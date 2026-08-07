@@ -26,6 +26,45 @@ The `curl`, `playfab`, `opus`, and `tremor` Meson options remain only to
 preserve the upstream option surface; enabling them does not produce a working
 online build.
 
+### Full upstream (CMake) option inventory
+
+For completeness, these are all the upstream CMake options and their status in
+this Meson port:
+
+| CMake option | Default | Meson status | Notes |
+|---|---|---|---|
+| `STEAMWORKS` | OFF | dropped | dead end (see above) |
+| `EOS` | OFF | dropped | dead end (see above) |
+| `PLAYFAB` | OFF | kept as inert option | dead end (see above) |
+| `THEORAPLAYER` | OFF | replaced by `theoraplay` | vendored TheoraPlay (C) |
+| `CURL` | OFF | kept as inert option | dead end (see above) |
+| `OPUS` | OFF | kept as inert option | dead end (see above) |
+| `FMOD_ENABLED` | ON | dropped | replaced by OpenAL |
+| `OPENAL_ENABLED` | OFF | `openal` (default ON) | the port's audio engine |
+| `TREMOR_ENABLED` | OFF | `tremor` (default OFF) | inert; libvorbis used |
+| `EDITOR_ENABLED` | ON | `editor` (default ON) | editor exe built |
+| `GAME_ENABLED` | ON | always on | game exe always built |
+| `DATA_DIR` | OFF | `base_data_dir` | install data dir; our port uses
+  `base_data_dir` option instead |
+| `PANDORA_ENABLED` | OFF | hardcoded 0 | OpenPandora handheld; not a target |
+| `OPTIMIZATION_LEVEL` | `-O3` | n/a (Meson `buildtype`) | GCC/Clang flag; Meson
+  handles optimization via `buildtype` |
+| `BARONY_WIN32_LIBRARIES` | env | n/a (vcpkg) | extra lib dir for VS; vcpkg
+  paths used instead |
+| `BARONY_DATADIR` | env | `base_data_dir` | VS debugger working dir; port uses
+  `-datadir` argument |
+| `NINTENDO` | n/a | never defined | Switch platform; desktop only |
+| `BUILD_ENV_*` (EOS/PlayFab) | env | empty | dead-end credentials |
+
+### Platforms
+
+- **Windows** — primary target, actively built/tested (MSVC + vcpkg debug).
+- **Linux / macOS** — build plumbing is in place (the Meson `host_system`
+  branches for `darwin`/`linux` set `APPLE`/`LINUX`, `-rpath`, `-malign-double`,
+  and the correct OpenGL linkage), but **untested** — no CI or local machine
+  available. The ports are kept and should work, but are unverified. Fixes
+  welcome if a platform issue surfaces.
+
 What *is* ported and verified against the retail Steam data dir:
 - OpenAL audio (replaces FMOD)
 - TheoraPlay .ogv sign video playback (vendored C library; retail ships 122
