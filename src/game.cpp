@@ -4314,21 +4314,6 @@ bool handleEvents(void)
 
 	while ( SDL_PollEvent(&event) )   // poll SDL events
 	{
-#ifdef USE_IMGUI
-		if ( ImGui_t::isInit )
-		{
-			ImGui_ImplSDL2_ProcessEvent(&event);
-#ifdef DEBUG_EVENT_TIMERS
-			time2 = std::chrono::high_resolution_clock::now();
-			accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-			if ( accum > 5 )
-			{
-				printlog("Large tick time: [4] %f", accum);
-			}
-			time1 = std::chrono::high_resolution_clock::now();
-#endif
-		}
-#endif
 		// Global events
 		switch ( event.type )
 		{
@@ -4589,12 +4574,6 @@ bool handleEvents(void)
 				if (demo_mode == DemoMode::PLAYING) {
 					break;
 				}
-#ifdef USE_IMGUI
-				if ( ImGui_t::requestingMouse() )
-				{
-					break;
-				}
-#endif // USE_IMGUI
 #ifdef APPLE
                 if ((keystatus[SDLK_LCTRL] || keystatus[SDLK_RCTRL]) && event.button.button == SDL_BUTTON_LEFT) {
                     mousestatus[SDL_BUTTON_RIGHT] = 1;
@@ -4629,12 +4608,6 @@ bool handleEvents(void)
 			    if (demo_mode == DemoMode::PLAYING) {
 			        break;
 			    }
-#ifdef USE_IMGUI
-				if ( ImGui_t::requestingMouse() )
-				{
-					break;
-				}
-#endif // USE_IMGUI
 				if ( event.wheel.y > 0 )
 				{
 					mousestatus[SDL_BUTTON_WHEELUP] = 1;
@@ -5642,15 +5615,6 @@ void ingameHud()
 		{
 			players[player]->bControlEnabled = true;
 		}
-#ifdef USE_IMGUI
-		if ( ImGui_t::isInit )
-		{
-			if ( ImGui_t::disablePlayerControl && player == clientnum )
-			{
-				players[player]->bControlEnabled = false;
-			}
-		}
-#endif
 		bool& bControlEnabled = players[player]->bControlEnabled;
 
 	    Input& input = Input::inputs[player];
@@ -7404,25 +7368,6 @@ int main(int argc, char** argv)
 			lastGameTickCount = SDL_GetPerformanceCounter();
 			DebugStats.t1StartLoop = std::chrono::high_resolution_clock::now();
 
-#ifdef USE_IMGUI
-			if ( ImGui_t::queueInit )
-			{
-				ImGui_t::queueInit = false;
-				if ( !ImGui_t::isInit )
-				{
-					ImGui_t::init();
-				}
-			}
-			if ( ImGui_t::queueDeinit )
-			{
-				ImGui_t::queueDeinit = false;
-				if ( ImGui_t::isInit )
-				{
-					ImGui_t::deinit();
-				}
-			}
-#endif
-
 			doConsoleCommands();
 
 			// game logic
@@ -7478,10 +7423,6 @@ int main(int argc, char** argv)
 #endif // USE_EOS
 
 			DebugStats.t3SteamCallbacks = std::chrono::high_resolution_clock::now();
-
-#ifdef USE_IMGUI
-			ImGui_t::update();
-#endif
 
 			for ( int i = 0; i < MAXPLAYERS; ++i )
 			{
@@ -7664,9 +7605,6 @@ int main(int argc, char** argv)
 						UIToastNotificationManager.drawNotifications(MainMenu::isCutsceneActive(), true); // draw this before the cursor
                         framesProcResult = doFrames();
 
-#ifdef USE_IMGUI
-						ImGui_t::render();
-#endif
 #ifndef NINTENDO
 						Compendium_t::updateTooltip();
 
@@ -8035,10 +7973,6 @@ int main(int argc, char** argv)
 				{
 					UIToastNotificationManager.drawNotifications(MainMenu::isCutsceneActive(), true); // draw this before the cursor
 				}
-
-#ifdef USE_IMGUI
-				ImGui_t::render();
-#endif
 
 #ifndef NINTENDO
 				for ( int i = 0; i < MAXPLAYERS; ++i )

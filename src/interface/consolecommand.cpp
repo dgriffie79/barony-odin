@@ -4986,25 +4986,6 @@ namespace ConsoleCommands {
 		}
 	});
 
-	static ConsoleCommand ccmd_imgui("/devmenu", "", []CCMD{
-		if ( !(svFlags & SV_FLAG_CHEATS) )
-		{
-			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
-			return;
-		}
-
-#ifdef USE_IMGUI
-		if ( ImGui_t::isInit )
-		{
-			ImGui_t::queueDeinit = true;
-		}
-		else
-		{
-			ImGui_t::queueInit = true;
-		}
-#endif
-	});
-
 	static ConsoleCommand ccmd_loadshopkeeperconsumables("/loadshopconsumables", "", []CCMD{
 #ifndef EDITOR
 		ShopkeeperConsumables_t::readFromFile();

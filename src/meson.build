@@ -204,15 +204,6 @@ audio_sources = files(
   'engine/audio/sound_game.cpp',
   'engine/audio/music.cpp',
 )
-imgui_sources = files(
-  'imgui/imgui.cpp',
-  'imgui/imgui_demo.cpp',
-  'imgui/imgui_draw.cpp',
-  'imgui/imgui_impl_opengl3.cpp',
-  'imgui/imgui_impl_sdl.cpp',
-  'imgui/imgui_tables.cpp',
-  'imgui/imgui_widgets.cpp',
-)
 
 # (engine/ has no direct sources; only engine/audio/)
 
@@ -228,7 +219,6 @@ inc = include_directories(
   'ui',
   'engine',
   'engine/audio',
-  'imgui',
 )
 
 # Config.hpp is generated into the build dir root by configure_file.
@@ -253,7 +243,7 @@ if opus_enabled
 endif
 
 barony = executable('barony',
-  game_sources + magic_sources + interface_sources + ui_sources + audio_sources + imgui_sources,
+  game_sources + magic_sources + interface_sources + ui_sources + audio_sources,
   include_directories : [inc, build_inc],
   dependencies : barony_deps,
   cpp_args : common_cpp_args + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
