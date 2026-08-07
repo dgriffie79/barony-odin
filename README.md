@@ -21,6 +21,11 @@ system here is Meson (the upstream uses CMake), and the following subsystems are
 - **Tremor** (`USE_TREMOR`) — fixed-point Vorbis decoder alternative to
   libvorbis for OpenAL music decoding. Off by default; libvorbis (float) is
   used instead. Harmless to leave off for the port.
+- **ImGui** (`USE_IMGUI`, `/devmenu`) — the cheat-gated debug overlay (console
+  command GUI + HUD frame-timer profiler). Removed from the reference entirely
+  (code + vendored `src/imgui/`): it is not worth porting, and the Odin port
+  would build any debug tooling natively. Note: upstream `IMGUI` Config define
+  is set to 0 here.
 
 The `curl`, `playfab`, `opus`, and `tremor` Meson options remain only to
 preserve the upstream option surface; enabling them does not produce a working
@@ -55,6 +60,7 @@ this Meson port:
   `-datadir` argument |
 | `NINTENDO` | n/a | never defined | Switch platform; desktop only |
 | `BUILD_ENV_*` (EOS/PlayFab) | env | empty | dead-end credentials |
+| `IMGUI` | 1 | set to 0 | removed; debug overlay not ported (see above) |
 
 ### Platforms
 
