@@ -8395,24 +8395,41 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 		THEORAPLAY_freeVideo(due);
 	}
 
-	// Drain decoded audio in bounded chunks (signs are silent; TheoraPlay
-	// decodes Vorbis in the .ogv and we must consume it so the audio queue
-	// doesn't fill up and stall the worker thread).
-	for ( int i = 0; i < 8; ++i )
+	// Drain decoded audio (signs are silent; TheoraPlay decodes Vorbis in the
+	// .ogv and we must consume it so the audio queue doesn't fill up and stall
+	// the worker thread). getAudio is non-blocking and mutex-protected, so
+	// draining all currently-queued audio is safe and ensures isDecoding()
+	// correctly reflects the video stream at EOS.
+	while ( THEORAPLAY_availableAudio(decoder) > 0 )
 	{
 		const THEORAPLAY_AudioPacket* audio = THEORAPLAY_getAudio(decoder);
 		if ( !audio ) { break; }
 		THEORAPLAY_freeAudio(audio);
 	}
 
-	// Loop: when decoding has finished and no frames remain, seek back to the
-	// start. THEORAPLAY_seek is thread-safe (the worker picks it up), avoiding
-	// the race of stopDecode + recreate. Rewind the playback clock so the
-	// timestamps stay consistent after the seek.
+	// Loop: when decoding has finished and no frames remain, the TheoraPlay
+	// worker thread has exited (thread_done) and can no longer process seeks,
+	// so we re-create the decoder to play the clip again. stopDecode is safe:
+	// it sets halt, joins the worker, then frees the queues. We keep started
+	// true so the previous frame stays on screen while the new decoder fills
+	// its queue -- the first new frame (playms 0) is due immediately once it
+	// arrives, giving a seamless loop.
 	if ( !THEORAPLAY_isDecoding(decoder) && THEORAPLAY_availableVideo(decoder) == 0 )
 	{
+		if ( pendingFrame )
+		{
+			THEORAPLAY_freeVideo(pendingFrame);
+			pendingFrame = nullptr;
+		}
+		THEORAPLAY_stopDecode(decoder);
+		decoder = THEORAPLAY_startDecodeFile(currentfilePath.c_str(), 16, THEORAPLAY_VIDFMT_RGBA, nullptr, 1);
+		if ( !decoder )
+		{
+			started = false;
+			return;
+		}
 		currentPlayTime = 0;
-		THEORAPLAY_seek(decoder, 0);
+		lastTime = SDL_GetTicks();
 	}
 }
 
