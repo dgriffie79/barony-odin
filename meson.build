@@ -84,9 +84,9 @@ add_project_arguments('-DBASE_DATA_DIR="' + base_data_dir + '"', language : 'cpp
 # Dependencies
 # ---------------------------------------------------------------------------
 sdl2 = dependency('sdl2', required : true)
-# SDL2's header redefines main->SDL_main; vcpkg puts SDL2main in manual-link/
-# (must be explicitly linked, it provides the real main() entry point).
-sdl2main = cc.find_library('SDL2main', dirs : ['C:/dev/vcpkg/installed/x64-windows/lib/manual-link'], required : true)
+# NOTE: SDL2main is intentionally NOT linked. SDL2's header redefines main->SDL_main
+# and SDL2main provides the real process main(); the Odin driver owns the entry point
+# and calls barony_main directly (SDL_MAIN_HANDLED + SDL_SetMainReady cover SDL).
 sdl2_image = dependency('SDL2_image', required : true)
 # SDL2_net ships no .pc with vcpkg; use its CMake config.
 sdl2_net = dependency('SDL2_net', method : 'cmake', required : true)

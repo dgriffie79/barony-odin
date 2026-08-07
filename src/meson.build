@@ -225,11 +225,19 @@ inc = include_directories(
 build_inc = include_directories('..')  # relative to src/ -> builddir/
 
 # The game + editor share most sources; editor uses -DEDITOR and a subset.
-# To keep things simple and correct, build each executable from its own list.
+# To keep things simple and correct, build each library from its own list.
+#
+# The C++ code is built as SHARED LIBRARIES (barony_game.dll / barony_editor.dll)
+# that the Odin driver (odin/game/main.odin, odin/editor/main.odin) foreign-imports
+# and calls into. The process entry point lives in Odin; the C++ entry point was
+# renamed main -> barony_main (see game.cpp / editor.cpp) and exported as
+# extern "C" BARONY_EXPORT. SDL_MAIN_HANDLED (meson_force_include.h) stops SDL
+# from hijacking main, and barony_main calls SDL_SetMainReady() itself, so
+# SDL2main must NOT be linked into the DLLs (it provides its own main()).
 
-# Game executable
+# Game shared library
 barony_deps = [
-  sdl2, sdl2main, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
+  sdl2, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
 ]
 barony_deps += audio_deps
 if theoraplay_enabled
@@ -242,25 +250,83 @@ if opus_enabled
   barony_deps += opus
 endif
 
-barony = executable('barony',
+barony_game_lib = shared_library('barony_game',
   game_sources + magic_sources + interface_sources + ui_sources + audio_sources,
   include_directories : [inc, build_inc],
   dependencies : barony_deps,
-  cpp_args : common_cpp_args + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
+  cpp_args : common_cpp_args + ['-DBARONY_BUILD_DLL'] + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
   link_args : common_link_args,
 )
 
-# Editor executable (optional)
+# Editor shared library (optional)
 if editor_enabled
   editor_deps = [
-    sdl2, sdl2main, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
+    sdl2, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
   ]
   editor_deps += audio_deps
-  editor = executable('editor',
+  barony_editor_lib = shared_library('barony_editor',
     editor_sources,
     include_directories : [inc, build_inc],
     dependencies : editor_deps,
-    cpp_args : common_cpp_args + ['-DEDITOR'],
+    cpp_args : common_cpp_args + ['-DBARONY_BUILD_DLL', '-DEDITOR'],
     link_args : common_link_args,
   )
+endif
+
+# ---------------------------------------------------------------------------
+# Odin drivers (the actual barony.exe / editor.exe)
+#
+# Odin owns the process entry point and calls barony_main() (the renamed C++
+# main, exported from barony_game.dll / barony_editor.dll). Each Odin exe is
+# built with `odin build` in a custom_target, output into builddir/src next to
+# the DLLs so the game runs from there.
+#
+# One Odin package (odin/: main.odin + game.odin + editor.odin) builds both
+# binaries: the game by default, the editor with -define:EDITOR=true.
+# game.odin imports ../builddir/src/barony_game.lib; editor.odin imports
+# ../builddir/src/barony_editor.lib (both relative to odin/, so no libs are
+# copied into the source tree).
+# ---------------------------------------------------------------------------
+if host_system == 'windows'
+  odin_exe = find_program('odin', 'C:/dev/odin/odin.exe', required : false)
+  if odin_exe.found()
+    odin_root = meson.current_source_dir() / '..' / 'odin'
+
+    # Odin exe for the game -> builddir/src/barony.exe
+    # (game.odin's foreign import resolves ../builddir/src/barony_game.lib
+    # relative to odin/)
+    odin_game_exe = custom_target('odin_game_exe',
+      output : 'barony.exe',
+      input : [
+        odin_root / 'main.odin',
+        odin_root / 'game.odin',
+      ],
+      depends : [barony_game_lib],
+      command : [
+        odin_exe, 'build', odin_root,
+        '-out:' + meson.current_build_dir() / 'barony.exe',
+        '-debug',
+      ],
+      build_by_default : true,
+    )
+
+    if editor_enabled
+      # Odin exe for the editor -> builddir/src/editor.exe
+      odin_editor_exe = custom_target('odin_editor_exe',
+        output : 'editor.exe',
+        input : [
+          odin_root / 'main.odin',
+          odin_root / 'editor.odin',
+        ],
+        depends : [barony_editor_lib],
+        command : [
+          odin_exe, 'build', odin_root,
+          '-out:' + meson.current_build_dir() / 'editor.exe',
+          '-debug',
+          '-define:EDITOR=true',
+        ],
+        build_by_default : true,
+      )
+    endif
+  endif
 endif

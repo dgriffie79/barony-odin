@@ -1561,8 +1561,13 @@ bool pasting = false;
 #include <mach-o/dyld.h> //For _NSGetExecutablePath()
 #endif
 
-int main(int argc, char** argv)
+// Renamed from main() -> barony_main() so the Odin driver can own the process
+// entry point and call into Barony as a library (extern "C" for the Odin
+// foreign import). SDL_SetMainReady() tells SDL we are the real entry point
+// (SDL_MAIN_HANDLED is defined in meson_force_include.h).
+extern "C" BARONY_EXPORT int barony_main(int argc, char** argv)
 {
+	SDL_SetMainReady();
 #ifdef APPLE
 	uint32_t buffsize = 4096;
 	char binarypath[buffsize];

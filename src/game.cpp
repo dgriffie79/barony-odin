@@ -7053,8 +7053,14 @@ static void doConsoleCommands() {
 #include <mach-o/dyld.h>
 #endif
 
-int main(int argc, char** argv)
+// Renamed from main() -> barony_main() so the Odin driver can own the process
+// entry point and call into Barony as a library (extern "C" for the Odin
+// foreign import). SDL_SetMainReady() tells SDL we are the real entry point
+// (SDL_MAIN_HANDLED is defined in meson_force_include.h, so SDL does not
+// redefine main -> SDL_main).
+extern "C" BARONY_EXPORT int barony_main(int argc, char** argv)
 {
+	SDL_SetMainReady();
 #ifdef WINDOWS
 	SetUnhandledExceptionFilter(unhandled_handler);
 #ifdef _DEBUG

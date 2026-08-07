@@ -10,4 +10,12 @@
 #ifdef GetObject
 #undef GetObject
 #endif
+// SDL_MAIN_HANDLED: stop SDL_main.h from doing `#define main SDL_main`.
+// The Odin driver provides the real process entry and calls barony_main
+// (the renamed C++ main) directly, so SDL must not hijack main(). Must be
+// defined before any SDL header is included (this file is force-included
+// via -FI on MSVC, before every TU).
+#ifndef SDL_MAIN_HANDLED
+#define SDL_MAIN_HANDLED
+#endif
 #endif

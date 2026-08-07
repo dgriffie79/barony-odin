@@ -12,6 +12,15 @@
 #pragma once
 #include "Config.hpp"
 
+// BARONY_EXPORT: dllexport for the C ABI entry point (barony_main) when
+// building Barony as a shared library that the Odin driver links against.
+// Outside a DLL build it's an empty macro (plain external symbol).
+#if defined(_WIN32) && defined(BARONY_BUILD_DLL)
+#define BARONY_EXPORT __declspec(dllexport)
+#else
+#define BARONY_EXPORT
+#endif
+
 #include <stdlib.h>
 //#ifdef WINDOWS
 //#ifdef _DEBUG
