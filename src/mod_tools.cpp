@@ -8383,28 +8383,22 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 		}
 	}
 
-	// Drain decoded audio (signs are silent; TheoraPlay decodes Vorbis in the
-	// .ogv and we must consume it so the audio queue doesn't fill up).
-	while ( THEORAPLAY_availableAudio(decoder) > 0 )
+	// Drain decoded audio in bounded chunks (signs are silent; TheoraPlay
+	// decodes Vorbis in the .ogv and we must consume it so the audio queue
+	// doesn't fill up and stall the worker thread).
+	for ( int i = 0; i < 8; ++i )
 	{
 		const THEORAPLAY_AudioPacket* audio = THEORAPLAY_getAudio(decoder);
 		if ( !audio ) { break; }
 		THEORAPLAY_freeAudio(audio);
 	}
 
-	// Loop: when decoding has finished and no frames remain, restart the file.
+	// Loop: when decoding has finished and no frames remain, seek back to the
+	// start. THEORAPLAY_seek is thread-safe (the worker picks it up), avoiding
+	// the race of stopDecode + recreate.
 	if ( !THEORAPLAY_isDecoding(decoder) && THEORAPLAY_availableVideo(decoder) == 0 )
 	{
-		const char* filename = currentfile.c_str();
-		const char* path = currentfilePath.c_str();
-		THEORAPLAY_stopDecode(decoder);
-		decoder = THEORAPLAY_startDecodeFile(path, 16, THEORAPLAY_VIDFMT_RGBA, nullptr, 1);
-		if ( decoder )
-		{
-			currentfile = filename;
-			currentfilePath = path;
-			started = false;
-		}
+		THEORAPLAY_seek(decoder, 0);
 	}
 }
 
