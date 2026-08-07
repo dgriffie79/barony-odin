@@ -83,3 +83,8 @@ xcode/Barony/Barony.xcodeproj/xcuserdata/*
 *.ilk
 /VS.2015/x64
 *.sqlite-journal
+
+# Meson build directory
+/builddir/
+meson-logs/
+meson-private/

@@ -972,5 +972,11 @@ char* getTimeAndDateFormatted(time_t t, char* buf, size_t size);
 #ifdef near
 #undef near
 #endif
+#ifdef GetObject
+#undef GetObject
+#endif
+#ifdef GetObjectA
+#undef GetObjectA
+#endif
 
 #define VERTEX_ARRAYS_ENABLED

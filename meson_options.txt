@@ -1,0 +1,18 @@
+option('openal', type : 'boolean', value : true,
+       description : 'Use OpenAL for the sound engine (required; FMOD removed in the Odin port)')
+option('tremor', type : 'boolean', value : false,
+       description : 'Use Tremor (fixed-point) instead of libvorbis for OpenAL decoding')
+option('theoraplay', type : 'boolean', value : false,
+       description : 'Enable TheoraPlay .ogv video playback for animated signs (vendored in third_party/theoraplay)')
+option('curl', type : 'boolean', value : false,
+       description : 'Enable libcurl (online features; required by playfab)')
+option('playfab', type : 'boolean', value : false,
+       description : 'Enable PlayFab telemetry (requires curl)')
+option('opus', type : 'boolean', value : false,
+       description : 'Enable Opus voice codec (only meaningful with FMOD voice chat, which is removed)')
+option('editor', type : 'boolean', value : true,
+       description : 'Build the level editor executable in addition to the game')
+option('base_data_dir', type : 'string', value : '',
+       description : 'Base data directory at runtime (defaults to the source directory)')
+option('vcpkg_root', type : 'string', value : 'C:/dev/vcpkg/installed/x64-windows',
+       description : 'vcpkg installed tree root (used to locate runtime DLLs for Windows builds)')

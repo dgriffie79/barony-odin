@@ -83,6 +83,21 @@ bool loadMusic()
 		fortressmusic = (FMOD::Sound**)malloc(sizeof(FMOD::Sound*) * NUMINTROMUSIC);
 		memset(fortressmusic, 0, sizeof(FMOD::Sound*) * NUMINTROMUSIC);
 	}
+#elif defined USE_OPENAL
+	// Allocate the OpenAL music buffer arrays. OPENAL_CreateStreamSound just
+	// records the file path; the actual decode/streaming happens at play time
+	// (openal_oggopen in OPENAL_CreateChannel).
+	if ( NUMMINESMUSIC > 0 ) { minesmusic = (OPENAL_BUFFER**)calloc(NUMMINESMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMSWAMPMUSIC > 0 ) { swampmusic = (OPENAL_BUFFER**)calloc(NUMSWAMPMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMLABYRINTHMUSIC > 0 ) { labyrinthmusic = (OPENAL_BUFFER**)calloc(NUMLABYRINTHMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMRUINSMUSIC > 0 ) { ruinsmusic = (OPENAL_BUFFER**)calloc(NUMRUINSMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMUNDERWORLDMUSIC > 0 ) { underworldmusic = (OPENAL_BUFFER**)calloc(NUMUNDERWORLDMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMHELLMUSIC > 0 ) { hellmusic = (OPENAL_BUFFER**)calloc(NUMHELLMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMMINOTAURMUSIC > 0 ) { minotaurmusic = (OPENAL_BUFFER**)calloc(NUMMINOTAURMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMCAVESMUSIC > 0 ) { cavesmusic = (OPENAL_BUFFER**)calloc(NUMCAVESMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMCITADELMUSIC > 0 ) { citadelmusic = (OPENAL_BUFFER**)calloc(NUMCITADELMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMINTROMUSIC > 0 ) { intromusic = (OPENAL_BUFFER**)calloc(NUMINTROMUSIC, sizeof(OPENAL_BUFFER*)); }
+	if ( NUMFORTRESSMUSIC > 0 ) { fortressmusic = (OPENAL_BUFFER**)calloc(NUMFORTRESSMUSIC, sizeof(OPENAL_BUFFER*)); }
 #endif
 
     bool introMusicChanged;
@@ -172,16 +187,6 @@ void playMusic(FMOD::Sound* sound, bool loop, bool crossfade, bool resume)
 	}
 }
 #endif
-
-bool shopmusicplaying = false;
-bool combatmusicplaying = false;
-bool minotaurmusicplaying = false;
-bool herxmusicplaying = false;
-bool devilmusicplaying = false;
-bool olddarkmap = false;
-bool sanctummusicplaying = false;
-
-int currenttrack = -1;
 
 #ifdef USE_FMOD
 void handleLevelMusic()

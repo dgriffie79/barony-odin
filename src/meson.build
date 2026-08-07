@@ -1,0 +1,276 @@
+# Barony game/editor sources (from the original CMakeLists.txt)
+
+# Root src/ files used by the game
+game_sources = files(
+  'main.cpp',
+  'init.cpp',
+  'collision.cpp',
+  'light.cpp',
+  'maps.cpp',
+  'cursors.cpp',
+  'draw.cpp',
+  'opengl.cpp',
+  'objects.cpp',
+  'list.cpp',
+  'files.cpp',
+  'items.cpp',
+  'paths.cpp',
+  'charclass.cpp',
+  'net.cpp',
+  'game.cpp',
+  'stat.cpp',
+  'acttorch.cpp',
+  'actplayer.cpp',
+  'actmonster.cpp',
+  'actitem.cpp',
+  'acthudweapon.cpp',
+  'actgold.cpp',
+  'actgib.cpp',
+  'actgeneral.cpp',
+  'actdoor.cpp',
+  'actladder.cpp',
+  'input.cpp',
+  'item_usage_funcs.cpp',
+  'entity.cpp',
+  'messages.cpp',
+  'actflame.cpp',
+  'actcampfire.cpp',
+  'actfountain.cpp',
+  'actsink.cpp',
+  'monster_rat.cpp',
+  'monster_goblin.cpp',
+  'monster_slime.cpp',
+  'monster_human.cpp',
+  'monster_scorpion.cpp',
+  'monster_succubus.cpp',
+  'monster_troll.cpp',
+  'monster_shopkeeper.cpp',
+  'monster_skeleton.cpp',
+  'monster_minotaur.cpp',
+  'monster_ghoul.cpp',
+  'monster_demon.cpp',
+  'monster_spider.cpp',
+  'monster_lich.cpp',
+  'monster_imp.cpp',
+  'monster_gnome.cpp',
+  'monster_devil.cpp',
+  'monster_automaton.cpp',
+  'monster_cockatrice.cpp',
+  'monster_crystalgolem.cpp',
+  'monster_goatman.cpp',
+  'monster_incubus.cpp',
+  'monster_insectoid.cpp',
+  'monster_kobold.cpp',
+  'monster_lichfire.cpp',
+  'monster_lichice.cpp',
+  'monster_scarab.cpp',
+  'monster_sentrybot.cpp',
+  'monster_shadow.cpp',
+  'monster_vampire.cpp',
+  'monster_mimic.cpp',
+  'monster_bugbear.cpp',
+  'monster_bat.cpp',
+  'shops.cpp',
+  'mechanisms.cpp',
+  'actgate.cpp',
+  'actchest.cpp',
+  'actsprite.cpp',
+  'menu.cpp',
+  'savepng.cpp',
+  'actarrow.cpp',
+  'actarrowtrap.cpp',
+  'actboulder.cpp',
+  'actheadstone.cpp',
+  'actthrown.cpp',
+  'actbeartrap.cpp',
+  'actspeartrap.cpp',
+  'actwallbuster.cpp',
+  'book.cpp',
+  'init_game.cpp',
+  'prng.cpp',
+  'scores.cpp',
+  'steam.cpp',
+  'hash.cpp',
+  'player.cpp',
+  'entity_shared.cpp',
+  'stat_shared.cpp',
+  'item_tool.cpp',
+  'actsummontrap.cpp',
+  'actpowercrystal.cpp',
+  'monster_shared.cpp',
+  'actpedestal.cpp',
+  'actteleporter.cpp',
+  'actmagictrap.cpp',
+  'steam_shared.cpp',
+  'mod_tools.cpp',
+  'json.cpp',
+  'eos.cpp',
+  'lobbies.cpp',
+  'shader.cpp',
+  'playfab.cpp',
+  'monster_d.cpp',
+  'monster_m.cpp',
+  'monster_s.cpp',
+  'monster_g.cpp',
+  'monster_summons.cpp',
+  'monster_moth.cpp',
+  'monster_duck.cpp',
+)
+
+# Editor sources (subset of src/, compiled with -DEDITOR)
+editor_sources = files(
+  'main.cpp',
+  'init.cpp',
+  'light.cpp',
+  'buttons.cpp',
+  'cursors.cpp',
+  'draw.cpp',
+  'opengl.cpp',
+  'objects.cpp',
+  'entity_editor.cpp',
+  'input.cpp',
+  'list.cpp',
+  'hash.cpp',
+  'files.cpp',
+  'editor.cpp',
+  'entity_shared.cpp',
+  'stat_editor.cpp',
+  'stat_shared.cpp',
+  'items_editor.cpp',
+  'steam_shared.cpp',
+  'json.cpp',
+  'eos_editor.cpp',
+  'mod_tools.cpp',
+  'prng.cpp',
+  'shader.cpp',
+  'ui/Button.cpp',
+  'ui/Field.cpp',
+  'ui/Font.cpp',
+  'ui/Frame.cpp',
+  'ui/Image.cpp',
+  'ui/Slider.cpp',
+  'ui/Text.cpp',
+  'ui/Widget.cpp',
+  'ui/LoadingScreen.cpp',
+  'engine/audio/defines.cpp',
+  'engine/audio/init_audio.cpp',
+  'engine/audio/sound.cpp',
+)
+
+# Subdirectory sources
+magic_sources = files(
+  'magic/magic.cpp',
+  'magic/actmagic.cpp',
+  'magic/spell.cpp',
+  'magic/setupSpells.cpp',
+  'magic/act_HandMagic.cpp',
+  'magic/castSpell.cpp',
+)
+interface_sources = files(
+  'interface/interface.cpp',
+  'interface/screenshot.cpp',
+  'interface/clickdescription.cpp',
+  'interface/consolecommand.cpp',
+  'interface/drawminimap.cpp',
+  'interface/drawstatus.cpp',
+  'interface/magicgui.cpp',
+  'interface/updatecharactersheet.cpp',
+  'interface/updaterightsidebar.cpp',
+  'interface/updatechestinventory.cpp',
+  'interface/identify_and_appraise.cpp',
+  'interface/playerinventory.cpp',
+  'interface/bookgui.cpp',
+  'interface/shopgui.cpp',
+  'interface/removecurse.cpp',
+  'interface/ui_general.cpp',
+)
+ui_sources = files(
+  'ui/Button.cpp',
+  'ui/Field.cpp',
+  'ui/Font.cpp',
+  'ui/Frame.cpp',
+  'ui/Image.cpp',
+  'ui/Slider.cpp',
+  'ui/Text.cpp',
+  'ui/Widget.cpp',
+  'ui/GameUI.cpp',
+  'ui/LoadingScreen.cpp',
+  'ui/MainMenu.cpp',
+)
+audio_sources = files(
+  'engine/audio/defines.cpp',
+  'engine/audio/init_audio.cpp',
+  'engine/audio/sound.cpp',
+  'engine/audio/sound_game.cpp',
+  'engine/audio/music.cpp',
+)
+imgui_sources = files(
+  'imgui/imgui.cpp',
+  'imgui/imgui_demo.cpp',
+  'imgui/imgui_draw.cpp',
+  'imgui/imgui_impl_opengl3.cpp',
+  'imgui/imgui_impl_sdl.cpp',
+  'imgui/imgui_tables.cpp',
+  'imgui/imgui_widgets.cpp',
+)
+
+# (engine/ has no direct sources; only engine/audio/)
+
+# ---------------------------------------------------------------------------
+# Executables
+# ---------------------------------------------------------------------------
+
+# Shared include dirs (so #include "Config.hpp", "main.hpp", subdir headers work)
+inc = include_directories(
+  '.',
+  'magic',
+  'interface',
+  'ui',
+  'engine',
+  'engine/audio',
+  'imgui',
+)
+
+# Config.hpp is generated into the build dir root by configure_file.
+build_inc = include_directories('..')  # relative to src/ -> builddir/
+
+# The game + editor share most sources; editor uses -DEDITOR and a subset.
+# To keep things simple and correct, build each executable from its own list.
+
+# Game executable
+barony_deps = [
+  sdl2, sdl2main, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
+]
+barony_deps += audio_deps
+if theoraplay_enabled
+  barony_deps += theoraplay_dep
+endif
+if curl_enabled
+  barony_deps += curl
+endif
+if opus_enabled
+  barony_deps += opus
+endif
+
+barony = executable('barony',
+  game_sources + magic_sources + interface_sources + ui_sources + audio_sources + imgui_sources,
+  include_directories : [inc, build_inc],
+  dependencies : barony_deps,
+  cpp_args : common_cpp_args,
+  link_args : common_link_args,
+)
+
+# Editor executable (optional)
+if editor_enabled
+  editor_deps = [
+    sdl2, sdl2main, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
+  ]
+  editor_deps += audio_deps
+  editor = executable('editor',
+    editor_sources,
+    include_directories : [inc, build_inc],
+    dependencies : editor_deps,
+    cpp_args : common_cpp_args + ['-DEDITOR'],
+    link_args : common_link_args,
+  )
+endif

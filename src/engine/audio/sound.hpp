@@ -497,12 +497,15 @@ extern int openal_maxchannels;
 
 extern bool levelmusicplaying;
 
+extern int currenttrack; // track index for handleLevelMusic (defined in defines.cpp)
+
 extern bool shopmusicplaying;
 extern bool combatmusicplaying;
 extern bool minotaurmusicplaying;
 extern bool herxmusicplaying;
 extern bool devilmusicplaying;
 extern bool olddarkmap;
+extern bool sanctummusicplaying;
 extern bool sfxUseDynamicAmbientVolume, sfxUseDynamicEnvironmentVolume;
 
 struct OPENAL_CHANNELGROUP;
@@ -540,9 +543,11 @@ extern OPENAL_BUFFER* sokobanmusic;
 extern OPENAL_BUFFER* caveslairmusic;
 extern OPENAL_BUFFER* bramscastlemusic;
 extern OPENAL_BUFFER* hamletmusic;
+extern OPENAL_BUFFER** fortressmusic;
 #define NUMCAVESMUSIC 3
 #define NUMCITADELMUSIC 3
 #define NUMINTROMUSIC 3
+#define NUMFORTRESSMUSIC 2
 //TODO: Automatically scan the music folder for a mines subdirectory and use all the music for the mines or something like that. I'd prefer something neat like for that loading music for a level, anyway. And I can just reuse the code I had for ORR.
 
 extern OPENAL_SOUND* music_channel, *music_channel2, *music_resume; //TODO: List of music, play first one, fade out all the others? Eh, maybe some other day. //music_resume is the music to resume after, say, combat or shops. //TODO: Clear music_resume every biome change. Or otherwise validate it for that level set.
@@ -561,8 +566,11 @@ OPENAL_SOUND* playSoundEntity(Entity* entity, Uint16 snd, Uint8 vol);
 OPENAL_SOUND* playSoundEntityLocal(Entity* entity, Uint16 snd, Uint8 vol);
 OPENAL_SOUND* playSound(Uint16 snd, Uint8 vol);
 OPENAL_SOUND* playSoundVelocity(); //TODO: Write.
+OPENAL_SOUND* playSoundNotification(Uint16 snd, Uint8 vol);
+OPENAL_SOUND* playSoundNotificationPlayer(int player, Uint16 snd, Uint8 vol);
 
-void playmusic(OPENAL_BUFFER* sound, bool loop, bool crossfade, bool resume); //Automatically crossfades. NOTE: Resets fadein and fadeout increments to the defaults every time it is called. You'll have to change the fadein and fadeout increments AFTER calling this function.
+void stopMusic();
+void playMusic(OPENAL_BUFFER* sound, bool loop, bool crossfade, bool resume); //Automatically crossfades. NOTE: Resets fadein and fadeout increments to the defaults every time it is called. You'll have to change the fadein and fadeout increments AFTER calling this function.
 
 void handleLevelMusic(); //Manages and updates the level music.
 

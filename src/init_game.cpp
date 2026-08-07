@@ -613,10 +613,7 @@ void deinitGame()
 		safePacketsReceivedMap[c].clear();
 	}
 #ifdef SOUND
-#ifdef USE_OPENAL //TODO: OpenAL is now all of the broken...
-#define FMOD_Channel_Stop OPENAL_Channel_Stop
-#define FMOD_Sound_Release OPENAL_Sound_Release
-#endif
+#ifdef USE_FMOD
 	if ( !no_sound )
 	{
 		music_channel->stop();
@@ -642,102 +639,58 @@ void deinitGame()
 		tutorialmusic->release();
 		gameovermusic->release();
 		introstorymusic->release();
-#ifdef USE_FMOD
 		ensembleSounds.deinit();
-#endif
-
-		for ( int c = 0; c < NUMMINESMUSIC; c++ )
-		{
-			minesmusic[c]->release();
-		}
-		if ( minesmusic )
-		{
-			free(minesmusic);
-		}
-		for ( int c = 0; c < NUMSWAMPMUSIC; c++ )
-		{
-			swampmusic[c]->release();
-		}
-		if ( swampmusic )
-		{
-			free(swampmusic);
-		}
-		for ( int c = 0; c < NUMLABYRINTHMUSIC; c++ )
-		{
-			labyrinthmusic[c]->release();
-		}
-		if ( labyrinthmusic )
-		{
-			free(labyrinthmusic);
-		}
-		for ( int c = 0; c < NUMRUINSMUSIC; c++ )
-		{
-			ruinsmusic[c]->release();
-		}
-		if ( ruinsmusic )
-		{
-			free(ruinsmusic);
-		}
-		for ( int c = 0; c < NUMUNDERWORLDMUSIC; c++ )
-		{
-			underworldmusic[c]->release();
-		}
-		if ( underworldmusic )
-		{
-			free(underworldmusic);
-		}
-		for ( int c = 0; c < NUMHELLMUSIC; c++ )
-		{
-			hellmusic[c]->release();
-		}
-		if ( hellmusic )
-		{
-			free(hellmusic);
-		}
-		for ( int c = 0; c < NUMMINOTAURMUSIC; c++ )
-		{
-			minotaurmusic[c]->release();
-		}
-		if ( minotaurmusic )
-		{
-			free(minotaurmusic);
-		}
-		for ( int c = 0; c < NUMCAVESMUSIC; c++ )
-		{
-			cavesmusic[c]->release();
-		}
-		if ( cavesmusic )
-		{
-			free(cavesmusic);
-		}
-		for ( int c = 0; c < NUMCITADELMUSIC; c++ )
-		{
-			citadelmusic[c]->release();
-		}
-		if ( citadelmusic )
-		{
-			free(citadelmusic);
-		}
-		for ( int c = 0; c < NUMINTROMUSIC; c++ )
-		{
-			intromusic[c]->release();
-		}
-		if ( intromusic )
-		{
-			free(intromusic);
-		}
-		for ( int c = 0; c < NUMFORTRESSMUSIC; c++ )
-		{
-			fortressmusic[c]->release();
-		}
-		if ( fortressmusic )
-		{
-			free(fortressmusic);
-		}
+		for ( int c = 0; c < NUMMINESMUSIC; c++ ) { minesmusic[c]->release(); } if ( minesmusic ) { free(minesmusic); }
+		for ( int c = 0; c < NUMSWAMPMUSIC; c++ ) { swampmusic[c]->release(); } if ( swampmusic ) { free(swampmusic); }
+		for ( int c = 0; c < NUMLABYRINTHMUSIC; c++ ) { labyrinthmusic[c]->release(); } if ( labyrinthmusic ) { free(labyrinthmusic); }
+		for ( int c = 0; c < NUMRUINSMUSIC; c++ ) { ruinsmusic[c]->release(); } if ( ruinsmusic ) { free(ruinsmusic); }
+		for ( int c = 0; c < NUMUNDERWORLDMUSIC; c++ ) { underworldmusic[c]->release(); } if ( underworldmusic ) { free(underworldmusic); }
+		for ( int c = 0; c < NUMHELLMUSIC; c++ ) { hellmusic[c]->release(); } if ( hellmusic ) { free(hellmusic); }
+		for ( int c = 0; c < NUMMINOTAURMUSIC; c++ ) { minotaurmusic[c]->release(); } if ( minotaurmusic ) { free(minotaurmusic); }
+		for ( int c = 0; c < NUMCAVESMUSIC; c++ ) { cavesmusic[c]->release(); } if ( cavesmusic ) { free(cavesmusic); }
+		for ( int c = 0; c < NUMCITADELMUSIC; c++ ) { citadelmusic[c]->release(); } if ( citadelmusic ) { free(citadelmusic); }
+		for ( int c = 0; c < NUMINTROMUSIC; c++ ) { intromusic[c]->release(); } if ( intromusic ) { free(intromusic); }
+		for ( int c = 0; c < NUMFORTRESSMUSIC; c++ ) { fortressmusic[c]->release(); } if ( fortressmusic ) { free(fortressmusic); }
 	}
-#ifdef USE_OPENAL
-#undef FMOD_Channel_Stop
-#undef FMOD_Sound_Release
+#elif defined USE_OPENAL
+	if ( !no_sound )
+	{
+		// OPENAL_BUFFER/OPENAL_SOUND are C structs; use the wrapper functions.
+		OPENAL_Channel_Stop(music_channel);
+		OPENAL_Channel_Stop(music_channel2);
+		OPENAL_Sound_Release(introductionmusic);
+		OPENAL_Sound_Release(intermissionmusic);
+		OPENAL_Sound_Release(minetownmusic);
+		OPENAL_Sound_Release(splashmusic);
+		OPENAL_Sound_Release(librarymusic);
+		OPENAL_Sound_Release(shopmusic);
+		OPENAL_Sound_Release(herxmusic);
+		OPENAL_Sound_Release(templemusic);
+		OPENAL_Sound_Release(endgamemusic);
+		OPENAL_Sound_Release(escapemusic);
+		OPENAL_Sound_Release(devilmusic);
+		OPENAL_Sound_Release(sanctummusic);
+		OPENAL_Sound_Release(gnomishminesmusic);
+		OPENAL_Sound_Release(greatcastlemusic);
+		OPENAL_Sound_Release(sokobanmusic);
+		OPENAL_Sound_Release(caveslairmusic);
+		OPENAL_Sound_Release(bramscastlemusic);
+		OPENAL_Sound_Release(hamletmusic);
+		OPENAL_Sound_Release(tutorialmusic);
+		OPENAL_Sound_Release(gameovermusic);
+		OPENAL_Sound_Release(introstorymusic);
+		for ( int c = 0; c < NUMMINESMUSIC; c++ ) { OPENAL_Sound_Release(minesmusic[c]); } if ( minesmusic ) { free(minesmusic); }
+		for ( int c = 0; c < NUMSWAMPMUSIC; c++ ) { OPENAL_Sound_Release(swampmusic[c]); } if ( swampmusic ) { free(swampmusic); }
+		for ( int c = 0; c < NUMLABYRINTHMUSIC; c++ ) { OPENAL_Sound_Release(labyrinthmusic[c]); } if ( labyrinthmusic ) { free(labyrinthmusic); }
+		for ( int c = 0; c < NUMRUINSMUSIC; c++ ) { OPENAL_Sound_Release(ruinsmusic[c]); } if ( ruinsmusic ) { free(ruinsmusic); }
+		for ( int c = 0; c < NUMUNDERWORLDMUSIC; c++ ) { OPENAL_Sound_Release(underworldmusic[c]); } if ( underworldmusic ) { free(underworldmusic); }
+		for ( int c = 0; c < NUMHELLMUSIC; c++ ) { OPENAL_Sound_Release(hellmusic[c]); } if ( hellmusic ) { free(hellmusic); }
+		for ( int c = 0; c < NUMMINOTAURMUSIC; c++ ) { OPENAL_Sound_Release(minotaurmusic[c]); } if ( minotaurmusic ) { free(minotaurmusic); }
+		for ( int c = 0; c < NUMCAVESMUSIC; c++ ) { OPENAL_Sound_Release(cavesmusic[c]); } if ( cavesmusic ) { free(cavesmusic); }
+		for ( int c = 0; c < NUMCITADELMUSIC; c++ ) { OPENAL_Sound_Release(citadelmusic[c]); } if ( citadelmusic ) { free(citadelmusic); }
+		for ( int c = 0; c < NUMINTROMUSIC; c++ ) { OPENAL_Sound_Release(intromusic[c]); } if ( intromusic ) { free(intromusic); }
+		for ( int c = 0; c < NUMFORTRESSMUSIC; c++ ) { OPENAL_Sound_Release(fortressmusic[c]); } if ( fortressmusic ) { free(fortressmusic); }
+	}
 #endif
 #endif
 

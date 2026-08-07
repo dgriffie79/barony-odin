@@ -436,6 +436,81 @@ OPENAL_SOUND* playSoundPlayer(int player, Uint16 snd, Uint8 vol)
 
 /*-------------------------------------------------------------------------------
 
+	playSoundNotificationPlayer
+
+	Plays a global notification sound on the given player's channel.
+
+-------------------------------------------------------------------------------*/
+
+OPENAL_SOUND* playSoundNotificationPlayer(int player, Uint16 snd, Uint8 vol)
+{
+	if (no_sound)
+	{
+		return NULL;
+	}
+
+	if ( player < 0 || player >= MAXPLAYERS )
+	{
+		return NULL;
+	}
+	if ( players[player]->isLocalPlayer() )
+	{
+		return playSoundNotification(snd, vol);
+	}
+	else if ( multiplayer == SERVER && vol > 0 )
+	{
+		if ( client_disconnected[player] || player <= 0 )
+		{
+			return NULL;
+		}
+		memcpy(net_packet->data, "SNDN", 4);
+		SDLNet_Write16(snd, &net_packet->data[4]);
+		net_packet->data[6] = vol;
+		net_packet->address.host = net_clients[player - 1].host;
+		net_packet->address.port = net_clients[player - 1].port;
+		net_packet->len = 7;
+		sendPacketSafe(net_sock, -1, net_packet, player - 1);
+		return NULL;
+	}
+
+	return NULL;
+}
+
+/*-------------------------------------------------------------------------------
+
+	playSoundNotification
+
+	Plays a global notification sound (UI blips etc.), attached to the
+	notification channel group so it isn't positional.
+
+-------------------------------------------------------------------------------*/
+
+OPENAL_SOUND* playSoundNotification(Uint16 snd, Uint8 vol)
+{
+	if (no_sound)
+	{
+		return NULL;
+	}
+#ifndef SOUND
+	return NULL;
+#endif
+	if ( !openal_context || snd < 0 || snd >= numsounds || !getChannelGroupForSoundIndex(snd) )
+	{
+		return NULL;
+	}
+	if ( sounds[snd] == NULL || vol == 0 )
+	{
+		return NULL;
+	}
+	OPENAL_SOUND* channel = OPENAL_CreateChannel(sounds[snd]);
+	OPENAL_Channel_SetVolume(channel, vol / 255.f);
+	OPENAL_Channel_SetChannelGroup(channel, music_notification_group);
+	OPENAL_Channel_Play(channel);
+	return channel;
+}
+
+/*-------------------------------------------------------------------------------
+
 	playSoundPos
 
 	plays a sound effect with the given volume at the given
@@ -672,16 +747,6 @@ void playMusic(OPENAL_BUFFER* sound, bool loop, bool crossfade, bool resume)
 	}
 	OPENAL_Channel_Play(music_channel);
 }
-
-bool shopmusicplaying = false;
-bool combatmusicplaying = false;
-bool minotaurmusicplaying = false;
-bool herxmusicplaying = false;
-bool devilmusicplaying = false;
-bool olddarkmap = false;
-bool sanctummusicplaying = false;
-
-int currenttrack = -1;
 
 void handleLevelMusic()
 {

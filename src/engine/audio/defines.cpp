@@ -14,6 +14,17 @@
 
 Uint32 numsounds = 0;
 
+// Shared music state (used by both FMOD and OpenAL paths, and the editor).
+bool levelmusicplaying = false;
+bool shopmusicplaying = false;
+bool combatmusicplaying = false;
+bool minotaurmusicplaying = false;
+bool herxmusicplaying = false;
+bool devilmusicplaying = false;
+bool olddarkmap = false;
+bool sanctummusicplaying = false;
+int currenttrack = -1;
+
 #ifdef USE_FMOD
 FMOD::System* fmod_system = nullptr;
 
@@ -56,7 +67,6 @@ FMOD::Sound* hamletmusic = nullptr;
 FMOD::Sound* tutorialmusic = nullptr;
 FMOD::Sound* gameovermusic = nullptr;
 FMOD::Sound* introstorymusic = nullptr;
-bool levelmusicplaying = false;
 
 FMOD::Channel* music_channel = nullptr;
 FMOD::Channel* music_channel2 = nullptr;
