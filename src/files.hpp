@@ -15,13 +15,16 @@
 #include <string>
 #include <vector>
 #include <cstdio>
+#include <cassert>
+#include <cstdint>
 #include <dirent.h>
 
 #include "main.hpp"
 
-//This class provides a common platform-independent interface for file accesses. Deriving classes must provide an implementation for all of these methods, but may make use of any common routines or common portions of routines.
-//Don't create a FileBase or derivative class directly, use FileIO::open to get one...
-class FileBase {
+//This class provides a common platform-independent interface for file accesses.
+//It is a single concrete class (no virtual dispatch) - the PC implementation.
+//Don't create a File directly, use FileIO::open to get one...
+class File {
 	friend class FileIO;
 
 public:
@@ -30,24 +33,53 @@ public:
 	// @param size the size of each data element in bytes
 	// @param count the number of data elements to write
 	// @return the number of bytes written
-	// The base class only contains the common implementation between FileNX and FilePC (currently just input validation), not a default implementation, so deriving implementation is mandatory.
-	virtual size_t write(const void* src, size_t size, size_t count) = 0;
+	size_t write(const void* src, size_t size, size_t count)
+	{
+		if (mode != FileMode::WRITE || nullptr == src)
+		{
+			return 0U;
+		}
+		const size_t writeSize = size * count;
+		(void)data.insert(data.begin() + pos, (const uint8_t*)src, (const uint8_t*)src + writeSize);
+		pos += writeSize;
+		return writeSize / size;
+	}
 
 	// read data into the given buffer
 	// @param buffer the buffer to read into
 	// @param size the size of each data element in bytes
 	// @param count the number of data elements to read
 	// @return the number of bytes read
-	// The base class only contains the common implementation between FileNX and FilePC (currently just input validation), not a default implementation, so deriving implementation is mandatory.
-	virtual size_t read(void* buffer, size_t size, size_t count) = 0;
+	size_t read(void* buffer, size_t size, size_t count)
+	{
+		if (mode != FileMode::READ || nullptr == buffer)
+		{
+			return 0U;
+		}
+		size_t readSize = 0U;
+		size_t end = std::min(this->size(), pos + size * count);
+		uint8_t* buf = (uint8_t*)buffer;
+		for (size_t c = pos; c < end; ++c) {
+			*buf = data[c]; ++buf;
+			++readSize;
+		}
+		pos += readSize;
+		return readSize / size;
+	}
 
 	// get the size of the file
 	// @return the size in bytes
-	virtual size_t size() = 0;
+	size_t size()
+	{
+		return data.size();
+	}
 
 	// determine whether we have reached the end of the file or not
 	// @return true if we are at the end of the file, otherwise false
-	virtual bool eof() = 0;
+	bool eof()
+	{
+		return pos >= size();
+	}
 
 	// read a string from the file, culling newlines
 	// @param buf the buffer to contain the read string
@@ -169,16 +201,31 @@ public:
 	// @param offset how much to move the stream, or where
 	// @param mode The seek mode
 	// @return 0 on success, non-zero on error
-	virtual int seek(ptrdiff_t offset, SeekMode mode) = 0;
+	int seek(ptrdiff_t offset, SeekMode mode)
+	{
+		switch (mode) {
+		case SeekMode::SET: pos = offset; break;
+		case SeekMode::ADD: pos += offset; break;
+		case SeekMode::SETEND: pos = size() + offset; break;
+		}
+		if (eof()) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
 
 	// get the current offset into the stream
 	// @return the offset into the stream, in bytes
-	virtual long int tell() = 0;
+	long int tell()
+	{
+		return (long int)pos;
+	}
 
 	// sets the file position back to the start of the file.
 	void rewind()
 	{
-		seek(0, FileBase::SeekMode::SET);
+		seek(0, File::SeekMode::SET);
 	}
 
 	// file mode
@@ -189,31 +236,73 @@ public:
 		WRITE		// file set for write mode
 	};
 
-protected:
-	FileMode mode = FileMode::INVALID;
-	std::string path;
-
-	FileBase(FileMode mode, const char* path) :
-		mode(mode),
-		path(path)
+	// close the file, after this point no ops are valid
+	void close()
 	{
+	    assert(fp);
+	    if (mode == FileMode::WRITE) {
+	        size_t c = 0u;
+	        size_t end = size();
+		    for (; c < end;) {
+		        size_t result = fwrite(data.data(), sizeof(uint8_t), end - c, fp);
+		        if (!result) {
+		            // failed to write, try to write just a chunk
+		            constexpr size_t chunk_size = 1024;
+		            size_t chunk = std::min(end - c, chunk_size);
+		            printlog("[FILES] failed to write %llu bytes to '%s', trying %llu bytes instead", end - c, path.c_str(), chunk);
+		            result = fwrite(data.data(), sizeof(uint8_t), chunk, fp);
+		            assert(result);
+		        }
+		        c += result;
+		    }
+	        assert(c == end);
+	    }
+		int result = fclose(fp);
+		assert(result == 0);
 	}
-	virtual ~FileBase() { }
 
 private:
-	// close the file, after this point no ops are valid
-	virtual void close() = 0;
+	File(FILE* fp, FileMode mode, const char* path) :
+		mode(mode),
+		path(path),
+		fp(fp)
+	{
+	    assert(fp);
+	    if (mode == FileMode::READ) {
+		    (void)fseek(fp, 0, SEEK_END);
+		    size_t end = ftell(fp);
+		    (void)fseek(fp, 0, SEEK_SET);
+		    data.resize(end);
+		    size_t c = 0;
+		    for (; c < end;) {
+		        size_t result = fread(data.data(), sizeof(uint8_t), end - c, fp);
+		        if (!result) {
+		            // failed to read, try to read just a chunk
+		            constexpr size_t chunk_size = 1024;
+		            size_t chunk = std::min(end - c, chunk_size);
+		            printlog("[FILES] failed to read %llu bytes from '%s', trying %llu bytes instead", end - c, path, chunk);
+		            result = fread(data.data(), sizeof(uint8_t), chunk, fp);
+		            assert(result);
+		        }
+		        c += result;
+		    }
+	        assert(c == end);
+		}
+	}
+
+	~File()
+	{
+	}
+
+	FileMode mode = FileMode::INVALID;
+	std::string path;
+	FILE* fp = nullptr;
+	std::vector<uint8_t> data;
+	size_t pos = 0u;
 };
 
-#ifdef NINTENDO
- #include "nintendo/filenx.hpp"
- typedef FileNX File;
-#else
- #include "engine/filepc.hpp"
- typedef FilePC File;
-#endif
 
-//Don't create a FileBase or derivative class directly, use this to get one...
+//Don't create a File directly, use this to get one...
 class FileIO {
 private:
 	FileIO() {}
@@ -230,30 +319,26 @@ public:
 			return nullptr;
 		}
 
-		FileBase::FileMode fileMode;
+		File::FileMode fileMode;
 		switch (mode[0])
 		{
-		case 'r': fileMode = FileBase::FileMode::READ; break;
-		case 'w': fileMode = FileBase::FileMode::WRITE; break;
-		default: fileMode = FileBase::FileMode::INVALID; break;
+		case 'r': fileMode = File::FileMode::READ; break;
+		case 'w': fileMode = File::FileMode::WRITE; break;
+		default: fileMode = File::FileMode::INVALID; break;
 		}
 
-#ifdef NINTENDO
-		return FileNX::FileIO_NintendoOpen(path, mode, fileMode);
-#else
         // note: on PC, files are ALWAYS opened in binary mode
 		FILE* fp;
 		switch (fileMode) {
 		default: assert(0 && "invalid file open mode");
-		case FileBase::FileMode::READ: fp = fopen(path, "rb"); break;
-		case FileBase::FileMode::WRITE: fp = fopen(path, "wb"); break;
+		case File::FileMode::READ: fp = fopen(path, "rb"); break;
+		case File::FileMode::WRITE: fp = fopen(path, "wb"); break;
 		}
 		if (fp) {
 			return new File(fp, fileMode, path);
 		} else {
 			return nullptr;
 		}
-#endif
 	}
 
 	// close the given file

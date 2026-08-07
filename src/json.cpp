@@ -469,7 +469,7 @@ private:
 static EFileFormat GetFileFormat(File * file) {
 	Uint32 fileFormatTag = 0;
 	file->read(&fileFormatTag, sizeof(fileFormatTag), 1);
-	file->seek(0, FileBase::SeekMode::SET);
+	file->seek(0, File::SeekMode::SET);
 
 	if (fileFormatTag == BinaryFormatTag) {
 		return EFileFormat::Binary;

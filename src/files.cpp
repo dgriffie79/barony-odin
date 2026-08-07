@@ -6063,21 +6063,3 @@ void physfsReloadSystemImages()
 		}
 	}
 }
-
-size_t FileBase::write(const void* src, size_t size, size_t count)
-{
-	if (mode != FileMode::WRITE || nullptr == src)
-	{
-		return 0U;
-	}
-	return 1U; //Input validation passed.
-}
-
-size_t FileBase::read(void* buffer, size_t size, size_t count)
-{
-	if (mode != FileMode::READ || nullptr == buffer)
-	{
-		return 0U;
-	}
-	return 1U; //Input validation passed.
-}
