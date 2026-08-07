@@ -8166,21 +8166,64 @@ void VideoManager_t::drawAsFrameCallback(const Widget& widget, SDL_Rect frameSiz
 
 	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
-		// Lazily create the upload textures from the first frame's dimensions,
-		// so the draw path never uploads into an uninitialized (0) texture.
-		// (updateCurrentClip's "wait for 8 frames" gate may not have run yet.)
+		// Pop at most one frame per draw. If its timestamp hasn't been reached
+		// yet, we can't put it back (getVideo removes it), so we hold it as
+		// pendingFrame and upload it on a later draw when currentPlayTime
+		// catches up. This paces playback by playms, not render FPS.
+		if ( frame->playms > currentPlayTime )
+		{
+			if ( pendingFrame )
+			{
+				THEORAPLAY_freeVideo(pendingFrame);
+			}
+			pendingFrame = frame;
+			frame = nullptr;
+		}
+		else
+		{
+			if ( pendingFrame )
+			{
+				THEORAPLAY_freeVideo(pendingFrame);
+				pendingFrame = nullptr;
+			}
+			// Lazily create the upload textures from the first frame's dimensions,
+			// so the draw path never uploads into an uninitialized (0) texture.
+			if (textureId1 == 0) {
+				videoWidth = (int)frame->width;
+				videoHeight = (int)frame->height;
+				textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				whichTexture = false;
+			}
+			GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
+			GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+				frame->width, frame->height, GL_RGBA,
+				GL_UNSIGNED_BYTE, frame->pixels));
+			THEORAPLAY_freeVideo(frame);
+		}
+	}
+	else if ( pendingFrame && pendingFrame->playms <= currentPlayTime )
+	{
+		// No new frame but our held frame is now due: display it.
 		if (textureId1 == 0) {
-			videoWidth = (int)frame->width;
-			videoHeight = (int)frame->height;
+			videoWidth = (int)pendingFrame->width;
+			videoHeight = (int)pendingFrame->height;
 			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
 			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
 			whichTexture = false;
 		}
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
-        GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-            frame->width, frame->height, GL_RGBA,
-            GL_UNSIGNED_BYTE, frame->pixels));
-		THEORAPLAY_freeVideo(frame);
+		GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+			pendingFrame->width, pendingFrame->height, GL_RGBA,
+			GL_UNSIGNED_BYTE, pendingFrame->pixels));
+		whichTexture = !whichTexture;
+		THEORAPLAY_freeVideo(pendingFrame);
+		pendingFrame = nullptr;
+	}
+
+	if ( frame )
+	{
+		whichTexture = !whichTexture;
 	}
 
 	// TheoraPlay gives full frames (no subframe cropping).
@@ -8250,19 +8293,55 @@ void VideoManager_t::draw()
     
 	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
-		// Same lazy texture init as drawAsFrameCallback.
+		// Same pacing as drawAsFrameCallback: hold frames whose timestamp
+		// hasn't been reached yet.
+		if ( frame->playms > currentPlayTime )
+		{
+			if ( pendingFrame )
+			{
+				THEORAPLAY_freeVideo(pendingFrame);
+			}
+			pendingFrame = frame;
+			frame = nullptr;
+		}
+		else
+		{
+			if ( pendingFrame )
+			{
+				THEORAPLAY_freeVideo(pendingFrame);
+				pendingFrame = nullptr;
+			}
+			if (textureId1 == 0) {
+				videoWidth = (int)frame->width;
+				videoHeight = (int)frame->height;
+				textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				whichTexture = false;
+			}
+			GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
+			GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+				frame->width, frame->height, GL_RGBA,
+				GL_UNSIGNED_BYTE, frame->pixels));
+			THEORAPLAY_freeVideo(frame);
+			whichTexture = !whichTexture;
+		}
+	}
+	else if ( pendingFrame && pendingFrame->playms <= currentPlayTime )
+	{
 		if (textureId1 == 0) {
-			videoWidth = (int)frame->width;
-			videoHeight = (int)frame->height;
+			videoWidth = (int)pendingFrame->width;
+			videoHeight = (int)pendingFrame->height;
 			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
 			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
 			whichTexture = false;
 		}
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
-        GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-            frame->width, frame->height, GL_RGBA,
-            GL_UNSIGNED_BYTE, frame->pixels));
-		THEORAPLAY_freeVideo(frame);
+		GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+			pendingFrame->width, pendingFrame->height, GL_RGBA,
+			GL_UNSIGNED_BYTE, pendingFrame->pixels));
+		whichTexture = !whichTexture;
+		THEORAPLAY_freeVideo(pendingFrame);
+		pendingFrame = nullptr;
 	}
     
 	const int sw = videoWidth;
@@ -8324,6 +8403,12 @@ void VideoManager_t::deinitManager()
 void VideoManager_t::destroyClip()
 {
 	started = false;
+	currentPlayTime = 0;
+	if ( pendingFrame )
+	{
+		THEORAPLAY_freeVideo(pendingFrame);
+		pendingFrame = nullptr;
+	}
 	if ( decoder )
 	{
 		THEORAPLAY_stopDecode(decoder);
@@ -8379,6 +8464,15 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 		started = false;
 		return;
 	}
+
+	// Advance the playback clock by the real elapsed time. The draw callback
+	// pops frames whose playms timestamp we've reached, so playback speed
+	// matches the wall clock regardless of render FPS.
+	if ( started )
+	{
+		currentPlayTime += (Uint32)(timeDelta * 1000.0f);
+	}
+
 	// Wait until the decoder has produced at least a few frames before we
 	// start drawing, so we don't flash an empty texture.
 	if ( !started )
@@ -8388,20 +8482,7 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 			return;
 		}
 		started = true;
-		// Grab dimensions from the first ready frame.
-		const THEORAPLAY_VideoFrame* first = THEORAPLAY_getVideo(decoder);
-		if ( first )
-		{
-			videoWidth = (int)first->width;
-			videoHeight = (int)first->height;
-			if ( textureId1 == 0 )
-			{
-				textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
-				textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
-				whichTexture = false;
-			}
-			THEORAPLAY_freeVideo(first);
-		}
+		currentPlayTime = 0;
 	}
 
 	// Drain decoded audio in bounded chunks (signs are silent; TheoraPlay
@@ -8416,9 +8497,11 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 
 	// Loop: when decoding has finished and no frames remain, seek back to the
 	// start. THEORAPLAY_seek is thread-safe (the worker picks it up), avoiding
-	// the race of stopDecode + recreate.
+	// the race of stopDecode + recreate. Rewind the playback clock so the
+	// timestamps stay consistent after the seek.
 	if ( !THEORAPLAY_isDecoding(decoder) && THEORAPLAY_availableVideo(decoder) == 0 )
 	{
+		currentPlayTime = 0;
 		THEORAPLAY_seek(decoder, 0);
 	}
 }

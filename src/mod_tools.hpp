@@ -3136,6 +3136,9 @@ class VideoManager_t
 	GLuint textureId1 = 0;
 	GLuint textureId2 = 0;
 	Uint32 lastTime = 0;
+	Uint32 currentPlayTime = 0;
+	bool loopVideo = false;
+	const THEORAPLAY_VideoFrame* pendingFrame = nullptr;
 	int videoWidth = 0;
 	int videoHeight = 0;
 	void drawTexturedQuad(unsigned int texID, int tw, int th, const SDL_Rect& src, const SDL_Rect& dest, float alpha);
