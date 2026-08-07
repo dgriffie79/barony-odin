@@ -65,3 +65,7 @@ What *is* ported and verified against the retail Steam data dir:
 - OpenAL audio (replaces FMOD)
 - TheoraPlay .ogv sign video playback (vendored C library; retail ships 122
   .ogv files, 120 video-only, 2 with silent audio tracks)
+- **Direct-IP / LAN multiplayer** over SDL2_net (UDP sockets) — the
+  `directConnect` path is fully independent of Steam/EOS lobby services.
+  The online lobby browser (Steam lobby search / EOS crossplay) is not
+  ported; hosting/joining by IP address works.
