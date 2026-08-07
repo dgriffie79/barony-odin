@@ -11,10 +11,10 @@
 
 const Uint32 BinaryFormatTag = *"spff";
 
-class JsonFileWriter : public FileInterface {
-public:
-
-	JsonFileWriter(EFileFormat format)
+// Opaque state backing FileInterface when writing JSON. Holds the
+// rapidjson buffer + writer; the FileInterface methods forward here.
+struct JsonWriterState {
+	JsonWriterState(EFileFormat format)
 	: buffer()
 	, writer(buffer)
 	{
@@ -25,58 +25,42 @@ public:
 		}
 	}
 
-	static bool writeObject(File* file, const FileHelper::SerializationFunc& serialize, EFileFormat format) {
-		JsonFileWriter jfw(format);
-
-        bool result = false;
-		if (jfw.beginObject()) {
-		    result = serialize(&jfw);
-		    jfw.endObject();
-		}
-		jfw.save(file);
-		return result;
-	}
-
-	virtual bool isReading() const override { return false; }
-
-	virtual bool beginObject() override {
+	bool beginObject() {
 		return writer.StartObject();
 	}
-	virtual void endObject() override {
+	void endObject() {
 		writer.EndObject();
 	}
 
-	virtual bool beginArray(Uint32 & size) override {
+	bool beginArray(Uint32&) {
 		return writer.StartArray();
 	}
-	virtual void endArray() override {
+	void endArray() {
 		writer.EndArray();
 	}
 
-	virtual void propertyName(const char * fieldName) override {
+	void propertyName(const char* fieldName) {
 		writer.Key(fieldName);
 	}
 
-	virtual bool value(Uint32& value) override {
+	bool value(Uint32& value) {
 		return writer.Uint(value);
 	}
-	virtual bool value(Sint32& value) override {
+	bool value(Sint32& value) {
 		return writer.Int(value);
 	}
-	virtual bool value(float& value) override {
+	bool value(float& value) {
 		return writer.Double(value);
 	}
-	virtual bool value(double& value) override {
+	bool value(double& value) {
 		return writer.Double(value);
 	}
-	virtual bool value(bool& value) override {
+	bool value(bool& value) {
 		return writer.Bool(value);
 	}
-	virtual bool value(std::string& value) override {
+	bool value(std::string& value) {
 		return writer.String(value.c_str());
 	}
-
-private:
 
 	void save(File* file) {
 		buffer.Flush();
@@ -86,33 +70,14 @@ private:
 #endif
 	}
 
-	File * fp;
+private:
 	rapidjson::StringBuffer buffer;
 	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer;
 };
 
-class JsonFileReader : public FileInterface {
-public:
+struct JsonReaderState {
 
-	static bool readObject(File * fp, const FileHelper::SerializationFunc & serialize) {
-		JsonFileReader jfr;
-
-		if (!jfr.readAllFileData(fp)) {
-			return false;
-		}
-
-		if (jfr.beginObject()) {
-		    bool result = serialize(&jfr);
-		    jfr.endObject();
-		    return result;
-		} else {
-		    return false;
-		}
-	}
-
-	virtual bool isReading() const override { return true; }
-
-	virtual bool beginObject() override {
+	bool beginObject() {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsObject()) {
 		    DocIterator di;
@@ -125,13 +90,13 @@ public:
 		}
 	}
 
-	virtual void endObject() override {
+	void endObject() {
 	    if (!stack.empty()) {
 		    stack.pop_back();
 		}
 	}
 
-	virtual bool beginArray(Uint32 & size) override {
+	bool beginArray(Uint32 & size) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsArray()) {
 		    DocIterator di;
@@ -145,15 +110,15 @@ public:
 		}
 	}
 
-	virtual void endArray() override {
+	void endArray() {
 	    if (!stack.empty()) {
 		    stack.pop_back();
 		}
 	}
-	virtual void propertyName(const char * fieldName) override {
+	void propertyName(const char * fieldName) {
 		propName = fieldName;
 	}
-	virtual bool value(Uint32& value) override {
+	bool value(Uint32& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsUint()) {
 		    value = cv->GetUint();
@@ -162,7 +127,7 @@ public:
 		    return false;
 		}
 	}
-	virtual bool value(Sint32& value) override {
+	bool value(Sint32& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsInt()) {
 		    value = cv->GetInt();
@@ -171,7 +136,7 @@ public:
 		    return false;
 		}
 	}
-	virtual bool value(float& value) override {
+	bool value(float& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsFloat()) {
 		    value = cv->GetFloat();
@@ -180,7 +145,7 @@ public:
 		    return false;
 		}
 	}
-	virtual bool value(double& value) override {
+	bool value(double& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsDouble()) {
 		    value = cv->GetDouble();
@@ -189,7 +154,7 @@ public:
 		    return false;
 		}
 	}
-	virtual bool value(bool& value) override {
+	bool value(bool& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsBool()) {
 		    value = cv->GetBool();
@@ -198,7 +163,7 @@ public:
 		    return false;
 		}
 	}
-	virtual bool value(std::string& value) override {
+	bool value(std::string& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsString()) {
 			value = cv->GetString();
@@ -208,7 +173,34 @@ public:
 		}
 	}
 
-protected:
+	bool readAllFileData(File * fp) {
+		long size = fp->size();
+
+		// reserve an extra byte for the null terminator
+		char * data = (char *)calloc(sizeof(char), size + 1);
+		assert(data);
+
+		size_t bytesRead = fp->read(data, sizeof(char), size);
+		if (bytesRead != size) {
+			printlog("JsonFileReader: failed to read data (%d)", errno);
+			free(data);
+			return false;
+		}
+
+		// null terminate
+		data[size] = 0;
+
+		rapidjson::ParseResult result = doc.Parse(data);
+
+		free(data);
+
+		if (!result) {
+			printlog("JsonFileReader: parse error: %s (%d)", rapidjson::GetParseError_En(result.Code()), result.Offset());
+			return false;
+		}
+
+		return true;
+	}
 
 	rapidjson::Value::ConstValueIterator GetCurrentValue() {
 		if (stack.empty()) {
@@ -242,35 +234,6 @@ protected:
 		}
 	}
 
-	bool readAllFileData(File * fp) {
-		long size = fp->size();
-
-		// reserve an extra byte for the null terminator
-		char * data = (char *)calloc(sizeof(char), size + 1);
-		assert(data);
-
-		size_t bytesRead = fp->read(data, sizeof(char), size);
-		if (bytesRead != size) {
-			printlog("JsonFileReader: failed to read data (%d)", errno);
-			free(data);
-			return false;
-		}
-
-		// null terminate
-		data[size] = 0;
-
-		rapidjson::ParseResult result = doc.Parse(data);
-
-		free(data);
-
-		if (!result) {
-			printlog("JsonFileReader: parse error: %s (%d)", rapidjson::GetParseError_En(result.Code()), result.Offset());
-			return false;
-		}
-
-		return true;
-	}
-
 	struct DocIterator {
 		rapidjson::Value::ConstValueIterator it;
 		Uint32 index;
@@ -281,70 +244,48 @@ protected:
 	std::vector<DocIterator> stack;
 };
 
-class BinaryFileWriter : public FileInterface {
-public:
+struct BinaryWriterState {
 
-	BinaryFileWriter(File * file)
+	BinaryWriterState(File* file)
 	: fp(file)
 	{
 	}
 
-	~BinaryFileWriter() {
-	}
-
-	static bool writeObject(File * fp, const FileHelper::SerializationFunc & serialize) {
-		BinaryFileWriter bfw(fp);
-
-		bfw.writeHeader();
-
-		if (bfw.beginObject()) {
-		    bool result = serialize(&bfw);
-		    bfw.endObject();
-		    return result;
-		} else {
-		    return false;
-		}
-	}
-
-	virtual bool isReading() const override { return false; }
-
-	virtual bool beginObject() override {
+	bool beginObject() {
 	    return true;
 	}
 
-	virtual void endObject() override {
+	void endObject() {
 	}
 
-	virtual bool beginArray(Uint32 & size) override {
+	bool beginArray(Uint32& size) {
 		return fp->write(&size, sizeof(size), 1) == 1;
 	}
 
-	virtual void endArray() override {
+	void endArray() {
 	}
 
-	virtual void propertyName(const char * name) override {
+	void propertyName(const char*) {
 	}
 
-	virtual bool value(Uint32& v) override {
+	bool value(Uint32& v) {
 		return fp->write(&v, sizeof(v), 1) == 1;
 	}
-	virtual bool value(Sint32& v) override {
+	bool value(Sint32& v) {
 		return fp->write(&v, sizeof(v), 1) == 1;
 	}
-	virtual bool value(float& v) override {
+	bool value(float& v) {
 		return fp->write(&v, sizeof(v), 1) == 1;
 	}
-	virtual bool value(double& v) override {
+	bool value(double& v) {
 		return fp->write(&v, sizeof(v), 1) == 1;
 	}
-	virtual bool value(bool& v) override {
+	bool value(bool& v) {
 		return fp->write(&v, sizeof(v), 1) == 1;
 	}
-	virtual bool value(std::string& v) override {
+	bool value(std::string& v) {
 		return writeStringInternal(v);
 	}
-
-private:
 
 	void writeHeader() {
 		(void)fp->write(&BinaryFormatTag, sizeof(BinaryFormatTag), 1);
@@ -364,73 +305,54 @@ private:
 	File* fp = nullptr;
 };
 
-class BinaryFileReader : public FileInterface {
-public:
+struct BinaryReaderState {
 
-	BinaryFileReader(File * file)
+	BinaryReaderState(File* file)
 		: fp(file)
 	{
 	}
 
-	static bool readObject(File * fp, const FileHelper::SerializationFunc & serialize) {
-		BinaryFileReader bfr(fp);
-
-		if (!bfr.readHeader()) {
-			return false;
-		}
-
-		bfr.beginObject();
-		bool result = serialize(&bfr);
-		bfr.endObject();
-
-		return result;
-	}
-
-	virtual bool isReading() const override { return true; }
-
-	virtual bool beginObject() override {
+	bool beginObject() {
 	    return true;
 	}
 
-	virtual void endObject() override {
+	void endObject() {
 	}
 
-	virtual bool beginArray(Uint32 & size) override {
+	bool beginArray(Uint32& size) {
 		return fp->read(&size, sizeof(size), 1) == 1;
 	}
 
-	virtual void endArray() override {
+	void endArray() {
 	}
 
-	virtual void propertyName(const char * name) override {
+	void propertyName(const char*) {
 	}
 
-	virtual bool value(Uint32& v) override {
+	bool value(Uint32& v) {
 		size_t read = fp->read(&v, sizeof(v), 1);
 		return read == 1;
 	}
-	virtual bool value(Sint32& v) override {
+	bool value(Sint32& v) {
 		size_t read = fp->read(&v, sizeof(v), 1);
 		return read == 1;
 	}
-	virtual bool value(float& v) override {
+	bool value(float& v) {
 		size_t read = fp->read(&v, sizeof(v), 1);
 		return read == 1;
 	}
-	virtual bool value(double& v) override {
+	bool value(double& v) {
 		size_t read = fp->read(&v, sizeof(v), 1);
 		return read == 1;
 	}
-	virtual bool value(bool& v) override {
+	bool value(bool& v) {
 		size_t read = fp->read(&v, sizeof(v), 1);
 		return read == 1;
 	}
-	virtual bool value(std::string& v) override {
+	bool value(std::string& v) {
 		bool result = readStringInternal(v);
 		return result;
 	}
-
-private:
 
 	bool readHeader() {
 		Uint32 fileFormatTag;
@@ -479,6 +401,180 @@ static EFileFormat GetFileFormat(File * file) {
 	}
 }
 
+FileInterface::~FileInterface() {
+	delete jsonWriter;
+	delete jsonReader;
+}
+
+FileInterface::FileInterface(FileInterface&& other) noexcept
+	: format(other.format), reading(other.reading), fp(other.fp),
+	  jsonWriter(other.jsonWriter), jsonReader(other.jsonReader) {
+	other.format = EFileFormat::Json;
+	other.reading = false;
+	other.fp = nullptr;
+	other.jsonWriter = nullptr;
+	other.jsonReader = nullptr;
+}
+
+FileInterface& FileInterface::operator=(FileInterface&& other) noexcept {
+	if (this != &other) {
+		delete jsonWriter;
+		delete jsonReader;
+		format = other.format;
+		reading = other.reading;
+		fp = other.fp;
+		jsonWriter = other.jsonWriter;
+		jsonReader = other.jsonReader;
+		other.format = EFileFormat::Json;
+		other.reading = false;
+		other.fp = nullptr;
+		other.jsonWriter = nullptr;
+		other.jsonReader = nullptr;
+	}
+	return *this;
+}
+
+FileInterface FileInterface::makeWriter(File* file, EFileFormat format) {
+	FileInterface result;
+	result.format = format;
+	result.reading = false;
+	result.fp = file;
+	if (format == EFileFormat::Binary) {
+		// binary writes the header immediately; state is nil (fp used directly)
+		(void)file->write(&BinaryFormatTag, sizeof(BinaryFormatTag), 1);
+	} else {
+		result.jsonWriter = new JsonWriterState(format);
+	}
+	return result;
+}
+
+FileInterface FileInterface::makeReader(File* file) {
+	FileInterface result;
+	EFileFormat format = GetFileFormat(file);
+	result.format = format;
+	result.reading = true;
+	result.fp = file;
+	if (format == EFileFormat::Binary) {
+		// GetFileFormat peeked the 4-byte tag then seeked back to 0;
+		// skip past the tag so data reads start at the first payload byte.
+		Uint32 tag = 0;
+		(void)file->read(&tag, sizeof(tag), 1);
+	} else {
+		result.jsonReader = new JsonReaderState();
+		result.jsonReader->readAllFileData(file);
+	}
+	return result;
+}
+
+bool FileInterface::beginObject() {
+	if (format == EFileFormat::Binary) {
+		return true;
+	}
+	return reading ? jsonReader->beginObject() : jsonWriter->beginObject();
+}
+
+void FileInterface::endObject() {
+	if (format == EFileFormat::Binary) {
+		return;
+	}
+	if (reading) jsonReader->endObject(); else jsonWriter->endObject();
+}
+
+bool FileInterface::beginArray(Uint32& size) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&size, sizeof(size), 1) == 1 : fp->write(&size, sizeof(size), 1) == 1;
+	}
+	return reading ? jsonReader->beginArray(size) : jsonWriter->beginArray(size);
+}
+
+void FileInterface::endArray() {
+	if (format == EFileFormat::Binary) {
+		return;
+	}
+	if (reading) jsonReader->endArray(); else jsonWriter->endArray();
+}
+
+void FileInterface::propertyName(const char* name) {
+	if (format == EFileFormat::Binary) {
+		return;
+	}
+	if (reading) jsonReader->propertyName(name); else jsonWriter->propertyName(name);
+}
+
+bool FileInterface::value(Uint32& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+bool FileInterface::value(Sint32& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+bool FileInterface::value(float& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+bool FileInterface::value(double& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+bool FileInterface::value(bool& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+bool FileInterface::value(std::string& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? readStringInternalBinary(v) : writeStringInternalBinary(v);
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
+void FileInterface::flushToFile() {
+	if (!reading && jsonWriter) {
+		jsonWriter->save(fp);
+	}
+}
+
+bool FileInterface::writeStringInternalBinary(const std::string& v) {
+	Uint32 len = (Uint32)v.size();
+	bool result = true;
+	result = fp->write(&len, sizeof(len), 1) == 1 ? result : false;
+	if (len) {
+		result = fp->write(v.c_str(), sizeof(char), len) == len ?
+		    result : false;
+	}
+	return result;
+}
+
+bool FileInterface::readStringInternalBinary(std::string& v) {
+	Uint32 len;
+	bool result = true;
+	size_t read = fp->read(&len, sizeof(len), 1);
+	result = read == 1 ? result : false;
+
+	if (len) {
+		v.reserve(len);
+		read = fp->read(&v[0u], sizeof(char), len);
+	    result = read == len ? result : false;
+	}
+
+	return result;
+}
+
 //TODO: NX PORT: Update for the Switch?
 bool FileHelper::writeObjectInternal(const char * filename, EFileFormat format, const SerializationFunc& serialize) {
 	File * file = FileIO::open(filename, "wb");
@@ -491,14 +587,16 @@ bool FileHelper::writeObjectInternal(const char * filename, EFileFormat format, 
 	}
 
 	bool success = false;
-	if (format == EFileFormat::Binary) {
-		success = BinaryFileWriter::writeObject(file, serialize);
-	}
-	else if (format == EFileFormat::Json || format == EFileFormat::Json_Compact) {
-		success = JsonFileWriter::writeObject(file, serialize, format);
-	}
-	else {
-		assert(false);
+	{
+		FileInterface fi = FileInterface::makeWriter(file, format);
+		if (fi.beginObject()) {
+		    success = serialize(&fi);
+		    fi.endObject();
+		}
+		// JSON writer flushes its buffer to the file on destruction
+		if (format != EFileFormat::Binary) {
+			fi.flushToFile();
+		}
 	}
 
 	FileIO::close(file);
@@ -516,17 +614,13 @@ bool FileHelper::readObjectInternal(const char * filename, const SerializationFu
 		return false;
 	}
 
-	EFileFormat format = GetFileFormat(file);
-
 	bool success = false;
-	if (format == EFileFormat::Binary) {
-		success = BinaryFileReader::readObject(file, serialize);
-	}
-	else if(format == EFileFormat::Json || format == EFileFormat::Json_Compact) {
-		success = JsonFileReader::readObject(file, serialize);
-	}
-	else {
-		assert(false);
+	{
+		FileInterface fi = FileInterface::makeReader(file);
+		if (fi.beginObject()) {
+		    success = serialize(&fi);
+		    fi.endObject();
+		}
 	}
 
 	FileIO::close(file);

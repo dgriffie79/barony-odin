@@ -22,46 +22,70 @@
 #include <functional>
 #include <string>
 
+class File;
+
 enum class EFileFormat {
 	Json,
 	Binary,
 	Json_Compact
 };
 
+// Opaque per-format serialization state, owned by FileInterface and
+// defined in json.cpp (keeps rapidjson types out of this header).
+struct JsonWriterState;
+struct JsonReaderState;
+
 class FileInterface {
 public:
-	virtual ~FileInterface() {}
-	
+	FileInterface() = default;
+	~FileInterface();
+	FileInterface(const FileInterface&) = delete;
+	FileInterface& operator=(const FileInterface&) = delete;
+	FileInterface(FileInterface&& other) noexcept;
+	FileInterface& operator=(FileInterface&& other) noexcept;
+
+	// Factory functions. Replace the former per-format constructors and
+	// are the only way to obtain a FileInterface.
+	// @param file the open file to serialize to/from
+	// @param format the format to use (Json, Json_Compact, or Binary)
+	// @return a FileInterface bound to the given file and format
+	static FileInterface makeWriter(File* file, EFileFormat format);
+	static FileInterface makeReader(File* file);
+
 	// @return true if this interface is reading data from a file, false if it is writing
-	virtual bool isReading() const = 0;
+	bool isReading() const { return reading; }
+
+	// Flush any buffered output (JSON writer) to the underlying file.
+	// No-op for binary and reader interfaces.
+	void flushToFile();
 
 	// Signals the beginning of an object in the file
-	virtual bool beginObject() = 0;
+	bool beginObject();
 	// Signals the end of an object in the file
-	virtual void endObject() = 0;
+	void endObject();
 
 	// Signals the beginning of an array in the file
 	// @param size number of items in the array
-	virtual bool beginArray(Uint32 & size) = 0;
+	bool beginArray(Uint32& size);
 	// Signals the end of an array in the file
-	virtual void endArray() = 0;
+	void endArray();
 
 	// Serializes the name of a property
-	// @param name name of the property 
-	virtual void propertyName(const char * name) = 0;
+	// @param name name of the property
+	void propertyName(const char* name);
 
 	// @param v the value to serialize
-	virtual bool value(Uint32& v) = 0;
+	bool value(Uint32& v);
 	// @param v the value to serialize
-	virtual bool value(Sint32& v) = 0;
+	bool value(Sint32& v);
 	// @param v the value to serialize
-	virtual bool value(float& v) = 0;
+	bool value(float& v);
 	// @param v the value to serialize
-	virtual bool value(double& v) = 0;
+	bool value(double& v);
 	// @param v the value to serialize
-	virtual bool value(bool& v) = 0;
+	bool value(bool& v);
 	// @param v the value to serialize
-	virtual bool value(std::string& v) = 0;
+	bool value(std::string& v);
 
 	// Serialize a vector with a max length
 	// @param v the value to serialize
@@ -168,6 +192,17 @@ public:
             return true;
         }
     }
+
+private:
+	EFileFormat format = EFileFormat::Json;
+	bool reading = false;
+	File* fp = nullptr;
+	JsonWriterState* jsonWriter = nullptr;
+	JsonReaderState* jsonReader = nullptr;
+
+	// binary string length-prefixed write/read (used when format == Binary)
+	bool writeStringInternalBinary(const std::string& v);
+	bool readStringInternalBinary(std::string& v);
 };
 
 class FileHelper {
