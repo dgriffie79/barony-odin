@@ -16,9 +16,15 @@ system here is Meson (the upstream uses CMake), and the following subsystems are
 - **Opus voice chat** (`USE_OPUS`) — only meaningful with FMOD voice chat.
 - **libcurl** (`USE_LIBCURL`) — only used to cache Steam Workshop preview
   images; dead without Steam.
+- **Nintendo** (`NINTENDO`) — Switch platform build (mod-book filtering,
+  ROM read paths). Never enabled here; the port targets desktop only.
+- **Tremor** (`USE_TREMOR`) — fixed-point Vorbis decoder alternative to
+  libvorbis for OpenAL music decoding. Off by default; libvorbis (float) is
+  used instead. Harmless to leave off for the port.
 
-The `curl`, `playfab`, and `opus` Meson options remain only to preserve the
-upstream option surface; enabling them does not produce a working online build.
+The `curl`, `playfab`, `opus`, and `tremor` Meson options remain only to
+preserve the upstream option surface; enabling them does not produce a working
+online build.
 
 What *is* ported and verified against the retail Steam data dir:
 - OpenAL audio (replaces FMOD)
