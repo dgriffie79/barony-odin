@@ -14,7 +14,7 @@ public:
     Slider(Frame& _parent);
     Slider(const Slider&) = delete;
     Slider(Slider&&) = delete;
-    virtual ~Slider() = default;
+    ~Slider() = default;
 
     Slider& operator=(const Slider&) = delete;
     Slider& operator=(Slider&&) = delete;
@@ -33,7 +33,7 @@ public:
     };
 
     //! scroll the parent frame (if any) to be within our bounds
-    virtual void scrollParent();
+    void scrollParent();
 
     //! draws the slider
     //! @param _size size and position of slider's parent frame
@@ -60,7 +60,7 @@ public:
     SDL_Rect getAbsoluteSize() const;
 
     //! activates the slider
-    virtual void activate() override;
+    void activate();
 
     //! control slider with keyboard/gamepad inputs
     bool control();
@@ -72,9 +72,8 @@ public:
     void updateHandlePosition();
 
     //! deselect the slider
-    virtual void deselect() override;
+    void deselect();
 
-    virtual type_t              getType() const override { return WIDGET_SLIDER; }
     orientation_t               getOrientation() const { return orientation; }
     float                       getValue() const { return value; }
     float                       getMaxValue() const { return maxValue; }

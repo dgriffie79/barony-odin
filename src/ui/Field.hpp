@@ -17,7 +17,7 @@ public:
 	Field(Frame& _parent, const char* _text);
 	Field(const Field&) = delete;
 	Field(Field&&) = delete;
-	virtual ~Field();
+	~Field();
 
 	Field& operator=(const Field&) = delete;
 	Field& operator=(Field&&) = delete;
@@ -43,16 +43,16 @@ public:
     bool dirty = false; //!< if true, rebuild text cache
 
 	//! scroll the parent frame (if any) to be within our bounds
-	virtual void scrollParent();
+	void scrollParent();
 
 	//! activates the field for text editing
-	virtual void activate() override;
+	void activate();
 
 	//! deactivate text editing
 	void deactivate();
 
 	//! deselects the field
-	virtual void deselect() override;
+	void deselect();
 
 	//! draws the field
 	//! @param _size size and position of field's parent frame
@@ -115,7 +115,6 @@ public:
 
 	static const int TEXT_HIGHLIGHT_WORDS_PER_LINE = 10000;
 
-	virtual type_t              getType() const override { return WIDGET_FIELD; }
 	const char*					getText() const { return text; }
 	const size_t                getTextLen() const { return textlen; }
 	const char*					getFont() const { return font.c_str(); }

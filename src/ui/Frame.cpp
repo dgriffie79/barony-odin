@@ -222,6 +222,7 @@ void Frame::guiResize(int x, int y) {
 }
 
 Frame::Frame(const char* _name) {
+	type = WIDGET_FRAME;
 	size.x = 0;
 	size.y = 0;
 	size.w = 0;
@@ -1950,7 +1951,7 @@ void Frame::clearEntries() {
 }
 
 bool Frame::remove(const char* name) {
-    bool result = Widget::remove(name);
+    bool result = removeBase(name);
     if (!result) {
         for (int i = 0; i < images.size(); ++i) {
             image_t* image = images[i];
@@ -2265,7 +2266,7 @@ Frame* Frame::getParent() {
 }
 
 void Frame::deselect() {
-	Widget::deselect();
+	deselectBase();
 	activated = false;
 	activation = nullptr;
 	for (auto frame : frames) {

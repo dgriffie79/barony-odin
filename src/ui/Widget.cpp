@@ -3,6 +3,9 @@
 #include "../main.hpp"
 #include "Widget.hpp"
 #include "Frame.hpp"
+#include "Button.hpp"
+#include "Field.hpp"
+#include "Slider.hpp"
 #include "Image.hpp"
 #include "../player.hpp"
 #include "../input.hpp"
@@ -26,10 +29,19 @@ Widget::~Widget() {
 			}
 		}
 	}
-	deselect();
+	deselectBase();
 }
 
-bool Widget::remove(const char* name) {
+void Widget::deselectBase() {
+    for (int c = 0; c < MAXPLAYERS; ++c) {
+        if (_selectedWidgets[c] == this) {
+            _selectedWidgets[c] = nullptr;
+        }
+    }
+	selected = false;
+}
+
+bool Widget::removeBase(const char* name) {
     for (auto widget : widgets) {
         if (strcmp(widget->getName(), name) == 0) {
             widget->removeSelf();
@@ -64,16 +76,37 @@ void Widget::select() {
 }
 
 void Widget::deselect() {
-    for (int c = 0; c < MAXPLAYERS; ++c) {
-        if (_selectedWidgets[c] == this) {
-            _selectedWidgets[c] = nullptr;
-        }
+    switch (type) {
+    case WIDGET_BUTTON:
+        deselectBase();
+        break;
+    case WIDGET_FIELD:
+        static_cast<Field*>(this)->Field::deselect();
+        break;
+    case WIDGET_SLIDER:
+        static_cast<Slider*>(this)->Slider::deselect();
+        break;
+    case WIDGET_FRAME:
+        static_cast<Frame*>(this)->Frame::deselect();
+        break;
     }
-	selected = false;
 }
 
 void Widget::activate() {
-	// no-op
+    switch (type) {
+    case WIDGET_BUTTON:
+        static_cast<Button*>(this)->Button::activate();
+        break;
+    case WIDGET_FIELD:
+        static_cast<Field*>(this)->Field::activate();
+        break;
+    case WIDGET_SLIDER:
+        static_cast<Slider*>(this)->Slider::activate();
+        break;
+    case WIDGET_FRAME:
+        static_cast<Frame*>(this)->Frame::activate();
+        break;
+    }
 }
 
 void Widget::process() {
@@ -515,6 +548,26 @@ void Widget::drawPost(const SDL_Rect size,
 #endif
 }
 
+bool Widget::remove(const char* name) {
+    if (type == WIDGET_FRAME) {
+        return static_cast<Frame*>(this)->Frame::remove(name);
+    }
+    return removeBase(name);
+}
+
 void Widget::scrollParent() {
-	// no-op
+    switch (type) {
+    case WIDGET_BUTTON:
+        static_cast<Button*>(this)->Button::scrollParent();
+        break;
+    case WIDGET_FIELD:
+        static_cast<Field*>(this)->Field::scrollParent();
+        break;
+    case WIDGET_SLIDER:
+        static_cast<Slider*>(this)->Slider::scrollParent();
+        break;
+    case WIDGET_FRAME:
+        static_cast<Frame*>(this)->Frame::scrollParent();
+        break;
+    }
 }

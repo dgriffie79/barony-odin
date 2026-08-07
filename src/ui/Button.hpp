@@ -19,7 +19,7 @@ public:
 	Button(Frame& _parent);
 	Button(const Button&) = delete;
 	Button(Button&&) = delete;
-	virtual ~Button() = default;
+	~Button() = default;
 
 	Button& operator=(const Button&) = delete;
 	Button& operator=(Button&&) = delete;
@@ -54,7 +54,7 @@ public:
 	};
 
 	//! scroll the parent frame (if any) to be within our bounds
-	virtual void scrollParent();
+	void scrollParent();
 
 	//! draws the button
 	//! @param _size size and position of button's parent frame
@@ -81,9 +81,8 @@ public:
 	SDL_Rect getAbsoluteSize() const;
 
 	//! activates the button
-	virtual void activate() override;
+	void activate();
 
-	virtual type_t              getType() const override { return WIDGET_BUTTON; }
 	const char*					getText() const { return text.c_str(); }
 	const char*					getFont() const { return font.c_str(); }
 	int							getBorder() const { return border; }

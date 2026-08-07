@@ -8,14 +8,6 @@ class Frame;
 
 class Widget {
 public:
-    Widget() = default;
-    Widget(const Widget&) = delete;
-    Widget(Widget&&) = delete;
-    virtual ~Widget();
-
-    Widget& operator=(const Widget&) = delete;
-    Widget& operator=(Widget&&) = delete;
-
     //! widget type
     enum type_t {
         WIDGET_FRAME,
@@ -23,6 +15,19 @@ public:
         WIDGET_FIELD,
         WIDGET_SLIDER
     };
+
+    type_t type = WIDGET_FRAME;     //!< widget type tag (replaces virtual dispatch)
+
+protected:
+    Widget() = default;
+    Widget(const Widget&) = delete;
+    Widget(Widget&&) = delete;
+
+public:
+    ~Widget();
+
+    Widget& operator=(const Widget&) = delete;
+    Widget& operator=(Widget&&) = delete;
 
     //! glyph position
     enum glyph_position_t {
@@ -37,7 +42,7 @@ public:
         UPPER_LEFT,
     };
 
-    virtual type_t      getType() const = 0;
+    type_t              getType() const { return type; }
     Widget*             getParent() { return parent; }
     const Widget*       getParent() const { return parent; }
     const char*		    getName() const { return name.c_str(); }
@@ -100,7 +105,7 @@ public:
     //! remove an object from the widget
     //! @param name the name of the object to remove
     //! @return true if the object was successfully removed, false otherwise
-    virtual bool remove(const char* name);
+    bool remove(const char* name);
 
     //! recursively locates the head widget for this widget
     //! @return the head widget, which may be this widget
@@ -108,16 +113,16 @@ public:
     const Widget* findHead() const;
 
     //! scroll the parent frame (if any) to be within our bounds
-    virtual void scrollParent();
+    void scrollParent();
 
     //! activate this widget
-    virtual void activate();
+    void activate();
 
     //! select this widget
-    virtual void select();
+    void select();
 
     //! deselect this widget
-    virtual void deselect();
+    void deselect();
 
     //! update this widget for one tick
     void process();
@@ -175,6 +180,12 @@ public:
     Widget* findSelectedWidget();
 
 protected:
+    //! base (common) deselect behavior: clear selection state, no per-type logic
+    void deselectBase();
+
+    //! base (generic) widget removal: search children by name
+    bool removeBase(const char* name);
+
     Widget* parent = nullptr;                                       //!< parent widget
     std::list<Widget*> widgets;                                     //!< widget children
     std::string name;                                               //!< widget name

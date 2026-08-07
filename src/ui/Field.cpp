@@ -16,6 +16,7 @@
 #endif
 
 Field::Field(const int _textLen) {
+	type = WIDGET_FIELD;
 	textlen = std::max(_textLen, 0);
 	text = new char[textlen + 1];
 	color = makeColor(255, 255, 255, 255);
@@ -96,7 +97,7 @@ void Field::activate() {
 }
 
 void Field::deselect() {
-	Widget::deselect();
+	deselectBase();
 }
 
 void Field::deactivate() {

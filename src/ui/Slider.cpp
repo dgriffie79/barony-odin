@@ -13,6 +13,7 @@
 #endif
 
 Slider::Slider(Frame& _parent) {
+	type = WIDGET_SLIDER;
 	parent = &_parent;
 	_parent.adoptWidget(*this);
 }
@@ -361,7 +362,7 @@ bool Slider::control() {
 
 void Slider::deselect() {
 	activated = false;
-	Widget::deselect();
+	deselectBase();
 }
 
 void Slider::scrollParent() {

@@ -28,7 +28,7 @@ public:
 	Frame(Frame& parent, const char* _name = "");
 	Frame(const Frame&) = delete;
 	Frame(Frame&&) = delete;
-	virtual ~Frame();
+	~Frame();
 
 	Frame& operator=(const Frame&) = delete;
 	Frame& operator=(Frame&&) = delete;
@@ -210,7 +210,7 @@ public:
     //! remove an object from the frame
     //! @name the name of the object to remove
     //! @return true if an object was removed, or false if it was not found
-    virtual bool remove(const char* name) override;
+    bool remove(const char* name);
 
 	//! remove an entry from the frame list
 	//! @param name the name of the object to remove
@@ -262,10 +262,10 @@ public:
 	void resizeForEntries();
 
 	//! deselect all frame elements recursively
-	virtual void deselect() override;
+	void deselect();
 
 	//! activates the frame so we can select and activate list entries
-	virtual void activate() override;
+	void activate();
 
 	//! activates the current entry selection
 	void activateSelection();
@@ -313,9 +313,8 @@ public:
 	void bringToTop();
 
 	//! scroll the parent frame (if any) to be within our bounds
-	virtual void scrollParent();
+	void scrollParent();
 
-	virtual type_t					getType() const override { return WIDGET_FRAME; }
 	const char*						getFont() const { return font.c_str(); }
 	const int						getBorder() const { return border; }
 	const SDL_Rect&					getSize() const { return size; }

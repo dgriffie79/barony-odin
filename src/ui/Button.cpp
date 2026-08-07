@@ -14,6 +14,7 @@
 #endif
 
 Button::Button() {
+	type = WIDGET_BUTTON;
 	size.x = 0; size.w = 32;
 	size.y = 0; size.h = 32;
 	color = makeColor(127, 127, 127, 255);
