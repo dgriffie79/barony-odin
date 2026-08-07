@@ -4,12 +4,19 @@ option('tremor', type : 'boolean', value : false,
        description : 'Use Tremor (fixed-point) instead of libvorbis for OpenAL decoding')
 option('theoraplay', type : 'boolean', value : false,
        description : 'Enable TheoraPlay .ogv video playback for animated signs (vendored in third_party/theoraplay)')
+
+# Dead ends - NOT to be ported. The Odin port does not target Steam/Epic/PlayFab
+# online services (see README). The options are kept only so the CMake-era
+# option surface is preserved; enabling them has no effect on a working build
+# (they still need the proprietary SDKs/credentials that we deliberately do not
+# vendor or fetch).
 option('curl', type : 'boolean', value : false,
-       description : 'Enable libcurl (online features; required by playfab)')
+       description : 'DEAD END - libcurl HTTP (was only used for Steam Workshop image cache; not ported)')
 option('playfab', type : 'boolean', value : false,
-       description : 'Enable PlayFab telemetry (requires curl)')
+       description : 'DEAD END - PlayFab telemetry/leaderboards/challenges (requires Steam/Epic auth + PlayFab title credentials; not ported)')
 option('opus', type : 'boolean', value : false,
-       description : 'Enable Opus voice codec (only meaningful with FMOD voice chat, which is removed)')
+       description : 'DEAD END - Opus voice codec (was only meaningful with FMOD voice chat, which is removed; not ported)')
+
 option('editor', type : 'boolean', value : true,
        description : 'Build the level editor executable in addition to the game')
 option('base_data_dir', type : 'string', value : '',
