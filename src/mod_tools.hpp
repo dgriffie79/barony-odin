@@ -3177,7 +3177,7 @@ extern VideoManager_t VideoManager[MAXPLAYERS];
 #ifndef EDITOR
 #ifdef USE_IMGUI
 #include "imgui/imgui.h"
-#include "imgui/imgui_impl_sdl2.h"
+#include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
 
 class ImGui_t

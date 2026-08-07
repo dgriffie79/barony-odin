@@ -8945,24 +8945,24 @@ void ImGui_t::showConsoleCommands()
 		jumpLevel = 0;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ArrowButton("jumplvl--", ImGuiDir_Left) )
+	if ( ImGui::ArrowButton("jumplvl--", ImGuiDir_::ImGuiDir_Left) )
 	{
 		jumpLevel -= 5;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ArrowButton("jumplvl-", ImGuiDir_Left) )
+	if ( ImGui::ArrowButton("jumplvl-", ImGuiDir_::ImGuiDir_Left) )
 	{
 		jumpLevel--;
 	}
 	ImGui::SameLine();
 	ImGui::Text("%d", jumpLevel);
 	ImGui::SameLine();
-	if ( ImGui::ArrowButton("jumplvl+", ImGuiDir_Right) )
+	if ( ImGui::ArrowButton("jumplvl+", ImGuiDir_::ImGuiDir_Right) )
 	{
 		jumpLevel++;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ArrowButton("jumplvl++", ImGuiDir_Right) )
+	if ( ImGui::ArrowButton("jumplvl++", ImGuiDir_::ImGuiDir_Right) )
 	{
 		jumpLevel += 5;
 	}
