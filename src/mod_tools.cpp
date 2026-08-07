@@ -8166,6 +8166,16 @@ void VideoManager_t::drawAsFrameCallback(const Widget& widget, SDL_Rect frameSiz
 
 	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
+		// Lazily create the upload textures from the first frame's dimensions,
+		// so the draw path never uploads into an uninitialized (0) texture.
+		// (updateCurrentClip's "wait for 8 frames" gate may not have run yet.)
+		if (textureId1 == 0) {
+			videoWidth = (int)frame->width;
+			videoHeight = (int)frame->height;
+			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			whichTexture = false;
+		}
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
         GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
             frame->width, frame->height, GL_RGBA,
@@ -8240,6 +8250,14 @@ void VideoManager_t::draw()
     
 	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
+		// Same lazy texture init as drawAsFrameCallback.
+		if (textureId1 == 0) {
+			videoWidth = (int)frame->width;
+			videoHeight = (int)frame->height;
+			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			whichTexture = false;
+		}
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
         GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
             frame->width, frame->height, GL_RGBA,
@@ -8376,9 +8394,12 @@ void VideoManager_t::updateCurrentClip(float timeDelta)
 		{
 			videoWidth = (int)first->width;
 			videoHeight = (int)first->height;
-			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
-			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
-			whichTexture = false;
+			if ( textureId1 == 0 )
+			{
+				textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+				whichTexture = false;
+			}
 			THEORAPLAY_freeVideo(first);
 		}
 	}
@@ -8410,15 +8431,18 @@ void VideoManager_t::update()
 	{
 		return;
 	}
-	static Uint32 time = SDL_GetTicks();
 	Uint32 t = SDL_GetTicks();
-	float diff = (t - time) / 1000.0f;
+	float diff = 0.0f;
+	if ( lastTime != 0 )
+	{
+		diff = (t - lastTime) / 1000.0f;
+	}
+	lastTime = t;
 	if ( diff > 0.25f )
 	{
 		diff = 0.05f; // prevent spikes (usually happen on app load)
 	}
 	updateCurrentClip(diff);
-	time = t;
 }
 #endif
 
