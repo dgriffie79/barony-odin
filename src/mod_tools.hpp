@@ -3126,17 +3126,17 @@ extern ScriptTextParser_t ScriptTextParser;
 //#define USE_THEORA_VIDEO
 #endif // !EDITOR
 #ifdef USE_THEORA_VIDEO
-#include <theoraplayer/theoraplayer.h>
-#include <theoraplayer/Manager.h>
-#include <theoraplayer/VideoFrame.h>
+#include "../third_party/theoraplay/theoraplay.h"
 class VideoManager_t
 {
-	theoraplayer::VideoClip* clip = NULL;
+	THEORAPLAY_Decoder* decoder = nullptr;
 	static bool isInit;
 	bool started = false;
 	bool whichTexture = false;
 	GLuint textureId1 = 0;
 	GLuint textureId2 = 0;
+	int videoWidth = 0;
+	int videoHeight = 0;
 	void drawTexturedQuad(unsigned int texID, int tw, int th, const SDL_Rect& src, const SDL_Rect& dest, float alpha);
 	GLuint createTexture(int w, int h, unsigned int format);
 	int potCeil(int value)
@@ -3156,13 +3156,14 @@ class VideoManager_t
 	void draw();
 	static void init();
 	std::string currentfile = "";
+	std::string currentfilePath = "";
 public:
 	VideoManager_t() {};
-	~VideoManager_t() {};
+	~VideoManager_t() { destroyClip(); };
 	void drawAsFrameCallback(const Widget& widget, SDL_Rect frameSize, SDL_Rect offset, float alpha);
 	void update();
 	void loadfile(const char* filename);
-	bool isPlaying(const char* filename) { return currentfile == filename && (clip != nullptr); }
+	bool isPlaying(const char* filename) { return currentfile == filename && (decoder != nullptr); }
 	void stop() { destroyClip(); }
 	static void deinitManager();
 };

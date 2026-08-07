@@ -8160,23 +8160,24 @@ static ConsoleVariable<bool> cvar_doublebufferVideo("/video_doublebuffer", true)
 
 void VideoManager_t::drawAsFrameCallback(const Widget& widget, SDL_Rect frameSize, SDL_Rect offset, float alpha)
 {
-	if (!clip) {
+	if (!decoder) {
 		return;
 	}
 
-	theoraplayer::VideoFrame* frame = clip->fetchNextFrame();
+	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
         GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-            clip->getWidth(), clip->getHeight(), GL_RGBA,
-            GL_UNSIGNED_BYTE, frame->getBuffer()));
-		clip->popFrame();
+            frame->width, frame->height, GL_RGBA,
+            GL_UNSIGNED_BYTE, frame->pixels));
+		THEORAPLAY_freeVideo(frame);
 	}
 
-	float w = clip->getSubFrameWidth();
-	float h = clip->getSubFrameHeight();
-	float sx = clip->getSubFrameX();
-	float sy = clip->getSubFrameY();
+	// TheoraPlay gives full frames (no subframe cropping).
+	float w = (float)videoWidth;
+	float h = (float)videoHeight;
+	float sx = 0.f;
+	float sy = 0.f;
 	float tw = w;
 	float th = h;
 
@@ -8233,23 +8234,23 @@ void VideoManager_t::drawAsFrameCallback(const Widget& widget, SDL_Rect frameSiz
 
 void VideoManager_t::draw()
 {
-	if (!clip) {
+	if (!decoder) {
 		return;
 	}
     
-	theoraplayer::VideoFrame* frame = clip->fetchNextFrame();
+	const THEORAPLAY_VideoFrame* frame = THEORAPLAY_getVideo(decoder);
 	if (frame) {
 		GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, whichTexture ? textureId1 : textureId2));
         GL_CHECK_ERR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-            clip->getWidth(), clip->getHeight(), GL_RGBA,
-            GL_UNSIGNED_BYTE, frame->getBuffer()));
-		clip->popFrame();
+            frame->width, frame->height, GL_RGBA,
+            GL_UNSIGNED_BYTE, frame->pixels));
+		THEORAPLAY_freeVideo(frame);
 	}
     
-	const int sw = clip->getSubFrameWidth();
-    const int sh = clip->getSubFrameHeight();
-    const int sx = clip->getSubFrameX();
-    const int sy = clip->getSubFrameY();
+	const int sw = videoWidth;
+    const int sh = videoHeight;
+    const int sx = 0;
+    const int sy = 0;
     const int tw = sw;
     const int th = sh;
 
@@ -8284,17 +8285,12 @@ unsigned int VideoManager_t::createTexture(int w, int h, unsigned int format)
 
 void VideoManager_t::init()
 {
-	if ( isInit )
-	{
-		return;
-	}
-	theoraplayer::init(1);
+	// TheoraPlay has no global init; each decoder is created independently.
 	isInit = true;
 }
 
 void VideoManager_t::destroy()
 {
-	theoraplayer::destroy();
 	isInit = false;
 }
 
@@ -8310,11 +8306,15 @@ void VideoManager_t::deinitManager()
 void VideoManager_t::destroyClip()
 {
 	started = false;
-	if ( clip )
+	if ( decoder )
 	{
-		theoraplayer::manager->destroyVideoClip(clip);
-		clip = NULL;
+		THEORAPLAY_stopDecode(decoder);
+		decoder = nullptr;
 	}
+	currentfile = "";
+	currentfilePath = "";
+	videoWidth = 0;
+	videoHeight = 0;
 	if ( textureId1 != 0 )
 	{
         GL_CHECK_ERR(glDeleteTextures(1, &textureId1));
@@ -8327,18 +8327,12 @@ void VideoManager_t::destroyClip()
 	}
 }
 
-#define PRELOAD_VIDEO_TO_RAM
-
-#ifdef PRELOAD_VIDEO_TO_RAM
-#include <theoraplayer/MemoryDataSource.h>
-#endif
-
 void VideoManager_t::loadfile(const char* filename)
 {
 	if (!isInit) {
 		init();
 	}
-	if (clip) {
+	if (decoder) {
 		destroyClip();
 	}
 	if (!filename || !PHYSFS_getRealDir(filename)) {
@@ -8348,46 +8342,69 @@ void VideoManager_t::loadfile(const char* filename)
 	path += PHYSFS_getDirSeparator();
 	path += filename;
 
-	auto output_format = theoraplayer::FORMAT_RGBX;
+	// Start a multithreaded decoder. RGBA output matches GL_RGBA upload.
+	// maxframes caps the decoded-frame queue (the old code precached ~16).
+	decoder = THEORAPLAY_startDecodeFile(path.c_str(), 16, THEORAPLAY_VIDFMT_RGBA, nullptr, 1);
 
-#ifndef EDITOR
-	static ConsoleVariable<int> cvar_theoraOutput("/theora_output", 0);
-	if (*cvar_theoraOutput > 0) {
-		output_format = (theoraplayer::OutputMode)*cvar_theoraOutput;
-	}
-#endif
-
-#ifdef PRELOAD_VIDEO_TO_RAM
-	clip = theoraplayer::manager->createVideoClip(new theoraplayer::MemoryDataSource(path.c_str()), output_format);
-#else
-	clip = theoraplayer::manager->createVideoClip(path, output_format);
-#endif
-
-	if (!clip) {
+	if (!decoder) {
 		return;
 	}
 	currentfile = filename;
-	clip->setAutoRestart(true);
-	clip->setPrecachedFramesCount(16);
-	textureId1 = createTexture(clip->getWidth(), clip->getHeight(), GL_RGBA);
-	textureId2 = createTexture(clip->getWidth(), clip->getHeight(), GL_RGBA);
+	currentfilePath = path;
+	started = false;
 }
 
 void VideoManager_t::updateCurrentClip(float timeDelta)
 {
-	if ( !clip )
+	if ( !decoder )
 	{
 		started = false;
 		return;
 	}
+	// Wait until the decoder has produced at least a few frames before we
+	// start drawing, so we don't flash an empty texture.
 	if ( !started )
 	{
-		// let's wait until the system caches up a few frames on startup
-		if ( clip->getReadyFramesCount() < clip->getPrecachedFramesCount() * 0.5f )
+		if ( THEORAPLAY_availableVideo(decoder) < 8 )
 		{
 			return;
 		}
 		started = true;
+		// Grab dimensions from the first ready frame.
+		const THEORAPLAY_VideoFrame* first = THEORAPLAY_getVideo(decoder);
+		if ( first )
+		{
+			videoWidth = (int)first->width;
+			videoHeight = (int)first->height;
+			textureId1 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			textureId2 = createTexture(videoWidth, videoHeight, GL_RGBA);
+			whichTexture = false;
+			THEORAPLAY_freeVideo(first);
+		}
+	}
+
+	// Drain decoded audio (signs are silent; TheoraPlay decodes Vorbis in the
+	// .ogv and we must consume it so the audio queue doesn't fill up).
+	while ( THEORAPLAY_availableAudio(decoder) > 0 )
+	{
+		const THEORAPLAY_AudioPacket* audio = THEORAPLAY_getAudio(decoder);
+		if ( !audio ) { break; }
+		THEORAPLAY_freeAudio(audio);
+	}
+
+	// Loop: when decoding has finished and no frames remain, restart the file.
+	if ( !THEORAPLAY_isDecoding(decoder) && THEORAPLAY_availableVideo(decoder) == 0 )
+	{
+		const char* filename = currentfile.c_str();
+		const char* path = currentfilePath.c_str();
+		THEORAPLAY_stopDecode(decoder);
+		decoder = THEORAPLAY_startDecodeFile(path, 16, THEORAPLAY_VIDFMT_RGBA, nullptr, 1);
+		if ( decoder )
+		{
+			currentfile = filename;
+			currentfilePath = path;
+			started = false;
+		}
 	}
 }
 
@@ -8395,11 +8412,10 @@ void VideoManager_t::update()
 {
 	init();
 
-	if ( !isInit || !clip )
+	if ( !isInit || !decoder )
 	{
 		return;
 	}
-	//draw();
 	static Uint32 time = SDL_GetTicks();
 	Uint32 t = SDL_GetTicks();
 	float diff = (t - time) / 1000.0f;
@@ -8407,7 +8423,6 @@ void VideoManager_t::update()
 	{
 		diff = 0.05f; // prevent spikes (usually happen on app load)
 	}
-	theoraplayer::manager->update(diff);
 	updateCurrentClip(diff);
 	time = t;
 }

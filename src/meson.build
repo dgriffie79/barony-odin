@@ -256,7 +256,7 @@ barony = executable('barony',
   game_sources + magic_sources + interface_sources + ui_sources + audio_sources + imgui_sources,
   include_directories : [inc, build_inc],
   dependencies : barony_deps,
-  cpp_args : common_cpp_args,
+  cpp_args : common_cpp_args + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
   link_args : common_link_args,
 )
 

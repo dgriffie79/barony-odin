@@ -139,7 +139,8 @@ endif
 
 # Optional features
 if theoraplay_enabled
-  add_project_arguments('-DUSE_THEORA_VIDEO', language : 'cpp')
+  # USE_THEORA_VIDEO is added to the game target only (not the editor); the
+  # VideoManager_t code is inside #ifndef EDITOR in mod_tools.hpp.
   subdir('third_party/theoraplay')
 else
   theoraplay_dep = disabler()
