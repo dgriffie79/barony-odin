@@ -7054,11 +7054,11 @@ static void doConsoleCommands() {
 #endif
 
 // Renamed from main() -> barony_main() so the Odin driver can own the process
-// entry point and call into Barony as a library (extern "C" for the Odin
+// entry point and call into Barony as a library (C linkage for the Odin
 // foreign import). SDL_SetMainReady() tells SDL we are the real entry point
 // (SDL_MAIN_HANDLED is defined in meson_force_include.h, so SDL does not
 // redefine main -> SDL_main).
-extern "C" BARONY_EXPORT int barony_main(int argc, char** argv)
+extern "C" int barony_main(int argc, char** argv)
 {
 	SDL_SetMainReady();
 #ifdef WINDOWS

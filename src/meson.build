@@ -227,15 +227,17 @@ build_inc = include_directories('..')  # relative to src/ -> builddir/
 # The game + editor share most sources; editor uses -DEDITOR and a subset.
 # To keep things simple and correct, build each library from its own list.
 #
-# The C++ code is built as SHARED LIBRARIES (barony_game.dll / barony_editor.dll)
-# that the Odin driver (odin/game/main.odin, odin/editor/main.odin) foreign-imports
-# and calls into. The process entry point lives in Odin; the C++ entry point was
-# renamed main -> barony_main (see game.cpp / editor.cpp) and exported as
-# extern "C" BARONY_EXPORT. SDL_MAIN_HANDLED (meson_force_include.h) stops SDL
-# from hijacking main, and barony_main calls SDL_SetMainReady() itself, so
-# SDL2main must NOT be linked into the DLLs (it provides its own main()).
+# The C++ code is built as STATIC LIBRARIES (libbarony_game.a / libbarony_editor.a)
+# that get linked INTO the Odin executable. One static link means both directions
+# resolve at link time: Odin calls C++ (barony_main) and C++ objects can call
+# Odin-exported procs (@(export)) — the reverse-call pattern the port needs.
+# (Shared DLLs can't do DLL->exe imports cleanly.) The process entry point lives
+# in Odin; the C++ entry point was renamed main -> barony_main (see game.cpp /
+# editor.cpp). SDL_MAIN_HANDLED (meson_force_include.h) stops SDL from hijacking
+# main, and barony_main calls SDL_SetMainReady() itself, so SDL2main is NOT linked
+# (Odin provides the real main).
 
-# Game shared library
+# Game static library
 barony_deps = [
   sdl2, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
 ]
@@ -250,25 +252,25 @@ if opus_enabled
   barony_deps += opus
 endif
 
-barony_game_lib = shared_library('barony_game',
+barony_game_lib = static_library('barony_game',
   game_sources + magic_sources + interface_sources + ui_sources + audio_sources,
   include_directories : [inc, build_inc],
   dependencies : barony_deps,
-  cpp_args : common_cpp_args + ['-DBARONY_BUILD_DLL'] + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
+  cpp_args : common_cpp_args + (theoraplay_enabled ? ['-DUSE_THEORA_VIDEO'] : []),
   link_args : common_link_args,
 )
 
-# Editor shared library (optional)
+# Editor static library (optional)
 if editor_enabled
   editor_deps = [
     sdl2, sdl2_image, sdl2_net, sdl2_ttf, physfs, libpng, threads, opengl, glew, vorbisfile,
   ]
   editor_deps += audio_deps
-  barony_editor_lib = shared_library('barony_editor',
+  barony_editor_lib = static_library('barony_editor',
     editor_sources,
     include_directories : [inc, build_inc],
     dependencies : editor_deps,
-    cpp_args : common_cpp_args + ['-DBARONY_BUILD_DLL', '-DEDITOR'],
+    cpp_args : common_cpp_args + ['-DEDITOR'],
     link_args : common_link_args,
   )
 endif
@@ -277,35 +279,96 @@ endif
 # Odin drivers (the actual barony.exe / editor.exe)
 #
 # Odin owns the process entry point and calls barony_main() (the renamed C++
-# main, exported from barony_game.dll / barony_editor.dll). Each Odin exe is
-# built with `odin build` in a custom_target, output into builddir/src next to
-# the DLLs so the game runs from there.
-#
-# One Odin package (odin/: main.odin + game.odin + editor.odin) builds both
-# binaries: the game by default, the editor with -define:EDITOR=true.
-# game.odin imports ../builddir/src/barony_game.lib; editor.odin imports
-# ../builddir/src/barony_editor.lib (both relative to odin/, so no libs are
-# copied into the source tree).
+# main). The C++ static lib is linked with /WHOLEARCHIVE (so ALL objects are
+# included, not just those referenced from Odin), plus the vcpkg import libs
+# the static lib needs. One Odin package (odin/: main.odin + game.odin +
+# editor.odin + prng.odin) builds both binaries: the game by default, the
+# editor with -define:EDITOR=true. game.odin/editor.odin import the static
+# lib by relative path from odin/.
 # ---------------------------------------------------------------------------
 if host_system == 'windows'
   odin_exe = find_program('odin', 'C:/dev/odin/odin.exe', required : false)
   if odin_exe.found()
     odin_root = meson.current_source_dir() / '..' / 'odin'
 
+    # vcpkg debug import libs (must match the runtime DLLs: SDL2d, OpenAL32, etc.)
+    vcpkg_debug_lib = 'C:/dev/vcpkg/installed/x64-windows/debug/lib'
+    # The C++ static libs are compiled with /MDd (debug dynamic CRT); Odin defaults
+    # to /defaultlib:libcmt (static release CRT), so the debug DLL CRT import libs
+    # must be added explicitly to satisfy the C++ objects' __imp_* references.
+    # (8.3 short paths are used because Odin's -extra-linker-flags does not
+    # preserve quotes around paths with spaces.)
+    msvc_lib = 'C:/PROGRA~1/MIB055~1/18/COMMUN~1/VC/Tools/MSVC/1451~1.362/lib/x64'
+    ucrt_lib = 'C:/PROGRA~2/WI3CF2~1/10/Lib/100280~1.0/ucrt/x64'
+    # Common third-party + CRT import libs (the /WHOLEARCHIVE archive differs per exe)
+    odin_dep_libs = [
+      msvc_lib / 'msvcprtd.lib',
+      msvc_lib / 'vcruntimed.lib',
+      ucrt_lib / 'ucrtd.lib',
+      '/NODEFAULTLIB:libcmt',
+      '/NODEFAULTLIB:libucrt',
+      vcpkg_debug_lib / 'SDL2d.lib',
+      vcpkg_debug_lib / 'SDL2_imaged.lib',
+      vcpkg_debug_lib / 'SDL2_netd.lib',
+      vcpkg_debug_lib / 'SDL2_ttfd.lib',
+      vcpkg_debug_lib / 'physfs.lib',
+      vcpkg_debug_lib / 'libpng16d.lib',
+      vcpkg_debug_lib / 'glew32d.lib',
+      vcpkg_debug_lib / 'freetyped.lib',
+      vcpkg_debug_lib / 'bz2d.lib',
+      vcpkg_debug_lib / 'brotlicommon.lib',
+      vcpkg_debug_lib / 'brotlidec.lib',
+      vcpkg_debug_lib / 'brotlienc.lib',
+      vcpkg_debug_lib / 'fmtd.lib',
+      vcpkg_debug_lib / 'OpenAL32.lib',
+      vcpkg_debug_lib / 'ogg.lib',
+      vcpkg_debug_lib / 'vorbis.lib',
+      vcpkg_debug_lib / 'vorbisenc.lib',
+      vcpkg_debug_lib / 'vorbisfile.lib',
+      'opengl32.lib',
+      '/DEFAULTLIB:wsock32.lib',
+      '/DEFAULTLIB:ws2_32.lib',
+      '/DEFAULTLIB:shell32.lib',
+      '/DEFAULTLIB:user32.lib',
+      '/DEFAULTLIB:gdi32.lib',
+      '/DEFAULTLIB:winmm.lib',
+      '/DEFAULTLIB:imm32.lib',
+      '/DEFAULTLIB:ole32.lib',
+      '/DEFAULTLIB:oleaut32.lib',
+      '/DEFAULTLIB:version.lib',
+      '/DEFAULTLIB:uuid.lib',
+      '/DEFAULTLIB:advapi32.lib',
+      '/DEFAULTLIB:setupapi.lib',
+    ]
+
+    # Per-exe link flags: /WHOLEARCHIVE the matching static lib + common deps.
+    game_link_flags = ['/WHOLEARCHIVE:' + meson.current_build_dir() / 'libbarony_game.a'] + odin_dep_libs
+    editor_link_flags = ['/WHOLEARCHIVE:' + meson.current_build_dir() / 'libbarony_editor.a'] + odin_dep_libs
+
+    if theoraplay_enabled
+      # The game lib's mod_tools.cpp uses TheoraPlay (USE_THEORA_VIDEO); the
+      # editor does not. Link the vendored archive + theora/vorbis codec libs
+      # into the game exe only.
+      game_link_flags += meson.current_build_dir() / '..' / 'third_party' / 'theoraplay' / 'libtheoraplay.a'
+      game_link_flags += vcpkg_debug_lib / 'theora.lib'
+      game_link_flags += vcpkg_debug_lib / 'theoradec.lib'
+      game_link_flags += vcpkg_debug_lib / 'theoraenc.lib'
+    endif
+
     # Odin exe for the game -> builddir/src/barony.exe
-    # (game.odin's foreign import resolves ../builddir/src/barony_game.lib
-    # relative to odin/)
     odin_game_exe = custom_target('odin_game_exe',
       output : 'barony.exe',
       input : [
         odin_root / 'main.odin',
         odin_root / 'game.odin',
+        odin_root / 'prng.odin',
       ],
       depends : [barony_game_lib],
       command : [
         odin_exe, 'build', odin_root,
         '-out:' + meson.current_build_dir() / 'barony.exe',
         '-debug',
+        '-extra-linker-flags:' + ' '.join(game_link_flags),
       ],
       build_by_default : true,
     )
@@ -324,6 +387,7 @@ if host_system == 'windows'
           '-out:' + meson.current_build_dir() / 'editor.exe',
           '-debug',
           '-define:EDITOR=true',
+          '-extra-linker-flags:' + ' '.join(editor_link_flags),
         ],
         build_by_default : true,
       )
