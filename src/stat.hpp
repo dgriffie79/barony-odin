@@ -453,7 +453,7 @@ public:
 	void* monster_sound;
 #endif
 	int monster_idlevar;
-	std::map<std::string, std::string> attributes;
+	DynamicMapStr attributes;
 	struct Lootbag_t
 	{
 		int spawn_x = 0;
@@ -487,9 +487,9 @@ public:
 	static int getParryingACBonus(Stat* myStats, Item* myWeapon, bool checkWeapon, bool excludeSkill, int weaponSkill);
 	std::string getAttribute(std::string key) const
 	{ 
-		if ( attributes.find(key) != attributes.end() )
+		if ( attributes.contains(key) )
 		{
-			return attributes.at(key);
+			return attributes.at(key).c_str();
 		}
 		else
 		{

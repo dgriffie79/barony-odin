@@ -991,11 +991,7 @@ void ItemTooltips_t::readItemsFromFile()
 		items[i].indexShort = tmpItems[i].tpShortIndex;
 		items[i].tooltip = tmpItems[i].tooltip.c_str();
 		items[i].attributes.clear();
-		// bridge: tmpItem_t.attributes is still std::map (not converted yet)
-		for ( const auto& kv : tmpItems[i].attributes )
-		{
-			items[i].attributes[kv.first.c_str()] = kv.second;
-		}
+		items[i].attributes = tmpItems[i].attributes;  // both DynamicMapI32 now
 		if ( i == SPELL_ITEM )
 		{
 			items[i].variations = 1;

@@ -332,3 +332,121 @@ barony_dynamic_map_stri32_entries :: proc "c" (m: ^map[string]i32, key_ptrs: [^]
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> string (map[string]string) — BOTH keys AND values interned.
+// std::map<std::string,std::string> deep-copies both; Odin stores views. The
+// values are often temporaries (std::to_string results) so they must be
+// interned too, or they'd dangle. Values dedup like keys (shared global
+// interner).
+// ---------------------------------------------------------------------------
+
+// string -> string: init
+@(export)
+barony_dynamic_map_strstr_init :: proc "c" (m: ^map[string]string) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+// string -> string: put (interns key AND value)
+@(export)
+barony_dynamic_map_strstr_put :: proc "c" (m: ^map[string]string, key: string, value: string) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]string)
+	}
+	k := intern_string(key)
+	v := intern_string(value)
+	m[k] = v
+}
+
+// string -> string: get
+@(export)
+barony_dynamic_map_strstr_get :: proc "c" (m: ^map[string]string, key: string, out: ^string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		out^ = v
+	}
+	return ok
+}
+
+// string -> string: erase
+@(export)
+barony_dynamic_map_strstr_erase :: proc "c" (m: ^map[string]string, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	_, had := m[key]
+	runtime.delete_key(m, key)
+	return had
+}
+
+// string -> string: clear
+@(export)
+barony_dynamic_map_strstr_clear :: proc "c" (m: ^map[string]string) {
+	context = runtime.default_context()
+	if m^ != nil {
+		clear(&m^)
+	}
+}
+
+// string -> string: len
+@(export)
+barony_dynamic_map_strstr_len :: proc "c" (m: ^map[string]string) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+// string -> string: destroy
+@(export)
+barony_dynamic_map_strstr_destroy :: proc "c" (m: ^map[string]string) {
+	context = runtime.default_context()
+	if m^ != nil {
+		delete(m^)
+		m^ = nil
+	}
+}
+
+// string -> string: operator[] stable value ptr (returns ^string)
+@(export)
+barony_dynamic_map_strstr_entry :: proc "c" (m: ^map[string]string, key: string) -> ^string {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]string)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+// string -> string: snapshot entries (key_ptr, key_len, value_ptr, value_len)
+@(export)
+barony_dynamic_map_strstr_entries :: proc "c" (m: ^map[string]string, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]rawptr, val_lens: [^]i32, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, value in m^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		val_ptrs[n] = raw_data(value)
+		val_lens[n] = i32(len(value))
+		n += 1
+	}
+	return n
+}

@@ -1789,5 +1789,5 @@ bool isMonsterStatsDefault(Stat& myStats)
 
 void Stat::setAttribute(std::string key, std::string value)
 {
-	attributes[key] = value;
+	attributes[key] = value.c_str();
 }

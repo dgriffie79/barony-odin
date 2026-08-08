@@ -41,6 +41,15 @@ extern "C" {
     void      barony_dynamic_map_stri32_destroy(DynamicMapRaw*);
     int32_t*  barony_dynamic_map_stri32_entry(DynamicMapRaw*, DynamicString);
     int32_t   barony_dynamic_map_stri32_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, int32_t* val_ptrs, int32_t count);
+    void      barony_dynamic_map_strstr_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strstr_put(DynamicMapRaw*, DynamicString, DynamicString);
+    bool      barony_dynamic_map_strstr_get(DynamicMapRaw*, DynamicString, DynamicString*);
+    bool      barony_dynamic_map_strstr_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strstr_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strstr_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strstr_destroy(DynamicMapRaw*);
+    DynamicString* barony_dynamic_map_strstr_entry(DynamicMapRaw*, DynamicString);
+    int32_t   barony_dynamic_map_strstr_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void** val_ptrs, int32_t* val_lens, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -148,6 +157,113 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_map_stri32_put(&raw, key, vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, string> — stat_t.attributes, input bindings, etc.
+// BOTH keys AND values are interned (values are often temporaries like
+// std::to_string results — they'd dangle without interning).
+// ---------------------------------------------------------------------------
+class DynamicMapStr {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapStr() { barony_dynamic_map_strstr_init(&raw); }
+    ~DynamicMapStr() { barony_dynamic_map_strstr_destroy(&raw); }
+
+    DynamicMapStr(const DynamicMapStr& other) : raw{} {
+        barony_dynamic_map_strstr_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapStr& operator=(const DynamicMapStr& other) {
+        if (this != &other) { barony_dynamic_map_strstr_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapStr(DynamicMapStr&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapStr& operator=(DynamicMapStr&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strstr_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    // operator[]: returns a DynamicString reference to the interned value
+    DynamicString& operator[](const char* key) {
+        return *barony_dynamic_map_strstr_entry(&raw, DynamicString(key));
+    }
+    DynamicString& operator[](const DynamicString& key) {
+        return *barony_dynamic_map_strstr_entry(&raw, key);
+    }
+    DynamicString& operator[](const std::string& key) {
+        return *barony_dynamic_map_strstr_entry(&raw, DynamicString(key.c_str()));
+    }
+
+    // at: returns the value as a DynamicString (by value, for safety)
+    DynamicString at(const char* key) const {
+        DynamicString out;
+        barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+        return out;
+    }
+    DynamicString at(const std::string& key) const {
+        DynamicString out;
+        barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &out);
+        return out;
+    }
+
+    bool contains(const char* key) const {
+        DynamicString v;
+        return barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v);
+    }
+    bool contains(const DynamicString& key) const {
+        DynamicString v;
+        return barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), key, &v);
+    }
+    bool contains(const std::string& key) const {
+        DynamicString v;
+        return barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v);
+    }
+
+    int64_t size() const { return barony_dynamic_map_strstr_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strstr_clear(&raw); }
+    bool erase(const char* key) { return barony_dynamic_map_strstr_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strstr_erase(&raw, key); }
+    bool erase(const std::string& key) { return barony_dynamic_map_strstr_erase(&raw, DynamicString(key.c_str())); }
+
+    struct Entry { const char* key; int64_t key_len; const char* value; int64_t value_len; };
+    int32_t entryList(Entry* out, int32_t max) const {
+        int32_t n = (int32_t)size();
+        if (n > max) n = max;
+        if (n <= 0) return 0;
+        std::vector<void*> kp(n), vp(n);
+        std::vector<int32_t> kl(n), vl(n);
+        int32_t got = barony_dynamic_map_strstr_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vp.data(), vl.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            out[i].key = (const char*)kp[i];
+            out[i].key_len = kl[i];
+            out[i].value = (const char*)vp[i];
+            out[i].value_len = vl[i];
+        }
+        return got;
+    }
+
+private:
+    void copyFrom(const DynamicMapStr& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n), vp(n);
+        std::vector<int32_t> kl(n), vl(n);
+        int32_t got = barony_dynamic_map_strstr_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vp.data(), vl.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            DynamicString value((const char*)vp[i], vl[i]);
+            barony_dynamic_map_strstr_put(&raw, key, value);
         }
     }
 };

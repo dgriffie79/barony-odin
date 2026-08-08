@@ -5977,8 +5977,10 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					for ( int i = 0; i < NUMMISCFLAGS; ++i ) {
 						stats.MISC_FLAGS[i] = follower->MISC_FLAGS[i];
 					}
-					for ( auto& attribute : follower->attributes ) {
-						stats.attributes.push_back(attribute);
+					DynamicMapStr::Entry attrEntries[64];
+					int32_t attrCount = follower->attributes.entryList(attrEntries, 64);
+					for ( int32_t ai = 0; ai < attrCount; ++ai ) {
+						stats.attributes.push_back(std::make_pair(std::string(attrEntries[ai].key, attrEntries[ai].key_len), std::string(attrEntries[ai].value, attrEntries[ai].value_len)));
 					}
 
 					// equipment slots
@@ -6952,7 +6954,7 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 				char value[32];
 				stringCopy(key, attr.first.c_str(), sizeof(key), attr.first.size());
 				stringCopy(value, attr.second.c_str(), sizeof(value), attr.second.size());
-				stats->attributes.emplace(std::make_pair(key, value));
+				stats->attributes[key] = value;
 			}
 
 			// read follower inventory

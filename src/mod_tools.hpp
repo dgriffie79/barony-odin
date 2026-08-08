@@ -2748,7 +2748,7 @@ class ItemTooltips_t
 		std::string category = "nothing";
 		std::string equipSlot = "nothing";
 		std::vector<std::string> imagePaths;
-		std::map<std::string, Sint32> attributes;
+		DynamicMapI32 attributes;
 		std::string tooltip = "tooltip_default";
 		std::string iconLabelPath = "";
 	};
