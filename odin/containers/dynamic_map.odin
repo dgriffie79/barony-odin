@@ -11,9 +11,21 @@
 //   - string keys (Item.attributes etc.): map[string]V — C++ passes a
 //     DynamicString {data,len}, which is ABI-identical to Odin's string, so the
 //     shim receives it directly as `string`.
+//
+// STRING KEY OWNERSHIP (critical):
+// Odin's map[string]V stores keys as VIEWS (16-byte header copied, character
+// buffer NOT copied). std::map<std::string,V> deep-copies keys. To match
+// std::map semantics when called from C++, string keys are INTERNED into a
+// SHARED GLOBAL interner (strings.intern) on put. The map stores a view to the
+// interned copy, which lives for the process lifetime (bounded key sets:
+// attribute names, binding names, config keys). Repeated keys dedup to one
+// copy. Ported Odin code uses the same idiom (map[string]V + strings.intern).
+// The interner is lazily init'd; population is single-threaded (startup/game).
 package containers
 
 import "core:runtime"
+import "core:strings"
+import "core:slice"
 
 // ---------------------------------------------------------------------------
 // Integer-keyed maps (key = 4-byte blob). Value types get one instantiation
@@ -200,14 +212,20 @@ barony_dynamic_map_strint_destroy :: proc "c" (m: ^map[string]int) {
 	}
 }
 
-// string -> i32 (for Stat/Item attributes: map<string, Sint32>)
+// string -> i32 (for Stat/Item attributes: map<string, Sint32>) — interned key
+@(export)
+barony_dynamic_map_stri32_init :: proc "c" (m: ^map[string]i32) {
+	context = runtime.default_context()
+	m^ = nil
+}
 @(export)
 barony_dynamic_map_stri32_put :: proc "c" (m: ^map[string]i32, key: string, value: i32) {
 	context = runtime.default_context()
 	if m^ == nil {
 		m^ = make(map[string]i32)
 	}
-	m[key] = value
+	k := intern_string(key)
+	m[k] = value
 }
 @(export)
 barony_dynamic_map_stri32_get :: proc "c" (m: ^map[string]i32, key: string, out: ^i32) -> bool {
@@ -253,4 +271,64 @@ barony_dynamic_map_stri32_destroy :: proc "c" (m: ^map[string]i32) {
 		delete(m^)
 		m^ = nil
 	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Shared global string interner (key ownership for string-keyed maps)
+// ---------------------------------------------------------------------------
+// Odin's map[string]V stores keys as views; std::map deep-copies them. We
+// intern keys into ONE process-lifetime interner so map keys are stable and
+// deduplicated. Keys are never freed (bounded set — attribute/binding names).
+_global_interner: strings.Intern
+_global_interner_init: bool
+
+intern_string :: proc(key: string) -> string {
+	context = runtime.default_context()
+	if !_global_interner_init {
+		strings.intern_init(&_global_interner)
+		_global_interner_init = true
+	}
+	s, _ := strings.intern_get(&_global_interner, key)
+	return s
+}
+
+// map[string]i32 — operator[] stable value pointer (std::map::operator[]).
+// Returns pointer to the value slot; inserts default (0) if missing.
+// The caller must copy the value out (ptr valid until next mutation).
+@(export)
+barony_dynamic_map_stri32_entry :: proc "c" (m: ^map[string]i32, key: string) -> ^i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]i32)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+// map[string]i32 — snapshot all entries for C++ copy/iteration.
+// key_ptrs = array of (const char*) into interned storage, key_lens = array
+// of i32 lengths, val_ptrs = array of i32 values. Each array has `count`
+// slots (caller passes len(m)); returns entries written.
+@(export)
+barony_dynamic_map_stri32_entries :: proc "c" (m: ^map[string]i32, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]i32, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, value in m^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = raw_data(key) // view into the interned copy
+		key_lens[n] = i32(len(key))
+		val_ptrs[n] = value
+		n += 1
+	}
+	return n
 }
