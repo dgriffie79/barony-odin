@@ -22,6 +22,10 @@
 #include <functional>
 #include <string>
 
+// DynamicString ({data,len}, NUL-terminated) — the de-STL string that will
+// replace std::string in shared structs. Mirrors Odin's string layout.
+#include "../odin/containers/dynamic_string.hpp"
+
 class File;
 
 enum class EFileFormat {
@@ -86,6 +90,8 @@ public:
 	bool value(bool& v);
 	// @param v the value to serialize
 	bool value(std::string& v);
+	// @param v the value to serialize (DynamicString — de-STL string)
+	bool value(DynamicString& v);
 
 	// Serialize a vector with a max length
 	// @param v the value to serialize
@@ -203,6 +209,8 @@ private:
 	// binary string length-prefixed write/read (used when format == Binary)
 	bool writeStringInternalBinary(const std::string& v);
 	bool readStringInternalBinary(std::string& v);
+	bool writeStringInternalBinary(const DynamicString& v);
+	bool readStringInternalBinary(DynamicString& v);
 };
 
 class FileHelper {

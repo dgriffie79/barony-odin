@@ -7,6 +7,7 @@
 // emits the symbol reference; /WHOLEARCHIVE guarantees all objects are pulled
 // in (so ported Odin procs can be called from C++ and vice versa).
 package main
+import "containers"
 
 when #config(EDITOR, false) {
 	foreign import _barony "../builddir/src/libbarony_editor.a"

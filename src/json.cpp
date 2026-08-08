@@ -61,6 +61,9 @@ struct JsonWriterState {
 	bool value(std::string& value) {
 		return writer.String(value.c_str());
 	}
+	bool value(DynamicString& value) {
+		return writer.String(value.c_str());
+	}
 
 	void save(File* file) {
 		buffer.Flush();
@@ -164,6 +167,15 @@ struct JsonReaderState {
 		}
 	}
 	bool value(std::string& value) {
+		auto cv = GetCurrentValue();
+		if (cv && cv->IsString()) {
+			value = cv->GetString();
+			return true;
+		} else {
+		    return false;
+		}
+	}
+	bool value(DynamicString& value) {
 		auto cv = GetCurrentValue();
 		if (cv && cv->IsString()) {
 			value = cv->GetString();
@@ -286,12 +298,26 @@ struct BinaryWriterState {
 	bool value(std::string& v) {
 		return writeStringInternal(v);
 	}
+	bool value(DynamicString& v) {
+		return writeStringInternal(v);
+	}
 
 	void writeHeader() {
 		(void)fp->write(&BinaryFormatTag, sizeof(BinaryFormatTag), 1);
 	}
 
 	bool writeStringInternal(const std::string& v) {
+		Uint32 len = (Uint32)v.size();
+		bool result = true;
+		result = fp->write(&len, sizeof(len), 1) == 1 ? result : false;
+		if (len) {
+			result = fp->write(v.c_str(), sizeof(char), len) == len ?
+			    result : false;
+		}
+		return result;
+	}
+
+	bool writeStringInternal(const DynamicString& v) {
 		Uint32 len = (Uint32)v.size();
 		bool result = true;
 		result = fp->write(&len, sizeof(len), 1) == 1 ? result : false;
@@ -353,6 +379,10 @@ struct BinaryReaderState {
 		bool result = readStringInternal(v);
 		return result;
 	}
+	bool value(DynamicString& v) {
+		bool result = readStringInternal(v);
+		return result;
+	}
 
 	bool readHeader() {
 		Uint32 fileFormatTag;
@@ -380,6 +410,32 @@ struct BinaryReaderState {
 			v.reserve(len);
 			read = fp->read(&v[0u], sizeof(char), len);
 		    result = read == len ? result : false;
+		}
+
+		return result;
+	}
+
+	// DynamicString read: reads the length-prefixed bytes and appends them
+	// (sets len correctly; the std::string version's reserve+operator[]
+	// leaves size stale — we match the FORMAT, not the bug).
+	bool readStringInternal(DynamicString & v) {
+		Uint32 len;
+		bool result = true;
+		size_t read = fp->read(&len, sizeof(len), 1);
+		result = read == 1 ? result : false;
+
+		v.clear();
+		if (len) {
+			// read into a temp then append (sets len properly)
+			char* tmp = (char*)malloc(len);
+			if (tmp) {
+				read = fp->read(tmp, sizeof(char), len);
+				result = read == len ? result : false;
+				v.append(tmp, (int64_t)len);
+				free(tmp);
+			} else {
+				result = false;
+			}
 		}
 
 		return result;
@@ -543,6 +599,13 @@ bool FileInterface::value(std::string& v) {
 	return reading ? jsonReader->value(v) : jsonWriter->value(v);
 }
 
+bool FileInterface::value(DynamicString& v) {
+	if (format == EFileFormat::Binary) {
+		return reading ? readStringInternalBinary(v) : writeStringInternalBinary(v);
+	}
+	return reading ? jsonReader->value(v) : jsonWriter->value(v);
+}
+
 void FileInterface::flushToFile() {
 	if (!reading && jsonWriter) {
 		jsonWriter->save(fp);
@@ -550,6 +613,17 @@ void FileInterface::flushToFile() {
 }
 
 bool FileInterface::writeStringInternalBinary(const std::string& v) {
+	Uint32 len = (Uint32)v.size();
+	bool result = true;
+	result = fp->write(&len, sizeof(len), 1) == 1 ? result : false;
+	if (len) {
+		result = fp->write(v.c_str(), sizeof(char), len) == len ?
+		    result : false;
+	}
+	return result;
+}
+
+bool FileInterface::writeStringInternalBinary(const DynamicString& v) {
 	Uint32 len = (Uint32)v.size();
 	bool result = true;
 	result = fp->write(&len, sizeof(len), 1) == 1 ? result : false;
@@ -570,6 +644,28 @@ bool FileInterface::readStringInternalBinary(std::string& v) {
 		v.reserve(len);
 		read = fp->read(&v[0u], sizeof(char), len);
 	    result = read == len ? result : false;
+	}
+
+	return result;
+}
+
+bool FileInterface::readStringInternalBinary(DynamicString& v) {
+	Uint32 len;
+	bool result = true;
+	size_t read = fp->read(&len, sizeof(len), 1);
+	result = read == 1 ? result : false;
+
+	v.clear();
+	if (len) {
+		char* tmp = (char*)malloc(len);
+		if (tmp) {
+			read = fp->read(tmp, sizeof(char), len);
+			result = read == len ? result : false;
+			v.append(tmp, (int64_t)len);
+			free(tmp);
+		} else {
+			result = false;
+		}
 	}
 
 	return result;
