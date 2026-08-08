@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
+#include <string>
 #include <vector>
 #include "dynamic_string.hpp"
 
@@ -88,6 +89,10 @@ public:
     int32_t& operator[](const DynamicString& key) {
         return *barony_dynamic_map_stri32_entry(&raw, key);
     }
+    // bridge: accept std::string keys (until callers convert)
+    int32_t& operator[](const std::string& key) {
+        return *barony_dynamic_map_stri32_entry(&raw, DynamicString(key.c_str()));
+    }
 
     bool contains(const char* key) const {
         int32_t v;
@@ -96,6 +101,11 @@ public:
     bool contains(const DynamicString& key) const {
         int32_t v;
         return barony_dynamic_map_stri32_get(const_cast<DynamicMapRaw*>(&raw), key, &v);
+    }
+    // bridge: accept std::string keys (until callers convert)
+    bool contains(const std::string& key) const {
+        int32_t v;
+        return barony_dynamic_map_stri32_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v);
     }
 
     int64_t size() const { return barony_dynamic_map_stri32_len(const_cast<DynamicMapRaw*>(&raw)); }

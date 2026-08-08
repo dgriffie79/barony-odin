@@ -16,6 +16,7 @@
 #include "game.hpp"
 // DynamicString — de-STL string for shared struct members
 #include "../odin/containers/dynamic_string.hpp"
+#include "../odin/containers/dynamic_map.hpp"
 
 class Entity; // forward declare
 class Stat; // forward declare
@@ -778,7 +779,7 @@ public:
 	int level;					// item level for random generation
 	// equip slot that item can go in
 	ItemEquippableSlot item_slot = ItemEquippableSlot::NO_EQUIP;
-	std::map<std::string, Sint32> attributes;
+	DynamicMapI32 attributes;
 	DynamicString tooltip;  // "tooltip_default" default set at startup
 
 	const char* getIdentifiedName() const { return item_name_identified.c_str(); }
@@ -789,7 +790,7 @@ public:
 	{
 		if ( attributes.size() > 0 )
 		{
-			if ( attributes.find(attribute) != attributes.end() )
+			if ( attributes.contains(attribute) )
 			{
 				return true;
 			}
