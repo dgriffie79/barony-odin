@@ -779,7 +779,7 @@ public:
 	// equip slot that item can go in
 	ItemEquippableSlot item_slot = ItemEquippableSlot::NO_EQUIP;
 	std::map<std::string, Sint32> attributes;
-	std::string tooltip = "tooltip_default";
+	DynamicString tooltip;  // "tooltip_default" default set at startup
 
 	const char* getIdentifiedName() const { return item_name_identified.c_str(); }
 	const char* getUnidentifiedName() const { return item_name_unidentified.c_str(); }

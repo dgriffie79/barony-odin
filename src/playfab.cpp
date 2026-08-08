@@ -510,7 +510,9 @@ int parseOnlineHiscore(SaveGameInfo& info, Json::Value score)
     {
         if ( m == "dispname" )
         {
-            jsonValueToString(score, m, info.gamename);
+            std::string tmp;
+            jsonValueToString(score, m, tmp);
+            info.gamename = tmp.c_str();
         }
         else if ( m == "rank" )
         {

@@ -23717,7 +23717,7 @@ failed:
 
         // extract savegame info
         auto saveGameInfo = getSaveGameInfo(singleplayer, save_index);
-        const std::string& game_name = saveGameInfo.gamename;
+        const DynamicString& game_name = saveGameInfo.gamename;
 
         // create shortened player name
         char shortened_name[20] = { '\0' };
@@ -23889,7 +23889,7 @@ failed:
 
         // extract savegame info
         auto saveGameInfo = getSaveGameInfo(singleplayer, save_index);
-        const std::string& game_name = saveGameInfo.gamename;
+        const DynamicString& game_name = saveGameInfo.gamename;
 
         // create shortened player name
         char shortened_name[20] = { '\0' };
@@ -24310,7 +24310,7 @@ failed:
 						break;
 					}
 				}
-                const std::string& game_name = saveGameInfo.gamename;
+                const DynamicString& game_name = saveGameInfo.gamename;
                 const auto timestamp = saveGameInfo.timestamp;
 				int numplayers = 0;
 				for (auto p : saveGameInfo.players_connected) {

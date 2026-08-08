@@ -989,7 +989,7 @@ void ItemTooltips_t::readItemsFromFile()
 		items[i].fpindex = tmpItems[i].fpIndex;
 		items[i].index = tmpItems[i].tpIndex;
 		items[i].indexShort = tmpItems[i].tpShortIndex;
-		items[i].tooltip = tmpItems[i].tooltip;
+		items[i].tooltip = tmpItems[i].tooltip.c_str();
 		items[i].attributes.clear();
 		items[i].attributes = tmpItems[i].attributes;
 		if ( i == SPELL_ITEM )

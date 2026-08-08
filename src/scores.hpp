@@ -457,11 +457,11 @@ bool anySaveFileExists(bool singleplayer);
 bool anySaveFileExists();
 
 struct SaveGameInfo {
-	std::string magic_cookie = "BARONYJSONSAVE";
+	DynamicString magic_cookie = "BARONYJSONSAVE";
 	int game_version = -1;
-    std::string timestamp;
+    DynamicString timestamp;
 	Uint32 hash = 0;
-	std::string gamename;
+	DynamicString gamename;
 	Uint32 gamekey = 0;
 	Uint32 lobbykey = 0;
 	Uint32 mapseed = 0;
