@@ -2489,9 +2489,9 @@ public:
 		class SeededRun_t
 		{
 		public:
-			std::string seedString = "";
+			DynamicString seedString;
 			Uint32 seed = 0;
-			void setup(std::string _seedString);
+			void setup(DynamicString _seedString);
 			void reset();
 
 			static std::vector<std::string> prefixes;

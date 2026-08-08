@@ -468,7 +468,7 @@ struct SaveGameInfo {
 	Uint32 gametimer = 0;
 	Uint32 svflags = 0;
 	Uint32 customseed = 0;
-	std::string customseed_string = "";
+	DynamicString customseed_string;
     int player_num = 0;
     int multiplayer_type = SINGLE;
     int dungeon_lvl = 0;

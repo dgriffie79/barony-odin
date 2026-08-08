@@ -48,7 +48,8 @@ public:
 
     // ---- construction / destruction (RAII) ----
     DynamicString() : data(nullptr), len(0) { barony_dynamic_string_init(this); }
-    explicit DynamicString(const char* cstr) : data(nullptr), len(0) { assign(cstr); }
+    // non-explicit: implicit conversion from const char* (std::string semantics)
+    DynamicString(const char* cstr) : data(nullptr), len(0) { assign(cstr); }
     DynamicString(const char* bytes, int64_t n) : data(nullptr), len(0) { assign(bytes, n); }
     ~DynamicString() { barony_dynamic_string_destroy(this); }
 
@@ -101,6 +102,12 @@ public:
     int64_t find(const char* needle) const { return barony_dynamic_string_find(this, needle, (int64_t)std::strlen(needle), 0); }
     int64_t find(const char* needle, int64_t start) const { return barony_dynamic_string_find(this, needle, (int64_t)std::strlen(needle), (int)start); }
     int64_t find(const DynamicString& needle) const { return barony_dynamic_string_find(this, needle.data, needle.len, 0); }
+    // find a single char (std::string::find(char))
+    int64_t find(char c) const { return barony_dynamic_string_find(this, &c, 1, 0); }
+    // mutable char access (std::string::operator[]/at)
+    char& at(int64_t i) { return data[i]; }
+    char& operator[](int64_t i) { return data[i]; }
+    const char& operator[](int64_t i) const { return data[i]; }
     int compare(const DynamicString& other) const { return barony_dynamic_string_compare(this, &other); }
     int compare(const char* cstr) const {
         DynamicString tmp(cstr);

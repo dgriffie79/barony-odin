@@ -452,7 +452,7 @@ void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonPromptEnterTutorial
 	gameModeManager.Tutorial.writeToDocument();
 }
 
-void GameModeManager_t::CurrentSession_t::SeededRun_t::setup(std::string _seedString)
+void GameModeManager_t::CurrentSession_t::SeededRun_t::setup(DynamicString _seedString)
 {
 	if ( _seedString == "" )
 	{

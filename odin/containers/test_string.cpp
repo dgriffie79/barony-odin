@@ -124,6 +124,26 @@ int main() {
         CHECK(dcat == scat.c_str(), "concat matches std::string");
     }
 
+
+    // ---- find(char) + at() (MainMenu float_warning_add path) ----
+    {
+        DynamicString warn("line1\nline2");
+        int64_t nl = warn.find('\n');
+        CHECK(nl == 5, "find(char) newline at 5");
+        if (nl != -1) warn.at(nl) = ' ';
+        CHECK(warn == "line1 line2", "at() replace newline");
+        CHECK(warn[0] == 'l' && warn[1] == 'i', "operator[] read");
+    }
+
+    // ---- implicit ctor from const char* (non-explicit) ----
+    {
+        DynamicString implicit_ok = "implicit";
+        CHECK(implicit_ok == "implicit", "implicit ctor from cstr");
+        // lambda-style: function taking DynamicString by value from a cstr
+        auto takes_dstr = [](DynamicString s) { return s.size(); };
+        CHECK(takes_dstr("hello") == 5, "implicit ctor into by-value param");
+    }
+
     if (failures == 0) {
         printf("string test: PASS (all checks)\n");
         return 0;

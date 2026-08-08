@@ -19100,7 +19100,7 @@ failed:
 		{
 			if ( gameModeManager.currentSession.challengeRun.isActive() )
 			{
-				gameModeManager.currentSession.seededRun.setup(gameModeManager.currentSession.challengeRun.seed_word);
+				gameModeManager.currentSession.seededRun.setup(gameModeManager.currentSession.challengeRun.seed_word.c_str());
 			}
 		}
 
@@ -19208,7 +19208,7 @@ failed:
 				});
 		}
 
-		static auto float_warning_add = [](Frame* _frame, const char* name, std::string text) {
+		static auto float_warning_add = [](Frame* _frame, const char* name, DynamicString text) {
 			_frame->setDisabled(false);
 			Frame* frame = _frame->findFrame(name);
 			if ( !frame )
@@ -19224,7 +19224,7 @@ failed:
 			}
 
 			auto find = text.find('\n');
-			if ( find != std::string::npos )
+			if ( find != -1 )
 			{
 				text.at(find) = ' ';
 			}
