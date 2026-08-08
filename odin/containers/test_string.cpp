@@ -144,6 +144,59 @@ int main() {
         CHECK(takes_dstr("hello") == 5, "implicit ctor into by-value param");
     }
 
+    // ---- npos constant ----
+    {
+        DynamicString hay("the quick brown fox");
+        CHECK(hay.find("nope") == DynamicString::npos, "find missing == npos");
+        CHECK(hay.find("fox") != DynamicString::npos, "find present != npos");
+        CHECK(DynamicString::npos == -1, "npos is -1");
+    }
+
+    // ---- to_string family ----
+    {
+        DynamicString s1 = to_string(42);
+        CHECK(s1 == "42", "to_string(int)");
+        DynamicString s2 = to_string(-7);
+        CHECK(s2 == "-7", "to_string(negative)");
+        DynamicString s3 = to_string(1234567890u);
+        CHECK(s3 == "1234567890", "to_string(uint)");
+        DynamicString s4 = to_string((long long)9876543210LL);
+        CHECK(s4 == "9876543210", "to_string(long long)");
+        DynamicString s5 = to_string(3.5f);
+        CHECK(s5 == "3.500000", "to_string(float) snprintf format");
+        DynamicString s6 = to_string(2.25);
+        CHECK(s6 == "2.250000", "to_string(double) snprintf format");
+        // composition (the real UI usage: text += std::to_string(x))
+        DynamicString label = "Level ";
+        int x = 12;
+        label += to_string(x);
+        CHECK(label == "Level 12", "to_string composed with +=");
+        // expr args (like the survey: c + 2, entry.lorePoints)
+        int c = 5;
+        DynamicString e1 = to_string(c + 2);
+        CHECK(e1 == "7", "to_string(expr)");
+    }
+
+    // ---- stoi/stol/stof/stod family ----
+    {
+        DynamicString s("123");
+        CHECK(stoi(s) == 123, "stoi basic");
+        DynamicString neg("-42");
+        CHECK(stoi(neg) == -42, "stoi negative");
+        DynamicString hex("1A");
+        CHECK(stoi(hex, nullptr, 16) == 26, "stoi base 16");
+        size_t pos = 0;
+        DynamicString partial("456abc");
+        int r = stoi(partial, &pos);
+        CHECK(r == 456 && pos == 3, "stoi pos after partial parse");
+        DynamicString flt("3.75");
+        CHECK(stof(flt) == 3.75f, "stof");
+        DynamicString dbl("2.5");
+        CHECK(stod(dbl) == 2.5, "stod");
+        DynamicString big("2147483647");  // LONG_MAX on Windows (32-bit long)
+        CHECK(stol(big) == 2147483647L, "stol");
+    }
+
     if (failures == 0) {
         printf("string test: PASS (all checks)\n");
         return 0;

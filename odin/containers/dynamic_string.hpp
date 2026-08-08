@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 // forward decl so the extern "C" shim block can use DynamicString* params
 class DynamicString;
@@ -45,6 +47,9 @@ class DynamicString {
 public:
     char*   data;
     int64_t len;
+
+    // std::string::npos equivalent — find() returns this on no-match
+    static const int64_t npos = -1;
 
     // ---- construction / destruction (RAII) ----
     DynamicString() : data(nullptr), len(0) { barony_dynamic_string_init(this); }
@@ -143,3 +148,39 @@ inline bool operator!=(const char* a, const DynamicString& b) { return b != a; }
 inline DynamicString operator+(const DynamicString& a, const char* b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const char* a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const DynamicString& a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
+
+// std::to_string replacement — returns a DynamicString (no std:: allocator
+// involvement; snprintf formats into an Odin-allocated buffer via from_cstr)
+inline DynamicString to_string(int v) { char buf[32]; snprintf(buf, sizeof(buf), "%d", v); return DynamicString(buf); }
+inline DynamicString to_string(unsigned int v) { char buf[32]; snprintf(buf, sizeof(buf), "%u", v); return DynamicString(buf); }
+inline DynamicString to_string(long v) { char buf[32]; snprintf(buf, sizeof(buf), "%ld", v); return DynamicString(buf); }
+inline DynamicString to_string(long long v) { char buf[32]; snprintf(buf, sizeof(buf), "%lld", v); return DynamicString(buf); }
+inline DynamicString to_string(unsigned long long v) { char buf[32]; snprintf(buf, sizeof(buf), "%llu", v); return DynamicString(buf); }
+inline DynamicString to_string(float v) { char buf[64]; snprintf(buf, sizeof(buf), "%f", v); return DynamicString(buf); }
+inline DynamicString to_string(double v) { char buf[64]; snprintf(buf, sizeof(buf), "%f", v); return DynamicString(buf); }
+
+// std::stoi/std::stof replacement — parse a DynamicString to a number
+inline int stoi(const DynamicString& s, size_t* pos = nullptr, int base = 10) {
+    const char* end = nullptr;
+    long r = std::strtol(s.c_str(), const_cast<char**>(&end), base);
+    if (pos) *pos = end ? (size_t)(end - s.c_str()) : s.size();
+    return (int)r;
+}
+inline long stol(const DynamicString& s, size_t* pos = nullptr, int base = 10) {
+    const char* end = nullptr;
+    long r = std::strtol(s.c_str(), const_cast<char**>(&end), base);
+    if (pos) *pos = end ? (size_t)(end - s.c_str()) : s.size();
+    return r;
+}
+inline float stof(const DynamicString& s, size_t* pos = nullptr) {
+    const char* end = nullptr;
+    float r = std::strtof(s.c_str(), const_cast<char**>(&end));
+    if (pos) *pos = end ? (size_t)(end - s.c_str()) : s.size();
+    return r;
+}
+inline double stod(const DynamicString& s, size_t* pos = nullptr) {
+    const char* end = nullptr;
+    double r = std::strtod(s.c_str(), const_cast<char**>(&end));
+    if (pos) *pos = end ? (size_t)(end - s.c_str()) : s.size();
+    return r;
+}
