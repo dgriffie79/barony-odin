@@ -141,6 +141,17 @@ int main() {
         CHECK(dm.size() == (int64_t)sm.size(), "erase matches std::map");
     }
 
+    // ---- find() iterator pattern (find != end(), find->second) ----
+    {
+        DynamicMapI32 m;
+        m["ATK"] = 10;
+        auto find = m.find("ATK");
+        CHECK(find != m.end(), "find existing != end");
+        CHECK(find->second == 10, "find->second");
+        auto missing = m.find("NOPE");
+        CHECK(missing == m.end(), "find missing == end");
+    }
+
     if (failures == 0) {
         printf("dyn map test: PASS (all checks)\n");
         return 0;

@@ -90,6 +90,30 @@ public:
     }
 
     // ---- std::map-like API ----
+    // find(): returns an iterator-like; use find(k) != end() then find->second
+    // (first = key as DynamicString, second = value). Matches std::map::find
+    // usage including find->first.c_str().
+    struct KV { DynamicString first; int32_t second; };
+    struct Iterator {
+        KV kv{};
+        bool valid = false;
+        const KV* operator->() const { return &kv; }
+    };
+    Iterator find(const char* key) const {
+        Iterator it;
+        int32_t v;
+        if (barony_dynamic_map_stri32_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v)) {
+            it.kv.first = key;   // copies (DynamicString RAII)
+            it.kv.second = v;
+            it.valid = true;
+        }
+        return it;
+    }
+    Iterator find(const std::string& key) const {
+        return find(key.c_str());
+    }
+    Iterator end() const { return Iterator{}; }
+
     // operator[]: inserts default (0) if missing, returns STABLE reference
     // (via the Odin map_entry value pointer — same slot on re-access).
     int32_t& operator[](const char* key) {
@@ -122,6 +146,9 @@ public:
     void clear() { barony_dynamic_map_stri32_clear(&raw); }
     bool erase(const char* key) { return barony_dynamic_map_stri32_erase(&raw, DynamicString(key)); }
     bool erase(const DynamicString& key) { return barony_dynamic_map_stri32_erase(&raw, key); }
+    // iterator comparison for find() != end()
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
+    friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
 
     // ---- iteration ----
     struct Entry { const char* key; int64_t key_len; int32_t value; };

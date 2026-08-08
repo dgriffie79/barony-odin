@@ -10204,7 +10204,7 @@ EditorEntityData_t editorEntityData;
 std::map<int, EditorEntityData_t::EntityColliderData_t> EditorEntityData_t::colliderData;
 std::map<std::string, EditorEntityData_t::ColliderDmgProperties_t> EditorEntityData_t::colliderDmgTypes;
 std::map<std::string, std::map<int, int>> EditorEntityData_t::colliderRandomGenPool;
-std::map<std::string, int> EditorEntityData_t::colliderNameIndexes;
+DynamicMapI32 EditorEntityData_t::colliderNameIndexes;
 void EditorEntityData_t::readFromFile()
 {
 	const std::string filename = "data/entity_data.json";
@@ -14358,7 +14358,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
-std::map<std::string, int> Compendium_t::Events_t::monsterUniqueIDLookup;
+DynamicMapI32 Compendium_t::Events_t::monsterUniqueIDLookup;
 std::map<Compendium_t::EventTags, std::set<int>> Compendium_t::Events_t::eventMonsterLookup;
 void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 {
@@ -14517,11 +14517,13 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 
 		Compendium_t::Events_t::monsterIDToString[type] = monstertypename[i];
 	}
-	for ( auto& pair : Compendium_t::Events_t::monsterUniqueIDLookup )
+	DynamicMapI32::Entry uidEntries[512];
+	int32_t entryCount = Compendium_t::Events_t::monsterUniqueIDLookup.entryList(uidEntries, 512);
+	for ( int32_t ei = 0; ei < entryCount; ++ei )
 	{
-		int type = pair.second + Compendium_t::Events_t::kEventMonsterOffset;
-		Compendium_t::Events_t::monsterIDToString[type] = pair.first;
-		if ( pair.first == "ghost" )
+		int type = uidEntries[ei].value + Compendium_t::Events_t::kEventMonsterOffset;
+		Compendium_t::Events_t::monsterIDToString[type] = std::string(uidEntries[ei].key, uidEntries[ei].key_len);
+		if ( std::string(uidEntries[ei].key, uidEntries[ei].key_len) == "ghost" )
 		{
 			Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_GHOST_SPAWNED].insert(type);
 			Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_GHOST_TELEPORTS].insert(type);
@@ -14537,7 +14539,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 			Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_RECRUITED].insert(type);
 			Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_KILL_XP].insert(type);
 
-			if ( pair.first == "mysterious shop" )
+			if ( std::string(uidEntries[ei].key, uidEntries[ei].key_len) == "mysterious shop" )
 			{
 				Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_MERCHANT_ORBS].insert(type);
 				Compendium_t::Events_t::eventMonsterLookup[EventTags::CPDM_SHOP_BOUGHT].insert(type);
@@ -14724,8 +14726,8 @@ std::map<int, std::set<Compendium_t::EventTags>> Compendium_t::Events_t::itemEve
 std::map<Compendium_t::EventTags, std::set<int>> Compendium_t::Events_t::eventItemLookup;
 std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t::eventWorldLookup;
 std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t::eventCodexLookup;
-std::map<std::string, int> Compendium_t::Events_t::eventWorldIDLookup;
-std::map<std::string, int> Compendium_t::Events_t::eventCodexIDLookup;
+DynamicMapI32 Compendium_t::Events_t::eventWorldIDLookup;
+DynamicMapI32 Compendium_t::Events_t::eventCodexIDLookup;
 std::map<Compendium_t::EventTags, std::map<int, int>> Compendium_t::Events_t::eventClassIds;
 std::map<int, std::vector<Compendium_t::EventTags>> Compendium_t::Events_t::itemDisplayedEventsList;
 std::map<int, std::vector<std::string>> Compendium_t::Events_t::itemDisplayedCustomEventsList;

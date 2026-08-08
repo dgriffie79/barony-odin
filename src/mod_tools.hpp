@@ -2867,9 +2867,9 @@ public:
 		std::vector<std::string> descriptionText;
 		std::map<std::string, std::vector<std::string>> detailsText;
 		std::vector<std::string> detailsTextInsertOrder;
-		std::map<std::string, int> minWidths;
-		std::map<std::string, int> maxWidths;
-		std::map<std::string, int> headerMaxWidths;
+		DynamicMapI32 minWidths;
+		DynamicMapI32 maxWidths;
+		DynamicMapI32 headerMaxWidths;
 		void setColorHeading(Uint32 color) { headingTextColor = color; }
 		void setColorDescription(Uint32 color) { descriptionTextColor = color; }
 		void setColorDetails(Uint32 color) { detailsTextColor = color; }
@@ -2901,8 +2901,8 @@ public:
 	std::map<std::string, ItemLocalization_t> itemNameLocalizations;
 	std::map<std::string, std::string> bookNameLocalizations;
 	std::map<std::string, std::string> spellNameLocalizations;
-	std::map<std::string, int> itemNameStringToItemID;
-	std::map<std::string, int> spellNameStringToSpellID;
+	DynamicMapI32 itemNameStringToItemID;
+	DynamicMapI32 spellNameStringToSpellID;
 	std::string defaultString = "";
 	char buf[2048];
 	bool autoReload = false;
@@ -3354,7 +3354,7 @@ struct EditorEntityData_t
 		std::vector<int> spellTriggers;
 		std::set<int> pathableMonsters;
 		int colliderJumpLangEntry = 6234;
-		std::map<std::string, int> overrideProperties;
+		DynamicMapI32 overrideProperties;
 		bool hasOverride(std::string key)
 		{
 			auto find = overrideProperties.find(key);
@@ -3395,7 +3395,7 @@ struct EditorEntityData_t
 	static std::map<std::string, ColliderDmgProperties_t> colliderDmgTypes;
 	static std::map<int, EntityColliderData_t> colliderData;
 	static std::map<std::string, std::map<int, int>> colliderRandomGenPool;
-	static std::map<std::string, int> colliderNameIndexes;
+	static DynamicMapI32 colliderNameIndexes;
 	static int getColliderIndexFromName(std::string name)
 	{
 		auto find = colliderNameIndexes.find(name);
@@ -4317,7 +4317,7 @@ struct Compendium_t
 		static std::map<EventTags, Event_t> events;
 		static std::map<std::string, EventTags> eventIdLookup;
 		static std::map<int, std::set<EventTags>> itemEventLookup;
-		static std::map<std::string, int> monsterUniqueIDLookup;
+		static DynamicMapI32 monsterUniqueIDLookup;
 		static std::map<int, std::string> itemIDToString;
 		static std::map<int, std::string> monsterIDToString;
 		static std::map<int, std::string> codexIDToString;
@@ -4329,8 +4329,8 @@ struct Compendium_t
 		static std::map<EventTags, std::set<int>> eventMonsterLookup;
 		static std::map<EventTags, std::set<std::string>> eventWorldLookup;
 		static std::map<EventTags, std::set<std::string>> eventCodexLookup;
-		static std::map<std::string, int> eventWorldIDLookup;
-		static std::map<std::string, int> eventCodexIDLookup;
+		static DynamicMapI32 eventWorldIDLookup;
+		static DynamicMapI32 eventCodexIDLookup;
 		static std::map<EventTags, std::map<int, int>> eventClassIds;
 		static const int kEventClassesMax = 40;
 		static std::map<EventTags, std::map<std::string, std::string>> eventLangEntries;
