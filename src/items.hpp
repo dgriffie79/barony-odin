@@ -14,6 +14,8 @@
 #include "main.hpp"
 #include "prng.hpp"
 #include "game.hpp"
+// DynamicString — de-STL string for shared struct members
+#include "../odin/containers/dynamic_string.hpp"
 
 class Entity; // forward declare
 class Stat; // forward declare
@@ -719,7 +721,7 @@ public:
 	Sint32 getGoldValue() const;
 
 	void foodTinGetDescriptionIndices(int* a, int* b, int* c) const;
-	void foodTinGetDescription(std::string& cookingMethod, std::string& protein, std::string& sides) const;
+	void foodTinGetDescription(DynamicString& cookingMethod, DynamicString& protein, DynamicString& sides) const;
 	int foodGetPukeChance(Stat* eater) const;
 	int getLootBagPlayer() const;
 	int getLootBagNumItems() const;
@@ -761,8 +763,8 @@ extern Uint32 itemuids;
 // item generic
 class ItemGeneric
 {
-	std::string item_name_identified;      // identified item name
-	std::string item_name_unidentified;    // unidentified item name
+	DynamicString item_name_identified;      // identified item name
+	DynamicString item_name_unidentified;    // unidentified item name
 public:
 	int index;                  // world model
 	int indexShort;				// short mob world model
@@ -781,8 +783,8 @@ public:
 
 	const char* getIdentifiedName() const { return item_name_identified.c_str(); }
 	const char* getUnidentifiedName() const { return item_name_unidentified.c_str(); }
-	void setIdentifiedName(std::string name) { item_name_identified = name; }
-	void setUnidentifiedName(std::string name) { item_name_unidentified = name; }
+	void setIdentifiedName(DynamicString name) { item_name_identified = name; }
+	void setUnidentifiedName(DynamicString name) { item_name_unidentified = name; }
 	bool hasAttribute(std::string attribute)
 	{
 		if ( attributes.size() > 0 )

@@ -1616,8 +1616,8 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 	{
 		if ( item.itemId >= WOODEN_SHIELD && item.itemId < NUMITEMS )
 		{
-			items[item.itemId].setIdentifiedName(itemNameLocalizations[item.internalName].name_identified);
-			items[item.itemId].setUnidentifiedName(itemNameLocalizations[item.internalName].name_unidentified);
+			items[item.itemId].setIdentifiedName(itemNameLocalizations[item.internalName].name_identified.c_str());
+			items[item.itemId].setUnidentifiedName(itemNameLocalizations[item.internalName].name_unidentified.c_str());
 		}
 	}
 	for ( auto& spell : spellItems )
@@ -4759,7 +4759,7 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 	}
 	else if ( tooltipType.compare("tooltip_food_tin") == 0 )
 	{
-		std::string cookingMethod, protein, sides;
+		DynamicString cookingMethod, protein, sides;
 		item.foodTinGetDescription(cookingMethod, protein, sides);
 		snprintf(buf, sizeof(buf), str.c_str(), protein.c_str());
 	}

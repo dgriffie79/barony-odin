@@ -5460,7 +5460,7 @@ void Item::foodTinGetDescriptionIndices(int* a, int* b, int* c) const
 	}
 }
 
-void Item::foodTinGetDescription(std::string& cookingMethod, std::string& protein, std::string& sides) const
+void Item::foodTinGetDescription(DynamicString& cookingMethod, DynamicString& protein, DynamicString& sides) const
 {
 	int a, b, c;
 	foodTinGetDescriptionIndices(&a, &b, &c);
