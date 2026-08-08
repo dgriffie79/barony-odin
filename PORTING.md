@@ -85,14 +85,27 @@ All verified from C++ against std containers. Files:
 - `EnsembleSounds_t` in `sound.hpp` — 4 member vectors → DynamicArray,
   call sites → `barony_dynamic_array_*`. Game boots, sounds load. ✅
 - `src/meson.build` links `odin/containers/containers.lib` into game+editor.
+  (Later changed: containers is now IMPORTED by the odin package instead of
+  linked as a separate lib — linking a separately-built lib duplicated Odin's
+  runtime objects (LNK2005). See commit bd8c67d.)
 
-**String pilot (next):** `SaveGameInfo.customseed_string` (scores.hpp) +
-`SeededRun.seedString` (mod_tools.hpp) — ~25 sites, 2 members, converts
-together so cross-assignment is DynamicString↔DynamicString. Requires
-**FileInterface DynamicString serialization support**: add
-`value(DynamicString&)` overload + `writeStringInternal(const DynamicString&)` /
-`readStringInternal(DynamicString&)` in json.cpp/json.hpp (the current string
-path uses `std::string` and `.size()/.c_str()/.resize()`).
+**String pilot (DONE, verified in-game):** `SaveGameInfo.customseed_string`
+(scores.hpp) + `SeededRun.seedString` (mod_tools.hpp) → DynamicString — the
+first live members to leave std::string. ~25 call sites. Required:
+- **FileInterface DynamicString serialization**: `value(DynamicString&)`
+  overloads in all 4 state structs + FileInterface dispatch +
+  `writeStringInternal/readStringInternal` (JSON + Binary). Read matches the
+  FORMAT (`[u32 len][len bytes]`), not the std::string reserve+operator[] size
+  bug — sets len correctly, round-trips identically.
+- **Build fix**: containers package imported by odin/game.odin + editor.odin;
+  containers.lib dropped from link flags (runtime duplication).
+- **DynamicString class additions the pilot forced**: non-explicit ctor from
+  const char* (std::string implicit-conversion semantics — Language::get()/
+  literals pass into DynamicString params), find(char), at(), operator[].
+- **Verified**: USER ran the game, started a map with a custom seed — the map
+  MATCHED the reference Steam version with the same seed. Strongest possible
+  validation (seed string → djb2Hash → mapgen all through DynamicString).
+- Commit d1a3b2f.
 
 ## std::string survey findings (string-first ordering)
 
@@ -162,10 +175,21 @@ path uses `std::string` and `.size()/.c_str()/.resize()`).
 
 ## Next steps (in order)
 
-1. **String pilot**: `customseed_string` + `seedString` → DynamicString,
-   incl. FileInterface DynamicString serialization overloads.
-2. **Bulk vector replacement** via ast-grep (0.44.1 available) — rules for
-   `std::vector<T>` → DynamicArray, `.push_back` → shim, range-for → index loop.
-3. **Bulk string replacement** (1,336 non-UI sites + UI 40 members).
-4. **Map replacement** (native `map[[4]byte]V` / `map[string]V`).
+1. **String pilot** ✅ (customseed_string + seedString → DynamicString,
+   FileInterface serialization, verified in-game — commit d1a3b2f).
+2. **Bulk string replacement** — the next big push. The pilot locked the
+   transform spec: DynamicString's std::string-compatible API means the bulk
+   pass is mostly TYPE-SWAPS (std::string → DynamicString; the 2,164 `+=`,
+   467 `==`, find/substr/compare sites fix themselves via operators). Only
+   explicit transforms needed: std::to_string() (225 sites) → a
+   DynamicString-returning helper, and any std::string params/returns at
+   boundaries. Use ast-grep (0.44.1), build-gated per batch, per-file order:
+   non-UI shared-struct owners first (mod_tools 106 members, input, files,
+   scores, player), UI layer (MainMenu 568, GameUI 349, Button/Frame/Field)
+   last since it ports last.
+3. **Bulk vector replacement** — rules for `std::vector<T>` → DynamicArray,
+   `.push_back` → shim, range-for → index loop. (vector<string> converts in
+   the string pass: element type becomes DynamicString.)
+4. **Map replacement** — native `map[[4]byte]V` / `map[string]V` (string keys
+   ride on DynamicString after the string pass).
 5. Then port files bottom-up, deleting C++ as callers dry up.
