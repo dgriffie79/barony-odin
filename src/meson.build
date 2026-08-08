@@ -355,6 +355,11 @@ if host_system == 'windows'
       game_link_flags += vcpkg_debug_lib / 'theoraenc.lib'
     endif
 
+    # Odin containers shims (dynamic array/map/string) — C++ code in the
+    # static libs calls these; they must be linked into the final exe.
+    game_link_flags += meson.current_source_dir() / '..' / 'odin' / 'containers' / 'containers.lib'
+    editor_link_flags += meson.current_source_dir() / '..' / 'odin' / 'containers' / 'containers.lib'
+
     # Odin exe for the game -> builddir/src/barony.exe
     odin_game_exe = custom_target('odin_game_exe',
       output : 'barony.exe',

@@ -14,6 +14,9 @@
 #define FMOD_AUDIO_GUID_FMT "%.8x%.16llx"
 
 #include <stdio.h>
+
+// Odin-shim-backed dynamic array (replaces std::vector in shared structs)
+#include "../../../odin/containers/dynamic_array.hpp"
 #ifdef USE_FMOD
 #include <fmod.hpp>
 #endif
@@ -167,10 +170,10 @@ struct EnsembleSounds_t
     unsigned int combatSoundSyncPointInterval = 0;
     int exploreSongSeek = 0;
     int combatSongSeek = 0;
-    std::vector<unsigned int> exploreSyncPoints;
-    std::vector<int> exploreSyncPointsToSeek;
-    std::vector<int> exploreSyncPointsUnique;
-    std::vector<unsigned int> combatSyncPoints;
+    DynamicArray exploreSyncPoints;        // std::vector<unsigned int>
+    DynamicArray exploreSyncPointsToSeek;  // std::vector<int>
+    DynamicArray exploreSyncPointsUnique;  // std::vector<int>
+    DynamicArray combatSyncPoints;         // std::vector<unsigned int>
     void updatePlayingChannelVolumes();
     int combatBeat = 0;
     Uint32 ticksCombatPlaying = 0;

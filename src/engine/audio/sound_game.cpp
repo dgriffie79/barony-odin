@@ -3643,9 +3643,9 @@ void EnsembleSounds_t::setup()
 			int index = -1;
 			if ( i == 0 )
 			{
-				exploreSyncPoints.clear();
-				exploreSyncPointsToSeek.clear();
-				exploreSyncPointsUnique.clear();
+				barony_dynamic_array_clear(&exploreSyncPoints);
+				barony_dynamic_array_clear(&exploreSyncPointsToSeek);
+				barony_dynamic_array_clear(&exploreSyncPointsUnique);
 			}
 			int seekBar = -1;
 			int oldSeekBar = -1;
@@ -3684,15 +3684,15 @@ void EnsembleSounds_t::setup()
 					}
 					if ( oldSeekBar != seekBar )
 					{
-						exploreSyncPointsUnique.push_back(seekBar);
+						barony_dynamic_array_append(&exploreSyncPointsUnique, &seekBar, sizeof(seekBar));
 					}
 					oldSeekBar = seekBar;
 				}
 				fmod_result = exploreSound[i]->addSyncPoint(beat, FMOD_TIMEUNIT_PCM, nullptr, nullptr);
 				if ( i == 0 )
 				{
-					exploreSyncPoints.push_back(beat);
-					exploreSyncPointsToSeek.push_back(seekBar);
+					barony_dynamic_array_append(&exploreSyncPoints, &beat, sizeof(beat));
+					barony_dynamic_array_append(&exploreSyncPointsToSeek, &seekBar, sizeof(seekBar));
 				}
 				FMODErrorCheck();
 				beat += interval * (beatTime * numBeats);
@@ -3736,7 +3736,7 @@ void EnsembleSounds_t::setup()
 			int index = -1;
 			if ( i == 0 )
 			{
-				combatSyncPoints.clear();
+				barony_dynamic_array_clear(&combatSyncPoints);
 			}
 			while ( beat < len )
 			{
@@ -3744,7 +3744,7 @@ void EnsembleSounds_t::setup()
 				fmod_result = combatSound[i]->addSyncPoint(beat, FMOD_TIMEUNIT_PCM, nullptr, nullptr);
 				if ( i == 0 )
 				{
-					combatSyncPoints.push_back(beat);
+					barony_dynamic_array_append(&combatSyncPoints, &beat, sizeof(beat));
 				}
 				FMODErrorCheck();
 				beat += interval * beatTime * numBeats;
@@ -4347,14 +4347,14 @@ void EnsembleSounds_t::updatePlayingChannelVolumes()
 			{
 				int lastPoint = -1;
 				int index = -1;
-				for ( auto& point : exploreSyncPoints )
+				for ( int64_t pt = 0; pt < dynarray_size<unsigned int>(exploreSyncPoints); ++pt )
 				{
 					++index;
 					if ( index == 0 )
 					{
 						continue;
 					}
-					if ( point > pos )
+					if ( *dynarray_at<unsigned int>(exploreSyncPoints, pt) > pos )
 					{
 						break;
 					}
@@ -4366,15 +4366,15 @@ void EnsembleSounds_t::updatePlayingChannelVolumes()
 					{
 						lastPoint = *cvar_ensemble_explore_seek;
 					}
-					if ( lastPoint >= (exploreSyncPointsToSeek.size() - 4) )
+					if ( lastPoint >= (dynarray_size<int>(exploreSyncPointsToSeek) - 4) )
 					{
 						exploreSongSeek = 0; // loop back to beginning
 					}
 					else
 					{
-						if ( lastPoint < exploreSyncPointsToSeek.size() )
+						if ( lastPoint < dynarray_size<int>(exploreSyncPointsToSeek) )
 						{
-							exploreSongSeek = exploreSyncPointsToSeek[lastPoint];
+							exploreSongSeek = *dynarray_at<int>(exploreSyncPointsToSeek, lastPoint);
 						}
 						else
 						{
@@ -4402,14 +4402,14 @@ void EnsembleSounds_t::updatePlayingChannelVolumes()
 			{
 				int lastPoint = -1;
 				int index = -1;
-				for ( auto& point : combatSyncPoints )
+				for ( int64_t pt = 0; pt < dynarray_size<unsigned int>(combatSyncPoints); ++pt )
 				{
 					++index;
 					if ( index % 8 != 0 )
 					{
 						continue;
 					}
-					if ( point > pos )
+					if ( *dynarray_at<unsigned int>(combatSyncPoints, pt) > pos )
 					{
 						break;
 					}
