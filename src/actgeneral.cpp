@@ -2724,13 +2724,13 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 			{
 				std::string variableName = tagValue.substr(0, foundMapReference);
 				int value = std::stoi(tagValue.substr(foundMapReference + 1, tagValue.length() - foundMapReference));
-				if ( scriptVariables.find(variableName) != scriptVariables.end() )
+				if ( scriptVariables.contains(variableName) )
 				{
 					scriptVariables[variableName] = value;
 				}
 				else
 				{
-					scriptVariables.insert(std::make_pair(variableName, value));
+					scriptVariables[variableName] = value;
 				}
 				return 0;
 			}

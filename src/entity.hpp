@@ -1742,6 +1742,6 @@ public:
 		}
 		return entities;
 	}
-	std::unordered_map<std::string, int> scriptVariables;
+	DynamicMapI32 scriptVariables;
 };
 extern TextSourceScript textSourceScript;

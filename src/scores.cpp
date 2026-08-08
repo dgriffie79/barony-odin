@@ -4506,9 +4506,12 @@ void AchievementObserver::awardAchievementIfActive(int player, Entity* entity, i
 
 void AchievementObserver::checkMapScriptsOnVariableSet()
 {
-	for ( auto it = textSourceScript.scriptVariables.begin(); it != textSourceScript.scriptVariables.end(); ++it )
+	DynamicMapI32::Entry entries[64];
+	int32_t entryCount = textSourceScript.scriptVariables.entryList(entries, 64);
+	for ( int32_t ei = 0; ei < entryCount; ++ei )
 	{
-		size_t found = (*it).first.find("$ACH_TUTORIAL_SECRET");
+		std::string key(entries[ei].key, entries[ei].key_len);
+		size_t found = key.find("$ACH_TUTORIAL_SECRET");
 		if ( found != std::string::npos )
 		{
 			std::string mapname = map.name;
