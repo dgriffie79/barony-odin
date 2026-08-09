@@ -2327,7 +2327,7 @@ static void changeLevel() {
 
 	int prevcurrentlevel = currentlevel;
 	int prevsecretfloor = secretlevel;
-	std::string prevmapname = map.name;
+	DynamicString prevmapname = map.name;
 
 	// unlock some steam achievements
 	if ( !secretlevel )
@@ -6409,7 +6409,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		Compendium_t::Events_t::clientReceiveData[clientSequence][sequence] = buf;
 		if ( (int)Compendium_t::Events_t::clientReceiveData[clientSequence].size() == numchunks )
 		{
-			std::string str = "";
+			DynamicString str = "";
 			for ( int i = 1; i <= numchunks; ++i )
 			{
 				str += Compendium_t::Events_t::clientReceiveData[clientSequence][i];
@@ -6496,7 +6496,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		gui.savedAppearance = (Sint8)net_packet->data[7];
 		gui.receivedCharacterChangeOK = true;
 
-		std::string racename = "";
+		DynamicString racename = "";
 		if ( gui.savedRace != RACE_HUMAN )
 		{
 			if ( gui.savedAppearance != 0 )
@@ -6507,7 +6507,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		}
 		racename += getMonsterLocalizedName(getMonsterFromPlayerRace(gui.savedRace)).c_str();
 		camelCaseString(racename);
-		std::string classname = playerClassLangEntry(gui.savedClass >= 0 ? gui.savedClass : client_classes[player], player);
+		DynamicString classname = playerClassLangEntry(gui.savedClass >= 0 ? gui.savedClass : client_classes[player], player);
 		camelCaseString(classname);
 		if ( player == clientnum )
 		{
@@ -6782,7 +6782,7 @@ void clientHandlePacket()
 		memcpy(packetHeader, packetinfo, 4);
 		packetHeader[4] = '\0';
 
-		std::string tmp = packetHeader;
+		DynamicString tmp = packetHeader;
 		unsigned long hash = djb2Hash(packetHeader);
 		auto find = DebugStats.networkPackets.find(hash);
 		if ( find != DebugStats.networkPackets.end() )
@@ -9210,7 +9210,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 			gui.savedAppearance = (Sint8)net_packet->data[7];
 			gui.receivedCharacterChangeOK = true;
 
-			std::string racename = "";
+			DynamicString racename = "";
 			if ( gui.savedRace != RACE_HUMAN )
 			{
 				if ( gui.savedAppearance != 0 )
@@ -9221,7 +9221,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 			}
 			racename += getMonsterLocalizedName(getMonsterFromPlayerRace(gui.savedRace)).c_str();
 			camelCaseString(racename);
-			std::string classname = playerClassLangEntry(gui.savedClass >= 0 ? gui.savedClass : client_classes[player], player);
+			DynamicString classname = playerClassLangEntry(gui.savedClass >= 0 ? gui.savedClass : client_classes[player], player);
 			camelCaseString(classname);
 
 			for ( int i = 0; i < MAXPLAYERS; ++i )

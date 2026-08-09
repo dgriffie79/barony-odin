@@ -41,6 +41,7 @@ extern "C" {
     int64_t      barony_dynamic_string_find(const DynamicString*, const void*, int64_t, int);
     int64_t      barony_dynamic_string_find_first_of(const DynamicString*, const char*, int);
     void         barony_dynamic_string_erase(DynamicString*, int, int);
+    void         barony_dynamic_string_insert_cstr(DynamicString*, int, const char*);
     void         barony_dynamic_string_substr(DynamicString*, const DynamicString*, int, int);
     void         barony_dynamic_string_destroy(DynamicString*);
 }
@@ -59,6 +60,11 @@ public:
     // non-explicit: implicit conversion from const char* (std::string semantics)
     DynamicString(const char* cstr) : data(nullptr), len(0) { assign(cstr); }
     DynamicString(const char* bytes, int64_t n) : data(nullptr), len(0) { assign(bytes, n); }
+    // bridge: construct from std::string (unconverted callers pass std::string)
+    DynamicString(const std::string& s) : data(nullptr), len(0) { assign(s.c_str()); }
+    DynamicString& operator=(const std::string& s) { assign(s.c_str()); return *this; }
+    // append a std::string (bridge)
+    DynamicString& operator+=(const std::string& s) { barony_dynamic_string_append(this, s.c_str(), (int64_t)s.size()); return *this; }
     ~DynamicString() { barony_dynamic_string_destroy(this); }
 
     // copy: deep copy (std::string semantics)
@@ -91,6 +97,8 @@ public:
     void from_cstr(const char* cstr) { barony_dynamic_string_from_cstr(this, cstr); }
 
     DynamicString& operator+=(const char* cstr) { barony_dynamic_string_append(this, cstr, (int64_t)std::strlen(cstr)); return *this; }
+    // append a single char (std::string::operator+=(char))
+    DynamicString& operator+=(char c) { barony_dynamic_string_append(this, &c, 1); return *this; }
     DynamicString& operator+=(const DynamicString& other) { barony_dynamic_string_append(this, other.data, other.len); return *this; }
     DynamicString& append(const char* cstr) { barony_dynamic_string_append(this, cstr, (int64_t)std::strlen(cstr)); return *this; }
     DynamicString& append(const char* bytes, int64_t n) { barony_dynamic_string_append(this, bytes, (int)n); return *this; }
@@ -122,12 +130,16 @@ public:
     int64_t find(const DynamicString& needle) const { return barony_dynamic_string_find(this, needle.data, needle.len, 0); }
     // find a single char (std::string::find(char))
     int64_t find(char c) const { return barony_dynamic_string_find(this, &c, 1, 0); }
+    int64_t find(char c, int64_t start) const { return barony_dynamic_string_find(this, &c, 1, (int)start); }
     // find first of any char in the set (std::string::find_first_of)
     int64_t find_first_of(const char* set, int64_t start = 0) const { return barony_dynamic_string_find_first_of(this, set, (int)start); }
     // erase [pos, pos+count) in place (std::string::erase); count=-1 = to end
     DynamicString& erase(int64_t pos, int64_t count = -1) {
         if (count < 0) count = len - pos;
         barony_dynamic_string_erase(this, (int)pos, (int)count); return *this; }
+    // insert a string at pos (std::string::insert(pos, str))
+    DynamicString& insert(int64_t pos, const char* str) { barony_dynamic_string_insert_cstr(this, (int)pos, str); return *this; }
+    DynamicString& insert(int64_t pos, const std::string& str) { barony_dynamic_string_insert_cstr(this, (int)pos, str.c_str()); return *this; }
     // mutable char access (std::string::operator[]/at)
     char& at(int64_t i) { return data[i]; }
     char& operator[](int64_t i) { return data[i]; }
@@ -162,6 +174,12 @@ private:
 // symmetric ==/!= for "literal" == s
 inline bool operator==(const char* a, const DynamicString& b) { return b == a; }
 inline bool operator!=(const char* a, const DynamicString& b) { return b != a; }
+
+// bridge: std::string ==/!= DynamicString (unconverted members compared to converted locals)
+inline bool operator==(const std::string& a, const DynamicString& b) { return a == b.c_str(); }
+inline bool operator!=(const std::string& a, const DynamicString& b) { return a != b.c_str(); }
+inline bool operator==(const DynamicString& a, const std::string& b) { return a == b.c_str(); }
+inline bool operator!=(const DynamicString& a, const std::string& b) { return a != b.c_str(); }
 
 // std::string-compatible free helpers
 inline DynamicString operator+(const DynamicString& a, const char* b) { DynamicString r(a); r += b; return r; }

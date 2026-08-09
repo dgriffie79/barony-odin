@@ -36,7 +36,7 @@ void initGnome(Entity* my, Stat* myStats)
 	node_t* node;
 
 	my->flags[BURNABLE] = true;
-	std::string gnome_type = myStats ? myStats->getAttribute("gnome_type") : "";
+	DynamicString gnome_type = myStats ? myStats->getAttribute("gnome_type") : "";
 	if ( gnome_type.find("gnome2") != std::string::npos )
 	{
 		if ( gnome_type.find("gnome2F") != std::string::npos )
@@ -110,7 +110,7 @@ void initGnome(Entity* my, Stat* myStats)
 								if ( Stat* followerStats = entity->getStats() )
 								{
 									followerStats->leader_uid = entity->parent;
-									std::string followerType = rng.rand() % 2 ? "gnome2" : "gnome2F";
+									DynamicString followerType = rng.rand() % 2 ? "gnome2" : "gnome2F";
 									if ( i % 2 == 0 || i % 3 == 0 )
 									{
 										followerType += "_melee";
@@ -1036,7 +1036,7 @@ void gnomeMoveBodyparts(Entity* my, Stat* myStats, double dist)
 	Entity* helmet = nullptr;
 	Entity* torso = nullptr;
 
-	std::string gnome_type = my->sprite == 1426 ? "gnome2" : my->sprite == 1430 ? "gnome2F" : "";
+	DynamicString gnome_type = my->sprite == 1426 ? "gnome2" : my->sprite == 1430 ? "gnome2F" : "";
 
 	//Move bodyparts
 	for (bodypart = 0, node = my->children.first; node != nullptr; node = node->next, bodypart++)

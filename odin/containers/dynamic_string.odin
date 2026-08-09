@@ -285,3 +285,40 @@ barony_dynamic_string_find_first_of :: proc "c" (s: ^DynamicString, set: cstring
 	}
 	return -1
 }
+
+// Insert `ins` (cstr) at byte offset `pos` — std::string::insert(pos, str).
+@(export)
+barony_dynamic_string_insert_cstr :: proc "c" (s: ^DynamicString, pos: int, ins: cstring) {
+	context = runtime.default_context()
+	if s == nil || ins == nil {
+		return
+	}
+	ins_len := runtime.cstring_len(ins)
+	if ins_len == 0 {
+		return
+	}
+	clamp_pos := clamp(pos, 0, s.len)
+	new_len := s.len + ins_len
+	buf, _ := mem.alloc(new_len + 1, align_of(u8))
+	if buf == nil {
+		return
+	}
+	// copy left part, insert, copy right part
+	if clamp_pos > 0 {
+		runtime.mem_copy(buf, s.data, clamp_pos)
+	}
+	runtime.mem_copy(([^]u8)(uintptr(buf) + uintptr(clamp_pos)), rawptr(ins), ins_len)
+	if s.len - clamp_pos > 0 {
+		runtime.mem_copy(
+			([^]u8)(uintptr(buf) + uintptr(clamp_pos) + uintptr(ins_len)),
+			([^]u8)(uintptr(s.data) + uintptr(clamp_pos)),
+			s.len - clamp_pos,
+		)
+	}
+	(^u8)(uintptr(buf) + uintptr(new_len))^ = 0
+	if s.data != nil {
+		mem.free(s.data)
+	}
+	s.data = buf
+	s.len = new_len
+}

@@ -212,12 +212,12 @@ void Player::MessageZone_t::drawMessages()
 	//	Uint32 color = (current->text->color & 0x00ffffff) | ((Uint32)current->alpha << 24);
 
 	//	// highlights in messages.
-	//	std::string data = current->text->data;
+	//	DynamicString data = current->text->data;
 	//	size_t findHighlight = data.find("[");
 	//	bool doHighlight = false;
 	//	if ( findHighlight != std::string::npos )
 	//	{
-	//		std::string highlightedWords = data;
+	//		DynamicString highlightedWords = data;
 	//		for ( int i = 0; i < highlightedWords.size(); ++i )
 	//		{
 	//			if ( highlightedWords[i] != '\n' && highlightedWords[i] != '\0' )
@@ -273,7 +273,7 @@ void Player::MessageZone_t::deleteAllNotificationMessages()
 std::string messageSanitizePercentSign(std::string src, int* percentSignsFound)
 {
 	// sanitize input string for print commands.
-	std::string commandString = src;
+	DynamicString commandString = src;
 	std::size_t found = commandString.find('%');
 	if ( !commandString.empty() )
 	{

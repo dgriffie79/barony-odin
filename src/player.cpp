@@ -4155,7 +4155,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 			}
 			else
 			{
-				std::string name = Language::get(4011); // "follower" 
+				DynamicString name = Language::get(4011); // "follower" 
 				if ( parent->getStats() && strcmp(parent->getStats()->name, "") )
 				{
 					name = parent->getStats()->name;
@@ -5062,9 +5062,9 @@ void Player::WorldUI_t::handleTooltips()
 						}
 						else if ( parent->behavior == &actWallLock )
 						{
-							std::string wallLockStringNoKey;
-							std::string wallLockStringActivate;
-							std::string wallLockStringDeactivate;
+							DynamicString wallLockStringNoKey;
+							DynamicString wallLockStringActivate;
+							DynamicString wallLockStringDeactivate;
 							static char buf[256];
 							snprintf(buf, sizeof(buf), Language::get(6397), Language::get(6383 + parent->wallLockMaterial));
 							wallLockStringNoKey = buf;
@@ -7299,7 +7299,7 @@ const char* Player::getAccountName() const {
 						    *static_cast<CSteamID*>(steamIDRemote[remoteIDIndex]),
 						    "clientnum");
 						if (memberNumChar) {
-							std::string str = memberNumChar;
+							DynamicString str = memberNumChar;
 							if (!str.empty()) {
 								int memberNum = std::stoi(str);
 								if (memberNum >= 0 && memberNum < MAXPLAYERS && memberNum == playernum) {
@@ -8173,7 +8173,7 @@ void Player::PlayerMechanics_t::ensembleMusicUpdate()
 		}
 
 		bool active = !isPaused && isPlaying;
-		/*std::string debugPlaying = "";
+		/*DynamicString debugPlaying = "";
 		for ( int i = 0; i < NUMENSEMBLEMUSIC; ++i )
 		{
 			bool channelPlaying = false;

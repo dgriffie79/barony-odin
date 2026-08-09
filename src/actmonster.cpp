@@ -2123,7 +2123,7 @@ bool makeFollower(int monsterclicked, bool ringconflict, char namesays[64],
 		else if ( myStats->type == SLIME
 			&& !myStats->name[0] )
 		{
-			std::string name = getMonsterLocalizedName(SLIME);
+			DynamicString name = getMonsterLocalizedName(SLIME);
 			stringCopy(myStats->name, name.c_str(), sizeof(Stat::name), name.size());
 		}
         
@@ -2182,7 +2182,7 @@ bool makeFollower(int monsterclicked, bool ringconflict, char namesays[64],
 		//Tell the client he suckered somebody into his cult.
 		strcpy((char*) (net_packet->data), "LEAD");
 		SDLNet_Write32((Uint32 )my->getUID(), &net_packet->data[4]);
-		std::string name = myStats->name;
+		DynamicString name = myStats->name;
 		if ( name != "" && name == MonsterData_t::getSpecialNPCName(*myStats) )
 		{
 			name = myStats->getAttribute("special_npc");
@@ -2376,7 +2376,7 @@ void printFollowerTableForSkillsheet(int monsterclicked, Entity* my, Stat* mySta
 	if ( !players[monsterclicked]->entity ) { return; }
 	if ( !my || !myStats ) { return; }
 
-	std::string outputList = "{";
+	DynamicString outputList = "{";
 	int originalLeadershipSkill = stats[monsterclicked]->getModifiedProficiency(PRO_LEADERSHIP);
 	Sint32 originalCHR = stats[monsterclicked]->CHR;
 	stats[monsterclicked]->CHR = 10;
@@ -2458,7 +2458,7 @@ void printFollowerTableForSkillsheet(int monsterclicked, Entity* my, Stat* mySta
 			outputList += "\"";
 			outputList += monstertypename[(int)playerRace];
 			outputList += "\": [";
-			std::string arrayList = "";
+			DynamicString arrayList = "";
 			if ( allyList.find(playerRace) != allyList.end() )
 			{
 				bool firstAlly = true;
@@ -2528,9 +2528,9 @@ void printFollowerTableForSkillsheet(int monsterclicked, Entity* my, Stat* mySta
 	rapidjson::Document d;
 	d.Parse(outputList.c_str());
 
-	std::string outputPath = outputdir;
+	DynamicString outputPath = outputdir;
 	outputPath.append(PHYSFS_getDirSeparator());
-	std::string fileName = "data/skillsheet_leadership_entries.json";
+	DynamicString fileName = "data/skillsheet_leadership_entries.json";
 	outputPath.append(fileName.c_str());
 
 	File* fp = FileIO::open(outputPath.c_str(), "wb");
@@ -5200,7 +5200,7 @@ void actMonster(Entity* my)
 
 		//if ( myStats->type == GNOME )
 		//{
-		//	std::string state_string;
+		//	DynamicString state_string;
 		//	
 		//	switch(my->monsterState)
 		//	{
@@ -8543,7 +8543,7 @@ timeToGoAgain:
 							summonStats->monsterNoDropItems = 1;
 							summonStats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS] = 1;
 							summonStats->LVL = 5;
-							std::string lich_num_summons = myStats->getAttribute("lich_num_summons");
+							DynamicString lich_num_summons = myStats->getAttribute("lich_num_summons");
 							if ( lich_num_summons == "" )
 							{
 								myStats->setAttribute("lich_num_summons", "1");
@@ -8568,7 +8568,7 @@ timeToGoAgain:
 						summonStats->monsterNoDropItems = 1;
 						summonStats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS] = 1;
 						summonStats->LVL = 5;
-						std::string lich_num_summons = myStats->getAttribute("lich_num_summons");
+						DynamicString lich_num_summons = myStats->getAttribute("lich_num_summons");
 						if ( lich_num_summons == "" )
 						{
 							myStats->setAttribute("lich_num_summons", "1");
@@ -11217,7 +11217,7 @@ bool forceFollower(Entity& leader, Entity& follower)
 		else if ( followerStats->type == SLIME
 			&& !followerStats->name[0] )
 		{
-			std::string name = getMonsterLocalizedName(SLIME);
+			DynamicString name = getMonsterLocalizedName(SLIME);
 			stringCopy(followerStats->name, name.c_str(), sizeof(Stat::name), name.size());
 		}
         
@@ -11251,7 +11251,7 @@ bool forceFollower(Entity& leader, Entity& follower)
 		//Tell the client he suckered somebody into his cult.
 		strcpy((char*) (net_packet->data), "LEAD");
 		SDLNet_Write32((Uint32 )follower.getUID(), &net_packet->data[4]);
-		std::string name = followerStats->name;
+		DynamicString name = followerStats->name;
 		if ( name != "" && name == MonsterData_t::getSpecialNPCName(*followerStats) )
 		{
 			name = followerStats->getAttribute("special_npc");
@@ -13390,7 +13390,7 @@ void Entity::handleNPCInteractDialogue(Stat& myStats, AllyNPCChatter event)
 		return;
 	}
 
-	std::string message;
+	DynamicString message;
 
 	if ( myStats.type == HUMAN )
 	{

@@ -1188,7 +1188,7 @@ void Player::Ghost_t::handleActions()
 	{
 		bool showCalloutCommandsOnGamepad = false;
 		auto showCalloutCommandsFind = b.find("Call Out");
-		std::string showCalloutCommandsInputStr = "";
+		DynamicString showCalloutCommandsInputStr = "";
 		if ( showCalloutCommandsFind != b.end() )
 		{
 			showCalloutCommandsOnGamepad = (*showCalloutCommandsFind).second.isBindingUsingGamepad();
@@ -1338,8 +1338,8 @@ void Player::Ghost_t::handleActions()
 		auto& b = (multiplayer != SINGLE && player.playernum != 0) ? Input::inputs[0].getBindings() : input.getBindings();
 		bool showNPCCommandsOnGamepad = false;
 		auto showNPCCommandsFind = b.find("Show NPC Commands");
-		std::string showNPCCommandsInputStr = "";
-		std::string lastNPCCommandInputStr = "";
+		DynamicString showNPCCommandsInputStr = "";
+		DynamicString lastNPCCommandInputStr = "";
 		if ( showNPCCommandsFind != b.end() )
 		{
 			showNPCCommandsOnGamepad = (*showNPCCommandsFind).second.isBindingUsingGamepad();
@@ -10002,7 +10002,7 @@ void actPlayer(Entity* my)
 			{
 				bool showCalloutCommandsOnGamepad = false;
 				auto showCalloutCommandsFind = b.find("Call Out");
-				std::string showCalloutCommandsInputStr = "";
+				DynamicString showCalloutCommandsInputStr = "";
 				if ( showCalloutCommandsFind != b.end() )
 				{
 					showCalloutCommandsOnGamepad = (*showCalloutCommandsFind).second.isBindingUsingGamepad();
@@ -10155,8 +10155,8 @@ void actPlayer(Entity* my)
 				auto& b = (multiplayer != SINGLE && PLAYER_NUM != 0) ? Input::inputs[0].getBindings() : input.getBindings();
 				bool showNPCCommandsOnGamepad = false;
 				auto showNPCCommandsFind = b.find("Show NPC Commands");
-				std::string showNPCCommandsInputStr = "";
-				std::string lastNPCCommandInputStr = "";
+				DynamicString showNPCCommandsInputStr = "";
+				DynamicString lastNPCCommandInputStr = "";
 				if ( showNPCCommandsFind != b.end() )
 				{
 					showNPCCommandsOnGamepad = (*showNPCCommandsFind).second.isBindingUsingGamepad();
@@ -10922,7 +10922,7 @@ void actPlayer(Entity* my)
 								continue;
 							}
 							char whatever[256];
-							std::string nameStr = messageSanitizePercentSign(stats[PLAYER_NUM]->name, nullptr);
+							DynamicString nameStr = messageSanitizePercentSign(stats[PLAYER_NUM]->name, nullptr);
 							snprintf(whatever, sizeof(whatever), "%s %s", nameStr.c_str(), stats[PLAYER_NUM]->obituary);
 							whatever[255] = '\0';
 							messagePlayer(c, MESSAGE_OBITUARY, whatever);

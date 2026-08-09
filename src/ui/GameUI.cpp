@@ -357,6 +357,21 @@ void camelCaseString(std::string& str)
 	}
 }
 
+// DynamicString overload (bridges via the mutable buffer)
+void camelCaseString(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return; }
+	char prevLetter = ' ';
+	for ( auto& letter : str )
+	{
+		if ( letter >= 'a' && letter <= 'z' && prevLetter == ' ' )
+		{
+			letter = toupper(letter);
+		}
+		prevLetter = letter;
+	}
+}
+
 bool stringStartsWithVowel(std::string& str)
 {
 	if ( str.size() < 1 ) { return false; }
