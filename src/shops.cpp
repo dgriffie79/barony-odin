@@ -25,9 +25,9 @@
 list_t* shopInv[MAXPLAYERS] = { nullptr };
 Uint32 shopkeeper[MAXPLAYERS] = { 0 };
 Uint32 shoptimer[MAXPLAYERS] = { 0 };
-std::string shopspeech[MAXPLAYERS] = { "" };
+DynamicString shopspeech[MAXPLAYERS];
 int shopkeepertype[MAXPLAYERS] = { 0 };
-std::string shopkeepername[MAXPLAYERS] = { "" };
+DynamicString shopkeepername[MAXPLAYERS];
 char shopkeepername_client[MAXPLAYERS][64];
 std::map<Uint32, int> hamletShopkeeperSkillLimit[MAXPLAYERS];
 
