@@ -136,7 +136,7 @@ private:
 	int posx = 260;
 	int posy = 110;
 	static const int dockHeight = 32;
-	std::string notificationImage;
+	DynamicString notificationImage;
 	bool isInit = false;
 	int textx = 8;
 	int texty = 8;
@@ -166,16 +166,16 @@ private:
 	bool cardUpdateDisplaySecondaryText = false;
 	Uint32 idleTicksToHide = 10 * TICKS_PER_SECOND;
 
-	std::string displayedText;
-	std::string mainCardText;
-	std::string secondaryCardText;
-	std::string headerCardText;
-	std::string actionText;
+	DynamicString displayedText;
+	DynamicString mainCardText;
+	DynamicString secondaryCardText;
+	DynamicString headerCardText;
+	DynamicString actionText;
 
 	int statisticUpdateCurrent = 0;
 	int statisticUpdateMax = 0;
 	int pendingStatisticUpdateCurrent = -1;
-	std::string achievementID = "";
+	DynamicString achievementID = "";
 
 	bool skipDrawingCardThisTick = false;
 	bool bQueuedForUndock = false;

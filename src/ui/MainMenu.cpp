@@ -62,8 +62,8 @@ namespace MainMenu {
 	constexpr int MOUSE_EVENT_LIMIT_AUTO = 1000;
 
 	// ALL NEW menu options:
-	std::string current_audio_device;
-	std::string current_recording_audio_device;
+	DynamicString current_audio_device;
+	DynamicString current_recording_audio_device;
 	float master_volume = 1.f;
 	bool arachnophobia_filter = false;
 	bool hidden_roomcode = false;
@@ -26794,9 +26794,9 @@ failed:
 	}
 #endif
 
-	std::string MainMenuBanners_t::updateBannerImg = "";
-	std::string MainMenuBanners_t::updateBannerImgHighlight = "";
-	std::string MainMenuBanners_t::updateBannerURL = "";
+	DynamicString MainMenuBanners_t::updateBannerImg;
+	DynamicString MainMenuBanners_t::updateBannerImgHighlight;
+	DynamicString MainMenuBanners_t::updateBannerURL;
 	void MainMenuBanners_t::readFromFile()
 	{
 		const DynamicString filename = "data/banners.json";

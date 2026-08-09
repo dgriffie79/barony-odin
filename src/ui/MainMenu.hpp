@@ -16,8 +16,8 @@ namespace MainMenu {
 	extern Frame* main_menu_frame; // root main menu node
 	extern Uint32 main_menu_ticks;
 	// Here be new menu options:
-	extern std::string current_audio_device; // guid of the audio device currently in use
-	extern std::string current_recording_audio_device; // guid of the recording audio device currently in use
+	extern DynamicString current_audio_device; // guid of the audio device currently in use
+	extern DynamicString current_recording_audio_device; // guid of the recording audio device currently in use
 	extern float master_volume; // range is [0 - 100]
 	extern bool arachnophobia_filter; // if true, all spiders are crabs'
 	extern ConsoleVariable<bool> vertical_splitscreen; // if true, 2-player splitscreen has a vertical rather than horizontal layout
@@ -126,8 +126,8 @@ namespace MainMenu {
 	{
 		struct DescData_t
 		{
-			std::string text;
-			std::string internal_name;
+			DynamicString text;
+			DynamicString internal_name;
 			std::vector<std::tuple<int, std::string, Uint32>> survivalComplexity;
 			std::vector<Uint32> statRatings;
 			std::vector<std::string> statRatingsStrings;
@@ -145,18 +145,18 @@ namespace MainMenu {
 	{
 		struct DescData_t
 		{
-			std::string textLeft;
-			std::string textRight;
+			DynamicString textLeft;
+			DynamicString textRight;
 			std::set<int> traitLines;
 			std::set<int> proLines;
 			std::vector<int> linePaddings;
-			std::string title;
-			std::string traitsBasedOnPlayerRace;
-			std::string traitsBasedOnMonsterType;
-			std::string resistances;
-			std::string weaknesses;
-			std::string friendlyWith;
-			std::string racialSpells;
+			DynamicString title;
+			DynamicString traitsBasedOnPlayerRace;
+			DynamicString traitsBasedOnMonsterType;
+			DynamicString resistances;
+			DynamicString weaknesses;
+			DynamicString friendlyWith;
+			DynamicString racialSpells;
 		};
 		static std::unordered_map<std::string, DescData_t> data;
 		static void readFromFile();
@@ -207,9 +207,9 @@ namespace MainMenu {
 
 	struct MainMenuBanners_t
 	{
-		static std::string updateBannerImg;
-		static std::string updateBannerImgHighlight;
-		static std::string updateBannerURL;
+		static DynamicString updateBannerImg;
+		static DynamicString updateBannerImgHighlight;
+		static DynamicString updateBannerURL;
 		static void readFromFile();
 	};
 
@@ -404,8 +404,8 @@ namespace MainMenu {
 		int _level = 0;
 		bool _intro = false;
 		Uint32 lastUpdate = 0;
-		std::string levelStr = "";
-		std::string trimmedLevelStr = "";
+		DynamicString levelStr = "";
+		DynamicString trimmedLevelStr = "";
 		bool init = false;
 		bool needsUpdate = true;
 		bool enabled = true;
