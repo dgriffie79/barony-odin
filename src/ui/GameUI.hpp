@@ -32,8 +32,8 @@ void toggleShopBuybackView(const int player);
 void loadHUDSettingsJSON();
 struct EnemyBarSettings_t
 {
-	std::unordered_map<std::string, float> heightOffsets;
-	std::unordered_map<std::string, float> screenDistanceOffsets;
+	DynamicMapF32 heightOffsets;
+	DynamicMapF32 screenDistanceOffsets;
 	std::string getEnemyBarSpriteName(Entity* entity);
 	float getHeightOffset(Entity* entity)
 	{

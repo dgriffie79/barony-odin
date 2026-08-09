@@ -47,16 +47,15 @@ void Shader::unbind() {
 }
 
 int Shader::uniform(const char* name) {
-    auto find = uniforms.find(name);
-    if (find == uniforms.end()) {
+    if ( !uniforms.contains(name) ) {
         int handle = GL_CHECK_ERR_RET(glGetUniformLocation(program, (GLchar*)name));
         if (handle == -1) {
             printlog("uniform %s not found!", name);
         }
-        uniforms.emplace(std::string(name), handle);
+        uniforms[name] = handle;
         return handle;
     } else {
-        return find->second;
+        return uniforms[name];
     }
 }
 

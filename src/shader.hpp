@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "../odin/containers/dynamic_map.hpp"
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -43,6 +44,6 @@ public:
 private:
     const char* name = "untitled";
     std::vector<uint32_t> shaders;
-    std::unordered_map<std::string, int> uniforms;
+    DynamicMapI32 uniforms;
     uint32_t program = 0;
 };
