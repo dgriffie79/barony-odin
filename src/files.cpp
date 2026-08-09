@@ -3691,7 +3691,7 @@ std::list<std::string> directoryContents(const char* directory, bool includeSubd
 	return list;
 }
 
-std::vector<DynamicString> getLinesFromDataFile(std::string filename)
+std::vector<DynamicString> getLinesFromDataFile(DynamicString filename)
 {
 	std::vector<DynamicString> lines;
 #ifdef NINTENDO
@@ -3903,7 +3903,7 @@ std::list<std::string> physfsGetFileNamesInDirectory(const char* dir)
 	return filenames;
 }
 
-std::string physfsFormatMapName(char const * const levelfilename)
+DynamicString physfsFormatMapName(char const * const levelfilename)
 {
 	DynamicString fullMapPath;
 	DynamicString mapFileName = "maps/";
