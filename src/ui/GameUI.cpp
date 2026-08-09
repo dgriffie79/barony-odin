@@ -290,7 +290,7 @@ std::unordered_map<int, StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffe
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipDescColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipHeadingColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::notificationTextColor = 0xFFFFFFFF;
-DynamicString StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont;
+DynamicString StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont = "fonts/pixelmix.ttf#16#2";
 
 std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue);
 
