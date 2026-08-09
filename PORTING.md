@@ -139,6 +139,20 @@ first live members to leave std::string. ~25 call sites. Required:
 - **Maps with unused order** (Item.attributes etc.) → native `map` (hash,
   unordered) is fine. Order-dependent maps (allGameSpells, console commands)
   are global, not in shared structs — port with their files.
+- **PRESERVE default initializers when converting std::string → DynamicString**
+  (bit us TWICE — compendium_sorting, notificationFont). The member-decl swap
+  keeps `= "..."`, but the .cpp STATIC-def conversion dropped it:
+  `std::string X::name = "default";` → `DynamicString X::name;` lost the
+  default → empty at startup (compendium empty until sort clicked). ALWAYS
+  convert statics as `DynamicString X::name = "default";`. Same class as the
+  earlier magic_cookie default bug. When bulk-converting, audit all statics
+  with non-empty defaults (git show c8a4f95 + grep).
+- **DynamicMapI32 find() returns a COPY (KV snapshot), not a mutable slot** —
+  `find()->second = x` writes the copy and is silently lost. Use `map[key] = x`
+  (operator[] gives a mutable ref) for writes; `find()->second` for reads.
+  (std::map::find returns an iterator into the map; ours is a snapshot.)
+- **find() iterator's `first` points at interned storage** (process-lifetime
+  stable) — safe to store; never a copy that dies with the iterator.
 
 ## Meson build
 
