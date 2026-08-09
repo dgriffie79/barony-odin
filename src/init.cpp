@@ -98,14 +98,14 @@ bool mountBaseDataFolders() {
 #endif
 #ifdef NINTENDO
 			PHYSFS_mkdir("mods");
-			std::string path = outputdir;
+			DynamicString path = outputdir;
 			path.append(PHYSFS_getDirSeparator()).append("mods");
 			PHYSFS_setWriteDir(path.c_str()); //Umm...should it really be doing that? First off, it didn't actually create this directory. Second off, what about the rest of the directories it created?
 			printlog("[PhysFS]: successfully set write folder %s", path.c_str());
 #else // NINTENDO
 			if ( PHYSFS_mkdir("mods") )
 			{
-				std::string path = outputdir;
+				DynamicString path = outputdir;
 				path.append(PHYSFS_getDirSeparator()).append("mods");
 				PHYSFS_setWriteDir(path.c_str());
 				printlog("[PhysFS]: successfully set write folder %s", path.c_str());
@@ -595,7 +595,7 @@ int initApp(char const * const title, int fullscreen)
 	doLoadingScreen();
 
 	// load tiles
-	std::string tilesDirectory = PHYSFS_getRealDir("images/tiles.txt");
+	DynamicString tilesDirectory = PHYSFS_getRealDir("images/tiles.txt");
 	tilesDirectory.append(PHYSFS_getDirSeparator()).append("images/tiles.txt");
 	printlog("loading tiles from directory %s...\n", tilesDirectory.c_str());
 	fp = openDataFile(tilesDirectory.c_str(), "rb");
@@ -665,7 +665,7 @@ int initApp(char const * const title, int fullscreen)
 	if (!PHYSFS_getRealDir("images/animated.txt")) {
 		printlog("error: could not find file: %s", "images/animated.txt");
 	} else {
-        std::string directory = PHYSFS_getRealDir("images/animated.txt");
+        DynamicString directory = PHYSFS_getRealDir("images/animated.txt");
         directory.append(PHYSFS_getDirSeparator()).append("images/animated.txt");
         printlog("[PhysFS]: Loading tile animations from directory %s...\n", directory.c_str());
         File* fp = openDataFile(directory.c_str(), "rb");
@@ -700,7 +700,7 @@ int initApp(char const * const title, int fullscreen)
 		updateLoadingScreen(20);
 
 		// load models
-		std::string modelsDirectory = PHYSFS_getRealDir("models/models.txt");
+		DynamicString modelsDirectory = PHYSFS_getRealDir("models/models.txt");
 		modelsDirectory.append(PHYSFS_getDirSeparator()).append("models/models.txt");
 		printlog("loading models from directory %s...\n", modelsDirectory.c_str());
 
@@ -756,7 +756,7 @@ int initApp(char const * const title, int fullscreen)
 				}
 			}
 #ifdef EDITOR
-			std::string filename = name;
+			DynamicString filename = name;
 			if ( filename.find("models/") != std::string::npos )
 			{
 				filename = filename.substr(strlen("models/"));
@@ -843,10 +843,10 @@ int Language::loadLanguage(char const * const lang, bool forceLoadBaseDirectory)
 	// compose filename
 	char filename[128] = { 0 };
 	snprintf(filename, 127, "/lang/%s.txt", lang);
-	std::string langFilepath;
+	DynamicString langFilepath;
 	if ( PHYSFS_isInit() && PHYSFS_getRealDir(filename) != NULL && !forceLoadBaseDirectory )
 	{
-		std::string langRealDir = PHYSFS_getRealDir(filename);
+		DynamicString langRealDir = PHYSFS_getRealDir(filename);
 		langFilepath = langRealDir + PHYSFS_getDirSeparator() + filename;
 	}
 	else
@@ -887,10 +887,10 @@ int Language::loadLanguage(char const * const lang, bool forceLoadBaseDirectory)
 	char fontName[64] = { 0 };
 	char fontPath[1024];
 	snprintf(fontName, 63, "lang/%s.ttf", lang);
-	std::string fontFilepath;
+	DynamicString fontFilepath;
 	if ( PHYSFS_isInit() && PHYSFS_getRealDir(fontName) != NULL )
 	{
-		std::string fontRealDir = PHYSFS_getRealDir(fontName);
+		DynamicString fontRealDir = PHYSFS_getRealDir(fontName);
 		fontFilepath = fontRealDir + PHYSFS_getDirSeparator() + fontName;
 	}
 	else
@@ -903,7 +903,7 @@ int Language::loadLanguage(char const * const lang, bool forceLoadBaseDirectory)
 		strncpy(fontName, "lang/en.ttf", 63);
 		if ( PHYSFS_isInit() && PHYSFS_getRealDir(fontName) != NULL )
 		{
-			std::string fontRealDir = PHYSFS_getRealDir(fontName);
+			DynamicString fontRealDir = PHYSFS_getRealDir(fontName);
 			fontFilepath = fontRealDir + PHYSFS_getDirSeparator() + fontName;
 		}
 		else
@@ -1058,7 +1058,7 @@ int Language::reloadLanguage()
 {
 	if ( PHYSFS_isInit() && PHYSFS_getRealDir("lang/en.txt") != NULL )
 	{
-		std::string langRealDir = PHYSFS_getRealDir("lang/en.txt");
+		DynamicString langRealDir = PHYSFS_getRealDir("lang/en.txt");
 		if ( langRealDir != BASE_DATA_DIR )
 		{
 			loadLanguage("en", true); // force load the base directory first, then modded paths later.
@@ -1091,7 +1091,7 @@ void readTilesJson()
 		return;
 	}
 
-	std::string inputPath = PHYSFS_getRealDir("/data/tiles.json");
+	DynamicString inputPath = PHYSFS_getRealDir("/data/tiles.json");
 	inputPath.append("/data/tiles.json");
 
 	File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -1421,9 +1421,9 @@ int deinitApp()
 	snprintf(lognamewithTimestamp, 127, "log_%4d%02d%02d_%02d%02d%02d.txt", 
 		localTimeNow->tm_year + 1900, localTimeNow->tm_mon + 1, localTimeNow->tm_mday, localTimeNow->tm_hour, localTimeNow->tm_min, localTimeNow->tm_sec);
 
-	std::string logarchivePath = outputdir;
+	DynamicString logarchivePath = outputdir;
 	logarchivePath.append(PHYSFS_getDirSeparator()).append("logfiles").append(PHYSFS_getDirSeparator());
-	std::string logarchiveFilePath = logarchivePath + lognamewithTimestamp;
+	DynamicString logarchiveFilePath = logarchivePath + lognamewithTimestamp;
 
 	
 	// prune any old logfiles if qty >= numLogFilesToKeepInArchive 
@@ -1436,7 +1436,7 @@ int deinitApp()
 		{
 			struct tm *tm = nullptr;
 //#ifdef WINDOWS
-			std::string filePath = logarchivePath + file;
+			DynamicString filePath = logarchivePath + file;
 #ifdef WINDOWS
 			struct _stat fileDateModified;
 			if ( _stat(filePath.c_str(), &fileDateModified) == 0 )
@@ -1465,7 +1465,7 @@ int deinitApp()
 	std::sort(sortedLogFiles.begin(), sortedLogFiles.end()); // sort most recent to oldest.
 	while ( sortedLogFiles.size() >= numLogFilesToKeepInArchive )
 	{
-		std::string logToRemove = logarchivePath + sortedLogFiles.back().second;
+		DynamicString logToRemove = logarchivePath + sortedLogFiles.back().second;
 		printlog("notice: Deleting archived log file %s due to number of old log files (%d) exceeds limit of %d.", logToRemove.c_str(), sortedLogFiles.size(), numLogFilesToKeepInArchive);
 		if ( access(logToRemove.c_str(), F_OK) != -1 )
 		{

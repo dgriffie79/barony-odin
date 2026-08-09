@@ -1241,7 +1241,7 @@ bool physfsSearchMusicToUpdate_helper_findModifiedMusic(uint32_t numMusic, const
 		snprintf(tempstr, 1000, filenameTemplate, c);
 		if ( PHYSFS_getRealDir(tempstr) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(tempstr);
+			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
 			if ( musicDir.compare("./") != 0 )
 			{
 				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
@@ -1368,10 +1368,10 @@ bool physfsSearchMusicToUpdate()
 
 	for ( auto it = themeMusic.begin(); it != themeMusic.end(); ++it )
 	{
-		std::string filename = *it;
+		DynamicString filename = *it;
 		if ( PHYSFS_getRealDir(filename.c_str()) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(filename.c_str());
+			DynamicString musicDir = PHYSFS_getRealDir(filename.c_str());
 			if ( musicDir.compare("./") != 0 )
 			{
 				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
@@ -1408,7 +1408,7 @@ bool physfsSearchMusicToUpdate()
 		}
 		if ( PHYSFS_getRealDir(tempstr) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(tempstr);
+			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
 			if ( musicDir.compare("./") != 0 )
 			{
 				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
@@ -1433,7 +1433,7 @@ bool physfsSearchMusicToUpdate()
 	{
 		if ( PHYSFS_getRealDir(themePaths[i]) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(themePaths[i]);
+			DynamicString musicDir = PHYSFS_getRealDir(themePaths[i]);
 			if ( musicDir.compare("./") != 0 )
 			{
 				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
@@ -1469,7 +1469,7 @@ FMOD_RESULT physfsReloadMusic_helper_reloadMusicArray(uint32_t numMusic, const c
 		snprintf(tempstr, 1000, filenameTemplate, c);
 		if ( PHYSFS_getRealDir(tempstr) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(tempstr);
+			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
 			if ( musicDir.compare("./") != 0 || reloadAll )
 			{
 				musicDir.append(PHYSFS_getDirSeparator()).append(tempstr);
@@ -1510,10 +1510,10 @@ void physfsReloadMusic(bool &introMusicChanged, bool reloadAll) //TODO: This sho
 	bool ensembleNeedsUpdate = false;
 	for ( auto it = themeMusic.begin(); it != themeMusic.end(); ++it )
 	{
-		std::string filename = *it;
+		DynamicString filename = *it;
 		if ( PHYSFS_getRealDir(filename.c_str()) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(filename.c_str());
+			DynamicString musicDir = PHYSFS_getRealDir(filename.c_str());
 			if ( musicDir.compare("./") != 0 || reloadAll )
 			{
 				musicDir += PHYSFS_getDirSeparator() + filename;
@@ -1695,7 +1695,7 @@ void physfsReloadMusic(bool &introMusicChanged, bool reloadAll) //TODO: This sho
 		}
 		if ( PHYSFS_getRealDir(tempstr) != nullptr )
 		{
-			std::string musicDir = PHYSFS_getRealDir(tempstr);
+			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
 			if ( musicDir.compare("./") != 0 || reloadAll )
 			{
 				musicDir.append(PHYSFS_getDirSeparator()).append(tempstr);

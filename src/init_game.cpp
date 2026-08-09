@@ -126,25 +126,25 @@ void initGameDatafilesAsync(bool moddedReload)
 #ifndef NINTENDO
 	if ( PHYSFS_getRealDir(PLAYERNAMES_MALE_FILE.c_str()) )
 	{
-		std::string namesDirectory = PHYSFS_getRealDir(PLAYERNAMES_MALE_FILE.c_str());
+		DynamicString namesDirectory = PHYSFS_getRealDir(PLAYERNAMES_MALE_FILE.c_str());
 		namesDirectory.append(PHYSFS_getDirSeparator()).append(PLAYERNAMES_MALE_FILE);
 		randomPlayerNamesMale = getLinesFromDataFile(namesDirectory);
 	}
 	if ( PHYSFS_getRealDir(PLAYERNAMES_FEMALE_FILE.c_str()) )
 	{
-		std::string namesDirectory = PHYSFS_getRealDir(PLAYERNAMES_FEMALE_FILE.c_str());
+		DynamicString namesDirectory = PHYSFS_getRealDir(PLAYERNAMES_FEMALE_FILE.c_str());
 		namesDirectory.append(PHYSFS_getDirSeparator()).append(PLAYERNAMES_FEMALE_FILE);
 		randomPlayerNamesFemale = getLinesFromDataFile(namesDirectory);
 	}
 	if ( PHYSFS_getRealDir(NPCNAMES_MALE_FILE.c_str()) )
 	{
-		std::string namesDirectory = PHYSFS_getRealDir(NPCNAMES_MALE_FILE.c_str());
+		DynamicString namesDirectory = PHYSFS_getRealDir(NPCNAMES_MALE_FILE.c_str());
 		namesDirectory.append(PHYSFS_getDirSeparator()).append(NPCNAMES_MALE_FILE);
 		randomNPCNamesMale = getLinesFromDataFile(namesDirectory);
 	}
 	if ( PHYSFS_getRealDir(NPCNAMES_FEMALE_FILE.c_str()) )
 	{
-		std::string namesDirectory = PHYSFS_getRealDir(NPCNAMES_FEMALE_FILE.c_str());
+		DynamicString namesDirectory = PHYSFS_getRealDir(NPCNAMES_FEMALE_FILE.c_str());
 		namesDirectory.append(PHYSFS_getDirSeparator()).append(NPCNAMES_FEMALE_FILE);
 		randomNPCNamesFemale = getLinesFromDataFile(namesDirectory);
 	}
@@ -217,7 +217,7 @@ int initGame()
 #ifndef NINTENDO
 		if ( PHYSFS_getRealDir("mythsandoutcasts.key") != NULL )
 		{
-			std::string serial = PHYSFS_getRealDir("mythsandoutcasts.key");
+			DynamicString serial = PHYSFS_getRealDir("mythsandoutcasts.key");
 			serial.append(PHYSFS_getDirSeparator()).append("mythsandoutcasts.key");
 			// open the serial file
 			File* fp = nullptr;
@@ -243,7 +243,7 @@ int initGame()
 		}
 		if ( PHYSFS_getRealDir("legendsandpariahs.key") != NULL ) //TODO: NX PORT: Update for the Switch?
 		{
-			std::string serial = PHYSFS_getRealDir("legendsandpariahs.key");
+			DynamicString serial = PHYSFS_getRealDir("legendsandpariahs.key");
 			serial.append(PHYSFS_getDirSeparator()).append("legendsandpariahs.key");
 			// open the serial file
 			File* fp = nullptr;
@@ -269,7 +269,7 @@ int initGame()
 		}
 		if ( PHYSFS_getRealDir("desertersanddisciples.key") != NULL ) //TODO: NX PORT: Update for the Switch?
 		{
-			std::string serial = PHYSFS_getRealDir("desertersanddisciples.key");
+			DynamicString serial = PHYSFS_getRealDir("desertersanddisciples.key");
 			serial.append(PHYSFS_getDirSeparator()).append("desertersanddisciples.key");
 			// open the serial file
 			File* fp = nullptr;
@@ -414,7 +414,7 @@ int initGame()
 
 				node_t* node2 = list_Node(&items[c].images, x);
 				string_t* string = (string_t*)node2->element;
-				std::string itemImgDir;
+				DynamicString itemImgDir;
 				if ( PHYSFS_getRealDir(string->data) != NULL )
 				{
 					itemImgDir = PHYSFS_getRealDir(string->data);
@@ -830,7 +830,7 @@ void loadAchievementData(const char* path) {
 		return;
 	}
 
-	std::string inputPath = PHYSFS_getRealDir(path);
+	DynamicString inputPath = PHYSFS_getRealDir(path);
 	inputPath.append(path);
 
 	File* fp = FileIO::open(inputPath.c_str(), "rb");

@@ -145,7 +145,7 @@ void make_minidump(EXCEPTION_POINTERS* e)
 			"_%4d%02d%02d_%02d%02d%02d.dmp",
 			t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
 	}
-	std::string crashlogDir = outputdir;
+	DynamicString crashlogDir = outputdir;
 	crashlogDir.append(PHYSFS_getDirSeparator()).append("crashlogs");
 	if ( access(crashlogDir.c_str(), F_OK) == -1 )
 	{
@@ -176,7 +176,7 @@ void make_minidump(EXCEPTION_POINTERS* e)
 		return;
 	}
 
-	std::string crashDumpFile = crashlogDir + name;
+	DynamicString crashDumpFile = crashlogDir + name;
 
 	auto hFile = CreateFileA(crashDumpFile.c_str(), GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if ( hFile == INVALID_HANDLE_VALUE )
@@ -210,7 +210,7 @@ void make_minidump(EXCEPTION_POINTERS* e)
 	// now copy the logfile into the crash folder.
 	char logfilePath[PATH_MAX];
 	completePath(logfilePath, "log.txt", outputdir);
-	std::string crashLogFile = crashlogDir + "log.txt";
+	DynamicString crashLogFile = crashlogDir + "log.txt";
 	CopyFileA(logfilePath, crashLogFile.c_str(), false);
 	return;
 }
@@ -2068,7 +2068,7 @@ void gameLogic(void)
 						}
 					}
 
-					std::string prevmapname = map.name;
+					DynamicString prevmapname = map.name;
 
 					bool loadingTheSameFloorAsCurrent = false;
 					if ( skipLevelsOnLoad > 0 )
@@ -2513,7 +2513,7 @@ void gameLogic(void)
 									{
 										strcpy((char*)net_packet->data, "LEAD");
 										SDLNet_Write32((Uint32)monster->getUID(), &net_packet->data[4]);
-										std::string name = monsterStats->name;
+										DynamicString name = monsterStats->name;
 										if ( name != "" && name == MonsterData_t::getSpecialNPCName(*monsterStats) )
 										{
 											name = monsterStats->getAttribute("special_npc");
@@ -4332,7 +4332,7 @@ bool handleEvents(void)
 				if ( command )
 				{
 				    static int saved_command_index = 0;
-				    static std::string saved_command_str;
+				    static DynamicString saved_command_str;
 				    if ( event.key.keysym.sym == SDLK_TAB )
 				    {
 				        if (saved_command_str.empty()) {
@@ -5634,9 +5634,9 @@ void ingameHud()
 						&& players[player]->worldUI.bTooltipInView
 						&& players[player]->worldUI.tooltipsInRange.size() > 1 )
 					{
-						std::string expandBinding = input.binding("Toggle Minimap");
-						std::string cycleNextBinding = input.binding("Interact Tooltip Next");
-						std::string cyclePrevBinding = input.binding("Interact Tooltip Prev");
+						DynamicString expandBinding = input.binding("Toggle Minimap");
+						DynamicString cycleNextBinding = input.binding("Interact Tooltip Next");
+						DynamicString cyclePrevBinding = input.binding("Interact Tooltip Prev");
 						if ( expandBinding == cycleNextBinding
 							|| expandBinding == cyclePrevBinding )
 						{
@@ -5996,7 +5996,7 @@ void ingameHud()
 				&& players[player]->worldUI.tooltipsInRange.size() > 1);
 		if ( worldUIBlocksFollowerCycle )
 		{
-			std::string cycleNPCbinding = input.binding("Cycle NPCs");
+			DynamicString cycleNPCbinding = input.binding("Cycle NPCs");
 			if ( cycleNPCbinding != input.binding("Interact Tooltip Next")
 				&& cycleNPCbinding != input.binding("Interact Tooltip Prev") )
 			{
@@ -6012,7 +6012,7 @@ void ingameHud()
 		}
 		else if ( FollowerMenu[player].followerMenuIsOpen() )
 		{
-			std::string cycleNPCbinding = input.binding("Cycle NPCs");
+			DynamicString cycleNPCbinding = input.binding("Cycle NPCs");
 			if ( cycleNPCbinding == input.binding("MenuCancel") )
 			{
 				allowCycle = false;
@@ -7841,7 +7841,7 @@ extern "C" int barony_main(int argc, char** argv)
 						}
 					}
 					TimerExperiments::updateClocks();
-					//std::string timerOutput = TimerExperiments::render(TimerExperiments::cameraRenderState[0].yaw);
+					//DynamicString timerOutput = TimerExperiments::render(TimerExperiments::cameraRenderState[0].yaw);
 					//cameras[0].x = players[0]->entity->x / 16.0;//TimerExperiments::cameraRenderState.x.position;
 					//cameras[0].y = players[0]->entity->y / 16.0;//TimerExperiments::cameraRenderState.y.position;
 					//cameras[0].z = TimerExperiments::cameraRenderState.z.position;

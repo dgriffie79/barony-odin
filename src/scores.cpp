@@ -966,7 +966,7 @@ void saveAllScores(const std::string& scoresfilename)
 		return;
 	}
 
-	std::string filename = "scores.dat";
+	DynamicString filename = "scores.dat";
 	if ( scoresfilename == SCORESFILE_MULTIPLAYER )
 	{
 		filename = "scores_multiplayer.dat";
@@ -1291,8 +1291,8 @@ bool verifyScoreStruct(score_t* score, score_t* score2)
 	assert(score->stats->sex == score2->stats->sex);
 	assert(score->stats->stat_appearance == score2->stats->stat_appearance);
 	assert(score->stats->playerRace == score2->stats->playerRace);
-	std::string name1 = score->stats->name;
-	std::string name2 = score2->stats->name;
+	DynamicString name1 = score->stats->name;
+	DynamicString name2 = score2->stats->name;
 	assert(name1 == name2);
 	assert(score->classnum == score2->classnum);
 	assert(score->victory == score2->victory);
@@ -1541,7 +1541,7 @@ void loadAllScoresJSON(const std::string& scoresfilename)
 		return;
 	}
 
-	std::string checkStr = jsonGetStr(d, "game_version");
+	DynamicString checkStr = jsonGetStr(d, "game_version");
 	int versionNumber = 000;
 	char versionStr[4] = "000";
 	int i = 0;
@@ -1572,7 +1572,7 @@ void loadAllScoresJSON(const std::string& scoresfilename)
 	{
 		for ( auto itr = d["books_read"].Begin(); itr != d["books_read"].End(); ++itr )
 		{
-			std::string bookname = itr->GetString();
+			DynamicString bookname = itr->GetString();
 			if ( char* book = (char*)malloc(sizeof(char) * (bookname.size() + 1)) )
 			{
 				memset(book, 0, sizeof(char) * (bookname.size() + 1));
@@ -1874,7 +1874,7 @@ void loadAllScores(const std::string& scoresfilename)
 		list_FreeAll(&topscoresMultiplayer_legacy);
 	}
 
-	std::string filename = "scores.dat";
+	DynamicString filename = "scores.dat";
 	if ( scoresfilename == SCORESFILE_MULTIPLAYER )
 	{
 		filename = "scores_multiplayer.dat";
@@ -3244,7 +3244,7 @@ void updateGameplayStatisticsInMainLoop()
 
 std::string setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex)
 {
-	std::string filename = "savegames/savegame" + std::to_string(saveIndex);
+	DynamicString filename = "savegames/savegame" + std::to_string(saveIndex);
 
 	//OLD FORMAT
 	//#define SAVEGAMEFILE "savegame.dat"
@@ -4514,7 +4514,7 @@ void AchievementObserver::checkMapScriptsOnVariableSet()
 		size_t found = key.find("$ACH_TUTORIAL_SECRET");
 		if ( found != std::string::npos )
 		{
-			std::string mapname = map.name;
+			DynamicString mapname = map.name;
 			if ( mapname.find("Tutorial Hub") != std::string::npos )
 			{
 				updatePlayerAchievement(clientnum, BARONY_ACH_MASTER, EXTRA_CREDIT_SECRET);
@@ -4661,7 +4661,7 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 		case BARONY_ACH_MASTER:
 			if ( gameModeManager.getMode() == GameModeManager_t::GAME_MODE_TUTORIAL )
 			{
-				std::string mapname = map.name;
+				DynamicString mapname = map.name;
 				if ( mapname.find("Tutorial Hub") != std::string::npos )
 				{
 					awardAchievement(player, achievement);
@@ -4672,7 +4672,7 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 		case BARONY_ACH_EXTRA_CREDIT:
 			if ( gameModeManager.getMode() == GameModeManager_t::GAME_MODE_TUTORIAL )
 			{
-				std::string mapname = map.name;
+				DynamicString mapname = map.name;
 				if ( mapname.find("Tutorial Hub") == std::string::npos
 					&& mapname.find("Tutorial ") != std::string::npos )
 				{
@@ -6070,7 +6070,7 @@ int saveGame(int saveIndex) {
 	static ConsoleVariable<bool> cvar_saveText("/save_text_format", true);
 
 	char path[PATH_MAX] = "";
-	std::string savefile = setSaveGameFileName(multiplayer == SINGLE, SaveFileType::JSON, saveIndex);
+	DynamicString savefile = setSaveGameFileName(multiplayer == SINGLE, SaveFileType::JSON, saveIndex);
 	completePath(path, savefile.c_str(), outputdir);
 	auto result = FileHelper::writeObject(path, *cvar_saveText ? EFileFormat::Json_Compact : EFileFormat::Binary, info);
 	return result == true ? 0 : 1;
@@ -6190,7 +6190,7 @@ std::string SaveGameInfo::serializeToOnlineHiscore(const int playernum, const in
 
 	Uint32 gametimer = std::min(this->gametimer, (Uint32)0xFFFFFF);
 
-	std::string lid = "lid";
+	DynamicString lid = "lid";
 	int lid_version = 0;
 	int challengeEventSave = 0;
 	for ( auto& pair : additional_data )

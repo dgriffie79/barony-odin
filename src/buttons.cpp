@@ -87,7 +87,7 @@ static void updateMapNames()
 	struct dirent* ent;
 	mapNames.clear();
 	// file list
-	std::string path;
+	DynamicString path;
 	if ( savewindow > 0 )
 	{
 		path = physfs_saveDirectory + "/maps/";
@@ -119,7 +119,7 @@ static void updateMapNames()
 static void updateModFolderNames()
 {
 	modFolderNames.clear();
-	std::string path = outputdir;
+	DynamicString path = outputdir;
 	path.append(PHYSFS_getDirSeparator()).append("mods/");
 	modFolderNames = directoryContents(path.c_str(), true, false);
 	if ( !modFolderNames.empty() )
@@ -133,13 +133,13 @@ static void updateModFolderNames()
 	}
 }
 
-void writeLevelsTxt(std::string modFolder)
+void writeLevelsTxt(DynamicString modFolder)
 {
-	std::string path = outputdir;
+	DynamicString path = outputdir;
 	path.append(PHYSFS_getDirSeparator()).append("mods/").append(modFolder);
 	if ( access(path.c_str(), F_OK) == 0 )
 	{
-		std::string writeFile = modFolder + "/maps/levels.txt";
+		DynamicString writeFile = modFolder + "/maps/levels.txt";
 		PHYSFS_File *physfp = PHYSFS_openWrite(writeFile.c_str());
 		if ( physfp != NULL )
 		{
@@ -655,7 +655,7 @@ void buttonOpen(button_t* my)
 
 void buttonSetSaveDirectoryFolder(button_t* my)
 {
-	std::string filepath = outputdir;
+	DynamicString filepath = outputdir;
 	bool inModFolder = false;
 	if ( strcmp(foldername, ".") == 0 || strcmp(foldername, "") == 0 )
 	{
@@ -681,15 +681,15 @@ void buttonSetSaveDirectoryFolder(button_t* my)
 		
 		if ( PHYSFS_mkdir(foldername) )
 		{
-			std::string dir = foldername;
-			std::string folder = "/books";
+			DynamicString dir = foldername;
+			DynamicString folder = "/books";
 			PHYSFS_mkdir((dir + folder).c_str());
 			folder = "/editor";
 			PHYSFS_mkdir((dir + folder).c_str());
 
 			folder = "/images";
 			PHYSFS_mkdir((dir + folder).c_str());
-			std::string subfolder = "/sprites";
+			DynamicString subfolder = "/sprites";
 			PHYSFS_mkdir((dir + folder + subfolder).c_str());
 			subfolder = "/system";
 			PHYSFS_mkdir((dir + folder + subfolder).c_str());
@@ -741,7 +741,7 @@ void buttonSetOpenDirectoryFolder(button_t* my)
 {
 	if ( PHYSFS_unmount(physfs_openDirectory.c_str()) )
 	{
-		std::string filepath = outputdir;
+		DynamicString filepath = outputdir;
 		if ( strcmp(foldername, ".") == 0 || strcmp(foldername, "") == 0 )
 		{
 			physfs_openDirectory = BASE_DATA_DIR;
@@ -857,7 +857,7 @@ void buttonOpenConfirm(button_t* my)
 	{
 		strcat(message, " ");
 	}*/
-	std::string fullMapName = physfsFormatMapName(filename);
+	DynamicString fullMapName = physfsFormatMapName(filename);
 	printlog("opening map file '%s'...\n", fullMapName.c_str());
 	if (loadMap(fullMapName.c_str(), &map, map.entities, map.creatures) == -1)
 	{
@@ -900,7 +900,7 @@ void buttonSave(button_t* my)
 		}*/
 		printlog("saving map file '%s'...\n", filename);
 
-		std::string path = physfs_saveDirectory;
+		DynamicString path = physfs_saveDirectory;
 		path.append("/maps/").append(filename);
 		if (saveMap(path.c_str()))
 		{
@@ -1759,7 +1759,7 @@ void buttonOpenNextMap(button_t* my)
 	
 	updateMapNames();
 
-	std::string searchStr = filename;
+	DynamicString searchStr = filename;
 	auto find = searchStr.find(".lmp");
 	if ( find == std::string::npos )
 	{
@@ -1775,7 +1775,7 @@ void buttonOpenNextMap(button_t* my)
 			{
 				if ( it->size() > 0 && it->front() != '.' )
 				{
-					std::string f = *it;
+					DynamicString f = *it;
 					auto find = f.find(".lmp");
 					if ( find != std::string::npos )
 					{
@@ -1803,7 +1803,7 @@ void buttonOpenPrevMap(button_t* my)
 
 	updateMapNames();
 
-	std::string searchStr = filename;
+	DynamicString searchStr = filename;
 	auto find = searchStr.find(".lmp");
 	if ( find == std::string::npos )
 	{
@@ -1819,7 +1819,7 @@ void buttonOpenPrevMap(button_t* my)
 			{
 				if ( it->size() > 0 && it->front() != '.' )
 				{
-					std::string f = *it;
+					DynamicString f = *it;
 					auto find = f.find(".lmp");
 					if ( find != std::string::npos )
 					{
