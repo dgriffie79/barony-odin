@@ -485,7 +485,7 @@ public:
 	int getPassiveShieldBonus(bool checkShield, bool excludeSkill) const;
 	int getActiveShieldBonus(bool checkShield, bool excludeSkill, Item* shieldItem = nullptr, bool checkNonShieldBonus = false) const;
 	static int getParryingACBonus(Stat* myStats, Item* myWeapon, bool checkWeapon, bool excludeSkill, int weaponSkill);
-	std::string getAttribute(std::string key) const
+	DynamicString getAttribute(DynamicString key) const
 	{ 
 		if ( attributes.contains(key) )
 		{
@@ -496,7 +496,7 @@ public:
 			return "";
 		}
 	}
-	void setAttribute(std::string key, std::string value);
+	void setAttribute(DynamicString key, DynamicString value);
 	bool statusEffectRemovedByCureAilment(const int effect, Entity* my);
 	int numShillelaghDebuffsActive(Entity* my);
 	void addItemToLootingBag(const int player, const real_t x, const real_t y, Item& item);

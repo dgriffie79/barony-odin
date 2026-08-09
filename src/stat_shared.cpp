@@ -1787,7 +1787,7 @@ bool isMonsterStatsDefault(Stat& myStats)
 	return false;
 }
 
-void Stat::setAttribute(std::string key, std::string value)
+void Stat::setAttribute(DynamicString key, DynamicString value)
 {
 	attributes[key] = value.c_str();
 }
