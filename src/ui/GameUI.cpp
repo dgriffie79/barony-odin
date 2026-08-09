@@ -372,6 +372,39 @@ void camelCaseString(DynamicString& str)
 	}
 }
 
+// DynamicString overloads for the other case helpers
+void capitalizeString(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return; }
+	char letter = str[0];
+	if ( letter >= 'a' && letter <= 'z' ) { str[0] = toupper(letter); }
+}
+
+void uppercaseString(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return; }
+	for ( auto& letter : str ) { if ( letter >= 'a' && letter <= 'z' ) letter = toupper(letter); }
+}
+
+void lowercaseString(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return; }
+	for ( auto& letter : str ) { if ( letter >= 'A' && letter <= 'Z' ) letter = tolower(letter); }
+}
+
+bool stringStartsWithVowel(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return false; }
+	switch ( str[0] )
+	{
+		case 'a': case 'e': case 'i': case 'o': case 'u':
+		case 'A': case 'E': case 'I': case 'O': case 'U':
+			return true;
+		default: break;
+	}
+	return false;
+}
+
 bool stringStartsWithVowel(std::string& str)
 {
 	if ( str.size() < 1 ) { return false; }

@@ -143,6 +143,21 @@ public:
         return -1;
     }
     int64_t rfind(const std::string& needle) const { return rfind(needle.c_str()); }
+    // find last of any char in the set (std::string::find_last_of)
+    int64_t find_last_of(const char* set, int64_t start = -1) const {
+        int64_t n = len;
+        if (start >= 0 && start < n) n = start + 1;
+        for (int64_t i = n - 1; i >= 0; --i) {
+            if (std::strchr(set, data[i])) return i;
+        }
+        return -1;
+    }
+    // erase at an iterator position (std::string::erase(iterator))
+    char* erase(char* pos) {
+        int64_t idx = pos - data;
+        erase(idx, 1);
+        return data + idx;
+    }
     // find first of any char in the set (std::string::find_first_of)
     int64_t find_first_of(const char* set, int64_t start = 0) const { return barony_dynamic_string_find_first_of(this, set, (int)start); }
     // erase [pos, pos+count) in place (std::string::erase); count=-1 = to end

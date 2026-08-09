@@ -336,11 +336,15 @@ void openMapWindow(int player);
 void openLogWindow(int player);
 
 void capitalizeString(std::string& str);
+void capitalizeString(DynamicString& str);
 void lowercaseString(std::string& str);
+void lowercaseString(DynamicString& str);
 void uppercaseString(std::string& str);
+void uppercaseString(DynamicString& str);
 void camelCaseString(std::string& str);
 void camelCaseString(DynamicString& str);
 bool stringStartsWithVowel(std::string& str);
+bool stringStartsWithVowel(DynamicString& str);
 
 struct MinotaurWarning_t
 {
