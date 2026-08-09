@@ -97,13 +97,13 @@ namespace MainMenu {
 
     // If you want to add new player-visible bindings, ADD THEM HERE:
     struct DefaultBinding {
-        const std::string action;
-        const std::string keyboard;
-        const std::string gamepad;
-        const std::string joystick;
+        const DynamicString action;
+        const DynamicString keyboard;
+        const DynamicString gamepad;
+        const DynamicString joystick;
     };
     struct BindingLayout {
-        std::string name;
+        DynamicString name;
         const std::vector<DefaultBinding> bindings;
     };
     static std::vector<BindingLayout> defaultBindings = {
@@ -400,7 +400,7 @@ namespace MainMenu {
     static bool restartPromptRequired = false;
 
 	static FadeDestination main_menu_fade_destination = FadeDestination::None;
-	static std::string tutorial_map_destination;
+	static DynamicString tutorial_map_destination;
 
 	enum class LobbyType {
 	    None,
@@ -484,7 +484,7 @@ namespace MainMenu {
 		int characterAppearance[NUM_LAST_CHARACTERS];
 		int characterSex[NUM_LAST_CHARACTERS];
 		int characterRace[NUM_LAST_CHARACTERS];
-		std::string characterName[NUM_LAST_CHARACTERS];
+		DynamicString characterName[NUM_LAST_CHARACTERS];
 		inline void save();
 		static inline LastCreatedCharacter load();
 		static inline LastCreatedCharacter reset();
@@ -625,8 +625,8 @@ namespace MainMenu {
 		bool hdr_enabled = true;
 		float fov = 60.f;
 		float fps = AUTO_FPS;
-		std::string audio_device = "";
-		std::string recording_audio_device = "";
+		DynamicString audio_device = "";
+		DynamicString recording_audio_device = "";
 		bool recording_loopback = false;
 #ifdef NINTENDO
 		bool enable_voice_input = false;
@@ -1238,7 +1238,7 @@ namespace MainMenu {
 		}
 		auto selectedWidget = frame.findSelectedWidget(getMenuOwner());
 		if (selectedWidget) {
-			std::string setting;
+			DynamicString setting;
 			auto name = std::string(selectedWidget->getName());
 			if (selectedWidget->getType() == Widget::WIDGET_SLIDER) {
 				setting = name.substr(sizeof("setting_") - 1, name.size() - (sizeof("_slider") - 1) - (sizeof("setting_") - 1));
@@ -2003,7 +2003,7 @@ namespace MainMenu {
             [](Button& button){ // okay
                 soundActivate();
 
-                static std::string text;
+                static DynamicString text;
 
                 auto frame = static_cast<Frame*>(button.getParent()); assert(frame);
                 auto field = frame->findField("field"); assert(field);
@@ -2600,9 +2600,9 @@ namespace MainMenu {
                     }
 					for (Uint32 index = 0; index < count; ++index) {
 						file->beginObject();
-						std::string binding;
+						DynamicString binding;
 						file->property("binding", binding);
-						std::string input;
+						DynamicString input;
 						file->property("input", input);
 						bindings[binding] = input;
 						file->endObject();
@@ -2610,9 +2610,9 @@ namespace MainMenu {
 				} else {
 					for (auto& bind : bindings) {
 						file->beginObject();
-						std::string binding = bind.first;
+						DynamicString binding = bind.first;
 						file->property("binding", binding);
-						std::string input = bind.second;
+						DynamicString input = bind.second;
 						file->property("input", input);
 						file->endObject();
 					}
@@ -2798,8 +2798,8 @@ namespace MainMenu {
 
     // rebinding state
     static Button* bound_button;
-    static std::string bound_binding;
-    static std::string bound_input;
+    static DynamicString bound_binding;
+    static DynamicString bound_input;
     static int bound_player;
     static int bound_device;
     static const char* bound_profile;
@@ -3338,7 +3338,7 @@ namespace MainMenu {
 			printlog("[JSON]: Error: Could not find file: %s", file);
 			return;
 		}
-		std::string inputPath = PHYSFS_getRealDir(file);
+		DynamicString inputPath = PHYSFS_getRealDir(file);
 		inputPath.append(PHYSFS_getDirSeparator());
 		inputPath.append(file);
 
@@ -3938,7 +3938,7 @@ namespace MainMenu {
 
 /******************************************************************************/
 
-	static std::string settings_tab_name;
+	static DynamicString settings_tab_name;
 
 	struct Setting {
 		enum class Type : Uint8 {
@@ -5438,7 +5438,7 @@ namespace MainMenu {
 		slider->setWidgetLeft(names.first.c_str());
 
 		// rescues focus if it is lost somehow
-		static std::string rescueSetting;
+		static DynamicString rescueSetting;
 		rescueSetting = names.first;
 		frame.setTickCallback([](Widget& widget){
 			assert(main_menu_frame);
@@ -5910,7 +5910,7 @@ namespace MainMenu {
 			bindings.erase(binding);
 			return true;
 		} else {
-			std::string input_to_store;
+			DynamicString input_to_store;
 			if (device_index >= 1 && device_index <= 4 && strncmp(input, "Pad", 3) == 0) {
 				input_to_store = input + 4;
 			}
@@ -6177,7 +6177,7 @@ namespace MainMenu {
 							goto bind_failed;
 						}
 						auto begin = Input::lastInputOfAnyKind.substr(0, 3);
-						std::string newinput = begin == "Pad" || begin == "Joy" ?
+						DynamicString newinput = begin == "Pad" || begin == "Joy" ?
 								Input::lastInputOfAnyKind.substr(4) : Input::lastInputOfAnyKind;
 						bound_button->setText(newinput.c_str());
 		                auto glyph = Input::getGlyphPathForInput(bound_button->getText(), false, Input::getControllerType(bound_player));
@@ -7210,7 +7210,7 @@ bind_failed:
                             field->setText(bindings[0].c_str());
                         }
                         if (bindings.size() >= 2) {
-                            const std::string cat = bindings[0] + "\n" + bindings[1];
+                            const DynamicString cat = bindings[0] + "\n" + bindings[1];
                             field->setText(cat.c_str());
                         }
                     }
@@ -7254,14 +7254,14 @@ bind_failed:
         if (players.empty()) {
             players.reserve(MAX_SPLITSCREEN);
             for (int c = 0; c < MAX_SPLITSCREEN; ++c) {
-                std::string str = Language::get(5208);
+                DynamicString str = Language::get(5208);
                 str += std::to_string(c + 1);
                 players.emplace_back(str);
                 player_ptrs.emplace_back(players.back().c_str());
             }
         }
 
-        std::string player_str = Language::get(5208) + std::to_string(player + 1);
+        DynamicString player_str = Language::get(5208) + std::to_string(player + 1);
         y += settingsAddDropdown(*settings_subwindow, y, "player_dropdown_button",
             Language::get(5209), Language::get(5210), false, player_ptrs, player_str.c_str(),
             [](Button& button){
@@ -8644,7 +8644,7 @@ bind_failed:
 		return 5369;
 	}
 
-    static void createLeaderboards(std::string leaderboard_type) {
+    static void createLeaderboards(DynamicString leaderboard_type) {
         assert(main_menu_frame);
 
         static score_t* selectedScore;
@@ -9285,7 +9285,7 @@ bind_failed:
             char victory_text[1024] = "";
 			if ( score->victory == 0 && score->stats->killer != KilledBy::UNKNOWN )
 			{
-				std::string cause_of_death = "";
+				DynamicString cause_of_death = "";
 				switch ( score->stats->killer ) {
 					case KilledBy::MONSTER: {
 						if ( score->stats->killer_name.empty() ) 
@@ -9967,7 +9967,7 @@ bind_failed:
 														}
 														Uint32 interval = ticks % int(1 * TICKS_PER_SECOND);
 														int numDots = (interval / (TICKS_PER_SECOND / 5));
-														std::string status = "";
+														DynamicString status = "";
 														while ( numDots >= 0 )
 														{
 															--numDots;
@@ -10624,7 +10624,7 @@ bind_failed:
 			}
 
 			// image path
-			std::string path;
+			DynamicString path;
 			if (locked) {
 				if (name) {
 					path = std::string("*#images/achievements/") + name + std::string("_l.png");
@@ -10749,7 +10749,7 @@ bind_failed:
     struct LobbyChatMessage {
         Uint32 timestamp;
         Uint32 color;
-        std::string msg;
+        DynamicString msg;
     };
 
     static Uint32 new_lobby_chat_message_alert = 0;
@@ -11508,7 +11508,7 @@ bind_failed:
 					net_packet->data[4] = sequence; // chunk index
 					net_packet->data[4] |= ((numchunks) << 4); // upper bits num chunks
 
-					std::string substr = gameModeManager.currentSession.challengeRun.scenarioStr.substr(c, chunksize);
+					DynamicString substr = gameModeManager.currentSession.challengeRun.scenarioStr.substr(c, chunksize);
 					stringCopy((char*)net_packet->data + 5, substr.c_str(),
 						256 + 1, substr.size());
 
@@ -11638,7 +11638,7 @@ bind_failed:
 	        return;
 	    }
 
-		std::string msgStr = msg;
+		DynamicString msgStr = msg;
 		int numCharsAdded = 0;
 		msgStr = messageSanitizePercentSign(msgStr, &numCharsAdded);
 		msg = msgStr.c_str();
@@ -12317,7 +12317,7 @@ bind_failed:
 			if ( (int)lobbyCustomScenarioClient.size() == numchunks )
 			{
 				// parse the scenario.
-				std::string str = "";
+				DynamicString str = "";
 				for ( int i = 1; i <= numchunks; ++i )
 				{
 					str += lobbyCustomScenarioClient[i];
@@ -12744,7 +12744,7 @@ bind_failed:
 					    const char* memberNumChar = SteamMatchmaking()->GetLobbyMemberData(
 					        *static_cast<CSteamID*>(currentLobby), SteamUser()->GetSteamID(), "clientnum");
 					    if (memberNumChar) {
-						    std::string str = memberNumChar;
+						    DynamicString str = memberNumChar;
 						    if (str.empty() || std::to_string(clientnum) != str) {
 							    SteamMatchmaking()->SetLobbyMemberData(*static_cast<CSteamID*>(currentLobby),
 							        "clientnum", std::to_string(clientnum).c_str());
@@ -13096,7 +13096,7 @@ bind_failed:
                     flushP2PPackets(100, 200);
 
 		            // EOS.searchLobbies() nukes the lobby list, so we need to copy this.
-		            std::string lobbyId = lobby->LobbyId.c_str();
+		            DynamicString lobbyId = lobby->LobbyId.c_str();
 		            EOS.searchLobbies(
 		                EOSFuncs::LobbyParameters_t::LobbySearchOptions::LOBBY_SEARCH_BY_LOBBYID,
 			            EOSFuncs::LobbyParameters_t::LobbyJoinOptions::LOBBY_JOIN_FIRST_SEARCH_RESULT,
@@ -13203,14 +13203,14 @@ failed:
 
 	void ClassDescriptions::readFromFile()
 	{
-		const std::string filename = "data/class_descriptions.json";
+		const DynamicString filename = "data/class_descriptions.json";
 		if ( !PHYSFS_getRealDir(filename.c_str()) )
 		{
 			printlog("[JSON]: Error: Could not locate json file %s", filename.c_str());
 			return;
 		}
 
-		std::string inputPath = PHYSFS_getRealDir(filename.c_str());
+		DynamicString inputPath = PHYSFS_getRealDir(filename.c_str());
 		inputPath.append(PHYSFS_getDirSeparator());
 		inputPath.append(filename.c_str());
 
@@ -13247,7 +13247,7 @@ failed:
 		Stat tmpStats(0);
 		for ( auto it = classes.MemberBegin(); it != classes.MemberEnd(); ++it )
 		{
-			std::string classname = it->name.GetString();
+			DynamicString classname = it->name.GetString();
 			int key = it->value["id"].GetInt();
 			auto& classEntry = data[key];
 			classEntry.internal_name = classname;
@@ -13259,7 +13259,7 @@ failed:
 
 			for ( auto it2 = it->value["desc"].Begin(); it2 != it->value["desc"].End(); )
 			{
-				std::string line = (it2->GetString());
+				DynamicString line = (it2->GetString());
 				if ( line.size() > 0 && line[0] == '-' )
 				{
 					line[0] = '\x1E';
@@ -13312,7 +13312,7 @@ failed:
 			}
 			for ( auto it2 = it->value["stats"].Begin(); it2 != it->value["stats"].End(); ++it2 )
 			{
-				std::string value = it2->GetString();
+				DynamicString value = it2->GetString();
 				classEntry.statRatingsStrings.push_back(value);
 				if ( value == "bad" )
 				{
@@ -13351,14 +13351,14 @@ failed:
 
 	void RaceDescriptions::readFromFile()
 	{
-		const std::string filename = "data/race_descriptions.json";
+		const DynamicString filename = "data/race_descriptions.json";
 		if ( !PHYSFS_getRealDir(filename.c_str()) )
 		{
 			printlog("[JSON]: Error: Could not locate json file %s", filename.c_str());
 			return;
 		}
 
-		std::string inputPath = PHYSFS_getRealDir(filename.c_str());
+		DynamicString inputPath = PHYSFS_getRealDir(filename.c_str());
 		inputPath.append(PHYSFS_getDirSeparator());
 		inputPath.append(filename.c_str());
 
@@ -13388,14 +13388,14 @@ failed:
 		auto& races = d["descriptions"];
 		for ( auto it = races.MemberBegin(); it != races.MemberEnd(); ++it )
 		{
-			std::string key = it->name.GetString();
+			DynamicString key = it->name.GetString();
 			auto& raceEntry = data[key];
 			raceEntry.title = it->value["title"].GetString();
 			std::vector<std::string> textLeftLines;
 			std::vector<std::string> textRightLines;
 			for ( auto it2 = it->value["left_align"].Begin(); it2 != it->value["left_align"].End(); )
 			{
-				std::string line = (it2->GetString());
+				DynamicString line = (it2->GetString());
 				if ( line.size() > 0 && line[0] == '-' )
 				{
 					line[0] = '\x1E';
@@ -13432,7 +13432,7 @@ failed:
 			}
 			for ( auto it2 = it->value["right_align"].Begin(); it2 != it->value["right_align"].End(); )
 			{
-				std::string line = (it2->GetString());
+				DynamicString line = (it2->GetString());
 				if ( line.size() > 0 && line[0] == '-' )
 				{
 					line[0] = '\x1E';
@@ -13557,8 +13557,8 @@ failed:
 		auto& raceDescriptionDataBase = RaceDescriptions::getMonsterDescriptionData(race);
 		auto details_text = card.findField("details"); assert(details_text);
 		auto details_text_right = card.findField("details_right"); assert(details_text_right);
-		std::string details_text_buf = "";
-		std::string details_text_right_buf = "";
+		DynamicString details_text_buf = "";
+		DynamicString details_text_right_buf = "";
 		if ( details_text ) {
 			details_text->clearLinesToColor();
 			details_text->clearIndividualLinePadding();
@@ -13869,7 +13869,7 @@ failed:
 	static void race_achievement_required_error(int classnum)
 	{
 		char buf[256];
-		std::string achName = "";
+		DynamicString achName = "";
 		switch ( classnum )
 		{
 		case CLASS_CONJURER:
@@ -14763,7 +14763,7 @@ failed:
 				"seed_box"
 			);
 
-			std::string name = index != 0 ? "customseed_client_text" : "customseed_server_text";
+			DynamicString name = index != 0 ? "customseed_client_text" : "customseed_server_text";
 			auto customseed_client_text = card->addField(name.c_str(), 32);
 			customseed_client_text->setSize(SDL_Rect{ seed_box->pos.x + 2, seed_box->pos.y + 4, seed_box->pos.w - 4, 28 });
 			customseed_client_text->setFont(smallfont_outline);
@@ -17071,7 +17071,7 @@ failed:
 		auto current_class_name = classes_in_order[current_class];
 
         bool selected_button = false;
-		static const std::string prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
+		static const DynamicString prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
 		for (int c = num_classes - 1; c >= 0; --c) {
 			auto name = classes_in_order[c];
 			auto find = classes.find(name);
@@ -17500,7 +17500,7 @@ failed:
 			{
 				text = field->getText();
 			}
-			//std::string nameStr = text;
+			//DynamicString nameStr = text;
 			//nameStr = messageSanitizePercentSign(nameStr, nullptr);
 			//text = nameStr.c_str();
 
@@ -18395,7 +18395,7 @@ failed:
 		    const SDL_Rect viewport{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 #ifdef NINTENDO
 			// draw A button
-			std::string path = Input::getGlyphPathForInput("ButtonA", pressed,
+			DynamicString path = Input::getGlyphPathForInput("ButtonA", pressed,
                 Input::ControllerType::NintendoSwitch);
 			auto image = Image::get((std::string("*") + path).c_str());
 			const int x = pos.x + pos.w / 2;
@@ -18413,7 +18413,7 @@ failed:
                 if (controllerAvailable) {
                     // draw spacebar and A button
                     {
-                        std::string path = Input::getGlyphPathForInput("Space", pressed);
+                        DynamicString path = Input::getGlyphPathForInput("Space", pressed);
 		                auto image = Image::get((std::string("*") + path).c_str());
 		                const int x = pos.x + pos.w / 2 - 32;
 		                const int y = pos.y + pos.h / 2 + 16;
@@ -18422,7 +18422,7 @@ failed:
 		                image->draw(nullptr, SDL_Rect{x - w / 2, y - h / 2, w, h}, viewport);
                     }
                     {
-                        std::string path = Input::getGlyphPathForInput("ButtonA", pressed, Input::getControllerType(player));
+                        DynamicString path = Input::getGlyphPathForInput("ButtonA", pressed, Input::getControllerType(player));
 		                auto image = Image::get((std::string("*") + path).c_str());
 		                const int x = pos.x + pos.w / 2 + 32;
 		                const int y = pos.y + pos.h / 2 + 16;
@@ -18432,7 +18432,7 @@ failed:
                     }
                 } else {
                     // only draw spacebar
-                    std::string path = Input::getGlyphPathForInput("Space", pressed);
+                    DynamicString path = Input::getGlyphPathForInput("Space", pressed);
 		            auto image = Image::get((std::string("*") + path).c_str());
 		            const int x = pos.x + pos.w / 2;
 		            const int y = pos.y + pos.h / 2 + 16;
@@ -18442,7 +18442,7 @@ failed:
                 }
             } else if (controllerAvailable) {
                 // draw A button
-                std::string path = Input::getGlyphPathForInput("ButtonA", pressed, Input::getControllerType(player));
+                DynamicString path = Input::getGlyphPathForInput("ButtonA", pressed, Input::getControllerType(player));
                 auto image = Image::get((std::string("*") + path).c_str());
                 const int x = pos.x + pos.w / 2;
                 const int y = pos.y + pos.h / 2 + 16;
@@ -19337,7 +19337,7 @@ failed:
 							icon = images[i];
 
 							auto voiceState = VoiceChat.getVoiceState(i);
-							std::string imgPath = "";
+							DynamicString imgPath = "";
 
 							if ( i == clientnum )
 							{
@@ -19733,7 +19733,7 @@ failed:
 		        if (no_one_logged_in && countControllers() > 0) {
 		            const SDL_Rect viewport{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 		            const bool pressed = ticks % TICKS_PER_SECOND >= TICKS_PER_SECOND / 2;
-                    std::string path = Input::getGlyphPathForInput("ButtonB", pressed, Input::getControllerType(widget.getOwner()));
+                    DynamicString path = Input::getGlyphPathForInput("ButtonB", pressed, Input::getControllerType(widget.getOwner()));
                     auto image = Image::get((std::string("*") + path).c_str());
                     const int off_x = 1;
                     const int off_y = 4;
@@ -20144,7 +20144,7 @@ failed:
 				pingFrame->setHollow(true);
 				pingFrame->setTickCallback([](Widget& widget) {
 					auto frame = static_cast<Frame*>(&widget);
-					std::string name = frame->getName();
+					DynamicString name = frame->getName();
 					name = name.substr(strlen("ping"));
 					int player = std::stoi(name);
 					if ( auto ping = frame->findField("ping") )
@@ -20459,14 +20459,14 @@ failed:
 /******************************************************************************/
 
 	struct LobbyInfo {
-	    std::string name;
-        std::string version;
-		std::string challengeLid;
+	    DynamicString name;
+        DynamicString version;
+		DynamicString challengeLid;
 	    int players;
 	    int ping;
 	    bool locked;
 	    Uint32 flags;
-	    std::string address;
+	    DynamicString address;
 		int numMods;
 		bool modsDisableAchievements;
 	    intptr_t index = -1;
@@ -20558,7 +20558,7 @@ failed:
 				{
 					if ( info.challengeLid.find("oneshot") != std::string::npos )
 					{
-						std::string prefix = Language::get(6110);
+						DynamicString prefix = Language::get(6110);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' ) 
@@ -20571,7 +20571,7 @@ failed:
 					}
 					else if ( info.challengeLid.find("unlimited") != std::string::npos )
 					{
-						std::string prefix = Language::get(6111);
+						DynamicString prefix = Language::get(6111);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' )
@@ -20584,7 +20584,7 @@ failed:
 					}
 					else if ( info.challengeLid.find("challenge") != std::string::npos )
 					{
-						std::string prefix = Language::get(6112);
+						DynamicString prefix = Language::get(6112);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' )
@@ -20682,7 +20682,7 @@ failed:
 				{
 					if ( info.challengeLid.find("oneshot") != std::string::npos )
 					{
-						std::string prefix = Language::get(6110);
+						DynamicString prefix = Language::get(6110);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' )
@@ -20695,7 +20695,7 @@ failed:
 					}
 					else if ( info.challengeLid.find("unlimited") != std::string::npos )
 					{
-						std::string prefix = Language::get(6111);
+						DynamicString prefix = Language::get(6111);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' )
@@ -20708,7 +20708,7 @@ failed:
 					}
 					else if ( info.challengeLid.find("challenge") != std::string::npos )
 					{
-						std::string prefix = Language::get(6112);
+						DynamicString prefix = Language::get(6112);
 						for ( auto& c : prefix )
 						{
 							if ( c == '\n' )
@@ -21627,7 +21627,7 @@ failed:
 
                 const auto& lobby = lobbies[selectedLobby];
 
-                std::string flags1, flags2;
+                DynamicString flags1, flags2;
                 bool foundFlags = false;
                 for (int c = 0, index = 0; c < NUM_SERVER_FLAGS; ++c) {
                     if (lobby.flags & (1 << c)) {
@@ -21677,8 +21677,8 @@ failed:
                 values1->reflowTextToFit(0);
                 const int numLines = values1->getNumTextLines();
                 
-                std::string header_txt = Language::get(5510); // Name:
-                std::string values2_txt;
+                DynamicString header_txt = Language::get(5510); // Name:
+                DynamicString values2_txt;
                 for (int c = 0; c <= numLines; ++c) {
                     header_txt += "\n";
                     values2_txt += "\n";
@@ -22549,7 +22549,7 @@ failed:
             "Fill the lobby browser with bogus entries to test its features.");
         if (*cvar_testLobbyBrowser) {
             // test lobbies
-            std::string allBlanks;
+            DynamicString allBlanks;
             for (int c = 0; c < 64; ++c) {
                 allBlanks.append(u8"\uFFFD");
                 if (c && c % 12 == 0) {
@@ -22781,7 +22781,7 @@ failed:
                 }
                 });
             button->setTickCallback([](Widget& widget){
-                std::string sublabel_name = widget.getName();
+                DynamicString sublabel_name = widget.getName();
                 sublabel_name.append("_sublabel_background");
                 auto frame = static_cast<Frame*>(widget.getParent()); assert(frame);
                 auto button = static_cast<Button*>(&widget); assert(button);
@@ -22801,7 +22801,7 @@ failed:
             button->addWidgetAction("MenuAlt1", "reset");
             button->addWidgetAction("MenuCancel", "back_button");
 
-            std::string sublabel_name = name;
+            DynamicString sublabel_name = name;
             auto sublabel_background = subwindow.addImage(
                 SDL_Rect{938, y + 4, 98, 44},
                 0xffffffff,
@@ -22820,8 +22820,8 @@ failed:
 
         // collect best times
         const auto& levels = gameModeManager.Tutorial.levels;
-        std::string times[11];
-        std::string total_time_str;
+        DynamicString times[11];
+        DynamicString total_time_str;
         Uint64 total_time = 0;
         times[0] = Language::get(5539);
         for (int c = 1; c < 11; ++c) {
@@ -24139,7 +24139,7 @@ failed:
         const auto class_name = classes_in_order[class_index];
         const auto class_find = classes.find(class_name);
         if (class_find != classes.end()) {
-            std::string class_img_path = "#*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
+            DynamicString class_img_path = "#*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
             class_img_path += class_find->second.image_highlighted;
             auto class_img = subframe->addImage(
                 SDL_Rect{2, 0, 54, 54},
@@ -24149,7 +24149,7 @@ failed:
         }
         
         // portrait
-        const std::string portrait_path =
+        const DynamicString portrait_path =
             monsterData.getAllyIconFromSprite(playerHeadSprite(
                 (Monster)getMonsterFromPlayerRace(info.players[player].race),
                 (sex_t)info.players[player].stats.sex,
@@ -24256,7 +24256,7 @@ failed:
 		            });
 
 				// set previous book in line
-				std::string prevstr;
+				DynamicString prevstr;
 				auto prev = it;
 				if (prev != savegames.begin()) {
 					--prev;
@@ -24267,7 +24267,7 @@ failed:
 				savegame_book->setWidgetLeft(prevstr.c_str());
 
 				// set next book in line
-				std::string nextstr;
+				DynamicString nextstr;
 				auto next = it;
 				++next;
 				if (next == savegames.end()) {
@@ -24383,7 +24383,7 @@ failed:
                 cover->setHollow(true);
 
 				// add savegame picture
-				std::string screenshot_path = "images/ui/Main Menus/ContinueGame/savescreens/";
+				DynamicString screenshot_path = "images/ui/Main Menus/ContinueGame/savescreens/";
 				if (saveGameInfo.level_track == 1) {
 					switch (saveGameInfo.dungeon_lvl) {
 					default: screenshot_path += "save_unknown00.png"; break;
@@ -24482,7 +24482,7 @@ failed:
 
 				if ( challengeEventSave >= 1 && challengeEventSave <= 3 )
 				{
-					std::string title = Language::get(6110 + (challengeEventSave - 1));
+					DynamicString title = Language::get(6110 + (challengeEventSave - 1));
 					for ( auto& c : title )
 					{
 						if ( c == '\n' )
@@ -26799,14 +26799,14 @@ failed:
 	std::string MainMenuBanners_t::updateBannerURL = "";
 	void MainMenuBanners_t::readFromFile()
 	{
-		const std::string filename = "data/banners.json";
+		const DynamicString filename = "data/banners.json";
 		if ( !PHYSFS_getRealDir(filename.c_str()) )
 		{
 			printlog("[JSON]: Error: Could not locate json file %s", filename.c_str());
 			return;
 		}
 
-		std::string inputPath = PHYSFS_getRealDir(filename.c_str());
+		DynamicString inputPath = PHYSFS_getRealDir(filename.c_str());
 		inputPath.append(PHYSFS_getDirSeparator());
 		inputPath.append(filename.c_str());
 
@@ -27713,7 +27713,7 @@ failed:
             banner->setText(Language::get(5793));
         }
 
-        std::string cause_of_death;
+        DynamicString cause_of_death;
         switch (stats[player]->killer) {
         case KilledBy::MONSTER: {
             if (stats[player]->killer_name.empty()) {
@@ -28353,7 +28353,7 @@ failed:
 	        }
 	    }
 
-        std::string path = Input::getGlyphPathForInput("ButtonA", false, Input::getControllerType(player));
+        DynamicString path = Input::getGlyphPathForInput("ButtonA", false, Input::getControllerType(player));
         auto image = Image::get((std::string("*") + path).c_str());
         const int w = image->getWidth();
         const int h = image->getHeight();
@@ -28419,8 +28419,8 @@ failed:
                 
     /******************************************************************************/
     
-    static std::string username;
-    static std::string hostname;
+    static DynamicString username;
+    static DynamicString hostname;
     
     const char* getUsername() {
         return username.c_str();
@@ -28441,7 +28441,7 @@ failed:
 	void randomizeUsername() {
 		// generate a name like:
 		// Filthy Rat #5743
-		std::string monster = getMonsterLocalizedName(
+		DynamicString monster = getMonsterLocalizedName(
 			(Monster)RNG.uniform(Monster::HUMAN, Monster::MAX_MONSTER));
 		monster[0] = toupper(monster[0]);
 		char buf[32];
@@ -28457,7 +28457,7 @@ failed:
 		setHostname(buf);
 	}
 
-	static std::string mods_active_tab = "";
+	static DynamicString mods_active_tab = "";
 	static Uint32 mods_loading_tick = 0;
 #ifdef STEAMWORKS
 	static void createWorkshopCreateMenu(SteamUGCDetails_t* details);
@@ -28515,7 +28515,7 @@ failed:
 
 	static void fn_load_mod(Button& button, const int index, const bool isWorkshopMod, const bool toggleActive, const bool viewMyItems, bool& isDownloaded)
 	{
-		std::string name = button.getName();
+		DynamicString name = button.getName();
 		name = name.substr(0, name.size() - strlen("_button"));
 		Frame* frame = static_cast<Frame*>(button.getParent())->findFrame(name.c_str());
 		bool modLoaded = false;
@@ -28532,13 +28532,13 @@ failed:
 			{
 				if ( !itemDownloaded )
 				{
-					std::string fileID_jpg = "/workshop_cache/";
+					DynamicString fileID_jpg = "/workshop_cache/";
 					fileID_jpg += std::to_string(itemDetails.m_nPublishedFileId) + ".jpg";
 
-					std::string fileID_png = "/workshop_cache/";
+					DynamicString fileID_png = "/workshop_cache/";
 					fileID_png += std::to_string(itemDetails.m_nPublishedFileId) + ".png";
 
-					std::string filePath = "";
+					DynamicString filePath = "";
 					if ( PHYSFS_getRealDir(fileID_jpg.c_str()) )
 					{
 						filePath = PHYSFS_getRealDir(fileID_jpg.c_str());
@@ -28577,9 +28577,9 @@ failed:
 
 					if ( filePath != "" )
 					{
-						std::string modOrderName = frame->getName();
+						DynamicString modOrderName = frame->getName();
 						modOrderName += "_mod_order";
-						std::string modPathName = modOrderName + "_path";
+						DynamicString modPathName = modOrderName + "_path";
 						Field* modOrderTxt = frame->findField(modOrderName.c_str());
 						if ( Field* modPathTxt = frame->findField(modPathName.c_str()) )
 						{
@@ -28635,7 +28635,7 @@ failed:
 		}
 		else
 		{
-			std::string path = outputdir;
+			DynamicString path = outputdir;
 			auto it = Mods::localModFoldernames.begin();
 			std::advance(it, index);
 			path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator()).append(*it);
@@ -28697,9 +28697,9 @@ failed:
 
 		if ( !viewMyItems )
 		{
-			std::string modOrderName = frame->getName();
+			DynamicString modOrderName = frame->getName();
 			modOrderName += "_mod_order";
-			std::string modPathName = modOrderName + "_path";
+			DynamicString modPathName = modOrderName + "_path";
 			Field* modOrderTxt = frame->findField(modOrderName.c_str());
 			if ( Field* modPathTxt = frame->findField(modPathName.c_str()) )
 			{
@@ -28769,9 +28769,9 @@ failed:
 		}
 		else
 		{
-			std::string modOrderName = frame->getName();
+			DynamicString modOrderName = frame->getName();
 			modOrderName += "_mod_order";
-			std::string modPathName = modOrderName + "_path";
+			DynamicString modPathName = modOrderName + "_path";
 			Field* modOrderTxt = frame->findField(modOrderName.c_str());
 			if ( Field* modPathTxt = frame->findField(modPathName.c_str()) )
 			{
@@ -28826,10 +28826,10 @@ failed:
 			currentVersionNum = std::stoi(v);
 		}
 
-		std::string latestVersionStr = "";
+		DynamicString latestVersionStr = "";
 		if ( tags )
 		{
-			std::string allTags = tags;
+			DynamicString allTags = tags;
 			auto found = allTags.find(',');
 			std::vector<std::string> foundTags;
 			while ( found != std::string::npos )
@@ -28865,7 +28865,7 @@ failed:
 		}
 
 		auto title = frame->addField("title", 44);
-		std::string titleStr = titleTxt;
+		DynamicString titleStr = titleTxt;
 		if ( titleStr.size() >= 40 )
 		{
 			titleStr = titleStr.substr(0, 40);
@@ -28881,7 +28881,7 @@ failed:
 		if ( latestVersionStr != "" )
 		{
 			auto version = frame->addField("version", 16);
-			std::string s = "[";
+			DynamicString s = "[";
 			s += latestVersionStr;
 			s += ']';
 			version->setText(s.c_str());
@@ -28927,7 +28927,7 @@ failed:
 			descPos.h = 48;
 			if ( desc->getNumTextLines() >= 3 ) // trim to 2 lines
 			{
-				std::string str = desc->getText();
+				DynamicString str = desc->getText();
 				auto find1 = str.find('\n');
 				if ( find1 != std::string::npos )
 				{
@@ -28944,7 +28944,7 @@ failed:
 
 			if ( desc->getNumTextLines() >= 3 ) // if after reflow had to wrap line
 			{
-				std::string str = desc->getText();
+				DynamicString str = desc->getText();
 				auto find1 = str.find('\n');
 				if ( find1 != std::string::npos )
 				{
@@ -28983,7 +28983,7 @@ failed:
 
 		if ( !viewMyItems )
 		{
-			std::string button_name = name;
+			DynamicString button_name = name;
 			button_name += "_button";
 			auto button = subwindow.addButton(button_name.c_str());
 			button->setColor(0xffffffff);
@@ -29021,13 +29021,13 @@ failed:
 			button->addWidgetAction("MenuAlt2", "load_status_help");
 			button->addWidgetAction("MenuStart", "start_modded_game");
 			button->setCallback([](Button& button) {
-				std::string name = button.getName();
+				DynamicString name = button.getName();
 				name = name.substr(0, name.size() - strlen("_button"));
 				Frame* frame = static_cast<Frame*>(button.getParent())->findFrame(name.c_str());
 				auto index = reinterpret_cast<intptr_t>(frame->getUserData());
 				bool isWorkshopMod = reinterpret_cast<intptr_t>(button.getUserData()) == 1 ? true : false;
 
-				std::string buttonbg = button.getBackground();
+				DynamicString buttonbg = button.getBackground();
 				if ( buttonbg == "*#images/ui/Main Menus/Mods/Load_Button_00.png" )
 				{
 					soundActivate();
@@ -29040,7 +29040,7 @@ failed:
 				fn_load_mod(button, index, isWorkshopMod, true, false, isDownloaded);
 			});
 
-			std::string mod_order_name = name;
+			DynamicString mod_order_name = name;
 			mod_order_name += "_mod_order";
 			Field* modOrder = frame->addField(mod_order_name.c_str(), 32);
 			modOrder->setFont(smallfont_outline);
@@ -29056,7 +29056,7 @@ failed:
 			modOrder->setDisabled(true);
 			modOrder->setTickCallback([](Widget& widget) {
 				auto frame = static_cast<Frame*>(widget.getParent());
-				std::string modPathName = widget.getName();
+				DynamicString modPathName = widget.getName();
 				modPathName += "_path";
 				if ( auto modPath = frame->findField(modPathName.c_str()) )
 				{
@@ -29074,7 +29074,7 @@ failed:
 				}
 			});
 
-			std::string mod_path_name = mod_order_name + "_path";
+			DynamicString mod_path_name = mod_order_name + "_path";
 			Field* modPath = frame->addField(mod_path_name.c_str(), PATH_MAX);
 			modPath->setDisabled(true);
 			modPath->setText("");
@@ -29084,7 +29084,7 @@ failed:
 
 			if ( modPath )
 			{
-				std::string previewPath = modPath->getText();
+				DynamicString previewPath = modPath->getText();
 				previewPath += PHYSFS_getDirSeparator();
 				previewPath += "preview.png";
 				auto panel = frame->addImage(SDL_Rect{ padx - 6, 8, 68, 68 }, makeColorRGB(255, 255, 255), "*#images/ui/Main Menus/Mods/ModMenu_PreviewFrame.png", "preview bg");
@@ -29096,7 +29096,7 @@ failed:
 		}
 		else
 		{
-			std::string button_name = name;
+			DynamicString button_name = name;
 			button_name += "_button";
 			auto button = subwindow.addButton(button_name.c_str());
 			button->setBackground("*#images/ui/Main Menus/Mods/Load_Button_00.png");
@@ -29118,7 +29118,7 @@ failed:
 			button->setCallback([](Button& button) {
 				soundActivate();
 
-				std::string name = button.getName();
+				DynamicString name = button.getName();
 				name = name.substr(0, name.size() - strlen("_button"));
 				Frame* frame = static_cast<Frame*>(button.getParent())->findFrame(name.c_str());
 				auto index = reinterpret_cast<intptr_t>(frame->getUserData());
@@ -29131,9 +29131,9 @@ failed:
 				}
 			});
 
-			std::string mod_order_name = name;
+			DynamicString mod_order_name = name;
 			mod_order_name += "_mod_order";
-			std::string mod_path_name = mod_order_name + "_path";
+			DynamicString mod_path_name = mod_order_name + "_path";
 			Field* modPath = frame->addField(mod_path_name.c_str(), PATH_MAX);
 			modPath->setDisabled(true);
 			modPath->setText("");
@@ -29143,7 +29143,7 @@ failed:
 
 			if ( modPath )
 			{
-				std::string previewPath = modPath->getText();
+				DynamicString previewPath = modPath->getText();
 				if ( !(viewMyItems && !isDownloaded) )
 				{
 					previewPath += PHYSFS_getDirSeparator();
@@ -29304,8 +29304,8 @@ failed:
 							bool itemDownloaded = SteamUGC()->GetItemInstallInfo(itemDetails.m_nPublishedFileId, NULL, fullpath, PATH_MAX, NULL);
 							bool pathIsMounted = Mods::isPathInMountedFiles(fullpath);
 
-							std::string prevButtonName = "";
-							std::string currentButtonName = name;
+							DynamicString prevButtonName = "";
+							DynamicString currentButtonName = name;
 							currentButtonName += "_button";
 							if ( prevFrame )
 							{
@@ -29495,8 +29495,8 @@ failed:
 							char name[32];
 							snprintf(name, sizeof(name), "mod%d", i);
 
-							std::string prevButtonName = "";
-							std::string currentButtonName = name;
+							DynamicString prevButtonName = "";
+							DynamicString currentButtonName = name;
 							currentButtonName += "_button";
 							if ( prevFrame )
 							{
@@ -29623,7 +29623,7 @@ failed:
 		}
 
 		Mods::localModFoldernames.clear();
-		std::string path = outputdir;
+		DynamicString path = outputdir;
 		path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator());
 		Mods::localModFoldernames = directoryContents(path.c_str(), true, false);
 
@@ -29667,13 +29667,13 @@ failed:
 							char name[32];
 							snprintf(name, sizeof(name), "mod%d", index);
 
-							std::string path = outputdir;
+							DynamicString path = outputdir;
 							path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator()).append(folder);
 							bool pathIsMounted = Mods::isPathInMountedFiles(path);
-							std::string title = "/mods/" + folder + "/";
+							DynamicString title = "/mods/" + folder + "/";
 
-							std::string prevButtonName = "";
-							std::string currentButtonName = name;
+							DynamicString prevButtonName = "";
+							DynamicString currentButtonName = name;
 							currentButtonName += "_button";
 							if ( prevFrame )
 							{
@@ -30358,7 +30358,7 @@ failed:
 		browse_workshop->setDisabled(true);
 		browse_workshop->setInvisible(true);
 		browse_workshop->setCallback([](Button&) {
-			std::string info = Language::get(5882);
+			DynamicString info = Language::get(5882);
             info += VERSION;
 			auto frame = monoPromptXL(info.c_str(),
 			Language::get(5881), [](Button& button) {
@@ -30455,7 +30455,7 @@ failed:
 				closeBinary();
 
 				int res = 0;
-				std::string folderName = field->getText();
+				DynamicString folderName = field->getText();
 				if ( folderName != "" )
 				{
 					res = Mods::createBlankModDirectory(folderName);
@@ -30784,9 +30784,9 @@ failed:
 		});
 	}
 
-	static std::string modFolderPathToUpload = "";
-	static std::string modTitleToUpload = "";
-	static std::string modDescToUpload = "";
+	static DynamicString modFolderPathToUpload = "";
+	static DynamicString modTitleToUpload = "";
+	static DynamicString modDescToUpload = "";
 	static std::set<int> modTags;
 
 #ifdef STEAMWORKS
@@ -30806,7 +30806,7 @@ failed:
 		modTags.clear();
 		if ( details )
 		{
-			std::string allTags = details->m_rgchTags;
+			DynamicString allTags = details->m_rgchTags;
 			auto found = allTags.find(',');
 			std::vector<std::string> foundTags;
 			while ( found != std::string::npos )
@@ -30989,7 +30989,7 @@ failed:
 					std::size_t found = modFolderPathToUpload.find_last_of("/\\");
 					if ( found != std::string::npos )
 					{
-						std::string folderName = "/mods/" + modFolderPathToUpload.substr(found + 1) + "/";
+						DynamicString folderName = "/mods/" + modFolderPathToUpload.substr(found + 1) + "/";
 						field->setText(folderName.c_str());
 						field->setColor(makeColorRGB(255, 255, 255));
 					}
@@ -31098,7 +31098,7 @@ failed:
 				char path[PATH_MAX];
 				nfdresult_t result = NFD_OKAY;
 
-				std::string modsPath = "";
+				DynamicString modsPath = "";
 				if ( PHYSFS_getRealDir("mods") )
 				{
 					modsPath = PHYSFS_getRealDir("mods");
@@ -31125,12 +31125,12 @@ failed:
 					std::size_t found = modFolderPathToUpload.find_last_of("/\\");
 					if ( found != std::string::npos )
 					{
-						std::string folder = modFolderPathToUpload.substr(found + 1);
-						std::string parent = modFolderPathToUpload.substr(0, found);
+						DynamicString folder = modFolderPathToUpload.substr(found + 1);
+						DynamicString parent = modFolderPathToUpload.substr(0, found);
 						std::size_t found2 = parent.find_last_of("/\\");
 						if ( found2 != std::string::npos )
 						{
-							std::string parentFolder = parent.substr(found2 + 1);
+							DynamicString parentFolder = parent.substr(found2 + 1);
 							if ( parentFolder == "mods" )
 							{
 								fail = false;
@@ -31585,7 +31585,7 @@ failed:
 			manage->setCallback([](Button&) {
 				auto frame = monoPromptXL(Language::get(5918),
 				Language::get(5919), [](Button& button) {
-					std::string url = "steam://url/CommunityFilePage/";
+					DynamicString url = "steam://url/CommunityFilePage/";
 					url += std::to_string(Mods::uploadingExistingItem);
 					openURLTryWithOverlay(url);
 
@@ -31679,7 +31679,7 @@ failed:
 		enter->addWidgetAction("MenuCancel", "back_button");
 
 		enter->setCallback([](Button& button) {
-			std::string message = "";
+			DynamicString message = "";
 			if ( Mods::uploadingExistingItem != 0 )
 			{
 				if ( modFolderPathToUpload == "" )
@@ -31943,7 +31943,7 @@ failed:
 						Mods::uploadStatus = UploadStatus::STATUS_UPLOAD_CONTENT_START;
 						bool res = false;
 						
-						std::string fullpath = Mods::getFolderFullPath(modFolderPathToUpload);
+						DynamicString fullpath = Mods::getFolderFullPath(modFolderPathToUpload);
 
 						if ( access(fullpath.c_str(), F_OK) == 0 )
 						{
@@ -31953,7 +31953,7 @@ failed:
 							{
 								// set preview image.
 								bool imagePreviewFound = false;
-								std::string imgPath = fullpath;
+								DynamicString imgPath = fullpath;
 								/*imgPath.append("/preview.jpg");
 								if ( !imagePreviewFound && access((imgPath).c_str(), F_OK) == 0 )
 								{
@@ -32187,7 +32187,7 @@ failed:
 		button->setTextColor(makeColorRGB(128, 128, 128));
 
 		frame->setTickCallback([](Widget& widget) {
-			std::string status = workshopUploadStateManager();
+			DynamicString status = workshopUploadStateManager();
 			status += '\n';
 
 			auto frame = static_cast<Frame*>(&widget);
@@ -32224,7 +32224,7 @@ failed:
 					view->setFont(smallfont_outline);
 					view->setText(Language::get(5951));
 					view->setCallback([](Button& button) {
-						std::string url = "steam://url/CommunityFilePage/";
+						DynamicString url = "steam://url/CommunityFilePage/";
 						url += std::to_string(g_SteamWorkshop->SubmitItemUpdateResult.m_nPublishedFileId);
 						openURLTryWithOverlay(url);
 
@@ -32365,9 +32365,9 @@ failed:
 		}
 	}
 
-	static void playChallengeEventOneshotAttempted(std::string _lid)
+	static void playChallengeEventOneshotAttempted(DynamicString _lid)
 	{
-		static std::string lid;
+		static DynamicString lid;
 		lid = _lid;
 
 		auto check = VALID_OK_CHARACTER;
@@ -32450,7 +32450,7 @@ failed:
 			}
 		}
 
-		std::string txt;
+		DynamicString txt;
 		if ( check == INVALID_REQUIREDLC1 )
 		{
 			txt = Language::get(6126);
@@ -32566,9 +32566,9 @@ failed:
 		}
 	}
 
-	static void playChallengeEventExpiringWarning(std::string _lid)
+	static void playChallengeEventExpiringWarning(DynamicString _lid)
 	{
-		static std::string lid;
+		static DynamicString lid;
 		lid = _lid;
 		auto prompt = binaryPrompt(
 			Language::get(6109),
@@ -32618,7 +32618,7 @@ failed:
 	const int hoursLeftWarning = 12;
 	static void playChallengeVerifyEvent(Button& button)
 	{
-		static std::string lid;
+		static DynamicString lid;
 		lid = button.getName();
 
 		auto prompt = monoPrompt(
@@ -32640,7 +32640,7 @@ failed:
 
 			int throwError = 0;
 
-			std::string prompt = "Loading challenge";
+			DynamicString prompt = "Loading challenge";
 			if ( playfabUser.bLoggedIn )
 			{
 				for ( auto& e : playfabUser.periodicalEvents.periodicalEvents )
@@ -32805,7 +32805,7 @@ failed:
 				return;
 			}
 
-			std::string prompt = Language::get(6113);
+			DynamicString prompt = Language::get(6113);
 			if ( playfabUser.bLoggedIn && !playfabUser.periodicalEvents.error )
 			{
 				if ( !playfabUser.periodicalEvents.awaitingData 
@@ -32905,7 +32905,7 @@ failed:
 
 				frame->setDisabled(true);
 
-				static std::string previous_rules;
+				static DynamicString previous_rules;
 				auto rules_frame = frame->findFrame("rules_frame");
 				if ( rules_frame )
 				{
@@ -33040,7 +33040,7 @@ failed:
 					}
 					else if ( e.scenarioInfo.race >= RACE_HUMAN && e.scenarioInfo.race <= RACE_INSECTOID )
 					{
-						std::string s = getMonsterLocalizedName(getMonsterFromPlayerRace(e.scenarioInfo.race));
+						DynamicString s = getMonsterLocalizedName(getMonsterFromPlayerRace(e.scenarioInfo.race));
 						camelCaseString(s);
 						txt->setText(s.c_str());
 						if ( e.scenarioInfo.race == RACE_HUMAN )
@@ -33066,7 +33066,7 @@ failed:
 					}
 					else if ( e.scenarioInfo.classnum >= 0 && e.scenarioInfo.classnum < NUMCLASSES )
 					{
-						std::string s = playerClassLangEntry(e.scenarioInfo.classnum, 0);
+						DynamicString s = playerClassLangEntry(e.scenarioInfo.classnum, 0);
 						camelCaseString(s);
 						txt->setText(s.c_str());
 						if ( e.scenarioInfo.classnum <= CLASS_MONK )
@@ -33102,7 +33102,7 @@ failed:
 					{
 						txt->clearLinesToColor();
 
-						std::string rules;
+						DynamicString rules;
 						switch ( e.scenarioInfo.eventType )
 						{
 							default:
@@ -33189,7 +33189,7 @@ failed:
 						}
 
 						txt->addColorToLine(0, makeColor(178, 131, 84, 255));
-						std::string checkStr = txt->getText();
+						DynamicString checkStr = txt->getText();
 						auto find = checkStr.find(":");
 						if ( find != std::string::npos )
 						{
@@ -33394,7 +33394,7 @@ failed:
 				{
 					if ( e.lid == "lid_victory_seed_oneshot" )
 					{
-						std::string timeLeft = "";
+						DynamicString timeLeft = "";
 						char buf[128] = "";
 						if ( e.hoursLeft >= 24 )
 						{
@@ -33455,7 +33455,7 @@ failed:
 						{
 							leaderboard_btn->setDisabled(e.locked);
 							leaderboard_btn->setInvisible(e.locked);
-							std::string imgPath = leaderboard_btn->getName();
+							DynamicString imgPath = leaderboard_btn->getName();
 							imgPath += "_img";
 							if ( auto leaderboard_img = parent->findImage(imgPath.c_str()) )
 							{
@@ -33564,7 +33564,7 @@ failed:
 				{
 					if ( e.lid == "lid_victory_seed_unlimited" )
 					{
-						std::string timeLeft = "";
+						DynamicString timeLeft = "";
 						char buf[128] = "";
 						if ( e.hoursLeft >= 24 )
 						{
@@ -33626,7 +33626,7 @@ failed:
 						{
 							leaderboard_btn->setDisabled(e.locked);
 							leaderboard_btn->setInvisible(e.locked);
-							std::string imgPath = leaderboard_btn->getName();
+							DynamicString imgPath = leaderboard_btn->getName();
 							imgPath += "_img";
 							if ( auto leaderboard_img = parent->findImage(imgPath.c_str()) )
 							{
@@ -33737,7 +33737,7 @@ failed:
 				{
 					if ( e.lid == "lid_victory_seed_challenge" )
 					{
-						std::string timeLeft = "";
+						DynamicString timeLeft = "";
 						char buf[128] = "";
 						if ( e.hoursLeft >= 24 )
 						{
@@ -33829,7 +33829,7 @@ failed:
 					{ 
 						leaderboard_btn->setDisabled(e.locked); 
 						leaderboard_btn->setInvisible(e.locked); 
-						std::string imgPath = leaderboard_btn->getName();
+						DynamicString imgPath = leaderboard_btn->getName();
 						imgPath += "_img";
 						if ( auto leaderboard_img = parent->findImage(imgPath.c_str()) )
 						{
@@ -33940,9 +33940,9 @@ failed:
 	static std::vector<Entity*> compendiumMonsterLimbs;
 	static ConsoleVariable<bool> cvar_compendium_monster_entity("/compendium_monster_entity", false);
 	static void populateRecordsSectionItems(Frame* page_right, int entryType, const char* entryName = "", int specificClass = -1);
-	static void refreshCompendiumCamera(std::string& modelsPath)
+	static void refreshCompendiumCamera(const DynamicString& modelsPath)
 	{
-		auto find = CompendiumEntries.compendiumObjectLimbs.find(modelsPath);
+		auto find = CompendiumEntries.compendiumObjectLimbs.find(modelsPath.c_str());
 		if ( find != CompendiumEntries.compendiumObjectLimbs.end() )
 		{
 			if ( find->second.baseCamera.inUse )
@@ -34017,7 +34017,7 @@ failed:
 	constexpr auto compendiumLoreCostAvailable = makeColorRGB(255, 255, 255);
 	constexpr auto compendiumLoreCostInactive = makeColorRGB(156, 156, 156);
 
-	static void refreshCompendiumEntryWorld(std::string name, Frame* parent, const bool gamepadClick)
+	static void refreshCompendiumEntryWorld(DynamicString name, Frame* parent, const bool gamepadClick)
 	{
 		if ( CompendiumEntries.worldObjects.find(name) == CompendiumEntries.worldObjects.end() )
 		{
@@ -34085,7 +34085,7 @@ failed:
 			);
 		}
 
-		refreshCompendiumCamera(Compendium_t::compendiumEntityCurrent.modelName);
+		refreshCompendiumCamera(DynamicString(Compendium_t::compendiumEntityCurrent.modelName));
 
 		if ( Frame* page_left = parent->findFrame("page_left") )
 		{
@@ -34117,7 +34117,7 @@ failed:
 
 			if ( auto blurb = page_left->findField("blurb") )
 			{
-				std::string txt = "";
+				DynamicString txt = "";
 				for ( auto& str : entry.blurb )
 				{
 					if ( txt != "" ) { txt += '\n'; }
@@ -34231,7 +34231,7 @@ failed:
 					{
 						tipsTxt->setDisabled(false);
 					}
-					std::string txt = "";
+					DynamicString txt = "";
 					for ( auto& str : entry.details )
 					{
 						if ( txt != "" ) { txt += '\n'; }
@@ -34298,9 +34298,9 @@ failed:
 		"codex",
 		"achievements"
 	};
-	static std::string compendium_current = "monsters";
+	static DynamicString compendium_current = "monsters";
 
-	static void refreshCompendiumEntryItemsBlurb(std::string name, Frame* parent)
+	static void refreshCompendiumEntryItemsBlurb(DynamicString name, Frame* parent)
 	{
 		if ( Frame* page_left = parent->findFrame("page_left") )
 		{
@@ -34335,7 +34335,7 @@ failed:
 		{
 			if ( auto blurb = page_left->findField("blurb") )
 			{
-				std::string txt = "";
+				DynamicString txt = "";
 				for ( auto& str : entry.blurb )
 				{
 					if ( txt != "" ) { txt += '\n'; }
@@ -34418,7 +34418,7 @@ failed:
 
 						firstValue = false;
 
-						std::string output = "";
+						DynamicString output = "";
 						if ( findEvent->second.attributes.find("stats") != findEvent->second.attributes.end()
 							&& tag != Compendium_t::EventTags::CPDM_CLASS_STAT_STR_MAX
 							&& tag != Compendium_t::EventTags::CPDM_CLASS_STAT_DEX_MAX
@@ -34469,7 +34469,7 @@ failed:
 				}
 				if ( useSum )
 				{
-					std::string output = Compendium_t::Events_t::formatEventRecordText(sum, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+					DynamicString output = Compendium_t::Events_t::formatEventRecordText(sum, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
 					results.push_back(std::make_pair(sum, output));
 				}
 				else
@@ -34867,12 +34867,12 @@ failed:
 						break;
 					}
 
-					std::string customTagKey = "";
+					DynamicString customTagKey = "";
 
 					if ( txt )
 					{
 						txt->setDisabled(false);
-						std::string itemname = "default";
+						DynamicString itemname = "default";
 						if ( entryType >= 0 && entryType < NUMITEMS )
 						{
 							if ( Compendium_t::Events_t::eventLangEntries[tag].find(itemNameStrings[entryType + 2])
@@ -34932,7 +34932,7 @@ failed:
 							}
 						}
 
-						std::string str = Compendium_t::Events_t::eventLangEntries[tag][itemname];
+						DynamicString str = Compendium_t::Events_t::eventLangEntries[tag][itemname];
 						if ( tag == Compendium_t::EventTags::CPDM_CUSTOM_TAG )
 						{
 							auto find = Compendium_t::Events_t::itemDisplayedCustomEventsList.find(entryType);
@@ -35020,7 +35020,7 @@ failed:
 								}
 
 								results.clear();
-								std::string output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0,
+								DynamicString output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0,
 									Compendium_t::Events_t::eventCustomLangEntries[customTagKey]
 								);
 								results.push_back(std::make_pair(value, output));
@@ -35165,7 +35165,7 @@ failed:
 							}
 							if ( value > 0 )
 							{
-								std::string output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+								DynamicString output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
 								// get monster plural
 								{
 									auto find = Compendium_t::Events_t::monsterIDToString.find(entryType);
@@ -35178,7 +35178,7 @@ failed:
 										{
 											monsterType = LICH;
 										}
-										std::string s = value > 1 ? getMonsterLocalizedPlural(monsterType) : getMonsterLocalizedName(monsterType);
+										DynamicString s = value > 1 ? getMonsterLocalizedPlural(monsterType) : getMonsterLocalizedName(monsterType);
 										camelCaseString(s);
 										output += s;
 									}
@@ -35335,7 +35335,7 @@ failed:
 										value = find->second.value;
 									}
 								}
-								std::string output = "";
+								DynamicString output = "";
 								auto findEvent = Compendium_t::Events_t::events.find(tag);
 								if ( find == findTag->second.end() )
 								{
@@ -35486,7 +35486,7 @@ failed:
 							//soundActivate();
 						}
 
-						refreshCompendiumCamera(Compendium_t::compendiumEntityCurrent.modelName);
+						refreshCompendiumCamera(DynamicString(Compendium_t::compendiumEntityCurrent.modelName));
 
 						// find records for this item
 						auto findCat = Compendium_t::Events_t::eventCodexIDLookup.find(Compendium_t::compendiumEntityCurrent.contentsName);
@@ -35545,7 +35545,7 @@ failed:
 
 					auto find = ItemTooltips.itemNameStringToItemID.find(toSelect.getName());
 					int itemType = find != ItemTooltips.itemNameStringToItemID.end() ? find->second : -1;
-					std::string modelsPath = "items_single";
+					DynamicString modelsPath = "items_single";
 					if ( strstr(toSelect.getName(), "spell_") )
 					{
 						itemType = SPELL_ITEM;
@@ -35628,7 +35628,7 @@ failed:
 														{
 															if ( auto contents_notif = contents->findFrame("notifs") )
 															{
-																std::string findImg = "notif_" + compendium_contents_current[compendium_current];
+																DynamicString findImg = "notif_" + compendium_contents_current[compendium_current];
 																if ( auto img = contents_notif->findImage(findImg.c_str()) )
 																{
 																	img->disabled = true;
@@ -35716,7 +35716,7 @@ failed:
 	static ConsoleVariable<bool>cvar_compendium_reveal("/compendium_reveal", false);
 #endif
 	static bool compendiumEntryControlEnabled = false;
-	static void refreshCompendiumEntryItemsList(std::string name, Frame* parent, const bool gamepadClick)
+	static void refreshCompendiumEntryItemsList(DynamicString name, Frame* parent, const bool gamepadClick)
 	{
 		if ( compendium_current == "items" )
 		{
@@ -36539,7 +36539,7 @@ failed:
 					{
 						if ( auto spell = getSpellFromID(data.spellID) )
 						{
-							std::string name = spell->getSpellName();
+							DynamicString name = spell->getSpellName();
 							camelCaseString(name);
 							if ( auto s = getSpellFromID(data.spellID) )
 							{
@@ -36562,7 +36562,7 @@ failed:
 								{
 									notifTxt->setSize(itemName->getSize());
 									notifTxt->setFont(itemName->getFont());
-									std::string str = "\n";
+									DynamicString str = "\n";
 									str += Language::get(6183);
 									notifTxt->setText(str.c_str());
 									notifTxt->setColor(makeColorRGB(255, 255, 255));
@@ -36576,7 +36576,7 @@ failed:
 					}
 					else
 					{
-						std::string name = items[id].getIdentifiedName();
+						DynamicString name = items[id].getIdentifiedName();
 						camelCaseString(name);
 						char buf[128];
 						if ( items[id].level >= 0 )
@@ -36636,7 +36636,7 @@ failed:
 							{
 								notifTxt->setSize(itemName->getSize());
 								notifTxt->setFont(itemName->getFont());
-								std::string str = "\n";
+								DynamicString str = "\n";
 								str += Language::get(6183);
 								notifTxt->setText(str.c_str());
 								notifTxt->setColor(makeColorRGB(255, 255, 255));
@@ -36731,7 +36731,7 @@ failed:
 		}
 	}
 
-	static void refreshCompendiumEntryCodexList(std::string name, Frame* parent)
+	static void refreshCompendiumEntryCodexList(DynamicString name, Frame* parent)
 	{
 		if ( CompendiumEntries.codex.find(name) == CompendiumEntries.codex.end() )
 		{
@@ -36792,7 +36792,7 @@ failed:
 							{
 								if ( pair.second == i )
 								{
-									std::string classname = playerClassLangEntry(i, 0);
+									DynamicString classname = playerClassLangEntry(i, 0);
 									camelCaseString(classname);
 									entries.push_back(classname);
 								}
@@ -36803,7 +36803,7 @@ failed:
 					{
 						for ( int i = 0; i < NUMCLASSES; ++i )
 						{
-							std::string classname = playerClassLangEntry(i, 0);
+							DynamicString classname = playerClassLangEntry(i, 0);
 							camelCaseString(classname);
 							entries.push_back(classname);
 							for ( auto& pair : rankedScores )
@@ -37043,7 +37043,7 @@ failed:
 
 					if ( name == "classes list" )
 					{
-						std::string name = data;
+						DynamicString name = data;
 						name += '\n';
 						char buf[64] = "00:00:00:00";
 
@@ -37071,7 +37071,7 @@ failed:
 								snprintf(buf, sizeof(buf), "%02d:%02d:%02d:%02d", day, hour, min, sec);
 								name += buf;
 
-								std::string txt = "\n";
+								DynamicString txt = "\n";
 								if ( findLang != Compendium_t::Events_t::eventCustomLangEntries.end() )
 								{
 									txt += findLang->second["format"];
@@ -37152,7 +37152,7 @@ failed:
 		}
 	}
 
-	static void refreshCompendiumEntryCodex(std::string name, Frame* parent, const bool gamepadClick)
+	static void refreshCompendiumEntryCodex(DynamicString name, Frame* parent, const bool gamepadClick)
 	{
 		if ( CompendiumEntries.codex.find(name) == CompendiumEntries.codex.end() )
 		{
@@ -37165,7 +37165,7 @@ failed:
 			entry.models.empty() ? "" : entry.models[Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size()]
 		);
 
-		refreshCompendiumCamera(Compendium_t::compendiumEntityCurrent.modelName);
+		refreshCompendiumCamera(DynamicString(Compendium_t::compendiumEntityCurrent.modelName));
 
 		if ( Frame* page_left = parent->findFrame("page_left") )
 		{
@@ -37197,7 +37197,7 @@ failed:
 
 			if ( auto blurb = page_left->findField("blurb") )
 			{
-				std::string txt = "";
+				DynamicString txt = "";
 				for ( auto& str : entry.blurb )
 				{
 					if ( txt != "" ) { txt += '\n'; }
@@ -37333,7 +37333,7 @@ failed:
 						{
 							tipsTxt->setDisabled(false);
 						}
-						std::string txt = "";
+						DynamicString txt = "";
 						for ( auto& str : entry.details )
 						{
 							if ( txt != "" ) { txt += '\n'; }
@@ -37370,16 +37370,16 @@ failed:
 		}
 	}
 
-	static void refreshCompendiumAchievements(std::string name, Frame* parent);
+	static void refreshCompendiumAchievements(DynamicString name, Frame* parent);
 
-	static void refreshCompendiumEntryMonster(std::string name, Frame* parent, const bool gamepadClick)
+	static void refreshCompendiumEntryMonster(DynamicString name, Frame* parent, const bool gamepadClick)
 	{
 		if ( CompendiumEntries.monsters.find(name) == CompendiumEntries.monsters.end() )
 		{
 			return;
 		}
 
-		std::string entryname = name;
+		DynamicString entryname = name;
 		if ( name == "spider" && ((!intro && ::arachnophobia_filter) || (intro && MainMenu::arachnophobia_filter)) )
 		{
 			entryname = "crab";
@@ -37405,7 +37405,7 @@ failed:
 			);
 		}
 
-		refreshCompendiumCamera(Compendium_t::compendiumEntityCurrent.modelName);
+		refreshCompendiumCamera(DynamicString(Compendium_t::compendiumEntityCurrent.modelName));
 
 		if ( true /*compendiumMonster */ )
 		{
@@ -37441,7 +37441,7 @@ failed:
 
 					if ( auto blurb = page_left->findField("blurb") )
 					{
-						std::string txt = "";
+						DynamicString txt = "";
 						for ( auto& str : entry.blurb )
 						{
 							if ( txt != "" ) { txt += '\n'; }
@@ -37517,7 +37517,7 @@ failed:
 
 						if ( auto txt = page_right->findField("level type") )
 						{
-							std::string str = Language::get(6190);
+							DynamicString str = Language::get(6190);
 							if ( entry.lvl.size() > 0 )
 							{
 								char buf[32] = "-";
@@ -37774,7 +37774,7 @@ failed:
 
 						if ( auto abilities = page_right->findField("abilities") )
 						{
-							std::string txt = "";
+							DynamicString txt = "";
 							for ( auto& str : entry.abilities )
 							{
 								if ( txt != "" ) { txt += '\n'; }
@@ -37818,7 +37818,7 @@ failed:
 
 								if ( auto inv = page_right->findField("inventory") )
 								{
-									std::string txt = "";
+									DynamicString txt = "";
 									for ( auto& str : entry.inventory )
 									{
 										if ( txt != "" ) { txt += '\n'; }
@@ -37866,7 +37866,7 @@ failed:
 	}
 
 	static Uint32 compendiumRevealAnimState = 0;
-	static void compendiumPageRightHideUnlocked(Frame* page_right, const bool unlocked, const bool hideAll, std::string to_unlock = "")
+	static void compendiumPageRightHideUnlocked(Frame* page_right, const bool unlocked, const bool hideAll, DynamicString to_unlock = "")
 	{
 		if ( !page_right ) { return; }
 		if ( hideAll )
@@ -38007,7 +38007,7 @@ failed:
 				Compendium_t::compendium_sorting = Compendium_t::compendium_sorting == "default" ? "alphabetical" : "default";
 		});
 
-		std::string sorting = Compendium_t::compendium_sorting;
+		DynamicString sorting = Compendium_t::compendium_sorting;
 		if ( Compendium_t::compendium_sorting_hide_undiscovered )
 		{
 			sorting += "_discovered";
@@ -38134,8 +38134,8 @@ failed:
 							: (compendium_current == "achievements" ? &Compendium_t::AchievementData_t::contents[sorting]
 							: nullptr)))));
 
-		std::string content = "";
-		std::string previousEntry = compendium_contents_current[compendium_current];
+		DynamicString content = "";
+		DynamicString previousEntry = compendium_contents_current[compendium_current];
 
 		compendiumEntryControlEnabled = false;
 		bool unlocked = false;
@@ -38221,7 +38221,7 @@ failed:
 					{
 						for ( auto img : notifs->getImages() )
 						{
-							std::string name = "";
+							DynamicString name = "";
 							auto find = img->name.find("notif_");
 							if ( find != std::string::npos )
 							{
@@ -38271,7 +38271,7 @@ failed:
 				if ( pageNext ) { pageNext->setDisabled(false); }
 				{
 
-					std::string txt = Language::get(6179);
+					DynamicString txt = Language::get(6179);
 					int prevId = -1;
 					if ( id > 0 && id < entries->size() )
 					{
@@ -38321,7 +38321,7 @@ failed:
 				}
 				
 				{
-					std::string txt = Language::get(6180);
+					DynamicString txt = Language::get(6180);
 					int nextId = -1;
 					if ( (id + 1) < entries->size() )
 					{
@@ -38549,7 +38549,7 @@ failed:
 								: (compendium_current == "achievements" ? &Compendium_t::AchievementData_t::unlocks
 								: nullptr)))));
 
-			std::string sorting = Compendium_t::compendium_sorting;
+			DynamicString sorting = Compendium_t::compendium_sorting;
 			if ( Compendium_t::compendium_sorting_hide_undiscovered && entriesContents && unlockStatus )
 			{
 				sorting += "_discovered";
@@ -38602,7 +38602,7 @@ failed:
 							notifAnim = 0;
 						}
 
-						std::string imgPath = "*#images/ui/Inventory/tooltips/ExclamationAnim00.png";
+						DynamicString imgPath = "*#images/ui/Inventory/tooltips/ExclamationAnim00.png";
 						switch ( notifAnim )
 						{
 						case 1:
@@ -38769,7 +38769,7 @@ failed:
 					contents_notif->setSize(SDL_Rect{ 0, 0, contents->getSize().w, contents->getActualSize().h });
 					if ( data.first != "-" )
 					{
-						std::string imgName = "notif_" + data.first;
+						DynamicString imgName = "notif_" + data.first;
 						auto img = contents_notif->addImage(SDL_Rect{ 4, 4 + (int)(contents->getEntries().size() - 1) * contents->getEntrySize(), 6, 14 },
 							0xFFFFFFFF,
 							"*#images/ui/Inventory/tooltips/ExclamationAnim00.png",
@@ -38870,7 +38870,7 @@ failed:
 		}
 	};
 
-	static void refreshCompendiumAchievements(std::string name, Frame* parent)
+	static void refreshCompendiumAchievements(DynamicString name, Frame* parent)
 	{
 		if ( !parent ) { return; }
 		Frame* frame = parent->findFrame("achievements");
@@ -39045,7 +39045,7 @@ failed:
 
 		for ( int i = 0; i < 8; ++i )
 		{
-			std::string name = "ach_";
+			DynamicString name = "ach_";
 			name += std::to_string(i + 1);
 			auto ach = frame->findFrame(name.c_str());
 			if ( ach )
@@ -39614,7 +39614,7 @@ failed:
 
 		for ( int i = 1; i <= 8; ++i )
 		{
-			std::string name = "ach_";
+			DynamicString name = "ach_";
 			name += std::to_string(i);
 			auto ach = frame->addFrame(name.c_str());
 			ach->setSize(SDL_Rect{ 0 + (i >= 5 ? 458 : 0), ((i - 1) % 4) * 132, 392 + 22, 134 + 6 });
@@ -40370,7 +40370,7 @@ failed:
 			CompendiumEntries.readItemsTranslationsFromFile();
 			CompendiumEntries.readMagicTranslationsFromFile();
 			refreshCompendiumEntryItemsBlurb(compendium_contents_current[compendium_current], main_menu_frame->findFrame("compendium"));
-			std::string modelsPath = "items_single";
+			DynamicString modelsPath = "items_single";
 			if ( Compendium_t::compendiumItemModel.skill[10] == SPELL_ITEM && Compendium_t::compendiumItemModel.flags[SPRITE] )
 			{
 				modelsPath = "spells_single";
@@ -40384,7 +40384,7 @@ failed:
 			CompendiumEntries.readItemsTranslationsFromFile();
 			CompendiumEntries.readMagicTranslationsFromFile();
 			refreshCompendiumEntryItemsBlurb(compendium_contents_current[compendium_current], main_menu_frame->findFrame("compendium"));
-			std::string modelsPath = "items_single";
+			DynamicString modelsPath = "items_single";
 			if ( Compendium_t::compendiumItemModel.skill[10] == SPELL_ITEM && Compendium_t::compendiumItemModel.flags[SPRITE] )
 			{
 				modelsPath = "spells_single";
@@ -40525,7 +40525,7 @@ failed:
 													{
 														if ( auto contents_notif = contents->findFrame("notifs") )
 														{
-															std::string findImg = "notif_" + compendium_contents_current[compendium_current];
+															DynamicString findImg = "notif_" + compendium_contents_current[compendium_current];
 															if ( auto img = contents_notif->findImage(findImg.c_str()) )
 															{
 																img->disabled = false;
@@ -40877,7 +40877,7 @@ failed:
 						146 + cvar_lore_point_highlight->y * Compendium_t::PointsAnim_t::anim,
 						132 + cvar_lore_point_highlight->z * Compendium_t::PointsAnim_t::anim));
 				}
-				std::string str = std::to_string(Compendium_t::PointsAnim_t::txtCurrentPoints).c_str();
+				DynamicString str = std::to_string(Compendium_t::PointsAnim_t::txtCurrentPoints).c_str();
 				txt->setText(str.c_str());
 			}
 				});
@@ -40921,7 +40921,7 @@ failed:
 					if ( Compendium_t::PointsAnim_t::txtChangePoints >= 0 )
 					{
 						txt->setColor(makeColorRGB(67, 195, 157));
-						std::string str = "+" + std::to_string(Compendium_t::PointsAnim_t::txtChangePoints);
+						DynamicString str = "+" + std::to_string(Compendium_t::PointsAnim_t::txtChangePoints);
 						txt->setText(str.c_str());
 					}
 					else
@@ -40985,7 +40985,7 @@ failed:
 			//		}
 			//		else
 			//		{
-			//			std::string amt = "/" + std::to_string(Compendium_t::lorePointsAchievementsTotal);
+			//			DynamicString amt = "/" + std::to_string(Compendium_t::lorePointsAchievementsTotal);
 			//			txt->setText(amt.c_str());
 			//		}
 			//	});
@@ -41026,7 +41026,7 @@ failed:
 				totalCompletion += Compendium_t::CompendiumMagic_t::completionPercent;
 				totalCompletion /= 6;
 				totalCompletion = std::min(100, std::max(0, totalCompletion));
-				std::string str = std::to_string(totalCompletion).c_str();
+				DynamicString str = std::to_string(totalCompletion).c_str();
 				str += '%';
 				txt->setText(str.c_str());
 
@@ -41162,7 +41162,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6174);
+				DynamicString str = Language::get(6174);
 				str += '\n';
 				str += std::to_string(Compendium_t::CompendiumMonsters_t::completionPercent);
 				str += '%';
@@ -41304,7 +41304,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6175);
+				DynamicString str = Language::get(6175);
 				str += '\n';
 				str += std::to_string(Compendium_t::CompendiumItems_t::completionPercent);
 				str += '%';
@@ -41418,7 +41418,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6176);
+				DynamicString str = Language::get(6176);
 				str += '\n';
 				str += std::to_string(Compendium_t::CompendiumMagic_t::completionPercent);
 				str += '%';
@@ -41532,7 +41532,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6177);
+				DynamicString str = Language::get(6177);
 				str += '\n';
 				str += std::to_string(Compendium_t::CompendiumWorld_t::completionPercent);
 				str += '%';
@@ -41659,7 +41659,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6178);
+				DynamicString str = Language::get(6178);
 				str += '\n';
 				str += std::to_string(Compendium_t::CompendiumCodex_t::completionPercent);
 				str += '%';
@@ -41823,7 +41823,7 @@ failed:
 				{
 					field->setColor(tabTextColorInactive);
 				}
-				std::string str = Language::get(6184);
+				DynamicString str = Language::get(6184);
 				str += '\n';
 				str += std::to_string(Compendium_t::AchievementData_t::completionPercent);
 				str += '%';
