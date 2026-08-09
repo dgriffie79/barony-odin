@@ -89,9 +89,9 @@ public:
 	auto& getSystemGamepadBindings() { return gamepad_system_bindings; }
 	auto& getJoystickBindings() { return joystick_bindings; }
 	auto& getSystemJoystickBindings() { return joystick_system_bindings; }
-	void setKeyboardBindings(std::unordered_map<std::string, std::string>& toSet) { kb_bindings = toSet; }
-	void setGamepadBindings(std::unordered_map<std::string, std::string>& toSet) { gamepad_bindings = toSet; }
-	void setJoystickBindings(std::unordered_map<std::string, std::string>& toSet) { joystick_bindings = toSet; }
+	void setKeyboardBindings(DynamicMapStr& toSet) { kb_bindings = toSet; }
+	void setGamepadBindings(DynamicMapStr& toSet) { gamepad_bindings = toSet; }
+	void setJoystickBindings(DynamicMapStr& toSet) { joystick_bindings = toSet; }
 
 	//! controller type
 	enum playerControlType_t {
@@ -213,14 +213,14 @@ private:
 	std::unordered_map<std::string, binding_t> bindings;
 
 	//! bindings written by the config file
-	std::unordered_map<std::string, std::string> kb_bindings;
-	std::unordered_map<std::string, std::string> gamepad_bindings;
-	std::unordered_map<std::string, std::string> joystick_bindings;
+	DynamicMapStr kb_bindings;
+	DynamicMapStr gamepad_bindings;
+	DynamicMapStr joystick_bindings;
 
 	//! default system bindings, likely not changeable
-	std::unordered_map<std::string, std::string> kb_system_bindings;
-	std::unordered_map<std::string, std::string> gamepad_system_bindings;
-	std::unordered_map<std::string, std::string> joystick_system_bindings;
+	DynamicMapStr kb_system_bindings;
+	DynamicMapStr gamepad_system_bindings;
+	DynamicMapStr joystick_system_bindings;
 
 	bool disabled = false;
 

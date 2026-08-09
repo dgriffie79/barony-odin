@@ -270,6 +270,41 @@ public:
         return barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v);
     }
 
+    // find() iterator (std::map-like) — first = interned key, second = value
+    struct KV { const char* first; DynamicString second; };
+    struct Iterator {
+        KV kv{};
+        bool valid = false;
+        const KV* operator->() const { return &kv; }
+    };
+    Iterator find(const char* key) const {
+        Iterator it;
+        void* kp = nullptr; int32_t kl = 0; void* vp = nullptr; int32_t vl = 0;
+        // strstr find shim: get stored key + value
+        DynamicString k(key), v;
+        if (barony_dynamic_map_strstr_get(const_cast<DynamicMapRaw*>(&raw), k, &v)) {
+            // get the stored key ptr via the entries snapshot of the found key
+            int32_t n = (int32_t)size();
+            if (n > 0) {
+                std::vector<void*> kps(n); std::vector<int32_t> kls(n); std::vector<void*> vps(n); std::vector<int32_t> vls(n);
+                int32_t got = barony_dynamic_map_strstr_entries(const_cast<DynamicMapRaw*>(&raw), kps.data(), kls.data(), vps.data(), vls.data(), n);
+                for (int32_t i = 0; i < got; ++i) {
+                    if (kls[i] == (int32_t)std::strlen(key) && std::memcmp(kps[i], key, kls[i]) == 0) {
+                        it.kv.first = (const char*)kps[i];
+                        it.kv.second = DynamicString((const char*)vps[i], vls[i]);
+                        it.valid = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return it;
+    }
+    Iterator find(const std::string& key) const { return find(key.c_str()); }
+    Iterator end() const { return Iterator{}; }
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
+    friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
+
     int64_t size() const { return barony_dynamic_map_strstr_len(const_cast<DynamicMapRaw*>(&raw)); }
     bool empty() const { return size() == 0; }
     void clear() { barony_dynamic_map_strstr_clear(&raw); }

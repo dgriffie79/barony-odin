@@ -504,9 +504,9 @@ namespace MainMenu {
 
     // Binding options
 	struct Bindings {
-		std::unordered_map<std::string, std::string> kb_mouse_bindings[MAX_SPLITSCREEN];
-		std::unordered_map<std::string, std::string> gamepad_bindings[MAX_SPLITSCREEN];
-		std::unordered_map<std::string, std::string> joystick_bindings[MAX_SPLITSCREEN];
+		DynamicMapStr kb_mouse_bindings[MAX_SPLITSCREEN];
+		DynamicMapStr gamepad_bindings[MAX_SPLITSCREEN];
+		DynamicMapStr joystick_bindings[MAX_SPLITSCREEN];
 		inline void save();
 		static inline Bindings load();
 		static inline Bindings reset(const char* profile);
@@ -2559,9 +2559,9 @@ namespace MainMenu {
 		Bindings bindings;
 		for (int c = 0; c < MAX_SPLITSCREEN; ++c) {
             for (auto& binding : getBindings(profile)) {
-			    bindings.kb_mouse_bindings[c].emplace(binding.action, binding.keyboard);
-			    bindings.gamepad_bindings[c].emplace(binding.action, binding.gamepad);
-			    bindings.joystick_bindings[c].emplace(binding.action, binding.joystick);
+			    bindings.kb_mouse_bindings[c][binding.action] = binding.keyboard;
+			    bindings.gamepad_bindings[c][binding.action] = binding.gamepad;
+			    bindings.joystick_bindings[c][binding.action] = binding.joystick;
 			}
 		}
 		return bindings;
@@ -2608,11 +2608,13 @@ namespace MainMenu {
 						file->endObject();
 					}
 				} else {
-					for (auto& bind : bindings) {
+					DynamicMapStr::Entry bindEntries[128];
+					int32_t bindCount = bindings.entryList(bindEntries, 128);
+					for ( int32_t bi = 0; bi < bindCount; ++bi ) {
 						file->beginObject();
-						DynamicString binding = bind.first;
+						DynamicString binding = bindEntries[bi].key;
 						file->property("binding", binding);
-						DynamicString input = bind.second;
+						DynamicString input = bindEntries[bi].value;
 						file->property("input", input);
 						file->endObject();
 					}
@@ -5927,12 +5929,7 @@ namespace MainMenu {
                 printlog("failed to bind");
 				return false;
 			} else {
-				auto find = bindings.find(binding);
-				if (find == bindings.end()) {
-					bindings.insert(std::make_pair(binding, input_to_store.c_str()));
-				} else {
-					find->second = input_to_store.c_str();
-				}
+				bindings[binding] = input_to_store.c_str();
 				return true;
 			}
 		}
@@ -7197,9 +7194,11 @@ bind_failed:
                     field->setText(b.text);
                 } else {
                     std::vector<std::string> bindings;
-                    for (auto& bind : allSettings.bindings.gamepad_bindings[player]) {
-                        if (bind.second == b.name) {
-                            bindings.emplace_back(translateBinding(bind.first.c_str()));
+                    DynamicMapStr::Entry gpEntries[128];
+                    int32_t gpCount = allSettings.bindings.gamepad_bindings[player].entryList(gpEntries, 128);
+                    for ( int32_t gi = 0; gi < gpCount; ++gi ) {
+                        if (strcmp(gpEntries[gi].value, b.name) == 0) {
+                            bindings.emplace_back(translateBinding(gpEntries[gi].key));
                         }
                     }
                     if (bindings.empty()) {
@@ -7337,9 +7336,9 @@ bind_failed:
                     allSettings.bindings.gamepad_bindings[bound_player].clear();
                     allSettings.bindings.joystick_bindings[bound_player].clear();
                     for (auto& binding : getBindings(profile)) {
-                        allSettings.bindings.kb_mouse_bindings[bound_player].emplace(binding.action, binding.keyboard);
-                        allSettings.bindings.gamepad_bindings[bound_player].emplace(binding.action, binding.gamepad);
-                        allSettings.bindings.joystick_bindings[bound_player].emplace(binding.action, binding.joystick);
+                        allSettings.bindings.kb_mouse_bindings[bound_player][binding.action] = binding.keyboard;
+                        allSettings.bindings.gamepad_bindings[bound_player][binding.action] = binding.gamepad;
+                        allSettings.bindings.joystick_bindings[bound_player][binding.action] = binding.joystick;
                     }
                     
                     // using the "Minimal" layout causes facehotbar / "Modern" hotbar from working at all.
