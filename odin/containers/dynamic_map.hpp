@@ -401,3 +401,11 @@ private:
         }
     }
 };
+
+// ---------------------------------------------------------------------------
+// map<string, LightDef> — light.hpp lightDefs. LightDef is a POD (layout
+// matches the Odin mirror exactly). Value copied by value; keys interned.
+// NOTE: the DynamicMapLightDef class lives in src/light.hpp (next to
+// LightDef); the shims are declared here.
+// ---------------------------------------------------------------------------
+struct DynamicMapLightDefRaw;  // forward (defined in light.hpp)

@@ -45,7 +45,7 @@ int getBook(std::string bookTitle)
 	int index = 0;
 	for ( auto& book : allBooks )
 	{
-		if ( book.default_name == bookTitle )
+		if ( book.default_name == bookTitle.c_str() )
 		{
 			return index;
 		}
@@ -601,7 +601,7 @@ void BookParser_t::createBook(std::string filename)
 		return; //Failed to open the file.
 	}
 
-	newBook.default_name = filename;
+	newBook.default_name = filename.c_str();
 	auto findTxt = newBook.default_name.find(".txt");
 	if ( findTxt != std::string::npos )
 	{
