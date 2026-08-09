@@ -292,7 +292,7 @@ Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipHeadingColor = 0xF
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::notificationTextColor = 0xFFFFFFFF;
 std::string StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont = "fonts/pixelmix.ttf#16#2";
 
-std::string formatSkillSheetEffects(int playernum, int proficiency, std::string& tag, std::string& rawValue);
+std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue);
 
 int GAMEUI_FRAMEDATA_ANIMATING_ITEM = 1;
 int GAMEUI_FRAMEDATA_ALCHEMY_ITEM = 2;
@@ -14359,8 +14359,8 @@ void openLogWindow(int player) {
 }
 
 std::map<std::string, std::pair<std::string, std::string>> Player::CharacterSheet_t::mapDisplayNamesDescriptions;
-std::string Player::CharacterSheet_t::defaultString = "";
-std::map<std::string, std::string> Player::CharacterSheet_t::hoverTextStrings;
+DynamicString Player::CharacterSheet_t::defaultString;
+DynamicMapStr Player::CharacterSheet_t::hoverTextStrings;
 void Player::CharacterSheet_t::loadCharacterSheetJSON()
 {
 	if ( !PHYSFS_getRealDir("/data/charsheet.json") )
@@ -17085,9 +17085,9 @@ void Player::CharacterSheet_t::updateGameTimer()
 	}
 }
 
-std::string& Player::CharacterSheet_t::getHoverTextString(std::string key)
+DynamicString& Player::CharacterSheet_t::getHoverTextString(std::string key)
 {
-	if ( hoverTextStrings.find(key) != hoverTextStrings.end() )
+	if ( hoverTextStrings.contains(key) )
 	{
 		return hoverTextStrings[key];
 	}
@@ -18028,12 +18028,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		int maxWidth = 260;
 		if ( getHoverTextString("stat_max_tooltip_width") != defaultString )
 		{
-			maxWidth = std::max(0, std::stoi(getHoverTextString("stat_max_tooltip_width")));
+			maxWidth = std::max(0, stoi(getHoverTextString("stat_max_tooltip_width")));
 		}
 		int minWidth = 0;
 		if ( getHoverTextString("stat_min_tooltip_width") != defaultString )
 		{
-			minWidth = std::max(0, std::stoi(getHoverTextString("stat_min_tooltip_width")));
+			minWidth = std::max(0, stoi(getHoverTextString("stat_min_tooltip_width")));
 		}
 		const int padx = 16;
 		const int pady1 = 8;
@@ -35822,7 +35822,7 @@ void Player::SkillSheet_t::openSkillSheet()
 	}
 }
 
-std::string formatSkillSheetEffects(int playernum, int proficiency, std::string& tag, std::string& rawValue)
+std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue)
 {
 	char buf[2048] = "";
 	if ( !players[playernum] ) { return ""; }

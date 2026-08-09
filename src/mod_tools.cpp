@@ -1622,7 +1622,7 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 	}
 	for ( auto& spell : spellItems )
 	{
-		spell.second.name = spellNameLocalizations[spell.second.internalName];
+		spell.second.name = spellNameLocalizations[spell.second.internalName].c_str();
 		spell.second.name_lowercase = spell.second.name;
 		lowercaseString(spell.second.name_lowercase);
 	}

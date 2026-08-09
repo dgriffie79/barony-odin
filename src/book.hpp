@@ -34,7 +34,7 @@ public:
 	void createBooks(bool forceCacheRebuild);
 	void createBook(std::string filename); //Take a book filename and generate all of its pages.
 	void deleteBooks();
-	std::unordered_map<std::string, std::string> tempBookData;
+	DynamicMapStr tempBookData;
 	void readBooksIntoTemp();
 	std::list<std::string> getListOfBooksAfterFiltering();
 };

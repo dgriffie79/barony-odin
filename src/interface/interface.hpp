@@ -1828,7 +1828,7 @@ struct CalloutRadialMenu
 		std::string& getPlayerIconPath(const int playernum);
 	};
 	static std::map<std::string, WorldIconEntry_t> worldIconEntries;
-	static std::map<std::string, std::string> helpDescriptors;
+	static DynamicMapStr helpDescriptors;
 	static std::map<int, std::string> worldIconIDToEntryKey;
 	static int followerWheelRadius;
 	static int followerWheelButtonThickness;

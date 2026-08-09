@@ -2899,8 +2899,8 @@ public:
 		std::string name_unidentified = "";
 	};
 	std::map<std::string, ItemLocalization_t> itemNameLocalizations;
-	std::map<std::string, std::string> bookNameLocalizations;
-	std::map<std::string, std::string> spellNameLocalizations;
+	DynamicMapStr bookNameLocalizations;
+	DynamicMapStr spellNameLocalizations;
 	DynamicMapI32 itemNameStringToItemID;
 	DynamicMapI32 spellNameStringToSpellID;
 	std::string defaultString = "";

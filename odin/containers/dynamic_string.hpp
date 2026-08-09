@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
+#include <string>
 #include <cstdio>
 #include <cstdlib>
 
@@ -103,6 +104,10 @@ public:
     int64_t length() const { return len; }
     bool empty() const { return len == 0; }
 
+    // bridge: implicit conversion to std::string (unconverted callers assign
+    // DynamicString values into std::string vars — e.g. titleText = getHover...)
+    operator std::string() const { return c_str(); }
+
     // ---- search / compare ----
     int64_t find(const char* needle) const { return barony_dynamic_string_find(this, needle, (int64_t)std::strlen(needle), 0); }
     int64_t find(const char* needle, int64_t start) const { return barony_dynamic_string_find(this, needle, (int64_t)std::strlen(needle), (int)start); }
@@ -148,6 +153,10 @@ inline bool operator!=(const char* a, const DynamicString& b) { return b != a; }
 inline DynamicString operator+(const DynamicString& a, const char* b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const char* a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const DynamicString& a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
+
+// bridge: std::string += DynamicString (unconverted callers appending values)
+inline std::string& operator+=(std::string& a, const DynamicString& b) { a += b.c_str(); return a; }
+inline std::string operator+(const std::string& a, const DynamicString& b) { return a + b.c_str(); }
 
 // std::to_string replacement — returns a DynamicString (no std:: allocator
 // involvement; snprintf formats into an Odin-allocated buffer via from_cstr)

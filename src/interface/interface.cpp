@@ -28096,7 +28096,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 
 				if ( stats[player]->HP == 0 || !players[player]->entity )
 				{
-					helpText = helpDescriptors["ghost"];
+					helpText = helpDescriptors["ghost"].c_str();
 				}
 
 				if ( setType == SET_CALLOUT_BANNER_TEXT )
@@ -29067,7 +29067,7 @@ bool CalloutRadialMenu::calloutMenuIsOpen()
 std::vector<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
 std::map<std::string, CalloutRadialMenu::IconEntry> CalloutRadialMenu::iconEntries;
 std::map<std::string, CalloutRadialMenu::WorldIconEntry_t> CalloutRadialMenu::worldIconEntries;
-std::map<std::string, std::string> CalloutRadialMenu::helpDescriptors;
+DynamicMapStr CalloutRadialMenu::helpDescriptors;
 std::map<int, std::string> CalloutRadialMenu::worldIconIDToEntryKey;
 int CalloutRadialMenu::followerWheelButtonThickness = 70;
 int CalloutRadialMenu::followerWheelRadius = 140;
@@ -37583,7 +37583,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 								currentHeight += classTooltipPos.h - 1;
 
 								std::string descText = "";
-								descText = Player::CharacterSheet_t::getHoverTextString("stat_growth_info");
+								descText = Player::CharacterSheet_t::getHoverTextString("stat_growth_info").c_str();
 							}
 
 							tooltipPos.h = pady1 + currentHeight + pady2 - 8;

@@ -1318,7 +1318,7 @@ public:
 		Uint32 tooltipDeselectedTick = 0;
 
 		static std::map<std::string, std::pair<std::string, std::string>> mapDisplayNamesDescriptions;
-		static std::map<std::string, std::string> hoverTextStrings;
+		static DynamicMapStr hoverTextStrings;
 		enum SheetElements
 		{
 			SHEET_UNSELECTED,
@@ -1364,8 +1364,8 @@ public:
 		void updateAttributes();
 		void updateCharacterInfo();
 		static void loadCharacterSheetJSON();
-		static std::string defaultString;
-		static std::string& getHoverTextString(std::string key);
+		static DynamicString defaultString;
+		static DynamicString& getHoverTextString(std::string key);
 		void updateCharacterSheetTooltip(SheetElements element, SDL_Rect pos, Player::PanelJustify_t tooltipJustify = PANEL_JUSTIFY_RIGHT);
 	} characterSheet;
 

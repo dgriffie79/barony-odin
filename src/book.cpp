@@ -83,7 +83,7 @@ std::string getBookLocalizedNameFromIndex(int index, bool censored)
 			}
 		}
 	}
-	return ItemTooltips.bookNameLocalizations[allBooks[index].default_name];
+	return ItemTooltips.bookNameLocalizations[allBooks[index].default_name].c_str();
 }
 
 //Local helper function to make getting the list of books cross-platform easier.
@@ -196,14 +196,14 @@ bool BookParser_t::booksRequireCompiling()
 				std::string bookName = book_itr->name.GetString();
 				std::string rawText = book_itr->value["raw_text"].GetString();
 
-				if ( tempBookData.find(bookName) == tempBookData.end() )
+				if ( !tempBookData.contains(bookName) )
 				{
 					printlog("[Books]: Compiled Books Check - Book title: \"%s\" not found in compiled books, recompiling...", bookName.c_str());
 					return true;
 				}
 				else
 				{
-					if ( tempBookData[bookName] != rawText )
+					if ( tempBookData[bookName] != rawText.c_str() )
 					{
 						printlog("[Books]: Compiled Books Check - Book text: \"%s\" does not match in compiled books, recompiling...", bookName.c_str());
 						return true;
@@ -320,7 +320,7 @@ void BookParser_t::readBooksIntoTemp()
 			{
 				filenameNoExtension = filename.substr(0, findExtension);
 			}
-			tempBookData.insert(std::make_pair(filenameNoExtension, ""));
+			tempBookData[filenameNoExtension.c_str()] = "";
 			auto& entry = tempBookData[filenameNoExtension];
 
 			//Load in the text from a file.
