@@ -2421,7 +2421,7 @@ void drawEntities3D(view_t* camera, int mode)
 								{
 									if ( !strcmp(stats->name, getMonsterLocalizedName(SLIME).c_str()) )
 									{
-										std::string name = stats->name;
+										DynamicString name = stats->name;
 										camelCaseString(name);
 										glDrawSpriteFromImage(camera, entity, name.c_str(), mode);
 									}
@@ -2475,7 +2475,7 @@ void drawEntities3D(view_t* camera, int mode)
 								{
 									if ( !strcmp(stats->name, getMonsterLocalizedName(SLIME).c_str()) )
 									{
-										std::string name = stats->name;
+										DynamicString name = stats->name;
 										camelCaseString(name);
 										glDrawSpriteFromImage(camera, entity, name.c_str(), mode);
 									}

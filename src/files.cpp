@@ -2261,7 +2261,7 @@ voxel_t* loadVoxel(char* filename)
 			printlog("error: loadVoxel could not find file: %s", filename);
 			return nullptr;
 		}
-		std::string filenamePath = path;
+		DynamicString filenamePath = path;
 		filenamePath.append(PHYSFS_getDirSeparator()).append(filename);
 
 		if ( (file = openDataFile(filenamePath.c_str(), "rb")) == nullptr )
@@ -3082,7 +3082,7 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 
 	FileIO::close(fp);
 
-	std::string mapShortName = filename2;
+	DynamicString mapShortName = filename2;
 	size_t found = mapShortName.rfind("/");
 	if ( found != std::string::npos )
 	{
@@ -3096,7 +3096,7 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 			mapShortName = mapShortName.substr(found + 1);
 		}
 	}
-	size_t size = std::min(mapShortName.size(), sizeof(destmap->filename) - 1);
+	size_t size = std::min((size_t)mapShortName.size(), sizeof(destmap->filename) - 1);
 	memcpy(destmap->filename, mapShortName.c_str(), size);
 	destmap->filename[size] = '\0';
 
@@ -3741,8 +3741,8 @@ std::vector<DynamicString> getLinesFromDataFile(std::string filename)
 
 int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int* checkMapHash)
 {
-	std::string mapsDirectory; // store the full file path here.
-	std::string line = "";
+	DynamicString mapsDirectory; // store the full file path here.
+	DynamicString line = "";
 	if ( loadCustomNextMap.compare("") != 0 )
 	{
 		line = "map: " + loadCustomNextMap;
@@ -3782,8 +3782,8 @@ int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int* check
 	char tempstr[1024];
 	if ( found != std::string::npos )
 	{
-		std::string mapType = line.substr(0, found);
-		std::string mapName;
+		DynamicString mapType = line.substr(0, found);
+		DynamicString mapName;
 		mapName = line.substr(found + 1, line.find('\n'));
 		std::size_t carriageReturn = mapName.find('\r');
 		if ( carriageReturn != std::string::npos )
@@ -3825,7 +3825,7 @@ int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int* check
 			std::size_t darkmapChanceFound = mapName.find(" darkmap%: ");
 			std::size_t minotaurChanceFound = mapName.find(" minotaur%: ");
 			std::size_t disableNormalExitFound = mapName.find(" noexit");
-			std::string parameterStr = "";
+			DynamicString parameterStr = "";
 			std::tuple<int, int, int, int> mapParameters = std::make_tuple(-1, -1, -1, 0);
 			if ( secretChanceFound != std::string::npos )
 			{
@@ -3892,7 +3892,7 @@ std::list<std::string> physfsGetFileNamesInDirectory(const char* dir)
 		return filenames;
 	}
 	char **i;
-	std::string file;
+	DynamicString file;
 	for ( i = rc; *i != NULL; i++ )
 	{
 		file = *i;
@@ -3905,8 +3905,8 @@ std::list<std::string> physfsGetFileNamesInDirectory(const char* dir)
 
 std::string physfsFormatMapName(char const * const levelfilename)
 {
-	std::string fullMapPath;
-	std::string mapFileName = "maps/";
+	DynamicString fullMapPath;
+	DynamicString mapFileName = "maps/";
 	mapFileName.append(levelfilename);
 	if ( mapFileName.find(".lmp") == std::string::npos )
 	{
@@ -3929,7 +3929,7 @@ bool physfsSearchModelsToUpdate()
 		printlog("error: could not find file: %s", "models/models.txt");
 		return false;
 	}
-	std::string modelsDirectory = PHYSFS_getRealDir("models/models.txt");
+	DynamicString modelsDirectory = PHYSFS_getRealDir("models/models.txt");
 	modelsDirectory.append(PHYSFS_getDirSeparator()).append("models/models.txt");
 	File* fp = openDataFile(modelsDirectory.c_str(), "rb");
 	char name[PATH_MAX];
@@ -3939,7 +3939,7 @@ bool physfsSearchModelsToUpdate()
 		fp->gets2(name, PATH_MAX);
 		if ( PHYSFS_getRealDir(name) != NULL )
 		{
-			std::string modelRealDir = PHYSFS_getRealDir(name);
+			DynamicString modelRealDir = PHYSFS_getRealDir(name);
 			if ( modelRealDir.compare("./") != 0 )
 			{
 				FileIO::close(fp);
@@ -3959,7 +3959,7 @@ bool physfsModelIndexUpdate(int &start, int &end)
 		return false;
 	}
 	
-	std::string modelsDirectory = PHYSFS_getRealDir("models/models.txt");
+	DynamicString modelsDirectory = PHYSFS_getRealDir("models/models.txt");
 	modelsDirectory.append(PHYSFS_getDirSeparator()).append("models/models.txt");
 
 	File* fp = openDataFile(modelsDirectory.c_str(), "rb");
@@ -3991,7 +3991,7 @@ bool physfsModelIndexUpdate(int &start, int &end)
 			printlog("error: could not find file: %s", modelName);
 			continue;
 		}
-		std::string modelPath = PHYSFS_getRealDir(modelName);
+		DynamicString modelPath = PHYSFS_getRealDir(modelName);
 		if ( modelHasBeenModified || modelPath.compare("./") != 0 )
 		{
 			if ( !modelHasBeenModified )
@@ -4066,7 +4066,7 @@ bool physfsModelIndexUpdate(int &start, int &end)
 
 void saveModelCache() {
 	File* model_cache;
-	const std::string cache_path = std::string(outputdir) + "/models.cache";
+	const DynamicString cache_path = std::string(outputdir) + "/models.cache";
 	if (model_cache = openDataFile(cache_path.c_str(), "wb")) {
 		char modelCacheHeader[32] = "BARONY";
 		strcat(modelCacheHeader, VERSION);
@@ -4110,7 +4110,7 @@ void generatePolyModels(int start, int end, bool forceCacheRebuild)
 		if ( useModelCache && !forceCacheRebuild )
 		{
 #ifndef NINTENDO
-            std::string cache_path;
+            DynamicString cache_path;
             if (isCurrentHoliday()) {
                 const auto holiday = getCurrentHoliday();
                 switch (holiday) {
@@ -4125,7 +4125,7 @@ void generatePolyModels(int start, int end, bool forceCacheRebuild)
                 cache_path = std::string(outputdir) + "/models.cache";
             }
 #else
-			std::string cache_path = "models.cache";
+			DynamicString cache_path = "models.cache";
 #endif
 			auto model_cache = openDataFile(cache_path.c_str(), "rb");
 			if ( model_cache )
@@ -5172,7 +5172,7 @@ void reloadModels(int start, int end) {
 	}
 	doLoadingScreen();
 
-	std::string modelsDirectory = PHYSFS_getRealDir("models/models.txt");
+	DynamicString modelsDirectory = PHYSFS_getRealDir("models/models.txt");
 	modelsDirectory.append(PHYSFS_getDirSeparator()).append("models/models.txt");
 	File* fp = openDataFile(modelsDirectory.c_str(), "rb");
 	for ( int c = 0; !fp->eof(); c++ )
@@ -5197,7 +5197,7 @@ void reloadModels(int start, int end) {
 
 	std::atomic_bool loading_done{ false };
 	auto loading_task = std::async(std::launch::async, [&loading_done, start, end]() {
-		std::string modelsDirectory = PHYSFS_getRealDir("models/models.txt");
+		DynamicString modelsDirectory = PHYSFS_getRealDir("models/models.txt");
 		modelsDirectory.append(PHYSFS_getDirSeparator()).append("models/models.txt");
 		File* fp = openDataFile(modelsDirectory.c_str(), "rb");
 		for ( int c = 0; !fp->eof(); c++ )
@@ -5335,7 +5335,7 @@ bool physfsSearchSoundsToUpdate()
 		printlog("error: could not find file: %s", "sound/sounds.txt");
 		return false;
 	}
-	std::string soundsDirectory = PHYSFS_getRealDir("sound/sounds.txt");
+	DynamicString soundsDirectory = PHYSFS_getRealDir("sound/sounds.txt");
 	if ( soundsDirectory.compare("./") != 0 )
 	{
 		return true;
@@ -5349,7 +5349,7 @@ bool physfsSearchSoundsToUpdate()
 		fp->gets2(name, PATH_MAX);
 		if ( PHYSFS_getRealDir(name) != NULL )
 		{
-			std::string soundRealDir = PHYSFS_getRealDir(name);
+			DynamicString soundRealDir = PHYSFS_getRealDir(name);
 			if ( soundRealDir.compare("./") != 0 )
 			{
 				FileIO::close(fp);
@@ -5372,7 +5372,7 @@ void physfsReloadSounds(bool reloadAll)
 		printlog("error: could not find file: %s", "sound/sounds.txt");
 		return;
 	}
-	std::string soundsDirectory = PHYSFS_getRealDir("sound/sounds.txt");
+	DynamicString soundsDirectory = PHYSFS_getRealDir("sound/sounds.txt");
 	soundsDirectory.append(PHYSFS_getDirSeparator()).append("sound/sounds.txt");
 	File* fp = openDataFile(soundsDirectory.c_str(), "rb");
 	char name[PATH_MAX];
@@ -5418,10 +5418,10 @@ void physfsReloadSounds(bool reloadAll)
 
 		if ( PHYSFS_getRealDir(name) != NULL )
 		{
-			std::string soundRealDir = PHYSFS_getRealDir(name);
+			DynamicString soundRealDir = PHYSFS_getRealDir(name);
 			if ( soundHasBeenModified || reloadAll || soundRealDir.compare("./") != 0 )
 			{
-				std::string soundFile = soundRealDir;
+				DynamicString soundFile = soundRealDir;
 				soundFile.append(PHYSFS_getDirSeparator()).append(name);
 
 				if ( !soundHasBeenModified )
@@ -5478,7 +5478,7 @@ bool physfsSearchSpritesToUpdate() //TODO: NX PORT: Any changes needed here?
 		printlog("error: could not find file: %s", "images/sprites.txt");
 		return false;
 	}
-	std::string spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
+	DynamicString spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
 	spritesDirectory.append(PHYSFS_getDirSeparator()).append("images/sprites.txt");
 	File* fp = openDataFile(spritesDirectory.c_str(), "rb");
 	char name[PATH_MAX];
@@ -5488,7 +5488,7 @@ bool physfsSearchSpritesToUpdate() //TODO: NX PORT: Any changes needed here?
 		fp->gets2(name, PATH_MAX);
 		if ( PHYSFS_getRealDir(name) != nullptr )
 		{
-			std::string spritesRealDir = PHYSFS_getRealDir(name);
+			DynamicString spritesRealDir = PHYSFS_getRealDir(name);
 			if ( spritesRealDir.compare("./") != 0 )
 			{
 				FileIO::close(fp);
@@ -5508,7 +5508,7 @@ void physfsReloadSprites(bool reloadAll) //TODO: NX PORT: Any changes needed her
 		printlog("error: could not find file: %s", "images/sprites.txt");
 		return;
 	}
-	std::string spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
+	DynamicString spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
 	spritesDirectory.append(PHYSFS_getDirSeparator()).append("images/sprites.txt");
 	printlog("[PhysFS]: Loading sprites from directory %s...\n", spritesDirectory.c_str());
 	File* fp = openDataFile(spritesDirectory.c_str(), "rb");
@@ -5528,10 +5528,10 @@ void physfsReloadSprites(bool reloadAll) //TODO: NX PORT: Any changes needed her
 		fp->gets2(name, PATH_MAX);
 		if ( PHYSFS_getRealDir(name) != nullptr )
 		{
-			std::string spritesRealDir = PHYSFS_getRealDir(name);
+			DynamicString spritesRealDir = PHYSFS_getRealDir(name);
 			if ( reloadAll || spritesRealDir.compare("./") != 0 )
 			{
-				std::string spriteFile = spritesRealDir;
+				DynamicString spriteFile = spritesRealDir;
 				spriteFile.append(PHYSFS_getDirSeparator()).append(name);
 				if ( sprites[c] )
 				{
@@ -5570,7 +5570,7 @@ bool physfsSearchTilesToUpdate()
 		printlog("error: could not find file: %s", "images/tiles.txt");
 		return false;
 	}
-	std::string tilesDirectory = PHYSFS_getRealDir("images/tiles.txt");
+	DynamicString tilesDirectory = PHYSFS_getRealDir("images/tiles.txt");
 	tilesDirectory.append(PHYSFS_getDirSeparator()).append("images/tiles.txt");
 	File* fp = openDataFile(tilesDirectory.c_str(), "rb");
 	char name[PATH_MAX];
@@ -5580,7 +5580,7 @@ bool physfsSearchTilesToUpdate()
 		fp->gets2(name, PATH_MAX);
 		if ( PHYSFS_getRealDir(name) != NULL )
 		{
-			std::string tileRealDir = PHYSFS_getRealDir(name);
+			DynamicString tileRealDir = PHYSFS_getRealDir(name);
 			if ( tileRealDir.compare("./") != 0 )
 			{
 				FileIO::close(fp);
@@ -5599,7 +5599,7 @@ void physfsReloadTiles(bool reloadAll)
 	if (!PHYSFS_getRealDir("images/tiles.txt")) {
 		printlog("error: could not find file: %s", "images/tiles.txt");
 	} else {
-        std::string directory = PHYSFS_getRealDir("images/tiles.txt");
+        DynamicString directory = PHYSFS_getRealDir("images/tiles.txt");
         directory.append(PHYSFS_getDirSeparator()).append("images/tiles.txt");
         printlog("[PhysFS]: Loading tiles from directory %s...\n", directory.c_str());
         File* fp = openDataFile(directory.c_str(), "rb");
@@ -5615,10 +5615,10 @@ void physfsReloadTiles(bool reloadAll)
                 fp->gets2(name, PATH_MAX);
                 if ( PHYSFS_getRealDir(name) != NULL )
                 {
-                    std::string tileRealDir = PHYSFS_getRealDir(name);
+                    DynamicString tileRealDir = PHYSFS_getRealDir(name);
                     if ( reloadAll || tileRealDir.compare("./") != 0 )
                     {
-                        std::string tileFile = tileRealDir;
+                        DynamicString tileFile = tileRealDir;
                         tileFile.append(PHYSFS_getDirSeparator()).append(name);
                         if ( tiles[c] )
                         {
@@ -5672,7 +5672,7 @@ void physfsReloadTiles(bool reloadAll)
 	if (!PHYSFS_getRealDir("images/animated.txt")) {
 		printlog("error: could not find file: %s", "images/animated.txt");
 	} else {
-        std::string directory = PHYSFS_getRealDir("images/animated.txt");
+        DynamicString directory = PHYSFS_getRealDir("images/animated.txt");
         directory.append(PHYSFS_getDirSeparator()).append("images/animated.txt");
         printlog("[PhysFS]: Loading tile animations from directory %s...\n", directory.c_str());
         File* fp = openDataFile(directory.c_str(), "rb");
@@ -5706,7 +5706,7 @@ void physfsReloadTiles(bool reloadAll)
 
 bool physfsIsMapLevelListModded()
 {
-	std::string mapsDirectory = PHYSFS_getRealDir(LEVELSFILE);
+	DynamicString mapsDirectory = PHYSFS_getRealDir(LEVELSFILE);
 	if ( mapsDirectory.compare("./") != 0 )
 	{
 		//return true;
@@ -5718,7 +5718,7 @@ bool physfsIsMapLevelListModded()
 	{
 		return false;
 	}
-	std::string line = levelsList.front();
+	DynamicString line = levelsList.front();
 	int levelsCounted = 0;
 	for ( std::vector<DynamicString>::const_iterator i = levelsList.begin(); i != levelsList.end(); ++i )
 	{
@@ -5731,8 +5731,8 @@ bool physfsIsMapLevelListModded()
 		std::size_t found = line.find(' ');
 		if ( found != std::string::npos )
 		{
-			std::string mapType = line.substr(0, found);
-			std::string mapName;
+			DynamicString mapType = line.substr(0, found);
+			DynamicString mapName;
 			mapName = line.substr(found + 1, line.find('\n'));
 			std::size_t carriageReturn = mapName.find('\r');
 			if ( carriageReturn != std::string::npos )
@@ -5787,8 +5787,8 @@ bool physfsIsMapLevelListModded()
 		std::size_t found = line.find(' ');
 		if ( found != std::string::npos )
 		{
-			std::string mapType = line.substr(0, found);
-			std::string mapName;
+			DynamicString mapType = line.substr(0, found);
+			DynamicString mapName;
 			mapName = line.substr(found + 1, line.find('\n'));
 			std::size_t carriageReturn = mapName.find('\r');
 			if ( carriageReturn != std::string::npos )
@@ -5828,7 +5828,7 @@ bool physfsSearchItemSpritesToUpdate()
 		{
 			node_t* node = list_Node(&items[c].images, x);
 			string_t* string = (string_t*)node->element;
-			std::string itemImgDir;
+			DynamicString itemImgDir;
 			if ( PHYSFS_getRealDir(string->data) != NULL )
 			{
 				itemImgDir = PHYSFS_getRealDir(string->data);
@@ -5854,7 +5854,7 @@ void physfsReloadItemSprites(bool reloadAll)
 			{
 				node_t* node = list_Node(&items[c].images, x);
 				string_t* string = (string_t*)node->element;
-				std::string itemImgDir;
+				DynamicString itemImgDir;
 				if ( PHYSFS_getRealDir(string->data) != NULL )
 				{
 					itemImgDir = PHYSFS_getRealDir(string->data);
@@ -5895,7 +5895,7 @@ void physfsReloadItemSprites(bool reloadAll)
 
 				node_t* node2 = list_Node(&items[c].images, x);
 				string_t* string = (string_t*)node2->element;
-				std::string itemImgDir;
+				DynamicString itemImgDir;
 				if ( PHYSFS_getRealDir(string->data) != NULL )
 				{
 					itemImgDir = PHYSFS_getRealDir(string->data);
@@ -5926,7 +5926,7 @@ bool physfsSearchMonsterLimbFilesToUpdate()
 		{
 			continue;
 		}
-		std::string limbsDir = PHYSFS_getRealDir(filename);
+		DynamicString limbsDir = PHYSFS_getRealDir(filename);
 		if ( limbsDir.compare("./") != 0 )
 		{
 			printlog("[PhysFS]: Found modified limbs.txt file for monster %s, reloading all limb information...", monstertypename[c]);
@@ -5958,7 +5958,7 @@ void physfsReloadMonsterLimbFiles()
 
 		if ( PHYSFS_getRealDir(filename) )
 		{
-			std::string limbsDir = PHYSFS_getRealDir(filename);
+			DynamicString limbsDir = PHYSFS_getRealDir(filename);
 			limbsDir.append(PHYSFS_getDirSeparator()).append(filename);
 			if ( (fp = openDataFile(limbsDir.c_str(), "rb")) == NULL )
 			{
@@ -6016,10 +6016,10 @@ bool physfsSearchSystemImagesToUpdate()
 	for ( std::vector<std::pair<SDL_Surface**, std::string>>::const_iterator it = systemResourceImages.begin(); it != systemResourceImages.end(); ++it )
 	{
 		std::pair<SDL_Surface**, std::string> line = *it;
-		std::string imgFile = line.second;
+		DynamicString imgFile = line.second;
 		if ( PHYSFS_getRealDir(imgFile.c_str()) != NULL)
 		{
-			std::string imgDir = PHYSFS_getRealDir(imgFile.c_str());
+			DynamicString imgDir = PHYSFS_getRealDir(imgFile.c_str());
 			if ( imgDir.compare("./") != 0 )
 			{
 				printlog("[PhysFS]: Found modified %s file, reloading system image...", imgFile.c_str());
@@ -6046,7 +6046,7 @@ void physfsReloadSystemImages()
 					printlog("error: could not find file: %s", line.second.c_str());
 					continue;
 				}
-				std::string filepath = PHYSFS_getRealDir(line.second.c_str());
+				DynamicString filepath = PHYSFS_getRealDir(line.second.c_str());
 				filepath.append(PHYSFS_getDirSeparator()).append(line.second);
 
 				char filepathChar[1024];

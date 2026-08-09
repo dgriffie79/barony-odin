@@ -416,7 +416,7 @@ struct BinaryReaderState {
 	}
 
 	// DynamicString read: reads the length-prefixed bytes and appends them
-	// (sets len correctly; the std::string version's reserve+operator[]
+	// (sets len correctly; the DynamicString version's reserve+operator[]
 	// leaves size stale — we match the FORMAT, not the bug).
 	bool readStringInternal(DynamicString & v) {
 		Uint32 len;

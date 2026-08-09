@@ -667,7 +667,7 @@ std::string stackTrace() {
 	char** symbols = backtrace_symbols(array, size);
 
     // build string
-    std::string trace;
+    DynamicString trace;
 	for (auto c = 3; c < size; ++c) {
 	    trace += "\n";
 	    symbols[c] = strrchr(symbols[c], (int)'(');
@@ -700,7 +700,7 @@ void stackTraceUnique() {
 	char** symbols = backtrace_symbols(array, size);
 
     // build string
-    std::string trace;
+    DynamicString trace;
 	for (auto c = 3; c < size; ++c) {
 	    trace += "\n";
 	    //symbols[c] = strrchr(symbols[c], (int)'(');

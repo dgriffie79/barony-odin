@@ -2141,7 +2141,7 @@ void glDrawSpriteFromImage(view_t* camera, Entity* entity, std::string text, int
     {
         if ( text.find('*') == std::string::npos )
         {
-            text.insert(text.begin(), '*');
+            text.insert(0, 1, '*');
         }
         if ( auto imgGet = Image::get(text.c_str()) )
         {

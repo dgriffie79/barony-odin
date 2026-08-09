@@ -113,10 +113,10 @@ void BookParser_t::deleteBooks()
 
 bool BookParser_t::readCompiledBooks()
 {
-	std::string compiledBooksPath = "books/compiled_books.json";
+	DynamicString compiledBooksPath = "books/compiled_books.json";
 	if ( PHYSFS_getRealDir(compiledBooksPath.c_str()) != NULL )
 	{
-		std::string path = PHYSFS_getRealDir(compiledBooksPath.c_str());
+		DynamicString path = PHYSFS_getRealDir(compiledBooksPath.c_str());
 		path.append(PHYSFS_getDirSeparator());
 		compiledBooksPath = path + compiledBooksPath;
 		File* fp = FileIO::open(compiledBooksPath.c_str(), "rb");
@@ -161,10 +161,10 @@ bool BookParser_t::booksRequireCompiling()
 {
 	readBooksIntoTemp();
 
-	std::string compiledBooksPath = "books/compiled_books.json";
+	DynamicString compiledBooksPath = "books/compiled_books.json";
 	if ( PHYSFS_getRealDir(compiledBooksPath.c_str()) != NULL )
 	{
-		std::string path = PHYSFS_getRealDir(compiledBooksPath.c_str());
+		DynamicString path = PHYSFS_getRealDir(compiledBooksPath.c_str());
 		path.append(PHYSFS_getDirSeparator());
 		compiledBooksPath = path + compiledBooksPath;
 		File* fp = FileIO::open(compiledBooksPath.c_str(), "rb");
@@ -193,8 +193,8 @@ bool BookParser_t::booksRequireCompiling()
 			for ( rapidjson::Value::ConstMemberIterator book_itr = d["books"].MemberBegin();
 				book_itr != d["books"].MemberEnd(); ++book_itr )
 			{
-				std::string bookName = book_itr->name.GetString();
-				std::string rawText = book_itr->value["raw_text"].GetString();
+				DynamicString bookName = book_itr->name.GetString();
+				DynamicString rawText = book_itr->value["raw_text"].GetString();
 
 				if ( !tempBookData.contains(bookName) )
 				{
@@ -221,14 +221,14 @@ std::list<std::string> BookParser_t::getListOfBooksAfterFiltering()
 
 #ifndef NINTENDO
 	//TODO: We will need to enable this on NINTENDO if we want mod support. Realistically, that just means adding JSON support and making ignoreBooksPath a static const definition in a header somewhere. (2 headers, actually: define it once for PC, definite it differently for Switch) ...we'll probably also need to update thet PHYSFS_getRealDir() call as well, something akin to the getListOfBooks() function. I.e. NINTENDO ROM reading or whatever.
-	std::string ignoreBooksPath = "books/ignored_books.json";
+	DynamicString ignoreBooksPath = "books/ignored_books.json";
 	std::unordered_set<std::string> ignoredBooks;
 	bool foundIgnoreBookFile = false;
 	if ( PHYSFS_getRealDir(ignoreBooksPath.c_str()) != NULL )
 	{
 		foundIgnoreBookFile = true;
 		ignoredBooks.insert("ignored_books.json");
-		std::string path = PHYSFS_getRealDir(ignoreBooksPath.c_str());
+		DynamicString path = PHYSFS_getRealDir(ignoreBooksPath.c_str());
 		path.append(PHYSFS_getDirSeparator());
 		ignoreBooksPath = path + ignoreBooksPath;
 
@@ -314,7 +314,7 @@ void BookParser_t::readBooksIntoTemp()
 		for ( const auto& filename : discoveredbooks )
 		{
 			//printlog("reading book: \"%s\"\n", filename.c_str());
-			std::string filenameNoExtension = filename;
+			DynamicString filenameNoExtension = filename;
 			auto findExtension = filename.find(".txt");
 			if ( findExtension != std::string::npos )
 			{
@@ -324,11 +324,11 @@ void BookParser_t::readBooksIntoTemp()
 			auto& entry = tempBookData[filenameNoExtension];
 
 			//Load in the text from a file.
-			std::string bookPath = "books/";
+			DynamicString bookPath = "books/";
 			bookPath.append(filename);
 			if ( PHYSFS_getRealDir(bookPath.c_str()) != nullptr )
 			{
-				std::string path = PHYSFS_getRealDir(bookPath.c_str());
+				DynamicString path = PHYSFS_getRealDir(bookPath.c_str());
 				path.append(PHYSFS_getDirSeparator());
 				bookPath = path + bookPath;
 			}
@@ -383,9 +383,9 @@ void BookParser_t::createBooks(bool forceCacheRebuild)
 
 void BookParser_t::writeCompiledBooks()
 {
-	std::string inputPath = outputdir;
+	DynamicString inputPath = outputdir;
 	inputPath.append(PHYSFS_getDirSeparator());
-	std::string fileName = "books/compiled_books.json";
+	DynamicString fileName = "books/compiled_books.json";
 	inputPath.append(fileName);
 
 	File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -575,11 +575,11 @@ int lengthOfCurrentWord(char* const text, const int index)
 void BookParser_t::createBook(std::string filename)
 {
 	//Load in the text from a file.
-	std::string tempstr = "books/";
+	DynamicString tempstr = "books/";
 	tempstr.append(filename);
 	if ( PHYSFS_getRealDir(tempstr.c_str()) != nullptr )
 	{
-		std::string path = PHYSFS_getRealDir(tempstr.c_str());
+		DynamicString path = PHYSFS_getRealDir(tempstr.c_str());
 		path.append(PHYSFS_getDirSeparator());
 		tempstr = path + tempstr;
 	}
@@ -609,7 +609,7 @@ void BookParser_t::createBook(std::string filename)
 	}
 	//newBook.rawBookText = book->text;
 	
-	std::string pageText = "";
+	DynamicString pageText = "";
 	for ( auto& character : newBook.text )
 	{
 		if ( character == '\r' )
@@ -941,10 +941,10 @@ bool physfsSearchBooksToUpdate()
 	{
 		for ( auto& bookTitle : booklist )
 		{
-			std::string bookFilename = "books/" + bookTitle;
+			DynamicString bookFilename = "books/" + bookTitle;
 			if ( PHYSFS_getRealDir(bookFilename.c_str()) != nullptr )
 			{
-				std::string bookDir = PHYSFS_getRealDir(bookFilename.c_str());
+				DynamicString bookDir = PHYSFS_getRealDir(bookFilename.c_str());
 				if ( bookDir.compare("./") != 0 )
 				{
 					// found a book not belonging in the base path.

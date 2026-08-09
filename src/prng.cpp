@@ -230,7 +230,7 @@ int BaronyRNG::getSeed(void* out, size_t size) const {
 void BaronyRNG::getBytes(void* data_, size_t size) {
 #ifndef NDEBUG
     /*if (this == &local_rng) {
-        std::string str = stackTrace();
+        DynamicString str = stackTrace();
         if (!str.empty() && str.find("gameLogic") == std::string::npos) {
             printlog(str.c_str());
         }

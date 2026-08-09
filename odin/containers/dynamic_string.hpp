@@ -99,6 +99,7 @@ public:
     DynamicString& operator+=(const char* cstr) { barony_dynamic_string_append(this, cstr, (int64_t)std::strlen(cstr)); return *this; }
     // append a single char (std::string::operator+=(char))
     DynamicString& operator+=(char c) { barony_dynamic_string_append(this, &c, 1); return *this; }
+    void push_back(char c) { barony_dynamic_string_append(this, &c, 1); }
     DynamicString& operator+=(const DynamicString& other) { barony_dynamic_string_append(this, other.data, other.len); return *this; }
     DynamicString& append(const char* cstr) { barony_dynamic_string_append(this, cstr, (int64_t)std::strlen(cstr)); return *this; }
     DynamicString& append(const char* bytes, int64_t n) { barony_dynamic_string_append(this, bytes, (int)n); return *this; }
@@ -131,6 +132,17 @@ public:
     // find a single char (std::string::find(char))
     int64_t find(char c) const { return barony_dynamic_string_find(this, &c, 1, 0); }
     int64_t find(char c, int64_t start) const { return barony_dynamic_string_find(this, &c, 1, (int)start); }
+    // find last occurrence of a cstr (std::string::rfind) — reverse scan
+    int64_t rfind(const char* needle) const {
+        int64_t n = (int64_t)std::strlen(needle);
+        if (n == 0) return len;
+        if (n > len) return -1;
+        for (int64_t i = len - n; i >= 0; --i) {
+            if (std::memcmp(data + i, needle, n) == 0) return i;
+        }
+        return -1;
+    }
+    int64_t rfind(const std::string& needle) const { return rfind(needle.c_str()); }
     // find first of any char in the set (std::string::find_first_of)
     int64_t find_first_of(const char* set, int64_t start = 0) const { return barony_dynamic_string_find_first_of(this, set, (int)start); }
     // erase [pos, pos+count) in place (std::string::erase); count=-1 = to end
