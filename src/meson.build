@@ -365,6 +365,9 @@ if host_system == 'windows'
         odin_root / 'main.odin',
         odin_root / 'game.odin',
         odin_root / 'prng.odin',
+        odin_root / 'containers' / 'dynamic_array.odin',
+        odin_root / 'containers' / 'dynamic_map.odin',
+        odin_root / 'containers' / 'dynamic_string.odin',
       ],
       depends : [barony_game_lib],
       command : [
@@ -383,6 +386,9 @@ if host_system == 'windows'
         input : [
           odin_root / 'main.odin',
           odin_root / 'editor.odin',
+          odin_root / 'containers' / 'dynamic_array.odin',
+          odin_root / 'containers' / 'dynamic_map.odin',
+          odin_root / 'containers' / 'dynamic_string.odin',
         ],
         depends : [barony_editor_lib],
         command : [
