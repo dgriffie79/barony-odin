@@ -5540,9 +5540,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgPrimaryIcon->path = icon.iconPath;
                     
                     DynamicString iconText = icon.text;
-                    std::string iconTextStr = iconText.c_str();
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
-                    iconText = iconTextStr.c_str();
+                    DynamicString conditionalAttribute = icon.conditionalAttribute.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, conditionalAttribute, parentFrame);
+                    icon.conditionalAttribute = conditionalAttribute.c_str();
                     
                     if ( tooltipType.find("tooltip_spell_") != std::string::npos && iconText == "" )
                     {
@@ -5576,9 +5576,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgSecondaryIcon->path = overrideIconType ? overrideIconType->iconPath : icon.iconPath;
                     
                     DynamicString iconText = overrideIconType ? overrideIconType->text : icon.text;
-                    std::string iconTextStr = iconText.c_str();
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
-                    iconText = iconTextStr.c_str();
+                    DynamicString conditionalAttribute = icon.conditionalAttribute.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, conditionalAttribute, parentFrame);
+                    icon.conditionalAttribute = conditionalAttribute.c_str();
                     
                     DynamicString bracketText = "";
                     ItemTooltips.stripOutHighlightBracketText(iconText, bracketText);
@@ -5605,9 +5605,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgThirdIcon->path = icon.iconPath;
                     
                     DynamicString iconText = icon.text;
-                    std::string iconTextStr = iconText.c_str();
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
-                    iconText = iconTextStr.c_str();
+                    DynamicString conditionalAttribute = icon.conditionalAttribute.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, conditionalAttribute, parentFrame);
+                    icon.conditionalAttribute = conditionalAttribute.c_str();
                     
                     DynamicString bracketText = "";
                     ItemTooltips.stripOutHighlightBracketText(iconText, bracketText);

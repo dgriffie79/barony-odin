@@ -192,10 +192,10 @@ public:
 
 		bool readKeyToItemEntry(rapidjson::Value::ConstMemberIterator& itr)
 		{
-			std::string name = itr->name.GetString();
+			DynamicString name = itr->name.GetString();
 			if ( name.compare("type") == 0 )
 			{
-				std::string itemName = "empty";
+				DynamicString itemName = "empty";
 				if ( itr->value.IsArray() )
 				{
 					itemName = getRandomArrayStr(itr->value.GetArray(), "empty");
@@ -221,7 +221,7 @@ public:
 			}
 			else if ( name.compare("status") == 0 )
 			{
-				std::string status = "broken";
+				DynamicString status = "broken";
 				if ( itr->value.IsArray() )
 				{
 					status = getRandomArrayStr(itr->value.GetArray(), "broken");
@@ -275,7 +275,7 @@ public:
 				}
 				else if ( itr->value.IsString() )
 				{
-					std::string str = itr->value.GetString();
+					DynamicString str = itr->value.GetString();
 					if ( str.compare("random") == 0 )
 					{
 						this->appearance = monster_stat_rng.rand();
@@ -868,7 +868,7 @@ public:
 
 	bool readKeyToStatEntry(StatEntry& statEntry, rapidjson::Value::ConstMemberIterator& itr)
 	{
-		std::string name = itr->name.GetString();
+		DynamicString name = itr->name.GetString();
 		if ( name.compare("name") == 0 )
 		{
 			strcpy(statEntry.name, itr->value.GetString());
@@ -876,7 +876,7 @@ public:
 		}
 		else if ( name.compare("type") == 0 )
 		{
-			std::string val = itr->value.GetString();
+			DynamicString val = itr->value.GetString();
 			for ( int i = 0; i < NUMMONSTERS; ++i )
 			{
 				if ( val.compare(monstertypename[i]) == 0 )
@@ -1060,15 +1060,15 @@ public:
 	void writeToFile(rapidjson::Document& d, std::string monsterFileName)
 	{
 		int filenum = 0;
-		std::string testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
+		DynamicString testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
 		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
 		{
 			++filenum;
 			testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
 		}
-		std::string outputPath = PHYSFS_getRealDir("/data/custom-monsters/");
+		DynamicString outputPath = PHYSFS_getRealDir("/data/custom-monsters/");
 		outputPath.append(PHYSFS_getDirSeparator());
-		std::string fileName = "data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
+		DynamicString fileName = "data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
 		outputPath.append(fileName.c_str());
 
 
@@ -1086,7 +1086,7 @@ public:
 
 	StatEntry* readFromFile(std::string monsterFileName)
 	{
-		std::string filePath = "/data/custom-monsters/";
+		DynamicString filePath = "/data/custom-monsters/";
 		filePath.append(monsterFileName);
 		if ( filePath.find(".json") == std::string::npos )
 		{
@@ -1094,7 +1094,7 @@ public:
 		}
 		if ( PHYSFS_getRealDir(filePath.c_str()) )
 		{
-			std::string inputPath = PHYSFS_getRealDir(filePath.c_str());
+			DynamicString inputPath = PHYSFS_getRealDir(filePath.c_str());
 			inputPath.append(filePath);
 
 			File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -1138,7 +1138,7 @@ public:
 			const rapidjson::Value& equipped_items = d["equipped_items"];
 			for ( rapidjson::Value::ConstMemberIterator itemSlot_itr = equipped_items.MemberBegin(); itemSlot_itr != equipped_items.MemberEnd(); ++itemSlot_itr )
 			{
-				std::string slotName = itemSlot_itr->name.GetString();
+				DynamicString slotName = itemSlot_itr->name.GetString();
 				if ( itemSlot_itr->value.IsArray() )
 				{
 					std::vector<std::pair<ItemEntry, int>> itemsToChoose;
@@ -1294,7 +1294,7 @@ public:
 							++index;
 						}
 
-						std::string result = statEntry->shopkeeperStoreTypes.at(monster_stat_rng.discrete(storeChances.data(), storeChances.size())).first;
+						DynamicString result = statEntry->shopkeeperStoreTypes.at(monster_stat_rng.discrete(storeChances.data(), storeChances.size())).first;
 						index = 0;
 						for ( auto& lookup : shopkeeperTypeStrings )
 						{
@@ -1369,7 +1369,7 @@ public:
 	class LevelCurve
 	{
 	public:
-		std::string mapName = "";
+		DynamicString mapName = "";
 		std::vector<MonsterCurveEntry> monsterCurve;
 		std::vector<MonsterCurveEntry> fixedSpawns;
 	};
@@ -1382,7 +1382,7 @@ public:
 		real_t y = 0.0;
 		int leaderType = NOTHING;
 		Uint32 uid = 0;
-		std::string followerName = "";
+		DynamicString followerName = "";
 	};
 	std::vector<FollowerGenerateDetails_t> followersToGenerateForLeaders;
 	inline bool inUse() { return usingCustomManager; };
@@ -1396,7 +1396,7 @@ public:
 		usingCustomManager = false;
 		if ( PHYSFS_getRealDir("/data/monstercurve.json") )
 		{
-			std::string inputPath = PHYSFS_getRealDir("/data/monstercurve.json");
+			DynamicString inputPath = PHYSFS_getRealDir("/data/monstercurve.json");
 			inputPath.append("/data/monstercurve.json");
 
 			File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -1560,7 +1560,7 @@ public:
 		printlog("[MonsterCurveCustomManager]: Error: default to nothing.");
 		return NOTHING;
 	}
-	std::string rollMonsterVariant(std::string currentMap, int monsterType)
+	std::string rollMonsterVariant(DynamicString currentMap, int monsterType)
 	{
 		for ( LevelCurve& curve : allLevelCurves )
 		{
@@ -1601,7 +1601,7 @@ public:
 		}
 		return "default";
 	}
-	std::string rollFixedMonsterVariant(std::string currentMap, int monsterType)
+	std::string rollFixedMonsterVariant(DynamicString currentMap, int monsterType)
 	{
 		for ( LevelCurve& curve : allLevelCurves )
 		{
@@ -1637,7 +1637,7 @@ public:
 			outMonsterType = myStats->type;
 			while ( statEntry->numFollowers > 0 )
 			{
-				std::string followerName = statEntry->getFollowerVariant();
+				DynamicString followerName = statEntry->getFollowerVariant();
 				if ( followerName.compare("") && followerName.compare("none") )
 				{
 					followersToGenerateForLeaders.push_back(FollowerGenerateDetails_t());
@@ -1814,15 +1814,15 @@ public:
 	void writeToFile(rapidjson::Document& d)
 	{
 		int filenum = 0;
-		std::string testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
+		DynamicString testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
 		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
 		{
 			++filenum;
 			testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
 		}
-		std::string outputPath = PHYSFS_getRealDir("/data/");
+		DynamicString outputPath = PHYSFS_getRealDir("/data/");
 		outputPath.append(PHYSFS_getDirSeparator());
-		std::string fileName = "data/monstercurve_export" + std::to_string(filenum) + ".json";
+		DynamicString fileName = "data/monstercurve_export" + std::to_string(filenum) + ".json";
 		outputPath.append(fileName.c_str());
 
 		File* fp = FileIO::open(outputPath.c_str(), "wb");
@@ -1883,7 +1883,7 @@ public:
 	{
 	public:
 		MapGeneration(std::string name) { mapName = name; };
-		std::string mapName = "";
+		DynamicString mapName = "";
 		std::vector<std::string> trapTypes;
 		std::unordered_set<int> minoFloors;
 		std::unordered_set<int> darkFloors;
@@ -2024,15 +2024,15 @@ public:
 	void writeToFile(rapidjson::Document& d)
 	{
 		int filenum = 0;
-		std::string testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
+		DynamicString testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
 		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
 		{
 			++filenum;
 			testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
 		}
-		std::string outputPath = PHYSFS_getRealDir("/data/");
+		DynamicString outputPath = PHYSFS_getRealDir("/data/");
 		outputPath.append(PHYSFS_getDirSeparator());
-		std::string fileName = "data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
+		DynamicString fileName = "data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
 		outputPath.append(fileName.c_str());
 
 		File* fp = FileIO::open(outputPath.c_str(), "wb");
@@ -2053,7 +2053,7 @@ public:
 		resetValues();
 		if ( PHYSFS_getRealDir("/data/gameplaymodifiers.json") )
 		{
-			std::string inputPath = PHYSFS_getRealDir("/data/gameplaymodifiers.json");
+			DynamicString inputPath = PHYSFS_getRealDir("/data/gameplaymodifiers.json");
 			inputPath.append("/data/gameplaymodifiers.json");
 
 			File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -2091,7 +2091,7 @@ public:
 
 	bool readKeyToGameplayProperty(rapidjson::Value::ConstMemberIterator& itr)
 	{
-		std::string name = itr->name.GetString();
+		DynamicString name = itr->name.GetString();
 		if ( name.compare("version") == 0 )
 		{
 			return true;
@@ -2190,7 +2190,7 @@ public:
 		{
 			for ( rapidjson::Value::ConstMemberIterator map_itr = itr->value.MemberBegin(); map_itr != itr->value.MemberEnd(); ++map_itr )
 			{
-				std::string mapName = map_itr->name.GetString();
+				DynamicString mapName = map_itr->name.GetString();
 				MapGeneration m(mapName);
 				for ( rapidjson::Value::ConstMemberIterator obj_itr = map_itr->value.MemberBegin(); obj_itr != map_itr->value.MemberEnd(); ++obj_itr )
 				{
@@ -2206,7 +2206,7 @@ public:
 
 	bool readKeyToMapGenerationProperty(MapGeneration& m, rapidjson::Value::ConstMemberIterator& itr)
 	{
-		std::string name = itr->name.GetString();
+		DynamicString name = itr->name.GetString();
 		if ( name.compare("trap_generation_types") == 0 )
 		{
 			m.usingTrapTypes = true;
@@ -2518,11 +2518,11 @@ public:
 
 			bool isActive() { return inUse; }
 			bool isActive(ChallengeEvents_t _eventType) { return inUse && (eventType == _eventType); }
-			std::string scenarioStr = "";
-			std::string lid = "";
+			DynamicString scenarioStr = "";
+			DynamicString lid = "";
 			int lid_version = -1;
 			Uint32 seed = 0;
-			std::string seed_word = "";
+			DynamicString seed_word = "";
 			Uint32 lockedFlags = 0;
 			Uint32 setFlags = 0;
 			int classnum = -1;
@@ -2589,7 +2589,7 @@ public:
 
 	class Tutorial_t
 	{
-		std::string currentMap = "";
+		DynamicString currentMap = "";
 		const Uint32 kNumTutorialLevels = 10;
 	public:
 		void init()
@@ -2633,8 +2633,8 @@ public:
 			void onClickEntry();
 			int windowScroll = 0;
 			int selectedMenuItem = -1;
-			std::string windowTitle = "";
-			std::string defaultHoverText = "";
+			DynamicString windowTitle = "";
+			DynamicString defaultHoverText = "";
 		} Menu;
 
 		class FirstTimePrompt_t
@@ -2661,9 +2661,9 @@ public:
 				description = "";
 				completionTime = 0;
 			};
-			std::string filename;
-			std::string title;
-			std::string description;
+			DynamicString filename;
+			DynamicString title;
+			DynamicString description;
 			Uint32 completionTime;
 		};
 		std::vector<Level_t> levels;
@@ -2672,13 +2672,13 @@ public:
 		void writeToDocument();
 
 #if defined(LINUX)
-		const std::string tutorialScoresFilename = "/savegames/tutorial_scores_2.json";
+		const DynamicString tutorialScoresFilename = "/savegames/tutorial_scores_2.json";
 #else
-		const std::string tutorialScoresFilename = "/savegames/tutorial_scores.json";
+		const DynamicString tutorialScoresFilename = "/savegames/tutorial_scores.json";
 #endif
 		void writeToFile(rapidjson::Document& d)
 		{
-			std::string outputPath = outputdir;
+			DynamicString outputPath = outputdir;
 			outputPath.append(tutorialScoresFilename.c_str());
 
 			File* fp = FileIO::open(outputPath.c_str(), "wb");
@@ -2710,9 +2710,9 @@ class IRCHandler_t
 	std::vector<char> recvBuffer;
 	struct Auth_t
 	{
-		std::string oauth = "";
-		std::string chatroom = "";
-		std::string username = "";
+		DynamicString oauth = "";
+		DynamicString chatroom = "";
+		DynamicString username = "";
 	} auth;
 public:
 	IRCHandler_t()
@@ -2737,7 +2737,7 @@ class ItemTooltips_t
 {
 	struct tmpItem_t
 	{
-		std::string internalName = "nothing";
+		DynamicString internalName = "nothing";
 		Sint32 itemId = -1;
 		Sint32 fpIndex = -1;
 		Sint32 tpIndex = -1;
@@ -2745,11 +2745,11 @@ class ItemTooltips_t
 		Sint32 gold = 0;
 		Sint32 weight = 0;
 		Sint32 itemLevel = -1;
-		std::string category = "nothing";
-		std::string equipSlot = "nothing";
+		DynamicString category = "nothing";
+		DynamicString equipSlot = "nothing";
 		std::vector<std::string> imagePaths;
 		DynamicMapI32 attributes;
-		std::string tooltip = "tooltip_default";
+		DynamicString tooltip = "tooltip_default";
 		std::string iconLabelPath = "";
 	};
 
@@ -2786,14 +2786,14 @@ private:
 	struct spellItem_t
 	{
 		Sint32 id;
-		std::string internalName;
-		std::string name;
-		std::string name_lowercase;
-		std::string spellTypeStr;
+		DynamicString internalName;
+		DynamicString name;
+		DynamicString name_lowercase;
+		DynamicString spellTypeStr;
 		SpellItemTypes spellType;
-		std::string spellbookInternalName;
-		std::string magicstaffInternalName;
-		std::string fociInternalName;
+		DynamicString spellbookInternalName;
+		DynamicString magicstaffInternalName;
+		DynamicString fociInternalName;
 		Sint32 spellbookId = -1;
 		Sint32 magicstaffId = -1;
 		Sint32 fociId = -1;
@@ -2841,10 +2841,10 @@ private:
 public:
 	struct ItemTooltipIcons_t
 	{
-		std::string iconPath = "";
-		std::string text = "";
+		DynamicString iconPath = "";
+		DynamicString text = "";
 		Uint32 textColor = 0xFFFFFFFF;
-		std::string conditionalAttribute = "";
+		DynamicString conditionalAttribute = "";
 		ItemTooltipIcons_t(std::string _path, std::string _text)
 		{
 			iconPath = _path;
@@ -2895,8 +2895,8 @@ public:
 	//std::map<int, std::vector<std::pair<int, Sint32>>> itemValueTableByCategory;
 	struct ItemLocalization_t
 	{
-		std::string name_identified = "";
-		std::string name_unidentified = "";
+		DynamicString name_identified = "";
+		DynamicString name_unidentified = "";
 	};
 	std::map<std::string, ItemLocalization_t> itemNameLocalizations;
 	DynamicMapStr bookNameLocalizations;
@@ -2965,7 +2965,7 @@ public:
 	void refreshAllStatues();
 	void resetStatueEditor();
 	static Uint32 statueId;
-	std::string exportFileName = "";
+	DynamicString exportFileName = "";
 	int exportRotations = 0;
 	bool exportActive = false;
 	rapidjson::Document exportDocument;
@@ -3005,7 +3005,7 @@ class DebugTimers_t
 {
 	std::map<std::string, std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>>> timepoints;
 public:
-	void addTimePoint(std::string key, std::string desc = "") { timepoints[key].push_back(std::make_pair(desc, std::chrono::high_resolution_clock::now())); }
+	void addTimePoint(std::string key, DynamicString desc = "") { timepoints[key].push_back(std::make_pair(desc, std::chrono::high_resolution_clock::now())); }
 	void printTimepoints(std::string key, int& posy);
 	void clearTimepoints(std::string key) { timepoints[key].clear(); }
 	void clearAllTimepoints() { timepoints.clear(); }
@@ -3015,24 +3015,24 @@ extern DebugTimers_t DebugTimers;
 
 class GlyphRenderer_t
 {
-	std::string baseSourceFolder = "";
-	std::string renderedGlyphFolder = "";
-	std::string basePressedGlyphPath = "";
-	std::string baseUnpressedGlyphPath = "";
-	std::string pressedRenderedPrefix = "";
-	std::string unpressedRenderedPrefix = "";
-	std::string defaultstring = "";
+	DynamicString baseSourceFolder = "";
+	DynamicString renderedGlyphFolder = "";
+	DynamicString basePressedGlyphPath = "";
+	DynamicString baseUnpressedGlyphPath = "";
+	DynamicString pressedRenderedPrefix = "";
+	DynamicString unpressedRenderedPrefix = "";
+	DynamicString defaultstring = "";
 public:
 	struct GlyphData_t
 	{
-		std::string keyname = "";
-		std::string folder = "";
-		std::string fullpath = "";
-		std::string pressedRenderedFullpath = "";
-		std::string unpressedRenderedFullpath = "";
-		std::string filename = "";
-		std::string unpressedGlyphPath = "";
-		std::string pressedGlyphPath = "";
+		DynamicString keyname = "";
+		DynamicString folder = "";
+		DynamicString fullpath = "";
+		DynamicString pressedRenderedFullpath = "";
+		DynamicString unpressedRenderedFullpath = "";
+		DynamicString filename = "";
+		DynamicString unpressedGlyphPath = "";
+		DynamicString pressedGlyphPath = "";
 		int render_offsetx = 0;
 		int render_offsety = 0;
 		int keycode = SDLK_UNKNOWN;
@@ -3043,7 +3043,7 @@ public:
 	~GlyphRenderer_t() {};
 	bool readFromFile();
 	void renderGlyphsToPNGs();
-	std::string& getGlyphPath(int scancode, bool pressed = false) 
+	DynamicString& getGlyphPath(int scancode, bool pressed = false) 
 	{ 
 		if ( allGlyphs.find(scancode) != allGlyphs.end() )
 		{ 
@@ -3091,24 +3091,24 @@ public:
 
 	struct Entry_t
 	{
-		std::string name = "";
+		DynamicString name = "";
 		std::vector<std::string> rawText;
 		struct Variable_t
 		{
 			VariableTypes type = TEXT;
-			std::string value = "";
+			DynamicString value = "";
 			int numericValue = 0;
 			int sizex = 0;
 			int sizey = 0;
 		};
 		std::vector<Variable_t> variables;
-		std::string formattedText = "";
+		DynamicString formattedText = "";
 		ObjectType_t objectType = OBJ_MESSAGE;
 		int hjustify = 4;
 		int vjustify = 0;
 		std::vector<int> padPerLine;
 		int padTopY = 0;
-		std::string font = "";
+		DynamicString font = "";
 		Uint32 fontColor = 0xFFFFFFFF;
 		Uint32 fontOutlineColor = 0xFFFFFFFF;
 		Uint32 fontHighlightColor = 0xFFFFFFFF;
@@ -3119,8 +3119,8 @@ public:
 		struct AdditionalContentProperties_t
 		{
 			SDL_Rect pos{0, 0, 0, 0};
-			std::string path = "";
-			std::string bgPath = "";
+			DynamicString path = "";
+			DynamicString bgPath = "";
 			int imgBorder = 0;
 		};
 		AdditionalContentProperties_t signVideoContent;
@@ -3166,8 +3166,8 @@ class VideoManager_t
 	static void destroy();
 	void draw();
 	static void init();
-	std::string currentfile = "";
-	std::string currentfilePath = "";
+	DynamicString currentfile = "";
+	DynamicString currentfilePath = "";
 public:
 	VideoManager_t() {};
 	~VideoManager_t() { destroyClip(); };
@@ -3258,13 +3258,13 @@ struct LocalAchievements_t
 {
 	struct Achievement_t
 	{
-		std::string name;
+		DynamicString name;
 		bool unlocked = false;
 		int64_t unlockTime = 0;
 	};
 	struct Statistic_t
 	{
-		std::string name;
+		DynamicString name;
 		int value = 0;
 	};
 	std::map<std::string, Achievement_t> achievements;
@@ -3351,9 +3351,9 @@ struct EditorEntityData_t
 		std::vector<int> gib_hit;
 		std::vector<int> sfxBreak;
 		int sfxHit = 0;
-		std::string damageCalculationType = "default";
-		std::string name = "";
-		std::string hpbarLookupName = "object";
+		DynamicString damageCalculationType = "default";
+		DynamicString name = "";
+		DynamicString hpbarLookupName = "object";
 		int entityLangEntry = 4335;
 		int hitMessageLangEntry = 2509;
 		int breakMessageLangEntry = 2510;
@@ -3445,8 +3445,8 @@ struct Mods
 	static std::vector<std::pair<std::string, uint64>> workshopLoadedFileIDMap;
 	struct WorkshopTags_t
 	{
-		std::string tag;
-		std::string text;
+		DynamicString tag;
+		DynamicString text;
 		WorkshopTags_t(const char* _tag, const char* _text)
 		{
 			tag = _tag;
@@ -3460,7 +3460,7 @@ struct Mods
 	static Uint32 uploadTicks;
 	static Uint32 processedOnTick;
 	static int uploadNumRetries;
-	static std::string getFolderFullPath(std::string input);
+	static std::string getFolderFullPath(DynamicString input);
 	static bool forceDownloadCachedImages;
 #endif
 	static void updateModCounts();
@@ -3612,12 +3612,12 @@ struct Compendium_t
 			ACH_TYPE_DLC3,
 			ACH_TYPE_DLC1_DLC2_DLC3
 		};
-		std::string name;
-		std::string desc;
-		std::string desc_formatted;
+		DynamicString name;
+		DynamicString desc;
+		DynamicString desc_formatted;
 		bool hidden = false;
 		AchievementDLCType dlcType = ACH_TYPE_NORMAL;
-		std::string category = "";
+		DynamicString category = "";
 		int lorePoints = 0;
 		int64_t unlockTime = 0;
 		bool unlocked = false;
@@ -3647,7 +3647,7 @@ struct Compendium_t
 		static bool sortAlphabetical;
 	};
 	static std::unordered_map<std::string, AchievementData_t> achievements;
-	static std::string compendium_sorting;
+	static DynamicString compendium_sorting;
 	static bool compendium_sorting_hide_undiscovered;
 	static bool compendium_sorting_hide_ach_unlocked;
 
@@ -4062,7 +4062,7 @@ struct Compendium_t
 		struct Monster_t
 		{
 			int monsterType = NOTHING;
-			std::string unique_npc = "";
+			DynamicString unique_npc = "";
 			std::vector<std::string> blurb;
 			std::vector<Sint32> hp;
 			std::vector<Sint32> spd;
@@ -4078,7 +4078,7 @@ struct Compendium_t
 			std::array<int, 7> resistances;
 			std::vector<std::string> abilities;
 			std::vector<std::string> inventory;
-			std::string imagePath = "";
+			DynamicString imagePath = "";
 			std::vector<std::string> models;
 			std::set<std::string> unlockAchievements;
 			int lorePoints = 0;
@@ -4119,14 +4119,14 @@ struct Compendium_t
 		struct World_t
 		{
 			int modelIndex = -1;
-			std::string imagePath = "";
+			DynamicString imagePath = "";
 			std::vector<std::string> models;
 			std::vector<std::string> blurb;
 			std::vector<Uint32> linesToHighlight;
 			std::vector<std::string> details;
 			std::set<std::string> unlockAchievements;
 			std::set<EventTags> unlockTags;
-			std::string featureImg = "";
+			DynamicString featureImg = "";
 			int id = -1;
 			int lorePoints = 0;
 		};
@@ -4146,13 +4146,13 @@ struct Compendium_t
 		struct Codex_t
 		{
 			int modelIndex = -1;
-			std::string imagePath = "";
+			DynamicString imagePath = "";
 			std::vector<std::string> renderedImagePaths;
 			std::vector<std::string> blurb;
 			std::vector<Uint32> linesToHighlight;
 			std::vector<std::string> details;
 			std::vector<std::string> models;
-			std::string featureImg = "";
+			DynamicString featureImg = "";
 			int id = -1;
 			CompendiumView_t view;
 			int lorePoints = 0;
@@ -4177,14 +4177,14 @@ struct Compendium_t
 		{
 			struct CodexItem_t
 			{
-				std::string name = "";
+				DynamicString name = "";
 				int rotation = 0;
 				int spellID = -1;
 				int effectID = -1;
 				int itemID = -1;
 			};
 			int modelIndex = -1;
-			std::string imagePath = "";
+			DynamicString imagePath = "";
 			std::vector<std::string> blurb;
 			std::vector<CodexItem_t> items_in_category;
 			int lorePoints = 0;
@@ -4257,8 +4257,8 @@ struct Compendium_t
 
 	struct CompendiumEntityCurrent
 	{
-		std::string contentsName = "";
-		std::string modelName = "";
+		DynamicString contentsName = "";
+		DynamicString modelName = "";
 		int modelIndex = -1;
 		Uint32 modelRNG = 0;
 		void set(std::string _contentsName, std::string _modelName, int _modelIndex = -1)
@@ -4300,7 +4300,7 @@ struct Compendium_t
 			Type type = SUM;
 			EventTrackingType eventTrackingType = ALWAYS_UPDATE;
 			ClientUpdateType clienttype = CLIENT_ONLY;
-			std::string name = "";
+			DynamicString name = "";
 			int id = CPDM_EVENT_TAGS_MAX;
 			std::set<std::string> attributes;
 		};

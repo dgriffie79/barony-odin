@@ -871,7 +871,19 @@ void lowercaseString(std::string& str)
 		}
 	}
 }
+void lowercaseString(DynamicString& str)
+{
+	if ( str.size() < 1 ) { return; }
+	for ( auto& letter : str )
+	{
+		if ( letter >= 'A' && letter <= 'Z' )
+		{
+			letter = tolower(letter);
+		}
+	}
+}
 #endif
+
 
 void hashSpellProp(Uint32& hash, Uint32& hashShift, int& toSet)
 {
@@ -4864,6 +4876,15 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 	}
 	str = buf;
 #endif
+}
+
+// DynamicString overload (bridges — the std::string version writes into str + conditionalAttribute)
+void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, Item& item, DynamicString& str, int iconIndex, DynamicString& conditionalAttribute, Frame* parentFrame)
+{
+	std::string s(str.c_str()), c(conditionalAttribute.c_str());
+	formatItemIcon(player, tooltipType, item, s, iconIndex, c, parentFrame);
+	str = s.c_str();
+	conditionalAttribute = c.c_str();
 }
 
 void ItemTooltips_t::formatItemDescription(const int player, std::string tooltipType, Item& item, std::string& str)
@@ -19208,6 +19229,6 @@ std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendi
 std::map<std::string, Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> Compendium_t::AchievementData_t::achievementsBookDisplay;
 std::unordered_set<std::string> Compendium_t::AchievementData_t::achievementUnlockedLookup;
 bool Compendium_t::AchievementData_t::sortAlphabetical = false;
-std::string Compendium_t::compendium_sorting = "default";
+DynamicString Compendium_t::compendium_sorting;
 bool Compendium_t::compendium_sorting_hide_undiscovered = false;
 bool Compendium_t::compendium_sorting_hide_ach_unlocked = false;
