@@ -38182,14 +38182,14 @@ failed:
 						}
 						if ( allRevealed )
 						{
-							findUnlock->second = Compendium_t::UNLOCKED_VISITED;
+							(*unlockStatus)[entry.first] = Compendium_t::UNLOCKED_VISITED;
 							Compendium_t::PointsAnim_t::countUnreadLastTicks = 0;
 							Compendium_t::PointsAnim_t::countUnreadNotifs();
 						}
 					}
 					else if ( findUnlock->second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 					{
-						findUnlock->second = Compendium_t::LOCKED_REVEALED_VISITED;
+						(*unlockStatus)[entry.first] = Compendium_t::LOCKED_REVEALED_VISITED;
 						Compendium_t::PointsAnim_t::countUnreadLastTicks = 0;
 						Compendium_t::PointsAnim_t::countUnreadNotifs();
 					}
@@ -38681,7 +38681,7 @@ failed:
 							auto findUnlock = unlockStatus->find(data.first);
 							if ( findUnlock != unlockStatus->end() )
 							{
-								unlockCurrentStatus = findUnlock->second;
+								unlockCurrentStatus = (Compendium_t::CompendiumUnlockStatus)findUnlock->second;
 								unlocked = findUnlock->second > Compendium_t::LOCKED_UNKNOWN;
 								drawNotification = unlocked
 									&& (findUnlock->second == Compendium_t::UNLOCKED_UNVISITED
@@ -40484,7 +40484,7 @@ failed:
 								unlockFound = true;
 								if ( findUnlock->second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 								{
-									findUnlock->second = Compendium_t::UNLOCKED_UNVISITED;
+									(*unlockStatus)[compendium_contents_current[compendium_current]] = Compendium_t::UNLOCKED_UNVISITED;
 								}
 								else if ( findUnlock->second == Compendium_t::LOCKED_REVEALED_VISITED )
 								{
@@ -40509,11 +40509,11 @@ failed:
 									}
 									if ( allRevealed )
 									{
-										findUnlock->second = Compendium_t::UNLOCKED_VISITED;
+										(*unlockStatus)[compendium_contents_current[compendium_current]] = Compendium_t::UNLOCKED_VISITED;
 									}
 									else
 									{
-										findUnlock->second = Compendium_t::UNLOCKED_UNVISITED;
+										(*unlockStatus)[compendium_contents_current[compendium_current]] = Compendium_t::UNLOCKED_UNVISITED;
 
 										if ( main_menu_frame )
 										{

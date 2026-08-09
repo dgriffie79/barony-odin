@@ -3632,7 +3632,7 @@ struct Compendium_t
 		static void onAchievementUnlock(const char* ach);
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
-		static std::map<std::string, CompendiumUnlockStatus> unlocks;
+		static DynamicMapI32 unlocks;
 		static int completionPercent;
 		static int numUnread;
 		static void readContentsLang();
@@ -4088,7 +4088,7 @@ struct Compendium_t
 		static DynamicMapStr contentsMap;
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents_unfiltered;
 		static void readContentsLang();
-		static std::map<std::string, CompendiumUnlockStatus> unlocks;
+		static DynamicMapI32 unlocks;
 		static int completionPercent;
 		static int numUnread;
 	};
@@ -4133,7 +4133,7 @@ struct Compendium_t
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
-		static std::map<std::string, CompendiumUnlockStatus> unlocks;
+		static DynamicMapI32 unlocks;
 		static int completionPercent;
 		static int numUnread;
 	};
@@ -4161,7 +4161,7 @@ struct Compendium_t
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
-		static std::map<std::string, CompendiumUnlockStatus> unlocks;
+		static DynamicMapI32 unlocks;
 		static int completionPercent;
 		static int numUnread;
 	};
@@ -4192,7 +4192,7 @@ struct Compendium_t
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
-		static std::map<std::string, CompendiumUnlockStatus> unlocks;
+		static DynamicMapI32 unlocks;
 		static std::map<int, CompendiumUnlockStatus> itemUnlocks;
 		static int completionPercent;
 		static int numUnread;

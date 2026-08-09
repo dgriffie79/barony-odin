@@ -12638,21 +12638,21 @@ SDL_Rect Compendium_t::tooltipPos;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents;
 DynamicMapStr Compendium_t::CompendiumMonsters_t::contentsMap;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents_unfiltered;
-std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumMonsters_t::unlocks;
+DynamicMapI32 Compendium_t::CompendiumMonsters_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumWorld_t::contents;
 DynamicMapStr Compendium_t::CompendiumWorld_t::contentsMap;
-std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumWorld_t::unlocks;
+DynamicMapI32 Compendium_t::CompendiumWorld_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumCodex_t::contents;
 DynamicMapStr Compendium_t::CompendiumCodex_t::contentsMap;
-std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumCodex_t::unlocks;
+DynamicMapI32 Compendium_t::CompendiumCodex_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumItems_t::contents;
 DynamicMapStr Compendium_t::CompendiumItems_t::contentsMap;
-std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::unlocks;
+DynamicMapI32 Compendium_t::CompendiumItems_t::unlocks;
 std::map<int, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::itemUnlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMagic_t::contents;
 DynamicMapStr Compendium_t::CompendiumMagic_t::contentsMap;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::AchievementData_t::contents;
-std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::AchievementData_t::unlocks;
+DynamicMapI32 Compendium_t::AchievementData_t::unlocks;
 DynamicMapStr Compendium_t::AchievementData_t::contentsMap;
 int Compendium_t::CompendiumMonsters_t::completionPercent = 0;
 int Compendium_t::CompendiumCodex_t::completionPercent = 0;
@@ -16309,10 +16309,12 @@ void Compendium_t::writeUnlocksSaveData()
 	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
 	rapidjson::Value obj(rapidjson::kObjectType);
 	obj.RemoveAllMembers();
-	for ( auto& pair : CompendiumItems_t::unlocks )
+	DynamicMapI32::Entry unlocksEntries_u0[512];
+	int32_t unlocksCount_u0 = CompendiumItems_t::unlocks.entryList(unlocksEntries_u0, 512);
+	for ( int32_t ui = 0; ui < unlocksCount_u0; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(pair.first.c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(rapidjson::Value(unlocksEntries_u0[ui].key, exportDocument.GetAllocator()),
+			rapidjson::Value((int)unlocksEntries_u0[ui].value), exportDocument.GetAllocator());
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "items", obj);
 
@@ -16325,34 +16327,42 @@ void Compendium_t::writeUnlocksSaveData()
 	CustomHelpers::addMemberToRoot(exportDocument, "items_status", obj);
 
 	obj.RemoveAllMembers();
-	for ( auto& pair : AchievementData_t::unlocks )
+	DynamicMapI32::Entry unlocksEntries_u1[512];
+	int32_t unlocksCount_u1 = AchievementData_t::unlocks.entryList(unlocksEntries_u1, 512);
+	for ( int32_t ui = 0; ui < unlocksCount_u1; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(pair.first.c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(rapidjson::Value(unlocksEntries_u1[ui].key, exportDocument.GetAllocator()),
+			rapidjson::Value((int)unlocksEntries_u1[ui].value), exportDocument.GetAllocator());
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "achievements", obj);
 
 	obj.RemoveAllMembers();
-	for ( auto& pair : CompendiumWorld_t::unlocks )
+	DynamicMapI32::Entry unlocksEntries_u2[512];
+	int32_t unlocksCount_u2 = CompendiumWorld_t::unlocks.entryList(unlocksEntries_u2, 512);
+	for ( int32_t ui = 0; ui < unlocksCount_u2; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(pair.first.c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(rapidjson::Value(unlocksEntries_u2[ui].key, exportDocument.GetAllocator()),
+			rapidjson::Value((int)unlocksEntries_u2[ui].value), exportDocument.GetAllocator());
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "world", obj);
 
 	obj.RemoveAllMembers();
-	for ( auto& pair : CompendiumCodex_t::unlocks )
+	DynamicMapI32::Entry unlocksEntries_u3[512];
+	int32_t unlocksCount_u3 = CompendiumCodex_t::unlocks.entryList(unlocksEntries_u3, 512);
+	for ( int32_t ui = 0; ui < unlocksCount_u3; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(pair.first.c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(rapidjson::Value(unlocksEntries_u3[ui].key, exportDocument.GetAllocator()),
+			rapidjson::Value((int)unlocksEntries_u3[ui].value), exportDocument.GetAllocator());
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "codex", obj);
 
 	obj.RemoveAllMembers();
-	for ( auto& pair : CompendiumMonsters_t::unlocks )
+	DynamicMapI32::Entry unlocksEntries[512];
+	int32_t unlocksCount = CompendiumMonsters_t::unlocks.entryList(unlocksEntries, 512);
+	for ( int32_t ui = 0; ui < unlocksCount; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(pair.first.c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(rapidjson::Value(unlocksEntries[ui].key, exportDocument.GetAllocator()),
+			rapidjson::Value((int)unlocksEntries[ui].value), exportDocument.GetAllocator());
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "monsters", obj);
 
@@ -18752,65 +18762,75 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 		countUnreadLastTicks = ticks;
 
 		int numUnread = 0;
-		for ( auto& unlockStatus : CompendiumCodex_t::unlocks )
+		DynamicMapI32::Entry entries_e0[512];
+		int32_t entryCount_e0 = CompendiumCodex_t::unlocks.entryList(entries_e0, 512);
+		for ( int32_t ui = 0; ui < entryCount_e0; ++ui )
 		{
-			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
-				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
+			if ( entries_e0[ui].value == Compendium_t::UNLOCKED_UNVISITED
+				|| entries_e0[ui].value == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumCodex_t::contentsMap.contains(unlockStatus.first) )
+				if ( CompendiumCodex_t::contentsMap.contains(entries_e0[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumCodex_t::numUnread;
 				}
 			}
 		}
-		for ( auto& unlockStatus : CompendiumWorld_t::unlocks )
+		DynamicMapI32::Entry entries_e1[512];
+		int32_t entryCount_e1 = CompendiumWorld_t::unlocks.entryList(entries_e1, 512);
+		for ( int32_t ui = 0; ui < entryCount_e1; ++ui )
 		{
-			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
-				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
+			if ( entries_e1[ui].value == Compendium_t::UNLOCKED_UNVISITED
+				|| entries_e1[ui].value == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumWorld_t::contentsMap.contains(unlockStatus.first) )
+				if ( CompendiumWorld_t::contentsMap.contains(entries_e1[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumWorld_t::numUnread;
 				}
 			}
 		}
-		for ( auto& unlockStatus : CompendiumItems_t::unlocks )
+		DynamicMapI32::Entry entries_e2[512];
+		int32_t entryCount_e2 = CompendiumItems_t::unlocks.entryList(entries_e2, 512);
+		for ( int32_t ui = 0; ui < entryCount_e2; ++ui )
 		{
-			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
-				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
+			if ( entries_e2[ui].value == Compendium_t::UNLOCKED_UNVISITED
+				|| entries_e2[ui].value == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumItems_t::contentsMap.contains(unlockStatus.first) )
+				if ( CompendiumItems_t::contentsMap.contains(entries_e2[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumItems_t::numUnread;
 				}
-				if ( CompendiumMagic_t::contentsMap.contains(unlockStatus.first) )
+				if ( CompendiumMagic_t::contentsMap.contains(entries_e2[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumMagic_t::numUnread;
 				}
 			}
 		}
-		for ( auto& unlockStatus : CompendiumMonsters_t::unlocks )
+		DynamicMapI32::Entry entries_e3[512];
+		int32_t entryCount_e3 = CompendiumMonsters_t::unlocks.entryList(entries_e3, 512);
+		for ( int32_t ui = 0; ui < entryCount_e3; ++ui )
 		{
-			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
-				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
+			if ( entries_e3[ui].value == Compendium_t::UNLOCKED_UNVISITED
+				|| entries_e3[ui].value == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumMonsters_t::contentsMap.contains(unlockStatus.first) )
+				if ( CompendiumMonsters_t::contentsMap.contains(entries_e3[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumMonsters_t::numUnread;
 				}
 			}
 		}
-		for ( auto& unlockStatus : Compendium_t::AchievementData_t::unlocks )
+		DynamicMapI32::Entry entries_e4[512];
+		int32_t entryCount_e4 = Compendium_t::AchievementData_t::unlocks.entryList(entries_e4, 512);
+		for ( int32_t ui = 0; ui < entryCount_e4; ++ui )
 		{
-			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
-				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
+			if ( entries_e4[ui].value == Compendium_t::UNLOCKED_UNVISITED
+				|| entries_e4[ui].value == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( Compendium_t::AchievementData_t::contentsMap.contains(unlockStatus.first) )
+				if ( Compendium_t::AchievementData_t::contentsMap.contains(entries_e4[ui].key) )
 				{
 					++numUnread;
 					++Compendium_t::AchievementData_t::numUnread;
