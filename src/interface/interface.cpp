@@ -1638,7 +1638,7 @@ void FollowerRadialMenu::loadFollowerJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/follower_wheel.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/follower_wheel.json");
 		inputPath.append("/data/follower_wheel.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -1810,7 +1810,7 @@ void FollowerRadialMenu::loadFollowerJSON()
 					for ( rapidjson::Value::ConstValueIterator itr = d["icons"].Begin();
 						itr != d["icons"].End(); ++itr )
 					{
-						std::string actionName = "";
+						DynamicString actionName = "";
 						if ( (*itr).HasMember("action") )
 						{
 							actionName = (*itr)["action"].GetString();
@@ -1849,8 +1849,8 @@ void FollowerRadialMenu::loadFollowerJSON()
 								for ( rapidjson::Value::ConstMemberIterator itr3 = itr2->MemberBegin();
 									itr3 != itr2->MemberEnd(); ++itr3 )
 								{
-									std::string mapKey = itr3->name.GetString();
-									std::string mapText = itr3->value["text"].GetString();
+									DynamicString mapKey = itr3->name.GetString();
+									DynamicString mapText = itr3->value["text"].GetString();
 									std::set<int> mapHighlights;
 									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
 										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
@@ -3711,8 +3711,8 @@ void FollowerRadialMenu::drawFollowerMenu()
 			}
 			else
 			{
-				std::string requirement = "";
-				std::string current = "";
+				DynamicString requirement = "";
+				DynamicString current = "";
 				int requirementVal = 0;
 				int currentVal = 0;
 				if ( highlight >= ALLY_CMD_DEFEND && highlight <= ALLY_CMD_END && highlight != ALLY_CMD_CANCEL )
@@ -6825,7 +6825,7 @@ void GenericGUIMenu::alterItem(Item* item)
 	bool isEquipped = itemIsEquipped(item, gui_player);
 
 	ItemType prevType = item->type;
-	std::string prevItem = item->getName();
+	DynamicString prevItem = item->getName();
 	if ( itemfxGUI.currentMode == ItemEffectGUI_t::ITEMFX_MODE_ALTER_INSTRUMENT )
 	{
 		int result = getAlterItemResultAtCycle(item);
@@ -6960,7 +6960,7 @@ void GenericGUIMenu::alterItem(Item* item)
 			Item* pickedUp = itemPickup(gui_player, itemToPickup);
 			int oldCount = item->count;
 			item->count = 1;
-			std::string desc = itemToPickup->description();
+			DynamicString desc = itemToPickup->description();
 			messagePlayer(gui_player, MESSAGE_MISC, Language::get(6553), desc.c_str(), item->description());
 			item->count = oldCount;
 			free(itemToPickup);
@@ -7013,7 +7013,7 @@ void GenericGUIMenu::alterItem(Item* item)
 			Item* pickedUp = itemPickup(gui_player, itemToPickup);
 			int oldCount = item->count;
 			item->count = 1;
-			std::string desc = itemToPickup->description();
+			DynamicString desc = itemToPickup->description();
 			messagePlayer(gui_player, MESSAGE_MISC, Language::get(6553), desc.c_str(), item->description());
 			item->count = oldCount;
 			free(itemToPickup);
@@ -9047,7 +9047,7 @@ bool alchemyAddRecipe(int player, int basePotion, int secondaryPotion, int resul
 		clientLearnedAlchemyRecipes[player].push_back(std::make_pair(result, std::make_pair(basePotion, secondaryPotion)));
 		if ( !hideRecipeFromList(result) )
 		{
-			std::string itemName = items[result].getIdentifiedName();
+			DynamicString itemName = items[result].getIdentifiedName();
 			size_t pos = std::string::npos;
 			for ( auto& potionName : Player::SkillSheet_t::skillSheetData.potionNamesToFilter )
 			{
@@ -9057,7 +9057,7 @@ bool alchemyAddRecipe(int player, int basePotion, int secondaryPotion, int resul
 				}
 			}
 			capitalizeString(itemName);
-			std::string iconPath = "";
+			DynamicString iconPath = "";
 			node_t* imagePathsNode = nullptr;
 			for ( auto it = potionStandardAppearanceMap.begin(); it != potionStandardAppearanceMap.end(); ++it )
 			{
@@ -10378,7 +10378,7 @@ bool GenericGUIMenu::alchemyLearnRecipe(int type, bool increaseskill, bool notif
 					{
 						messagePlayerColor(gui_player, MESSAGE_PROGRESSION, color, Language::get(3349), items[type].getIdentifiedName());
 					}
-					std::string itemName = items[type].getIdentifiedName();
+					DynamicString itemName = items[type].getIdentifiedName();
 					size_t pos = std::string::npos;
 					for ( auto& potionName : Player::SkillSheet_t::skillSheetData.potionNamesToFilter )
 					{
@@ -10388,7 +10388,7 @@ bool GenericGUIMenu::alchemyLearnRecipe(int type, bool increaseskill, bool notif
 						}
 					}
 					capitalizeString(itemName);
-					std::string iconPath = "";
+					DynamicString iconPath = "";
 					node_t* imagePathsNode = nullptr;
 					Uint32 index = (*it).second % items[type].variations;
 					imagePathsNode = list_Node(&items[type].images, index);
@@ -13253,7 +13253,7 @@ bool GenericGUIMenu::scribingWriteItem(Item* item)
 				}
 			}
 		}
-		std::string label = item->getScrollLabel();
+		DynamicString label = item->getScrollLabel();
 		Item* crafted = newItem(item->type, scribingBlankScrollTarget->status, 
 			scribingBlankScrollTarget->beatitude, 1, item->appearance, true, nullptr);
 		if ( crafted )
@@ -14213,7 +14213,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerScrapHeld(void* metalHeldText, voi
 			{
 				showChangedMetalScrap = true;
 				//changeGoldText->setDisabled(false);
-				//std::string s = "+";
+				//DynamicString s = "+";
 				//if ( playerChangeMetalScrap < 0 )
 				//{
 				//	s = "";
@@ -14248,7 +14248,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerScrapHeld(void* metalHeldText, voi
 			{
 				showChangedMagicScrap = true;
 				//changeGoldText->setDisabled(false);
-				//std::string s = "+";
+				//DynamicString s = "+";
 				//if ( playerChangeMagicScrap < 0 )
 				//{
 				//	s = "";
@@ -14628,7 +14628,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 			{
 				snprintf(buf, sizeof(buf), "%s (%+d)", item->getName(), item->beatitude);
 			}
-			std::string titleStr = buf;
+			DynamicString titleStr = buf;
 			if ( !titleStr.empty() )
 			{
 				if ( titleStr[0] >= 'a' && titleStr[0] <= 'z' )
@@ -14638,7 +14638,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 				size_t found = titleStr.find(' ');
 				while ( found != std::string::npos )
 				{
-					auto& c = titleStr[std::min(found + 1, titleStr.size() - 1)];
+					auto& c = titleStr[std::min(found + 1, (size_t)(titleStr.size() - 1))];
 					if ( c >= 'a' && c <= 'z' )
 					{
 						c = (char)toupper((int)c);
@@ -15279,7 +15279,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 				if ( displayItemName->getNumTextLines() > 2 )
 				{
 					// more than 2 lines, append ...
-					std::string copiedName = displayItemName->getText();
+					DynamicString copiedName = displayItemName->getText();
 					auto lastNewline = copiedName.find_last_of('\n');
 					copiedName = copiedName.substr(0U, lastNewline);
 					copiedName += "...";
@@ -15393,7 +15393,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 	else if ( parentGUI.tinkeringFilter == TINKER_FILTER_REPAIRABLE )
 	{
 		bool activeTooltip = (itemActionType != TINKER_ACTION_NONE && itemDesc.size() > 1);
-		std::string currentText = costScrapText->getText();
+		DynamicString currentText = costScrapText->getText();
 		if ( activeTooltip || (!activeTooltip
 			&& currentText != Language::get(4135)
 			&& currentText != Language::get(4134)) ) // if inactive tooltip, don't quickly change between upgrade/repair
@@ -17687,7 +17687,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 			{
 				snprintf(buf, sizeof(buf), "%s (%+d)", item->getName(), item->beatitude);
 			}
-			std::string titleStr = buf;
+			DynamicString titleStr = buf;
 			if ( !titleStr.empty() )
 			{
 				if ( titleStr[0] >= 'a' && titleStr[0] <= 'z' )
@@ -17697,7 +17697,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 				size_t found = titleStr.find(' ');
 				while ( found != std::string::npos )
 				{
-					auto& c = titleStr[std::min(found + 1, titleStr.size() - 1)];
+					auto& c = titleStr[std::min(found + 1, (size_t)(titleStr.size() - 1))];
 					if ( c >= 'a' && c <= 'z' )
 					{
 						c = (char)toupper((int)c);
@@ -18399,7 +18399,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 				if ( displayItemName->getNumTextLines() > 3 )
 				{
 					// more than 2 lines, append ...
-					std::string copiedName = displayItemName->getText();
+					DynamicString copiedName = displayItemName->getText();
 					auto lastNewline = copiedName.find_last_of('\n');
 					copiedName = copiedName.substr(0U, lastNewline);
 					copiedName += "...";
@@ -18417,7 +18417,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 
 				// do highlights
 				displayItemName->clearWordsToHighlight();
-				std::string str = displayItemName->getText();
+				DynamicString str = displayItemName->getText();
 				if ( str == Language::get(4167) )
 				{
 					displayItemName->setTextColor(hudColors.characterSheetRed);
@@ -18444,7 +18444,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 						++wordIndex;
 						if ( str[c] == '[' )
 						{
-							std::string toCompare = str.substr(str.find('[', c));
+							DynamicString toCompare = str.substr(str.find('[', c));
 							Uint32 color = 0;
 							if ( toCompare == Language::get(4155) )
 							{
@@ -21242,7 +21242,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherCharge(void* featherChargeText, 
 			{
 				showChangedCharge = true;
 				featherChangeChargeField->setDisabled(false);
-				std::string s = "+";
+				DynamicString s = "+";
 				if ( changeFeatherCharge < 0 )
 				{
 					s = "";
@@ -21354,7 +21354,7 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 			Item* item = (Item*)node->element;
 			if ( item )
 			{
-				std::string label = item->getScrollLabel();
+				DynamicString label = item->getScrollLabel();
 				assert(scrolls.find(label) == scrolls.end());
 
 				bool identified = false;
@@ -21422,7 +21422,7 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 			bodyTxt->setColor(hudColors.characterSheetOffWhiteText);
 			if ( scroll.second.second )
 			{
-				std::string scrollShortName = items[scroll.second.first].getIdentifiedName();
+				DynamicString scrollShortName = items[scroll.second.first].getIdentifiedName();
 				if ( scrollShortName.find(ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"]) != std::string::npos )
 				{
 					scrollShortName = scrollShortName.substr(ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"].size());
@@ -21443,7 +21443,7 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 						real_t percent = ((ticks - discovery.startTicks) / (TICKS_PER_SECOND / 10)) + 1;
 						percent /= 10.0;
 						percent = std::min(percent, 1.0);
-						size_t numChars = std::min(size_t(scrollShortName.size() * percent), scrollShortName.size());
+						size_t numChars = std::min(size_t(scrollShortName.size() * percent), (size_t)scrollShortName.size());
 						discovery.name = scrollShortName.substr(0, numChars);
 						for ( auto sz = numChars; sz < scrollShortName.size(); ++sz )
 						{
@@ -21973,7 +21973,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 			{
 				snprintf(buf, sizeof(buf), "%s (%+d)", item->getName(), item->beatitude);
 			}
-			std::string titleStr = buf;
+			DynamicString titleStr = buf;
 			if ( !titleStr.empty() )
 			{
 				if ( titleStr[0] >= 'a' && titleStr[0] <= 'z' )
@@ -21983,7 +21983,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 				size_t found = titleStr.find(' ');
 				while ( found != std::string::npos )
 				{
-					auto& c = titleStr[std::min(found + 1, titleStr.size() - 1)];
+					auto& c = titleStr[std::min(found + 1, (size_t)(titleStr.size() - 1))];
 					if ( c >= 'a' && c <= 'z' )
 					{
 						c = (char)toupper((int)c);
@@ -22571,7 +22571,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 				if ( displayItemName->getNumTextLines() > 2 )
 				{
 					// more than 2 lines, append ...
-					std::string copiedName = displayItemName->getText();
+					DynamicString copiedName = displayItemName->getText();
 					auto lastNewline = copiedName.find_last_of('\n');
 					copiedName = copiedName.substr(0U, lastNewline);
 					copiedName += "...";
@@ -23742,7 +23742,7 @@ GenericGUIMenu::FeatherGUI_t::FeatherActions_t GenericGUIMenu::FeatherGUI_t::set
 		{
 			if ( isItemInscriptionNode )
 			{
-				std::string label = item->getScrollLabel();
+				DynamicString label = item->getScrollLabel();
 				if ( !checkResultOnly )
 				{
 					currentHoveringInscriptionLabel = label;
@@ -25641,11 +25641,11 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 			
 			if ( isSpell )
 			{
-				std::string prefix = ItemTooltips.adjectives["spell_prefixes"]["spell_of"].c_str();
+				DynamicString prefix = ItemTooltips.adjectives["spell_prefixes"]["spell_of"].c_str();
 				camelCaseString(prefix);
 				itemFxTitle->setText(prefix.c_str());
 
-				std::string statusStr = "";
+				DynamicString statusStr = "";
 				if ( spell )
 				{
 					statusStr = spell->getSpellName();
@@ -25664,15 +25664,15 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 				}
 				else if ( !item->identified )
 				{
-					std::string prefix = ItemTooltips.adjectives["scroll_prefixes"]["unknown_scroll"].c_str();
+					DynamicString prefix = ItemTooltips.adjectives["scroll_prefixes"]["unknown_scroll"].c_str();
 					snprintf(buf, sizeof(buf), "%s (?)", prefix.c_str());
 				}
 				else
 				{
-					std::string prefix = ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"].c_str();
+					DynamicString prefix = ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"].c_str();
 					snprintf(buf, sizeof(buf), "%s", prefix.c_str());
 				}
-				std::string titleStr = buf;
+				DynamicString titleStr = buf;
 				if ( !titleStr.empty() )
 				{
 					camelCaseString(titleStr);
@@ -25685,7 +25685,7 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 
 				if ( item->identified )
 				{
-					std::string scrollShortName = items[item->type].getIdentifiedName();
+					DynamicString scrollShortName = items[item->type].getIdentifiedName();
 					if ( scrollShortName.find(ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"]) != std::string::npos )
 					{
 						scrollShortName = scrollShortName.substr(ItemTooltips.adjectives["scroll_prefixes"]["scroll_of"].size());
@@ -26549,7 +26549,7 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 				if ( displayItemName->getNumTextLines() > 2 )
 				{
 					// more than 2 lines, append ...
-					std::string copiedName = displayItemName->getText();
+					DynamicString copiedName = displayItemName->getText();
 					auto lastNewline = copiedName.find_last_of('\n');
 					copiedName = copiedName.substr(0U, lastNewline);
 					copiedName += "...";
@@ -27334,7 +27334,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/callout_wheel.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/callout_wheel.json");
 		inputPath.append("/data/callout_wheel.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -27463,10 +27463,10 @@ void CalloutRadialMenu::loadCalloutJSON()
 					for ( rapidjson::Value::ConstMemberIterator itr = d["world_icons"].MemberBegin();
 						itr != d["world_icons"].MemberEnd(); ++itr )
 					{
-						std::string key = (*itr).name.GetString();
+						DynamicString key = (*itr).name.GetString();
 						auto& entry = worldIconEntries[key];
 
-						std::string basePath = "*images/ui/CalloutWheel/WorldIcons/";
+						DynamicString basePath = "*images/ui/CalloutWheel/WorldIcons/";
 						entry.pathDefault = basePath + (*itr).value["default"].GetString();
 						entry.pathPlayer1 = basePath + (*itr).value["0"].GetString();
 						entry.pathPlayer2 = basePath + (*itr).value["1"].GetString();
@@ -27502,7 +27502,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 					for ( rapidjson::Value::ConstValueIterator itr = d["icons"].Begin();
 						itr != d["icons"].End(); ++itr )
 					{
-						std::string actionName = "";
+						DynamicString actionName = "";
 						if ( (*itr).HasMember("action") )
 						{
 							actionName = (*itr)["action"].GetString();
@@ -27541,21 +27541,21 @@ void CalloutRadialMenu::loadCalloutJSON()
 								for ( rapidjson::Value::ConstMemberIterator itr3 = itr2->MemberBegin();
 									itr3 != itr2->MemberEnd(); ++itr3 )
 								{
-									std::string mapKey = itr3->name.GetString();
-									std::string mapText = itr3->value["text"].GetString();
+									DynamicString mapKey = itr3->name.GetString();
+									DynamicString mapText = itr3->value["text"].GetString();
 									std::set<int> mapHighlights;
 									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
 										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
 									{
 										mapHighlights.insert(highlightItr->GetInt());
 									}
-									std::string worldMsg = "";
-									std::string worldMsgSays = "";
-									std::string worldMsgEmote = "";
-									std::string worldMsgEmoteYou = "";
-									std::string worldMsgEmoteToYou = "";
-									std::string worldIcon = "";
-									std::string worldIconMini = "";
+									DynamicString worldMsg = "";
+									DynamicString worldMsgSays = "";
+									DynamicString worldMsgEmote = "";
+									DynamicString worldMsgEmoteYou = "";
+									DynamicString worldMsgEmoteToYou = "";
+									DynamicString worldIcon = "";
+									DynamicString worldIconMini = "";
 									if ( itr3->value.HasMember("msg") )
 									{
 										worldMsg = itr3->value["msg"].GetString();
@@ -27665,7 +27665,7 @@ std::string CalloutRadialMenu::getCalloutMessage(const IconEntry::IconEntryText_
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-				std::string nameStr = shortname;
+				DynamicString nameStr = shortname;
 				nameStr = messageSanitizePercentSign(nameStr, nullptr);
 				snprintf(buf, sizeof(buf), text_map.worldMsgEmote.c_str(), nameStr.c_str(), object);
 			}
@@ -27681,7 +27681,7 @@ std::string CalloutRadialMenu::getCalloutMessage(const IconEntry::IconEntryText_
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-				std::string nameStr = shortname;
+				DynamicString nameStr = shortname;
 				nameStr = messageSanitizePercentSign(nameStr, nullptr);
 				snprintf(buf, sizeof(buf), text_map.worldMsgEmote.c_str(), nameStr.c_str());
 			}
@@ -27702,7 +27702,7 @@ std::string CalloutRadialMenu::getCalloutMessage(const IconEntry::IconEntryText_
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-				std::string playerSays = shortname;
+				DynamicString playerSays = shortname;
 				playerSays = messageSanitizePercentSign(playerSays, nullptr);
 				playerSays += ": ";
 				snprintf(buf, sizeof(buf), text_map.worldMsgSays.c_str(), playerSays.c_str(), object);
@@ -27719,7 +27719,7 @@ std::string CalloutRadialMenu::getCalloutMessage(const IconEntry::IconEntryText_
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-				std::string playerSays = shortname;
+				DynamicString playerSays = shortname;
 				playerSays = messageSanitizePercentSign(playerSays, nullptr);
 				playerSays += ": ";
 				snprintf(buf, sizeof(buf), text_map.worldMsgSays.c_str(), playerSays.c_str());
@@ -27751,7 +27751,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	{
 		return "";
 	}
-	std::string key = "default";
+	DynamicString key = "default";
 	Entity* entity = uidToEntity(lockOnEntityUid);
 	const int player = getPlayer();
 
@@ -27806,7 +27806,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		|| cmd == CALLOUT_CMD_SOUTHWEST
 		|| cmd == CALLOUT_CMD_SOUTHEAST )
 	{
-		std::string targetPlayerName = "";
+		DynamicString targetPlayerName = "";
 		
 		int toPlayer = getPlayerForDirectPlayerCmd(getPlayer(), cmd);
 		key = "player_wave";
@@ -27871,7 +27871,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-				std::string nameStr = shortname;
+				DynamicString nameStr = shortname;
 				nameStr = messageSanitizePercentSign(nameStr, nullptr);
 				char buf[128];
 				snprintf(buf, sizeof(buf), textMap.worldMsgEmoteToYou.c_str(), nameStr.c_str());
@@ -28008,7 +28008,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				auto& textMap = text_map[key];
 				auto highlights = textMap.bannerHighlights;
 
-				std::string helpText = "";
+				DynamicString helpText = "";
 
 				// hunger stats
 				{
@@ -28112,7 +28112,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		}
 		else if ( cmd == CALLOUT_CMD_LOOK )
 		{
-			std::string targetPlayerName = "";
+			DynamicString targetPlayerName = "";
 			if ( entity && (entity->behavior == &actPlayer || entity->behavior == &actDeathGhost) )
 			{
 				char shortname[32];
@@ -28155,7 +28155,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				{
 					char shortname[32];
 					stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-					std::string nameStr = shortname;
+					DynamicString nameStr = shortname;
 					nameStr = messageSanitizePercentSign(nameStr, nullptr);
 					char buf[128];
 					snprintf(buf, sizeof(buf), textMap.worldMsgEmoteToYou.c_str(), nameStr.c_str());
@@ -28171,7 +28171,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		else if ( (cmd == CALLOUT_CMD_AFFIRMATIVE && !(lockOnEntityUid == 0 || (entity && playerEntity == entity)))
 			|| cmd == CALLOUT_CMD_THANKS )
 		{
-			std::string targetPlayerName = "";
+			DynamicString targetPlayerName = "";
 			if ( entity && (entity->behavior == &actPlayer || entity->behavior == &actDeathGhost) )
 			{
 				char shortname[32];
@@ -28221,7 +28221,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				{
 					char shortname[32];
 					stringCopy(shortname, stats[getPlayer()]->name, sizeof(shortname), 22);
-					std::string nameStr = shortname;
+					DynamicString nameStr = shortname;
 					nameStr = messageSanitizePercentSign(nameStr, nullptr);
 					char buf[128];
 					snprintf(buf, sizeof(buf), textMap.worldMsgEmoteToYou.c_str(), nameStr.c_str());
@@ -28243,7 +28243,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			int monsterType = entity->getMonsterTypeFromSprite();
 			if ( monsterType >= NOTHING && monsterType < NUMMONSTERS )
 			{
-				std::string monsterName = getMonsterLocalizedName((Monster)monsterType);
+				DynamicString monsterName = getMonsterLocalizedName((Monster)monsterType);
 				bool namedNPC = false;
 				if ( multiplayer != CLIENT && monsterType != SHOPKEEPER )
 				{
@@ -28261,7 +28261,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 					}
 				}
 
-				std::string key = "npc";
+				DynamicString key = "npc";
 				if ( calloutType == CALLOUT_TYPE_NPC_PLAYERALLY )
 				{
 					key = "npc_ally";
@@ -28368,7 +28368,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			}
 		}
 
-		std::string objectName = Language::get(6383 + wallLockMaterial);
+		DynamicString objectName = Language::get(6383 + wallLockMaterial);
 
 		auto& textMap = text_map[key];
 		if ( setType == SET_CALLOUT_BANNER_TEXT )
@@ -28394,7 +28394,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		break;
 	case CALLOUT_TYPE_ITEM:
 	{
-		std::string itemName;
+		DynamicString itemName;
 		if ( entity && (multiplayer != CLIENT || (multiplayer == CLIENT && entity->itemReceivedDetailsFromServer == 1)) )
 		{
 			if ( Item* item = newItemFromEntity(entity, true) )
@@ -28434,7 +28434,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 						}
 						else
 						{
-							std::string name = item->getName();
+							DynamicString name = item->getName();
 							if ( setType == SET_CALLOUT_WORLD_TEXT && (name.find(' ') != std::string::npos) )
 							{
 								snprintf(buf, sizeof(buf), "%s\n%s (?)", ItemTooltips.getItemStatusAdjective(item->type, item->status).c_str(), name.c_str());
@@ -28459,7 +28459,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 									health = 5;
 								}
 							}
-							std::string name = item->getName();
+							DynamicString name = item->getName();
 							if ( setType == SET_CALLOUT_WORLD_TEXT && (name.find(' ') != std::string::npos) )
 							{
 								std::vector<size_t> spaces;
@@ -28507,7 +28507,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 						}
 						else
 						{
-							std::string name = item->getName();
+							DynamicString name = item->getName();
 							if ( setType == SET_CALLOUT_WORLD_TEXT && (name.find(' ') != std::string::npos) )
 							{
 								std::vector<size_t> spaces;
@@ -28557,7 +28557,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			itemName = Language::get(3634);
 		}
-		std::string key = "item";
+		DynamicString key = "item";
 		if ( stringStartsWithVowel(itemName) && text_map.find(std::string(key + "_an")) != text_map.end() )
 		{
 			key += "_an";
@@ -28613,7 +28613,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			return key;
 		}
-		std::string trapName = Language::get(4362);
+		DynamicString trapName = Language::get(4362);
 		if ( entity )
 		{
 			if ( entity->behavior == &actBoulderTrapHole )
@@ -28677,7 +28677,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			return key;
 		}
-		std::string objectName = Language::get(4366);
+		DynamicString objectName = Language::get(4366);
 		if ( entity )
 		{
 			if ( entity->behavior == &actSink )
@@ -28787,7 +28787,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			return key;
 		}
-		std::string trapName = Language::get(4362);
+		DynamicString trapName = Language::get(4362);
 		if ( entity )
 		{
 			auto highlights = text_map[key].bannerHighlights;
@@ -28829,7 +28829,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		if ( entity )
 		{
 			auto highlights = text_map[key].bannerHighlights;
-			std::string objectName = Language::get(entity->getColliderLangName());
+			DynamicString objectName = Language::get(entity->getColliderLangName());
 
 			if ( highlights.size() > 0 )
 			{
@@ -29550,10 +29550,10 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 	{
 		Uint32 creationTick = 0;
 		real_t dist = 0.0;
-		std::string imgPath = "";
+		DynamicString imgPath = "";
 		Uint32 color = 0;
 		SDL_Rect pos;
-		CalloutToDraw_t(std::string _imgPath, Uint32 _color, SDL_Rect _pos, Uint32 _creationTick, real_t _dist)
+		CalloutToDraw_t(DynamicString _imgPath, Uint32 _color, SDL_Rect _pos, Uint32 _creationTick, real_t _dist)
 		{
 			imgPath = _imgPath;
 			color = _color;
@@ -29596,15 +29596,15 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			auto& iconPathsMini = CalloutRadialMenu::worldIconEntries[CalloutRadialMenu::worldIconIDToEntryKey[callout.second.tagSmallID]];
 			if ( selfCallout )
 			{
-				std::string checkTag = CalloutRadialMenu::worldIconIDToEntryKey[callout.second.tagID] + "_display_self";
+				DynamicString checkTag = CalloutRadialMenu::worldIconIDToEntryKey[callout.second.tagID] + "_display_self";
 				if ( CalloutRadialMenu::worldIconEntries.find(checkTag) != CalloutRadialMenu::worldIconEntries.end() )
 				{
 					iconPaths = &CalloutRadialMenu::worldIconEntries[checkTag];
 				}
 			}
 
-			std::string iconPath = "";
-			std::string iconPathMini = "";
+			DynamicString iconPath = "";
+			DynamicString iconPathMini = "";
 			int playerColor = i;
 			if ( callout.second.cmd == CALLOUT_CMD_SOUTH
 				|| callout.second.cmd == CALLOUT_CMD_SOUTHWEST
@@ -30132,7 +30132,7 @@ bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu:
 		}
 	}
 
-	std::string calloutTypeKey = getCalloutKeyForCommand(_cmd);
+	DynamicString calloutTypeKey = getCalloutKeyForCommand(_cmd);
 	Uint32 oldTarget = lockOnEntityUid;
 	if ( overrideUID != 0 )
 	{
@@ -30142,7 +30142,7 @@ bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu:
 	{
 		lockOnEntityUid = entity->getUID();
 	}
-	std::string key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
+	DynamicString key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
 	lockOnEntityUid = oldTarget;
 
 	callout.tagID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTag].id;
@@ -30262,10 +30262,10 @@ bool CalloutRadialMenu::createParticleCallout(real_t x, real_t y, real_t z, Uint
 		}
 	}
 
-	std::string calloutTypeKey = getCalloutKeyForCommand(_cmd);
+	DynamicString calloutTypeKey = getCalloutKeyForCommand(_cmd);
 	Uint32 oldTarget = lockOnEntityUid;
 	lockOnEntityUid = uid;
-	std::string key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
+	DynamicString key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
 	lockOnEntityUid = oldTarget;
 
 	callout.tagID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTag].id;
@@ -30345,7 +30345,7 @@ void CalloutRadialMenu::sendCalloutText(CalloutRadialMenu::CalloutCommand cmd)
 	{
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
-			std::string text = setCalloutText(nullptr, getCalloutKeyForCommand(cmd).c_str(), 0, cmd, SET_CALLOUT_WORLD_TEXT, i);
+			DynamicString text = setCalloutText(nullptr, getCalloutKeyForCommand(cmd).c_str(), 0, cmd, SET_CALLOUT_WORLD_TEXT, i);
 			if ( text != "" )
 			{
 				messagePlayerColor(i, MESSAGE_INTERACTION, playerColor(getPlayer(), colorblind_lobby, false),
@@ -31049,7 +31049,7 @@ void CalloutRadialMenu::drawCalloutMenu()
 							setCalloutText(bannerTxt, "player_wave_1", textHighlightColor, (CalloutCommand)i, SET_CALLOUT_BANNER_TEXT, -1);
 						}
 
-						std::string key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
+						DynamicString key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
 						if ( lockedOption )
 						{
 							panelIcons[i]->color = makeColor(255, 255, 255, 64);
@@ -31071,7 +31071,7 @@ void CalloutRadialMenu::drawCalloutMenu()
 							setCalloutText(bannerTxt, "player_wave_2", textHighlightColor, (CalloutCommand)i, SET_CALLOUT_BANNER_TEXT, -1);
 						}
 						
-						std::string key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
+						DynamicString key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
 						if ( lockedOption )
 						{
 							panelIcons[i]->color = makeColor(255, 255, 255, 64);
@@ -31093,7 +31093,7 @@ void CalloutRadialMenu::drawCalloutMenu()
 							setCalloutText(bannerTxt, "player_wave_3", textHighlightColor, (CalloutCommand)i, SET_CALLOUT_BANNER_TEXT, -1);
 						}
 						
-						std::string key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
+						DynamicString key = (i == highlight) ? "tag_btn_player_wave_hover" : "tag_btn_player_wave";
 						if ( lockedOption )
 						{
 							panelIcons[i]->color = makeColor(255, 255, 255, 64);
@@ -31206,8 +31206,8 @@ void CalloutRadialMenu::drawCalloutMenu()
 		//	}
 		//	else
 		//	{
-		//		std::string requirement = "";
-		//		std::string current = "";
+		//		DynamicString requirement = "";
+		//		DynamicString current = "";
 		//		int requirementVal = 0;
 		//		int currentVal = 0;
 		//		if ( highlight >= ALLY_CMD_DEFEND && highlight <= ALLY_CMD_END && highlight != CALLOUT_CMD_CANCEL )
@@ -31839,7 +31839,7 @@ bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updat
 			{
 				char shortname[32];
 				stringCopy(shortname, stats[playernum]->name, sizeof(shortname), 22);
-				std::string nameStr = shortname;
+				DynamicString nameStr = shortname;
 				nameStr = messageSanitizePercentSign(nameStr, nullptr);
 				strcat(interactText, nameStr.c_str());
 			}
@@ -32119,7 +32119,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateRaceSlots()
 	for ( auto& race : raceSlots )
 	{
 		++index;
-		static const std::string prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
+		static const DynamicString prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
 		int x = ASSIST_RACE_COLUMN;
 		int y = index;
 
@@ -32192,7 +32192,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateRaceSlots()
 					{
 						dlcType = MainMenu::DLC::DesertersAndDisciples;
 					}
-					std::string str = getMonsterLocalizedName(getMonsterFromPlayerRace(race)).c_str();
+					DynamicString str = getMonsterLocalizedName(getMonsterFromPlayerRace(race)).c_str();
 					uppercaseString(str);
 					slotTxt->setText(str.c_str());
 					switch ( dlcType ) {
@@ -32274,7 +32274,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 		int classIndex = pair.second;
 		auto key = MainMenu::classes_in_order[classIndex];
 		auto find = MainMenu::classes.find(key);
-		static const std::string prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
+		static const DynamicString prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
 
 		int x = pair.first % 100;
 		int y = pair.first / 100;
@@ -32761,7 +32761,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 		receivedCharacterChangeOK = true;
 		addNotification(Language::get(6334), Language::get(6335), "", GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK);
 
-		std::string racename = "";
+		DynamicString racename = "";
 		if ( savedRace != RACE_HUMAN )
 		{
 			if ( savedAppearance != 0 )
@@ -32772,7 +32772,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 		}
 		racename += getMonsterLocalizedName(getMonsterFromPlayerRace(savedRace)).c_str();
 		camelCaseString(racename);
-		std::string classname = playerClassLangEntry(savedClass >= 0 ? savedClass : client_classes[parentGUI.gui_player], parentGUI.gui_player);
+		DynamicString classname = playerClassLangEntry(savedClass >= 0 ? savedClass : client_classes[parentGUI.gui_player], parentGUI.gui_player);
 		camelCaseString(classname);
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
@@ -32809,7 +32809,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 		receivedCharacterChangeOK = true;
 		addNotification(Language::get(6334), Language::get(6335), "", GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK);
 
-		std::string racename = "";
+		DynamicString racename = "";
 		if ( savedRace != RACE_HUMAN )
 		{
 			if ( savedAppearance != 0 )
@@ -32820,7 +32820,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 		}
 		racename += getMonsterLocalizedName(getMonsterFromPlayerRace(savedRace)).c_str();
 		camelCaseString(racename);
-		std::string classname = playerClassLangEntry(savedClass >= 0 ? savedClass : client_classes[parentGUI.gui_player], parentGUI.gui_player);
+		DynamicString classname = playerClassLangEntry(savedClass >= 0 ? savedClass : client_classes[parentGUI.gui_player], parentGUI.gui_player);
 		camelCaseString(classname);
 		messagePlayer(clientnum, MESSAGE_WORLD, Language::get(6355), racename.c_str(), classname.c_str());
 
@@ -35308,7 +35308,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 		auto drawerSlotsFrame = assistClassFrame->findFrame("class slots");
 		{
 			auto classText = assistClassFrame->findField("class txt");
-			std::string txt = "";
+			DynamicString txt = "";
 			int classnum = -1;
 			Uint32 color = makeColor(121, 117, 116, 255);
 			if ( savedClass == -1 )
@@ -35334,7 +35334,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 					color = hudColors.characterDLC3ClassText;
 				}
 			}
-			std::string classname = playerClassLangEntry(classnum, parentGUI.gui_player);
+			DynamicString classname = playerClassLangEntry(classnum, parentGUI.gui_player);
 			uppercaseString(classname);
 			txt += classname;
 			classText->setText(txt.c_str());
@@ -35342,7 +35342,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 		}
 		{
 			auto classNewText = assistClassFrame->findField("class new txt");
-			std::string txt = Language::get(6319);
+			DynamicString txt = Language::get(6319);
 			if ( selectedClass == -1 
 				|| (selectedClass == client_classes[parentGUI.gui_player] && savedClass == -1) )
 			{
@@ -35351,7 +35351,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 			}
 			else
 			{
-				std::string classname = playerClassLangEntry(selectedClass, parentGUI.gui_player);
+				DynamicString classname = playerClassLangEntry(selectedClass, parentGUI.gui_player);
 				uppercaseString(classname);
 				txt += classname;
 				classNewText->addColorToLine(1, hudColors.characterBaseClassText);
@@ -35537,7 +35537,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 		auto drawerSlotsFrame = assistRaceFrame->findFrame("race slots");
 		{
 			auto raceText = assistRaceFrame->findField("race txt");
-			std::string txt = "";
+			DynamicString txt = "";
 			int race = -1;
 			Uint32 color = makeColor(121, 117, 116, 255);
 			if ( savedRace == -1 )
@@ -35566,7 +35566,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 					color = hudColors.characterDLC3ClassText;
 				}
 			}
-			std::string racename = getMonsterLocalizedName(getMonsterFromPlayerRace(race)).c_str();
+			DynamicString racename = getMonsterLocalizedName(getMonsterFromPlayerRace(race)).c_str();
 			uppercaseString(racename);
 			txt += racename;
 			raceText->setText(txt.c_str());
@@ -35574,7 +35574,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 		}
 		/*{
 			auto classNewText = assistClassFrame->findField("class new txt");
-			std::string txt = Language::get(6319);
+			DynamicString txt = Language::get(6319);
 			if ( selectedClass == -1 || selectedClass == client_classes[parentGUI.gui_player] )
 			{
 				txt += '-';
@@ -35582,7 +35582,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 			}
 			else
 			{
-				std::string classname = playerClassLangEntry(selectedClass, parentGUI.gui_player);
+				DynamicString classname = playerClassLangEntry(selectedClass, parentGUI.gui_player);
 				uppercaseString(classname);
 				txt += classname;
 				classNewText->addColorToLine(1, hudColors.characterBaseClassText);
@@ -37335,7 +37335,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 						{
 							details_text->setText(Language::get(6347));
 						}
-						std::string txt = details_text->getText();
+						DynamicString txt = details_text->getText();
 						std::vector<std::string> lines;
 						for ( int c = 0; c < txt.size(); ++c )
 						{
@@ -37501,7 +37501,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 							SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 
 							char titleBuf[64];
-							std::string classname = playerClassLangEntry(itemType, parentGUI.gui_player);
+							DynamicString classname = playerClassLangEntry(itemType, parentGUI.gui_player);
 							uppercaseString(classname);
 							txt->setText(classname.c_str());
 							SDL_Rect txtPos = SDL_Rect{ padx, pady1 - 3, maxWidth - padx * 2, 80 };
@@ -37582,7 +37582,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 
 								currentHeight += classTooltipPos.h - 1;
 
-								std::string descText = "";
+								DynamicString descText = "";
 								descText = Player::CharacterSheet_t::getHoverTextString("stat_growth_info").c_str();
 							}
 
@@ -37685,7 +37685,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 							Monster race = getMonsterFromPlayerRace(itemType);
 
 							char titleBuf[64];
-							std::string racename;
+							DynamicString racename;
 							if ( selectedDisableAbilities == 1 && itemType != RACE_HUMAN )
 							{
 								racename += Language::get(4068);
@@ -39998,7 +39998,7 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 				if ( displayItemName->getNumTextLines() > 3 )
 				{
 					// more than 2 lines, append ...
-					std::string copiedName = displayItemName->getText();
+					DynamicString copiedName = displayItemName->getText();
 					auto lastNewline = copiedName.find_last_of('\n');
 					copiedName = copiedName.substr(0U, lastNewline);
 					copiedName += "...";
@@ -40016,7 +40016,7 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 
 				// do highlights
 				displayItemName->clearWordsToHighlight();
-				std::string str = displayItemName->getText();
+				DynamicString str = displayItemName->getText();
 				if ( str == Language::get(4167) )
 				{
 					displayItemName->setTextColor(hudColors.characterSheetRed);
@@ -40043,7 +40043,7 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 						++wordIndex;
 						if ( str[c] == '[' )
 						{
-							std::string toCompare = str.substr(str.find('[', c));
+							DynamicString toCompare = str.substr(str.find('[', c));
 							Uint32 color = 0;
 							if ( toCompare == Language::get(4155) )
 							{

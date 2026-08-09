@@ -6601,6 +6601,22 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 #endif
 }
 
+// DynamicString overload (bridges — writes into str)
+void ItemTooltips_t::formatItemDescription(const int player, std::string tooltipType, Item& item, DynamicString& str)
+{
+	std::string s(str.c_str());
+	formatItemDescription(player, tooltipType, item, s);
+	str = s.c_str();
+}
+
+// DynamicString overload (bridges — writes into str)
+void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType, Item& item, DynamicString& str, DynamicString detailTag, Frame* parentFrame)
+{
+	std::string s(str.c_str()), d(detailTag.c_str());
+	formatItemDetails(player, tooltipType, item, s, d, parentFrame);
+	str = s.c_str();
+}
+
 void ItemTooltips_t::stripOutHighlightBracketText(std::string& str, std::string& bracketText)
 {
 	for ( auto it = str.begin(); it != str.end(); ++it )
@@ -6645,6 +6661,15 @@ void ItemTooltips_t::stripOutHighlightBracketText(std::string& str, std::string&
 			bracketText += '\n';
 		}
 	}
+}
+
+// DynamicString overload (bridges — the std::string version writes into both)
+void ItemTooltips_t::stripOutHighlightBracketText(DynamicString& str, DynamicString& bracketText)
+{
+	std::string s(str.c_str()), b(bracketText.c_str());
+	stripOutHighlightBracketText(s, b);
+	str = s.c_str();
+	bracketText = b.c_str();
 }
 
 bool charIsWordSeparator(char c)
@@ -6735,6 +6760,18 @@ void ItemTooltips_t::getWordIndexesItemDetails(void* field, std::string& str, st
 		((Field*)field)->addWordToHighlight(h.first, color);
 		//messagePlayer(0, "Highlights: %d", h.first);
 	}
+}
+
+// DynamicString overload (bridges — writes into the string params)
+void ItemTooltips_t::getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
+	std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
+{
+	std::string s(str.c_str()), h(highlightValues.c_str()), p(positiveValues.c_str()), n(negativeValues.c_str());
+	getWordIndexesItemDetails(field, s, h, p, n, highlightIndexes, positiveIndexes, negativeIndexes, tooltip);
+	str = s.c_str();
+	highlightValues = h.c_str();
+	positiveValues = p.c_str();
+	negativeValues = n.c_str();
 }
 
 void ItemTooltips_t::stripOutPositiveNegativeItemDetails(std::string& str, std::string& positiveValues, std::string& negativeValues)
@@ -6892,6 +6929,16 @@ void ItemTooltips_t::stripOutPositiveNegativeItemDetails(std::string& str, std::
 		++it;
 		index = std::distance(str.begin(), it);
 	}
+}
+
+// DynamicString overload (bridges — the std::string version writes into all three)
+void ItemTooltips_t::stripOutPositiveNegativeItemDetails(DynamicString& str, DynamicString& positiveValues, DynamicString& negativeValues)
+{
+	std::string s(str.c_str()), p(positiveValues.c_str()), n(negativeValues.c_str());
+	stripOutPositiveNegativeItemDetails(s, p, n);
+	str = s.c_str();
+	positiveValues = p.c_str();
+	negativeValues = n.c_str();
 }
 #endif // !EDITOR
 

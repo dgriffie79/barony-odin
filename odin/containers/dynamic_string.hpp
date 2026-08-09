@@ -143,6 +143,13 @@ public:
         return -1;
     }
     int64_t rfind(const std::string& needle) const { return rfind(needle.c_str()); }
+    // find last of a single char (std::string::find_last_of(char))
+    int64_t find_last_of(char c, int64_t start = -1) const {
+        int64_t n = len;
+        if (start >= 0 && start < n) n = start + 1;
+        for (int64_t i = n - 1; i >= 0; --i) { if (data[i] == c) return i; }
+        return -1;
+    }
     // find last of any char in the set (std::string::find_last_of)
     int64_t find_last_of(const char* set, int64_t start = -1) const {
         int64_t n = len;

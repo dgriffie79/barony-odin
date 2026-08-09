@@ -4401,7 +4401,7 @@ std::string getBindingNameForMissingTooltipPrompts(int index)
 
 int getContextMenuOptionOrder(const int player, ItemContextMenuPrompts prompt)
 {
-	std::string bindingName = getContextMenuOptionBindingName(player, prompt);
+	DynamicString bindingName = getContextMenuOptionBindingName(player, prompt);
 	if ( bindingName == "MenuAlt1" )
 	{
 		return 2;
@@ -4772,7 +4772,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
     {
         tooltipDisplayedSettings.updateItem(player, item);
         
-        std::string tooltipType = ItemTooltips.tmpItems[item->type].tooltip;
+        DynamicString tooltipType = ItemTooltips.tmpItems[item->type].tooltip;
         
         if ( ItemTooltips.tooltips.find(tooltipType) == ItemTooltips.tooltips.end() )
         {
@@ -4789,9 +4789,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         
         /*if ( item->type == FOOD_TIN )
          {
-         std::string cookingMethod;
-         std::string protein;
-         std::string sides;
+         DynamicString cookingMethod;
+         DynamicString protein;
+         DynamicString sides;
          item->foodTinGetDescription(cookingMethod, protein, sides);
          snprintf(buf, sizeof(buf), "%s %s %s%s%s (%+d)", ItemTooltips.getItemStatusAdjective(item->type, item->status).c_str(),
          item->getName(),
@@ -4919,7 +4919,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         if ( doTitleOnlyTooltip )
         {
             auto titleOnlyTxt = titleOnlyFrame->findField("title only header");
-            std::string title = buf;
+            DynamicString title = buf;
             if ( itemCategory(item) != BOOK && !(itemCategory(item) == SCROLL && !item->identified) )
             {
                 std::replace(title.begin(), title.end(), '\n', ' ');
@@ -5022,9 +5022,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             texty = textGet->getNumTextLines() * Font::get(txtHeader->getFont())->height();
         }
         
-        std::string minWidthKey = "default";
-        std::string maxWidthKey = "default";
-        std::string headerMaxWidthKey = "default";
+        DynamicString minWidthKey = "default";
+        DynamicString maxWidthKey = "default";
+        DynamicString headerMaxWidthKey = "default";
         if ( spell_t* spell = getSpellFromItem(player, item, false) )
         {
             if ( itemTooltip.minWidths.find(ItemTooltips.spellItems[spell->ID].internalName) != itemTooltip.minWidths.end() )
@@ -5066,7 +5066,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                 txtHeader->reflowTextToFit(0);
             }
             
-            std::string input = txtHeader->getText();
+            DynamicString input = txtHeader->getText();
             size_t offset = 0;
             size_t findChar = 0;
             std::vector<std::string> tokens;
@@ -5539,8 +5539,10 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgPrimaryIcon->disabled = false;
                     imgPrimaryIcon->path = icon.iconPath;
                     
-                    std::string iconText = icon.text;
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, icon.conditionalAttribute, parentFrame);
+                    DynamicString iconText = icon.text;
+                    std::string iconTextStr = iconText.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
+                    iconText = iconTextStr.c_str();
                     
                     if ( tooltipType.find("tooltip_spell_") != std::string::npos && iconText == "" )
                     {
@@ -5548,10 +5550,10 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                         continue;
                     }
                     
-                    std::string bracketText = "";
+                    DynamicString bracketText = "";
                     ItemTooltips.stripOutHighlightBracketText(iconText, bracketText);
-                    std::string positiveText = "";
-                    std::string negativeText = "";
+                    DynamicString positiveText = "";
+                    DynamicString negativeText = "";
                     ItemTooltips.stripOutPositiveNegativeItemDetails(iconText, positiveText, negativeText);
                     ItemTooltips.getWordIndexesItemDetails(txtPrimaryValue, iconText, bracketText, positiveText, negativeText,
                                                            highlightWordIndexes, positiveWordIndexes, negativeWordIndexes, itemTooltip);
@@ -5573,13 +5575,15 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgSecondaryIcon->disabled = false;
                     imgSecondaryIcon->path = overrideIconType ? overrideIconType->iconPath : icon.iconPath;
                     
-                    std::string iconText = overrideIconType ? overrideIconType->text : icon.text;
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, icon.conditionalAttribute, parentFrame);
+                    DynamicString iconText = overrideIconType ? overrideIconType->text : icon.text;
+                    std::string iconTextStr = iconText.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
+                    iconText = iconTextStr.c_str();
                     
-                    std::string bracketText = "";
+                    DynamicString bracketText = "";
                     ItemTooltips.stripOutHighlightBracketText(iconText, bracketText);
-                    std::string positiveText = "";
-                    std::string negativeText = "";
+                    DynamicString positiveText = "";
+                    DynamicString negativeText = "";
                     ItemTooltips.stripOutPositiveNegativeItemDetails(iconText, positiveText, negativeText);
                     ItemTooltips.getWordIndexesItemDetails(txtSecondaryValue, iconText, bracketText, positiveText, negativeText,
                                                            highlightWordIndexes, positiveWordIndexes, negativeWordIndexes, itemTooltip);
@@ -5600,13 +5604,15 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     imgThirdIcon->disabled = false;
                     imgThirdIcon->path = icon.iconPath;
                     
-                    std::string iconText = icon.text;
-                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconText, index, icon.conditionalAttribute, parentFrame);
+                    DynamicString iconText = icon.text;
+                    std::string iconTextStr = iconText.c_str();
+                    ItemTooltips.formatItemIcon(player, tooltipType, *item, iconTextStr, index, icon.conditionalAttribute, parentFrame);
+                    iconText = iconTextStr.c_str();
                     
-                    std::string bracketText = "";
+                    DynamicString bracketText = "";
                     ItemTooltips.stripOutHighlightBracketText(iconText, bracketText);
-                    std::string positiveText = "";
-                    std::string negativeText = "";
+                    DynamicString positiveText = "";
+                    DynamicString negativeText = "";
                     ItemTooltips.stripOutPositiveNegativeItemDetails(iconText, positiveText, negativeText);
                     ItemTooltips.getWordIndexesItemDetails(txtThirdValue, iconText, bracketText, positiveText, negativeText,
                                                            highlightWordIndexes, positiveWordIndexes, negativeWordIndexes, itemTooltip);
@@ -5633,7 +5639,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         auto txtAttributes = frameAttr->findField("inventory mouse tooltip attributes text");
         txtAttributes->setDisabled(true);
         
-        std::string descriptionTextString = "";
+        DynamicString descriptionTextString = "";
         if ( !doShortTooltip && (itemTooltip.descriptionText.size() > 0 || descriptionTextString.size() > 0) )
         {
             txtAttributes->setDisabled(false);
@@ -5658,7 +5664,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         
         frameDesc->setDisabled(true);
 
-        std::string detailsTextString = "";
+        DynamicString detailsTextString = "";
         if ( !doShortTooltip && itemTooltip.detailsText.size() > 0 )
         {
             frameDesc->setDisabled(false);
@@ -6055,7 +6061,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     {
                         spell_t* spell = getSpellFromItem(player, item, false);
                         if ( !spell ) { continue; }
-                        std::string subs = tag.substr(10, std::string::npos);
+                        DynamicString subs = tag.substr(10, std::string::npos);
                         if ( !spell || ItemTooltips.spellItems[spell->ID].internalName != subs )
                         {
                             continue;
@@ -6090,7 +6096,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                             }
                         }
                         if ( !spell ) { continue; }
-                        std::string subs = tag.substr(10, std::string::npos);
+                        DynamicString subs = tag.substr(10, std::string::npos);
                         if ( !spell || ItemTooltips.spellItems[spell->ID].internalName != subs )
                         {
                             continue;
@@ -6124,7 +6130,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     }
                 }
                 
-                std::string tagText = "";
+                DynamicString tagText = "";
                 for ( auto it = itemTooltip.detailsText[tag.c_str()].begin(); it != itemTooltip.detailsText[tag.c_str()].end(); ++it )
                 {
                     tagText += (*it);
@@ -6400,8 +6406,8 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                 txtDescription->reflowTextToFit(-1);
             }
             
-            std::string detailsPositiveText = "";
-            std::string detailsNegativeText = "";
+            DynamicString detailsPositiveText = "";
+            DynamicString detailsNegativeText = "";
             
             detailsTextString = txtDescription->getText();
             ItemTooltips.stripOutPositiveNegativeItemDetails(detailsTextString, detailsPositiveText, detailsNegativeText);
@@ -6409,7 +6415,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             std::map<int, Uint32> positiveWordIndexes;
             std::map<int, Uint32> negativeWordIndexes;
             std::map<int, Uint32> highlightWordIndexes;
-            std::string empty;
+            DynamicString empty;
             ItemTooltips.getWordIndexesItemDetails(txtDescription, detailsTextString, empty, detailsPositiveText, detailsNegativeText,
                                                    highlightWordIndexes, positiveWordIndexes, negativeWordIndexes, itemTooltip);
             txtDescription->setText(detailsTextString.c_str());
@@ -6461,7 +6467,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                 imgWeightIcon->disabled = true;
                 txtWeightValue->setDisabled(true);
                 
-                std::string spellCost = ItemTooltips.getCostOfSpellString(player, *item);
+                DynamicString spellCost = ItemTooltips.getCostOfSpellString(player, *item);
                 txtGoldValue->setText(spellCost.c_str());
                 if ( txtGoldValue->getNumTextLines() > 1 )
                 {
@@ -6476,7 +6482,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
 					{
 						if ( skill.skillId == spell->skillID )
 						{
-							std::string spellSkillValue = skill.getSkillName();
+							DynamicString spellSkillValue = skill.getSkillName();
 							char spellTierBuf[128];
 							snprintf(spellTierBuf, sizeof(spellTierBuf), ItemTooltips.adjectives["spell_prefixes"]["tier"].c_str(), spell->getSpellTierName());
 							spellSkillValue += spellTierBuf;
@@ -6543,10 +6549,10 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             
             const int lowerIconImgToTextOffset = 0;
             
-            const std::string goldImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_Money_00.png";
-            const std::string weightImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_WGT_00.png";
-            const std::string spellMPCostImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_ManaRegen_00.png";
-			const std::string assistImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_Assistance_00.png";
+            const DynamicString goldImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_Money_00.png";
+            const DynamicString weightImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_WGT_00.png";
+            const DynamicString spellMPCostImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_ManaRegen_00.png";
+			const DynamicString assistImagePath = "images/ui/Inventory/tooltips/HUD_Tooltip_Icon_Assistance_00.png";
             
             if ( tooltipType.find("tooltip_spell_") != std::string::npos )
             {
@@ -6647,7 +6653,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
 						{
 							if ( skill.skillId == spell->skillID )
 							{
-								std::string spellSkillValue = skill.getSkillName();
+								DynamicString spellSkillValue = skill.getSkillName();
 								char spellTierBuf[128];
 								snprintf(spellTierBuf, sizeof(spellTierBuf), ItemTooltips.adjectives["spell_prefixes"]["tier"].c_str(), spell->getSpellTierName());
 								spellSkillValue += spellTierBuf;
@@ -10460,7 +10466,7 @@ void Player::Inventory_t::updateInventory()
 								{
 									if ( !players[player]->GUI.isDropdownActive() )
 									{
-										std::string dropdownName = "item_interact";
+										DynamicString dropdownName = "item_interact";
 										if ( players[player]->GUI.activeModule == Player::GUI_t::MODULE_SPELLS && itemCategory(item) == SPELL_CAT )
 										{
 											dropdownName = "spell_interact";

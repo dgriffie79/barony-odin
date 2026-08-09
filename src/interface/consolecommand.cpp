@@ -44,7 +44,7 @@ bool logCheckMainLoopTimers = false;
 bool autoLimbReload = false;
 
 /*******************************************************************************
-	std::string cvars
+	DynamicString cvars
 *******************************************************************************/
 
 template ConsoleVariable<std::string>::ConsoleVariable(const char*, std::string const&, const char*);
@@ -133,7 +133,7 @@ void ConsoleVariable<T>::setter(int argc, const char** argv)
 	if (find != map.end()) {
 		auto& cvar = find->second;
 		if (argc >= 2) {
-			std::string data;
+			DynamicString data;
 			data = argv[1];
 			for (int c = 2; c < argc; ++c) {
 				data.append(" ");
@@ -421,7 +421,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -439,7 +439,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for ( int arg = 2; arg < argc; ++arg ) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -518,7 +518,7 @@ namespace ConsoleCommands {
 			bool identified = true;
 			if ( argc >= 3 )
 			{
-				std::string str = argv[2];
+				DynamicString str = argv[2];
 				if ( str == "0" )
 				{
 					identified = false;
@@ -538,7 +538,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -580,7 +580,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -622,7 +622,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -659,7 +659,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -710,7 +710,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -1701,7 +1701,7 @@ namespace ConsoleCommands {
 			if (argc < 2) {
 				return;
 			}
-			std::string name = argv[1];
+			DynamicString name = argv[1];
 			for (int arg = 2; arg < argc; ++arg) {
 				name.append(" ");
 				name.append(argv[arg]);
@@ -1783,7 +1783,7 @@ namespace ConsoleCommands {
 			if (argc < 2) {
 				return;
 			}
-			std::string name = argv[1];
+			DynamicString name = argv[1];
 			for (int arg = 2; arg < argc; ++arg) {
 				name.append(" ");
 				name.append(argv[arg]);
@@ -1814,7 +1814,7 @@ namespace ConsoleCommands {
 							statEntry->setStatsAndEquipmentToMonster(monster->getStats());
 							while (statEntry->numFollowers > 0)
 							{
-								std::string followerName = statEntry->getFollowerVariant();
+								DynamicString followerName = statEntry->getFollowerVariant();
 								if (followerName.compare("") && followerName.compare("none"))
 								{
 									MonsterStatCustomManager::StatEntry* followerEntry = monsterStatCustomManager.readFromFile(followerName.c_str());
@@ -2746,10 +2746,10 @@ namespace ConsoleCommands {
 		});
 
 	static ConsoleCommand ccmd_loadmod("/loadmod", "load the specified mod", []CCMD{
-		std::string dir, name, fileid;
+		DynamicString dir, name, fileid;
 		for (int c = 1; c < argc; ++c)
 		{
-			std::string cmd = argv[c];
+			DynamicString cmd = argv[c];
 			std::size_t dirfind = cmd.find("dir:");
 			if (dirfind != std::string::npos) {
 				dir = cmd.substr(dirfind + 4);
@@ -2766,12 +2766,12 @@ namespace ConsoleCommands {
 				continue;
 			}
 		}
-		std::string modname;
+		DynamicString modname;
 		if (!dir.empty() && !name.empty())
 		{
 			if (fileid.empty())
 			{
-				std::string directory = dir;
+				DynamicString directory = dir;
 				modname = name;
 				//TODO is this still necessary?
 				//modname = modname.substr(0, modname.length() - 1);
@@ -2781,7 +2781,7 @@ namespace ConsoleCommands {
 #ifdef STEAMWORKS
 			else
 			{
-				std::string directory = dir;
+				DynamicString directory = dir;
 				modname = name;
 				printlog("[Mods]: Adding mod \"%s\" in path \"%s\"", directory.c_str(), modname.c_str());
 				Mods::mountedFilepaths.push_back(std::make_pair(directory, modname));
@@ -3585,7 +3585,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string name = argv[1];
+		DynamicString name = argv[1];
 		for (int arg = 2; arg < argc; ++arg) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -3962,7 +3962,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string message = argv[1];
+		DynamicString message = argv[1];
 		message.append("\r\n");
 		IRCHandler.packetSend(message);
 		messagePlayer(clientnum, MESSAGE_MISC, "[IRC]: Sent message.");
@@ -4028,7 +4028,7 @@ namespace ConsoleCommands {
 		{
 			int reloadSpriteIndex = atoi(argv[1]);
 		
-			std::string spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
+			DynamicString spritesDirectory = PHYSFS_getRealDir("images/sprites.txt");
 			spritesDirectory.append(PHYSFS_getDirSeparator()).append("images/sprites.txt");
 			printlog("[PhysFS]: Loading sprites from directory %s...\n", spritesDirectory.c_str());
 			File* fp = openDataFile(spritesDirectory.c_str(), "rb");
@@ -4039,7 +4039,7 @@ namespace ConsoleCommands {
 				if ( c != reloadSpriteIndex ) { continue; }
 				if ( PHYSFS_getRealDir(name) != nullptr )
 				{
-					std::string spriteFile = PHYSFS_getRealDir(name);
+					DynamicString spriteFile = PHYSFS_getRealDir(name);
 					spriteFile.append(PHYSFS_getDirSeparator()).append(name);
 					if ( sprites[c] )
 					{
@@ -4249,7 +4249,7 @@ namespace ConsoleCommands {
 					{
 						d["item_names"].AddMember(rapidjson::Value(ItemTooltips.tmpItems[spellbookId].internalName.c_str(), d.GetAllocator()), rapidjson::Value(rapidjson::kObjectType),
 							d.GetAllocator());
-						std::string str = "spellbook of ";
+						DynamicString str = "spellbook of ";
 						str += spell->getSpellName(true);
 						d["item_names"][ItemTooltips.tmpItems[spellbookId].internalName.c_str()].AddMember("name_identified", rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
 						d["item_names"][ItemTooltips.tmpItems[spellbookId].internalName.c_str()].AddMember("name_unidentified", rapidjson::Value("spellbook", d.GetAllocator()), d.GetAllocator());
@@ -4954,7 +4954,7 @@ namespace ConsoleCommands {
 		int status = atoi(argv[2]);
 		status = std::max(std::min(static_cast<int>(EXCELLENT), status), static_cast<int>(BROKEN));
 
-		std::string name = argv[3];
+		DynamicString name = argv[3];
 		for ( int arg = 4; arg < argc; ++arg ) {
 			name.append(" ");
 			name.append(argv[arg]);
@@ -5055,12 +5055,12 @@ namespace ConsoleCommands {
 			m.worldUI = new list_t;
 			m.worldUI->first = nullptr;
 			m.worldUI->last = nullptr;
-			const std::string mapPath = "maps/" + f;
+			const DynamicString mapPath = "maps/" + f;
 			auto path = PHYSFS_getRealDir(mapPath.c_str());
 			if (path)
 			{
 				int maphash = 0;
-				const std::string fullMapPath = path + (PHYSFS_getDirSeparator() + mapPath);
+				const DynamicString fullMapPath = path + (PHYSFS_getDirSeparator() + mapPath);
 				int result = loadMap(fullMapPath.c_str(), &m, m.entities, m.creatures, &maphash);
 				if (result >= 0) {
 					(void)verifyMapHash(fullMapPath.c_str(), maphash);
@@ -5109,13 +5109,13 @@ namespace ConsoleCommands {
 #ifndef NINTENDO
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			bool foundNumber = std::find_if(f.begin(), f.end(), ::isdigit) != f.end();
 			if ( foundNumber && PHYSFS_getRealDir(mapPath.c_str()) )
 			{
 				int maphash = 0;
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 				loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, nullptr);
@@ -5198,13 +5198,13 @@ namespace ConsoleCommands {
 		}
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			bool foundNumber = std::find_if(f.begin(), f.end(), ::isdigit) != f.end();
 			if ( foundNumber && PHYSFS_getRealDir(mapPath.c_str()) )
 			{
 				int maphash = 0;
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 				loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, nullptr);
@@ -5239,13 +5239,13 @@ namespace ConsoleCommands {
 		}
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			/*bool foundNumber = std::find_if(f.begin(), f.end(), ::isdigit) != f.end();*/
 			if ( /*foundNumber &&*/ PHYSFS_getRealDir(mapPath.c_str()) )
 			{
 				int maphash = 0;
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 				loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, nullptr);
@@ -5277,7 +5277,7 @@ namespace ConsoleCommands {
 							{
 								buf[totalChars] = '\0';
 							}
-							std::string output = buf;
+							DynamicString output = buf;
 							printlog("Map: %s, floor interaction: %s", f.c_str(), output.c_str());
 						}
 					}
@@ -5298,12 +5298,12 @@ namespace ConsoleCommands {
 		std::map<std::string, std::vector<std::string>> treasureLoot;
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			if ( mapPath.find("_lock") != std::string::npos && PHYSFS_getRealDir(mapPath.c_str()) )
 			{
 				int maphash = 0;
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 				loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, nullptr);
@@ -5314,7 +5314,7 @@ namespace ConsoleCommands {
 					{
 						int x = entity->x / 16;
 						int y = entity->y / 16;
-						std::string coord = "@[x:";
+						DynamicString coord = "@[x:";
 						coord += (std::to_string(x));
 						coord += (",y:");
 						coord += (std::to_string(y));
@@ -5331,7 +5331,7 @@ namespace ConsoleCommands {
 						else if ( entity->sprite == 8 )
 						{
 							{
-								std::string item = "item, [x";
+								DynamicString item = "item, [x";
 								item += std::to_string(std::max(1, entity->skill[13]));
 								item += "], ";
 								item += "(";
@@ -5826,13 +5826,13 @@ namespace ConsoleCommands {
 		}
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			bool foundNumber = std::find_if(f.begin(), f.end(), ::isdigit) != f.end();
 			if ( /*foundNumber &&*/ PHYSFS_getRealDir(mapPath.c_str()) )
 			{
 				int maphash = 0;
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 				loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, nullptr);
@@ -6006,7 +6006,7 @@ namespace ConsoleCommands {
 		for ( int i = SPELL_FORCEBOLT; i < NUM_SPELLS; ++i )
 		{
 			auto spell = getSpellFromID(i);
-			std::string tags;
+			DynamicString tags;
 			for ( auto tag : ItemTooltips.spellItems[i].spellTagsStr )
 			{
 				tags += tag;
@@ -6451,12 +6451,12 @@ namespace ConsoleCommands {
 		}
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
-			std::string mapPath = "maps/";
+			DynamicString mapPath = "maps/";
 			mapPath += f;
 			bool foundNumber = std::find_if(f.begin(), f.end(), ::isdigit) != f.end();
 			if ( /*foundNumber &&*/ PHYSFS_getRealDir(mapPath.c_str()) )
 			{
-				std::string fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
+				DynamicString fullMapPath = PHYSFS_getRealDir(mapPath.c_str());
 				fullMapPath += PHYSFS_getDirSeparator();
 				fullMapPath += mapPath;
 
@@ -6538,7 +6538,7 @@ namespace ConsoleCommands {
 
 	static ConsoleCommand ccmd_shader_test("/shader_test", "", []CCMD{
 		{
-			std::string filePath = "/data/shaders/";
+			DynamicString filePath = "/data/shaders/";
 			filePath.append("sprite");
 			if ( filePath.find(".json") == std::string::npos )
 			{
@@ -6546,7 +6546,7 @@ namespace ConsoleCommands {
 			}
 			if ( PHYSFS_getRealDir(filePath.c_str()) )
 			{
-				std::string inputPath = PHYSFS_getRealDir(filePath.c_str());
+				DynamicString inputPath = PHYSFS_getRealDir(filePath.c_str());
 				inputPath.append(filePath);
 
 				File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -6571,8 +6571,8 @@ namespace ConsoleCommands {
 					return;
 				}
 
-				std::string vertex;
-				std::string fragment;
+				DynamicString vertex;
+				DynamicString fragment;
 
 				for ( auto itr = d["vertex"].Begin(); itr != d["vertex"].End(); ++itr )
 				{
@@ -6607,7 +6607,7 @@ namespace ConsoleCommands {
 			}
 		}
 		{
-			std::string filePath = "/data/shaders/";
+			DynamicString filePath = "/data/shaders/";
 			filePath.append("voxel");
 			if ( filePath.find(".json") == std::string::npos )
 			{
@@ -6615,7 +6615,7 @@ namespace ConsoleCommands {
 			}
 			if ( PHYSFS_getRealDir(filePath.c_str()) )
 			{
-				std::string inputPath = PHYSFS_getRealDir(filePath.c_str());
+				DynamicString inputPath = PHYSFS_getRealDir(filePath.c_str());
 				inputPath.append(filePath);
 
 				File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -6640,8 +6640,8 @@ namespace ConsoleCommands {
 					return;
 				}
 
-				std::string vertex;
-				std::string fragment;
+				DynamicString vertex;
+				DynamicString fragment;
 
 				for ( auto itr = d["vertex"].Begin(); itr != d["vertex"].End(); ++itr )
 				{
@@ -6738,7 +6738,7 @@ namespace ConsoleCommands {
 		{
 			return;
 		}
-		std::string str_c = argv[1];
+		DynamicString str_c = argv[1];
 		real_t c = std::stof(str_c);
 		int chance = 5;
 		if ( argc >= 3 )

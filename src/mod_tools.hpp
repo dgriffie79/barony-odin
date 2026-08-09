@@ -2932,11 +2932,18 @@ public:
 	bool bSpellHasBasicHitMessage(const int spellID);
 
 	void formatItemIcon(const int player, std::string tooltipType, Item& item, std::string& str, int iconIndex, std::string& conditionalAttribute, Frame* parentFrame = nullptr);
+	void formatItemIcon(const int player, std::string tooltipType, Item& item, DynamicString& str, int iconIndex, DynamicString& conditionalAttribute, Frame* parentFrame = nullptr);
 	void formatItemDescription(const int player, std::string tooltipType, Item& item, std::string& str);
+	void formatItemDescription(const int player, std::string tooltipType, Item& item, DynamicString& str);
 	void formatItemDetails(const int player, std::string tooltipType, Item& item, std::string& str, std::string detailTag, Frame* parentFrame = nullptr);
+	void formatItemDetails(const int player, std::string tooltipType, Item& item, DynamicString& str, DynamicString detailTag, Frame* parentFrame = nullptr);
 	void stripOutPositiveNegativeItemDetails(std::string& str, std::string& positiveValues, std::string& negativeValues);
+	void stripOutPositiveNegativeItemDetails(DynamicString& str, DynamicString& positiveValues, DynamicString& negativeValues);
 	void stripOutHighlightBracketText(std::string& str, std::string& bracketText);
+	void stripOutHighlightBracketText(DynamicString& str, DynamicString& bracketText);
 	void getWordIndexesItemDetails(void* field, std::string& str, std::string& highlightValues, std::string& positiveValues, std::string& negativeValues,
+		std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
+	void getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
 		std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
 };
 extern ItemTooltips_t ItemTooltips;

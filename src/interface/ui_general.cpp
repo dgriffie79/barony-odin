@@ -763,7 +763,7 @@ void UIToastNotificationManager_t::createLeaderboardNotification(std::string inf
 	char buf[128];
 	if ( info.find("oneshot") != std::string::npos )
 	{
-		std::string prefix = Language::get(6110);
+		DynamicString prefix = Language::get(6110);
 		for ( auto& c : prefix )
 		{
 			if ( c == '\n' )
@@ -791,7 +791,7 @@ void UIToastNotificationManager_t::createLeaderboardNotification(std::string inf
 	}
 	else if ( info.find("unlimited") != std::string::npos )
 	{
-		std::string prefix = Language::get(6111);
+		DynamicString prefix = Language::get(6111);
 		for ( auto& c : prefix )
 		{
 			if ( c == '\n' )
@@ -819,7 +819,7 @@ void UIToastNotificationManager_t::createLeaderboardNotification(std::string inf
 	}
 	else if ( info.find("challenge") != std::string::npos )
 	{
-		std::string prefix = Language::get(6112);
+		DynamicString prefix = Language::get(6112);
 		for ( auto& c : prefix )
 		{
 			if ( c == '\n' )
@@ -972,7 +972,7 @@ void UIToastNotificationManager_t::createStatisticUpdateNotification(const char*
 		{
 			achievementName = it->second.name.c_str();
 		}
-		const std::string imgName = unlocked ?
+		const DynamicString imgName = unlocked ?
 			std::string("*#images/achievements/") + name + std::string(".png"):
 			std::string("*#images/achievements/") + name + std::string("_l.png");
 		n = UIToastNotificationManager.addNotification(imgName.c_str());
