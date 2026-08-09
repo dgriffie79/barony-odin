@@ -6263,7 +6263,7 @@ void Entity::handleEffects(Stat* myStats)
 				}
 				else if ( myStats->shield->type == TOOL_TORCH && player >= 0 )
 				{
-					std::string itemName = myStats->shield->getName();
+					DynamicString itemName = myStats->shield->getName();
 					ItemType itemType = myStats->shield->type;
 					Status itemStatus = myStats->shield->status;
 					messagePlayer(player, MESSAGE_EQUIPMENT, Language::get(638), itemName.c_str());
@@ -18313,7 +18313,7 @@ void Entity::awardXP(Entity* src, bool share, bool root)
 		}
 		if ( srcStats->type == SHADOW && root )
 		{
-			std::string name = "Shadow of ";
+			DynamicString name = "Shadow of ";
 			name += stats[player]->name;
 			if ( name.compare(srcStats->name) == 0 )
 			{
@@ -25781,7 +25781,7 @@ bool Entity::degradeArmor(Stat& hitstats, Item& armor, int armornum)
 
 	if ( armor.type == TOOL_TORCH && armor.count > 1 && playerhit >= 0 && &armor == stats[playerhit]->shield )
 	{
-		std::string itemName = armor.getName();
+		DynamicString itemName = armor.getName();
 		ItemType itemType = armor.type;
 		Status itemStatus = armor.status;
 

@@ -52,7 +52,7 @@ void TreasureRoomGenerator::init()
 	}
 	treasure_rng.seedBytes(&seed, sizeof(seed));
 
-	std::string previous_station[2] = { "", "" };
+	DynamicString previous_station[2] = { "", "" };
 	for ( int i = 0; i <= 35; i += 5 )
 	{
 		for ( int j = 0; j < 2; ++j )
@@ -830,7 +830,7 @@ struct StartRoomInfo_t
 
 		//for ( auto point : exitPoints )
 		//{
-		//	std::string dir = "";
+		//	DynamicString dir = "";
 		//	switch ( point.second )
 		//	{
 		//		case WEST:
@@ -855,7 +855,7 @@ struct StartRoomInfo_t
 			printlog("[MAP GENERATOR]: Start map does not have accessibility to any other areas!");
 			for ( auto& point : goodTunnelPoints )
 			{
-				std::string dir = "";
+				DynamicString dir = "";
 				switch ( point.second )
 				{
 					case WEST:
@@ -877,7 +877,7 @@ struct StartRoomInfo_t
 			}
 			for ( auto& point : badTunnelPoints )
 			{
-				std::string dir = "";
+				DynamicString dir = "";
 				switch ( point.second )
 				{
 					case WEST:
@@ -899,7 +899,7 @@ struct StartRoomInfo_t
 			}
 			for ( auto& point : worstTunnelPoints )
 			{
-				std::string dir = "";
+				DynamicString dir = "";
 				switch ( point.second )
 				{
 					case WEST:
@@ -1065,7 +1065,7 @@ bool mapTileDiggable(const int x, const int y)
 	return true;
 }
 
-bool loadSubRoomData(std::string fullMapPath, list_t* mapList)
+bool loadSubRoomData(DynamicString fullMapPath, list_t* mapList)
 {
 	// allocate memory for the next subroom and attempt to load it
 	map_t* subRoomMap = (map_t*)malloc(sizeof(map_t));
@@ -1277,7 +1277,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 
 	int checkMapHash = -1;
 	{
-		std::string fullMapPath;
+		DynamicString fullMapPath;
 		fullMapPath = physfsFormatMapName(levelset);
 
 		if ( fullMapPath.empty() || loadMap(fullMapPath.c_str(), &map, map.entities, map.creatures, &checkMapHash) == -1 )
@@ -1448,7 +1448,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 
 	struct GroupSubRooms_t
 	{
-		std::string rootMapFileName = "";
+		DynamicString rootMapFileName = "";
 		int count = 0;
 		std::vector<bool> possibleRooms;
 		list_t list;
@@ -1476,7 +1476,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 	if ( shoplevel )
 	{
 		char sublevelname[128] = "";
-		std::string shopMapTitle = "shop";
+		DynamicString shopMapTitle = "shop";
 		if ( MFLAG_GENADJACENTROOMS )
 		{
 			shopMapTitle = "shop-roomgen";
@@ -1487,7 +1487,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 			snprintf(sublevelnum, 3, "%02d", numlevels);
 			strcat(sublevelname, sublevelnum);
 
-			std::string fullMapPath = physfsFormatMapName(sublevelname);
+			DynamicString fullMapPath = physfsFormatMapName(sublevelname);
 
 			if ( fullMapPath.empty() )
 			{
@@ -1501,7 +1501,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 			snprintf(sublevelnum, 3, "%02d", shopleveltouse);
 			strcat(sublevelname, sublevelnum);
 			shopSubRooms.rootMapFileName = sublevelname;
-			std::string fullMapPath = physfsFormatMapName(sublevelname);
+			DynamicString fullMapPath = physfsFormatMapName(sublevelname);
 
 			shopmap.tiles = nullptr;
 			shopmap.entities = (list_t*) malloc(sizeof(list_t));
@@ -1542,7 +1542,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 		snprintf(sublevelnum, 3, "%02d", numlevels);
 		strcat(sublevelname, sublevelnum);
 
-		std::string fullMapPath = physfsFormatMapName(sublevelname);
+		DynamicString fullMapPath = physfsFormatMapName(sublevelname);
 		if ( fullMapPath.empty() )
 		{
 			break;    // no more levels to load
@@ -1555,8 +1555,8 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 	{
 		if ( treasure_room_generator.orb_floors.find(currentlevel) != treasure_room_generator.orb_floors.end() )
 		{
-			std::string specialMapName = treasure_room_generator.orb_floors[currentlevel];
-			std::string fullMapPath = physfsFormatMapName(specialMapName.c_str());
+			DynamicString specialMapName = treasure_room_generator.orb_floors[currentlevel];
+			DynamicString fullMapPath = physfsFormatMapName(specialMapName.c_str());
 			if ( !fullMapPath.empty() )
 			{
 				if ( loadSubRoomData(fullMapPath, &specialMapRooms.list) )
@@ -1569,7 +1569,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 						char subRoomName[128] = "";
 						snprintf(subRoomName, sizeof(subRoomName), "%s%c", specialMapName.c_str(), letter);
 
-						std::string fullMapPath = physfsFormatMapName(subRoomName);
+						DynamicString fullMapPath = physfsFormatMapName(subRoomName);
 
 						if ( fullMapPath.empty() )
 						{
@@ -1658,7 +1658,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 			{
 				snprintf(treasureRoomName, sizeof(treasureRoomName), "%s_lock%c%02d", levelset, prefix, treasureLevels);
 			}
-			std::string fullMapPath = physfsFormatMapName(treasureRoomName);
+			DynamicString fullMapPath = physfsFormatMapName(treasureRoomName);
 			if ( fullMapPath.empty() )
 			{
 				break;    // no more levels to load
@@ -1682,7 +1682,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 				char treasureSubRoomName[128] = "";
 				snprintf(treasureSubRoomName, sizeof(treasureSubRoomName), "%s%c", treasureRoomName, letter);
 
-				std::string fullMapPath = physfsFormatMapName(treasureSubRoomName);
+				DynamicString fullMapPath = physfsFormatMapName(treasureSubRoomName);
 
 				if ( fullMapPath.empty() )
 				{
@@ -1781,7 +1781,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 			char subRoomName[128] = "";
 			snprintf(subRoomName, sizeof(subRoomName), "%s%02d%c", levelset, subRoomNumLevels, letter);
 
-			std::string fullMapPath = physfsFormatMapName(subRoomName);
+			DynamicString fullMapPath = physfsFormatMapName(subRoomName);
 
 			if ( fullMapPath.empty() )
 			{
@@ -1802,7 +1802,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 		// look for mapnames ending in a letter a to z
 		char shopSubRoomName[128];
 		snprintf(shopSubRoomName, sizeof(shopSubRoomName), "%s%c", shopSubRooms.rootMapFileName.c_str(), letter);
-		std::string fullMapPath = physfsFormatMapName(shopSubRoomName);
+		DynamicString fullMapPath = physfsFormatMapName(shopSubRoomName);
 
 		if ( fullMapPath.empty() )
 		{
@@ -1944,7 +1944,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 					default:
 						break;
 				}
-				std::string fullMapPath = physfsFormatMapName(secretmapname);
+				DynamicString fullMapPath = physfsFormatMapName(secretmapname);
 				if ( fullMapPath.empty() || loadMap(fullMapPath.c_str(), &secretlevelmap, secretlevelmap.entities, secretlevelmap.creatures, &checkMapHash) == -1 )
 				{
 					list_FreeAll(secretlevelmap.entities);
@@ -7930,14 +7930,14 @@ void assignActions(map_t* map)
 						setRandomMonsterStats(myStats, tmpRng);
 					}
 
-					std::string checkName = myStats->name;
+					DynamicString checkName = myStats->name;
 					if ( checkName.find(".json") != std::string::npos )
 					{
 						monsterCurveCustomManager.createMonsterFromFile(entity, myStats, checkName, monsterType);
 					}
 					else if ( customMonsterCurveExists )
 					{
-						std::string variantName = "default";
+						DynamicString variantName = "default";
 						if ( monsterIsFixedSprite )
 						{
 							if ( isMonsterStatsDefault(*myStats) )
@@ -10019,7 +10019,7 @@ void assignActions(map_t* map)
 				{
 					buf[totalChars] = '\0';
 				}
-				std::string output = buf;
+				DynamicString output = buf;
 				size_t found = output.find("\\n");
 				while ( found != std::string::npos )
 				{
@@ -11167,7 +11167,7 @@ int loadMainMenuMap(bool blessedAdditionMaps, bool forceVictoryMap, int forcemap
 		}
 	}
 
-	std::string fullMapName;
+	DynamicString fullMapName;
 
 	int selection = forcemap;
 	if (selection <= 0) {

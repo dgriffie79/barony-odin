@@ -543,7 +543,7 @@ std::string& MonsterData_t::getAllyIconFromSprite(int sprite, int type)
 
 int MonsterData_t::getSpecialNPCBaseModel(Stat& myStats)
 {
-	std::string npcValue = myStats.getAttribute("special_npc");
+	DynamicString npcValue = myStats.getAttribute("special_npc");
 	if ( npcValue != "" )
 	{
 		return monsterDataEntries[myStats.type].specialNPCs[npcValue].baseModel;
@@ -553,7 +553,7 @@ int MonsterData_t::getSpecialNPCBaseModel(Stat& myStats)
 
 std::string MonsterData_t::getSpecialNPCName(Stat& myStats)
 {
-	std::string npcValue = myStats.getAttribute("special_npc");
+	DynamicString npcValue = myStats.getAttribute("special_npc");
 	if ( npcValue != "" )
 	{
 		return monsterDataEntries[myStats.type].specialNPCs[npcValue].name;

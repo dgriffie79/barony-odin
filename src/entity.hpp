@@ -1700,6 +1700,7 @@ public:
 	void addScriptToTextSource(Entity& src, const char* text);
 	void handleTextSourceScript(Entity& src, std::string input);
 	int textSourceProcessScriptTag(std::string& input, std::string findTag, Entity& src);
+	int textSourceProcessScriptTag(DynamicString& input, std::string findTag, Entity& src);
 	bool hasClearedInventory = false;
 	int getScriptType(Sint32 skill)
 	{

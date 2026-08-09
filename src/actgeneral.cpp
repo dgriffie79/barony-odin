@@ -456,7 +456,7 @@ void actStatue(Entity* my)
 			{
 				int index = 0;
 				real_t baseHeight = 0.0;
-				std::string directionString = StatueManager.directionKeys[my->statueDir];
+				DynamicString directionString = StatueManager.directionKeys[my->statueDir];
 				for ( auto& limb : StatueManager.allStatues[my->statueId].limbs[directionString] )
 				{
 					Entity* childEntity = newEntity(limb.sprite, 1, map.entities, nullptr);
@@ -2533,12 +2533,12 @@ void actFloorDecoration(Entity* my)
 				{
 					buf[totalChars] = '\0';
 				}
-				std::string output = buf;
+				DynamicString output = buf;
 
 				if ( buf[0] == '$' )
 				{
 					// try to replace text with data file entry
-					std::string key = "";
+					DynamicString key = "";
 					for ( int j = 0; j <= totalChars; ++j )
 					{
 						char c = buf[j];
@@ -2623,7 +2623,7 @@ void actFloorDecoration(Entity* my)
 				while ( foundInputTag != std::string::npos )
 				{
 					output.erase(foundInputTag, strlen("@in="));
-					std::string impulseStr;
+					DynamicString impulseStr;
 					size_t inputTagStrIndex = foundInputTag;
 					while ( inputTagStrIndex < output.length()
 						&& output.at(inputTagStrIndex) != ' '
@@ -2637,7 +2637,7 @@ void actFloorDecoration(Entity* my)
 						++inputTagStrIndex;
 					}
 					output.erase(output.find(impulseStr), impulseStr.length());
-					std::string inputFormatted;
+					DynamicString inputFormatted;
 					inputFormatted.append("[");
 					const char* binding = Input::inputs[0].binding(impulseStr.c_str());
 					inputFormatted.append(binding[0] == '\0' ? impulseStr : binding);
@@ -2694,7 +2694,7 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 			return 0;
 		}
 
-		std::string tagValue;
+		DynamicString tagValue;
 
 		while ( foundScriptTag < input.length()
 			&& input.at(foundScriptTag) != ' '
@@ -2722,7 +2722,7 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 		{
 			if ( findTag.compare("@setvar=") == 0 )
 			{
-				std::string variableName = tagValue.substr(0, foundMapReference);
+				DynamicString variableName = tagValue.substr(0, foundMapReference);
 				int value = std::stoi(tagValue.substr(foundMapReference + 1, tagValue.length() - foundMapReference));
 				if ( scriptVariables.contains(variableName) )
 				{
@@ -2736,8 +2736,8 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 			}
 
 
-			std::string x_str = tagValue.substr(0, foundMapReference);
-			std::string y_str = tagValue.substr(foundMapReference + 1, tagValue.length() - foundMapReference);
+			DynamicString x_str = tagValue.substr(0, foundMapReference);
+			DynamicString y_str = tagValue.substr(foundMapReference + 1, tagValue.length() - foundMapReference);
 			int x1 = 0;
 			int x2 = 0;
 			int y1 = 0;
@@ -2784,7 +2784,7 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 				size_t foundSeperator = tagValue.find(";");
 				if ( foundSeperator != std::string::npos )
 				{
-					std::string first_str = tagValue.substr(foundSeperator + 1, tagValue.length() - foundSeperator);
+					DynamicString first_str = tagValue.substr(foundSeperator + 1, tagValue.length() - foundSeperator);
 					explosionSprite = std::stoi(first_str);
 				}
 				return ((x1 & 0xFF) << 16) + ((y1 & 0xFF) << 24) + ((explosionSprite & 0xFFFF) << 0);
@@ -2799,8 +2799,8 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 			{
 				std::pair<int, int> param1 = std::make_pair(0, 0);
 				std::pair<int, int> param2 = std::make_pair(0, 0);
-				std::string first_str = tagValue.substr(0, foundSeperator);
-				std::string second_str = tagValue.substr(foundSeperator + 1, tagValue.length() - foundSeperator);
+				DynamicString first_str = tagValue.substr(0, foundSeperator);
+				DynamicString second_str = tagValue.substr(foundSeperator + 1, tagValue.length() - foundSeperator);
 				size_t foundRange = first_str.find("-");
 				if ( foundRange != std::string::npos )
 				{
@@ -2838,8 +2838,8 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 				{
 					std::pair<int, int> param1 = std::make_pair(0, 0);
 					// found range reference.
-					std::string first_str = tagValue.substr(0, foundRange);
-					std::string second_str = tagValue.substr(foundRange + 1, tagValue.length() - foundRange);
+					DynamicString first_str = tagValue.substr(0, foundRange);
+					DynamicString second_str = tagValue.substr(foundRange + 1, tagValue.length() - foundRange);
 
 					param1.first = std::stoi(first_str);
 					param1.second = std::stoi(second_str);
@@ -2947,16 +2947,26 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 	return k_ScriptError;
 }
 
+// DynamicString overload — bridges to the std::string version (which writes
+// into input), copying both ways.
+int TextSourceScript::textSourceProcessScriptTag(DynamicString& input, std::string findTag, Entity& src)
+{
+	std::string tmp(input.c_str());
+	int result = textSourceProcessScriptTag(tmp, findTag, src);
+	input = tmp.c_str();
+	return result;
+}
+
 void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 {
 	bool statOnlyUpdateNeeded = false;
 
 	std::vector<std::string> tokens;
-	std::string searchString = input;
+	DynamicString searchString = input;
 	size_t findToken = searchString.find("@");
 	while ( findToken != std::string::npos )
 	{
-		std::string token = "@";
+		DynamicString token = "@";
 		++findToken;
 		while ( findToken < searchString.length()
 			&& searchString.at(findToken) != ' '
@@ -2973,7 +2983,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 	}
 
 	printlog("[SCRIPT]: Starting Execution...");
-	std::string executionLog = "[SCRIPT]: Processed tokens:";
+	DynamicString executionLog = "[SCRIPT]: Processed tokens:";
 	std::vector<Entity*> attachedEntities = textSourceScript.getScriptAttachedEntities(src);
 
 	for ( auto it = tokens.begin(); it != tokens.end(); ++it )
@@ -3868,7 +3878,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 		}
 		else if ( (*it).find("@copyNPC=") != std::string::npos )
 		{
-			std::string profTag = "@copyNPC=";
+			DynamicString profTag = "@copyNPC=";
 			int result = textSourceProcessScriptTag(input, profTag, src);
 			if ( result != k_ScriptError )
 			{
@@ -3928,7 +3938,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 		}
 		else if ( (*it).find("@setenemy=") != std::string::npos )
 		{
-			std::string profTag = "@setenemy=";
+			DynamicString profTag = "@setenemy=";
 			int result = textSourceProcessScriptTag(input, profTag, src);
 			if ( result != k_ScriptError )
 			{
@@ -3979,7 +3989,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 		}
 		else if ( (*it).find("@setally=") != std::string::npos )
 		{
-			std::string profTag = "@setally=";
+			DynamicString profTag = "@setally=";
 			int result = textSourceProcessScriptTag(input, profTag, src);
 			if ( result != k_ScriptError )
 			{
@@ -4028,7 +4038,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 		}
 		else if ( (*it).find("@setvar=") != std::string::npos )
 		{
-			std::string profTag = "@setvar=";
+			DynamicString profTag = "@setvar=";
 			int result = textSourceProcessScriptTag(input, profTag, src);
 			if ( result != k_ScriptError )
 			{
@@ -4542,7 +4552,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 		{
 			for ( int i = 0; i < NUMSTATS; ++i )
 			{
-				std::string profTag = "@st";
+				DynamicString profTag = "@st";
 				switch ( i )
 				{
 					case STAT_STR:
@@ -4631,7 +4641,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 			}
 			for ( int i = 0; i < NUMSTATS; ++i )
 			{
-				std::string profTag = "@st";
+				DynamicString profTag = "@st";
 				switch ( i )
 				{
 					case STAT_STR:
@@ -4721,7 +4731,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 
 			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 			{
-				std::string profTag = "@pro";
+				DynamicString profTag = "@pro";
 				profTag.append(std::to_string(i).append("="));
 				if ( (*it).find(profTag) != std::string::npos )
 				{
@@ -4766,7 +4776,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
 			}
 			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 			{
-				std::string profTag = "@pro";
+				DynamicString profTag = "@pro";
 				profTag.append(std::to_string(i).append("+"));
 				if ( (*it).find(profTag) != std::string::npos )
 				{
@@ -4958,7 +4968,7 @@ void Entity::actTextSource()
 		{
 			textSourceVariables4W |= 1;
 
-			std::string output = textSourceScript.getScriptFromEntity(*this);
+			DynamicString output = textSourceScript.getScriptFromEntity(*this);
 
 			Uint32 color = makeColorRGB((textSourceColorRGB >> 16) & 0xFF, (textSourceColorRGB >> 8) & 0xFF,
 				(textSourceColorRGB >> 0) & 0xFF);
@@ -4981,7 +4991,7 @@ void Entity::actTextSource()
 			if ( foundDistanceRequirement != std::string::npos )
 			{
 				output.erase(foundDistanceRequirement, 2);
-				std::string distance;
+				DynamicString distance;
 				while ( foundDistanceRequirement < output.length() 
 					&& output.at(foundDistanceRequirement) != ' '
 					&& output.at(foundDistanceRequirement) != '\0'
@@ -4999,7 +5009,7 @@ void Entity::actTextSource()
 			while ( foundInputTag != std::string::npos )
 			{
 				output.erase(foundInputTag, strlen("@in="));
-				std::string impulseStr;
+				DynamicString impulseStr;
 				size_t inputTagStrIndex = foundInputTag;
 				while ( inputTagStrIndex < output.length()
 					&& output.at(inputTagStrIndex) != ' '
@@ -5013,7 +5023,7 @@ void Entity::actTextSource()
 					++inputTagStrIndex;
 				}
 				output.erase(output.find(impulseStr), impulseStr.length());
-				std::string inputFormatted;
+				DynamicString inputFormatted;
 				inputFormatted.append("[");
 				const char* binding = Input::inputs[0].binding(impulseStr.c_str());
 				inputFormatted.append(binding[0] == '\0' ? impulseStr : binding);
@@ -5195,7 +5205,7 @@ std::string TextSourceScript::getScriptFromEntity(Entity& src)
 	if ( buf[0] == '$' )
 	{
 		// try to replace script with data file entry
-		std::string key = "";
+		DynamicString key = "";
 		for ( int i = 0; i <= totalChars; ++i )
 		{
 			char c = buf[i];
@@ -5259,7 +5269,7 @@ void TextSourceScript::addScriptToTextSource(Entity& src, const char* text)
 
 void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 {
-	std::string script = getScriptFromEntity(src);
+	DynamicString script = getScriptFromEntity(src);
 
 	size_t foundScriptTag = script.find("@script");
 	if ( foundScriptTag != std::string::npos )

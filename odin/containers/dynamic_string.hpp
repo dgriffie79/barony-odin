@@ -140,6 +140,11 @@ public:
     // insert a string at pos (std::string::insert(pos, str))
     DynamicString& insert(int64_t pos, const char* str) { barony_dynamic_string_insert_cstr(this, (int)pos, str); return *this; }
     DynamicString& insert(int64_t pos, const std::string& str) { barony_dynamic_string_insert_cstr(this, (int)pos, str.c_str()); return *this; }
+    // insert count copies of ch at pos (std::string::insert(pos, count, ch))
+    DynamicString& insert(int64_t pos, int64_t count, char ch) {
+        for (int64_t i = 0; i < count; ++i) barony_dynamic_string_insert_cstr(this, (int)(pos + i), (&ch));
+        return *this;
+    }
     // mutable char access (std::string::operator[]/at)
     char& at(int64_t i) { return data[i]; }
     char& operator[](int64_t i) { return data[i]; }
@@ -185,6 +190,8 @@ inline bool operator!=(const DynamicString& a, const std::string& b) { return a 
 inline DynamicString operator+(const DynamicString& a, const char* b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const char* a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
 inline DynamicString operator+(const DynamicString& a, const DynamicString& b) { DynamicString r(a); r += b; return r; }
+inline DynamicString operator+(const DynamicString& a, char c) { DynamicString r(a); r += c; return r; }
+inline DynamicString operator+(char c, const DynamicString& a) { DynamicString r; r += c; r += a; return r; }
 
 // bridge: std::string += DynamicString (unconverted callers appending values)
 inline std::string& operator+=(std::string& a, const DynamicString& b) { a += b.c_str(); return a; }

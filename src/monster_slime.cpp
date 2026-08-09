@@ -23,7 +23,7 @@
 #include "magic/magic.hpp"
 #include "mod_tools.hpp"
 
-int getSlimeFrame(std::string color, int frame)
+int getSlimeFrame(DynamicString color, int frame)
 {
 	auto& data = MonsterData_t::monsterDataEntries[SLIME];
 	auto find = data.keyToSpriteLookup.find(color);
@@ -228,7 +228,7 @@ void initSlime(Entity* my, Stat* myStats)
 			}
 
 
-			std::string color = "slime green";
+			DynamicString color = "slime green";
 			if ( myStats->getAttribute("slime_type") == "" )
 			{
 				slimeSetType(my, myStats, false, &rng);
