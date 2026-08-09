@@ -77,7 +77,7 @@ void Button::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const 
 		return;
 	}
 
-#if defined(EDITOR) || defined(NINTENDO)
+#if defined(EDITOR)
 	const bool focused = (fingerdown && highlighted) || selected;
 #else
 	const int mouseowner = intro || gamePaused ? inputs.getPlayerIDAllowedKeyboard() : owner;
@@ -378,13 +378,7 @@ Button::result_t Button::process(SDL_Rect _size, SDL_Rect _actualSize, const boo
 		return result;
 	}
 
-#if defined(NINTENDO)
-	const bool clicking = fingerdown;
-	Sint32 mousex = (::fingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 mousey = (::fingery / (float)yres) * (float)Frame::virtualScreenY;
-	Sint32 omousex = (::ofingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 omousey = (::ofingery / (float)yres) * (float)Frame::virtualScreenY;
-#elif defined(EDITOR)
+#if defined(EDITOR)
 	const bool clicking = mousestatus[SDL_BUTTON_LEFT];
 	Sint32 mousex = (::mousex / (float)xres) * (float)Frame::virtualScreenX;
 	Sint32 mousey = (::mousey / (float)yres) * (float)Frame::virtualScreenY;
@@ -400,11 +394,7 @@ Button::result_t Button::process(SDL_Rect _size, SDL_Rect _actualSize, const boo
 #endif
 
 #ifndef EDITOR
-#ifndef NINTENDO
 	if (rectContainsPoint(_size, omousex, omousey) && inputs.getVirtualMouse(mouseowner)->draw_cursor) {
-#else
-	if (rectContainsPoint(_size, omousex, omousey)) {
-#endif
 		result.highlighted = highlighted = true;
 		result.highlightTime = highlightTime;
 		result.tooltip = tooltip.c_str();

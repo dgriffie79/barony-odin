@@ -118,18 +118,14 @@ void Frame::fboInit() {
         gui_fb.init(Frame::virtualScreenX, Frame::virtualScreenY, GL_NEAREST, GL_NEAREST);
     }
 #endif
-#ifndef NINTENDO
     gui_fb_upscaled.init(Frame::virtualScreenX * 3, Frame::virtualScreenY * 3, GL_LINEAR, GL_NEAREST); // 4k resolution
     gui_fb_downscaled.init(Frame::virtualScreenX / 2, Frame::virtualScreenY / 2, GL_LINEAR, GL_NEAREST); // 360p resolution
-#endif
 }
 
 void Frame::fboDestroy() {
 	gui_fb.destroy();
-#ifndef NINTENDO
 	gui_fb_upscaled.destroy();
 	gui_fb_downscaled.destroy();
-#endif
 }
 
 #ifndef EDITOR
@@ -448,8 +444,6 @@ void Frame::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 static bool isMouseActive(int owner) {
 #if defined(EDITOR)
 	return true;
-#elif defined(NINTENDO)
-	return fingerdown;
 #else
 	const int mouseowner = intro || gamePaused ? inputs.getPlayerIDAllowedKeyboard() : owner;
 	return inputs.getVirtualMouse(mouseowner)->draw_cursor || mousexrel || mouseyrel;
@@ -568,12 +562,7 @@ void Frame::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const W
 		}
 	}
 
-#if defined(NINTENDO)
-	Sint32 mousex = (::fingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 mousey = (::fingery / (float)yres) * (float)Frame::virtualScreenY;
-	Sint32 omousex = (::ofingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 omousey = (::ofingery / (float)yres) * (float)Frame::virtualScreenY;
-#elif defined(EDITOR)
+#if defined(EDITOR)
 	Sint32 mousex = (::mousex / (float)xres) * (float)Frame::virtualScreenX;
 	Sint32 mousey = (::mousey / (float)yres) * (float)Frame::virtualScreenY;
 	Sint32 omousex = (::omousex / (float)xres) * (float)Frame::virtualScreenX;
@@ -1062,12 +1051,7 @@ Frame::result_t Frame::process(SDL_Rect _size, SDL_Rect _actualSize, bool usable
 	fullSize.h += (actualSize.w > size.w) ? sliderSize : 0;
 	fullSize.w += (actualSize.h > size.h) ? sliderSize : 0;
 
-#if defined(NINTENDO)
-	Sint32 mousex = (::fingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 mousey = (::fingery / (float)yres) * (float)Frame::virtualScreenY;
-	Sint32 omousex = (::ofingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 omousey = (::ofingery / (float)yres) * (float)Frame::virtualScreenY;
-#elif defined(EDITOR)
+#if defined(EDITOR)
 	Sint32 mousex = (::mousex / (float)xres) * (float)Frame::virtualScreenX;
 	Sint32 mousey = (::mousey / (float)yres) * (float)Frame::virtualScreenY;
 	Sint32 omousex = (::omousex / (float)xres) * (float)Frame::virtualScreenX;

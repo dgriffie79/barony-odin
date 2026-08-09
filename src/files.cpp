@@ -2121,13 +2121,6 @@ bool completePath(char *dest, const char * const filename, const char *base) {
 		return true;
 	}
 
-#ifdef NINTENDO
-	// Already absolute on nintendo
-	if (strncmp(filename, base, strlen(base)) == 0) {
-		strcpy(dest, filename);
-		return true;
-	}
-#endif
 
 #ifdef WINDOWS
 	// Already absolute (drive letter in path)
@@ -2183,9 +2176,6 @@ bool dataPathExists(const char * const path, bool complete) {
 }
 
 void openLogFile() {
-#ifdef NINTENDO
-	return;
-#endif
 	char path[PATH_MAX];
 	completePath(path, "log.txt", outputdir);
 
@@ -3694,13 +3684,9 @@ std::list<std::string> directoryContents(const char* directory, bool includeSubd
 std::vector<DynamicString> getLinesFromDataFile(DynamicString filename)
 {
 	std::vector<DynamicString> lines;
-#ifdef NINTENDO
-	std::string filepath(filename);
-#else
 	std::string filepath(datadir);
 	filepath += "/";
 	filepath += filename;
-#endif
 	std::ifstream file(filepath);
 	if ( !file )
 	{
@@ -4109,7 +4095,6 @@ void generatePolyModels(int start, int end, bool forceCacheRebuild)
         memset(polymodels, 0, sizeof(polymodel_t) * nummodels);
 		if ( useModelCache && !forceCacheRebuild )
 		{
-#ifndef NINTENDO
             DynamicString cache_path;
             if (isCurrentHoliday()) {
                 const auto holiday = getCurrentHoliday();
@@ -4124,9 +4109,6 @@ void generatePolyModels(int start, int end, bool forceCacheRebuild)
             } else {
                 cache_path = std::string(outputdir) + "/models.cache";
             }
-#else
-			DynamicString cache_path = "models.cache";
-#endif
 			auto model_cache = openDataFile(cache_path.c_str(), "rb");
 			if ( model_cache )
 			{
@@ -5137,11 +5119,9 @@ void generatePolyModels(int start, int end, bool forceCacheRebuild)
 		// free up quads for the next model
 		list_FreeAll(&quads);
 	}
-#ifndef NINTENDO
     if (!isCurrentHoliday() && useModelCache) {
 		saveModelCache();
     }
-#endif
 
     uint64_t greatest = 0;
     for (uint32_t c = 0; c < nummodels; ++c) {

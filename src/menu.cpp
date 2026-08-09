@@ -2485,14 +2485,6 @@ static void handleMainMenu(bool mode)
 				if (inputstr != stats[0]->name) //TODO: NX PORT: Not sure if this portion is correct...the PC version of this chunk has changed significantly in the interleaving time.
 				{
 					inputstr = stats[0]->name;
-#ifdef NINTENDO
-					auto result = nxKeyboard("Enter your character's name");
-					if (result.success)
-					{
-						strncpy(inputstr, result.str.c_str(), 21);
-						inputstr[21] = '\0';
-					}
-#endif
 				}
 				SDL_StartTextInput();
 			}
@@ -2641,8 +2633,6 @@ static void handleMainMenu(bool mode)
 	}
 
 	// serial window.
-#ifdef NINTENDO
-#endif
 
 	// settings window
 	if ( settings_window == true )
@@ -4085,14 +4075,6 @@ static void handleMainMenu(bool mode)
 				if (inputstr != portnumber_char)
 				{
 					inputstr = portnumber_char;
-#ifdef NINTENDO
-					auto result = nxKeyboard("Enter port number");
-					if (result.success)
-					{
-						strncpy(inputstr, result.str.c_str(), 21);
-						inputstr[21] = '\0'; //TODO: NX PORT: Why 21? inputlen = 5 down there, shouldn't this be inputstr[4]?
-					}
-#endif
 				}
 			}
 			//strncpy(portnumber_char,inputstr,5);
@@ -4128,14 +4110,6 @@ static void handleMainMenu(bool mode)
 				if (inputstr != connectaddress)
 				{
 					inputstr = connectaddress;
-#ifdef NINTENDO
-					auto result = nxKeyboard("Enter address");
-					if (result.success)
-					{
-						strncpy(inputstr, result.str.c_str(), 21);
-						inputstr[21] = '\0'; //TODO: NX PORT: Why not inputstr[30], since inputlen = 31?
-					}
-#endif
 				}
 			}
 			//strncpy(connectaddress,inputstr,31);
@@ -6906,7 +6880,6 @@ void doNewGame(bool makeHighscore) {
 
 		if ( players[c]->isLocalPlayer() )
 		{
-#ifndef NINTENDO
 			if ( inputs.hasController(c) )
 			{
 				players[c]->hotbar.useHotbarFaceMenu = playerSettings[c].gamepad_facehotbar;
@@ -6915,9 +6888,6 @@ void doNewGame(bool makeHighscore) {
 			{
 				players[c]->hotbar.useHotbarFaceMenu = false;
 			}
-#else
-			players[c]->hotbar.useHotbarFaceMenu = playerSettings[c].gamepad_facehotbar;
-#endif // NINTENDO
 		}
 	}
 
@@ -8252,17 +8222,6 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 	}
 	splitscreen = false;
 
-#ifdef NINTENDO
-	fpsLimit = 60; // revert to 60 for the main menu
-	nxEnableAutoSleep();
-	nxEndParentalControls();
-	if (directConnect) {
-		// cleanse wireless connection state
-		nxShutdownWireless();
-	} else {
-		MainMenu::logoutOfEpic();
-	}
-#endif
 
     // this is done so that save game screenshots get
     // reloaded after the game is done.
@@ -9753,7 +9712,6 @@ void buttonRandomName(button_t* my)
 		return;
 	}
 	DynamicString name;
-#ifndef NINTENDO
 	try
 	{
 		name = randomEntryFromVector(*names);
@@ -9768,9 +9726,6 @@ void buttonRandomName(button_t* my)
 		printlog("Error: Failed to choose random name.");
 		return;
 	}
-#else
-	name = randomEntryFromVector(*names);
-#endif
 
 	strncpy(inputstr, name.c_str(), std::min<size_t>(name.length(), inputlen));
 	inputstr[std::min<size_t>(name.length(), inputlen)] = '\0';

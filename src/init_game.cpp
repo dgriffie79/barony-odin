@@ -116,7 +116,6 @@ void initGameDatafilesAsync(bool moddedReload)
 {
 	physfsReloadMonsterLimbFiles();
 	GlyphHelper.readFromFile();
-#ifndef NINTENDO
 	if ( PHYSFS_getRealDir(PLAYERNAMES_MALE_FILE.c_str()) )
 	{
 		DynamicString namesDirectory = PHYSFS_getRealDir(PLAYERNAMES_MALE_FILE.c_str());
@@ -141,7 +140,6 @@ void initGameDatafilesAsync(bool moddedReload)
 		namesDirectory.append(PHYSFS_getDirSeparator()).append(NPCNAMES_FEMALE_FILE);
 		randomNPCNamesFemale = getLinesFromDataFile(namesDirectory);
 	}
-#endif
 }
 
 int initGame()
@@ -167,16 +165,6 @@ int initGame()
 	auto loading_task = std::async(std::launch::async, [&loading_done](){
 		updateLoadingScreen(92);
 		initGameDatafilesAsync(false);
-#ifdef NINTENDO
-		const auto playerMaleNames = BASE_DATA_DIR + std::string("/") + PLAYERNAMES_MALE_FILE;
-		const auto playerFemaleNames = BASE_DATA_DIR + std::string("/") + PLAYERNAMES_FEMALE_FILE;
-        const auto npcMaleNames = BASE_DATA_DIR + std::string("/") + NPCNAMES_MALE_FILE;
-        const auto npcFemaleNames = BASE_DATA_DIR + std::string("/") + NPCNAMES_FEMALE_FILE;
-		randomPlayerNamesMale = getLinesFromDataFile(playerMaleNames);
-		randomPlayerNamesFemale = getLinesFromDataFile(playerFemaleNames);
-        randomNPCNamesMale = getLinesFromDataFile(npcMaleNames);
-        randomNPCNamesFemale = getLinesFromDataFile(npcFemaleNames);
-#endif // NINTENDO
 
 		updateLoadingScreen(94);
 
@@ -185,7 +173,6 @@ int initGame()
 		//enabledDLCPack2 = true;
 //#endif
 
-#ifndef NINTENDO
 		if ( PHYSFS_getRealDir("mythsandoutcasts.key") != NULL )
 		{
 			DynamicString serial = PHYSFS_getRealDir("mythsandoutcasts.key");
@@ -264,7 +251,6 @@ int initGame()
 				FileIO::close(fp);
 			}
 		}
-#endif // !NINTENDO
 
 		removedEntities.first = NULL;
 		removedEntities.last = NULL;
@@ -417,9 +403,6 @@ int initGame()
 #ifdef USE_FMOD
 		VoiceChat.init();
 #endif
-#endif
-#ifdef NINTENDO
-		nxPostSDLInit();
 #endif
 	}
 
@@ -725,9 +708,7 @@ void deinitGame()
 		delete game_controller;
 	}*/
 
-#ifndef NINTENDO
 	IRCHandler.disconnect();
-#endif // !NINTENDO
 
 	if ( shoparea )
 	{
@@ -797,12 +778,6 @@ void loadAchievementData(const char* path) {
 			return;
 		}
 		auto achName = it.name.GetString();
-#ifdef NINTENDO
-		if ( !strcmp(achName, "BARONY_ACH_LOCAL_CUSTOMS") )
-		{
-			continue;
-		}
-#endif
 		if ( !strcmp(achName, "BARONY_ACH_CARTOGRAPHER") )
 		{
 			continue;

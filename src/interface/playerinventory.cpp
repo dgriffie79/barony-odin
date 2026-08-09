@@ -4359,35 +4359,19 @@ std::string getBindingNameForMissingTooltipPrompts(int index)
 {
 	if ( index == 1 )
 	{
-#ifdef NINTENDO
-		return "MenuAlt1";
-#else
 		return "MenuAlt2";
-#endif
 	}
 	else if ( index == 2 )
 	{
-#ifdef NINTENDO
-		return "MenuAlt2";
-#else
 		return "MenuAlt1";
-#endif
 	}
 	else if ( index == 3 )
 	{
-#ifdef NINTENDO
-		return "MenuConfirm";
-#else
 		return "MenuCancel";
-#endif
 	}
 	else if ( index == 4 )
 	{
-#ifdef NINTENDO
-		return "MenuCancel";
-#else
 		return "MenuConfirm";
-#endif
 	}
 	else
 	{

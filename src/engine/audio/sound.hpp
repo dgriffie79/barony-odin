@@ -32,12 +32,7 @@
 #include <mutex>
 #include <queue>
 #ifdef USE_OPUS
-#ifdef NINTENDO
-typedef int16_t opus_int16;
-#define opus_strerror(x) ""
-#else
 #include <opus/opus.h>
-#endif
 #endif
 #include "../../interface/consolecommand.hpp"
 
@@ -248,13 +243,8 @@ public:
     {
         bool loopback_local_record = false;
         float voice_global_volume = 100.f;
-#ifdef NINTENDO
-        bool enable_voice_input = false;
-        bool enable_voice_receive = false;
-#else
         bool enable_voice_input = false;
         bool enable_voice_receive = true;
-#endif
         float recordingGain = 100.f;
         bool pushToTalk = true;
         bool use_custom_rolloff = true;
@@ -395,10 +385,8 @@ public:
 #ifdef USE_OPUS
     class OpusAudioCodec_t
     {
-#ifndef NINTENDO
         OpusEncoder* encoder = nullptr;
         OpusDecoder* decoder[MAXPLAYERS] = { nullptr };
-#endif
         bool bInit = false;
     public:
         static void logError(const char* str, ...)
@@ -429,9 +417,6 @@ public:
 
         void deinit()
         {
-#ifdef NINTENDO
-            nxDeinitOpus();
-#else
             if ( encoder )
             {
                 opus_encoder_destroy(encoder);
@@ -445,7 +430,6 @@ public:
                     decoder[i] = nullptr;
                 }
             }
-#endif
             if ( bInit )
             {
                 logInfo("OpusAudioCodec_t::deinit()");

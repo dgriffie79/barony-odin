@@ -67,9 +67,6 @@ using std::string; //Instead of including an entire namespace, please explicitly
 #include <functional>
 #include "physfs.h"
 
-#ifdef NINTENDO
-#include "nintendo/baronynx.hpp"
-#endif
 
 
 enum ESteamStatTypes
@@ -135,7 +132,6 @@ extern bool autoLimbReload;
  #include <OpenGL/gl3.h>
  #include <SDL2/SDL_opengl.h>
 #else // APPLE
- #ifndef NINTENDO
   #define GL_GLEXT_PROTOTYPES
   #ifdef WINDOWS
     #include <GL/glew.h>
@@ -145,7 +141,6 @@ extern bool autoLimbReload;
   #ifdef LINUX
   	typedef uint16_t GLhalf;
   #endif
- #endif
 #ifndef WINDOWS
  #include <GL/glext.h>
 #endif
@@ -163,16 +158,12 @@ extern bool autoLimbReload;
 #ifdef APPLE
  #include <SDL2_image/SDL_image.h>
 #else // APPLE
- #ifndef NINTENDO
   #include "SDL_image.h"
- #endif // NINTENDO
 #endif // !APPLE
 #ifdef APPLE
 #include <SDL2_net/SDL_net.h>
 #else
-#ifndef NINTENDO
 #include "SDL_net.h"
-#endif
 #endif
 #ifdef APPLE
 #include <SDL2_ttf/SDL_ttf.h>
@@ -920,10 +911,8 @@ struct SteamGlobalStat_t
 extern SteamGlobalStat_t g_SteamAPIGlobalStats[1];
 
 
-#ifndef NINTENDO
  #define getSizeOfText(A, B, C, D) TTF_SizeUTF8(A, B, C, D)
  #define getHeightOfFont(A) TTF_FontHeight(A)
-#endif // NINTENDO
 
 #define LOCAL_ACHIEVEMENTS
 

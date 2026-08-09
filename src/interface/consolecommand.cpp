@@ -3851,7 +3851,6 @@ namespace ConsoleCommands {
 		}
 		});
 
-#ifndef NINTENDO
 	static ConsoleCommand ccmd_ircconnect("/ircconnect", "", []CCMD{
 		if (IRCHandler.connect())
 		{
@@ -3879,7 +3878,6 @@ namespace ConsoleCommands {
 		IRCHandler.packetSend(message);
 		messagePlayer(clientnum, MESSAGE_MISC, "[IRC]: Sent message.");
 		});
-#endif // !NINTENDO
 
 	static ConsoleCommand ccmd_loadtooltips("/loadtooltips", "", []CCMD{
 		ItemTooltips.readTooltipsFromFile();
@@ -4905,7 +4903,6 @@ namespace ConsoleCommands {
 	});
 
 	static ConsoleCommand ccmd_writedefaultclasshotbars("/writedefaultclasshotbars", "", []CCMD{
-#ifndef NINTENDO
 #ifndef EDITOR
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
@@ -4917,7 +4914,6 @@ namespace ConsoleCommands {
 		ClassHotbarConfig_t::writeToFile(ClassHotbarConfig_t::HOTBAR_LAYOUT_DEFAULT_CONFIG, ClassHotbarConfig_t::HOTBAR_CONFIG_WRITE);
 		intro = oldIntro;
 		ClassHotbarConfig_t::init();
-#endif
 #endif
 	});
 
@@ -4948,7 +4944,6 @@ namespace ConsoleCommands {
 	});
 
 	static ConsoleCommand ccmd_maphashcheck("/maphashcheck", "", []CCMD{
-#ifndef NINTENDO
 		const char* outpath = nullptr;
 		if (argc > 1) {
 			outpath = argv[1];
@@ -5014,11 +5009,9 @@ namespace ConsoleCommands {
                 FileIO::close(fp);
             }
 		}
-#endif
 	});
 
 	static ConsoleCommand ccmd_mapwirecheck("/mapwirecheck", "", []CCMD{
-#ifndef NINTENDO
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
 			DynamicString mapPath = "maps/";
@@ -5078,7 +5071,6 @@ namespace ConsoleCommands {
 				// will crash the game but will show results of every map load :)
 			}
 		}
-#endif
 	});
 
 	static ConsoleCommand ccmd_map_debug_stations("/map_debug_stations", "", []CCMD{
@@ -5102,7 +5094,6 @@ namespace ConsoleCommands {
 	});
 
 	static ConsoleCommand ccmd_map_debug_door("/map_debug_door", "", []CCMD{
-#ifndef NINTENDO
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
@@ -5139,11 +5130,9 @@ namespace ConsoleCommands {
 				// will crash the game but will show results of every map load :)
 			}
 		}
-#endif
 		});
 
 	static ConsoleCommand ccmd_map_debug_floor_interact("/map_debug_floor_interact", "", []CCMD{
-#ifndef NINTENDO
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
@@ -5197,11 +5186,9 @@ namespace ConsoleCommands {
 				// will crash the game but will show results of every map load :)
 			}
 		}
-#endif
 		});
 
 	static ConsoleCommand ccmd_map_debug_treasure("/map_debug_treasure", "", []CCMD{
-#ifndef NINTENDO
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
@@ -5348,12 +5335,10 @@ namespace ConsoleCommands {
 				}
 			}
 		}
-#endif
 		});
 
 	static ConsoleCommand ccmd_exportitemlang("/exportitemlang", "", []CCMD{
 #ifndef EDITOR
-#ifndef NINTENDO
 		/*rapidjson::Document d;
 		d.SetObject();
 		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
@@ -5376,12 +5361,10 @@ namespace ConsoleCommands {
 		fp->write(os.GetString(), sizeof(char), os.GetSize());
 		FileIO::close(fp);*/
 #endif
-#endif
 	});
 
 	static ConsoleCommand ccmd_exportspelllang("/exportspelllang", "", []CCMD{
 #ifndef EDITOR
-#ifndef NINTENDO
 		/*rapidjson::Document d;
 		d.SetObject();
 		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
@@ -5405,7 +5388,6 @@ namespace ConsoleCommands {
 		d.Accept(writer);
 		fp->write(os.GetString(), sizeof(char), os.GetSize());
 		FileIO::close(fp);*/
-#endif
 #endif
 	});
 
@@ -5730,7 +5712,6 @@ namespace ConsoleCommands {
 	});
 
 	static ConsoleCommand ccmd_mesh_collider_verify_and_crash_game("/mesh_collider_verify_and_crash_game", "", []CCMD{
-#ifndef NINTENDO
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
@@ -5795,7 +5776,6 @@ namespace ConsoleCommands {
 				// will crash the game but will show results of every map load :)
 			}
 		}
-#endif
 	});
 
     static ConsoleCommand ccmd_test_light("/test_light", "spawn a test light (r, g, b)", []CCMD{
@@ -6355,7 +6335,6 @@ namespace ConsoleCommands {
 		});
 
 	static ConsoleCommand ccmd_mapdebugfixedmonsters("/mapdebugfixedmonsters", "prints fixed monster spawns", []CCMD{
-	#ifndef NINTENDO
 		if ( !(svFlags & SV_FLAG_CHEATS) )
 		{
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
@@ -6445,7 +6424,6 @@ namespace ConsoleCommands {
 				// will crash the game but will show results of every map load :)
 			}
 		}
-#endif
 		});
 
 	static ConsoleCommand ccmd_shader_test("/shader_test", "", []CCMD{

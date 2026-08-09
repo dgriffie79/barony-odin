@@ -921,11 +921,7 @@ static ConsoleCommand ccmd_demo_play("/demo_play", "play a recorded demo(default
 
 ConsoleVariable<bool> framesEatMouse("/gui_eat_mouseclicks", true);
 static ConsoleVariable<bool> cvar_lava_use_vismap("/lava_use_vismap", true);
-#ifdef NINTENDO
-static ConsoleVariable<bool> cvar_lava_bubbles_enabled("/lava_bubbles_enabled", false);
-#else
 static ConsoleVariable<bool> cvar_lava_bubbles_enabled("/lava_bubbles_enabled", true);
-#endif
 
 static real_t drunkextend[MAXPLAYERS] = { (real_t)0.0 };
 
@@ -938,9 +934,6 @@ void gameLogic(void)
 	Uint32 i = 0, j;
 	bool entitydeletedself;
 
-#ifdef NINTENDO
-	(void)nxUpdateCrashMessage();
-#endif
 
     if (!gamePaused && !loading) {
         if (demo_file) {
@@ -4155,35 +4148,6 @@ bool handleEvents(void)
 
 	Input::lastInputOfAnyKind = "";
 
-#ifdef NINTENDO
-	// update controllers
-	nxControllersUpdate();
-
-	// detect resolution changes
-	if (nxHasResolutionChanged()) {
-		int x, y;
-		nxGetCurrentResolution(x, y);
-		printlog("new display size: %d %d", x, y);
-
-		if (!changeVideoMode(x, y)) {
-			printlog("critical error! Attempting to abort safely...\n");
-			mainloop = 0;
-		}
-		if (!intro) {
-			MainMenu::setupSplitscreen();
-		}
-	}
-
-	// detect app focus changes
-	const bool asleep = nxAppOutOfFocus();
-	if (asleep) {
-		if (!intro && !gamePaused) {
-			if (!MainMenu::isMenuOpen() && !MainMenu::isCutsceneActive()) {
-				pauseGame(2, 0);
-			}
-		}
-	}
-#endif
 
     // consume mouse buttons that were eaten by GUI
 	if (!framesProcResult.usable && *framesEatMouse) {
@@ -4213,36 +4177,6 @@ bool handleEvents(void)
 #endif
 
 	// update network state
-#if defined(NINTENDO)
-	if (initialized && !loading) {
-		// update local wireless communication mode
-		if (directConnect && multiplayer != SINGLE) {
-			if (!nxHandleWireless()) {
-				MainMenu::timedOut(); // handle wireless disconnect
-			}
-			if (multiplayer == SERVER && !intro) {
-				if (ticks % TICKS_PER_SECOND == 0) {
-					int numplayers = 0;
-					for (int c = 0; c < MAXPLAYERS; ++c) {
-						if (!client_disconnected[c]) {
-							++numplayers;
-						}
-					}
-					char address[64] = { '\0' };
-					bool result = false;
-					nxGetWirelessAddress(address, sizeof(address));
-					if (address[0]) {
-						result = nxUpdateLobby(address, MainMenu::getHostname(), svFlags, numplayers);
-					}
-					if (!result) {
-						MainMenu::timedOut();
-					}
-				}
-			}
-		}
-
-	}
-#endif // NINTENDO
 
 #ifdef DEBUG_EVENT_TIMERS
 	time2 = std::chrono::high_resolution_clock::now();
@@ -4537,7 +4471,6 @@ bool handleEvents(void)
 				//mouseyrel += event.tfinger.dy * yres;
 				break;
 			}
-#ifndef NINTENDO
 			case SDL_MOUSEBUTTONDOWN: // if a mouse button is pressed...
 				if (demo_mode == DemoMode::PLAYING) {
 					break;
@@ -5138,7 +5071,6 @@ bool handleEvents(void)
 				}
 				break;
 			}
-#endif
 			case SDL_WINDOWEVENT:
 				if ( event.window.event == SDL_WINDOWEVENT_FOCUS_LOST && mute_audio_on_focus_lost )
 				{
@@ -5155,16 +5087,6 @@ bool handleEvents(void)
 				}
 				else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
-#if defined(NINTENDO)
-					if (!changeVideoMode(event.window.data1, event.window.data2))
-					{
-						printlog("critical error! Attempting to abort safely...\n");
-						mainloop = 0;
-					}
-					if (!intro) {
-						MainMenu::setupSplitscreen();
-					}
-#else
                     float factorX, factorY;
                     {
                         int w1, w2, h1, h2;
@@ -5180,7 +5102,6 @@ bool handleEvents(void)
 						printlog("critical error! Attempting to abort safely...\n");
 						mainloop = 0;
 					}
-#endif
 				}
 				break;
 		}
@@ -6391,7 +6312,6 @@ void ingameHud()
 			}
 			else if ( inputs.getVirtualMouse(player)->draw_cursor )
 			{
-#ifndef NINTENDO
                 const float factorX = (float)xres / Frame::virtualScreenX;
                 const float factorY = (float)yres / Frame::virtualScreenY;
 				auto cursor = Image::get("*#images/system/cursor_hand.png");
@@ -6426,7 +6346,6 @@ void ingameHud()
 					pos.y -= inputs.getUIInteraction(player)->itemMenuOffsetDetectionY;
 				}
 				cursor->draw(nullptr, pos, SDL_Rect{0, 0, xres, yres});
-#endif
 			}
 			else
 			{
@@ -6759,26 +6678,6 @@ static void doConsoleCommands() {
 	Input& input = Input::inputs[clientnum]; // commands - uses local clientnum only
 	const bool controlEnabled = players[clientnum]->bControlEnabled && !movie;
 
-#if defined(NINTENDO) && defined(NINTENDO_DEBUG)
-	// activate console
-	if (input.binaryToggle("ConsoleCommand1") &&
-		input.binaryToggle("ConsoleCommand2") &&
-		input.binaryToggle("ConsoleCommand3"))
-	{
-		input.consumeBinary("ConsoleCommand1");
-		input.consumeBinary("ConsoleCommand2");
-		input.consumeBinary("ConsoleCommand3");
-		auto result = nxKeyboard("Enter console command");
-		if (result.success)
-		{
-			char temp[128];
-			strncpy(temp, result.str.c_str(), 128);
-			temp[127] = '\0';
-			messagePlayer(clientnum, MESSAGE_MISC, temp);
-			consoleCommand(temp);
-		}
-	}
-#else
 	// check for input to start/stop a command (enter / return keystroke, or chat binding)
 	bool confirm = false;
 	if (controlEnabled) {
@@ -7003,7 +6902,6 @@ static void doConsoleCommands() {
 			SDL_StopTextInput();
 		}
 	}
-#endif // NINTENDO
 }
 
 #include <stdio.h>
@@ -7027,9 +6925,6 @@ extern "C" int barony_main(int argc, char** argv)
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 #endif // WINDOWS
-#ifdef NINTENDO
-	nxInit();
-#endif // NINTENDO
 
 #ifdef LINUX
 	struct sigaction sa;
@@ -7055,9 +6950,7 @@ extern "C" int barony_main(int argc, char** argv)
 	(void)chdir(BASE_DATA_DIR); // fixes a lot of headaches...
 #endif
 
-#ifndef NINTENDO
 	try
-#endif
 	{
 #if defined(APPLE) || defined(BSD) || defined(HAIKU)
 #ifdef APPLE
@@ -7121,7 +7014,6 @@ extern "C" int barony_main(int argc, char** argv)
 #ifdef WINDOWS
 		strcpy(outputdir, "./");
 #else
- #ifndef NINTENDO
 		char *basepath = getenv("HOME");
 		//No EOS. Could be Steam though. Or could also not.
 		snprintf(outputdir, sizeof(outputdir), "%s/.barony", basepath);
@@ -7129,9 +7021,6 @@ extern "C" int barony_main(int argc, char** argv)
 		{
 			mkdir(outputdir, 0777);
 		}
- #else // !NINTENDO
-		strcpy(outputdir, "save:");
- #endif // NINTENDO
 #endif
 		// read command line arguments
 		if ( argc > 1 )
@@ -7260,16 +7149,6 @@ extern "C" int barony_main(int argc, char** argv)
 		// initialize player conducts
 		setDefaultPlayerConducts();
 
-#ifdef NINTENDO
-		if (!nxIsHandheldMode()) {
-			nxAssignControllers(1, 1, true, false, true, false, nullptr);
-		}
-		for (int c = 0; c < 4; ++c) {
-			game_controllers[c].open(0, c); // first parameter is not used by Nintendo.
-			bindControllerToPlayer(c, c);
-		}
-		//inputs.setPlayerIDAllowedKeyboard(-1);
-#endif
 
 		// play splash sound
 #ifdef MUSIC
@@ -7503,7 +7382,6 @@ extern "C" int barony_main(int argc, char** argv)
 						UIToastNotificationManager.drawNotifications(MainMenu::isCutsceneActive(), true); // draw this before the cursor
                         framesProcResult = doFrames();
 
-#ifndef NINTENDO
 						Compendium_t::updateTooltip();
 
 						// draw mouse
@@ -7571,7 +7449,6 @@ extern "C" int barony_main(int argc, char** argv)
 								}
 							}
 						}
-#endif
 					}
 				}
 			}
@@ -7872,7 +7749,6 @@ extern "C" int barony_main(int argc, char** argv)
 					UIToastNotificationManager.drawNotifications(MainMenu::isCutsceneActive(), true); // draw this before the cursor
 				}
 
-#ifndef NINTENDO
 				for ( int i = 0; i < MAXPLAYERS; ++i )
 				{
 					if ( gamePaused || players[i]->GUI.isGameoverActive() )
@@ -7910,7 +7786,6 @@ extern "C" int barony_main(int argc, char** argv)
 						continue;
 					}
 				}
-#endif
 			}
 
 			// fade in/out effect
@@ -8061,9 +7936,7 @@ extern "C" int barony_main(int argc, char** argv)
 						{
 							if (inputs.getController(i))
 							{
-#ifndef NINTENDO
 								(void)inputs.getController(i)->handleRumble();
-#endif
 								inputs.getController(i)->updateButtonsReleased();
 							}
 						}
@@ -8092,7 +7965,6 @@ extern "C" int barony_main(int argc, char** argv)
 		deinitGame();
 		return deinitApp();
 	}
-#ifndef NINTENDO
 	catch (const std::exception &exc)
 	{
 		// catch anything thrown within try block that derives from std::exception
@@ -8105,11 +7977,7 @@ extern "C" int barony_main(int argc, char** argv)
 		std::cerr << "UNKNOWN EXCEPTION CAUGHT!\n";
 		return 1;
 	}
-#endif // NINTENDO
 
-#ifdef NINTENDO
-	nxTerm();
-#endif // NINTENDO
 }
 
 void DebugStatsClass::storeStats()

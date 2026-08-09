@@ -781,16 +781,6 @@ int initOPENAL()
 
 	initialized = 1;
 
-#ifdef NINTENDO
-	//TODO: Do we also want this on other platforms?
-	// print source limit
-	ALCint size = -1;
-	alcGetIntegerv(openal_device, ALC_MONO_SOURCES, 1, &size);
-	printlog("openAL: max mono sources: %d", size);
-	size = -1;
-	alcGetIntegerv(openal_device, ALC_STEREO_SOURCES, 1, &size);
-	printlog("openAL: max stereo sources: %d", size);
-#endif // NINTENDO
 
 	return 1;
 }

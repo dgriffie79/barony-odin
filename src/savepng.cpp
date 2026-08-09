@@ -7,7 +7,6 @@
 
 #include "main.hpp"
 #include "Config.hpp"
-#ifndef NINTENDO
 #ifdef APPLE
 #include <SDL2/SDL.h>
 #else
@@ -206,4 +205,3 @@ int SDL_SavePNG_RW(SDL_Surface* surface, SDL_RWops* dst, int freedst)
 	return (SUCCESS);
 }
 
-#endif

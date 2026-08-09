@@ -16,9 +16,6 @@
 #include <sys/stat.h>
 #include <sstream>
 
-#ifdef NINTENDO
- #include "nintendo/nxplatform.hpp"
-#endif // NINTENDO
 #include "draw.hpp"
 #include "files.hpp"
 #include "engine/audio/sound.hpp"
@@ -89,13 +86,6 @@ bool mountBaseDataFolders() {
 			PHYSFS_mkdir("data/statues");
 			PHYSFS_mkdir("data/scripts");
 			PHYSFS_mkdir("config");
-#ifdef NINTENDO
-			PHYSFS_mkdir("mods");
-			DynamicString path = outputdir;
-			path.append(PHYSFS_getDirSeparator()).append("mods");
-			PHYSFS_setWriteDir(path.c_str()); //Umm...should it really be doing that? First off, it didn't actually create this directory. Second off, what about the rest of the directories it created?
-			printlog("[PhysFS]: successfully set write folder %s", path.c_str());
-#else // NINTENDO
 			if ( PHYSFS_mkdir("mods") )
 			{
 				DynamicString path = outputdir;
@@ -108,7 +98,6 @@ bool mountBaseDataFolders() {
 				printlog("[PhysFS]: unsuccessfully created mods/ folder. Error: %s", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 				return false;
 			}
-#endif // !NINTENDO
 		}
 	}
 	else
@@ -196,10 +185,8 @@ int initApp(char const * const title, int fullscreen)
 	}
 
 	// init PHYSFS
-#ifndef NINTENDO
 	PHYSFS_init("/");
 	PHYSFS_permitSymbolicLinks(1);
-#endif
 
 	if ( !PHYSFS_isInit() )
 	{
@@ -253,14 +240,7 @@ int initApp(char const * const title, int fullscreen)
 	// init steamworks
 #ifdef PANDORA
 #endif
-#ifndef NINTENDO
-#endif
-#ifndef NINTENDO
 #ifdef APPLE
-#else
-#endif
-#endif
-#ifdef NINTENDO
 #else
 #endif
 #ifndef EDITOR
@@ -332,11 +312,7 @@ int initApp(char const * const title, int fullscreen)
 	SDL_SetEventFilter(event_filter, nullptr);
 #endif
 
-#ifdef NINTENDO
-	SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILEPATH);
-#else
 	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
-#endif
 
 	//printlog("initializing SDL_mixer. rate: %d format: %d channels: %d buffers: %d\n", audio_rate, audio_format, audio_channels, audio_buffers);
 	/*if( Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) ) {
@@ -790,11 +766,7 @@ int Language::loadLanguage(char const * const lang, bool forceLoadBaseDirectory)
 	}
 	else
 	{
-#ifdef NINTENDO
 		langFilepath = std::string(BASE_DATA_DIR) + filename;
-#else
-		langFilepath = std::string(BASE_DATA_DIR) + filename;
-#endif
 	}
 
 	// check if language file is valid
@@ -1021,9 +993,6 @@ static GLuint tileTextures[numTileAtlases] = { 0 };
 static ConsoleVariable<int> cvar_tileTextureSize("/tile_texture_size", 32, "the size of a tile texture");
 void readTilesJson()
 {
-#ifdef NINTENDO
-	return;
-#endif
 	if ( !PHYSFS_getRealDir("/data/tiles.json") )
 	{
 		printlog("[JSON]: Error: Could not find file: data/tiles.json");
@@ -1308,9 +1277,7 @@ int deinitApp()
 
 	// shutdown SDL subsystems
 	printlog("shutting down SDL and its subsystems...\n");
-#ifndef NINTENDO
 	SDLNet_Quit();
-#endif
 	IMG_Quit();
 	//Mix_HaltChannel(-1);
 	//Mix_CloseAudio();
@@ -1333,7 +1300,6 @@ int deinitApp()
 	// shutdown steamworks
 
 
-#ifndef NINTENDO
 	int numLogFilesToKeepInArchive = 30;
 	// archive logfiles.
 	char lognamewithTimestamp[128];
@@ -1424,14 +1390,11 @@ int deinitApp()
 	completePath(logToArchive, "log.txt", outputdir);
 #ifdef WINDOWS
 	CopyFileA(logToArchive, logarchiveFilePath.c_str(), false);
-#elif defined NINTENDO
-	// TODO?
 #else //LINUX & APPLE
 	std::stringstream ss;
 	ss << "cp " << logToArchive << " " << logarchiveFilePath.c_str();
 	system(ss.str().c_str());
 #endif // WINDOWS
-#endif //ndef NINTENDO
 	return 0;
 }
 
@@ -1445,13 +1408,6 @@ int deinitApp()
 
 static void positionAndLimitWindow(int& x, int& y, int& w, int& h)
 {
-#ifdef NINTENDO
-	// don't do anything on nintendo.
-	// SDL_GetDisplayBounds() isn't helpful, because it just returns
-	// the size of the current display, which is incorrect when you're
-	// trying to switch the display size.
-	return;
-#else
 	static const int displays = SDL_GetNumVideoDisplays();
 	std::vector<SDL_Rect> displayBounds;
 	for (int i = 0; i < displays; i++) {
@@ -1473,7 +1429,6 @@ static void positionAndLimitWindow(int& x, int& y, int& w, int& h)
 			y = bound.y + (bound.h - h) / 2;
 		}
 	}
-#endif
 }
 
 bool initVideo()
@@ -1534,16 +1489,12 @@ bool initVideo()
 	    flags |= SDL_WINDOW_FULLSCREEN;
 #endif
         
-#ifdef NINTENDO
-    	flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-#else
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN;
         }
         if (borderless) {
             flags |= SDL_WINDOW_BORDERLESS;
         }
-#endif
 
 		positionAndLimitWindow(screen_x, screen_y, screen_width, screen_height);
         
@@ -1554,7 +1505,6 @@ bool initVideo()
             return false;
         }
         
-#ifndef NINTENDO
         // make sure that we actually got the window size we wanted
         SDL_GL_GetDrawableSize(screen, &xres, &yres);
         SDL_DestroyWindow(screen);
@@ -1566,7 +1516,6 @@ bool initVideo()
             printlog("failed to set video mode.\n");
             return false;
         }
-#endif
 	}
 	else
 	{
@@ -1604,9 +1553,6 @@ bool initVideo()
 		glewInit();
 #endif
 
-#ifdef NINTENDO
-		initNxGL();
-#endif
         
         // do this to fix the window size/position caused by high-dpi scaling
         int w1, w2, h1, h2;

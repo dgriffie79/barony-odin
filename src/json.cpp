@@ -68,9 +68,6 @@ struct JsonWriterState {
 	void save(File* file) {
 		buffer.Flush();
 		file->puts(buffer.GetString());
-#ifdef NINTENDO
-		file->putc('\0');
-#endif
 	}
 
 private:

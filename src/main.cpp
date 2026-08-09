@@ -622,11 +622,9 @@ void printlog(const char* str, ...)
 		newstr[c] = '\n';
 		newstr[c + 1] = 0;
 	}
-#ifndef NINTENDO
 	//fprintf( stderr, "%s", newstr );
 	fprintf( stderr, "[%s] %s", buffer, newstr );
 	fflush( stderr );
-#endif
 	//fprintf( stdout, "%s", newstr );
 	fprintf( stdout, "[%s] %s", buffer, newstr );
 	fflush( stdout );
@@ -738,19 +736,6 @@ static ConsoleCommand purgeStackTraces("/purge_stack_traces", "purge stack trace
     });
 #endif
 
-#ifdef NINTENDO
-time_t getTime() {
-    return nxGetTime();
-}
-
-char* getTimeFormatted(time_t t, char* buf, size_t size) {
-    return nxGetTimeFormatted(t, buf, size);
-}
-
-char* getTimeAndDateFormatted(time_t t, char* buf, size_t size) {
-    return nxGetTimeAndDateFormatted(t, buf, size);
-}
-#else // NINTENDO
 time_t getTime() {
     return time(nullptr);
 }
@@ -766,7 +751,6 @@ char* getTimeAndDateFormatted(time_t t, char* buf, size_t size) {
     strftime(buf, size, "%Y-%m-%d %H-%M-%S", tm);
     return buf;
 }
-#endif
 
 void getTimeAndDate(time_t t, int* year, int* month, int* day, int* hour, int* min, int* second) {
     char buf[32];

@@ -41,9 +41,7 @@ ScriptTextParser_t ScriptTextParser;
 #ifdef USE_THEORA_VIDEO
 VideoManager_t VideoManager[MAXPLAYERS];
 #endif
-#ifndef NINTENDO
 IRCHandler_t IRCHandler;
-#endif // !NINTENDO
 StatueManager_t StatueManager;
 DebugTimers_t DebugTimers;
 
@@ -648,7 +646,6 @@ void GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile()
 	}
 }
 
-#ifndef NINTENDO
 bool IRCHandler_t::readFromFile()
 {
 	if ( PHYSFS_getRealDir("/data/twitchchat.json") )
@@ -835,7 +832,6 @@ void IRCHandler_t::handleMessage(std::string& msg)
 	}
 #endif
 }
-#endif // !NINTENDO
 
 Uint32 ItemTooltips_t::itemsJsonHashRead = 0;
 const Uint32 ItemTooltips_t::kItemsJsonHash = 2516917045;
@@ -7443,7 +7439,7 @@ bool GlyphRenderer_t::readFromFile()
 
 void GlyphRenderer_t::renderGlyphsToPNGs()
 {
-#if defined(EDITOR) || defined(NINTENDO)
+#if defined(EDITOR)
 	return;
 #else
 	printlog("[Glyph Export]: Starting export...");
@@ -9871,8 +9867,6 @@ void GameplayPreferences_t::process()
 							&& VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_LOOPBACK_LOCAL_RECORD))
 						|| !VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_ENABLE_VOICE_INPUT) 
 							|| !VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_ENABLE_VOICE_RECEIVE)) ? 1 : 0) << player);
-#elif defined(NINTENDO)
-					pref.set(1 << player);
 #else				
 					pref.set(1 << player);
 #endif

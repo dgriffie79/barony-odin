@@ -72,18 +72,6 @@ void Field::activate() {
 	if (!editable) {
 		return;
 	}
-#ifdef NINTENDO
-	auto result = nxKeyboard(guide.c_str());
-	if (result.success) {
-		setText(result.str.c_str());
-		if (callback) {
-			(*callback)(*this);
-		}
-		else {
-			printlog("modified field with no callback");
-		}
-	}
-#else
     if (activated) {
         deactivate();
     } else {
@@ -93,7 +81,6 @@ void Field::activate() {
 	    inputlen = (int)textlen;
 	    SDL_StartTextInput();
 	}
-#endif
 }
 
 void Field::deselect() {
@@ -550,7 +537,7 @@ Field::result_t Field::process(SDL_Rect _size, SDL_Rect _actualSize, const bool 
 		return result;
 	}
 
-#if defined(EDITOR) || defined(NINTENDO)
+#if defined(EDITOR)
 	Sint32 omousex = (::omousex / (float)xres) * (float)Frame::virtualScreenX;
 	Sint32 omousey = (::omousey / (float)yres) * (float)Frame::virtualScreenY;
 #else
@@ -560,11 +547,7 @@ Field::result_t Field::process(SDL_Rect _size, SDL_Rect _actualSize, const bool 
 #endif
 
 #ifndef EDITOR
-#ifndef NINTENDO
 	if (rectContainsPoint(_size, omousex, omousey) && inputs.getVirtualMouse(mouseowner)->draw_cursor) {
-#else
-	if (rectContainsPoint(_size, omousex, omousey)) {
-#endif
 		result.highlighted = highlighted = true;
 		result.highlightTime = highlightTime;
 	    result.tooltip = tooltip.c_str();

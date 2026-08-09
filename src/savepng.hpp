@@ -7,7 +7,6 @@
  * http://www.libpng.org/pub/png/src/libpng-LICENSE.txt
  */
 #include "Config.hpp"
-#ifndef NINTENDO
 #ifdef APPLE
 #include <SDL2/SDL_video.h>
 #else
@@ -37,5 +36,4 @@ extern int SDL_SavePNG_RW(SDL_Surface* surface, SDL_RWops* rw, int freedst);
  * Return new SDL_Surface with a format suitable for PNG output.
  */
 extern SDL_Surface* SDL_PNGFormatAlpha(SDL_Surface* src);
-
-#endif
+

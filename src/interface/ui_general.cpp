@@ -242,13 +242,7 @@ void UIToastNotification::drawDockedCard()
     SDL_Rect r2 = r; r2.x = 0; r2.y = 0;
 	sizeWindowDecorations(*frame, r2);
 
-#if defined(NINTENDO)
-	const bool clicking = fingerdown;
-	Sint32 mousex = (::fingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 mousey = (::fingery / (float)yres) * (float)Frame::virtualScreenY;
-	Sint32 omousex = (::ofingerx / (float)xres) * (float)Frame::virtualScreenX;
-	Sint32 omousey = (::ofingery / (float)yres) * (float)Frame::virtualScreenY;
-#elif defined(EDITOR)
+#if defined(EDITOR)
 	const bool clicking = mousestatus[SDL_BUTTON_LEFT];
 	Sint32 mousex = (::mousex / (float)xres) * (float)Frame::virtualScreenX;
 	Sint32 mousey = (::mousey / (float)yres) * (float)Frame::virtualScreenY;
@@ -307,12 +301,10 @@ void UIToastNotification::drawMainCard()
 		drawProgressBar(r);
 	}
 
-#ifndef NINTENDO
 	if (actionFlags & ActionFlags::UI_NOTIFICATION_CLOSE)
 	{
 		drawCloseButton(r);
 	}
-#endif
 
 	if (actionFlags & ActionFlags::UI_NOTIFICATION_ACTION_BUTTON)
 	{
@@ -703,9 +695,6 @@ void openURLTryWithOverlay(const std::string& url, bool forceSystemBrowser)
 #ifdef LINUX
 		system(std::string("xdg-open " + url).c_str());
 #endif // LINUX
-#ifdef NINTENDO
-		SDL_OpenURL(url.c_str());
-#endif // NINTENDO
 	}
 }
 

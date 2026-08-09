@@ -2698,7 +2698,6 @@ public:
 };
 extern GameModeManager_t gameModeManager;
 
-#ifndef NINTENDO
 class IRCHandler_t
 {
 	IPaddress ip;
@@ -2731,7 +2730,6 @@ public:
 	bool readFromFile();
 };
 extern IRCHandler_t IRCHandler;
-#endif // !NINTENDO
 
 class ItemTooltips_t
 {

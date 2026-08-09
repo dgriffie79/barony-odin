@@ -1391,7 +1391,6 @@ VoiceChat_t::OpusAudioCodec_t OpusAudioCodec;
 VoiceChat_t::OpusAudioCodec_t::encode_rtn VoiceChat_t::OpusAudioCodec_t::encodeFrame(std::vector<opus_int16>& in)
 {
 	encode_rtn data;
-#ifndef NINTENDO
 	if ( !OpusAudioCodec.bInit || !OpusAudioCodec.encoder )
 	{
 		return data;
@@ -1405,7 +1404,6 @@ VoiceChat_t::OpusAudioCodec_t::encode_rtn VoiceChat_t::OpusAudioCodec_t::encodeF
 	{
 		OpusAudioCodec.max_num_bytes_encoded = std::max(OpusAudioCodec.max_num_bytes_encoded, (unsigned int)data.numBytes);
 	}
-#endif
 	return data;
 }
 
@@ -1414,12 +1412,8 @@ int VoiceChat_t::OpusAudioCodec_t::decodeFrame(int which_decoder, encode_rtn& fr
 	if ( !bInit ) { return 0; }
 
 	auto t3 = std::chrono::high_resolution_clock::now();
-#ifdef NINTENDO
-	int frame_size = nxDecodeFrame(which_decoder, &frame_in, &out);
-#else
 	if ( !decoder[which_decoder] ) { return 0; }
 	int frame_size = opus_decode(decoder[which_decoder], frame_in.cbits, frame_in.numBytes, out.data(), MAX_FRAME_SIZE, 0);
-#endif
 	auto t4 = std::chrono::high_resolution_clock::now();
 	++decoded_samples;
 	decoding_time += 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3).count();
@@ -1433,13 +1427,6 @@ void VoiceChat_t::OpusAudioCodec_t::init(int sampleRate, int numChannels)
 	this->sampleRate = sampleRate;
 	this->numChannels = numChannels;
 	
-#ifdef NINTENDO
-	if ( !nxInitOpus(sampleRate, numChannels) )
-	{
-		deinit();
-		return;
-	}
-#else
 	int opus_err;
 	encoder = opus_encoder_create(sampleRate, numChannels, OPUS_APPLICATION_VOIP, &opus_err);
 	if ( opus_err < 0 )
@@ -1470,7 +1457,6 @@ void VoiceChat_t::OpusAudioCodec_t::init(int sampleRate, int numChannels)
 		}
 	}
 	logInfo("decoder created successfully, sample rate: %d, channels: %d", sampleRate, numChannels);
-#endif
 	bInit = true;
 }
 #endif
@@ -1526,9 +1512,6 @@ void VoiceChat_t::setRecordingDevice(int device_index)
 
 void VoiceChat_t::deinitRecording(bool resetPushTalkToggle)
 {
-#ifdef NINTENDO
-	return;
-#endif
 	lastRecordTick = 0;
 	recordingLastPos = 0;
 	bIsRecording = false;
@@ -2293,9 +2276,6 @@ ConsoleVariable<bool> cvar_voice_debug("/voice_debug", false);
 void VoiceChat_t::updateRecording()
 {
 	allowInputs = false;
-#ifdef NINTENDO
-	return;
-#endif
 	pushAvailableDatagrams();
 
 	auto& input = Input::inputs[clientnum];
@@ -3101,27 +3081,8 @@ void VoiceChat_t::receivePacket(UDPpacket* packet)
 				static OpusAudioCodec_t::encode_rtn encodedFrame;
 				std::fill(out.begin(), out.end(), 0);
 
-#ifdef NINTENDO
-				if ( readBytes + 8 >= OpusAudioCodec_t::encode_rtn::OPUS_MAX_PACKET_SIZE )
-				{
-					OpusAudioCodec_t::logError("failed decoding frame, frame too large with header, size: %d, limit: %d", readBytes + 8, OpusAudioCodec_t::encode_rtn::OPUS_MAX_PACKET_SIZE);
-					return; // no space to decode packet
-				}
-				// header data (packet size, big endian)
-				encodedFrame.cbits[0] = (readBytes >> 24) & 0xFF;
-				encodedFrame.cbits[1] = (readBytes >> 16) & 0xFF;
-				encodedFrame.cbits[2] = (readBytes >> 8) & 0xFF;
-				encodedFrame.cbits[3] = (readBytes >> 0) & 0xFF;
-				// header data (zeroes)
-				memset(encodedFrame.cbits + 4, 0, sizeof(Uint32));
-				// opus data offset by 8 due to header
-				memcpy(encodedFrame.cbits + 8, &packet->data[packetVoiceDataIdx], readBytes);
-				// length of packet increases
-				encodedFrame.numBytes = readBytes + 8;
-#else
 				memcpy(encodedFrame.cbits, &packet->data[packetVoiceDataIdx], readBytes);
 				encodedFrame.numBytes = readBytes;
-#endif
 				int frame_size = OpusAudioCodec.decodeFrame(player, encodedFrame, out);
 				if ( frame_size < 0 )
 				{
