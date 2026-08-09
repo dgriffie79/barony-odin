@@ -52,6 +52,6 @@ typedef struct Message
 /*
 * Remove single % from message strings.
 */
-std::string messageSanitizePercentSign(std::string src, int* percentSignsFound);
+DynamicString messageSanitizePercentSign(DynamicString src, int* percentSignsFound);
 
 extern const int MESSAGE_LIST_SIZE_CAP;

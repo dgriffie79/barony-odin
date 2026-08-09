@@ -270,7 +270,7 @@ void Player::MessageZone_t::deleteAllNotificationMessages()
 	notification_messages.clear();
 }
 
-std::string messageSanitizePercentSign(std::string src, int* percentSignsFound)
+DynamicString messageSanitizePercentSign(DynamicString src, int* percentSignsFound)
 {
 	// sanitize input string for print commands.
 	DynamicString commandString = src;
