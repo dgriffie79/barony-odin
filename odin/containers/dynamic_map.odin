@@ -599,3 +599,114 @@ barony_dynamic_map_strf32_entries :: proc "c" (m: ^map[string]f32, key_ptrs: [^]
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> LightDef (map<string,LightDef>) — light.hpp lightDefs.
+// LightDef is a POD (i32 + 5xf32 + bool) — layout matches C++ exactly.
+// Values copied by value (POD, no ownership); keys interned.
+// ---------------------------------------------------------------------------
+LightDef :: struct {
+	radius:      i32,
+	r, g, b, a:  f32,
+	falloff_exp: f32,
+	shadows:     bool,
+}
+
+@(export)
+barony_dynamic_map_strlightdef_init :: proc "c" (m: ^map[string]LightDef) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strlightdef_put :: proc "c" (m: ^map[string]LightDef, key: string, value: LightDef) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]LightDef)
+	}
+	k := intern_string(key)
+	m[k] = value
+}
+
+@(export)
+barony_dynamic_map_strlightdef_get :: proc "c" (m: ^map[string]LightDef, key: string, out: ^LightDef) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		out^ = v
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strlightdef_erase :: proc "c" (m: ^map[string]LightDef, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	_, had := m[key]
+	runtime.delete_key(m, key)
+	return had
+}
+
+@(export)
+barony_dynamic_map_strlightdef_clear :: proc "c" (m: ^map[string]LightDef) {
+	context = runtime.default_context()
+	if m^ != nil {
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strlightdef_len :: proc "c" (m: ^map[string]LightDef) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strlightdef_destroy :: proc "c" (m: ^map[string]LightDef) {
+	context = runtime.default_context()
+	if m^ != nil {
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strlightdef_entry :: proc "c" (m: ^map[string]LightDef, key: string) -> ^LightDef {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]LightDef)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strlightdef_entries :: proc "c" (m: ^map[string]LightDef, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]LightDef, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, value in m^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		val_ptrs[n] = value
+		n += 1
+	}
+	return n
+}

@@ -180,7 +180,7 @@ light_t* lightSphere(int index, Sint32 x, Sint32 y, Sint32 radius, float r, floa
 #include "rapidjson/filereadstream.h"
 #include "files.hpp"
 
-std::unordered_map<std::string, LightDef> lightDefs;
+DynamicMapLightDef lightDefs;
 bool loadLights(bool forceLoadBaseDirectory) {
     if ( !PHYSFS_getRealDir("/data/lights.json") )
     {
