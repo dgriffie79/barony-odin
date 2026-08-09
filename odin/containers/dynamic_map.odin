@@ -450,3 +450,27 @@ barony_dynamic_map_strstr_entries :: proc "c" (m: ^map[string]string, key_ptrs: 
 	}
 	return n
 }
+
+// map[string]i32 — get the STORED (interned) key pointer + value for a key.
+// Used by C++ find() so iterators point at process-lifetime interned storage
+// (std::map::find iterator semantics — key stays valid while the map lives).
+@(export)
+barony_dynamic_map_stri32_find :: proc "c" (m: ^map[string]i32, key: string, out_key: ^rawptr, out_key_len: ^i32, out_val: ^i32) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	kp, vp, inserted, err := map_entry(m, key)
+	if err != nil {
+		return false
+	}
+	if inserted {
+		// map_entry inserts if missing — roll back to keep find() non-mutating
+		runtime.delete_key(m, key)
+		return false
+	}
+	out_key^ = raw_data(kp^)
+	out_key_len^ = i32(len(kp^))
+	out_val^ = vp^
+	return true
+}

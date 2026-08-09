@@ -40,6 +40,7 @@ extern "C" {
     int32_t   barony_dynamic_map_stri32_len(DynamicMapRaw*);
     void      barony_dynamic_map_stri32_destroy(DynamicMapRaw*);
     int32_t*  barony_dynamic_map_stri32_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_stri32_find(DynamicMapRaw*, DynamicString, void**, int32_t*, int32_t*);
     int32_t   barony_dynamic_map_stri32_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, int32_t* val_ptrs, int32_t count);
     void      barony_dynamic_map_strstr_init(DynamicMapRaw*);
     void      barony_dynamic_map_strstr_put(DynamicMapRaw*, DynamicString, DynamicString);
@@ -91,9 +92,12 @@ public:
 
     // ---- std::map-like API ----
     // find(): returns an iterator-like; use find(k) != end() then find->second
-    // (first = key as DynamicString, second = value). Matches std::map::find
-    // usage including find->first.c_str().
-    struct KV { DynamicString first; int32_t second; };
+    // (first = key, second = value). Matches std::map::find usage.
+    // CRITICAL: first points to the INTERNED key (process-lifetime stable),
+    // NOT a copy — a temp iterator's first must outlive the iterator (callers
+    // store find->first.c_str() pointers). Interned keys never free, so this
+    // is safe.
+    struct KV { const char* first; int64_t first_len; int32_t second; };
     struct Iterator {
         KV kv{};
         bool valid = false;
@@ -101,10 +105,11 @@ public:
     };
     Iterator find(const char* key) const {
         Iterator it;
-        int32_t v;
-        if (barony_dynamic_map_stri32_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v)) {
-            it.kv.first = key;   // copies (DynamicString RAII)
-            it.kv.second = v;
+        void* kp = nullptr; int32_t kl = 0, vv = 0;
+        if (barony_dynamic_map_stri32_find(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &kp, &kl, &vv)) {
+            it.kv.first = (const char*)kp;  // interned, process-lifetime stable
+            it.kv.first_len = kl;
+            it.kv.second = vv;
             it.valid = true;
         }
         return it;

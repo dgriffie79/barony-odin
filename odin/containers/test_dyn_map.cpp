@@ -150,6 +150,15 @@ int main() {
         CHECK(find->second == 10, "find->second");
         auto missing = m.find("NOPE");
         CHECK(missing == m.end(), "find missing == end");
+        // find->first.c_str() must be STABLE after the iterator dies
+        // (callers store it — the compendium crash bug)
+        const char* stored;
+        {
+            auto f2 = m.find("ATK");
+            stored = f2->first;
+        }  // f2 dies here — stored must still be valid (interned)
+        CHECK(std::strcmp(stored, "ATK") == 0, "find->first.c_str() stable after iterator death");
+        CHECK(m["ATK"] == 10, "map still intact");
     }
 
     if (failures == 0) {

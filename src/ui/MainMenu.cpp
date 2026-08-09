@@ -35498,7 +35498,7 @@ failed:
 								index = (reinterpret_cast<intptr_t>(f->getUserData()) & 0x7F) - 1;
 							}
 							Compendium_t::compendiumEntityCurrent.modelIndex = index + 1;
-							populateRecordsSectionItems(page_right_inner.getParent(), Compendium_t::Events_t::kEventCodexOffset + findCat->second, findCat->first.c_str(), index);
+							populateRecordsSectionItems(page_right_inner.getParent(), Compendium_t::Events_t::kEventCodexOffset + findCat->second, findCat->first, index);
 						}
 					}
 					else
