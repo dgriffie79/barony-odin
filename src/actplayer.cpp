@@ -30,9 +30,6 @@
 #include "classdescriptions.hpp"
 #include "ui/MainMenu.hpp"
 #include "interface/consolecommand.hpp"
-#ifdef USE_PLAYFAB
-#include "playfab.hpp"
-#endif
 
 bool settings_smoothmouse = false;
 bool usecamerasmoothing = false;
@@ -7824,13 +7821,6 @@ void actPlayer(Entity* my)
 			&& ((stats[PLAYER_NUM]->playerRace >= 13 && stats[PLAYER_NUM]->playerRace <= 17)
 			|| client_classes[PLAYER_NUM] >= 21) )
 		{
-#ifdef STEAMWORKS
-			if ( !enabledDLCPack3 || !SteamApps()->BIsDlcInstalled(1010822) )
-			{
-				int* potato = NULL;
-				(*potato) = 322;
-			}
-#endif
 		}*/
 
 		if ( players[PLAYER_NUM]->isLocalPlayer() && PLAYER_ALIVETIME == 1 && currentlevel > 0 )
@@ -11361,20 +11351,11 @@ void actPlayer(Entity* my)
 								{
 									for ( int c = 0; c < MAXPLAYERS; ++c ) {
 										if ( !client_disconnected[c] ) {
-#ifdef USE_PLAYFAB
-											if ( c == 0 )
-											{
-												playfabUser.postScore(c);
-											}
-#endif
 										}
 									}
 								}
 								else
 								{
-#ifdef USE_PLAYFAB
-									playfabUser.postScore(clientnum);
-#endif
 								}
 
 								if ( multiplayer == SERVER )

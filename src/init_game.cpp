@@ -24,13 +24,6 @@
 #include "magic/magic.hpp"
 #include "monster.hpp"
 #include "net.hpp"
-#ifdef STEAMWORKS
-#include <steam/steam_api.h>
-#include "steam.hpp"
-#endif
-#ifdef USE_PLAYFAB
-#include "playfab.hpp"
-#endif
 #include "menu.hpp"
 #include "paths.hpp"
 #include "player.hpp"
@@ -160,26 +153,6 @@ int initGame()
 	lobbyChatboxMessages.last = NULL;
 
 	// steam stuff
-#ifdef STEAMWORKS
-	cpp_SteamServerWrapper_Instantiate(); //TODO: Remove these wrappers.
-	cpp_SteamServerClientWrapper_Instantiate();
-
-	cpp_SteamServerClientWrapper_OnP2PSessionRequest = &steam_OnP2PSessionRequest;
-	//cpp_SteamServerClientWrapper_OnGameOverlayActivated = &steam_OnGameOverlayActivated;
-	cpp_SteamServerClientWrapper_OnLobbyCreated = &steam_OnLobbyCreated;
-	cpp_SteamServerClientWrapper_OnGameJoinRequested = &steam_OnGameJoinRequested;
-	cpp_SteamServerClientWrapper_OnLobbyEntered = &steam_OnLobbyEntered;
-	cpp_SteamServerClientWrapper_GameServerPingOnServerResponded = &steam_GameServerPingOnServerResponded;
-	cpp_SteamServerClientWrapper_OnLobbyMatchListCallback = &steam_OnLobbyMatchListCallback;
-	cpp_SteamServerClientWrapper_OnP2PSessionConnectFail = &steam_OnP2PSessionConnectFail;
-	cpp_SteamServerClientWrapper_OnLobbyDataUpdate = &steam_OnLobbyDataUpdatedCallback;
- #ifdef USE_EOS
-	cpp_SteamServerClientWrapper_OnRequestEncryptedAppTicket = &steam_OnRequestEncryptedAppTicket;
- #endif //USE_EOS
-#endif
-#ifdef USE_PLAYFAB
-	playfabUser.init();
-#endif
 
 	initGameControllers();
 
@@ -212,8 +185,6 @@ int initGame()
 		//enabledDLCPack2 = true;
 //#endif
 
-#if defined(USE_EOS) || defined(STEAMWORKS)
-#else
 #ifndef NINTENDO
 		if ( PHYSFS_getRealDir("mythsandoutcasts.key") != NULL )
 		{
@@ -294,7 +265,6 @@ int initGame()
 			}
 		}
 #endif // !NINTENDO
-#endif
 
 		removedEntities.first = NULL;
 		removedEntities.last = NULL;
@@ -743,36 +713,6 @@ void deinitGame()
 	list_FreeAll(&lobbyChatboxMessages);
 
 	// steam stuff
-#ifdef STEAMWORKS
-	cpp_SteamServerWrapper_Destroy();
-	cpp_SteamServerClientWrapper_Destroy();
-	if ( currentLobby )
-	{
-		SteamMatchmaking()->LeaveLobby(*static_cast<CSteamID*>(currentLobby));
-		cpp_Free_CSteamID(currentLobby); //TODO: Remove these bodges.
-		currentLobby = NULL;
-	}
-	for ( int c = 0; c < MAXPLAYERS; c++ )
-	{
-		if ( steamIDRemote[c] )
-		{
-			cpp_Free_CSteamID(steamIDRemote[c]);
-			steamIDRemote[c] = NULL;
-		}
-	}
-	for ( int c = 0; c < MAX_STEAM_LOBBIES; c++ )
-	{
-		if ( lobbyIDs[c] )
-		{
-			cpp_Free_CSteamID(lobbyIDs[c]);
-			lobbyIDs[c] = NULL;
-		}
-	}
-#endif
-#if defined USE_EOS
-	EOS.stop();
-	EOS.quit();
-#endif
 
 	//Close game controller
 	/*if (game_controller)
@@ -817,9 +757,6 @@ void deinitGame()
 
 #ifdef USE_THEORA_VIDEO
 	VideoManager_t::deinitManager();
-#endif
-#ifdef USE_PLAYFAB
-	playfabUser.postScoreHandler.deinit();
 #endif
 }
 
@@ -866,13 +803,10 @@ void loadAchievementData(const char* path) {
 			continue;
 		}
 #endif
-#ifndef STEAMWORKS
 		if ( !strcmp(achName, "BARONY_ACH_CARTOGRAPHER") )
 		{
 			continue;
 		}
-#endif
-#ifndef USE_PLAYFAB
 		if ( !strcmp(achName, "BARONY_ACH_BLOOM_PLANTED") )
 		{
 			continue;
@@ -893,7 +827,6 @@ void loadAchievementData(const char* path) {
 		{
 			continue;
 		}
-#endif
 		const auto& ach = it.value.GetObject();
 		auto& achData = Compendium_t::achievements[achName];
 		if (ach.HasMember("name") && ach["name"].IsString()) {
@@ -995,26 +928,6 @@ void loadAchievementData(const char* path) {
 
 void sortAchievementsForDisplay()
 {
-#ifdef STEAMWORKS
-	if ( Compendium_t::AchievementData_t::achievementsNeedFirstData )
-	{
-		//if ( SteamUser()->BLoggedOn() )
-		{
-			Compendium_t::AchievementData_t::achievementsNeedFirstData = false;
-
-			for ( auto& achData : Compendium_t::achievements )
-			{
-				Uint32 time = 0;
-				bool unlocked = false;
-				SteamUserStats()->GetAchievementAndUnlockTime(achData.first.c_str(), &achData.second.unlocked, &time);
-				if ( achData.second.unlocked )
-				{
-					achData.second.unlockTime = time;
-				}
-			}
-		}
-	}
-#endif
 
 	Compendium_t::AchievementData_t::achievementsNeedResort = false;
 

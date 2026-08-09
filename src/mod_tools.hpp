@@ -3440,29 +3440,6 @@ struct Mods
 	static bool disableSteamAchievements;
 	static bool lobbyDisableSteamAchievements;
 	static bool isLoading;
-#ifdef STEAMWORKS
-	static std::vector<SteamUGCDetails_t*> workshopSubscribedItemList;
-	static std::vector<std::pair<std::string, uint64>> workshopLoadedFileIDMap;
-	struct WorkshopTags_t
-	{
-		DynamicString tag;
-		DynamicString text;
-		WorkshopTags_t(const char* _tag, const char* _text)
-		{
-			tag = _tag;
-			text = _text;
-		}
-	};
-	static std::vector<WorkshopTags_t> tag_settings;
-	static int uploadStatus;
-	static int uploadErrorStatus;
-	static PublishedFileId_t uploadingExistingItem;
-	static Uint32 uploadTicks;
-	static Uint32 processedOnTick;
-	static int uploadNumRetries;
-	static std::string getFolderFullPath(DynamicString input);
-	static bool forceDownloadCachedImages;
-#endif
 	static void updateModCounts();
 	static bool mountAllExistingPaths();
 	static bool clearAllMountedPaths();

@@ -71,9 +71,6 @@ using std::string; //Instead of including an entire namespace, please explicitly
 #include "nintendo/baronynx.hpp"
 #endif
 
-#ifdef STEAMWORKS
-#define STEAM_APPID 371970
-#endif
 
 enum ESteamStatTypes
 {
@@ -186,9 +183,6 @@ extern bool autoLimbReload;
 #include "savepng.hpp"
 
 //Ifdef steam or something?
-#ifdef STEAMWORKS
-//#include <steamworks_cwrapper/steam_wrapper.h>
-#endif
 
 #ifdef WINDOWS
 #include <io.h>
@@ -912,23 +906,6 @@ void GO_SwapBuffers(SDL_Window* screen);
 static const int NUM_STEAM_STATISTICS = 73;
 extern SteamStat_t g_SteamStats[NUM_STEAM_STATISTICS];
 
-#ifdef STEAMWORKS
- #include <steam/steam_api.h>
- struct SteamGlobalStat_t
- {
-	 int m_ID;
-	 ESteamStatTypes m_eStatType;
-	 const char *m_pchStatName;
-	 int64 m_iValue;
-	 float m_flValue;
-	 float m_flAvgNumerator;
-	 float m_flAvgDenominator;
- };
- #include "steam.hpp"
- extern CSteamLeaderboards* g_SteamLeaderboards;
- extern CSteamWorkshop* g_SteamWorkshop;
- extern CSteamStatistics* g_SteamStatistics;
-#else
 struct SteamGlobalStat_t
 {
 	int m_ID;
@@ -940,21 +917,15 @@ struct SteamGlobalStat_t
 	float m_flAvgNumerator;
 	float m_flAvgDenominator;
 };
-#endif // STEAMWORKS
 extern SteamGlobalStat_t g_SteamAPIGlobalStats[1];
 
-#ifdef USE_EOS
- #include "eos.hpp"
-#endif // USE_EOS
 
 #ifndef NINTENDO
  #define getSizeOfText(A, B, C, D) TTF_SizeUTF8(A, B, C, D)
  #define getHeightOfFont(A) TTF_FontHeight(A)
 #endif // NINTENDO
 
-#if defined(NINTENDO) || (!defined(USE_EOS) && !defined(STEAMWORKS))
- #define LOCAL_ACHIEVEMENTS
-#endif
+#define LOCAL_ACHIEVEMENTS
 
 DynamicString stackTrace();
 void stackTraceUnique();

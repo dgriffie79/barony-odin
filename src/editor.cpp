@@ -24,10 +24,6 @@
 #define EDITOR
 #endif
 
-#ifdef STEAMWORKS
-#include <steam/steam_api.h>
-#include "steam.hpp"
-#endif // STEAMWORKS
 
 
 //#include "player.hpp"
@@ -1648,27 +1644,15 @@ extern "C" int barony_main(int argc, char** argv)
 	if ( (x = initApp("Barony Editor", fullscreen)) )
 	{
 		printlog("Critical error: %d\n", x);
-#ifdef STEAMWORKS
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Uh oh",
-								"Barony has encountered a critical error and cannot start.\n\n"
-								"Please check the log.txt file in the game directory for additional info\n"
-								"and verify Steam is running. Alternatively, contact us through our website\n"
-								"at http://www.baronygame.com/ for support.",
-								screen);
-#else
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Uh oh",
 								"Barony has encountered a critical error and cannot start.\n\n"
 								"Please check the log.txt file in the game directory for additional info,\n"
 								"or contact us through our website at http://www.baronygame.com/ for support.",
 								screen);
-#endif
 		deinitApp();
 		exit(x);
 	}
 	
-#ifdef STEAMWORKS
-	g_SteamStatistics->RequestStats();
-#endif // STEAMWORKS
 
 
 	copymap.tiles = nullptr;
@@ -2134,16 +2118,6 @@ extern "C" int barony_main(int argc, char** argv)
 		// game logic
 		(void)handleEvents();
 
-#ifdef STEAMWORKS
-		SteamAPI_RunCallbacks();
-		if ( SteamUser()->BLoggedOn() && !achievementCartographer )
-		{
-			SteamUserStats()->SetAchievement("BARONY_ACH_CARTOGRAPHER");
-			achievementCartographer = true;
-			SteamUserStats()->StoreStats();
-			//printlog("STEAM ACHIEVEMENT\n");
-		}
-#endif
 
 		// move buttons
 		/*if( !fullscreen ) {

@@ -31,10 +31,6 @@
  #include "editor.hpp"
 #endif // NINTENDO
 #include "menu.hpp"
-#ifdef STEAMWORKS
- #include <steam/steam_api.h>
- #include "steam.hpp"
-#endif // STEAMWORKS
 #ifndef EDITOR
 #include "player.hpp"
 #endif
@@ -93,9 +89,6 @@ bool mountBaseDataFolders() {
 			PHYSFS_mkdir("data/statues");
 			PHYSFS_mkdir("data/scripts");
 			PHYSFS_mkdir("config");
-#ifdef STEAMWORKS
-			PHYSFS_mkdir("workshop_cache");
-#endif
 #ifdef NINTENDO
 			PHYSFS_mkdir("mods");
 			DynamicString path = outputdir;
@@ -258,65 +251,17 @@ int initApp(char const * const title, int fullscreen)
 	}*/
 
 	// init steamworks
-#ifdef STEAMWORKS
-	SteamAPI_RestartAppIfNecessary(STEAM_APPID);
-	if ( !SteamAPI_Init() )
-	{
-		printlog("error: failed to initialize Steamworks!\n");
-		printlog(" make sure your steam client is running before attempting to start again.\n");
-		return 1;
-	}
-	steam_init = true;
-	g_SteamLeaderboards = new CSteamLeaderboards();
-	g_SteamWorkshop = new CSteamWorkshop();
-	g_SteamStatistics = new CSteamStatistics(g_SteamStats, g_SteamAPIGlobalStats, NUM_STEAM_STATISTICS);
-    if (xres == 1280 && yres == 720 && SteamUtils()->IsSteamRunningOnSteamDeck()) {
-        // default steam deck native resolution
-        xres = 1280;
-        yres = 800;
-    }
 #ifdef PANDORA
-    if (xres == 1280 && yres == 720) {
-        // Pandora native resolution
-        xres = 800;
-        yres = 480;
-    }
 #endif
-	// Preloads mod content from a workshop fileID
-	//gamemodsWorkshopPreloadMod(YOUR WORKSHOP FILE ID HERE, "YOUR WORKSHOP TITLE HERE");
-#endif
-#if defined USE_EOS
-	EOS.readFromFile();
-	EOS.readFromCmdLineArgs();
 #ifndef NINTENDO
-	if ( EOS.initPlatform(true) == false )
-	{
-		return 14;
-	}
 #endif
-#ifndef STEAMWORKS
 #ifndef NINTENDO
 #ifdef APPLE
-	if ( EOS.CredentialName.compare("") == 0 )
-	{
-		EOSFuncs::logInfo("Error, attempting to launch outside of store...");
-		return 15;
-	}
 #else
-	if ( EOS.appRequiresRestart == EOS_EResult::EOS_Success )
-	{
-		// restarting app
-		EOSFuncs::logInfo("App attempting restart through store...");
-		return 15;
-	}
 #endif
 #endif
 #ifdef NINTENDO
-	EOS.SetNetworkAvailable(nxConnectedToNetwork());
 #else
-	EOS.initAuth();
-#endif
-#endif // !STEAMWORKS
 #endif
 #ifndef EDITOR
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -368,17 +313,11 @@ int initApp(char const * const title, int fullscreen)
 				new_event.window.windowID = screen ? SDL_GetWindowID(screen) : 0;
 				SDL_PushEvent(&new_event);
 			}
-#ifdef USE_EOS
-			EOS.SetSleepStatus(false);
-#endif
 			break;
 		}
 		case SDL_APP_WILLENTERBACKGROUND:
 		case SDL_APP_DIDENTERBACKGROUND:
 			printlog("barony going to sleep");
-#ifdef USE_EOS
-			EOS.SetSleepStatus(true);
-#endif
 			break;
 		case SDL_APP_LOWMEMORY:
 			printlog("barony low memory, dumping UI cache");
@@ -1392,22 +1331,6 @@ int deinitApp()
 	SDL_Quit();
 
 	// shutdown steamworks
-#ifdef STEAMWORKS
-	if (steam_init) {
-		printlog("storing user stats to Steam...\n");
-		SteamUserStats()->StoreStats();
-		if (g_SteamLeaderboards) {
-			delete g_SteamLeaderboards;
-		}
-		if (g_SteamWorkshop) {
-			delete g_SteamWorkshop;
-		}
-		if (g_SteamStatistics) {
-			delete g_SteamStatistics;
-		}
-		SteamAPI_Shutdown();
-	}
-#endif
 
 
 #ifndef NINTENDO

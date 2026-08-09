@@ -4878,7 +4878,7 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 #endif
 }
 
-// DynamicString overload (bridges — the std::string version writes into str + conditionalAttribute)
+// DynamicString overload (bridges Â— the std::string version writes into str + conditionalAttribute)
 void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, Item& item, DynamicString& str, int iconIndex, DynamicString& conditionalAttribute, Frame* parentFrame)
 {
 	std::string s(str.c_str()), c(conditionalAttribute.c_str());
@@ -6622,7 +6622,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 #endif
 }
 
-// DynamicString overload (bridges — writes into str)
+// DynamicString overload (bridges Â— writes into str)
 void ItemTooltips_t::formatItemDescription(const int player, std::string tooltipType, Item& item, DynamicString& str)
 {
 	std::string s(str.c_str());
@@ -6630,7 +6630,7 @@ void ItemTooltips_t::formatItemDescription(const int player, std::string tooltip
 	str = s.c_str();
 }
 
-// DynamicString overload (bridges — writes into str)
+// DynamicString overload (bridges Â— writes into str)
 void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType, Item& item, DynamicString& str, DynamicString detailTag, Frame* parentFrame)
 {
 	std::string s(str.c_str()), d(detailTag.c_str());
@@ -6684,7 +6684,7 @@ void ItemTooltips_t::stripOutHighlightBracketText(std::string& str, std::string&
 	}
 }
 
-// DynamicString overload (bridges — the std::string version writes into both)
+// DynamicString overload (bridges Â— the std::string version writes into both)
 void ItemTooltips_t::stripOutHighlightBracketText(DynamicString& str, DynamicString& bracketText)
 {
 	std::string s(str.c_str()), b(bracketText.c_str());
@@ -6783,7 +6783,7 @@ void ItemTooltips_t::getWordIndexesItemDetails(void* field, std::string& str, st
 	}
 }
 
-// DynamicString overload (bridges — writes into the string params)
+// DynamicString overload (bridges Â— writes into the string params)
 void ItemTooltips_t::getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
 	std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
 {
@@ -6952,7 +6952,7 @@ void ItemTooltips_t::stripOutPositiveNegativeItemDetails(std::string& str, std::
 	}
 }
 
-// DynamicString overload (bridges — the std::string version writes into all three)
+// DynamicString overload (bridges Â— the std::string version writes into all three)
 void ItemTooltips_t::stripOutPositiveNegativeItemDetails(DynamicString& str, DynamicString& positiveValues, DynamicString& negativeValues)
 {
 	std::string s(str.c_str()), p(positiveValues.c_str()), n(negativeValues.c_str());
@@ -10615,53 +10615,11 @@ void Mods::updateModCounts()
 		}
 	}
 }
-#ifdef STEAMWORKS
-std::vector<SteamUGCDetails_t*> Mods::workshopSubscribedItemList;
-std::vector<std::pair<std::string, uint64>> Mods::workshopLoadedFileIDMap;
-std::vector<Mods::WorkshopTags_t> Mods::tag_settings = {
-	Mods::WorkshopTags_t("dungeons", "Dungeons"),
-	Mods::WorkshopTags_t("textures", "Textures"),
-	Mods::WorkshopTags_t("models", "Models"),
-	Mods::WorkshopTags_t("gameplay", "Gameplay"),
-	Mods::WorkshopTags_t("audio", "Audio"),
-	Mods::WorkshopTags_t("misc", "Misc"),
-	Mods::WorkshopTags_t("translations", "Translations")
-};
-int Mods::uploadStatus = 0;
-int Mods::uploadErrorStatus = 0;
-Uint32 Mods::uploadTicks = 0;
-Uint32 Mods::processedOnTick = 0;
-PublishedFileId_t Mods::uploadingExistingItem = 0;
-int Mods::uploadNumRetries = 3;
-bool Mods::forceDownloadCachedImages = false;
-
-std::string Mods::getFolderFullPath(std::string input)
-{
-	if ( input == "" ) { return ""; }
 #ifdef WINDOWS
 #ifdef _UNICODE
-	wchar_t pathbuffer[PATH_MAX];
-	const int len1 = MultiByteToWideChar(CP_ACP, 0, input.c_str(), input.size() + 1, 0, 0);
-	auto buf1 = new wchar_t[len1];
-	MultiByteToWideChar(CP_ACP, 0, input.c_str(), input.size() + 1, buf1, len1);
-	const int pathlen = GetFullPathNameW(buf1, PATH_MAX, pathbuffer, NULL);
-	delete[] buf1;
-	const int len2 = WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, 0, 0, 0, 0);
-	auto buf2 = new char[len2];
-	WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, buf2, len2, 0, 0);
-	std::string fullpath = buf2;
 #else
-	char pathbuffer[PATH_MAX];
-	GetFullPathNameA(input.c_str(), PATH_MAX, pathbuffer, NULL);
-	std::string fullpath = pathbuffer;
 #endif
 #else
-	char pathbuffer[PATH_MAX];
-	realpath(input.c_str(), pathbuffer);
-	std::string fullpath = pathbuffer;
-#endif
-	return fullpath;
-}
 #endif
 
 #ifdef USE_LIBCURL
@@ -10878,17 +10836,6 @@ bool Mods::removePathFromMountedFiles(std::string findStr)
 		if ( line.first.compare(findStr) == 0 )
 		{
 			// found entry, remove from list.
-#ifdef STEAMWORKS
-			for ( std::vector<std::pair<std::string, uint64>>::iterator itId = Mods::workshopLoadedFileIDMap.begin();
-				itId != Mods::workshopLoadedFileIDMap.end(); ++itId )
-			{
-				if ( itId->first.compare(line.second) == 0 )
-				{
-					Mods::workshopLoadedFileIDMap.erase(itId);
-					break;
-				}
-			}
-#endif // STEAMWORKS
 			Mods::mountedFilepaths.erase(it);
 			return true;
 		}
@@ -16971,9 +16918,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 4 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "mines", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "mines", 
@@ -16988,9 +16932,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 9 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "swamps", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "swamps",
@@ -17005,9 +16946,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 14 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "labyrinth", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "labyrinth",
@@ -17022,9 +16960,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 19 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "ruins", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "ruins",
@@ -17043,9 +16978,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 23 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "hell", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "hell",
@@ -17068,9 +17000,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 29 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "crystal caves", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "crystal caves",
@@ -17085,9 +17014,6 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 					if ( prevlevel == 34 )
 					{
 						eventUpdateWorld(playernum, Compendium_t::CPDM_LEVELS_BIOME_CLEAR, "arcane citadel", 1);
-#ifdef USE_PLAYFAB
-						playfabUser.biomeLeave();
-#endif
 						commitUniqueValue = true; // commit at end of biome to save to file
 					}
 					eventUpdateWorld(playernum, Compendium_t::CPDM_BIOMES_MIN_COMPLETION, "arcane citadel",

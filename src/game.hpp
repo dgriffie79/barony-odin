@@ -15,10 +15,6 @@
 #include <chrono>
 #include "../odin/containers/dynamic_string.hpp"
 
-#ifdef STEAMWORKS
-#include <steam/steam_api.h>
-#include "steam.hpp"
-#endif
 
 #include "interface/consolecommand.hpp"
 

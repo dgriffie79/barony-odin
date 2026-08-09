@@ -29,13 +29,6 @@
 #include "scores.hpp"
 #include "menu.hpp"
 #include "net.hpp"
-#ifdef STEAMWORKS
-#include <steam/steam_api.h>
-#include "steam.hpp"
-#endif
-#ifdef USE_PLAYFAB
-#include "playfab.hpp"
-#endif
 #include "prng.hpp"
 #include "collision.hpp"
 #include "paths.hpp"
@@ -1240,9 +1233,6 @@ void gameLogic(void)
 
 	// damage indicator timers
 	handleDamageIndicatorTicks();
-#ifdef STEAMWORKS
-	MainMenu::richPresence.process();
-#endif
 
 	if ( intro == true )
 	{
@@ -1336,12 +1326,6 @@ void gameLogic(void)
 
 			if ( !directConnect && LobbyHandler.getHostingType() == LobbyHandler_t::LobbyServiceType::LOBBY_CROSSPLAY )
 			{
-#ifdef USE_EOS
-				if ( multiplayer == SERVER && ticks % TICKS_PER_SECOND == 0 )
-				{
-					EOS.CurrentLobbyData.updateLobbyDuringGameLoop();
-				}
-#endif // USE_EOS
 			}
 
 
@@ -4192,9 +4176,6 @@ bool handleEvents(void)
 
 	// detect app focus changes
 	const bool asleep = nxAppOutOfFocus();
-#ifdef USE_EOS
-	EOS.SetSleepStatus(asleep);
-#endif
 	if (asleep) {
 		if (!intro && !gamePaused) {
 			if (!MainMenu::isMenuOpen() && !MainMenu::isCutsceneActive()) {
@@ -4260,19 +4241,6 @@ bool handleEvents(void)
 			}
 		}
 
-#ifdef USE_EOS
-		// handle EOS timeouts and disconnects
-		const bool connected = nxConnectedToNetwork();
-		EOS.SetNetworkAvailable(connected);
-		if (EOS.isInitialized() && EOS.CurrentUserInfo.isLoggedIn() && EOS.CurrentUserInfo.isValid()) {
-			// I don't care if we're in the lobby browser, hosting a lobby, or playing a game.
-			// Any state we are in where EOS is connected, we need to end the game immediately if
-			// the network is lost. Or else Epic has a freakout.
-			if (!connected) {
-				MainMenu::timedOut();
-			}
-		}
-#endif // USE_EOS
 	}
 #endif // NINTENDO
 
@@ -5014,14 +4982,6 @@ bool handleEvents(void)
 					// reobtain haptic devices for each existing controller
 					controller.reinitHaptic();
 				}
-#ifdef STEAMWORKS
-                // on steam deck, player 1 always needs a controller.
-                if (SteamUtils()->IsSteamRunningOnSteamDeck()) {
-                    if (id >= 0 && !inputs.hasController(0)) {
-                        bindControllerToPlayer(id, 0);
-                    }
-                }
-#endif
 				break;
 			}
 			case SDL_CONTROLLERDEVICEREMOVED:
@@ -7163,24 +7123,8 @@ extern "C" int barony_main(int argc, char** argv)
 #else
  #ifndef NINTENDO
 		char *basepath = getenv("HOME");
-  #ifdef USE_EOS
-   #ifdef STEAMWORKS
-		//Steam + EOS
-		snprintf(outputdir, sizeof(outputdir), "%s/.barony", basepath);
-   #else
-		//Just EOS.
-		std::string firstDotdir(basepath);
-		firstDotdir += "/.barony/";
-		if (access(firstDotdir.c_str(), F_OK) == -1)
-		{
-			mkdir(firstDotdir.c_str(), 0777); //Since this mkdir is not equivalent to mkdir -p, have to create each part of the path manually.
-		}
-		snprintf(outputdir, sizeof(outputdir), "%s/epicgames", firstDotdir.c_str());
-   #endif
-  #else //USE_EOS
 		//No EOS. Could be Steam though. Or could also not.
 		snprintf(outputdir, sizeof(outputdir), "%s/.barony", basepath);
-  #endif
 		if (access(outputdir, F_OK) == -1)
 		{
 			mkdir(outputdir, 0777);
@@ -7194,10 +7138,6 @@ extern "C" int barony_main(int argc, char** argv)
 		{
 			for (c = 1; c < argc; c++)
 			{
-#ifdef STEAMWORKS
-			    cmd_line += argv[c];
-			    cmd_line += " ";
-#endif
 				if ( argv[c] != NULL )
 				{
 					if ( !strcmp(argv[c], "-windowed") )
@@ -7242,9 +7182,6 @@ extern "C" int barony_main(int argc, char** argv)
 					}
 					else
 					{
-#ifdef USE_EOS
-						EOS.CommandLineArgs.push_back(argv[c]);
-#endif // USE_EOS
 					}
 				}
 			}
@@ -7289,34 +7226,11 @@ extern "C" int barony_main(int argc, char** argv)
 		if ( (c = initApp("Barony", fullscreen)) )
 		{
 			printlog("Critical error: %d\n", c);
-#ifdef STEAMWORKS
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Uh oh",
-									"Barony has encountered a critical error and cannot start.\n\n"
-									"Please check the log.txt file in the game directory for additional info\n"
-									"and verify Steam is running. Alternatively, contact us through our website\n"
-									"at https://www.baronygame.com/ for support.",
-				screen);
-#elif defined USE_EOS
-			if ( EOS.appRequiresRestart == EOS_EResult::EOS_Success )
-			{
-				// restarting app from launcher.
-			}
-			else
-			{
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Uh oh",
-					"Barony has encountered a critical error and cannot start.\n\n"
-					"Please check the log.txt file in the game directory for additional info,\n"
-					"and verify the game is launched through the Epic Games Store. \n"
-					"Alternatively, contact us through our website at https://www.baronygame.com/ for support.",
-					screen);
-			}
-#else
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Uh oh",
 									"Barony has encountered a critical error and cannot start.\n\n"
 									"Please check the log.txt file in the game directory for additional info,\n"
 									"or contact us through our website at https://www.baronygame.com/ for support.",
 									screen);
-#endif
 			deinitApp();
 			exit(c);
 		}
@@ -7405,28 +7319,6 @@ extern "C" int barony_main(int argc, char** argv)
 			}
 #endif
 			// handle steam callbacks
-#ifdef STEAMWORKS
-			if ( g_SteamLeaderboards )
-			{
-				g_SteamLeaderboards->ProcessLeaderboardUpload();
-			}
-			SteamAPI_RunCallbacks();
-#endif
-#ifdef USE_PLAYFAB
-			PlayFab::PlayFabClientAPI::Update();
-			playfabUser.update();
-#endif
-#ifdef USE_EOS
-			if (EOS.PlatformHandle) {
-				EOS_Platform_Tick(EOS.PlatformHandle);
-			}
-			if (EOS.ServerPlatformHandle) {
-				EOS_Platform_Tick(EOS.ServerPlatformHandle);
-			}
-			EOS.StatGlobalManager.updateQueuedStats();
-			EOS.AccountManager.handleLogin();
-			EOS.CrossplayAccountManager.handleLogin();
-#endif // USE_EOS
 
 			DebugStats.t3SteamCallbacks = std::chrono::high_resolution_clock::now();
 

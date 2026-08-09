@@ -31,10 +31,6 @@
 #include "../ui/MainMenu.hpp"
 #include "../mod_tools.hpp"
 #include "../book.hpp"
-#ifdef STEAMWORKS
-#include <steam/steam_api.h>
-#include "../steam.hpp"
-#endif
 
 //Prototype helper functions for player inventory helper functions.
 bool restrictPaperDollMovement = true;

@@ -379,11 +379,6 @@ Input::ControllerType Input::getControllerType(int index) {
     if (*cvar_forceGlyphs >= 0) {
         return (ControllerType)*cvar_forceGlyphs;
     } else {
-#ifdef STEAMWORKS
-        if (SteamUtils()->IsSteamRunningOnSteamDeck()) {
-            return ControllerType::SteamDeck;
-        }
-#endif
         // SDL lets us differentiate controller types
         const int device = ::inputs.getControllerID(index);
         auto type = SDL_GameControllerTypeForIndex(device);

@@ -7288,43 +7288,8 @@ const char* Player::getAccountName() const {
 	    }
     } else {
 		if (LobbyHandler.getP2PType() == LobbyHandler_t::LobbyServiceType::LOBBY_STEAM) {
-#ifdef STEAMWORKS
-			if (isLocalPlayer()) {
-				return SteamFriends()->GetPersonaName();
-			} else {
-				for (int remoteIDIndex = 0; remoteIDIndex < MAXPLAYERS; ++remoteIDIndex) {
-					if (steamIDRemote[remoteIDIndex]) {
-						const char* memberNumChar = SteamMatchmaking()->GetLobbyMemberData(
-						    *static_cast<CSteamID*>(currentLobby),
-						    *static_cast<CSteamID*>(steamIDRemote[remoteIDIndex]),
-						    "clientnum");
-						if (memberNumChar) {
-							DynamicString str = memberNumChar;
-							if (!str.empty()) {
-								int memberNum = std::stoi(str);
-								if (memberNum >= 0 && memberNum < MAXPLAYERS && memberNum == playernum) {
-									return SteamFriends()->GetFriendPersonaName(
-									    *static_cast<CSteamID*>(steamIDRemote[remoteIDIndex]));
-								}
-							}
-						}
-					}
-				}
-			}
-#endif
 		}
 		else if (LobbyHandler.getP2PType() == LobbyHandler_t::LobbyServiceType::LOBBY_CROSSPLAY) {
-#if defined USE_EOS
-			if (isLocalPlayer()) {
-				return EOS.CurrentUserInfo.Name.c_str();
-			} else {
-				for (auto& player : EOS.CurrentLobbyData.playersInLobby) {
-					if (player.clientNumber == playernum) {
-						return player.name.c_str();
-					}
-				}
-			}
-#endif
 		}
 	}
     return unknown;

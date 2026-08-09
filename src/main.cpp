@@ -316,14 +316,7 @@ SteamStat_t g_SteamStats[NUM_STEAM_STATISTICS] =
 	{ 73, STEAM_STAT_INT, "STAT_SOURCE_ENGINE" }
 };
 
-#ifdef STEAMWORKS
-bool directConnect = false;
-CSteamLeaderboards* g_SteamLeaderboards = NULL;
-CSteamWorkshop* g_SteamWorkshop = NULL;
-CSteamStatistics* g_SteamStatistics = NULL;
-#else
 bool directConnect = true;
-#endif
 char address[64];
 IPaddress net_server;
 IPaddress* net_clients = nullptr;
