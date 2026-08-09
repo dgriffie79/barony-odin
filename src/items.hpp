@@ -786,7 +786,7 @@ public:
 	const char* getUnidentifiedName() const { return item_name_unidentified.c_str(); }
 	void setIdentifiedName(DynamicString name) { item_name_identified = name; }
 	void setUnidentifiedName(DynamicString name) { item_name_unidentified = name; }
-	bool hasAttribute(std::string attribute)
+	bool hasAttribute(DynamicString attribute)
 	{
 		if ( attributes.size() > 0 )
 		{
