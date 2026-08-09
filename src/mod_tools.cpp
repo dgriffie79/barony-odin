@@ -19249,6 +19249,6 @@ std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendi
 std::map<std::string, Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> Compendium_t::AchievementData_t::achievementsBookDisplay;
 std::unordered_set<std::string> Compendium_t::AchievementData_t::achievementUnlockedLookup;
 bool Compendium_t::AchievementData_t::sortAlphabetical = false;
-DynamicString Compendium_t::compendium_sorting;
+DynamicString Compendium_t::compendium_sorting = "default";
 bool Compendium_t::compendium_sorting_hide_undiscovered = false;
 bool Compendium_t::compendium_sorting_hide_ach_unlocked = false;
