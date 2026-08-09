@@ -378,7 +378,7 @@ Sint8 minimap[MINIMAP_MAX_DIMENSION][MINIMAP_MAX_DIMENSION];
 bool loadnextlevel = false;
 int skipLevelsOnLoad = 0;
 bool loadingSameLevelAsCurrent = false;
-std::string loadCustomNextMap = "";
+DynamicString loadCustomNextMap;
 Uint32 forceMapSeed = 0;
 bool loading = false;
 int currentlevel = 0, minotaurlevel = 0;

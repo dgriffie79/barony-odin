@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <chrono>
+#include "../odin/containers/dynamic_string.hpp"
 
 #ifdef STEAMWORKS
 #include <steam/steam_api.h>
@@ -105,7 +106,7 @@ extern char address[64];
 extern bool loadnextlevel;
 extern int skipLevelsOnLoad;
 extern bool loadingSameLevelAsCurrent;
-extern std::string loadCustomNextMap;
+extern DynamicString loadCustomNextMap;
 extern Uint32 forceMapSeed;
 extern int currentlevel;
 extern bool secretlevel;

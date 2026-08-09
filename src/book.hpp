@@ -17,8 +17,8 @@ class Book_t
 {
 public:
 	Book_t() {};
-	std::string text = "";
-	std::string default_name = "";
+	DynamicString text = "";
+	DynamicString default_name = "";
 	std::vector<std::string> formattedPages;
 };
 extern std::vector<Book_t> allBooks;

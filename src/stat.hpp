@@ -329,7 +329,7 @@ public:
 	Uint32 killer_uid = 0;
 	Monster killer_monster;
 	ItemType killer_item;
-	std::string killer_name = "";
+	DynamicString killer_name = "";
 
 	// attributes
 	Sint32 HP, MAXHP, OLDHP;

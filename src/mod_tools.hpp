@@ -2602,7 +2602,7 @@ public:
 		void createFirstTutorialCompletedPrompt();
 		void setTutorialMap(std::string& mapname)
 		{
-			loadCustomNextMap = mapname;
+			loadCustomNextMap = mapname.c_str();
 			currentMap = loadCustomNextMap;
 		}
 		void launchHub()

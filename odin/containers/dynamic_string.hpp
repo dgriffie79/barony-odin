@@ -104,6 +104,12 @@ public:
     int64_t length() const { return len; }
     bool empty() const { return len == 0; }
 
+    // iteration (std::string-compatible char iteration)
+    char* begin() { return data ? data : nullptr; }
+    char* end() { return data ? data + len : nullptr; }
+    const char* begin() const { return data ? data : nullptr; }
+    const char* end() const { return data ? data + len : nullptr; }
+
     // bridge: implicit conversion to std::string (unconverted callers assign
     // DynamicString values into std::string vars — e.g. titleText = getHover...)
     operator std::string() const { return c_str(); }
