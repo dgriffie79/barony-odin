@@ -294,7 +294,7 @@ void Input::refresh() {
 			bind(binding.first.c_str(), binding.second.c_str());
 		}
 
-		std::string prefix;
+		DynamicString prefix;
 		prefix.append("Pad");
 		prefix.append(std::to_string(player));
 		for (auto& binding : getGamepadBindings()) {
@@ -327,7 +327,7 @@ void Input::refresh() {
 			bind(binding.first.c_str(), binding.second.c_str());
 		}
 
-		std::string prefix;
+		DynamicString prefix;
 		prefix.append("Joy");
 		prefix.append(std::to_string(player));
 		for (auto& binding : getJoystickBindings()) {
@@ -428,7 +428,7 @@ std::string Input::getGlyphPathForInput(const char* input, bool pressed, Control
     }
     
     // base path
-    const std::string rootPath = "images/ui/Glyphs/";
+    const DynamicString rootPath = "images/ui/Glyphs/";
     
     if (type == ControllerType::PlayStation) {
         static const std::unordered_map<std::string, std::pair<std::string, std::string>> mappings = {
