@@ -1135,7 +1135,7 @@ int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int le
 	{
 		return -1000;
 	}
-	std::string mapsDirectory; // store the full file path here.
+	DynamicString mapsDirectory; // store the full file path here.
 	if ( !isSecretLevel )
 	{
 		mapsDirectory = PHYSFS_getRealDir(LEVELSFILE);
@@ -1147,8 +1147,8 @@ int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int le
 		mapsDirectory.append(PHYSFS_getDirSeparator()).append(SECRETLEVELSFILE);
 	}
 	printlog("Maps directory: %s", mapsDirectory.c_str());
-	std::vector<std::string> levelsList = getLinesFromDataFile(mapsDirectory);
-	std::string line = levelsList.front();
+	std::vector<DynamicString> levelsList = getLinesFromDataFile(mapsDirectory);
+	DynamicString line = levelsList.front();
 	int levelsCounted = 0;
 
 	std::vector<int> eligibleLevels;
@@ -1163,13 +1163,13 @@ int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int le
 
 		// find the actual map name, ignoring gen: or map: in the line.
 		std::size_t found = line.find(' ');
-		std::string mapName;
-		if ( found != std::string::npos )
+		DynamicString mapName;
+		if ( found != DynamicString::npos )
 		{
-			std::string mapType = line.substr(0, found);
+			DynamicString mapType = line.substr(0, found);
 			mapName = line.substr(found + 1, line.find('\n'));
 			std::size_t carriageReturn = mapName.find('\r');
-			if ( carriageReturn != std::string::npos )
+			if ( carriageReturn != DynamicString::npos )
 			{
 				mapName.erase(carriageReturn);
 			}
@@ -1195,9 +1195,9 @@ int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int le
 	
 	if ( eligibleLevels.empty() )
 	{
-		std::string mapPath = "maps/";
+		DynamicString mapPath = "maps/";
 		mapPath.append(mapToSearch);
-		if ( mapPath.find(".lmp") == std::string::npos )
+		if ( mapPath.find(".lmp") == DynamicString::npos )
 		{
 			mapPath.append(".lmp");
 		}
@@ -1466,9 +1466,9 @@ void actCustomPortal(Entity* my)
 
 				if ( gameModeManager.getMode() == GameModeManager_t::GAME_MODE_TUTORIAL )
 				{
-					std::string mapname = map.name;
-					if ( mapname.find("Tutorial Hub") == std::string::npos
-						&& mapname.find("Tutorial ") != std::string::npos )
+					DynamicString mapname = map.name;
+					if ( mapname.find("Tutorial Hub") == DynamicString::npos
+						&& mapname.find("Tutorial ") != DynamicString::npos )
 					{
 						achievementObserver.updatePlayerAchievement(clientnum, AchievementObserver::BARONY_ACH_DIPLOMA, AchievementObserver::DIPLOMA_LEVEL_COMPLETE);
 						achievementObserver.updatePlayerAchievement(clientnum, AchievementObserver::BARONY_ACH_BACK_TO_BASICS, AchievementObserver::BACK_TO_BASICS_LEVEL_COMPLETE);
@@ -1501,7 +1501,7 @@ void actCustomPortal(Entity* my)
 						gameModeManager.Tutorial.writeToDocument();
 						achievementObserver.updatePlayerAchievement(clientnum, AchievementObserver::BARONY_ACH_FAST_LEARNER, AchievementObserver::FAST_LEARNER_TIME_UPDATE);
 					}
-					else if ( mapname.find("Tutorial Hub") != std::string::npos )
+					else if ( mapname.find("Tutorial Hub") != DynamicString::npos )
 					{
 						completionTime = 0;
 					}

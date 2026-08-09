@@ -10,6 +10,7 @@
 
 -------------------------------------------------------------------------------*/
 #pragma once
+#include "../odin/containers/dynamic_string.hpp"
 
 #include <list>
 #include <string>
@@ -387,7 +388,7 @@ DIR * openDataDir(const char *const);
 bool dataPathExists(const char *const, bool complete = true);
 bool completePath(char *dest, const char * const path, const char *base = datadir);
 void openLogFile();
-std::vector<std::string> getLinesFromDataFile(std::string filename);
+std::vector<DynamicString> getLinesFromDataFile(std::string filename);
 int loadMainMenuMap(bool blessedAdditionMaps, bool forceVictoryMap, int forcemap = -1);
 int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int *checkMapHash = nullptr);
 std::list<std::string> physfsGetFileNamesInDirectory(const char* dir);

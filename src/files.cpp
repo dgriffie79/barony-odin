@@ -3691,9 +3691,9 @@ std::list<std::string> directoryContents(const char* directory, bool includeSubd
 	return list;
 }
 
-std::vector<std::string> getLinesFromDataFile(std::string filename)
+std::vector<DynamicString> getLinesFromDataFile(std::string filename)
 {
-	std::vector<std::string> lines;
+	std::vector<DynamicString> lines;
 #ifdef NINTENDO
 	std::string filepath(filename);
 #else
@@ -3717,7 +3717,7 @@ std::vector<std::string> getLinesFromDataFile(std::string filename)
 			{
 				if ( !line.empty() )
 				{
-					lines.push_back(line);
+					lines.push_back(DynamicString(line.c_str()));
 				}
 			}
 			file.close();
@@ -3730,7 +3730,7 @@ std::vector<std::string> getLinesFromDataFile(std::string filename)
 		{
 			if ( !line.empty() )
 			{
-				lines.push_back(line);
+				lines.push_back(DynamicString(line.c_str()));
 			}
 		}
 		file.close();
@@ -3761,12 +3761,12 @@ int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int* check
 			mapsDirectory.append(PHYSFS_getDirSeparator()).append(SECRETLEVELSFILE);
 		}
 		printlog("Maps directory: %s", mapsDirectory.c_str());
-		std::vector<std::string> levelsList = getLinesFromDataFile(mapsDirectory);
+		std::vector<DynamicString> levelsList = getLinesFromDataFile(mapsDirectory);
 		line = levelsList.front();
 		int levelsCounted = 0;
 		if ( levelToLoad > 0 ) // if level == 0, then load up the first map.
 		{
-			for ( std::vector<std::string>::const_iterator i = levelsList.begin(); i != levelsList.end() && levelsCounted <= levelToLoad; ++i )
+			for ( std::vector<DynamicString>::const_iterator i = levelsList.begin(); i != levelsList.end() && levelsCounted <= levelToLoad; ++i )
 			{
 				// process i, iterate through all the map levels until currentlevel.
 				line = *i;
@@ -5713,14 +5713,14 @@ bool physfsIsMapLevelListModded()
 	}
 	mapsDirectory.append(PHYSFS_getDirSeparator()).append(LEVELSFILE);
 
-	std::vector<std::string> levelsList = getLinesFromDataFile(mapsDirectory);
+	std::vector<DynamicString> levelsList = getLinesFromDataFile(mapsDirectory);
 	if ( levelsList.empty() )
 	{
 		return false;
 	}
 	std::string line = levelsList.front();
 	int levelsCounted = 0;
-	for ( std::vector<std::string>::const_iterator i = levelsList.begin(); i != levelsList.end(); ++i )
+	for ( std::vector<DynamicString>::const_iterator i = levelsList.begin(); i != levelsList.end(); ++i )
 	{
 		// process i, iterate through all the map levels until currentlevel.
 		line = *i;
@@ -5776,7 +5776,7 @@ bool physfsIsMapLevelListModded()
 	}
 	line = levelsList.front();
 	levelsCounted = 0;
-	for ( std::vector<std::string>::const_iterator i = levelsList.begin(); i != levelsList.end(); ++i )
+	for ( std::vector<DynamicString>::const_iterator i = levelsList.begin(); i != levelsList.end(); ++i )
 	{
 		// process i, iterate through all the map levels until currentlevel.
 		line = *i;

@@ -39,6 +39,8 @@ extern "C" {
     bool         barony_dynamic_string_equal_cstr(const DynamicString*, const char*);
     int32_t      barony_dynamic_string_compare(const DynamicString*, const DynamicString*);
     int64_t      barony_dynamic_string_find(const DynamicString*, const void*, int64_t, int);
+    int64_t      barony_dynamic_string_find_first_of(const DynamicString*, const char*, int);
+    void         barony_dynamic_string_erase(DynamicString*, int, int);
     void         barony_dynamic_string_substr(DynamicString*, const DynamicString*, int, int);
     void         barony_dynamic_string_destroy(DynamicString*);
 }
@@ -120,6 +122,12 @@ public:
     int64_t find(const DynamicString& needle) const { return barony_dynamic_string_find(this, needle.data, needle.len, 0); }
     // find a single char (std::string::find(char))
     int64_t find(char c) const { return barony_dynamic_string_find(this, &c, 1, 0); }
+    // find first of any char in the set (std::string::find_first_of)
+    int64_t find_first_of(const char* set, int64_t start = 0) const { return barony_dynamic_string_find_first_of(this, set, (int)start); }
+    // erase [pos, pos+count) in place (std::string::erase); count=-1 = to end
+    DynamicString& erase(int64_t pos, int64_t count = -1) {
+        if (count < 0) count = len - pos;
+        barony_dynamic_string_erase(this, (int)pos, (int)count); return *this; }
     // mutable char access (std::string::operator[]/at)
     char& at(int64_t i) { return data[i]; }
     char& operator[](int64_t i) { return data[i]; }

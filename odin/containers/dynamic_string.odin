@@ -1,4 +1,4 @@
-// dynamic_string.odin — C-ABI shim for a {data,len} string, callable from C++.
+// dynamic_string.odin -- C-ABI shim for a {data,len} string, callable from C++.
 //
 // Replaces std::string in shared structs. Layout matches Odin's `string`
 // ({data: [^]byte, len: int}, 16 bytes). The data is always NUL-terminated
@@ -92,7 +92,7 @@ barony_dynamic_string_append :: proc "c" (s: ^DynamicString, bytes: rawptr, n: i
 }
 
 // Clear: free the buffer and zero the struct (std::string::clear keeps
-// capacity, but we have no cap field — freeing is the safe equivalent).
+// capacity, but we have no cap field -- freeing is the safe equivalent).
 @(export)
 barony_dynamic_string_clear :: proc "c" (s: ^DynamicString) {
 	context = runtime.default_context()
@@ -242,4 +242,46 @@ barony_dynamic_string_destroy :: proc "c" (s: ^DynamicString) {
 		mem.free(s.data)
 	}
 	s^ = DynamicString{}
+}
+
+// Erase [start, start+n) -- std::string::erase(pos, count). In-place.
+@(export)
+barony_dynamic_string_erase :: proc "c" (s: ^DynamicString, start: int, n: int) {
+	context = runtime.default_context()
+	if s == nil || s.data == nil || start < 0 || start >= s.len {
+		return
+	}
+	clamp_n := min(n, s.len - start)
+	left := s.len - start - clamp_n
+	if left > 0 {
+		// manual shift (overlapping -- copy byte by byte)
+		base := uintptr(s.data)
+		for i in 0..<left {
+			(^u8)(base + uintptr(start) + uintptr(i))^ = (^u8)(base + uintptr(start) + uintptr(clamp_n) + uintptr(i))^
+		}
+	}
+	s.len -= clamp_n
+	if s.data != nil {
+		(^u8)(uintptr(s.data) + uintptr(s.len))^ = 0
+	}
+}
+
+// Find first occurrence of any char in `set` starting at `start` --
+// std::string::find_first_of. Returns byte offset or -1.
+@(export)
+barony_dynamic_string_find_first_of :: proc "c" (s: ^DynamicString, set: cstring, start: int) -> i64 {
+	if s == nil || set == nil || s.data == nil {
+		return -1
+	}
+	hay := ([^]u8)(s.data)
+	set_bytes := ([^]u8)(set)
+	for i in start..<s.len {
+		c := hay[i]
+		for j := 0; set_bytes[j] != 0; j += 1 {
+			if c == set_bytes[j] {
+				return i64(i)
+			}
+		}
+	}
+	return -1
 }

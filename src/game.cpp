@@ -226,10 +226,10 @@ ConsoleVariable<bool> cvar_enableKeepAlives("/keepalive_enabled", true);
 ConsoleVariable<bool> cvar_animate_tiles("/animate_tiles", true);
 ConsoleVariable<bool> cvar_map_sequence_rng("/map_sequence_rng", true);
 
-std::vector<std::string> randomPlayerNamesMale;
-std::vector<std::string> randomPlayerNamesFemale;
-std::vector<std::string> randomNPCNamesMale;
-std::vector<std::string> randomNPCNamesFemale;
+std::vector<DynamicString> randomPlayerNamesMale;
+std::vector<DynamicString> randomPlayerNamesFemale;
+std::vector<DynamicString> randomNPCNamesMale;
+std::vector<DynamicString> randomNPCNamesFemale;
 std::vector<std::string> physFSFilesInDirectory;
 TileEntityListHandler TileEntityList;
 // recommended for valgrind debugging:

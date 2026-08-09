@@ -11858,7 +11858,7 @@ void buttonRandomName(button_t* my)
 		return;
 	}
 
-	std::vector<std::string> *names;
+	std::vector<DynamicString> *names;
 
 	if ( stats[0]->sex == MALE )
 	{
