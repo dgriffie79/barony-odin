@@ -120,7 +120,7 @@ int gamemods_window = 0;
 std::list<std::string> currentDirectoryFiles;
 std::list<std::string> directoryFilesListToUpload;
 DynamicString directoryToUpload;
-std::string directoryPath;
+DynamicString directoryPath;
 int gamemods_window_scroll = 0;
 int gamemods_window_fileSelect = 0;
 int gamemods_uploadStatus = 0;

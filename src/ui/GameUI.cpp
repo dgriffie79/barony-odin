@@ -290,7 +290,7 @@ std::unordered_map<int, StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffe
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipDescColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipHeadingColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::notificationTextColor = 0xFFFFFFFF;
-std::string StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont = "fonts/pixelmix.ttf#16#2";
+DynamicString StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont;
 
 std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue);
 
@@ -7240,7 +7240,7 @@ void createStatusEffectQueue(const int player)
 
 const int breadStatusEffectHeight = 60;
 
-std::string& StatusEffectQueue_t::EffectDefinitionEntry_t::getName(int variation)
+DynamicString& StatusEffectQueue_t::EffectDefinitionEntry_t::getName(int variation)
 {
 	if ( variation >= 0 )
 	{
@@ -7249,7 +7249,7 @@ std::string& StatusEffectQueue_t::EffectDefinitionEntry_t::getName(int variation
 	return name;
 }
 
-std::string& StatusEffectQueue_t::EffectDefinitionEntry_t::getDesc(int variation)
+DynamicString& StatusEffectQueue_t::EffectDefinitionEntry_t::getDesc(int variation)
 {
 	if ( variation >= 0 )
 	{

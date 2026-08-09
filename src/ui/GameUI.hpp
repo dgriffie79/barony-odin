@@ -240,19 +240,19 @@ struct StatusEffectQueue_t
 	{
 		int effect_id = -1;
 		int spell_id = -1;
-		std::string internal_name = "";
-		std::string name = "";
-		std::string desc = "";
-		std::string imgPath = "";
-		std::vector<std::string> nameVariations;
-		std::vector<std::string> descVariations;
+		DynamicString internal_name = "";
+		DynamicString name = "";
+		DynamicString desc = "";
+		DynamicString imgPath = "";
+		std::vector<DynamicString> nameVariations;
+		std::vector<DynamicString> descVariations;
 		std::vector<int> useSpellIDForImgVariations;
 		std::vector<std::string> imgPathVariations;
 		int useSpellIDForImg = -1;
 		bool neverDisplay = false;
 		int sustainedSpellID = -1;
-		std::string& getName(int variation = -1);
-		std::string& getDesc(int variation = -1);
+		DynamicString& getName(int variation = -1);
+		DynamicString& getDesc(int variation = -1);
 		int tooltipWidth = 200;
 	};
 	struct StatusEffectDefinitions_t
@@ -262,7 +262,7 @@ struct StatusEffectQueue_t
 		static Uint32 tooltipHeadingColor;
 		static Uint32 tooltipDescColor;
 		static Uint32 notificationTextColor;
-		static std::string notificationFont;
+		static DynamicString notificationFont;
 		static void reset()
 		{
 			allEffects.clear();
