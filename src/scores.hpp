@@ -436,8 +436,8 @@ int totalScore(score_t* score);
 void loadScore(int score);
 void loadScore(score_t* score);
 bool deleteScore(bool multiplayer, int index);
-void saveAllScores(const std::string& scoresfilename);
-void loadAllScores(const std::string& scoresfilename);
+void saveAllScores(const DynamicString& scoresfilename);
+void loadAllScores(const DynamicString& scoresfilename);
 
 enum SaveFileType {
     MAIN,
@@ -449,7 +449,7 @@ enum SaveFileType {
 
 extern int savegameCurrentFileIndex;
 
-std::string setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex = savegameCurrentFileIndex);
+DynamicString setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex = savegameCurrentFileIndex);
 
 int deleteSaveGame(int gametype, int saveIndex = savegameCurrentFileIndex);
 bool saveGameExists(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
@@ -485,7 +485,7 @@ struct SaveGameInfo {
 
 	int populateFromSession(const int playernum);
 	int getTotalScore(const int playernum, const int victory);
-	std::string serializeToOnlineHiscore(const int playernum, const int victory);
+	DynamicString serializeToOnlineHiscore(const int playernum, const int victory);
 
 	struct Player {
 		Uint32 char_class = 0;
@@ -647,7 +647,7 @@ struct SaveGameInfo {
 				}
 			};
 
-			std::string name;
+			DynamicString name;
 			Uint32 type = Monster::HUMAN;
 			Uint32 sex = 0;
 			Uint32 statscore_appearance = 0;
@@ -906,7 +906,7 @@ public:
 		BY_THE_BOOK_BREW
 	};
 	void updatePlayerAchievement(int player, Achievement achievement, AchievementEvent achEvent);
-	bool bIsAchievementAllowedDuringTutorial(std::string achievementStr)
+	bool bIsAchievementAllowedDuringTutorial(DynamicString achievementStr)
 	{
 		if ( !achievementStr.compare("BARONY_ACH_TEACHABLE_MOMENT") )
 		{

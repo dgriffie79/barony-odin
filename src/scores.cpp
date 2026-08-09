@@ -958,7 +958,7 @@ void saveAllScoresJSON(const std::string& scoresfilename)
 	return;
 }
 
-void saveAllScores(const std::string& scoresfilename)
+void saveAllScores(const DynamicString& scoresfilename)
 {
 	if ( *cvar_scores_json )
 	{
@@ -1862,7 +1862,7 @@ void loadAllScoresJSON(const std::string& scoresfilename)
 	}
 }
 
-void loadAllScores(const std::string& scoresfilename)
+void loadAllScores(const DynamicString& scoresfilename)
 {
 	// clear top scores
 	if ( scoresfilename == SCORESFILE )
@@ -3242,7 +3242,7 @@ void updateGameplayStatisticsInMainLoop()
 	}
 }
 
-std::string setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex)
+DynamicString setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex)
 {
 	DynamicString filename = "savegames/savegame" + std::to_string(saveIndex);
 
@@ -6178,7 +6178,7 @@ int SaveGameInfo::getTotalScore(const int playernum, const int victory)
 	return amount;
 }
 
-std::string SaveGameInfo::serializeToOnlineHiscore(const int playernum, const int victory)
+DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const int victory)
 {
 	rapidjson::Document d;
 	d.SetObject();
