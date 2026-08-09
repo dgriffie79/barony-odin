@@ -2108,7 +2108,7 @@ void glDrawSprite(view_t* camera, Entity* entity, int mode)
     }
 }
 
-void glDrawSpriteFromImage(view_t* camera, Entity* entity, std::string text, int mode, bool useTextAsImgPath, bool rotate)
+void glDrawSpriteFromImage(view_t* camera, Entity* entity, DynamicString text, int mode, bool useTextAsImgPath, bool rotate)
 {
 	if (!camera || !entity || text.empty()) {
 		return;
