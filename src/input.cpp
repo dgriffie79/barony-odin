@@ -20,7 +20,7 @@ const float Input::rebinding_deadzone = 0.5f;
 const float Input::analogToggleThreshold = .5f;
 const Uint32 Input::BUTTON_HELD_TICKS = TICKS_PER_SECOND / 4;
 const Uint32 Input::BUTTON_ANALOG_REPEAT_TICKS = TICKS_PER_SECOND / 4;
-std::unordered_map<std::string, SDL_Keycode> Input::keycodeNames;
+DynamicMapI32 Input::keycodeNames;
 std::unordered_map<int, SDL_GameController*> Input::gameControllers;
 std::unordered_map<int, SDL_Joystick*> Input::joysticks;
 std::unordered_map<SDL_Keycode, bool> Input::keys;
@@ -1121,11 +1121,11 @@ SDL_Keycode Input::getKeycodeFromName(const char* name) {
 	if (search == keycodeNames.end()) {
 		SDL_Keycode keycode = SDL_GetKeyFromName(name);
 		if (keycode != SDLK_UNKNOWN) {
-            keycodeNames.emplace(name, keycode);
+            keycodeNames[name] = (int32_t)keycode;
 		}
 		return keycode;
 	} else {
-		return (*search).second;
+		return search->second;
 	}
 }
 

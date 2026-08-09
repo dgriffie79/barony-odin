@@ -13008,7 +13008,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 			auto find = Compendium_t::Events_t::eventIdLookup.find(s);
 			if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 			{
-				auto find2 = Compendium_t::Events_t::events.find(find->second);
+				auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 				if ( find2 != Compendium_t::Events_t::events.end() )
 				{
 					for ( auto& item : obj.items_in_category )
@@ -13032,7 +13032,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						for ( auto& item : obj.items_in_category )
@@ -13058,7 +13058,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						for ( auto& item : obj.items_in_category )
@@ -13495,7 +13495,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 			auto find = Compendium_t::Events_t::eventIdLookup.find(s);
 			if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 			{
-				auto find2 = Compendium_t::Events_t::events.find(find->second);
+				auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 				if ( find2 != Compendium_t::Events_t::events.end() )
 				{
 					for ( auto& item : obj.items_in_category )
@@ -13525,7 +13525,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						for ( auto& item : obj.items_in_category )
@@ -13557,7 +13557,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						for ( auto& item : obj.items_in_category )
@@ -13948,7 +13948,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						Compendium_t::Events_t::eventCodexLookup[(Compendium_t::EventTags)find2->second.id].insert(name);
@@ -13967,7 +13967,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
@@ -14289,7 +14289,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						Compendium_t::Events_t::eventWorldLookup[(Compendium_t::EventTags)find2->second.id].insert(name);
@@ -14307,7 +14307,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 				auto find = Compendium_t::Events_t::eventIdLookup.find(eventName);
 				if ( find != Compendium_t::Events_t::eventIdLookup.end() )
 				{
-					auto find2 = Compendium_t::Events_t::events.find(find->second);
+					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
 						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
@@ -14789,7 +14789,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 
 Uint32 Compendium_t::lastTickUpdate = 0;
 std::map<Compendium_t::EventTags, Compendium_t::Events_t::Event_t> Compendium_t::Events_t::events;
-std::map<std::string, Compendium_t::EventTags> Compendium_t::Events_t::eventIdLookup;
+DynamicMapI32 Compendium_t::Events_t::eventIdLookup;
 std::map<int, std::set<Compendium_t::EventTags>> Compendium_t::Events_t::itemEventLookup;
 std::map<Compendium_t::EventTags, std::set<int>> Compendium_t::Events_t::eventItemLookup;
 std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t::eventWorldLookup;
@@ -14848,7 +14848,7 @@ void Compendium_t::Events_t::readEventsTranslations()
 			auto find = eventIdLookup.find(itr2->name.GetString());
 			if ( find != eventIdLookup.end())
 			{
-				EventTags tag = eventIdLookup[find->first];
+				EventTags tag = (Compendium_t::EventTags)eventIdLookup[find->first];
 				auto& entry = eventLangEntries[tag];
 				for ( auto itr3 = itr2->value.MemberBegin(); itr3 != itr2->value.MemberEnd(); ++itr3 )
 				{
@@ -15190,8 +15190,8 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 					auto findTag = eventIdLookup.find(name);
 					if ( findTag != eventIdLookup.end() )
 					{
-						auto& playerTags = playerEvents[findTag->second];
-						for ( auto itemId : eventItemLookup[findTag->second] )
+						auto& playerTags = playerEvents[(Compendium_t::EventTags)findTag->second];
+						for ( auto itemId : eventItemLookup[(Compendium_t::EventTags)findTag->second] )
 						{
 							if ( cat == "spells" )
 							{
@@ -15290,7 +15290,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 					auto findTag = eventIdLookup.find(name);
 					if ( findTag != eventIdLookup.end() )
 					{
-						auto tag = findTag->second;
+						auto tag = (Compendium_t::EventTags)findTag->second;
 						if ( playerEvents.find(tag) == playerEvents.end() )
 						{
 							if ( valueType == "list" )

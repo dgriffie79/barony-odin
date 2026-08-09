@@ -4322,7 +4322,7 @@ struct Compendium_t
 			}
 		};
 		static std::map<EventTags, Event_t> events;
-		static std::map<std::string, EventTags> eventIdLookup;
+		static DynamicMapI32 eventIdLookup;
 		static std::map<int, std::set<EventTags>> itemEventLookup;
 		static DynamicMapI32 monsterUniqueIDLookup;
 		static std::map<int, std::string> itemIDToString;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "main.hpp"
+#include "../odin/containers/dynamic_map.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -244,7 +245,7 @@ private:
 	static const float analogToggleThreshold;
 
 	//! map of scancodes to input names
-	static std::unordered_map<std::string, SDL_Keycode> keycodeNames;
+	static DynamicMapI32 keycodeNames;
 	static SDL_Keycode getKeycodeFromName(const char* name);
 
 	//! number of game ticks to consider a button 'held' for long-press actions
