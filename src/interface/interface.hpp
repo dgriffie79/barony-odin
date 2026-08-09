@@ -127,7 +127,7 @@ public:
 	{
 		HPBarType barType = BAR_TYPE_CREATURE;
 		BarAnimator_t animator;
-		std::string enemy_name = "";
+		DynamicString enemy_name = "";
 		Sint32 enemy_hp = 0;
 		Sint32 enemy_maxhp = 0;
 		Sint32 enemy_oldhp = 0;
@@ -620,7 +620,7 @@ public:
 		bool isSalvageOrRepairMenuActive() const;
 		Sint32 metalScrapPrice = 0;
 		Sint32 magicScrapPrice = 0;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		int itemType = -1;
 		int itemRequirement = -1;
 		enum TinkerActions_t : int 
@@ -753,7 +753,7 @@ public:
 		bool isItemSelectedToEffect(Item* item);
 		bool isItemEffectMenuActive() const;
 		bool ItemEffectHasBeenCreated() const;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		int itemType = -1;
 		int itemRequirement = -1;
 		int confirmActionSteps = 0;
@@ -921,9 +921,9 @@ public:
 
 		struct AssistNotification_t
 		{
-			std::string img = "";
-			std::string title = "";
-			std::string body = "";
+			DynamicString img = "";
+			DynamicString title = "";
+			DynamicString body = "";
 			enum NotificationTypes
 			{
 				NOTIF_DEFAULT,
@@ -935,7 +935,7 @@ public:
 			NotificationTypes notificationType = NOTIF_DEFAULT;
 			real_t animx = 0.0;
 			int state = 0;
-			AssistNotification_t(std::string _title, std::string _body, std::string _img, NotificationTypes _notifType)
+			AssistNotification_t(DynamicString _title, DynamicString _body, DynamicString _img, NotificationTypes _notifType)
 			{
 				title = _title;
 				img = _img;
@@ -944,7 +944,7 @@ public:
 			}
 		};
 		std::vector<std::pair<Uint32, AssistNotification_t>> notifications;
-		AssistNotification_t* addNotification(std::string _title, std::string _body, std::string _img, AssistNotification_t::NotificationTypes _notifType);
+		AssistNotification_t* addNotification(DynamicString _title, DynamicString _body, DynamicString _img, AssistNotification_t::NotificationTypes _notifType);
 
 		enum AssistItemActions_t
 		{
@@ -1039,7 +1039,7 @@ public:
 		void updateMailMenu();
 		void createMailMenu();
 		bool mailGUIHasBeenCreated() const;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		int itemType = -1;
 		bool itemRequiresTitleReflow = true;
 		int selectedMailSlotX = -1;
@@ -1076,7 +1076,7 @@ public:
 		void updateFeatherMenu();
 		void createFeatherMenu();
 		bool featherGUIHasBeenCreated() const;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		int itemType = -1;
 		enum FeatherActions_t : int
 		{
@@ -1105,7 +1105,7 @@ public:
 		Uint32 animInvalidActionTicks = 0;
 		bool bDrawerOpen = false;
 		Uint32 inscribeSuccessTicks = 0;
-		std::string inscribeSuccessName = "";
+		DynamicString inscribeSuccessName = "";
 		bool drawerJustifyInverted = false;
 
 		real_t scrollPercent = 0.0;
@@ -1116,7 +1116,7 @@ public:
 
 		int chargeCostMin = 0;
 		int chargeCostMax = 0;
-		std::string currentHoveringInscriptionLabel = "";
+		DynamicString currentHoveringInscriptionLabel = "";
 		Sint32 currentFeatherCharge = 0;
 		Sint32 changeFeatherCharge = 0;
 		real_t animCharge = 0.0;
@@ -1127,7 +1127,7 @@ public:
 		{
 			Uint32 startTicks = 0;
 			Uint32 processedOnTick = 0;
-			std::string name = "";
+			DynamicString name = "";
 			DiscoveryAnim_t() :
 				startTicks(ticks),
 				processedOnTick(0)
@@ -1342,12 +1342,12 @@ public:
 		};
 		struct AlchNotification_t
 		{
-			std::string img = "";
-			std::string title = "";
-			std::string body = "";
+			DynamicString img = "";
+			DynamicString title = "";
+			DynamicString body = "";
 			real_t animx = 0.0;
 			int state = 0;
-			AlchNotification_t(std::string _title, std::string _body, std::string _img)
+			AlchNotification_t(DynamicString _title, DynamicString _body, DynamicString _img)
 			{
 				title = _title;
 				img = _img;
@@ -1396,7 +1396,7 @@ public:
 		bool alchemyGUIHasBeenCreated() const;
 		//bool isConstructMenuActive() const;
 		//bool isSalvageOrRepairMenuActive() const;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		int itemType = -1;
 		bool itemRequiresTitleReflow = true;
 		bool itemTooltipForRecipe = false;
@@ -1673,10 +1673,10 @@ public:
 	{
 		int x = 0;
 		int y = 0;
-		std::string path = "";
-		std::string path_locked = "";
-		std::string path_hover = "";
-		std::string path_locked_hover = "";
+		DynamicString path = "";
+		DynamicString path_locked = "";
+		DynamicString path_hover = "";
+		DynamicString path_locked_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 	};
@@ -1684,12 +1684,12 @@ public:
 	static std::vector<PanelEntry> panelEntriesAlternate;
 	struct IconEntry
 	{
-		std::string name = "";
+		DynamicString name = "";
 		int id = -1;
-		std::string path = "";
-		std::string path_hover = "";
-		std::string path_active = "";
-		std::string path_active_hover = "";
+		DynamicString path = "";
+		DynamicString path_hover = "";
+		DynamicString path_active = "";
+		DynamicString path_active_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 		std::map<std::string, std::pair<std::string, std::set<int>>> text_map;
@@ -1785,47 +1785,47 @@ struct CalloutRadialMenu
 	{
 		int x = 0;
 		int y = 0;
-		std::string path = "";
-		std::string path_hover = "";
+		DynamicString path = "";
+		DynamicString path_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 	};
 	static std::vector<PanelEntry> panelEntries;
 	struct IconEntry
 	{
-		std::string name = "";
+		DynamicString name = "";
 		int id = -1;
-		std::string path = "";
-		std::string path_hover = "";
-		std::string path_active = "";
-		std::string path_active_hover = "";
+		DynamicString path = "";
+		DynamicString path_hover = "";
+		DynamicString path_active = "";
+		DynamicString path_active_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 		struct IconEntryText_t
 		{
-			std::string bannerText = "";
+			DynamicString bannerText = "";
 			std::set<int> bannerHighlights;
-			std::string worldMsgSays = "";
-			std::string worldMsg = "";
-			std::string worldMsgEmote = "";
-			std::string worldMsgEmoteYou = "";
-			std::string worldMsgEmoteToYou = "";
-			std::string worldIconTag = "";
-			std::string worldIconTagMini = "";
+			DynamicString worldMsgSays = "";
+			DynamicString worldMsg = "";
+			DynamicString worldMsgEmote = "";
+			DynamicString worldMsgEmoteYou = "";
+			DynamicString worldMsgEmoteToYou = "";
+			DynamicString worldIconTag = "";
+			DynamicString worldIconTagMini = "";
 		};
 		std::map<std::string, IconEntryText_t> text_map;
 	};
 	static std::map<std::string, IconEntry> iconEntries;
 	struct WorldIconEntry_t
 	{
-		std::string pathDefault = "";
-		std::string pathPlayer1 = "";
-		std::string pathPlayer2 = "";
-		std::string pathPlayer3 = "";
-		std::string pathPlayer4 = "";
-		std::string pathPlayerX = "";
+		DynamicString pathDefault = "";
+		DynamicString pathPlayer1 = "";
+		DynamicString pathPlayer2 = "";
+		DynamicString pathPlayer3 = "";
+		DynamicString pathPlayer4 = "";
+		DynamicString pathPlayerX = "";
 		int id = 0;
-		std::string& getPlayerIconPath(const int playernum);
+		DynamicString& getPlayerIconPath(const int playernum);
 	};
 	static std::map<std::string, WorldIconEntry_t> worldIconEntries;
 	static DynamicMapStr helpDescriptors;

@@ -29485,7 +29485,7 @@ void CalloutRadialMenu::closeCalloutMenuGUI()
 	animInvalidActionTicks = 0;
 }
 
-std::string& CalloutRadialMenu::WorldIconEntry_t::getPlayerIconPath(const int playernum)
+DynamicString& CalloutRadialMenu::WorldIconEntry_t::getPlayerIconPath(const int playernum)
 {
 	if ( colorblind_lobby )
 	{
@@ -32683,7 +32683,7 @@ int GenericGUIMenu::AssistShrineGUI_t::getAssistPointsPreview()
 	return val;
 }
 
-GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t* GenericGUIMenu::AssistShrineGUI_t::addNotification(std::string _title, std::string _body, std::string _img, AssistNotification_t::NotificationTypes _notifType)
+GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t* GenericGUIMenu::AssistShrineGUI_t::addNotification(DynamicString _title, DynamicString _body, DynamicString _img, AssistNotification_t::NotificationTypes _notifType)
 {
 	if ( _notifType == AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK )
 	{
