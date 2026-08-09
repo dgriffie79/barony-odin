@@ -40,7 +40,7 @@ int numbooks = 0;
 
 //book_t *book_space_ninjas = NULL;
 
-int getBook(std::string bookTitle)
+int getBook(DynamicString bookTitle)
 {
 	int index = 0;
 	for ( auto& book : allBooks )
@@ -54,7 +54,7 @@ int getBook(std::string bookTitle)
 	return 0;
 }
 
-std::string getBookDefaultNameFromIndex(int index, bool censored)
+DynamicString getBookDefaultNameFromIndex(int index, bool censored)
 {
 	if (allBooks.empty() || index < 0 || index >= allBooks.size()) {
 		return "";
@@ -70,7 +70,7 @@ std::string getBookDefaultNameFromIndex(int index, bool censored)
 	return allBooks[index].default_name;
 }
 
-std::string getBookLocalizedNameFromIndex(int index, bool censored)
+DynamicString getBookLocalizedNameFromIndex(int index, bool censored)
 {
 	if ( allBooks.empty() || index < 0 || index >= allBooks.size() ) {
 		return "";
@@ -572,7 +572,7 @@ int lengthOfCurrentWord(char* const text, const int index)
 	return length;
 }
 
-void BookParser_t::createBook(std::string filename)
+void BookParser_t::createBook(DynamicString filename)
 {
 	//Load in the text from a file.
 	DynamicString tempstr = "books/";

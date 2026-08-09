@@ -2957,7 +2957,7 @@ int TextSourceScript::textSourceProcessScriptTag(DynamicString& input, std::stri
 	return result;
 }
 
-void TextSourceScript::handleTextSourceScript(Entity& src, std::string input)
+void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 {
 	bool statOnlyUpdateNeeded = false;
 
@@ -5177,7 +5177,7 @@ void TextSourceScript::playerClearInventory(bool clearStats)
 	this->hasClearedInventory = true;
 }
 
-std::string TextSourceScript::getScriptFromEntity(Entity& src)
+DynamicString TextSourceScript::getScriptFromEntity(Entity& src)
 {
 	// assemble the string.
 	char buf[256] = "";

@@ -32,7 +32,7 @@ public:
 	bool readCompiledBooks();
 	void writeCompiledBooks();
 	void createBooks(bool forceCacheRebuild);
-	void createBook(std::string filename); //Take a book filename and generate all of its pages.
+	void createBook(DynamicString filename); //Take a book filename and generate all of its pages.
 	void deleteBooks();
 	DynamicMapStr tempBookData;
 	void readBooksIntoTemp();
@@ -40,9 +40,9 @@ public:
 };
 extern BookParser_t bookParser_t;
 
-int getBook(std::string bookTitle);
-std::string getBookDefaultNameFromIndex(int index, bool censored = true);
-std::string getBookLocalizedNameFromIndex(int index, bool censored = true);
+int getBook(DynamicString bookTitle);
+DynamicString getBookDefaultNameFromIndex(int index, bool censored = true);
+DynamicString getBookLocalizedNameFromIndex(int index, bool censored = true);
 extern int numbooks;
 
 static const char* banned_books[] = {

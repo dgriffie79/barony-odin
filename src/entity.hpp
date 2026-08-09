@@ -1694,11 +1694,11 @@ public:
 	}
 	void updateClientInformation(int player, bool clearInventory, bool clearStats, ClientInformationType updateType);
 	void playerClearInventory(bool clearStats);
-	std::string getScriptFromEntity(Entity& src);
+	DynamicString getScriptFromEntity(Entity& src);
 	void parseScriptInMapGeneration(Entity& src);
 	Entity* createScriptEntityInMapGen(int x, int y, const char* text);
 	void addScriptToTextSource(Entity& src, const char* text);
-	void handleTextSourceScript(Entity& src, std::string input);
+	void handleTextSourceScript(Entity& src, DynamicString input);
 	int textSourceProcessScriptTag(std::string& input, std::string findTag, Entity& src);
 	int textSourceProcessScriptTag(DynamicString& input, std::string findTag, Entity& src);
 	bool hasClearedInventory = false;
