@@ -1150,9 +1150,9 @@ bool handleMonsterChatter(int monsterclicked, bool ringconflict, char namesays[6
 // check qty of a certain creature race alive on a map
 int numMonsterTypeAliveOnMap(Monster creature, Entity*& lastMonster);
 // get monster strings from language file
-std::string getMonsterLocalizedName(Monster creature, Stat* optionalStats = nullptr);
-std::string getMonsterLocalizedPlural(Monster creature);
-std::string getMonsterLocalizedInjury(Monster creature);
+DynamicString getMonsterLocalizedName(Monster creature, Stat* optionalStats = nullptr);
+DynamicString getMonsterLocalizedPlural(Monster creature);
+DynamicString getMonsterLocalizedInjury(Monster creature);
 
 //-----RACE SPECIFIC CONSTANTS-----
 
@@ -1275,25 +1275,25 @@ struct MonsterData_t
 	struct MonsterDataEntry_t
 	{
 		int monsterType = NOTHING;
-		std::string defaultIconPath = "";
+		DynamicString defaultIconPath = "";
 		struct IconLookup_t
 		{
-			std::string key = "";
-			std::string iconPath = "";
+			DynamicString key = "";
+			DynamicString iconPath = "";
 		};
 		std::map<int, IconLookup_t> iconSpritesAndPaths;
 		std::map<std::string, std::vector<int>> keyToSpriteLookup;
 		std::set<int> modelIndexes;
 		std::set<int> playerModelIndexes;
-		std::string defaultShortDisplayName = "";
+		DynamicString defaultShortDisplayName = "";
 		struct SpecialNPCEntry_t
 		{
-			std::string internalName = "";
-			std::string name = "";
-			std::string shortname = "";
+			DynamicString internalName = "";
+			DynamicString name = "";
+			DynamicString shortname = "";
 			std::set<int> modelIndexes;
 			int baseModel = 0;
-			std::string uniqueIcon = "";
+			DynamicString uniqueIcon = "";
 		};
 		std::map<std::string, SpecialNPCEntry_t> specialNPCs;
 		MonsterDataEntry_t(int type)
@@ -1304,15 +1304,15 @@ struct MonsterData_t
 		};
 		MonsterDataEntry_t() = default;
 	};
-	static std::string iconDefaultString;
-	static std::string keyDefaultString;
+	static DynamicString iconDefaultString;
+	static DynamicString keyDefaultString;
 	static std::map<int, MonsterDataEntry_t> monsterDataEntries;
-	static std::string& getAllyIconFromSprite(int sprite, int type = -1);
-	static std::string& getKeyFromSprite(int sprite, int type = -1);
-	static int getSpriteFromKey(int sprite, std::string key, int type = -1);
+	static DynamicString& getAllyIconFromSprite(int sprite, int type = -1);
+	static DynamicString& getKeyFromSprite(int sprite, int type = -1);
+	static int getSpriteFromKey(int sprite, DynamicString key, int type = -1);
 	static int getSpecialNPCBaseModel(Stat& myStats);
-	static std::string getSpecialNPCName(Stat& myStats);
-	static bool nameMatchesSpecialNPCName(Stat& myStats, std::string npcKey);
+	static DynamicString getSpecialNPCName(Stat& myStats);
+	static bool nameMatchesSpecialNPCName(Stat& myStats, DynamicString npcKey);
 	static void loadMonsterDataJSON();
 };
 extern MonsterData_t monsterData;

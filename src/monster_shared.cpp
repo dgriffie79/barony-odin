@@ -468,10 +468,10 @@ void Entity::spawnBlood(int bloodSprite)
 
 MonsterData_t monsterData;
 std::map<int, MonsterData_t::MonsterDataEntry_t> MonsterData_t::monsterDataEntries;
-std::string MonsterData_t::iconDefaultString = "#*images/ui/HUD/allies/icons/Icon_HeadDefaultM_00.png";
-std::string MonsterData_t::keyDefaultString = "";
+DynamicString MonsterData_t::iconDefaultString = "#*images/ui/HUD/allies/icons/Icon_HeadDefaultM_00.png";
+DynamicString MonsterData_t::keyDefaultString;
 
-int MonsterData_t::getSpriteFromKey(int sprite, std::string key, int type)
+int MonsterData_t::getSpriteFromKey(int sprite, DynamicString key, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
 	{
@@ -498,7 +498,7 @@ int MonsterData_t::getSpriteFromKey(int sprite, std::string key, int type)
 	}
 }
 
-std::string& MonsterData_t::getKeyFromSprite(int sprite, int type)
+DynamicString& MonsterData_t::getKeyFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
 	{
@@ -520,7 +520,7 @@ std::string& MonsterData_t::getKeyFromSprite(int sprite, int type)
 		return find->second.key;
 	}
 }
-std::string& MonsterData_t::getAllyIconFromSprite(int sprite, int type)
+DynamicString& MonsterData_t::getAllyIconFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
 	{
@@ -551,7 +551,7 @@ int MonsterData_t::getSpecialNPCBaseModel(Stat& myStats)
 	return 0;
 }
 
-std::string MonsterData_t::getSpecialNPCName(Stat& myStats)
+DynamicString MonsterData_t::getSpecialNPCName(Stat& myStats)
 {
 	DynamicString npcValue = myStats.getAttribute("special_npc");
 	if ( npcValue != "" )
@@ -561,7 +561,7 @@ std::string MonsterData_t::getSpecialNPCName(Stat& myStats)
 	return "";
 }
 
-bool MonsterData_t::nameMatchesSpecialNPCName(Stat& myStats, std::string npcKey)
+bool MonsterData_t::nameMatchesSpecialNPCName(Stat& myStats, DynamicString npcKey)
 {
 	auto& specialNPCs = monsterDataEntries[myStats.type].specialNPCs;
 	if ( specialNPCs.find(npcKey) != specialNPCs.end() )

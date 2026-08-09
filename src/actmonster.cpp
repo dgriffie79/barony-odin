@@ -221,7 +221,7 @@ double sightranges[NUMMONSTERS] =
 int monsterGlobalAnimationMultiplier = 10;
 int monsterGlobalAttackTimeMultiplier = 1;
 
-std::string getMonsterLocalizedName(Monster creature, Stat* optionalStats)
+DynamicString getMonsterLocalizedName(Monster creature, Stat* optionalStats)
 {
 	if ( creature == BUGBEAR )
 	{
@@ -258,7 +258,7 @@ std::string getMonsterLocalizedName(Monster creature, Stat* optionalStats)
 	return "nothing";
 }
 
-std::string getMonsterLocalizedPlural(Monster creature)
+DynamicString getMonsterLocalizedPlural(Monster creature)
 {
 	if ( creature == BUGBEAR )
 	{
@@ -290,7 +290,7 @@ std::string getMonsterLocalizedPlural(Monster creature)
 	}
 	return "nothings";
 }
-std::string getMonsterLocalizedInjury(Monster creature)
+DynamicString getMonsterLocalizedInjury(Monster creature)
 {
 	if ( creature == BUGBEAR )
 	{
