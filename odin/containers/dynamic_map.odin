@@ -1,14 +1,14 @@
-// dynamic_map.odin — C-ABI shim for maps, callable from C++.
+// dynamic_map.odin -- C-ABI shim for maps, callable from C++.
 //
 // Replaces std::map / std::unordered_map in shared structs. Uses ODIN'S NATIVE
-// map (hash map) — not a hand-rolled container — so growth/hash/equal are the
+// map (hash map) -- not a hand-rolled container -- so growth/hash/equal are the
 // battle-tested builtins. The C++ mirror is Raw_Map {data,len,allocator} (32
 // bytes on x64).
 //
 // Key strategy (from the de-STL ordering: strings are replaced BEFORE maps):
-//   - numeric keys (int/Uint32/enum, 4 bytes): map[[4]byte]V  — C++ passes the
+//   - numeric keys (int/Uint32/enum, 4 bytes): map[[4]byte]V  -- C++ passes the
 //     key as 4 raw bytes
-//   - string keys (Item.attributes etc.): map[string]V — C++ passes a
+//   - string keys (Item.attributes etc.): map[string]V -- C++ passes a
 //     DynamicString {data,len}, which is ABI-identical to Odin's string, so the
 //     shim receives it directly as `string`.
 //
@@ -213,7 +213,7 @@ barony_dynamic_map_strint_destroy :: proc "c" (m: ^map[string]int) {
 	}
 }
 
-// string -> i32 (for Stat/Item attributes: map<string, Sint32>) — interned key
+// string -> i32 (for Stat/Item attributes: map<string, Sint32>) -- interned key
 @(export)
 barony_dynamic_map_stri32_init :: proc "c" (m: ^map[string]i32) {
 	context = runtime.default_context()
@@ -280,7 +280,7 @@ barony_dynamic_map_stri32_destroy :: proc "c" (m: ^map[string]i32) {
 // ---------------------------------------------------------------------------
 // Odin's map[string]V stores keys as views; std::map deep-copies them. We
 // intern keys into ONE process-lifetime interner so map keys are stable and
-// deduplicated. Keys are never freed (bounded set — attribute/binding names).
+// deduplicated. Keys are never freed (bounded set -- attribute/binding names).
 _global_interner: strings.Intern
 _global_interner_init: bool
 
@@ -294,7 +294,7 @@ intern_string :: proc(key: string) -> string {
 	return s
 }
 
-// map[string]i32 — operator[] stable value pointer (std::map::operator[]).
+// map[string]i32 -- operator[] stable value pointer (std::map::operator[]).
 // Returns pointer to the value slot; inserts default (0) if missing.
 // The caller must copy the value out (ptr valid until next mutation).
 @(export)
@@ -311,7 +311,7 @@ barony_dynamic_map_stri32_entry :: proc "c" (m: ^map[string]i32, key: string) ->
 	return vp
 }
 
-// map[string]i32 — snapshot all entries for C++ copy/iteration.
+// map[string]i32 -- snapshot all entries for C++ copy/iteration.
 // key_ptrs = array of (const char*) into interned storage, key_lens = array
 // of i32 lengths, val_ptrs = array of i32 values. Each array has `count`
 // slots (caller passes len(m)); returns entries written.
@@ -335,7 +335,7 @@ barony_dynamic_map_stri32_entries :: proc "c" (m: ^map[string]i32, key_ptrs: [^]
 }
 
 // ---------------------------------------------------------------------------
-// string -> string (map[string]string) — BOTH keys AND values interned.
+// string -> string (map[string]string) -- BOTH keys AND values interned.
 // std::map<std::string,std::string> deep-copies both; Odin stores views. The
 // values are often temporaries (std::to_string results) so they must be
 // interned too, or they'd dangle. Values dedup like keys (shared global
@@ -357,14 +357,25 @@ barony_dynamic_map_strstr_put :: proc "c" (m: ^map[string]string, key: string, v
 		m^ = make(map[string]string)
 	}
 	k := intern_string(key)
-	v := intern_string(value)
-	m[k] = v
+	// deep-copy the VALUE into map-owned memory (NOT interned). The C++ side
+	// gets a DynamicString& to the value slot and RAII-assigns into it --
+	// from_cstr would destroy an interned view (shared buffer) -> double-free.
+	// Owned values free correctly.
+	buf, _ := mem.alloc(len(value) + 1, align_of(u8))
+	if buf == nil {
+		return
+	}
+	if len(value) > 0 {
+		runtime.mem_copy(buf, raw_data(value), len(value))
+	}
+	(^u8)(uintptr(buf) + uintptr(len(value)))^ = 0
+	m[k] = transmute(string)DynamicString{ data = buf, len = len(value) }
 }
 
 // string -> string: get
 @(export)
-// string -> string: get — DEEP-COPIES the value into fresh memory.
-// CRITICAL: out is a C++ DynamicString (RAII — frees on destruction). If we
+// string -> string: get -- DEEP-COPIES the value into fresh memory.
+// CRITICAL: out is a C++ DynamicString (RAII -- frees on destruction). If we
 // assign a VIEW into interned storage, the C++ dtor frees the interner's
 // memory -> double-free/corruption. Copy instead: the C++ side owns the copy.
 barony_dynamic_map_strstr_get :: proc "c" (m: ^map[string]string, key: string, out: ^string) -> bool {
@@ -374,7 +385,7 @@ barony_dynamic_map_strstr_get :: proc "c" (m: ^map[string]string, key: string, o
 	}
 	v, ok := m[key]
 	if ok {
-		// deep-copy into fresh memory (out is a C++ RAII DynamicString — it will free this)
+		// deep-copy into fresh memory (out is a C++ RAII DynamicString -- it will free this)
 	buf, _ := mem.alloc(len(v) + 1, align_of(u8))
 	if buf == nil {
 		return false
@@ -403,6 +414,12 @@ barony_dynamic_map_strstr_erase :: proc "c" (m: ^map[string]string, key: string)
 barony_dynamic_map_strstr_clear :: proc "c" (m: ^map[string]string) {
 	context = runtime.default_context()
 	if m^ != nil {
+		// free the owned value buffers (values are map-owned deep copies)
+		for _, value in m^ {
+			if raw_data(value) != nil {
+				mem.free(raw_data(value))
+			}
+		}
 		clear(&m^)
 	}
 }
@@ -422,6 +439,11 @@ barony_dynamic_map_strstr_len :: proc "c" (m: ^map[string]string) -> i32 {
 barony_dynamic_map_strstr_destroy :: proc "c" (m: ^map[string]string) {
 	context = runtime.default_context()
 	if m^ != nil {
+		for _, value in m^ {
+			if raw_data(value) != nil {
+				mem.free(raw_data(value))
+			}
+		}
 		delete(m^)
 		m^ = nil
 	}
@@ -463,9 +485,9 @@ barony_dynamic_map_strstr_entries :: proc "c" (m: ^map[string]string, key_ptrs: 
 	return n
 }
 
-// map[string]i32 — get the STORED (interned) key pointer + value for a key.
+// map[string]i32 -- get the STORED (interned) key pointer + value for a key.
 // Used by C++ find() so iterators point at process-lifetime interned storage
-// (std::map::find iterator semantics — key stays valid while the map lives).
+// (std::map::find iterator semantics -- key stays valid while the map lives).
 @(export)
 barony_dynamic_map_stri32_find :: proc "c" (m: ^map[string]i32, key: string, out_key: ^rawptr, out_key_len: ^i32, out_val: ^i32) -> bool {
 	context = runtime.default_context()
@@ -477,7 +499,7 @@ barony_dynamic_map_stri32_find :: proc "c" (m: ^map[string]i32, key: string, out
 		return false
 	}
 	if inserted {
-		// map_entry inserts if missing — roll back to keep find() non-mutating
+		// map_entry inserts if missing -- roll back to keep find() non-mutating
 		runtime.delete_key(m, key)
 		return false
 	}
@@ -488,7 +510,7 @@ barony_dynamic_map_stri32_find :: proc "c" (m: ^map[string]i32, key: string, out
 }
 
 // ---------------------------------------------------------------------------
-// string -> f32 (map<string,float>) — GameUI heightOffsets/screenDistanceOffsets
+// string -> f32 (map<string,float>) -- GameUI heightOffsets/screenDistanceOffsets
 // Values are floats (no ownership). Keys interned like the others.
 // ---------------------------------------------------------------------------
 
@@ -601,8 +623,8 @@ barony_dynamic_map_strf32_entries :: proc "c" (m: ^map[string]f32, key_ptrs: [^]
 }
 
 // ---------------------------------------------------------------------------
-// string -> LightDef (map<string,LightDef>) — light.hpp lightDefs.
-// LightDef is a POD (i32 + 5xf32 + bool) — layout matches C++ exactly.
+// string -> LightDef (map<string,LightDef>) -- light.hpp lightDefs.
+// LightDef is a POD (i32 + 5xf32 + bool) -- layout matches C++ exactly.
 // Values copied by value (POD, no ownership); keys interned.
 // ---------------------------------------------------------------------------
 LightDef :: struct {
