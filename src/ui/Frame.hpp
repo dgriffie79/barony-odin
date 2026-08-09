@@ -53,8 +53,8 @@ public:
 
 	//! frame image
 	struct image_t {
-		std::string name;
-		std::string path;
+		DynamicString name;
+		DynamicString path;
 		Uint32 color;
 		Uint32 outlineColor;
 		SDL_Rect pos;
@@ -85,10 +85,10 @@ public:
 	struct entry_t {
 		entry_t(Frame& _parent) : parent(_parent) {}
 		Frame& parent;
-		std::string name;
-		std::string text;
-		std::string tooltip;
-		std::string image;
+		DynamicString name;
+		DynamicString text;
+		DynamicString tooltip;
+		DynamicString image;
 		Uint32 color = makeColor(255, 255, 255, 255);
 		void* data = nullptr;
 
@@ -396,7 +396,7 @@ public:
 
 private:
 	Uint32 ticks = 0;									//!< number of engine ticks this frame has persisted
-	std::string font = Font::defaultFont;				//!< name of the font to use for frame entries
+	DynamicString font = Font::defaultFont;				//!< name of the font to use for frame entries
 	int border = 2;										//!< size of the frame's border
     SDL_Rect size{0, 0, 0, 0};							//!< size and position of the frame in its parent frame
 	SDL_Rect actualSize{0, 0, 0, 0};					//!< size of the frame's whole contents. when larger than size, activates sliders

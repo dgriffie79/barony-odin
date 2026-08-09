@@ -120,13 +120,13 @@ private:
     bool activated = false;                         //!< if true, the slider captures all input
     SDL_Rect handleSize{0, 0, 0, 0};                //!< size of the handle in pixels
     SDL_Rect railSize{0, 0, 0, 0};                  //!< size of the rail in pixels
-    std::string tooltip;						    //!< if empty, slider has no tooltip; otherwise, it does
+    DynamicString tooltip;						    //!< if empty, slider has no tooltip; otherwise, it does
     Uint32 color = 0xffffffff;					    //!< the slider's color
     Uint32 highlightColor = 0xffffffff;             //!< slider's color when highlighted
     Uint32 moveStartTime = 0u;                      //!< when the player started holding a direction to move the slider
     Uint32 lastMoveTime = 0u;                       //!< last time the slider was moved
-    std::string handleImageActivated;               //!< image to use for the handle (when activated)
-    std::string handleImage;                        //!< image to use for the handle
-    std::string railImage;                          //!< image to use for the rail
+    DynamicString handleImageActivated;               //!< image to use for the handle (when activated)
+    DynamicString handleImage;                        //!< image to use for the handle
+    DynamicString railImage;                          //!< image to use for the rail
 	bool ontop = false;								//!< whether the slider is drawn ontop of others
 };

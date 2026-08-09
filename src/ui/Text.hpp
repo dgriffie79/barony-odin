@@ -85,7 +85,7 @@ public:
 	//! reset the highlighted word map
 	void clearWordsToHighlight() { wordsToHighlight.clear(); }
 private:
-	std::string name;
+	DynamicString name;
 	GLuint texid = 0;
 	SDL_Surface* surf = nullptr;
 

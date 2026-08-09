@@ -127,13 +127,13 @@ public:
 
 private:
 	void (*callback)(Button&) = nullptr;			//!< native callback for clicking
-	std::string background;							//!< background image
-	std::string backgroundHighlighted;				//!< background image when highlighted/selected
-	std::string backgroundActivated;				//!< background image when activated
-	std::string text;								//!< button text, if any
-	std::string font = Font::defaultFont;			//!< button font
-	std::string icon;								//!< icon, if any (supersedes text content)
-	std::string tooltip;							//!< if empty, button has no tooltip; otherwise, it does
+	DynamicString background;							//!< background image
+	DynamicString backgroundHighlighted;				//!< background image when highlighted/selected
+	DynamicString backgroundActivated;				//!< background image when activated
+	DynamicString text;								//!< button text, if any
+	DynamicString font = Font::defaultFont;			//!< button font
+	DynamicString icon;								//!< icon, if any (supersedes text content)
+	DynamicString tooltip;							//!< if empty, button has no tooltip; otherwise, it does
 	int border = 2;									//!< size of the button border in pixels
 	SDL_Rect size{0,0,0,0};							//!< size and position of the button within its parent frame
 	Uint32 color = 0;								//!< the button's color

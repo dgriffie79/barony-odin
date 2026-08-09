@@ -164,9 +164,9 @@ public:
 	void	setIndividualLinePadding(const int _line, const int _padding) { individualLinePadding[_line] = _padding; }
 
 private:
-	std::string font = Font::defaultFont;				//!< font to use for rendering the field
-	std::string guide;									//!< string to use as a descriptive guide for the field (eg "Enter character's name");
-	std::string tooltip;                                //!< tooltip string
+	DynamicString font = Font::defaultFont;				//!< font to use for rendering the field
+	DynamicString guide;									//!< string to use as a descriptive guide for the field (eg "Enter character's name");
+	DynamicString tooltip;                                //!< tooltip string
 	char* text = nullptr;								//!< internal text buffer
 	size_t textlen = 0;									//!< length of internal text buffer
 	Uint32 color = 0;									//!< color mixed w/ final rendered text

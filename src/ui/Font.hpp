@@ -44,7 +44,7 @@ public:
 	static void dumpCache();
 
 private:
-	std::string name;
+	DynamicString name;
 	TTF_Font* font = nullptr;
 	int pointSize = 16;
 	int outlineSize = 0;

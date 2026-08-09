@@ -186,6 +186,11 @@ public:
         for (int64_t i = 0; i < count; ++i) barony_dynamic_string_insert_cstr(this, (int)(pos + i), (&ch));
         return *this;
     }
+    // front/back char access (std::string::front/back)
+    char& front() { return data[0]; }
+    char& back() { return data[len - 1]; }
+    const char& front() const { return data[0]; }
+    const char& back() const { return data[len - 1]; }
     // mutable char access (std::string::operator[]/at)
     char& at(int64_t i) { return data[i]; }
     char& operator[](int64_t i) { return data[i]; }

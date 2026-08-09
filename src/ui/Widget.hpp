@@ -188,7 +188,7 @@ protected:
 
     Widget* parent = nullptr;                                       //!< parent widget
     std::list<Widget*> widgets;                                     //!< widget children
-    std::string name;                                               //!< widget name
+    DynamicString name;                                               //!< widget name
     bool pressed = false;							                //!< pressed state
     bool reallyPressed = false;						                //!< the "actual" pressed state, pre-mouse process
     bool highlighted = false;                                       //!< if true, this widget has the mouse over it
@@ -217,7 +217,7 @@ protected:
         widgetActions;                              //!< widgets to select and activate when input is pressed
     std::unordered_map<std::string, std::string>
         widgetMovements;                            //!< widgets to select when input is pressed
-    std::string widgetSearchParent;                 //!< widget to search from for actions and movements
+    DynamicString widgetSearchParent;                 //!< widget to search from for actions and movements
 
     void drawPost(const SDL_Rect size,
         const std::vector<const Widget*>& selectedWidgets,

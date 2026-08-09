@@ -125,7 +125,7 @@ public:
 	const unsigned int		getHeight()	const { return surf ? surf->h : 0U; }
 
 private:
-	std::string name;
+	DynamicString name;
 	GLuint texid = 0;
 	SDL_Surface* surf = nullptr;
 	SDL_Surface* outlineSurf = nullptr;
