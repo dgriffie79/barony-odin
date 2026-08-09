@@ -88,3 +88,4 @@ xcode/Barony/Barony.xcodeproj/xcuserdata/*
 /builddir/
 meson-logs/
 meson-private/
+.pi-subagents
