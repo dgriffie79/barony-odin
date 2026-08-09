@@ -12636,24 +12636,24 @@ bool Compendium_t::tooltipNeedUpdate = false;
 SDL_Rect Compendium_t::tooltipPos;
 
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents;
-std::map<std::string, std::string> Compendium_t::CompendiumMonsters_t::contentsMap;
+DynamicMapStr Compendium_t::CompendiumMonsters_t::contentsMap;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents_unfiltered;
 std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumMonsters_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumWorld_t::contents;
-std::map<std::string, std::string> Compendium_t::CompendiumWorld_t::contentsMap;
+DynamicMapStr Compendium_t::CompendiumWorld_t::contentsMap;
 std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumWorld_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumCodex_t::contents;
-std::map<std::string, std::string> Compendium_t::CompendiumCodex_t::contentsMap;
+DynamicMapStr Compendium_t::CompendiumCodex_t::contentsMap;
 std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumCodex_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumItems_t::contents;
-std::map<std::string, std::string> Compendium_t::CompendiumItems_t::contentsMap;
+DynamicMapStr Compendium_t::CompendiumItems_t::contentsMap;
 std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::unlocks;
 std::map<int, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::itemUnlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMagic_t::contents;
-std::map<std::string, std::string> Compendium_t::CompendiumMagic_t::contentsMap;
+DynamicMapStr Compendium_t::CompendiumMagic_t::contentsMap;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::AchievementData_t::contents;
 std::map<std::string, Compendium_t::CompendiumUnlockStatus> Compendium_t::AchievementData_t::unlocks;
-std::map<std::string, std::string> Compendium_t::AchievementData_t::contentsMap;
+DynamicMapStr Compendium_t::AchievementData_t::contentsMap;
 int Compendium_t::CompendiumMonsters_t::completionPercent = 0;
 int Compendium_t::CompendiumCodex_t::completionPercent = 0;
 int Compendium_t::CompendiumItems_t::completionPercent = 0;
@@ -12673,7 +12673,7 @@ std::map<int, std::string> Compendium_t::Events_t::worldIDToString;
 std::map<int, std::string> Compendium_t::Events_t::itemIDToString;
 
 void Compendium_t::readContentsLang(std::string name, std::map<std::string, std::vector<std::pair<std::string, std::string>>>& contents,
-	std::map<std::string, std::string>& contentsMap)
+	DynamicMapStr& contentsMap)
 {
 	contents.clear();
 	contentsMap.clear();
@@ -14799,7 +14799,7 @@ DynamicMapI32 Compendium_t::Events_t::eventCodexIDLookup;
 std::map<Compendium_t::EventTags, std::map<int, int>> Compendium_t::Events_t::eventClassIds;
 std::map<int, std::vector<Compendium_t::EventTags>> Compendium_t::Events_t::itemDisplayedEventsList;
 std::map<int, std::vector<std::string>> Compendium_t::Events_t::itemDisplayedCustomEventsList;
-std::map<std::string, std::string> Compendium_t::Events_t::customEventsValues;
+DynamicMapStr Compendium_t::Events_t::customEventsValues;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::playerEvents;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::serverPlayerEvents[MAXPLAYERS];
 std::map<Compendium_t::EventTags, std::map<std::string, std::string>> Compendium_t::Events_t::eventLangEntries;
@@ -15100,7 +15100,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 	std::string compendiumSection, std::string compendiumContentsSelected, int specificClass)
 {
 	std::vector<std::pair<std::string, Sint32>> results;
-	if ( customEventsValues.find(key) == customEventsValues.end() )
+	if ( !customEventsValues.contains(key) )
 	{
 		return results;
 	}
@@ -18757,7 +18757,7 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
 				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumCodex_t::contentsMap.find(unlockStatus.first) != CompendiumCodex_t::contentsMap.end() )
+				if ( CompendiumCodex_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumCodex_t::numUnread;
@@ -18769,7 +18769,7 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
 				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumWorld_t::contentsMap.find(unlockStatus.first) != CompendiumWorld_t::contentsMap.end() )
+				if ( CompendiumWorld_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumWorld_t::numUnread;
@@ -18781,12 +18781,12 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
 				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumItems_t::contentsMap.find(unlockStatus.first) != CompendiumItems_t::contentsMap.end() )
+				if ( CompendiumItems_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumItems_t::numUnread;
 				}
-				if ( CompendiumMagic_t::contentsMap.find(unlockStatus.first) != CompendiumMagic_t::contentsMap.end() )
+				if ( CompendiumMagic_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumMagic_t::numUnread;
@@ -18798,7 +18798,7 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
 				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( CompendiumMonsters_t::contentsMap.find(unlockStatus.first) != CompendiumMonsters_t::contentsMap.end() )
+				if ( CompendiumMonsters_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::CompendiumMonsters_t::numUnread;
@@ -18810,7 +18810,7 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 			if ( unlockStatus.second == Compendium_t::UNLOCKED_UNVISITED
 				|| unlockStatus.second == Compendium_t::LOCKED_REVEALED_UNVISITED )
 			{
-				if ( Compendium_t::AchievementData_t::contentsMap.find(unlockStatus.first) != Compendium_t::AchievementData_t::contentsMap.end() )
+				if ( Compendium_t::AchievementData_t::contentsMap.contains(unlockStatus.first) )
 				{
 					++numUnread;
 					++Compendium_t::AchievementData_t::numUnread;
