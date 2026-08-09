@@ -92,7 +92,7 @@ class GameController
 	SDL_GameController* sdl_device;
 	SDL_Haptic* sdl_haptic;
 	int id;
-	std::string name;
+	DynamicString name;
 	static const int BUTTON_HELD_TICKS = TICKS_PER_SECOND / 4;
 
 #ifdef NINTENDO
@@ -719,17 +719,17 @@ public:
 		int dropDownOptionSelected = -1;
 		Uint32 dropDownItem = 0;
 		bool bOpen = false;
-		std::string currentName = "";
+		DynamicString currentName = "";
 		Frame* dropdownBlockClickFrame = nullptr;
 		Frame* dropdownFrame = nullptr;
 		bool dropDownToggleClick = false;
 		int dropdownLinkToModule = 0;
 		bool bClosedThisTick = false;
 		struct DropdownOption_t {
-			std::string text = "";
-			std::string keyboardGlyph = "";
-			std::string controllerGlyph = "";
-			std::string action = "";
+			DynamicString text = "";
+			DynamicString keyboardGlyph = "";
+			DynamicString controllerGlyph = "";
+			DynamicString action = "";
 			DropdownOption_t(std::string _text, std::string _keyboardGlyph, std::string _controllerGlyph, std::string _action)
 			{
 				text = _text;
@@ -740,21 +740,21 @@ public:
 		};
 		struct DropDown_t
 		{
-			std::string title = "Interact";
-			std::string internalName = "";
+			DynamicString title = "Interact";
+			DynamicString internalName = "";
 			bool alignRight = true;
 			int module = 0;
 			int defaultOption = 0;
 			std::vector<DropdownOption_t> options;
 		};
 
-		void open(const std::string name);
+		void open(const DynamicString name);
 		void close();
-		void create(const std::string name);
-		bool set(const std::string name);
+		void create(const DynamicString name);
+		bool set(const DynamicString name);
 		void process();
-		bool getDropDownAlignRight(const std::string& name);
-		void activateSelection(const std::string& name, int option);
+		bool getDropDownAlignRight(const DynamicString& name);
+		void activateSelection(const DynamicString& name, int option);
 		static std::map<std::string, DropDown_t> allDropDowns;
 		GUIDropdown_t(Player& p) :
 			player(p) {}
@@ -1210,10 +1210,10 @@ public:
 		void updateShop();
 		Uint32 chatTicks = 0;
 		size_t chatStringLength = 0;
-		std::string chatStrFull = "";
+		DynamicString chatStrFull = "";
 		Sint32 itemPrice = -1;
 		bool itemUnknownPreventPurchase = false;
-		std::string itemDesc = "";
+		DynamicString itemDesc = "";
 		bool itemRequiresTitleReflow = true;
 		Sint32 playerCurrentGold = 0;
 		Sint32 playerChangeGold = 0;
@@ -1265,7 +1265,7 @@ public:
 		int offsety = 0;
 		bool bBookOpen = false;
 		Item* openBookItem = nullptr;
-		std::string openBookName = "";
+		DynamicString openBookName = "";
 		int currentBookPage = 0;
 		void updateBookGUI();
 		void closeBookGUI();
@@ -1289,7 +1289,7 @@ public:
 		real_t signWorldCoordY = 0.0;
 		Frame* signFrame = nullptr;
 		bool bSignOpen = false;
-		std::string signName = "";
+		DynamicString signName = "";
 		int currentSignPage = 0;
 		void updateSignGUI();
 		void closeSignGUI();
@@ -1405,8 +1405,8 @@ public:
 			struct SkillEntry_t
 			{
 			private:
-				std::string skillName = "";
-				std::string skillShortName = "";
+				DynamicString skillName = "";
+				DynamicString skillShortName = "";
 			public:
 				void setSkillName(std::string name)
 				{
@@ -1430,13 +1430,13 @@ public:
 				SkillEntry_t() {};
 				~SkillEntry_t() {};
 				int skillId = -1;
-				std::string skillIconPath;
-				std::string skillIconPathLegend;
-				std::string skillIconPath32px;
-				std::string skillIconPathLegend32px;
-				std::string statIconPath;
-				std::string description;
-				std::string legendaryDescription;
+				DynamicString skillIconPath;
+				DynamicString skillIconPathLegend;
+				DynamicString skillIconPath32px;
+				DynamicString skillIconPathLegend32px;
+				DynamicString statIconPath;
+				DynamicString description;
+				DynamicString legendaryDescription;
 				int skillSfx = 552;
 				int effectStartOffsetX = 72;
 				int effectBackgroundOffsetX = 8;
@@ -1445,11 +1445,11 @@ public:
 				{
 					SkillEffect_t() {};
 					~SkillEffect_t() {};
-					std::string tag;
-					std::string title;
-					std::string titleShort;
-					std::string rawValue;
-					std::string value;
+					DynamicString tag;
+					DynamicString title;
+					DynamicString titleShort;
+					DynamicString rawValue;
+					DynamicString value;
 					int valueCustomWidthOffset = 0;
 					bool bAllowAutoResizeValue = false;
 					bool bAllowRealtimeUpdate = false;
@@ -1464,18 +1464,18 @@ public:
 				std::vector<SkillEffect_t> effects;
 			};
 			std::vector<SkillEntry_t> skillEntries;
-			std::string iconBgPathDefault = "";
-			std::string iconBgPathNovice = "";
-			std::string iconBgPathExpert = "";
-			std::string iconBgPathLegend = "";
-			std::string iconBgSelectedPathDefault = "";
-			std::string iconBgSelectedPathNovice = "";
-			std::string iconBgSelectedPathExpert = "";
-			std::string iconBgSelectedPathLegend = "";
-			std::string highlightSkillImg = "";
-			std::string selectSkillImg = "";
-			std::string highlightSkillImg_Right = "";
-			std::string selectSkillImg_Right = "";
+			DynamicString iconBgPathDefault = "";
+			DynamicString iconBgPathNovice = "";
+			DynamicString iconBgPathExpert = "";
+			DynamicString iconBgPathLegend = "";
+			DynamicString iconBgSelectedPathDefault = "";
+			DynamicString iconBgSelectedPathNovice = "";
+			DynamicString iconBgSelectedPathExpert = "";
+			DynamicString iconBgSelectedPathLegend = "";
+			DynamicString highlightSkillImg = "";
+			DynamicString selectSkillImg = "";
+			DynamicString highlightSkillImg_Right = "";
+			DynamicString selectSkillImg_Right = "";
 			std::vector<std::string> potionNamesToFilter;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableBase;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableLegendary;
@@ -1643,8 +1643,8 @@ public:
 			real_t animFadeScroll = 0.0;
 			real_t animFadeScrollDummy = 0.0;
 			bool bInit = false;
-			std::string name = "";
-			std::string customPortraitPath = "";
+			DynamicString name = "";
+			DynamicString customPortraitPath = "";
 			int level = 0;
 			int model = 0;
 			int monsterType = 0;
@@ -2059,8 +2059,8 @@ public:
 				Uint32 expiryTicks = 0;
 				Field* dialogueField = nullptr;
 				size_t dialogueStringLength = 0;
-				std::string dialogueStrFull = "";
-				std::string dialogueStrCurrent = "";
+				DynamicString dialogueStrFull = "";
+				DynamicString dialogueStrCurrent = "";
 				void deactivate();
 				void update();
 				DialogueType_t dialogueType = DIALOGUE_NONE;
@@ -2133,7 +2133,7 @@ public:
 		bool bTooltipActiveForPlayer(Entity& tooltip);
 		bool bTooltipInView = false;
 		Uint32 uidForActiveTooltip = 0;
-		std::string interactText = "Interact";
+		DynamicString interactText = "Interact";
 		void enable() { bEnabled = true; }
 		void disable() { 
 			bEnabled = false; 

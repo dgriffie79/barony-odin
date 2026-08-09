@@ -15559,7 +15559,7 @@ void Player::CharacterSheet_t::createCharacterSheet()
 	}
 }
 
-void Player::GUIDropdown_t::activateSelection(const std::string& name, const int option)
+void Player::GUIDropdown_t::activateSelection(const DynamicString& name, const int option)
 {
 	auto& dropdown = allDropDowns[name];
 	if ( dropdown.options[option].action == "no_action" )
@@ -15644,7 +15644,7 @@ void Player::GUIDropdown_t::activateSelection(const std::string& name, const int
 	}
 }
 
-bool Player::GUIDropdown_t::getDropDownAlignRight(const std::string& name)
+bool Player::GUIDropdown_t::getDropDownAlignRight(const DynamicString& name)
 {
 	bool invert = false;
 	if ( name == "drop_gold" )
@@ -16104,7 +16104,7 @@ void Player::CharacterSheet_t::processCharacterSheet()
 
 std::map<std::string, Player::GUIDropdown_t::DropDown_t> Player::GUIDropdown_t::allDropDowns;
 
-bool Player::GUIDropdown_t::set(const std::string name)
+bool Player::GUIDropdown_t::set(const DynamicString name)
 {
 	if ( allDropDowns.find(name) == allDropDowns.end() )
 	{
@@ -16644,7 +16644,7 @@ bool Player::GUI_t::isDropdownActive()
 	return false;
 }
 
-void Player::GUIDropdown_t::open(const std::string name)
+void Player::GUIDropdown_t::open(const DynamicString name)
 {
 	set(name);
 	assert(dropdownFrame);
@@ -16714,7 +16714,7 @@ void Player::GUIDropdown_t::open(const std::string name)
 	}
 }
 
-void Player::GUIDropdown_t::create(const std::string name)
+void Player::GUIDropdown_t::create(const DynamicString name)
 {
 	if ( dropdownFrame )
 	{
