@@ -821,7 +821,7 @@ bool handleEvents(void)
 						{
 							if ( textInsertCaratPosition != 0 )
 							{
-								std::string tmp = inputstr;
+								DynamicString tmp = inputstr;
 								tmp.erase(textInsertCaratPosition - 1, 1);
 								strcpy(inputstr, tmp.c_str());
 								textInsertCaratPosition = std::max(textInsertCaratPosition - 1, 0);
@@ -839,7 +839,7 @@ bool handleEvents(void)
 						{
 							if ( textInsertCaratPosition != 0 )
 							{
-								std::string tmp = inputstr;
+								DynamicString tmp = inputstr;
 								tmp.erase(textInsertCaratPosition - 1, 1);
 								strcpy(inputstr, tmp.c_str());
 								textInsertCaratPosition = std::max(textInsertCaratPosition - 1, 0);
@@ -885,7 +885,7 @@ bool handleEvents(void)
 								}
 								else if ( inputlen - ((int)strlen(inputstr) + 1) >= 0)
 								{
-									std::string tmp = inputstr;
+									DynamicString tmp = inputstr;
 									tmp.insert(textInsertCaratPosition, event.text.text);
 									strcpy(inputstr, tmp.c_str());
 									textInsertCaratPosition = std::min((int)strlen(inputstr), textInsertCaratPosition + 1);
@@ -6033,7 +6033,7 @@ extern "C" int barony_main(int argc, char** argv)
 						Uint32 color = makeColorRGB(0, 255, 0);
 						Uint32 colorRandom = makeColorRGB(0, 168, 255);
 						Uint32 colorError = makeColorRGB(255, 0, 0);
-						std::string rotationStr = "";
+						DynamicString rotationStr = "";
 						for ( int i = 0; i < numProperties; i++ )
 						{
 							int propertyInt = atoi(spriteProperties[i]);
