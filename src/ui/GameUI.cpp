@@ -253,13 +253,13 @@ struct DamageIndicatorSettings_t
 	real_t fadeSpeed = 1.0;
 	Uint32 fadeAfterTicks = HITRATE;
 	Uint32 deleteAfterTicks = 45;
-	std::string indicatorDamageFramePaths[4] = {
+	DynamicString indicatorDamageFramePaths[4] = {
 		"images/ui/HUD/indicators/damageB",
 		"images/ui/HUD/indicators/damage",
 		"images/ui/HUD/indicators/damage",
 		"images/ui/HUD/indicators/damage"
 	};
-	std::string indicatorBlockedFramePaths[4] = {
+	DynamicString indicatorBlockedFramePaths[4] = {
 		"images/ui/HUD/indicators/damage_blocked",
 		"images/ui/HUD/indicators/damage_blocked",
 		"images/ui/HUD/indicators/damage_blocked",
@@ -936,7 +936,7 @@ void createAllyFollowerFrame(const int player)
 	glyphFrame->setSize(SDL_Rect{ 0, 0, 300, 0 });
 	glyphFrame->setDisabled(true);
 	{
-		std::string font = "fonts/pixel_maz.ttf#32#2";
+		DynamicString font = "fonts/pixel_maz.ttf#32#2";
 		/*auto commandText = glyphFrame->addField("command prompt txt", 32);
 		commandText->setFont(font.c_str());
 		commandText->setHJustify(Field::justify_t::LEFT);
@@ -1330,7 +1330,7 @@ void updateVoicePromptFrame(const int player, Frame* baseFrame, Frame* allyFrame
 
 	if ( !glyph->disabled )
 	{
-		std::string imgPath = "#*images/ui/HUD/HUD_Mic_mute_00.png"; //(voice_pushtotalk & (1 << player)) ? "#*images/ui/HUD/HUD_Mic_live0_00.png" : "#*images/ui/HUD/HUD_Mic_mute_00.png";
+		DynamicString imgPath = "#*images/ui/HUD/HUD_Mic_mute_00.png"; //(voice_pushtotalk & (1 << player)) ? "#*images/ui/HUD/HUD_Mic_live0_00.png" : "#*images/ui/HUD/HUD_Mic_mute_00.png";
 		if ( VoiceChat.PlayerChannels[player].talkingTicks > 0 
 			|| VoiceChat.PlayerChannels[player].monitor_output_volume >= 0.05 )
 		{
@@ -1434,7 +1434,7 @@ Frame* createAllyPlayerEntry(const int player, Frame* baseFrame)
 		portrait->addImage(SDL_Rect{ 0, 0, 32, 32 }, 0xFFFFFFFF, "*#images/ui/HUD/allies/HUD_HPBar_HeadDefaultM_00.png", "portrait img");
 	}
 
-	std::string font = "fonts/pixel_maz.ttf#32#2";
+	DynamicString font = "fonts/pixel_maz.ttf#32#2";
 	{
 		Field* name = entry->addField("name", 128);
 		name->setFont(font.c_str());
@@ -1679,7 +1679,7 @@ Frame* createAllyPlayerEntry(const int player, Frame* baseFrame)
 			if ( voiceState != VoiceChat_t::VOICE_STATE_NONE && !(voice_no_recv & (1 << clientnum)) )
 			{
 				// icons only if clientnum is receiving and player wants to send
-				std::string imgPath = "";
+				DynamicString imgPath = "";
 
 				switch ( voiceState )
 				{
@@ -1781,7 +1781,7 @@ Frame* createAllyFollowerEntry(const int player, Frame* baseFrame)
 		portrait->addImage(SDL_Rect{ 0, 0, 32, 32 }, 0xFFFFFFFF, "*#images/ui/HUD/allies/HUD_HPBar_HeadDefaultM_00.png", "portrait img");
 	}
 
-	std::string font = "fonts/pixel_maz.ttf#32#2";
+	DynamicString font = "fonts/pixel_maz.ttf#32#2";
 	{
 		Field* name = entry->addField("name", 128);
 		name->setFont(font.c_str());
@@ -2396,7 +2396,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 
 		if ( updateName && (followerStats && ((!bPlayerBars && follower) || bPlayerBars)) )
 		{
-			std::string followerName = "";
+			DynamicString followerName = "";
 			followerBar.customPortraitPath = "";
 			size_t maxNameLen = 0;
 			if ( bPlayerBars )
@@ -4407,7 +4407,7 @@ void createEnemyBar(const int player, Frame*& frame)
 	skull = skullFrame->addImage(skullFrame->getSize(), 0xFFFFFFFF, "*#images/ui/HUD/enemybar/HUD_EnemyHP_Face2_00.png", "skull 50 img");
 	skull = skullFrame->addImage(skullFrame->getSize(), 0xFFFFFFFF, "*#images/ui/HUD/enemybar/HUD_EnemyHP_Face1_00.png", "skull 100 img");
 
-	std::string font = "fonts/pixel_maz.ttf#32#2";
+	DynamicString font = "fonts/pixel_maz.ttf#32#2";
 	Uint32 color = makeColor(235, 191, 140, 255);
 	auto enemyName = frame->addField("enemy name txt", 128);
 	enemyName->setSize(SDL_Rect{ 0, 0, frame->getSize().w, frame->getSize().h});
@@ -4492,7 +4492,7 @@ void createXPBar(const int player)
 	auto progressClipFrame = hud_t.xpFrame->addFrame("xp progress clipping frame");
 	progressClipFrame->setSize(SDL_Rect{ 0, 6, 1, progressBarHeight });
 
-	std::string bodyPath = "*#images/ui/HUD/xpbar/HUD_Exp_SandBody2_";
+	DynamicString bodyPath = "*#images/ui/HUD/xpbar/HUD_Exp_SandBody2_";
 	int xpPathNum = player;
 	if ( !colorblind_lobby )
 	{
@@ -5438,15 +5438,15 @@ void Player::HUD_t::updateUINavigation()
 	}
 
 	struct ButtonsAndGlyphs {
-		std::string name;
+		DynamicString name;
 		Button* button = nullptr;
 		Frame::image_t* glyph = nullptr;
-		std::string inputName;
+		DynamicString inputName;
 		CompactLayoutModes layoutMode;
-		ButtonsAndGlyphs(std::string _name, 
+		ButtonsAndGlyphs(DynamicString _name, 
 			Button* _button, 
 			Frame::image_t* _glyph,
-			std::string _inputName, 
+			DynamicString _inputName, 
 			CompactLayoutModes _layoutMode) :
 			name(_name),
 			button(_button),
@@ -5883,7 +5883,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/status_effects.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/status_effects.json");
 		inputPath.append("/data/status_effects.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -5977,7 +5977,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 						{
 							entry.name = itr->value["name"].GetString();
 						}
-						std::string buf = itr->value["desc"].GetString();
+						DynamicString buf = itr->value["desc"].GetString();
 						entry.desc = "\x1E ";
 						int index = 0;
 						for ( auto s : buf )
@@ -6047,9 +6047,9 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 							for ( auto arr = itr->value["desc"].Begin();
 								arr != itr->value["desc"].End(); ++arr )
 							{
-								std::string buf = arr->GetString();
+								DynamicString buf = arr->GetString();
 								int index = 0;
-								std::string formattedStr = "\x1E ";
+								DynamicString formattedStr = "\x1E ";
 								for ( auto s : buf )
 								{
 									if ( index == 0 && (buf[0] == '+' || buf[0] == '-') )
@@ -6077,7 +6077,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 						}
 						else
 						{
-							std::string buf = itr->value["desc"].GetString();
+							DynamicString buf = itr->value["desc"].GetString();
 							entry.desc = "\x1E ";
 							int index = 0;
 							for ( auto s : buf )
@@ -6444,7 +6444,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 						else if ( img->path.find("ensemble_flute.png") != std::string::npos )
 						{
 							alignRight = true;
-							std::string val = "I";
+							DynamicString val = "I";
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_ENSEMBLE_FLUTE);
 							if ( effectStrength >= 1 )
 							{
@@ -6475,7 +6475,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 						else if ( img->path.find("ensemble_lute.png") != std::string::npos )
 						{
 							alignRight = true;
-							std::string val = "I";
+							DynamicString val = "I";
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_ENSEMBLE_LUTE);
 							if ( effectStrength >= 1 )
 							{
@@ -6506,7 +6506,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 						else if ( img->path.find("ensemble_lyre.png") != std::string::npos )
 						{
 							alignRight = true;
-							std::string val = "I";
+							DynamicString val = "I";
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_ENSEMBLE_LYRE);
 							if ( effectStrength >= 1 )
 							{
@@ -6537,7 +6537,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 						else if ( img->path.find("ensemble_drum.png") != std::string::npos )
 						{
 							alignRight = true;
-							std::string val = "I";
+							DynamicString val = "I";
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_ENSEMBLE_DRUM);
 							if ( effectStrength >= 1 )
 							{
@@ -6568,7 +6568,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 						else if ( img->path.find("ensemble_horn.png") != std::string::npos )
 						{
 							alignRight = true;
-							std::string val = "I";
+							DynamicString val = "I";
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_ENSEMBLE_HORN);
 							if ( effectStrength >= 1 )
 							{
@@ -6743,7 +6743,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_FOCI_LIGHT_JUSTICE);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6774,7 +6774,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_FOCI_LIGHT_PEACE);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6805,7 +6805,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_FOCI_LIGHT_PROVIDENCE);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6836,7 +6836,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_FOCI_LIGHT_PURITY);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6867,7 +6867,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_FOCI_LIGHT_SANCTUARY);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6898,7 +6898,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_SANCTUARY) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6929,7 +6929,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_SIGIL) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6960,7 +6960,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_GREATER_MIGHT) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -6991,7 +6991,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_COUNSEL) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -7022,7 +7022,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_NIMBLENESS) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -7053,7 +7053,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_STURDINESS) & 0xF;
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -7085,7 +7085,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							Uint8 effectStrength = stats[player]->getEffectActive(EFF_GROWTH);
 							if ( effectStrength >= 1 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "III";
@@ -7112,7 +7112,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							int effectStrength = players[player]->mechanics.getBreakableCounterTier();
 							if ( effectStrength > 0 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 5 )
 								{
 									val = "V";
@@ -7147,7 +7147,7 @@ void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 							int effectStrength = players[player]->mechanics.getWealthTier();
 							if ( effectStrength > 0 )
 							{
-								std::string val = "I";
+								DynamicString val = "I";
 								if ( effectStrength >= 4 )
 								{
 									val = "IV";
@@ -7813,7 +7813,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 							&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
 						{
 							variation = 1;
-							std::string formatString = definition.getName(variation).c_str();
+							DynamicString formatString = definition.getName(variation).c_str();
 							char buf[256] = "";
 							Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid);
 							if ( tagged->behavior == &actMonster )
@@ -7832,14 +7832,14 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 							{
 								snprintf(buf, sizeof(buf), formatString.c_str(), stats[tagged->skill[2]]->name);
 							}
-							std::string formattedName = buf;
+							DynamicString formattedName = buf;
 							uppercaseString(formattedName);
 							tooltipHeader->setText(formattedName.c_str());
 						}
 					}
 					if ( variation == 2 )
 					{
-						std::string newHeader = definition.getName(variation).c_str();
+						DynamicString newHeader = definition.getName(variation).c_str();
 						uppercaseString(newHeader);
 						tooltipHeader->setText(newHeader.c_str());
 					}
@@ -7849,7 +7849,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 				else
 				{
 					int variation = -1;
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText(definition.getDesc(variation).c_str());
@@ -7897,11 +7897,11 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 
 					int tier = variation + 1;
 
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 
-					std::string newDesc = "";
+					DynamicString newDesc = "";
 					if ( stats[player]->type == DRYAD )
 					{
 						newDesc = definition.getDesc(1).c_str();
@@ -7981,10 +7981,10 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 						}
 					}
 
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
-					std::string newDesc = "";// definition.getDesc(variation).c_str();
+					DynamicString newDesc = "";// definition.getDesc(variation).c_str();
 					char buf[128] = "";
 					if ( effectID == EFF_ENSEMBLE_DRUM )
 					{
@@ -8107,7 +8107,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 						descVariation = 1;
 					}
 
-					std::string newHeader = definition.getName(nameVariation).c_str();
+					DynamicString newHeader = definition.getName(nameVariation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText(definition.getDesc(descVariation).c_str());
@@ -8117,7 +8117,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 					|| effectID == StatusEffectQueue_t::kEffectWantedInShop )
 				{
 					auto& definition2 = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(kEffectWanted);
-					std::string newHeader = definition2.getName(variation).c_str();
+					DynamicString newHeader = definition2.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText("");
@@ -8127,7 +8127,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 						char buf[128];
 						memset(buf, 0, sizeof(buf));
 						snprintf(buf, sizeof(buf), definition.getDesc(0).c_str(), getMonsterLocalizedName(h->playerRace).c_str());
-						std::string descStr = buf;
+						DynamicString descStr = buf;
 						if ( h->wantedLevel == ShopkeeperPlayerHostility.FAILURE_TO_IDENTIFY )
 						{
 							if ( descStr != "" ) { descStr += '\n'; }
@@ -8165,7 +8165,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 						variation = 1;
 					}
 
-					std::string newHeader = definition.getName(-1).c_str();
+					DynamicString newHeader = definition.getName(-1).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText(definition.getDesc(variation).c_str());
@@ -8176,11 +8176,11 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 					int tier = players[player]->mechanics.getBreakableCounterTier();
 					variation = tier;
 
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 
-					std::string descStr = definition.getDesc(0);
+					DynamicString descStr = definition.getDesc(0);
 					char buf[128];
 					memset(buf, 0, sizeof(buf));
 					int dmg = 1 + tier;
@@ -8206,12 +8206,12 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 				{
 					int tier = players[player]->mechanics.getWealthTier();
 					variation = tier;
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 
 
-					std::string descStr = "";
+					DynamicString descStr = "";
 					char buf[128];
 					memset(buf, 0, sizeof(buf));
 					snprintf(buf, sizeof(buf), definition.getDesc(0).c_str(), tier * 10);
@@ -8226,11 +8226,11 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 				}
 				else if ( effectID == StatusEffectQueue_t::kEffectAssistance )
 				{
-					std::string newHeader = definition.getName(-1).c_str();
+					DynamicString newHeader = definition.getName(-1).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 
-					std::string descStr = definition.getDesc(0);
+					DynamicString descStr = definition.getDesc(0);
 
 					char buf[128];
 					memset(buf, 0, sizeof(buf));
@@ -8258,7 +8258,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 				}
 				else if ( effectID == StatusEffectQueue_t::kEffectBountyTarget )
 				{
-					std::string newHeader = definition.getName(1).c_str();
+					DynamicString newHeader = definition.getName(1).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText(definition.getDesc(variation).c_str());
@@ -8280,7 +8280,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 						|| effectID == EFF_ENSEMBLE_LYRE
 						|| effectID == EFF_GROWTH) )
 				{
-					std::string newHeader = definition.getName(variation).c_str();
+					DynamicString newHeader = definition.getName(variation).c_str();
 					uppercaseString(newHeader);
 					tooltipHeader->setText(newHeader.c_str());
 					tooltipDesc->setText(definition.getDesc(variation).c_str());
@@ -9274,7 +9274,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 								if ( players[player]->entity->creatureShadowTaggedThisUid != 0
 									&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
 								{
-									std::string formatString = definition.getName(variation).c_str();
+									DynamicString formatString = definition.getName(variation).c_str();
 									char buf[256] = "";
 									Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid);
 									if ( tagged->behavior == &actMonster )
@@ -9293,7 +9293,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 									{
 										snprintf(buf, sizeof(buf), formatString.c_str(), stats[tagged->skill[2]]->name);
 									}
-									std::string formattedName = buf;
+									DynamicString formattedName = buf;
 									notificationTxt->setText(formattedName.c_str());
 								}
 							}
@@ -10838,7 +10838,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 				text->setDisabled(false);
 				if ( !glyphAdditional->disabled )
 				{
-					std::string txt = Language::get(4201);
+					DynamicString txt = Language::get(4201);
 					txt += Language::get(3650);
 					text->setText(txt.c_str());
 				}
@@ -10852,7 +10852,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 				text->setDisabled(false);
 				if ( !glyphAdditional->disabled )
 				{
-					std::string txt = Language::get(4201);
+					DynamicString txt = Language::get(4201);
 					txt += Language::get(3039);
 					text->setText(txt.c_str());
 				}
@@ -11027,7 +11027,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 		}*/
 		if ( target )
 		{
-			std::string interactText = Language::get(6500);
+			DynamicString interactText = Language::get(6500);
 			if ( target->behavior == &actMonster )
 			{
 				if ( target->isInertMimic() )
@@ -11102,19 +11102,19 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 				{
 					char shortname[32];
 					stringCopy(shortname, stats[playernum]->name, sizeof(shortname), 22);
-					std::string nameStr = shortname;
+					DynamicString nameStr = shortname;
 					nameStr = messageSanitizePercentSign(nameStr, nullptr);
 					interactText += nameStr;
 				}
 			}
 			else
 			{
-				std::string txt = CalloutMenu[player.playernum].interactText;
+				DynamicString txt = CalloutMenu[player.playernum].interactText;
 				auto prevCmd = CalloutMenu[player.playernum].optionSelected;
 				CalloutMenu[player.playernum].optionSelected = CalloutRadialMenu::CALLOUT_CMD_SELECT;
 				if ( CalloutMenu[player.playernum].allowedInteractEntity(*target) )
 				{
-					std::string str = CalloutMenu[player.playernum].interactText;
+					DynamicString str = CalloutMenu[player.playernum].interactText;
 					if ( str.length() > strlen(Language::get(4347)) )
 					{
 						str.erase(str.begin(), str.begin() + strlen(Language::get(4347)));
@@ -11699,10 +11699,10 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 	worldTooltipFrame->setDisabled(false);
 }
 
-std::string actionPromptBackingIconPath00 = "";
-std::string actionPromptBackingIconPath20 = "";
-std::string actionPromptBackingIconPath60 = "";
-std::string actionPromptBackingIconPath100 = "";
+DynamicString actionPromptBackingIconPath00 = "";
+DynamicString actionPromptBackingIconPath20 = "";
+DynamicString actionPromptBackingIconPath60 = "";
+DynamicString actionPromptBackingIconPath100 = "";
 
 void createActionPrompts(const int player)
 {
@@ -11869,7 +11869,7 @@ void drawActionPromptCooldownCallback(const Widget& widget, SDL_Rect rect)
 		}
 		/*if ( actionPoints > 0 )
 		{
-			std::string str = std::to_string(actionPoints);
+			DynamicString str = std::to_string(actionPoints);
 			if ( auto textGet = Text::get(str.c_str(), smallfont_outline, makeColorRGB(255, 255, 255), 0) )
 			{
 				textGet->drawColor(SDL_Rect{ 0,0,0,0 }, SDL_Rect{ drawRect.x - 6, drawRect.y + 1, 0, 0 },
@@ -11999,14 +11999,14 @@ void Player::HUD_t::updateActionPrompts()
 		iconBackingSize };
 
 	struct PromptInfo {
-		std::string name;
+		DynamicString name;
 		ActionPrompts promptType;
-		std::string inputName;
+		DynamicString inputName;
 	};
 
 	std::vector<PromptInfo> allPrompts;
-	const std::string blockBinding = Input::inputs[player.playernum].binding("Defend");
-	const std::string sneakBinding = Input::inputs[player.playernum].binding("Sneak");
+	const DynamicString blockBinding = Input::inputs[player.playernum].binding("Defend");
+	const DynamicString sneakBinding = Input::inputs[player.playernum].binding("Sneak");
 	bool sneakingSeparateFromBlock = false;// blockBinding != sneakBinding;
 	if ( ghostPrompts )
 	{
@@ -12043,7 +12043,7 @@ void Player::HUD_t::updateActionPrompts()
 		{
 			prompt->setDisabled(false);
 
-			std::string glyphName = promptInfo.name + " glyph";
+			DynamicString glyphName = promptInfo.name + " glyph";
 			auto img = prompt->findImage("action img");
 			auto glyph = actionPromptsFrame->findImage(glyphName.c_str());
 			auto imgBacking = prompt->findImage("action img backing");
@@ -12165,7 +12165,7 @@ void Player::HUD_t::updateActionPrompts()
 				promptText->setSize(textPos);
 			}
 
-			std::string skillImg = "";
+			DynamicString skillImg = "";
 			if ( skillForPrompt >= 0 && skillForPrompt < NUMPROFICIENCIES )
 			{
 				for ( auto& skill : player.skillSheet.skillSheetData.skillEntries )
@@ -12312,7 +12312,7 @@ void Player::HUD_t::updateActionPrompts()
 				pressed = true;
 			}*/
 
-			std::string bindingName = promptInfo.inputName.c_str();
+			DynamicString bindingName = promptInfo.inputName.c_str();
 			if ( !ghostPrompts )
 			{
 				if ( skillForPrompt == PRO_STEALTH && promptInfo.promptType == ACTION_PROMPT_OFFHAND )
@@ -13068,7 +13068,7 @@ void Player::MessageZone_t::processChatbox()
 			entry->setDisabled(false);
 			entry->setColor(color);
 
-			std::string data = messageSanitizePercentSign(current->text->data, nullptr);
+			DynamicString data = messageSanitizePercentSign(current->text->data, nullptr);
 			char str[ADD_MESSAGE_BUFFER_LENGTH];
 			snprintf(str, sizeof(str), data.c_str());
 
@@ -13167,7 +13167,7 @@ void doSharedMinimap() {
 }
 
 static Frame* createMinimap(int player) {
-    std::string name = "minimap";
+    DynamicString name = "minimap";
     name.append(std::to_string(player));
     auto& minimap = players[player]->minimap;
     minimap.real_scale = minimapScale;
@@ -13206,10 +13206,10 @@ static Frame* createMinimap(int player) {
 			&& players[player]->worldUI.bTooltipInView
 			&& players[player]->worldUI.tooltipsInRange.size() > 1 )
 		{
-			const std::string scaleBinding = input.binding("Minimap Scale");
-            const std::string expandBinding = input.binding("Toggle Minimap");
-            const std::string cycleNextBinding = input.binding("Interact Tooltip Next");
-            const std::string cyclePrevBinding = input.binding("Interact Tooltip Prev");
+			const DynamicString scaleBinding = input.binding("Minimap Scale");
+            const DynamicString expandBinding = input.binding("Toggle Minimap");
+            const DynamicString cycleNextBinding = input.binding("Interact Tooltip Next");
+            const DynamicString cyclePrevBinding = input.binding("Interact Tooltip Prev");
 			if ( scaleBinding == cycleNextBinding
 				|| scaleBinding == cyclePrevBinding )
 			{
@@ -14031,7 +14031,7 @@ void openLogWindow(int player) {
 			entry.img1->disabled = entry.text->isDisabled();
 			if ( !entry.img1->disabled )
 			{
-				std::string path = Input::inputs[player].getGlyphPathForBinding(entry.img1->name.c_str(), pressed);
+				DynamicString path = Input::inputs[player].getGlyphPathForBinding(entry.img1->name.c_str(), pressed);
 				if ( auto glyph = Image::get(path.c_str()) )
 				{
 					entry.img1->color = 0xffffffff;
@@ -14045,7 +14045,7 @@ void openLogWindow(int player) {
 			entry.img2->disabled = entry.text->isDisabled();
 			if ( !entry.img2->disabled )
 			{
-				std::string path = Input::inputs[player].getGlyphPathForBinding(entry.img2->name.c_str(), pressed);
+				DynamicString path = Input::inputs[player].getGlyphPathForBinding(entry.img2->name.c_str(), pressed);
 				if ( auto glyph = Image::get(path.c_str()) )
 				{
 					entry.img2->color = 0xffffffff;
@@ -14417,7 +14417,7 @@ void Player::CharacterSheet_t::loadCharacterSheetJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/charsheet.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/charsheet.json");
 		inputPath.append("/data/charsheet.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -14446,8 +14446,8 @@ void Player::CharacterSheet_t::loadCharacterSheetJSON()
 					for ( rapidjson::Value::ConstMemberIterator itr = d["level_strings"].MemberBegin();
 						itr != d["level_strings"].MemberEnd(); ++itr )
 					{
-						std::string name = "";
-						std::string desc = "";
+						DynamicString name = "";
+						DynamicString desc = "";
 						if ( itr->value.HasMember("display_name") )
 						{
 							name = itr->value["display_name"].GetString();
@@ -17144,7 +17144,7 @@ DynamicString& Player::CharacterSheet_t::getHoverTextString(std::string key)
 
 bool getAttackTooltipLines(int playernum, AttackHoverText_t& attackHoverTextInfo, int lineNumber, char titleBuf[128], char valueBuf[128])
 {
-	std::string skillName = "-";
+	DynamicString skillName = "-";
 	Sint32 skillLVL = 0;
 	for ( auto& skill : Player::SkillSheet_t::skillSheetData.skillEntries )
 	{
@@ -17741,21 +17741,21 @@ struct CharacterSheetTooltipCache_t
 
 	struct TextEntries_t
 	{
-		std::string title = "";
-		std::string entry1 = "";
-		std::string entry2 = "";
-		std::string entry3 = "";
-		std::string entry4 = "";
-		std::string entry5 = "";
-		std::string entry6 = "";
-		std::string entry7 = "";
-		std::string entry8 = "";
-		std::string entry9 = "";
-		std::string entry10 = "";
-		std::string entry11 = "";
-		std::string entry12 = "";
-		std::string entry13 = "";
-		std::string entry14 = "";
+		DynamicString title = "";
+		DynamicString entry1 = "";
+		DynamicString entry2 = "";
+		DynamicString entry3 = "";
+		DynamicString entry4 = "";
+		DynamicString entry5 = "";
+		DynamicString entry6 = "";
+		DynamicString entry7 = "";
+		DynamicString entry8 = "";
+		DynamicString entry9 = "";
+		DynamicString entry10 = "";
+		DynamicString entry11 = "";
+		DynamicString entry12 = "";
+		DynamicString entry13 = "";
+		DynamicString entry14 = "";
 	};
 	TextEntries_t textEntries[Player::CharacterSheet_t::SHEET_ENUM_END];
 	bool needsUpdate(const int player)
@@ -18090,8 +18090,8 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		const int padyMid = 8;
 		SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 
-		std::string titleText = "";
-		std::string descText = "";
+		DynamicString titleText = "";
+		DynamicString descText = "";
 		int value = 0;
 		switch ( element )
 		{
@@ -18894,7 +18894,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 			entry->setDisabled(false);
 			char buf[512] = "";
 
-			std::string descTextFormatted = "\x1E ";
+			DynamicString descTextFormatted = "\x1E ";
 			for ( auto s : descText )
 			{
 				descTextFormatted += s;
@@ -18991,15 +18991,15 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		const int padyMid = 8;
 		SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 
-		std::string titleText = "";
-		std::string descText = "";
+		DynamicString titleText = "";
+		DynamicString descText = "";
 		int value = 0;
 		switch ( element )
 		{
 			case SHEET_ATK:
 			{
 				char descBuf[256];
-				std::string skillName = "-";
+				DynamicString skillName = "-";
 				for ( auto& skill : player.skillSheet.skillSheetData.skillEntries )
 				{
 					if ( skill.skillId == attackHoverTextInfo.proficiency )
@@ -19024,7 +19024,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						if ( itemCategory(item) == MAGICSTAFF )
 						{
 							snprintf(itemNameBuf, sizeof(itemNameBuf), "%s (%+d)", item->getName(), item->beatitude);
-							std::string itemNameStr = itemNameBuf;
+							DynamicString itemNameStr = itemNameBuf;
 							capitalizeString(itemNameStr);
 							txtRightAlignHint->setText(itemNameStr.c_str());
 						}
@@ -19225,9 +19225,9 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 				case SHEET_POW:
 				{
 					snprintf(buf, sizeof(buf), "%s", getHoverTextString("attributes_pwr_base").c_str());
-					std::string tag = "MAGIC_SPELLPOWER_TOTAL";
-					std::string formatValue = "%d";
-					std::string pwrBonus = "";
+					DynamicString tag = "MAGIC_SPELLPOWER_TOTAL";
+					DynamicString formatValue = "%d";
+					DynamicString pwrBonus = "";
 					if ( auto spell = player.magic.selectedSpell() )
 					{
 						pwrBonus = formatSkillSheetEffects(player.playernum, spell->skillID, tag, formatValue);
@@ -19540,7 +19540,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 					break;
 				case SHEET_AC:
 				{
-					std::string skillName = "";
+					DynamicString skillName = "";
 					int skillLVL = 0;
 					for ( auto& skill : player.skillSheet.skillSheetData.skillEntries )
 					{
@@ -19552,21 +19552,21 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						}
 					}
 					snprintf(buf, sizeof(buf), getHoverTextString("attributes_ac_defending").c_str(), skillName.c_str(), skillLVL);
-					std::string tag = "BLOCK_AC_INCREASE";
+					DynamicString tag = "BLOCK_AC_INCREASE";
 					if ( stats[player.playernum]->shield && itemCategory(stats[player.playernum]->shield) != ARMOR )
 					{
 						tag = "BLOCK_AC_INCREASE_OFFHAND";
 					}
-					std::string blockBonus = formatSkillSheetEffects(player.playernum, PRO_SHIELD, tag, getHoverTextString("attributes_ac_bonus_format"));
+					DynamicString blockBonus = formatSkillSheetEffects(player.playernum, PRO_SHIELD, tag, getHoverTextString("attributes_ac_bonus_format"));
 					snprintf(valueBuf, sizeof(valueBuf), "%s", blockBonus.c_str());
 				}
 					break;
 				case SHEET_POW:
 				{
 					snprintf(buf, sizeof(buf), "%s", getHoverTextString("attributes_pwr_spellbook").c_str());
-					std::string tag = "MAGIC_SPELLPOWER_INT";
-					std::string formatValue = "%d";
-					std::string pwrBonus = formatSkillSheetEffects(player.playernum, NUMPROFICIENCIES, tag, formatValue);
+					DynamicString tag = "MAGIC_SPELLPOWER_INT";
+					DynamicString formatValue = "%d";
+					DynamicString pwrBonus = formatSkillSheetEffects(player.playernum, NUMPROFICIENCIES, tag, formatValue);
 					Sint32 pwr = std::stoi(pwrBonus) / 2;
 					snprintf(valueBuf, sizeof(valueBuf), getHoverTextString("attributes_pwr_bonus_format").c_str(), pwr);
 				}
@@ -19801,7 +19801,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 				case SHEET_RES:
 				{
 					Monster type = stats[player.playernum]->type;
-					std::string appearance = "";
+					DynamicString appearance = "";
 					bool aestheticOnly = false;
 					if ( player.entity )
 					{
@@ -19815,7 +19815,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 							}
 						}
 					}
-					std::string race = getMonsterLocalizedName(type).c_str();
+					DynamicString race = getMonsterLocalizedName(type).c_str();
 					capitalizeString(race);
 
 					snprintf(buf, sizeof(buf), getHoverTextString("attributes_res_base_value").c_str(), race.c_str());
@@ -19839,7 +19839,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 							}
 						}
 					}
-					std::string race = getMonsterLocalizedName(type).c_str();
+					DynamicString race = getMonsterLocalizedName(type).c_str();
 					capitalizeString(race);
 
 					snprintf(buf, sizeof(buf), getHoverTextString("attributes_rgn_base_value").c_str(), race.c_str());
@@ -19933,7 +19933,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 								}
 							}
 						}
-						std::string race = getMonsterLocalizedName(type).c_str();
+						DynamicString race = getMonsterLocalizedName(type).c_str();
 						capitalizeString(race);
 
 						snprintf(buf, sizeof(buf), getHoverTextString("attributes_rgn_base_value").c_str(), race.c_str());
@@ -20090,8 +20090,8 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 				case SHEET_POW:
 				{
 					snprintf(buf, sizeof(buf), "%s", getHoverTextString("attributes_pwr_entry_attr_bonus").c_str());
-					std::string tag = "MAGIC_SPELLPOWER_INT";
-					std::string pwrINTBonus = "";
+					DynamicString tag = "MAGIC_SPELLPOWER_INT";
+					DynamicString pwrINTBonus = "";
 					if ( auto spell = player.magic.selectedSpell() )
 					{
 						pwrINTBonus = formatSkillSheetEffects(player.playernum, spell->skillID, tag, getHoverTextString("attributes_pwr_bonus_format"));
@@ -20380,8 +20380,8 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 				case SHEET_POW:
 				{
 					snprintf(buf, sizeof(buf), "%s", getHoverTextString("attributes_pwr_entry_items_bonus").c_str());
-					std::string tag = "MAGIC_SPELLPOWER_EQUIPMENT";
-					std::string pwrINTBonus = "";
+					DynamicString tag = "MAGIC_SPELLPOWER_EQUIPMENT";
+					DynamicString pwrINTBonus = "";
 					if ( auto spell = player.magic.selectedSpell() )
 					{
 						pwrINTBonus = formatSkillSheetEffects(player.playernum, spell->skillID, tag, getHoverTextString("attributes_pwr_bonus_format"));
@@ -20979,7 +20979,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 			entry->setDisabled(false);
 			char buf[512] = "";
 
-			std::string descTextFormatted = "\x1E ";
+			DynamicString descTextFormatted = "\x1E ";
 			for ( auto s : descText )
 			{
 				descTextFormatted += s;
@@ -21052,8 +21052,8 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		const int padyMid = 4;
 		SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 		
-		std::string descriptionText = mapDisplayNamesDescriptions[map.name].second.c_str();
-		std::string mapDetailsText = "";
+		DynamicString descriptionText = mapDisplayNamesDescriptions[map.name].second.c_str();
+		DynamicString mapDetailsText = "";
 		auto& mapDetails = Player::Minimap_t::mapDetails;
 		for ( auto& detail : mapDetails )
 		{
@@ -21221,7 +21221,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 			}
 		}
 
-		std::string titleText = getHoverTextString("race_title_normal");
+		DynamicString titleText = getHoverTextString("race_title_normal");
 		if ( players[player.playernum]->entity )
 		{
 			if ( players[player.playernum]->entity->effectShapeshift != NOTHING )
@@ -21432,7 +21432,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 
 			currentHeight += classTooltipPos.h - 6;
 
-			std::string descText = "";
+			DynamicString descText = "";
 			descText = getHoverTextString("stat_growth_info");
 			
 			{
@@ -21449,7 +21449,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 				entry->setDisabled(false);
 				char buf[512] = "";
 
-				std::string descTextFormatted = "\x1E ";
+				DynamicString descTextFormatted = "\x1E ";
 				for ( auto s : descText )
 				{
 					descTextFormatted += s;
@@ -21515,7 +21515,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 
 		if ( player.characterSheet.showGameTimerAlways )
 		{
-			std::string tooltiptxt = getHoverTextString("game_timer_mouse") + getHoverTextString("game_timer_unpin");
+			DynamicString tooltiptxt = getHoverTextString("game_timer_mouse") + getHoverTextString("game_timer_unpin");
 			if ( strcmp(tooltiptxt.c_str(), txt->getText()) )
 			{
 				txt->setText(tooltiptxt.c_str());
@@ -21523,7 +21523,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		}
 		else
 		{
-			std::string tooltiptxt = getHoverTextString("game_timer_mouse") + getHoverTextString("game_timer_pin");
+			DynamicString tooltiptxt = getHoverTextString("game_timer_mouse") + getHoverTextString("game_timer_pin");
 			if ( strcmp(tooltiptxt.c_str(), txt->getText()) )
 			{
 				txt->setText(tooltiptxt.c_str());
@@ -21596,7 +21596,7 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 	int classNameWidth = 0;
 	if ( className )
 	{
-		std::string classname = playerClassLangEntry(client_classes[player.playernum], player.playernum);
+		DynamicString classname = playerClassLangEntry(client_classes[player.playernum], player.playernum);
 		if ( !classname.empty() )
 		{
 			capitalizeString(classname);
@@ -21680,7 +21680,7 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 	if ( auto raceText = characterInnerFrame->findField("character race text") )
 	{
 		Monster type = stats[player.playernum]->type;
-		std::string appearance = "";
+		DynamicString appearance = "";
 		bool aestheticOnly = false;
 		if ( player.entity )
 		{
@@ -21694,7 +21694,7 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 				}
 			}
 		}
-		std::string race = getMonsterLocalizedName(type).c_str();
+		DynamicString race = getMonsterLocalizedName(type).c_str();
 		capitalizeString(race);
 		if ( type == HUMAN )
 		{
@@ -23054,7 +23054,7 @@ void updateSlotFrameFromItem(Frame* slotFrame, void* itemPtr, bool forceUnusable
 			spriteImage->color = 0xFFFFFFFF;
 			if ( tryDimHotbarSlot )
 			{
-				std::string hotbarSlotParentStr = slotFrame->getParent()->getName();
+				DynamicString hotbarSlotParentStr = slotFrame->getParent()->getName();
 				if ( hotbarSlotParentStr.find("hotbar slot ") != std::string::npos )
 				{
 					int num = stoi(hotbarSlotParentStr.substr(strlen("hotbar slot ")));
@@ -23559,10 +23559,10 @@ void createInventoryTooltipFrame(const int player,
 		return;
 	}
 
-	//const std::string headerFont = "fonts/pixelmix.ttf#14#2";
-	//const std::string bodyFont = "fonts/pixelmix.ttf#12#2";
-	const std::string headerFont = "fonts/pixel_maz_multiline.ttf#16#2";
-	const std::string bodyFont = "fonts/pixel_maz_multiline.ttf#16#2";
+	//const DynamicString headerFont = "fonts/pixelmix.ttf#14#2";
+	//const DynamicString bodyFont = "fonts/pixelmix.ttf#12#2";
+	const DynamicString headerFont = "fonts/pixel_maz_multiline.ttf#16#2";
+	const DynamicString bodyFont = "fonts/pixel_maz_multiline.ttf#16#2";
 
 	if ( !tooltipContainerFrame )
 	{
@@ -24242,7 +24242,7 @@ void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark)
 
 	std::vector<Entity>* limbsArray = nullptr;
 	Compendium_t::CompendiumView_t* camera = &CompendiumEntries.defaultCamera;
-	std::string lookup = "items_single";
+	DynamicString lookup = "items_single";
 	if ( item->flags[SPRITE] && item->skill[10] == SPELL_ITEM )
 	{
 		lookup = "spells_single";
@@ -25651,7 +25651,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/skillsheet_entries.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/skillsheet_entries.json");
 		inputPath.append("/data/skillsheet_entries.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -25770,7 +25770,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 							for ( rapidjson::Value::ConstMemberIterator effPos_itr = (*itr)["effects_position"].MemberBegin(); 
 								effPos_itr != (*itr)["effects_position"].MemberEnd(); ++effPos_itr )
 							{
-								std::string memberName = effPos_itr->name.GetString();
+								DynamicString memberName = effPos_itr->name.GetString();
 								if ( memberName == "effect_start_offset_x" )
 								{
 									entry.effectStartOffsetX = effPos_itr->value.GetInt();
@@ -25922,7 +25922,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/skillsheet_leadership_entries.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/skillsheet_leadership_entries.json");
 		inputPath.append("/data/skillsheet_leadership_entries.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -25953,7 +25953,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_base"].MemberBegin();
 						itr != d["leadership_allies_base"].MemberEnd(); ++itr )
 					{
-						std::string monsterName = itr->name.GetString();
+						DynamicString monsterName = itr->name.GetString();
 						int monsterType = -1;
 						for ( int i = 0; i < NUMMONSTERS; ++i )
 						{
@@ -25969,7 +25969,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 							for ( rapidjson::Value::ConstValueIterator ally_itr = itr->value.Begin();
 								ally_itr != itr->value.End(); ++ally_itr )
 							{
-								std::string allyName = ally_itr->GetString();
+								DynamicString allyName = ally_itr->GetString();
 								int allyType = -1;
 								for ( int i = 0; i < NUMMONSTERS; ++i )
 								{
@@ -25994,7 +25994,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_legendary"].MemberBegin();
 						itr != d["leadership_allies_legendary"].MemberEnd(); ++itr )
 					{
-						std::string monsterName = itr->name.GetString();
+						DynamicString monsterName = itr->name.GetString();
 						int monsterType = -1;
 						for ( int i = 0; i < NUMMONSTERS; ++i )
 						{
@@ -26010,7 +26010,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 							for ( rapidjson::Value::ConstValueIterator ally_itr = itr->value.Begin();
 								ally_itr != itr->value.End(); ++ally_itr )
 							{
-								std::string allyName = ally_itr->GetString();
+								DynamicString allyName = ally_itr->GetString();
 								int allyType = -1;
 								for ( int i = 0; i < NUMMONSTERS; ++i )
 								{
@@ -26035,7 +26035,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_unique_recruits"].MemberBegin();
 						itr != d["leadership_allies_unique_recruits"].MemberEnd(); ++itr )
 					{
-						std::string monsterName = itr->name.GetString();
+						DynamicString monsterName = itr->name.GetString();
 						int monsterType = -1;
 						for ( int i = 0; i < NUMMONSTERS; ++i )
 						{
@@ -26054,7 +26054,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 								for ( rapidjson::Value::ConstMemberIterator entry_itr = ally_itr->MemberBegin();
 									entry_itr != ally_itr->MemberEnd(); ++entry_itr )
 								{
-									std::string allyName = entry_itr->name.GetString();
+									DynamicString allyName = entry_itr->name.GetString();
 									int allyType = -1;
 									for ( int i = 0; i < NUMMONSTERS; ++i )
 									{
@@ -26087,7 +26087,7 @@ void loadHUDSettingsJSON()
 	}
 	else
 	{
-		std::string inputPath = PHYSFS_getRealDir("/data/HUD_settings.json");
+		DynamicString inputPath = PHYSFS_getRealDir("/data/HUD_settings.json");
 		inputPath.append("/data/HUD_settings.json");
 
 		File* fp = FileIO::open(inputPath.c_str(), "rb");
@@ -26250,7 +26250,7 @@ void loadHUDSettingsJSON()
 				{
 					for ( auto ally_itr = d["allybars"].MemberBegin(); ally_itr != d["allybars"].MemberEnd(); ++ally_itr )
 					{
-						std::string type = ally_itr->name.GetString();
+						DynamicString type = ally_itr->name.GetString();
 						if ( type == "followers" )
 						{
 							if ( ally_itr->value.HasMember("entry_height") )
@@ -26314,7 +26314,7 @@ void loadHUDSettingsJSON()
 								for ( auto val_itr = ally_itr->value["hp"].MemberBegin();
 									val_itr != ally_itr->value["hp"].MemberEnd(); ++val_itr )
 								{
-									std::string key = val_itr->name.GetString();
+									DynamicString key = val_itr->name.GetString();
 									auto& bar = AllyStatusBarSettings_t::FollowerBars_t::hpBar;
 									if ( key == "bar_pixel_width" )
 									{
@@ -26375,7 +26375,7 @@ void loadHUDSettingsJSON()
 								for ( auto val_itr = ally_itr->value["mp"].MemberBegin();
 									val_itr != ally_itr->value["mp"].MemberEnd(); ++val_itr )
 								{
-									std::string key = val_itr->name.GetString();
+									DynamicString key = val_itr->name.GetString();
 									auto& bar = AllyStatusBarSettings_t::FollowerBars_t::mpBar;
 									if ( key == "bar_pixel_width" )
 									{
@@ -26467,7 +26467,7 @@ void loadHUDSettingsJSON()
 								for ( auto val_itr = ally_itr->value["hp"].MemberBegin();
 									val_itr != ally_itr->value["hp"].MemberEnd(); ++val_itr )
 								{
-									std::string key = val_itr->name.GetString();
+									DynamicString key = val_itr->name.GetString();
 									auto& bar = AllyStatusBarSettings_t::PlayerBars_t::hpBar;
 									if ( key == "bar_pixel_width" )
 									{
@@ -26524,7 +26524,7 @@ void loadHUDSettingsJSON()
 								for ( auto val_itr = ally_itr->value["mp"].MemberBegin();
 									val_itr != ally_itr->value["mp"].MemberEnd(); ++val_itr )
 								{
-									std::string key = val_itr->name.GetString();
+									DynamicString key = val_itr->name.GetString();
 									auto& bar = AllyStatusBarSettings_t::PlayerBars_t::mpBar;
 									if ( key == "bar_pixel_width" )
 									{
@@ -26723,7 +26723,7 @@ void loadHUDSettingsJSON()
 					EnemyHPDamageBarHandler::damageGibAnimCurves.clear();
 					for ( auto it = d["dmg_number_anim_curve"].MemberBegin(); it != d["dmg_number_anim_curve"].MemberEnd(); ++it )
 					{
-						std::string name = it->name.GetString();
+						DynamicString name = it->name.GetString();
 						if ( name == "default" )
 						{
 							for ( auto it2 = it->value.Begin(); it2 != it->value.End(); ++it2 )
@@ -26835,7 +26835,7 @@ void loadHUDSettingsJSON()
 							for ( rapidjson::Value::ConstMemberIterator itr = d["messages"][pair.first].MemberBegin();
 								itr != d["messages"][pair.first].MemberEnd(); ++itr )
 							{
-								std::string alignmentStr = itr->name.GetString();
+								DynamicString alignmentStr = itr->name.GetString();
 								auto alignment = Player::MessageZone_t::ALIGN_LEFT_BOTTOM;
 								if ( alignmentStr == "left_top" )
 								{
@@ -26858,7 +26858,7 @@ void loadHUDSettingsJSON()
 								for ( rapidjson::Value::ConstMemberIterator itr2 = itr->value.MemberBegin();
 									itr2 != itr->value.MemberEnd(); ++itr2 )
 								{
-									std::string layoutStr = itr2->name.GetString();
+									DynamicString layoutStr = itr2->name.GetString();
 									auto layout = MessageZoneSettings_t::MessageSettings_t::LAYOUT_DEFAULT;
 									if ( layoutStr == "default" )
 									{
@@ -26887,7 +26887,7 @@ void loadHUDSettingsJSON()
 						for ( rapidjson::Value::ConstMemberIterator itr = d["world_dialogue"]["types"].MemberBegin();
 							itr != d["world_dialogue"]["types"].MemberEnd(); ++itr )
 						{
-							std::string type = itr->name.GetString();
+							DynamicString type = itr->name.GetString();
 							auto dialogueType = Player::WorldUI_t::WorldTooltipDialogue_t::DIALOGUE_NONE;
 							if ( type == "default" )
 							{
@@ -27233,7 +27233,7 @@ void loadHUDSettingsJSON()
 						}
 						if ( itr->value.HasMember("gui_module") )
 						{
-							std::string moduleName = itr->value["gui_module"].GetString();
+							DynamicString moduleName = itr->value["gui_module"].GetString();
 							if ( moduleName == "character_sheet" )
 							{
 								dropdown.module = Player::GUI_t::MODULE_CHARACTERSHEET;
@@ -27270,10 +27270,10 @@ void loadHUDSettingsJSON()
 						for ( rapidjson::Value::ConstValueIterator options_itr = itr->value["options"].Begin();
 							options_itr != itr->value["options"].End(); ++options_itr )
 						{
-							std::string text = "";
-							std::string controller_glyph = "";
-							std::string keyboard_glyph = "";
-							std::string action = "no_action";
+							DynamicString text = "";
+							DynamicString controller_glyph = "";
+							DynamicString keyboard_glyph = "";
+							DynamicString action = "no_action";
 							if ( options_itr->HasMember("text") )
 							{
 								text = (*options_itr)["text"].GetString();
@@ -27833,7 +27833,7 @@ void createChestGUI(const int player)
 			Player::soundActivate();
 		});
 
-		std::string promptFont = "fonts/pixel_maz.ttf#32#2";
+		DynamicString promptFont = "fonts/pixel_maz.ttf#32#2";
 		const int promptWidth = 60;
 		const int promptHeight = 27;
 		auto promptBack = bgFrame->addField("prompt back txt", 16);
@@ -31653,7 +31653,7 @@ void Player::HUD_t::updateXPBar()
 		textClass->setDisabled(true);
 		if ( !bCompactWidth )
 		{
-			std::string classname = playerClassLangEntry(client_classes[player.playernum], player.playernum);
+			DynamicString classname = playerClassLangEntry(client_classes[player.playernum], player.playernum);
 			if ( !classname.empty() )
 			{
 				capitalizeString(classname);
@@ -31726,7 +31726,7 @@ void Player::HUD_t::updateXPBar()
 		if ( ticks % 5 == 0 )
 		{
 			bool moving = (xpBar.animateSetpoint * 10.0 - xpBar.animateValue != 0);
-			std::string playerStr = "00";
+			DynamicString playerStr = "00";
 			switch ( player.playernum )
 			{
 				case 0:
@@ -31941,7 +31941,7 @@ struct enemybarMapName_k {
 	std::map<std::string, enemybarMapTotalSize_k> m;
 };
 enemybarMapName_k enemyBarMap;
-SDL_Surface* enemyBarMapExists(std::string name, int baseWidth, int baseHeight,
+SDL_Surface* enemyBarMapExists(DynamicString name, int baseWidth, int baseHeight,
 	int progressWidth, int damageWidth,
 	Uint32 fx1, Uint32 fx2, Uint32 fx3, Uint32 fx4, Uint32 fx5,
 	Uint32 fx_lowDuration1, Uint32 fx_lowDuration2, Uint32 fx_lowDuration3, Uint32 fx_lowDuration4, Uint32 fx_lowDuration5)
@@ -32005,7 +32005,7 @@ SDL_Surface* enemyBarMapExists(std::string name, int baseWidth, int baseHeight,
 	}
 	return nullptr;
 }
-static void  enemyBarMapInsert(std::string name, int baseWidth, int baseHeight, int progressWidth, int damageWidth,
+static void  enemyBarMapInsert(DynamicString name, int baseWidth, int baseHeight, int progressWidth, int damageWidth,
 	Uint32 statusfx1, Uint32 statusfx2, Uint32 statusfx3, Uint32 statusfx4, Uint32 statusfx5,
 	Uint32 statusfx_lowDuration1, Uint32 statusfx_lowDuration2, Uint32 statusfx_lowDuration3, Uint32 statusfx_lowDuration4, Uint32 statusfx_lowDuration5,
 	SDL_Surface* surf)
@@ -32277,7 +32277,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					auto& definition = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(i);
 					if ( !definition.neverDisplay )
 					{
-						std::string imgPath;
+						DynamicString imgPath;
 						if ( i == EFF_SHAPESHIFT && variation == -1 )
 						{
 							imgPath = "";
@@ -32339,7 +32339,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					auto& definition = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(effectID);
 					if ( !definition.neverDisplay )
 					{
-						std::string imgPath;
+						DynamicString imgPath;
 						if ( i == EFF_SHAPESHIFT && variation == -1 )
 						{
 							imgPath = "";
@@ -32401,7 +32401,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					auto& definition = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(effectID);
 					if ( !definition.neverDisplay )
 					{
-						std::string imgPath;
+						DynamicString imgPath;
 						if ( i == EFF_SHAPESHIFT && variation == -1 )
 						{
 							imgPath = "";
@@ -32463,7 +32463,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					auto& definition = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(effectID);
 					if ( !definition.neverDisplay )
 					{
-						std::string imgPath;
+						DynamicString imgPath;
 						if ( i == EFF_SHAPESHIFT && variation == -1 )
 						{
 							imgPath = "";
@@ -32519,7 +32519,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					auto& definition = StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(effectID);
 					if ( !definition.neverDisplay )
 					{
-						std::string imgPath;
+						DynamicString imgPath;
 						if ( effectID == EFF_SHAPESHIFT && variation == -1 )
 						{
 							imgPath = "";
@@ -34476,7 +34476,7 @@ void hotbar_slot_t::storeLastItem(Item* item)
 
 std::string hotbarSlotBindingText(const int player, const int slotnum, const Input::binding_t& binding)
 {
-	std::string inputName = "";
+	DynamicString inputName = "";
 	if ( binding.type == Input::binding_t::KEYBOARD && binding.keycode != SDLK_UNKNOWN )
 	{
 		if ( binding.keycode >= SDLK_0 && binding.keycode <= SDLK_9 )
@@ -34958,9 +34958,9 @@ void Player::Hotbar_t::updateHotbar()
 		{
 			auto slot_text = slot->findField("slot num text");
 			slot_text->setDisabled(false); // enable the hotkey prompts per slot
-			std::string slotstr = "Hotbar Slot " + std::to_string(num + 1);
+			DynamicString slotstr = "Hotbar Slot " + std::to_string(num + 1);
 			auto binding = Input::inputs[player.playernum].input(slotstr.c_str());
-			std::string inputName = hotbarSlotBindingText(player.playernum, num, binding);
+			DynamicString inputName = hotbarSlotBindingText(player.playernum, num, binding);
 
 			const unsigned int midpoint = NUM_HOTBAR_SLOTS / 2;
 			if ( num < midpoint )
@@ -35731,7 +35731,7 @@ void Player::SkillSheet_t::createSkillSheet()
 		skillBackground->setBlitChildren(true);
 	}
 	
-	std::string promptFont = "fonts/pixel_maz.ttf#32#2";
+	DynamicString promptFont = "fonts/pixel_maz.ttf#32#2";
 	const int promptWidth = 60;
 	const int promptHeight = 27;
 	auto promptBack = frame->addField("prompt back txt", 16);
@@ -36483,7 +36483,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		else if ( tag == "LIST_LEADER_AVAILABLE_FOLLOWERS" )
 		{
-			std::string outputList = "";
+			DynamicString outputList = "";
 			Monster playerRace = stats[playernum]->type;
 			std::map<Monster, std::vector<Monster>>* allyTable = &Player::SkillSheet_t::skillSheetData.leadershipAllyTableBase;
 			enum TableOrder : int 
@@ -36515,7 +36515,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 							for ( auto& ally : (*allyTable)[playerRace] )
 							{
 								if ( ally < 0 || ally >= NUMMONSTERS ) { continue; }
-								std::string monsterName = "";
+								DynamicString monsterName = "";
 								monsterName = getMonsterLocalizedName(ally);
 								capitalizeString(monsterName);
 								if ( outputList != "" )
@@ -36538,7 +36538,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 							{
 								auto& ally = allyPair.first;
 								if ( ally < 0 || ally >= NUMMONSTERS ) { continue; }
-								std::string monsterName = "";
+								DynamicString monsterName = "";
 								monsterName = getMonsterLocalizedName(ally);
 								capitalizeString(monsterName);
 								if ( outputList != "" )
@@ -36794,7 +36794,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		else if ( tag == "TINKERING_KIT_REPAIR_ITEM" )
 		{
-			std::string canRepairItems = Language::get(4057); // none
+			DynamicString canRepairItems = Language::get(4057); // none
 			char metalbuf[64] = "";
 			char magicbuf[64] = "";
 			if ( (stats[playernum]->getModifiedProficiency(proficiency) + PER + (stats[playernum]->type == AUTOMATON ? 20 : 0)) >= SKILL_LEVEL_LEGENDARY )
@@ -36865,14 +36865,14 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		else if ( tag == "ALCHEMY_LEARNT_INGREDIENTS_BASE" )
 		{
-			std::string outputList = "";
+			DynamicString outputList = "";
 			for ( auto it = clientLearnedAlchemyIngredients[playernum].begin(); 
 				it != clientLearnedAlchemyIngredients[playernum].end(); ++it )
 			{
 				auto alchemyEntry = *it;
 				if ( GenericGUI[playernum].isItemBaseIngredient(alchemyEntry) )
 				{
-					std::string itemName = items[alchemyEntry].getIdentifiedName();
+					DynamicString itemName = items[alchemyEntry].getIdentifiedName();
 					size_t pos = std::string::npos;
 					for ( auto& potionName : Player::SkillSheet_t::skillSheetData.potionNamesToFilter )
 					{
@@ -36894,7 +36894,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		else if ( tag == "ALCHEMY_LEARNT_INGREDIENTS_SECONDARY" )
 		{
-			std::string outputList = "";
+			DynamicString outputList = "";
 			for ( auto it = clientLearnedAlchemyIngredients[playernum].begin();
 				it != clientLearnedAlchemyIngredients[playernum].end(); ++it )
 			{
@@ -36902,7 +36902,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 				if ( GenericGUI[playernum].isItemSecondaryIngredient(alchemyEntry)
 					&& !GenericGUI[playernum].isItemBaseIngredient(alchemyEntry) )
 				{
-					std::string itemName = items[alchemyEntry].getIdentifiedName();
+					DynamicString itemName = items[alchemyEntry].getIdentifiedName();
 					size_t pos = std::string::npos;
 					for ( auto& potionName : Player::SkillSheet_t::skillSheetData.potionNamesToFilter )
 					{
@@ -36934,7 +36934,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		snprintf(buf, sizeof(buf), "%d", 0);
 		if ( tag == "MAGIC_CURRENT_TIER" )
 		{
-			std::string tierName = Language::get(4061);
+			DynamicString tierName = Language::get(4061);
 			int skillLVL = std::min(stats[playernum]->getModifiedProficiency(proficiency) + statGetINT(stats[playernum], player), 100);
 			if ( skillLVL < 0 )
 			{
@@ -37007,7 +37007,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		else if ( tag == "MAGIC_MEMORIZED_LEVEL_SPELLS" )
 		{
 			int skillLVL = stats[playernum]->getProficiency(proficiency);
-			std::string magics = "";
+			DynamicString magics = "";
 			std::set<int> inserted;
 			for ( node_t* node = players[playernum]->magic.spellList.first; node; node = node->next )
 			{
@@ -37057,7 +37057,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 								magics += "\x1E ";
 								if ( players[playernum]->bUseCompactGUIHeight() || players[playernum]->bUseCompactGUIWidth() )
 								{
-									std::string name = spell->getSpellName();
+									DynamicString name = spell->getSpellName();
 									if ( name.size() > *cvar_skillsheet_magic_namelen )
 									{
 										name = name.substr(0, *cvar_skillsheet_magic_namelen - 1);
@@ -37089,7 +37089,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 			{
 				skillLVL /= 20;
 			}
-			std::string magics = "";
+			DynamicString magics = "";
 			std::set<int> inserted;
 			for ( int i = SPELL_NONE + 1; i < NUM_SPELLS; ++i )
 			{
@@ -37137,7 +37137,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 						magics += "\x1E ";
 						if ( players[playernum]->bUseCompactGUIHeight() || players[playernum]->bUseCompactGUIWidth() )
 						{
-							std::string name = spellEntry->getSpellName();
+							DynamicString name = spellEntry->getSpellName();
 							if ( name.size() > *cvar_skillsheet_magic_namelen )
 							{
 								name = name.substr(0, *cvar_skillsheet_magic_namelen - 1);
@@ -37241,7 +37241,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		{
 			int skillLVL = std::min(std::max(0, stats[playernum]->getModifiedProficiency(proficiency) + statGetINT(stats[playernum], player)), 100);
 			skillLVL /= 20;
-			std::string tierName = Language::get(4061);
+			DynamicString tierName = Language::get(4061);
 			tierName += " ";
 			if ( skillLVL <= 0 )
 			{
@@ -37836,8 +37836,8 @@ void Player::SkillSheet_t::processSkillSheet()
 		auto rightWingAllSkillsImg = allSkillEntriesRight->findImage("bg wing all skills right");
 		rightWingAllSkillsImg->ontop = true;
 		int index = 0;
-		std::string leftBinary = "00000000";
-		std::string rightBinary = "00000000";
+		DynamicString leftBinary = "00000000";
+		DynamicString rightBinary = "00000000";
 		for ( auto& skillEntry : skillSheetData.skillEntries )
 		{
 			if ( index >= 8 && index < 16 )
@@ -38442,7 +38442,7 @@ void Player::SkillSheet_t::processSkillSheet()
 			{
 				auto skillLvlHeaderVal = scrollArea->findField("skill lvl header val");
 				char skillLvl[128] = "";
-				std::string skillLvlTitle = "";
+				DynamicString skillLvlTitle = "";
 				if ( proficiencyValue >= SKILL_LEVEL_LEGENDARY )
 				{
 					skillLvlTitle = Language::get(369);
@@ -38562,7 +38562,7 @@ void Player::SkillSheet_t::processSkillSheet()
 					skillDescriptionTxtPos.w, txtHeightNew + 8 });
 				lowestY = std::max(lowestY, skillDescriptionTxt->getSize().y + skillDescriptionTxt->getNumTextLines() * actualFontHeight/*actualFont->height(true)*/);
 
-				std::string staticImgPath = "*#images/ui/SkillSheet/UI_Skills_Desc_Full_";
+				DynamicString staticImgPath = "*#images/ui/SkillSheet/UI_Skills_Desc_Full_";
 				staticImgPath += std::to_string(skillDescriptionBgFrame->getSize().w) + 'x' + std::to_string(skillDescriptionBgFrame->getSize().h) + ".png";
 
 				auto staticImg = Image::get(staticImgPath.c_str());
@@ -38648,7 +38648,7 @@ void Player::SkillSheet_t::processSkillSheet()
 						effect_t.effectUpdatedAtSkillLevel = stats[player.playernum]->getModifiedProficiency(proficiency);
 						effect_t.effectUpdatedAtBaseSkillLevel = stats[player.playernum]->getProficiency(proficiency);
 						effect_t.effectUpdatedAtMonsterType = stats[player.playernum]->type;
-						std::string oldValue = effect_t.value;
+						DynamicString oldValue = effect_t.value;
 						effect_t.value = formatSkillSheetEffects(player.playernum, proficiency, effect_t.tag, effect_t.rawValue);
 						if ( oldValue != effect_t.value )
 						{
@@ -38786,7 +38786,7 @@ void Player::SkillSheet_t::processSkillSheet()
 						{
 							// adjust inner background image elements
 
-							std::string staticImgPath = "*#images/ui/SkillSheet/UI_Skills_Eff_Full_";
+							DynamicString staticImgPath = "*#images/ui/SkillSheet/UI_Skills_Eff_Full_";
 							staticImgPath += std::to_string(effectBgImgFrame->getSize().w) + 'x' + std::to_string(effectBgImgFrame->getSize().h) + ".png";
 
 							auto staticImg = Image::get(staticImgPath.c_str());
@@ -39015,7 +39015,7 @@ void Player::SkillSheet_t::processSkillSheet()
 					legendDivTxt->setTextColor(legendRegularColor);
 					legendText->setTextColor(legendRegularColor);
 					
-					std::string staticImgPath = "*#images/ui/SkillSheet/UI_Skills_LegendBox_Full_";
+					DynamicString staticImgPath = "*#images/ui/SkillSheet/UI_Skills_LegendBox_Full_";
 					staticImgPath += std::to_string(legendPos.w) + 'x' + std::to_string(legendPos.h) + ".png";
 
 					auto staticImg = Image::get(staticImgPath.c_str());
@@ -39056,7 +39056,7 @@ void Player::SkillSheet_t::processSkillSheet()
 					legendDivTxt->setTextColor(legendGoldColor);
 					legendText->setTextColor(legendGoldColor);
 
-					std::string staticImgPath = "*#images/ui/SkillSheet/UI_Skills_LegendBox100_Full_";
+					DynamicString staticImgPath = "*#images/ui/SkillSheet/UI_Skills_LegendBox100_Full_";
 					staticImgPath += std::to_string(legendPos.w) + 'x' + std::to_string(legendPos.h) + ".png";
 
 					auto staticImg = Image::get(staticImgPath.c_str());
@@ -40707,7 +40707,7 @@ void Player::HUD_t::updateMinotaurWarning()
 	const int midX = dimmer->pos.w / 2;
 	const int midY = dimmer->pos.h / 2;
 
-	std::string minimapFrameName = "minimap";
+	DynamicString minimapFrameName = "minimap";
 	minimapFrameName.append(std::to_string(player.playernum));
 	SDL_Rect sharedminimapPos{ 0, 0, 0, 0 };
 	SDL_Rect minimapPos{ 0, 0, 0, 0 };
@@ -41339,8 +41339,8 @@ SDL_Surface* Player::WorldUI_t::WorldTooltipItem_t::blitItemWorldTooltip(Item* i
 					{
 						buf[c] = '\0';
 						strcpy(buf2, buf + c + 1);
-						std::string buf2Str = buf2;
-						replace(buf2Str.begin(), buf2Str.end(), '\n', ' ');
+						DynamicString buf2Str = buf2;
+						std::replace(buf2Str.begin(), buf2Str.end(), '\n', ' ');
 						strcpy(buf2, buf2Str.c_str());
 						break;
 					}
@@ -41565,7 +41565,7 @@ SDL_Surface* Player::WorldUI_t::WorldTooltipItem_t::blitItemWorldTooltip(Item* i
 
 	{
 		SDL_Rect identifyPos = pos;
-		std::string identifyStr = ItemTooltips.adjectives["item_identified_status"]["unidentified"];
+		DynamicString identifyStr = ItemTooltips.adjectives["item_identified_status"]["unidentified"];
 		if ( item->identified )
 		{
 			if ( item->beatitude > 0 )
@@ -42312,7 +42312,7 @@ SDL_Surface* Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::blitDialogue
 
 	SDL_Rect txtPos{ 16 + setting.padx, 9 + setting.pady, 0, 0 };
 	int fontHeight = Font::get(dialogueField->getFont())->height(true);
-	std::string buf;
+	DynamicString buf;
 	int linesDone = 0;
 	for ( size_t i = 0; i < dialogueStrCurrent.length(); ++i )
 	{
@@ -42463,7 +42463,7 @@ void DamageIndicatorHandler_t::DamageIndicator_t::process()
 	size = damageIndicatorSettings.settings[layout].image_size;
 	auto& indicatorDamagePaths = damageIndicatorSettings.indicatorDamageFramePaths;
 	auto& indicatorBlockPaths = damageIndicatorSettings.indicatorBlockedFramePaths;
-	std::string imagePath = hitDealtDamage ? indicatorDamagePaths[0] : indicatorBlockPaths[0];
+	DynamicString imagePath = hitDealtDamage ? indicatorDamagePaths[0] : indicatorBlockPaths[0];
 	if ( flashTicks > 0 )
 	{
 		if ( flashAnimState > numAnimationFrames )
@@ -42578,7 +42578,7 @@ void createLevelUpFrame(const int player)
 	statsFrame->setDisabled(true);
 	statsFrame->setHollow(true);
 	char name[32];
-	std::string font = "fonts/pixelmix.ttf#16#2";
+	DynamicString font = "fonts/pixelmix.ttf#16#2";
 	for ( int i = 0; i < 6; ++i )
 	{
 		snprintf(name, sizeof(name), "stat %d", i);
@@ -43309,7 +43309,7 @@ void createSkillUpFrame(const int player)
 	skillsFrame->setDisabled(true);
 	skillsFrame->setHollow(true);
 	char name[32];
-	std::string font = "fonts/pixelmix.ttf#16#2";
+	DynamicString font = "fonts/pixelmix.ttf#16#2";
 
 	auto skillFrame = skillsFrame->addFrame("skill");
 	skillFrame->setDisabled(true);
@@ -43339,7 +43339,7 @@ void createSkillUpFrame(const int player)
 	skillIncreaseTxt->setVJustify(Field::justify_t::TOP);
 	skillIncreaseTxt->setText("0");
 
-	std::string font2 = "fonts/pixel_maz.ttf#32#2";
+	DynamicString font2 = "fonts/pixel_maz.ttf#32#2";
 	auto skillNameTxt = skillFrame->addField("skill name txt", 64);
 	skillNameTxt->setFont(font2.c_str());
 	skillNameTxt->setHJustify(Field::justify_t::RIGHT);
@@ -43949,7 +43949,7 @@ void updateSkillUpFrame(const int player)
 		{
 			if ( auto spell = getSpellFromID(skillUp.spellID) )
 			{
-				std::string spellname = spell->getSpellName();
+				DynamicString spellname = spell->getSpellName();
 				camelCaseString(spellname);
 				skillCurrentOldTxt->setText(spellname.c_str());
 			}

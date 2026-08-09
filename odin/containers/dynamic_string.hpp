@@ -158,6 +158,13 @@ public:
         erase(idx, 1);
         return data + idx;
     }
+    // erase [first, last) (std::string::erase(first, last))
+    char* erase(char* first, char* last) {
+        int64_t idx = first - data;
+        int64_t count = last - first;
+        erase(idx, count);
+        return data + idx;
+    }
     // find first of any char in the set (std::string::find_first_of)
     int64_t find_first_of(const char* set, int64_t start = 0) const { return barony_dynamic_string_find_first_of(this, set, (int)start); }
     // erase [pos, pos+count) in place (std::string::erase); count=-1 = to end
