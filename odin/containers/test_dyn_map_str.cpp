@@ -56,6 +56,22 @@ int main() {
         DynamicMapStr m;
         m["dummy_ticks"] = "123";
         CHECK(m.at("dummy_ticks") == "123", "at()");
+        // the by-value return must OWN its copy — using it after the map
+        // stays alive, and destroying it must NOT corrupt the map (the
+        // crash bug: get() used to store a view into interned storage,
+        // which the RAII dtor then freed -> double-free)
+        {
+            DynamicString v = m.at("dummy_ticks");
+            CHECK(v == "123", "at() copy correct");
+        }  // v dies here — must not free interned storage
+        CHECK(m["dummy_ticks"] == "123", "map intact after at() temp destroyed");
+        CHECK(m.size() == 1, "map size intact");
+        // repeat many times to shake out corruption
+        for (int i = 0; i < 100; ++i) {
+            DynamicString v = m.at("dummy_ticks");
+            CHECK(v == "123", "at() repeated");
+        }
+        CHECK(m["dummy_ticks"] == "123", "map intact after 100 at() calls");
     }
 
     // ---- copy semantics ----

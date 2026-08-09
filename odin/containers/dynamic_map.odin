@@ -24,6 +24,7 @@
 package containers
 
 import "core:runtime"
+import "core:mem"
 import "core:strings"
 import "core:slice"
 
@@ -362,6 +363,10 @@ barony_dynamic_map_strstr_put :: proc "c" (m: ^map[string]string, key: string, v
 
 // string -> string: get
 @(export)
+// string -> string: get — DEEP-COPIES the value into fresh memory.
+// CRITICAL: out is a C++ DynamicString (RAII — frees on destruction). If we
+// assign a VIEW into interned storage, the C++ dtor frees the interner's
+// memory -> double-free/corruption. Copy instead: the C++ side owns the copy.
 barony_dynamic_map_strstr_get :: proc "c" (m: ^map[string]string, key: string, out: ^string) -> bool {
 	context = runtime.default_context()
 	if m^ == nil {
@@ -369,7 +374,14 @@ barony_dynamic_map_strstr_get :: proc "c" (m: ^map[string]string, key: string, o
 	}
 	v, ok := m[key]
 	if ok {
-		out^ = v
+		// deep-copy into fresh memory (out is a C++ RAII DynamicString — it will free this)
+	buf, _ := mem.alloc(len(v) + 1, align_of(u8))
+	if buf == nil {
+		return false
+	}
+	runtime.mem_copy(buf, raw_data(v), len(v))
+	(^u8)(uintptr(buf) + uintptr(len(v)))^ = 0
+	out^ = transmute(string)DynamicString{ data = buf, len = len(v) }
 	}
 	return ok
 }
