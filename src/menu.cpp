@@ -119,7 +119,7 @@ std::vector<std::tuple<int, int, int, std::string>> savegamesList; // tuple - la
 int gamemods_window = 0;
 std::list<std::string> currentDirectoryFiles;
 std::list<std::string> directoryFilesListToUpload;
-std::string directoryToUpload;
+DynamicString directoryToUpload;
 std::string directoryPath;
 int gamemods_window_scroll = 0;
 int gamemods_window_fileSelect = 0;
@@ -3016,7 +3016,7 @@ static void handleMainMenu(bool mode)
 				++serialVerifyWindow;
 				if ( serialVerifyWindow >= 25 )
 				{
-					std::string serial = serialInputText;
+					DynamicString serial = serialInputText;
 
 					// compute hash
 					if ( !serial.empty() )
@@ -4432,7 +4432,7 @@ static void handleMainMenu(bool mode)
 					if ( it != achievementDesc.end() )
 					{
 						auto item = *it;
-						std::string sub = item.second.length() > 140 ? item.second.substr(0, 140) + "..." : item.second;
+						DynamicString sub = item.second.length() > 140 ? item.second.substr(0, 140) + "..." : item.second;
 						for ( size_t c, offset = 0;;)
 						{
 							size_t lastoffset = offset;
@@ -4502,7 +4502,7 @@ static void handleMainMenu(bool mode)
 				}
 
 				// draw image
-				std::string img = unlocked ? item.first + ".png" : item.first + "_l.png";
+				DynamicString img = unlocked ? item.first + ".png" : item.first + "_l.png";
 				if ( !unlocked && hiddenAchievement )
 				{
 					img = "LOCKED_ACHIEVEMENT.png";
@@ -4639,7 +4639,7 @@ static void handleMainMenu(bool mode)
 							const char* memberNumChar = SteamMatchmaking()->GetLobbyMemberData(*static_cast<CSteamID*>(currentLobby), *static_cast<CSteamID*>(steamIDRemote[remoteIDIndex]), "clientnum");
 							if ( memberNumChar )
 							{
-								std::string str = memberNumChar;
+								DynamicString str = memberNumChar;
 								if ( str.compare("") != 0 )
 								{
 									int memberNum = std::stoi(str);
@@ -4667,7 +4667,7 @@ static void handleMainMenu(bool mode)
 							const char* memberNumChar = SteamMatchmaking()->GetLobbyMemberData(*static_cast<CSteamID*>(currentLobby), SteamUser()->GetSteamID(), "clientnum");
 							if ( memberNumChar )
 							{
-								std::string str = memberNumChar;
+								DynamicString str = memberNumChar;
 								if ( str.compare("") == 0 || str.compare(std::to_string(clientnum)) != 0 )
 								{
 									SteamMatchmaking()->SetLobbyMemberData(*static_cast<CSteamID*>(currentLobby), "clientnum", std::to_string(clientnum).c_str());
@@ -4712,7 +4712,7 @@ static void handleMainMenu(bool mode)
 #endif
 			}
 
-			std::string raceAndClass = Language::get(3161 + stats[c)->playerRace];
+			DynamicString raceAndClass = Language::get(3161 + stats[c)->playerRace];
 			raceAndClass += " ";
 			if ( stats[c]->playerRace > RACE_HUMAN && stats[c]->appearance != 0 )
 			{
@@ -5186,7 +5186,7 @@ static void handleMainMenu(bool mode)
 			bool skipMessageRelayToClients = false;
 			if ( multiplayer == SERVER )
 			{
-				std::string chatboxStr = lobbyChatbox;
+				DynamicString chatboxStr = lobbyChatbox;
 				if ( (chatboxStr.size() > strlen("/kick ")) 
 					&& chatboxStr.find("/kick ") != std::string::npos && chatboxStr.find("/kick ") == size_t(0U) )
 				{
@@ -5327,7 +5327,7 @@ static void handleMainMenu(bool mode)
 			{
 				char tagName[32];
 				std::vector<std::string> serverFileIdsLoaded;
-				std::string modList = "Clients can click '";
+				DynamicString modList = "Clients can click '";
 				modList.append(Language::get(2984)).append("' and \n'").append(Language::get(2985));
 				modList.append("' to automatically subscribe and \n");
 				modList.append("mount workshop items loaded in the host's lobby.\n\n");
@@ -5437,7 +5437,7 @@ static void handleMainMenu(bool mode)
 					}
 				}
 				ttfPrintTextFormattedColor(ttf12, xres / 2 + 8, suby1 + 304, modsStatusColor, "%2d mod(s) loaded by host (?)", serverNumModsLoaded);
-				std::string modStatusString;
+				DynamicString modStatusString;
 				if ( itemNeedsSubscribing )
 				{
 					modStatusString = "Your client is missing mods in subscriptions";
@@ -5457,14 +5457,14 @@ static void handleMainMenu(bool mode)
 
 				int lineStartListLoadedMods = numToolboxLines;
 				numToolboxLines += serverNumModsLoaded + 3;
-				std::string clientModString = "Your client mod list:\n";
+				DynamicString clientModString = "Your client mod list:\n";
 				for ( std::vector<std::pair<std::string, uint64>>::iterator it = gamemods_workshopLoadedFileIDMap.begin(); 
 					it != gamemods_workshopLoadedFileIDMap.end(); ++it )
 				{
 					clientModString.append(std::to_string(it->second));
 					clientModString.append("\n");
 				}
-				std::string serverModString = "Server mod list:\n";
+				DynamicString serverModString = "Server mod list:\n";
 				for ( std::vector<std::string>::iterator it = serverFileIdsLoaded.begin(); it != serverFileIdsLoaded.end(); ++it )
 				{
 					serverModString.append(*it);
@@ -6283,7 +6283,7 @@ static void handleMainMenu(bool mode)
 			if ( !currentDirectoryFiles.empty() )
 			{
 				int lineNumber = 0;
-				std::string line;
+				DynamicString line;
 				std::list<std::string>::const_iterator it = currentDirectoryFiles.begin();
 				std::advance(it, gamemods_window_scroll);
 
@@ -6355,7 +6355,7 @@ static void handleMainMenu(bool mode)
 				drawWindow(filename_padx, filename_pady - 2,
 					filename_padx2, filename_pady2);
 				int lineNumber = 0;
-				std::string line;
+				DynamicString line;
 				for ( std::list<std::string>::const_iterator it = directoryFilesListToUpload.begin(); it != directoryFilesListToUpload.end() && lineNumber < 20; ++it )
 				{
 					line = *it;
@@ -6545,7 +6545,7 @@ static void handleMainMenu(bool mode)
 				}
 				else if ( gamemods_window == 5 && g_SteamWorkshop->m_myWorkshopItemToModify.m_nPublishedFileId != 0 && gamemods_uploadStatus < 5 )
 				{
-					std::string line = g_SteamWorkshop->m_myWorkshopItemToModify.m_rgchTitle;
+					DynamicString line = g_SteamWorkshop->m_myWorkshopItemToModify.m_rgchTitle;
 					if ( line.size() > filenameMaxLength )
 					{
 						line = line.substr(0, filenameMaxLength - 2);
@@ -6683,7 +6683,7 @@ static void handleMainMenu(bool mode)
 					ttfPrintTextFormattedColor(ttf12, filename_padx, filename_pady, uint32ColorGreen, "successfully retrieved my workshop items!");
 				}
 
-				std::string modInfoStr = "current loaded mods (hover for info): ";
+				DynamicString modInfoStr = "current loaded mods (hover for info): ";
 				SDL_Rect tooltip; // we will draw the tooltip after drawing the other elements of the display window.
 				bool drawModLoadOrder = false;
 				int drawExtendedInformationForMod = -1; // value of 0 or greater will draw.
@@ -6795,7 +6795,7 @@ static void handleMainMenu(bool mode)
 						}
 
 						// draw preview title
-						std::string line = itemDetails.m_rgchTitle;
+						DynamicString line = itemDetails.m_rgchTitle;
 						std::size_t found = line.find_first_of('\n');
 						if ( found != std::string::npos && found < filenameMaxLength - 2 )
 						{
@@ -6870,12 +6870,12 @@ static void handleMainMenu(bool mode)
 								g_SteamWorkshop->m_myWorkshopItemToModify = itemDetails;
 
 								// grab the current item tags and store them for modification.
-								std::string workshopItemTagString = g_SteamWorkshop->m_myWorkshopItemToModify.m_rgchTags;
+								DynamicString workshopItemTagString = g_SteamWorkshop->m_myWorkshopItemToModify.m_rgchTags;
 								std::size_t found = workshopItemTagString.find(",");
 								g_SteamWorkshop->workshopItemTags.clear();
 								while ( found != std::string::npos )
 								{
-									std::string line = workshopItemTagString.substr(0, found);
+									DynamicString line = workshopItemTagString.substr(0, found);
 									workshopItemTagString = workshopItemTagString.substr(found + 1); // skip the "," character.
 									g_SteamWorkshop->workshopItemTags.push_back(line); // store the comma separated value.
 									found = workshopItemTagString.find(",");
@@ -6951,13 +6951,13 @@ static void handleMainMenu(bool mode)
 					int tooltip_pady = 8;
 					SteamUGCDetails_t itemDetails = g_SteamWorkshop->m_subscribedItemListDetails[drawExtendedInformationForMod];
 					// draw the information.
-					std::string line;
+					DynamicString line;
 
 					line = itemDetails.m_rgchDescription;
 					line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 					//line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-					std::string subString;
-					std::string outputStr;
+					DynamicString subString;
+					DynamicString outputStr;
 					std::size_t found = line.find('\n');
 					int numlines = 0;
 					while ( line.length() >= 62 || (found != std::string::npos && found < 62) )
@@ -7100,7 +7100,7 @@ static void handleMainMenu(bool mode)
 				ttfPrintTextFormattedColor(ttf12, filename_padx, filename_pady + TTF12_HEIGHT + 8, uint32ColorOrange, "to get started create a new folder, or copy shared custom content to the mods/ folder");
 			}
 
-			std::string modInfoStr = "current loaded mods (hover for info): ";
+			DynamicString modInfoStr = "current loaded mods (hover for info): ";
 			SDL_Rect tooltip; // we will draw the tooltip after drawing the other elements of the display window.
 			bool drawModLoadOrder = false;
 			int drawExtendedInformationForMod = -1; // value of 0 or greater will draw.
@@ -7182,7 +7182,7 @@ static void handleMainMenu(bool mode)
 				std::list<std::string>::iterator it = gamemods_localModFoldernames.begin();
 				std::advance(it, 2); // skip the "." and ".." directories.
 				std::advance(it, i);
-				std::string folderName = *it;
+				DynamicString folderName = *it;
 
 				drawWindowFancy(filename_padx, filename_pady - 8, filename_padx2, filename_pady + filename_rowHeight);
 				SDL_Rect highlightEntry;
@@ -7192,7 +7192,7 @@ static void handleMainMenu(bool mode)
 				highlightEntry.h = filename_rowHeight + 8;
 				drawRect(&highlightEntry, makeColorRGB(128, 128, 128), 64);
 
-				std::string path = outputdir;
+				DynamicString path = outputdir;
 				path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator()).append(folderName);
 				bool pathIsMounted = gamemodsIsPathInMountedFiles(path);
 
@@ -7341,7 +7341,7 @@ static void handleMainMenu(bool mode)
 
 			auto it = gameModeManager.Tutorial.levels.begin();
 			std::advance(it, i);
-			std::string folderName = (*it).title;
+			DynamicString folderName = (*it).title;
 
 			drawWindowFancy(filename_padx, filename_pady - 8, filename_padx2, filename_pady + filename_rowHeight);
 
@@ -8651,7 +8651,7 @@ void doNewGame(bool makeHighscore) {
 	lastEntityUIDs = entity_uids;
 	loading = true;
 	darkmap = false;
-	std::string prevmapname = map.name;
+	DynamicString prevmapname = map.name;
 	bool died = players[clientnum]->entity == nullptr;
 
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -8708,7 +8708,7 @@ void doNewGame(bool makeHighscore) {
 		conductGameChallenges[CONDUCT_CHEATS_ENABLED] = 1;
 	}
 
-	std::string challengeRunCustomStartLevel = "";
+	DynamicString challengeRunCustomStartLevel = "";
 	bool quickStartPortal = (gameModeManager.getMode() == GameModeManager_t::GAME_MODE_CUSTOM_RUN || gameModeManager.getMode() == GameModeManager_t::GAME_MODE_CUSTOM_RUN_ONESHOT) && !loadingsavegame;
 	if ( gameModeManager.currentSession.challengeRun.isActive(GameModeManager_t::CurrentSession_t::ChallengeRun_t::CHEVENT_SHOPPING_SPREE) )
 	{
@@ -9017,7 +9017,7 @@ void doNewGame(bool makeHighscore) {
 		{
 			if ( challengeRunCustomStartLevel != "" )
 			{
-				std::string fullMapName = physfsFormatMapName(challengeRunCustomStartLevel.c_str());
+				DynamicString fullMapName = physfsFormatMapName(challengeRunCustomStartLevel.c_str());
 				loadMap(fullMapName.c_str(), &map, map.entities, map.creatures, &checkMapHash);
 				if ( !verifyMapHash(fullMapName.c_str(), checkMapHash) )
 				{
@@ -9049,7 +9049,7 @@ void doNewGame(bool makeHighscore) {
 		{
 			if ( genmap == false )
 			{
-				std::string fullMapName = physfsFormatMapName(maptoload);
+				DynamicString fullMapName = physfsFormatMapName(maptoload);
 				loadMap(fullMapName.c_str(), &map, map.entities, map.creatures, &checkMapHash);
 				if (!verifyMapHash(fullMapName.c_str(), checkMapHash))
 				{
@@ -9217,7 +9217,7 @@ void doNewGame(bool makeHighscore) {
 									{
 										strcpy((char*)net_packet->data, "LEAD");
 										SDLNet_Write32((Uint32)monster->getUID(), &net_packet->data[4]);
-										std::string name = monsterStats->name;
+										DynamicString name = monsterStats->name;
 										if ( name != "" && name == MonsterData_t::getSpecialNPCName(*monsterStats) )
 										{
 											name = monsterStats->getAttribute("special_npc");
@@ -9420,7 +9420,7 @@ void doNewGame(bool makeHighscore) {
 		{
 			if ( challengeRunCustomStartLevel != "" )
 			{
-				std::string fullMapName = physfsFormatMapName(challengeRunCustomStartLevel.c_str());
+				DynamicString fullMapName = physfsFormatMapName(challengeRunCustomStartLevel.c_str());
 				loadMap(fullMapName.c_str(), &map, map.entities, map.creatures, &checkMapHash);
 				if ( !verifyMapHash(fullMapName.c_str(), checkMapHash) )
 				{
@@ -9452,7 +9452,7 @@ void doNewGame(bool makeHighscore) {
 		{
 			if ( genmap == false )
 			{
-				std::string fullMapName = physfsFormatMapName(maptoload);
+				DynamicString fullMapName = physfsFormatMapName(maptoload);
 				loadMap(fullMapName.c_str(), &map, map.entities, map.creatures, &checkMapHash);
 				if (!verifyMapHash(fullMapName.c_str(), checkMapHash))
 				{
@@ -9619,7 +9619,7 @@ void doNewGame(bool makeHighscore) {
 	{
 		if ( gameModeManager.getMode() == GameModeManager_t::GAME_MODE_TUTORIAL )
 		{
-			const std::string mapname = map.name;
+			const DynamicString mapname = map.name;
 			if ( mapname.find("Tutorial Hub") == std::string::npos
 				&& mapname.find("Tutorial ") != std::string::npos )
 			{
@@ -11874,7 +11874,7 @@ void buttonRandomName(button_t* my)
 		printlog("Warning: Random Name: Need names to pick from!");
 		return;
 	}
-	std::string name;
+	DynamicString name;
 #ifndef NINTENDO
 	try
 	{
@@ -11904,7 +11904,7 @@ void buttonGamemodsOpenDirectory(button_t* my)
 	{
 		std::list<std::string>::const_iterator it = currentDirectoryFiles.begin();
 		std::advance(it, std::max(gamemods_window_scroll + gamemods_window_fileSelect - 1, 0));
-		std::string directoryName = *it;
+		DynamicString directoryName = *it;
 
 		if ( directoryName.compare("..") == 0 || directoryName.compare(".") == 0 )
 		{
@@ -11948,13 +11948,13 @@ void buttonGamemodsPrevDirectory(button_t* my)
 }
 
 
-//void writeLevelsTxt(std::string modFolder)
+//void writeLevelsTxt(DynamicString modFolder)
 //{
-//	std::string path = BASE_DATA_DIR;
+//	DynamicString path = BASE_DATA_DIR;
 //	path.append("mods/").append(modFolder);
 //	if ( access(path.c_str(), F_OK) == 0 )
 //	{
-//		std::string writeFile = modFolder + "/maps/levels.txt";
+//		DynamicString writeFile = modFolder + "/maps/levels.txt";
 //		PHYSFS_File *physfp = PHYSFS_openWrite(writeFile.c_str());
 //		if ( physfp != NULL )
 //		{
@@ -12065,7 +12065,7 @@ void buttonGamemodsSelectDirectoryForUpload(button_t* my)
 	{
 		std::list<std::string>::const_iterator it = currentDirectoryFiles.begin();
 		std::advance(it, std::max(gamemods_window_scroll + gamemods_window_fileSelect - 1, 0));
-		std::string directoryName = *it;
+		DynamicString directoryName = *it;
 
 		if ( directoryName.compare("..") == 0 || directoryName.compare(".") == 0 )
 		{
@@ -12142,23 +12142,23 @@ void buttonGamemodsSetWorkshopItemFields(button_t* my)
 			const int len2 = WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, 0, 0, 0, 0);
 			auto buf2 = new char[len2];
 			WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, buf2, len2, 0, 0);
-			std::string fullpath = buf2;
+			DynamicString fullpath = buf2;
 #else
 			char pathbuffer[PATH_MAX];
 			GetFullPathNameA(directoryToUpload.c_str(), PATH_MAX, pathbuffer, NULL);
-			std::string fullpath = pathbuffer;
+			DynamicString fullpath = pathbuffer;
 #endif
 #else
 			char pathbuffer[PATH_MAX];
 			realpath(directoryToUpload.c_str(), pathbuffer);
-			std::string fullpath = pathbuffer;
+			DynamicString fullpath = pathbuffer;
 #endif
 			if ( access(fullpath.c_str(), F_OK) == 0 )
 			{
 				gamemods_workshopSetPropertyReturn[2] = SteamUGC()->SetItemContent(g_SteamWorkshop->UGCUpdateHandle, fullpath.c_str());
 				// set preview image.
 				bool imagePreviewFound = false;
-				std::string imgPath = fullpath;
+				DynamicString imgPath = fullpath;
 				imgPath.append("preview.jpg");
 				if ( !imagePreviewFound && access((imgPath).c_str(), F_OK) == 0 )
 				{
@@ -12195,7 +12195,7 @@ void buttonGamemodsSetWorkshopItemFields(button_t* my)
 			}
 
 			// copy all the items into this new char[][].
-			std::string line;
+			DynamicString line;
 			i = 0;
 			for ( std::list<std::string>::iterator it = g_SteamWorkshop->workshopItemTags.begin(); it != g_SteamWorkshop->workshopItemTags.end(); ++it )
 			{
@@ -12257,23 +12257,23 @@ void buttonGamemodsModifyExistingWorkshopItemFields(button_t* my)
 				const int len2 = WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, 0, 0, 0, 0);
 				auto buf2 = new char[len2];
 				WideCharToMultiByte(CP_ACP, 0, pathbuffer, pathlen, buf2, len2, 0, 0);
-				std::string fullpath = buf2;
+				DynamicString fullpath = buf2;
 #else
 				char pathbuffer[PATH_MAX];
 				GetFullPathNameA(directoryToUpload.c_str(), PATH_MAX, pathbuffer, NULL);
-				std::string fullpath = pathbuffer;
+				DynamicString fullpath = pathbuffer;
 #endif
 #else
 				char pathbuffer[PATH_MAX];
 				realpath(directoryToUpload.c_str(), pathbuffer);
-				std::string fullpath = pathbuffer;
+				DynamicString fullpath = pathbuffer;
 #endif
 				if ( access(fullpath.c_str(), F_OK) == 0 )
 				{
 					itemContentSetSuccess = SteamUGC()->SetItemContent(g_SteamWorkshop->UGCUpdateHandle, fullpath.c_str());
 					// set preview image.
 					bool imagePreviewFound = false;
-					std::string imgPath = fullpath;
+					DynamicString imgPath = fullpath;
 					imgPath.append("preview.jpg");
 					if ( !imagePreviewFound && access((imgPath).c_str(), F_OK) == 0 )
 					{
@@ -12311,7 +12311,7 @@ void buttonGamemodsModifyExistingWorkshopItemFields(button_t* my)
 			}
 
 			// copy all the items into this new char[][].
-			std::string line;
+			DynamicString line;
 			i = 0;
 			for ( std::list<std::string>::iterator it = g_SteamWorkshop->workshopItemTags.begin(); it != g_SteamWorkshop->workshopItemTags.end(); ++it )
 			{
@@ -12614,14 +12614,14 @@ void buttonGamemodsGetMyWorkshopItems(button_t* my)
 	}
 }
 
-void gamemodsDrawWorkshopItemTagToggle(std::string tagname, int x, int y)
+void gamemodsDrawWorkshopItemTagToggle(DynamicString tagname, int x, int y)
 {
 	if ( !g_SteamWorkshop )
 	{
 		return;
 	}
-	std::string printText = tagname;
-	std::string line;
+	DynamicString printText = tagname;
+	DynamicString line;
 	bool foundTag = false;
 	std::list<std::string>::iterator it;
 	if ( !g_SteamWorkshop->workshopItemTags.empty() )
@@ -12831,7 +12831,7 @@ bool gamemodsIsClientLoadOrderMatchingHost(std::vector<std::string> serverModLis
 
 #endif //STEAMWORKS
 
-bool gamemodsDrawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor, std::string btnText, int action)
+bool gamemodsDrawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor, DynamicString btnText, int action)
 {
 	bool clicked = false;
 	if ( mouseInBounds(clientnum, padx, padx + padw, pady - 4, pady + padh) )
@@ -12858,7 +12858,7 @@ bool gamemodsDrawClickableButton(int padx, int pady, int padw, int padh, Uint32 
 	return clicked;
 }
 
-bool gamemodsRemovePathFromMountedFiles(std::string findStr)
+bool gamemodsRemovePathFromMountedFiles(DynamicString findStr)
 {
 	std::vector<std::pair<std::string, std::string>>::iterator it;
 	std::pair<std::string, std::string> line;
@@ -12886,7 +12886,7 @@ bool gamemodsRemovePathFromMountedFiles(std::string findStr)
 	return false;
 }
 
-bool gamemodsIsPathInMountedFiles(std::string findStr)
+bool gamemodsIsPathInMountedFiles(DynamicString findStr)
 {
 	std::vector<std::pair<std::string, std::string>>::iterator it;
 	std::pair<std::string, std::string> line;
@@ -12907,7 +12907,7 @@ void buttonGamemodsGetLocalMods(button_t* my)
 	gamemods_window_scroll = 0;
 	gamemods_window = 7;
 	gamemods_localModFoldernames.clear();
-	std::string path = outputdir;
+	DynamicString path = outputdir;
 	path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator());
 	gamemods_localModFoldernames = directoryContents(path.c_str(), true, false);
 }
@@ -13047,7 +13047,7 @@ void buttonGamemodsStartModdedGame(button_t* my)
 //		gamemods_musicRequireReloadUnmodded = true;
 //	}
 //
-//	std::string langDirectory = PHYSFS_getRealDir("lang/en.txt");
+//	DynamicString langDirectory = PHYSFS_getRealDir("lang/en.txt");
 //	if ( langDirectory.compare("./") != 0 )
 //	{
 //		// print a loading message
@@ -13171,7 +13171,7 @@ bool gamemodsClearAllMountedPaths()
 	//char **i;
 	//for ( i = PHYSFS_getSearchPath(); *i != NULL; i++ )
 	//{
-	//	std::string line = *i;
+	//	DynamicString line = *i;
 	//	if ( line.compare(outputdir) != 0 && line.compare(datadir) != 0 && line.compare("./") != 0 ) // don't unmount the base ./ directory
 	//	{
 	//		if ( PHYSFS_unmount(*i) == 0 )
@@ -13283,7 +13283,7 @@ bool drawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor
 	return clicked;
 }
 #ifdef STEAMWORKS
-void gamemodsWorkshopPreloadMod(int fileID, std::string modTitle)
+void gamemodsWorkshopPreloadMod(int fileID, DynamicString modTitle)
 {
 	char fullpath[PATH_MAX] = "";
 	useModelCache = false;
