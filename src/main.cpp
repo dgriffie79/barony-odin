@@ -650,7 +650,7 @@ static std::unordered_map<std::string, size_t> unique_traces;
 #include <execinfo.h>
 #endif
 
-std::string stackTrace() {
+DynamicString stackTrace() {
 #ifndef NDEBUG
     if (!ENABLE_STACK_TRACES) {
         return "";

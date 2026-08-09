@@ -762,7 +762,7 @@ struct Language
 	static void reset();
 	static int loadLanguage(char const* const lang, bool forceLoadBaseDirectory);
 	static int reloadLanguage();
-	static std::string languageCode;
+	static DynamicString languageCode;
 };
 
 // random game defines
@@ -956,7 +956,7 @@ extern SteamGlobalStat_t g_SteamAPIGlobalStats[1];
  #define LOCAL_ACHIEVEMENTS
 #endif
 
-std::string stackTrace();
+DynamicString stackTrace();
 void stackTraceUnique();
 void finishStackTraceUnique();
 extern bool ENABLE_STACK_TRACES;

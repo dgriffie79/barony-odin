@@ -391,10 +391,10 @@ extern bool capture_mouse; //Useful for debugging when the game refuses to relea
 static const Uint8 TICKS_TO_PROCESS_FIRE = 30; // The amount of ticks needed until the 'BURNING' Status Effect is processed (char_fire % TICKS_TO_PROCESS_FIRE == 0)
 static const int EFFECT_WITHDRAWAL_BASE_TIME = TICKS_PER_SECOND * 60 * 8; // 8 minutes base withdrawal time.
 
-static const std::string PLAYERNAMES_MALE_FILE = "playernames-male.txt";
-static const std::string PLAYERNAMES_FEMALE_FILE = "playernames-female.txt";
-static const std::string NPCNAMES_MALE_FILE = "npcnames-male.txt";
-static const std::string NPCNAMES_FEMALE_FILE = "npcnames-female.txt";
+static const DynamicString PLAYERNAMES_MALE_FILE = "playernames-male.txt";
+static const DynamicString PLAYERNAMES_FEMALE_FILE = "playernames-female.txt";
+static const DynamicString NPCNAMES_MALE_FILE = "npcnames-male.txt";
+static const DynamicString NPCNAMES_FEMALE_FILE = "npcnames-female.txt";
 extern std::vector<DynamicString> randomPlayerNamesMale;
 extern std::vector<DynamicString> randomPlayerNamesFemale;
 extern std::vector<DynamicString> randomNPCNamesMale;
@@ -647,7 +647,7 @@ public:
 	static EntityStates cameraCurrentState[MAXPLAYERS];
 	static EntityStates cameraRenderState[MAXPLAYERS];
 
-	static std::string render(State state);
+	static DynamicString render(State state);
 
 	static void reset();
 	static void updateClocks();

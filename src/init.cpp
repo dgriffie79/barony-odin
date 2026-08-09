@@ -810,7 +810,7 @@ int initApp(char const * const title, int fullscreen)
 
 std::map<int, std::string> Language::entries;
 std::map<int, std::string> Language::tmpEntries;
-std::string Language::languageCode = "";
+DynamicString Language::languageCode;
 const char* Language::get(const int line)
 {
 	if ( line < 0 ) {

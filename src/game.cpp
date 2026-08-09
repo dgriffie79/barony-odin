@@ -734,7 +734,7 @@ real_t TimerExperiments::lerpAngle(real_t angle1, real_t angle2, real_t alpha)
 	return angle1 + alpha * (fmod(3 * PI + fmod(adiff, 2 * PI), 2 * PI) - PI);
 }
 
-std::string TimerExperiments::render(State state)
+DynamicString TimerExperiments::render(State state)
 {
 	using namespace std::chrono;
 	static auto t = time_point_cast<seconds>(Clock::now());
