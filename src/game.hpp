@@ -163,7 +163,7 @@ enum PlayerClasses : int
 	CLASS_PALADIN
 };
 
-static const std::vector<std::string> playerClassInternalNames = {
+static const std::vector<DynamicString> playerClassInternalNames = {
 	"class_barbarian",
 	"class_warrior",
 	"class_healer",
@@ -402,7 +402,7 @@ extern std::vector<DynamicString> randomNPCNamesFemale;
 extern bool enabledDLCPack1;
 extern bool enabledDLCPack2;
 extern bool enabledDLCPack3;
-extern std::vector<std::string> physFSFilesInDirectory;
+extern std::vector<DynamicString> physFSFilesInDirectory;
 void loadRandomNames();
 int mapLevel(int player, int radius, int _x, int _y, bool usingSpell);
 void mapLevel2(int player);

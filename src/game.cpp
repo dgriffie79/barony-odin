@@ -230,7 +230,7 @@ std::vector<DynamicString> randomPlayerNamesMale;
 std::vector<DynamicString> randomPlayerNamesFemale;
 std::vector<DynamicString> randomNPCNamesMale;
 std::vector<DynamicString> randomNPCNamesFemale;
-std::vector<std::string> physFSFilesInDirectory;
+std::vector<DynamicString> physFSFilesInDirectory;
 TileEntityListHandler TileEntityList;
 // recommended for valgrind debugging:
 // res of 480x270
