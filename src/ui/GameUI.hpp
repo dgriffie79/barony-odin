@@ -247,7 +247,7 @@ struct StatusEffectQueue_t
 		std::vector<DynamicString> nameVariations;
 		std::vector<DynamicString> descVariations;
 		std::vector<int> useSpellIDForImgVariations;
-		std::vector<std::string> imgPathVariations;
+		std::vector<DynamicString> imgPathVariations;
 		int useSpellIDForImg = -1;
 		bool neverDisplay = false;
 		int sustainedSpellID = -1;

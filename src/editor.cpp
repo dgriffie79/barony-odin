@@ -48,7 +48,7 @@ void mainLogic(void);
 std::vector<Entity*> groupedEntities;
 bool moveSelectionNegativeX = false;
 bool moveSelectionNegativeY = false;
-std::vector<std::string> mapNames;
+std::vector<DynamicString> mapNames;
 std::list<std::string> modFolderNames;
 std::string physfs_saveDirectory = BASE_DATA_DIR;
 std::string physfs_openDirectory = BASE_DATA_DIR;

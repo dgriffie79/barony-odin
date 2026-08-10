@@ -809,9 +809,9 @@ public:
 		GUIDropdown_t dropdownMenu;
 		void closeDropdowns();
 		bool isDropdownActive();
-		static void imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<std::string>& imgNames);
-		static void imageSetWidthHeight9x9(Frame* container, const std::vector<std::string>& imgNames);
-		static const std::vector<std::string> tooltipEffectBackgroundImages;
+		static void imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<DynamicString>& imgNames);
+		static void imageSetWidthHeight9x9(Frame* container, const std::vector<DynamicString>& imgNames);
+		static const std::vector<DynamicString> tooltipEffectBackgroundImages;
 		enum ImageIndexes9x9 : int
 		{
 			TOP_LEFT,
@@ -1471,7 +1471,7 @@ public:
 			DynamicString selectSkillImg = "";
 			DynamicString highlightSkillImg_Right = "";
 			DynamicString selectSkillImg_Right = "";
-			std::vector<std::string> potionNamesToFilter;
+			std::vector<DynamicString> potionNamesToFilter;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableBase;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableLegendary;
 			std::map<Monster, std::vector<std::pair<Monster, std::string>>> leadershipAllyTableSpecialRecruitment;

@@ -130,7 +130,7 @@ namespace MainMenu {
 			DynamicString internal_name;
 			std::vector<std::tuple<int, std::string, Uint32>> survivalComplexity;
 			std::vector<Uint32> statRatings;
-			std::vector<std::string> statRatingsStrings;
+			std::vector<DynamicString> statRatingsStrings;
 			Sint32 hp = DEFAULT_HP;
 			Sint32 mp = DEFAULT_MP;
 			std::vector<int> linePaddings;

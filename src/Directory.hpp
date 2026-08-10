@@ -27,6 +27,6 @@ public:
 		closedir(dir);
 		std::sort(list.begin(), list.end());
 	}
-	std::vector<std::string> list;
+	std::vector<DynamicString> list;
 	const char* path;
 };

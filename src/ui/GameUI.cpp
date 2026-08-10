@@ -483,7 +483,7 @@ std::string EnemyBarSettings_t::getEnemyBarSpriteName(Entity* entity)
 	return "default";
 }
 
-const std::vector<std::string> Player::GUI_t::tooltipEffectBackgroundImages =
+const std::vector<DynamicString> Player::GUI_t::tooltipEffectBackgroundImages =
 {
 	"9x9 bg top left",
 	"9x9 bg top right",
@@ -496,7 +496,7 @@ const std::vector<std::string> Player::GUI_t::tooltipEffectBackgroundImages =
 	"9x9 bg bottom middle"
 };
 
-void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const std::vector<std::string>& imgNames)
+void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const std::vector<DynamicString>& imgNames)
 {
 	for ( auto& img : imgNames )
 	{
@@ -512,7 +512,7 @@ void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const std::vector<s
 }
 
 // for 9x9 images stretched to fit a container
-void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<std::string>& imgNames)
+void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<DynamicString>& imgNames)
 {
 	assert(imgNames.size() == 9);
 	// adjust inner background image elements

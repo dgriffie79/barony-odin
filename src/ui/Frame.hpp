@@ -449,7 +449,7 @@ private:
 	std::vector<Slider*> sliders;
 	std::vector<entry_t*> list;
 
-	std::vector<std::string> syncScrollTargets;
+	std::vector<DynamicString> syncScrollTargets;
 
 	SDL_Surface* blitSurface = nullptr;					//!< cached surface to blit to if bBlitChildrenToTexture
 	TempTexture* blitTexture = nullptr;					//!< cached texture to draw to if bBlitChildrenToTexture

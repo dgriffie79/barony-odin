@@ -207,7 +207,7 @@ public:
 	bool bindingIsSharedWithKeyboardSystemBinding(const char* binding);
  
     //! get list of bindings for given input
-    std::vector<std::string> getBindingsForInput(const char* input) const;
+    std::vector<DynamicString> getBindingsForInput(const char* input) const;
     
 private:
 	std::unordered_map<std::string, binding_t> bindings;
