@@ -3156,7 +3156,7 @@ void drawEntities2D(long camx, long camy)
 							{
 								buf[totalChars] = '\0';
 							}
-							std::vector<std::string> lines;
+							std::vector<DynamicString> lines;
 							lines.push_back(spriteEditorNameStrings[selectedEntity[0]->sprite]);
 
 							strncpy(tmpStr, buf, 48);

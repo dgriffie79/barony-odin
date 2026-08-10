@@ -112,7 +112,7 @@ void TreasureRoomGenerator::init()
 					auto chosen_level = treasure_rng.discrete(chances_level.data(), chances_level.size());
 					chances_level[chosen_level] = 0;
 
-					std::vector<std::string> strs = { "cauldron", "workbench" };
+					std::vector<DynamicString> strs = { "cauldron", "workbench" };
 
 					int numStations = 1;
 

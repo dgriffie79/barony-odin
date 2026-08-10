@@ -1243,7 +1243,7 @@ bool physfsSearchMusicToUpdate_helper_findModifiedMusic(uint32_t numMusic, const
 	return false;
 }
 
-const std::vector<std::string> themeMusic = {
+const std::vector<DynamicString> themeMusic = {
 	"music/introduction.ogg",
 	"music/intermission.ogg",
 	"music/minetown.ogg",

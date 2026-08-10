@@ -5194,7 +5194,7 @@ namespace ConsoleCommands {
 			messagePlayer(clientnum, MESSAGE_MISC, Language::get(277));
 			return;
 		}
-		std::map<std::string, std::vector<std::string>> treasureLoot;
+		std::map<std::string, std::vector<DynamicString>> treasureLoot;
 		for ( auto f : directoryContents(".\\maps\\", false, true) )
 		{
 			DynamicString mapPath = "maps/";

@@ -2961,7 +2961,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 {
 	bool statOnlyUpdateNeeded = false;
 
-	std::vector<std::string> tokens;
+	std::vector<DynamicString> tokens;
 	DynamicString searchString = input;
 	size_t findToken = searchString.find("@");
 	while ( findToken != std::string::npos )

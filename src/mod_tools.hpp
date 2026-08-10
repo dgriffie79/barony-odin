@@ -73,8 +73,8 @@ public:
 class MonsterStatCustomManager
 {
 public:
-	static const std::vector<std::string> itemStatusStrings;
-	static const std::vector<std::string> shopkeeperTypeStrings;
+	static const std::vector<DynamicString> itemStatusStrings;
+	static const std::vector<DynamicString> shopkeeperTypeStrings;
 	MonsterStatCustomManager() = default;
 	static BaronyRNG monster_stat_rng;
 
@@ -1567,7 +1567,7 @@ public:
 		{
 			if ( curve.mapName.compare(currentMap) == 0 )
 			{
-				std::vector<std::string> variantResults;
+				std::vector<DynamicString> variantResults;
 				std::vector<unsigned int> variantChances;
 				for ( MonsterCurveEntry& monster : curve.monsterCurve )
 				{
@@ -1885,7 +1885,7 @@ public:
 	public:
 		MapGeneration(std::string name) { mapName = name; };
 		DynamicString mapName = "";
-		std::vector<std::string> trapTypes;
+		std::vector<DynamicString> trapTypes;
 		std::unordered_set<int> minoFloors;
 		std::unordered_set<int> darkFloors;
 		std::unordered_set<int> shopFloors;
@@ -2495,8 +2495,8 @@ public:
 			void setup(DynamicString _seedString);
 			void reset();
 
-			static std::vector<std::string> prefixes;
-			static std::vector<std::string> suffixes;
+			static std::vector<DynamicString> prefixes;
+			static std::vector<DynamicString> suffixes;
 			static void readSeedNamesFromFile();
 		} seededRun;
 
@@ -2746,7 +2746,7 @@ class ItemTooltips_t
 		Sint32 itemLevel = -1;
 		DynamicString category = "nothing";
 		DynamicString equipSlot = "nothing";
-		std::vector<std::string> imagePaths;
+		std::vector<DynamicString> imagePaths;
 		DynamicMapI32 attributes;
 		DynamicString tooltip = "tooltip_default";
 		std::string iconLabelPath = "";
@@ -2796,9 +2796,9 @@ private:
 		Sint32 spellbookId = -1;
 		Sint32 magicstaffId = -1;
 		Sint32 fociId = -1;
-		std::vector<std::string> spellTagsStr;
+		std::vector<DynamicString> spellTagsStr;
 		std::set<SpellTagTypes> spellTags;
-		std::vector<std::string> spellFormatTags;
+		std::vector<DynamicString> spellFormatTags;
 		std::vector<int> spellbookItemIconPaddingLines;
 		std::set<spell_t::SpellOnCastEventTypes> spellLevelTags;
 
@@ -2863,9 +2863,9 @@ public:
 		Uint32 statusEffectTextColor = 0;
 		Uint32 faintTextColor = 0;
 		std::vector<ItemTooltipIcons_t> icons;
-		std::vector<std::string> descriptionText;
-		std::map<std::string, std::vector<std::string>> detailsText;
-		std::vector<std::string> detailsTextInsertOrder;
+		std::vector<DynamicString> descriptionText;
+		std::map<std::string, std::vector<DynamicString>> detailsText;
+		std::vector<DynamicString> detailsTextInsertOrder;
 		DynamicMapI32 minWidths;
 		DynamicMapI32 maxWidths;
 		DynamicMapI32 headerMaxWidths;
@@ -2889,7 +2889,7 @@ public:
 	std::map<Sint32, spellItem_t> spellItems;
 	std::map<std::string, ItemTooltip_t> tooltips;
 	std::map<std::string, std::map<std::string, std::string>> adjectives;
-	std::map<std::string, std::vector<std::string>> templates;
+	std::map<std::string, std::vector<DynamicString>> templates;
 	//std::vector<std::pair<int, Sint32>> itemValueTable;
 	//std::map<int, std::vector<std::pair<int, Sint32>>> itemValueTableByCategory;
 	struct ItemLocalization_t
@@ -2995,7 +2995,7 @@ public:
 		real_t heightOffset = 0.0;
 	};
 
-	const std::vector<std::string> directionKeys{ "east", "south", "west", "north" };
+	const std::vector<DynamicString> directionKeys{ "east", "south", "west", "north" };
 	std::map<Uint32, Statue_t> allStatues;
 };
 extern StatueManager_t StatueManager;
@@ -3091,7 +3091,7 @@ public:
 	struct Entry_t
 	{
 		DynamicString name = "";
-		std::vector<std::string> rawText;
+		std::vector<DynamicString> rawText;
 		struct Variable_t
 		{
 			VariableTypes type = TEXT;
@@ -3615,7 +3615,7 @@ struct Compendium_t
 
 		struct CompendiumAchievementsDisplay
 		{
-			std::vector<std::vector<std::string>> pages;
+			std::vector<std::vector<DynamicString>> pages;
 			int currentPage = 0;
 			int numHidden = 0;
 		};
@@ -4039,7 +4039,7 @@ struct Compendium_t
 		{
 			int monsterType = NOTHING;
 			DynamicString unique_npc = "";
-			std::vector<std::string> blurb;
+			std::vector<DynamicString> blurb;
 			std::vector<Sint32> hp;
 			std::vector<Sint32> spd;
 			std::vector<Sint32> ac;
@@ -4052,10 +4052,10 @@ struct Compendium_t
 			MonsterSpecies species;
 			std::vector<Sint32> lvl;
 			std::array<int, 7> resistances;
-			std::vector<std::string> abilities;
-			std::vector<std::string> inventory;
+			std::vector<DynamicString> abilities;
+			std::vector<DynamicString> inventory;
 			DynamicString imagePath = "";
-			std::vector<std::string> models;
+			std::vector<DynamicString> models;
 			std::set<std::string> unlockAchievements;
 			int lorePoints = 0;
 			std::vector<Sint32> getDisplayStat(const char* name);
@@ -4096,10 +4096,10 @@ struct Compendium_t
 		{
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<std::string> models;
-			std::vector<std::string> blurb;
+			std::vector<DynamicString> models;
+			std::vector<DynamicString> blurb;
 			std::vector<Uint32> linesToHighlight;
-			std::vector<std::string> details;
+			std::vector<DynamicString> details;
 			std::set<std::string> unlockAchievements;
 			std::set<EventTags> unlockTags;
 			DynamicString featureImg = "";
@@ -4123,11 +4123,11 @@ struct Compendium_t
 		{
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<std::string> renderedImagePaths;
-			std::vector<std::string> blurb;
+			std::vector<DynamicString> renderedImagePaths;
+			std::vector<DynamicString> blurb;
 			std::vector<Uint32> linesToHighlight;
-			std::vector<std::string> details;
-			std::vector<std::string> models;
+			std::vector<DynamicString> details;
+			std::vector<DynamicString> models;
 			DynamicString featureImg = "";
 			int id = -1;
 			CompendiumView_t view;
@@ -4161,7 +4161,7 @@ struct Compendium_t
 			};
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<std::string> blurb;
+			std::vector<DynamicString> blurb;
 			std::vector<CodexItem_t> items_in_category;
 			int lorePoints = 0;
 		};
@@ -4306,7 +4306,7 @@ struct Compendium_t
 		static DynamicMapI32Str codexIDToString;
 		static DynamicMapI32Str worldIDToString;
 		static std::map<int, std::vector<EventTags>> itemDisplayedEventsList;
-		static std::map<int, std::vector<std::string>> itemDisplayedCustomEventsList;
+		static std::map<int, std::vector<DynamicString>> itemDisplayedCustomEventsList;
 		static DynamicMapStr customEventsValues;
 		static std::map<EventTags, std::set<int>> eventItemLookup;
 		static std::map<EventTags, std::set<int>> eventMonsterLookup;

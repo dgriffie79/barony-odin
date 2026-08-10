@@ -2007,7 +2007,7 @@ std::unordered_map<std::string, int> mapHashes = {
 	{ "warpzone.lmp", 3133088 }
 };
 
-const std::vector<std::string> officialLevelsTxtOrder =
+const std::vector<DynamicString> officialLevelsTxtOrder =
 {
 	"start",
 	"mine",
@@ -2047,7 +2047,7 @@ const std::vector<std::string> officialLevelsTxtOrder =
 	"sanctum"
 };
 
-const std::vector<std::string> officialSecretlevelsTxtOrder = 
+const std::vector<DynamicString> officialSecretlevelsTxtOrder = 
 {
 	"warpzone",
 	"warpzone",

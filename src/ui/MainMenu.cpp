@@ -3050,8 +3050,8 @@ namespace MainMenu {
         struct Story {
             int version = 1;
             bool press_a_to_advance = false;
-            std::vector<std::string> text;
-            std::vector<std::string> images;
+            std::vector<DynamicString> text;
+            std::vector<DynamicString> images;
 
             bool serialize(FileInterface* file) {
                 if (file->isReading()) {
@@ -4309,7 +4309,7 @@ namespace MainMenu {
 
 		    std::list<resolution> resolutions;
 		    getResolutionList(allSettings.video.display_id, resolutions);
-		    std::vector<std::string> resolutions_formatted;
+		    std::vector<DynamicString> resolutions_formatted;
 		    resolutions_formatted.reserve(resolutions.size());
 
 		    int index;
@@ -6077,7 +6077,7 @@ bind_failed:
 		int selected_res = -1;
 		std::list<resolution> resolutions;
 		getResolutionList(allSettings.video.display_id, resolutions);
-		std::vector<std::string> resolutions_formatted;
+		std::vector<DynamicString> resolutions_formatted;
 		std::vector<const char*> resolutions_formatted_ptrs;
 		resolutions_formatted.reserve(resolutions.size());
 		resolutions_formatted_ptrs.reserve(resolutions.size());
@@ -6101,7 +6101,7 @@ bind_failed:
 		}
 
 		int num_displays = getNumDisplays();
-		std::vector<std::string> displays_formatted;
+		std::vector<DynamicString> displays_formatted;
 		std::vector<const char*> displays_formatted_ptrs;
 		displays_formatted.reserve(num_displays);
 		displays_formatted_ptrs.reserve(num_displays);
@@ -6721,7 +6721,7 @@ bind_failed:
                 if (b.text) {
                     field->setText(b.text);
                 } else {
-                    std::vector<std::string> bindings;
+                    std::vector<DynamicString> bindings;
                     DynamicMapStr::Entry gpEntries[128];
                     int32_t gpCount = allSettings.bindings.gamepad_bindings[player].entryList(gpEntries, 128);
                     for ( int32_t gi = 0; gi < gpCount; ++gi ) {
@@ -6776,7 +6776,7 @@ bind_failed:
         
         y += settingsAddSubHeader(*settings_subwindow, y, "bindings_header", Language::get(5207), true);
         
-        static std::vector<std::string> players;
+        static std::vector<DynamicString> players;
         static std::vector<const char*> player_ptrs;
         if (players.empty()) {
             players.reserve(MAX_SPLITSCREEN);
@@ -10990,8 +10990,8 @@ failed:
 			DynamicString key = it->name.GetString();
 			auto& raceEntry = data[key];
 			raceEntry.title = it->value["title"].GetString();
-			std::vector<std::string> textLeftLines;
-			std::vector<std::string> textRightLines;
+			std::vector<DynamicString> textLeftLines;
+			std::vector<DynamicString> textRightLines;
 			for ( auto it2 = it->value["left_align"].Begin(); it2 != it->value["left_align"].End(); )
 			{
 				DynamicString line = (it2->GetString());
@@ -24621,7 +24621,7 @@ failed:
 		{
 			DynamicString allTags = tags;
 			auto found = allTags.find(',');
-			std::vector<std::string> foundTags;
+			std::vector<DynamicString> foundTags;
 			while ( found != std::string::npos )
 			{
 				foundTags.push_back(allTags.substr(0, found));
@@ -26106,7 +26106,7 @@ failed:
 		if ( name == "containers" && entry.models.size() > 0 )
 		{
 			// hack - only show breakables on levels weve unlocked
-			std::vector<std::string> revealed_models = entry.models;
+			std::vector<DynamicString> revealed_models = entry.models;
 			std::vector<std::pair<std::string, std::string>> areaUnlockNames = {
 				{"mines", "mines"},
 				{"swamps", "swamps"},
@@ -26368,7 +26368,7 @@ failed:
 	static CompendiumTooltipFrames_t compendiumItemTooltip;
 	static std::map<std::string, std::string> compendium_contents_current;
 	static std::map<std::string, std::map<std::string, int>> compendium_contents_list_current;
-	static std::vector<std::string> compendiumCategories = {
+	static std::vector<DynamicString> compendiumCategories = {
 		"monsters",
 		"items",
 		"magic",
@@ -26424,7 +26424,7 @@ failed:
 		}
 	}
 
-	static std::map<int, std::vector<std::string>> compendiumRecordsSectionLoadedValues;
+	static std::map<int, std::vector<DynamicString>> compendiumRecordsSectionLoadedValues;
 	static Uint32 compendiumRecordsSectionRandSequence = 0;
 	static Uint32 compendiumRecordsProcessedOnTick = 0;
 	static std::vector<std::pair<Sint32, std::string>> getRecordEventValue(const char* entryName, Compendium_t::EventTags tag)
@@ -28858,7 +28858,7 @@ failed:
 					pair.first = rankNum;
 				}
 
-				std::vector<std::string> entries;
+				std::vector<DynamicString> entries;
 				static ConsoleVariable cvar_compendium_class_sort_playtime("/compendium_class_sort_playtime", true);
 				if ( name == "classes list" )
 				{
@@ -30967,7 +30967,7 @@ failed:
 			page_right_number_flourish->disabled = true;
 		}
 
-		static const std::map<int, std::vector<std::string>> backingImgs =
+		static const std::map<int, std::vector<DynamicString>> backingImgs =
 		{ 
 			{ 
 				Compendium_t::AchievementData_t::AchievementDLCType::ACH_TYPE_DLC1, 

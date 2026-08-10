@@ -4421,7 +4421,7 @@ void createEnemyBar(const int player, Frame*& frame)
 	dmgText->setOntop(true);
 }
 
-std::vector<std::vector<std::string>> playerXPCapPaths = {
+std::vector<std::vector<DynamicString>> playerXPCapPaths = {
 	{
 		"*#images/ui/HUD/xpbar/HUD_Exp_SandCap_00.png",
 		"*#images/ui/HUD/xpbar/HUD_Exp_SandCap_00a.png",

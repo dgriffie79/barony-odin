@@ -37336,7 +37336,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 							details_text->setText(Language::get(6347));
 						}
 						DynamicString txt = details_text->getText();
-						std::vector<std::string> lines;
+						std::vector<DynamicString> lines;
 						for ( int c = 0; c < txt.size(); ++c )
 						{
 							if ( txt[c] == '\n' )

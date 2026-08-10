@@ -607,7 +607,7 @@ void Field::scrollParent() {
 	fparent->setActualSize(fActualSize);
 }
 
-void reflowTextLine(std::string& input, int width, const char* font, std::vector<std::string>& result)
+void reflowTextLine(std::string& input, int width, const char* font, std::vector<DynamicString>& result)
 {
 	Font* actualFont = Font::get(font);
 	if ( !actualFont )
@@ -626,7 +626,7 @@ void reflowTextLine(std::string& input, int width, const char* font, std::vector
 
 	size_t offset = 0;
 	size_t findChar = 0;
-	std::vector<std::string> tokens;
+	std::vector<DynamicString> tokens;
 	/*switch ( local_rng.rand() % 3 )
 	{
 		case 0:
@@ -795,13 +795,13 @@ void Field::reflowTextToFit(const int characterOffset, bool check) {
 	if ( usePreciseStringWidth )
 	{
 		// more expensive, but accurate text reflow.
-		std::vector<std::string> allLines;
+		std::vector<DynamicString> allLines;
 		char* nexttoken;
 		char* token = text;
 		do {
 			nexttoken = tokenize(token, "\n");
 			std::string tokenStr(token);
-			std::vector<std::string> result;
+			std::vector<DynamicString> result;
 			reflowTextLine(tokenStr, (getSize().w), font.c_str(), result);
 			for ( size_t i = 0; i < result.size(); ++i )
 			{

@@ -5049,7 +5049,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             DynamicString input = txtHeader->getText();
             size_t offset = 0;
             size_t findChar = 0;
-            std::vector<std::string> tokens;
+            std::vector<DynamicString> tokens;
             while ( (findChar = input.find('\n', offset)) != std::string::npos ) {
                 tokens.push_back(input.substr(offset, findChar - offset));
                 offset = findChar + 1;

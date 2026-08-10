@@ -45,7 +45,7 @@ IRCHandler_t IRCHandler;
 StatueManager_t StatueManager;
 DebugTimers_t DebugTimers;
 
-const std::vector<std::string> MonsterStatCustomManager::itemStatusStrings =
+const std::vector<DynamicString> MonsterStatCustomManager::itemStatusStrings =
 {
 	"broken",
 	"decrepit",
@@ -54,7 +54,7 @@ const std::vector<std::string> MonsterStatCustomManager::itemStatusStrings =
 	"excellent"
 };
 
-const std::vector<std::string> MonsterStatCustomManager::shopkeeperTypeStrings =
+const std::vector<DynamicString> MonsterStatCustomManager::shopkeeperTypeStrings =
 {
 	"equipment",
 	"hats",
@@ -597,8 +597,8 @@ bool GameModeManager_t::allowsBoulderBreak()
 	return false;
 }
 
-std::vector<std::string> GameModeManager_t::CurrentSession_t::SeededRun_t::prefixes;
-std::vector<std::string> GameModeManager_t::CurrentSession_t::SeededRun_t::suffixes;
+std::vector<DynamicString> GameModeManager_t::CurrentSession_t::SeededRun_t::prefixes;
+std::vector<DynamicString> GameModeManager_t::CurrentSession_t::SeededRun_t::suffixes;
 
 void GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile()
 {
@@ -1988,7 +1988,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 							keyValue_itr != details_itr->MemberEnd(); ++keyValue_itr )
 						{
 							tagsRead.insert(keyValue_itr->name.GetString());
-							std::vector<std::string> detailEntry;
+							std::vector<DynamicString> detailEntry;
 							if ( keyValue_itr->value.IsString() )
 							{
 								//printlog("[JSON]: Found template string '%s' for tooltip '%s'", keyValue_itr->value.GetString(), tooltipType_itr->name.GetString());
@@ -3373,7 +3373,7 @@ std::string& ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::strin
 	return defaultString;
 }
 
-Sint32 getStatAttributeBonusFromItem(const int player, Item& item, std::string& attribute)
+Sint32 getStatAttributeBonusFromItem(const int player, Item& item, const char* attribute)
 {
 #ifndef EDITOR
 	Sint32 stat = 0;
@@ -3690,32 +3690,32 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 	{
 		if ( conditionalAttribute == "STR" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute == "DEX" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute == "CON" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute == "INT" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute == "PER" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute == "CHR" )
 		{
-			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute),
+			snprintf(buf, sizeof(buf), str.c_str(), getStatAttributeBonusFromItem(player, item, conditionalAttribute.c_str()),
 				getItemStatFullName(conditionalAttribute.c_str()).c_str());
 		}
 		else if ( conditionalAttribute.find("EFF_") != std::string::npos )
@@ -5023,7 +5023,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 		}
 		else if ( detailTag.compare("equipment_stat_bonus") == 0 )
 		{
-			std::vector<std::string> statNames = { "STR", "DEX", "CON", "INT", "PER", "CHR" };
+			std::vector<DynamicString> statNames = { "STR", "DEX", "CON", "INT", "PER", "CHR" };
 			int baseStatBonus = 0;
 			int beatitudeStatBonus = 0;
 			bool found = false;
@@ -5033,7 +5033,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 				{
 					found = true;
 					baseStatBonus = items[item.type].attributes[stat];
-					beatitudeStatBonus = getStatAttributeBonusFromItem(player, item, stat) - baseStatBonus;
+					beatitudeStatBonus = getStatAttributeBonusFromItem(player, item, stat.c_str()) - baseStatBonus;
 
 					snprintf(buf, sizeof(buf), str.c_str(), baseStatBonus, stat.c_str(),
 						beatitudeStatBonus, stat.c_str(), getItemBeatitudeAdjective(item.beatitude).c_str());
@@ -8134,7 +8134,7 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 			}
 			std::string output = buf;
 
-			std::vector<std::string> signText;
+			std::vector<DynamicString> signText;
 			int line = 0;
 			signText.push_back("");
 			for ( int i = 0; i < output.size(); ++i )
@@ -8838,7 +8838,7 @@ void ShopkeeperConsumables_t::readFromFile()
 				{
 					auto& member = (*slot_itr)["type"];
 					bool isArr = member.IsArray();
-					std::vector<std::string> strings;
+					std::vector<DynamicString> strings;
 					if ( !isArr )
 					{
 						strings.push_back(member.GetString());
@@ -8877,7 +8877,7 @@ void ShopkeeperConsumables_t::readFromFile()
 				{
 					auto& member = (*slot_itr)["status"];
 					bool isArr = member.IsArray();
-					std::vector<std::string> strings;
+					std::vector<DynamicString> strings;
 					if ( !isArr )
 					{
 						strings.push_back(member.GetString());
@@ -9182,7 +9182,7 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 
 			auto& hotbar_t = players[clientnum]->hotbar;
 
-			std::vector<std::string> layoutTypes = { "classic", "modern" };
+			std::vector<DynamicString> layoutTypes = { "classic", "modern" };
 			for ( auto& layout : layoutTypes )
 			{
 				if ( layout == "classic" )
@@ -12546,7 +12546,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 }
 #endif
 
-void jsonVecToVec(rapidjson::Value& val, std::vector<std::string>& vec )
+void jsonVecToVec(rapidjson::Value& val, std::vector<DynamicString>& vec )
 {
 	for ( auto itr = val.Begin(); itr != val.End(); ++itr )
 	{
@@ -13023,7 +13023,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 
 		if ( w.HasMember("custom_events_display") )
 		{
-			std::vector<std::string> customEvents;
+			std::vector<DynamicString> customEvents;
 			for ( auto itr = w["custom_events_display"].Begin(); itr != w["custom_events_display"].End(); ++itr )
 			{
 				customEvents.push_back(itr->GetString());
@@ -13533,7 +13533,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 
 		if ( w.HasMember("custom_events_display") )
 		{
-			std::vector<std::string> customEvents;
+			std::vector<DynamicString> customEvents;
 			for ( auto itr = w["custom_events_display"].Begin(); itr != w["custom_events_display"].End(); ++itr )
 			{
 				customEvents.push_back(itr->GetString());
@@ -13923,7 +13923,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 		}
 		if ( w.HasMember("custom_events_display") )
 		{
-			std::vector<std::string> customEvents;
+			std::vector<DynamicString> customEvents;
 			for ( auto itr = w["custom_events_display"].Begin(); itr != w["custom_events_display"].End(); ++itr )
 			{
 				customEvents.push_back(itr->GetString());
@@ -14263,7 +14263,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 		}
 		if ( w.HasMember("custom_events_display") )
 		{
-			std::vector<std::string> customEvents;
+			std::vector<DynamicString> customEvents;
 			for ( auto itr = w["custom_events_display"].Begin(); itr != w["custom_events_display"].End(); ++itr )
 			{
 				customEvents.push_back(itr->GetString());
@@ -14739,7 +14739,7 @@ DynamicMapI32 Compendium_t::Events_t::eventWorldIDLookup;
 DynamicMapI32 Compendium_t::Events_t::eventCodexIDLookup;
 std::map<Compendium_t::EventTags, std::map<int, int>> Compendium_t::Events_t::eventClassIds;
 std::map<int, std::vector<Compendium_t::EventTags>> Compendium_t::Events_t::itemDisplayedEventsList;
-std::map<int, std::vector<std::string>> Compendium_t::Events_t::itemDisplayedCustomEventsList;
+std::map<int, std::vector<DynamicString>> Compendium_t::Events_t::itemDisplayedCustomEventsList;
 DynamicMapStr Compendium_t::Events_t::customEventsValues;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::playerEvents;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::serverPlayerEvents[MAXPLAYERS];
