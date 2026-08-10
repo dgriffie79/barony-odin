@@ -1802,19 +1802,8 @@ struct CalloutRadialMenu
 		DynamicString path_active_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
-		struct IconEntryText_t
-		{
-			DynamicString bannerText = "";
-			DynamicSetI32 bannerHighlights;
-			DynamicString worldMsgSays = "";
-			DynamicString worldMsg = "";
-			DynamicString worldMsgEmote = "";
-			DynamicString worldMsgEmoteYou = "";
-			DynamicString worldMsgEmoteToYou = "";
-			DynamicString worldIconTag = "";
-			DynamicString worldIconTagMini = "";
-		};
-		std::map<std::string, IconEntryText_t> text_map;
+		typedef IconEntryText_tMirror IconEntryText_t;
+		DynamicMapIconEntryText text_map;
 	};
 	static std::map<std::string, IconEntry> iconEntries;
 	struct WorldIconEntry_t

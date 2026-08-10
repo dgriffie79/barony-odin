@@ -1272,3 +1272,175 @@ barony_dynamic_map_striconentry_entries :: proc "c" (m: ^map[string]IconEntryTex
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> IconEntryText_t (map<string, IconEntryText_t>) — Callout's
+// IconEntry::text_map. The value OWNS 8 DynamicStrings + a DynamicSetI32,
+// so put/get/erase/clear/destroy deep-copy / deep-free (never shallow-copy).
+// ---------------------------------------------------------------------------
+IconEntryText_t :: struct {
+	bannerText:          DynamicString,
+	bannerHighlights:    map[i32]struct{},
+	worldMsgSays:        DynamicString,
+	worldMsg:            DynamicString,
+	worldMsgEmote:       DynamicString,
+	worldMsgEmoteYou:    DynamicString,
+	worldMsgEmoteToYou:  DynamicString,
+	worldIconTag:        DynamicString,
+	worldIconTagMini:    DynamicString,
+}
+
+icon_entry_text_free :: proc(v: ^IconEntryText_t) {
+	strings_to_free := [?]^DynamicString{
+		&v.bannerText, &v.worldMsgSays, &v.worldMsg, &v.worldMsgEmote,
+		&v.worldMsgEmoteYou, &v.worldMsgEmoteToYou, &v.worldIconTag, &v.worldIconTagMini,
+	}
+	for s in strings_to_free {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+	if v.bannerHighlights != nil {
+		delete(v.bannerHighlights)
+		v.bannerHighlights = nil
+	}
+}
+
+icon_entry_text_copy :: proc(dst: ^IconEntryText_t, src: ^IconEntryText_t) {
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.bannerText, &src.bannerText },
+		{ &dst.worldMsgSays, &src.worldMsgSays },
+		{ &dst.worldMsg, &src.worldMsg },
+		{ &dst.worldMsgEmote, &src.worldMsgEmote },
+		{ &dst.worldMsgEmoteYou, &src.worldMsgEmoteYou },
+		{ &dst.worldMsgEmoteToYou, &src.worldMsgEmoteToYou },
+		{ &dst.worldIconTag, &src.worldIconTag },
+		{ &dst.worldIconTagMini, &src.worldIconTagMini },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	if src.bannerHighlights != nil {
+		dst.bannerHighlights = make(map[i32]struct{})
+		for key in src.bannerHighlights {
+			dst.bannerHighlights[key] = {}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_init :: proc "c" (m: ^map[string]IconEntryText_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_put :: proc "c" (m: ^map[string]IconEntryText_t, key: string, value: ^IconEntryText_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]IconEntryText_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		icon_entry_text_free(&old)
+	}
+	new_val: IconEntryText_t
+	icon_entry_text_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_get :: proc "c" (m: ^map[string]IconEntryText_t, key: string, out: ^IconEntryText_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		icon_entry_text_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_erase :: proc "c" (m: ^map[string]IconEntryText_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		icon_entry_text_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_clear :: proc "c" (m: ^map[string]IconEntryText_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_text_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_len :: proc "c" (m: ^map[string]IconEntryText_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_destroy :: proc "c" (m: ^map[string]IconEntryText_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_text_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_striconentrytext_entries :: proc "c" (m: ^map[string]IconEntryText_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]IconEntryText_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		icon_entry_text_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

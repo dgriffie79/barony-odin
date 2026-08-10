@@ -27599,8 +27599,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 									{
 										worldIconMini = itr3->value["world_icon_small"].GetString();
 									}
-									CalloutRadialMenu::iconEntries[actionName].text_map[mapKey] = CalloutRadialMenu::IconEntry::IconEntryText_t();
-									auto& entry = CalloutRadialMenu::iconEntries[actionName].text_map[mapKey];
+									IconEntryText_tMirror entry;
 									entry.bannerText = mapText;
 									entry.bannerHighlights = mapHighlights;
 									entry.worldMsg = worldMsg;
@@ -27610,6 +27609,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 									entry.worldMsgEmoteToYou = worldMsgEmoteToYou;
 									entry.worldIconTag = worldIcon;
 									entry.worldIconTagMini = worldIconMini;
+									CalloutRadialMenu::iconEntries[actionName].text_map.put(mapKey, entry);
 
 									if ( worldIcon != "" )
 									{
@@ -27657,7 +27657,8 @@ void setCalloutBannerTextUnformatted(const int player, Field* field, const char*
 	{
 		return;
 	}
-	auto& textMap = CalloutMenu[player].iconEntries[iconName].text_map[textKey];
+	IconEntryText_tMirror textMap;
+	CalloutMenu[player].iconEntries[iconName].text_map.get(textKey, textMap);
 	field->setText(textMap.bannerText.c_str());
 	field->clearWordsToHighlight();
 	int hl_vals[64];
@@ -27817,7 +27818,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		}
 		else
 		{
-			return getCalloutMessage(findIcon->second.text_map["default"], nullptr, targetPlayer);
+			IconEntryText_tMirror _defaultText;
+			findIcon->second.text_map.get("default", _defaultText);
+			return getCalloutMessage(_defaultText, nullptr, targetPlayer);
 		}
 		return "";
 	}
@@ -27858,7 +27861,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			targetPlayerName = messageSanitizePercentSign(targetPlayerName, nullptr);
 		}
 
-		auto& textMap = findIcon->second.text_map[key];
+		IconEntryText_tMirror textMap;
+		findIcon->second.text_map.get(key, textMap);
 		auto highlights = textMap.bannerHighlights;
 		if ( highlights.size() > 0 )
 		{
@@ -28026,7 +28030,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 					key = "help_deceased";
 				}
 
-				auto& textMap = text_map[key];
+				IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 				auto highlights = textMap.bannerHighlights;
 
 				DynamicString helpText = "";
@@ -28148,7 +28153,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				return key;
 			}
 
-			auto& textMap = text_map[key];
+			IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 			auto highlights = textMap.bannerHighlights;
 			if ( highlights.size() > 0 )
 			{
@@ -28216,7 +28222,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				return key;
 			}
 
-			auto& textMap = text_map[key];
+			IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 			auto highlights = textMap.bannerHighlights;
 			if ( highlights.size() > 0 )
 			{
@@ -28297,17 +28304,17 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				}
 
 				if ( namedNPC
-					&& text_map.find(std::string(key + "_named")) != text_map.end() )
+					&& text_map.contains(std::string(key + "_named")) )
 				{
 					key += "_named";
 				}
 				else if ( stringStartsWithVowel(monsterName)
-					&& text_map.find(std::string(key + "_an")) != text_map.end() )
+					&& text_map.contains(std::string(key + "_an")) )
 				{
 					key += "_an";
 				}
 
-				if ( text_map.find(key) == text_map.end() )
+				if ( !text_map.contains(key) )
 				{
 					key = "default";
 				}
@@ -28316,7 +28323,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				{
 					return key;
 				}
-				auto& textMap = text_map[key];
+				IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 				auto highlights = textMap.bannerHighlights;
 				if ( highlights.size() > 0 )
 				{
@@ -28350,14 +28358,14 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		break;
 	case CALLOUT_TYPE_SWITCH_ON:
 		key = "switch";
-		if ( text_map.find(std::string(key + "_on")) != text_map.end() )
+		if ( text_map.contains(std::string(key + "_on")) )
 		{
 			key += "_on";
 		}
 		break;
 	case CALLOUT_TYPE_SWITCH_OFF:
 		key = "switch";
-		if ( text_map.find(std::string(key + "_off")) != text_map.end() )
+		if ( text_map.contains(std::string(key + "_off")) )
 		{
 			key += "_off";
 		}
@@ -28397,7 +28405,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 
 		DynamicString objectName = Language::get(6383 + wallLockMaterial);
 
-		auto& textMap = text_map[key];
+		IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 		if ( setType == SET_CALLOUT_BANNER_TEXT )
 		{
 			setCalloutBannerTextFormatted(player, field, color, textMap.bannerHighlights,
@@ -28585,12 +28594,12 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			itemName = Language::get(3634);
 		}
 		DynamicString key = "item";
-		if ( stringStartsWithVowel(itemName) && text_map.find(std::string(key + "_an")) != text_map.end() )
+		if ( stringStartsWithVowel(itemName) && text_map.contains(std::string(key + "_an")) )
 		{
 			key += "_an";
 		}
 
-		if ( text_map.find(key) == text_map.end() )
+		if ( !text_map.contains(key) )
 		{
 			key = "default";
 		}
@@ -28598,7 +28607,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			return key;
 		}
-		auto& textMap = text_map[key];
+		IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 		auto highlights = textMap.bannerHighlights;
 		if ( highlights.size() > 0 )
 		{
@@ -28634,7 +28644,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	case CALLOUT_TYPE_TRAP:
 	{
 		key = "trap";
-		if ( text_map.find(key) == text_map.end() )
+		if ( !text_map.contains(key) )
 		{
 			key = "default";
 		}
@@ -28666,7 +28676,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				trapName = Language::get(4350);
 			}
 		}
-		auto& textMap = text_map[key];
+		IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 		auto highlights = textMap.bannerHighlights;
 		if ( highlights.size() > 0 )
 		{
@@ -28700,7 +28711,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	case CALLOUT_TYPE_GENERIC_INTERACTABLE:
 	{
 		key = "generic_interactable";
-		if ( text_map.find(key) == text_map.end() )
+		if ( !text_map.contains(key) )
 		{
 			key = "default";
 		}
@@ -28748,7 +28759,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				objectName = Language::get(4363);
 			}
 		}
-		auto& textMap = text_map[key];
+		IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 		if ( setType == SET_CALLOUT_BANNER_TEXT )
 		{
 			setCalloutBannerTextFormatted(player, field, color, textMap.bannerHighlights,
@@ -28792,21 +28804,21 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		break;
 	case CALLOUT_TYPE_TELEPORTER_LADDER_UP:
 		key = "teleporter";
-		if ( text_map.find(std::string(key + "_up")) != text_map.end() )
+		if ( text_map.contains(std::string(key + "_up")) )
 		{
 			key += "_up";
 		}
 		break;
 	case CALLOUT_TYPE_TELEPORTER_LADDER_DOWN:
 		key = "teleporter";
-		if ( text_map.find(std::string(key + "_down")) != text_map.end() )
+		if ( text_map.contains(std::string(key + "_down")) )
 		{
 			key += "_down";
 		}
 		break;
 	case CALLOUT_TYPE_TELEPORTER_PORTAL:
 		key = "teleporter";
-		if ( text_map.find(std::string(key + "_portal")) != text_map.end() )
+		if ( text_map.contains(std::string(key + "_portal")) )
 		{
 			key += "_portal";
 		}
@@ -28821,7 +28833,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		DynamicString trapName = Language::get(4362);
 		if ( entity )
 		{
-			auto highlights = text_map[key].bannerHighlights;
+			IconEntryText_tMirror _tm;
+			text_map.get(key, _tm);
+			auto highlights = _tm.bannerHighlights;
 			if ( entity->behavior == &actBomb )
 			{
 				if ( entity->skill[21] >= WOODEN_SHIELD && entity->skill[21] < NUMITEMS )
@@ -28839,7 +28853,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			{
 				trapName = items[TOOL_BEARTRAP].getIdentifiedName();
 			}
-			auto& textMap = text_map[key];
+			IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 			if ( setType == SET_CALLOUT_BANNER_TEXT )
 			{
 				setCalloutBannerTextFormatted(player, field, color, highlights,
@@ -28861,7 +28876,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		}
 		if ( entity )
 		{
-			auto highlights = text_map[key].bannerHighlights;
+			IconEntryText_tMirror _tm;
+			text_map.get(key, _tm);
+			auto highlights = _tm.bannerHighlights;
 			DynamicString objectName = Language::get(entity->getColliderLangName());
 
 			if ( highlights.size() > 0 )
@@ -28878,7 +28895,8 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 					}
 				}
 			}
-			auto& textMap = text_map[key];
+			IconEntryText_tMirror textMap;
+			text_map.get(key, textMap);
 			if ( setType == SET_CALLOUT_BANNER_TEXT )
 			{
 				setCalloutBannerTextFormatted(player, field, color, highlights,
@@ -28897,7 +28915,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			break;
 	}
 
-	if ( text_map.find(key) == text_map.end() )
+	if ( !text_map.contains(key) )
 	{
 		if ( setType == SET_CALLOUT_BANNER_TEXT )
 		{
@@ -28909,7 +28927,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		}
 		else
 		{
-			return getCalloutMessage(text_map["default"], nullptr, targetPlayer);
+			IconEntryText_tMirror _defaultText;
+			text_map.get("default", _defaultText);
+			return getCalloutMessage(_defaultText, nullptr, targetPlayer);
 		}
 		return "";
 	}
@@ -28923,7 +28943,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	}
 	else
 	{
-		return getCalloutMessage(text_map[key], nullptr, targetPlayer);
+		IconEntryText_tMirror _tm;
+		text_map.get(key, _tm);
+		return getCalloutMessage(_tm, nullptr, targetPlayer);
 	}
 	return "";
 }
@@ -30180,8 +30202,10 @@ bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu:
 	DynamicString key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
 	lockOnEntityUid = oldTarget;
 
-	callout.tagID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTag].id;
-	callout.tagSmallID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTagMini].id;
+	IconEntryText_tMirror _calloutText;
+	iconEntries[calloutTypeKey].text_map.get(key, _calloutText);
+	callout.tagID = worldIconEntries[_calloutText.worldIconTag].id;
+	callout.tagSmallID = worldIconEntries[_calloutText.worldIconTagMini].id;
 
 	if ( callout.cmd == CALLOUT_CMD_AFFIRMATIVE || callout.cmd == CALLOUT_CMD_THANKS )
 	{
@@ -30303,8 +30327,10 @@ bool CalloutRadialMenu::createParticleCallout(real_t x, real_t y, real_t z, Uint
 	DynamicString key = setCalloutText(nullptr, calloutTypeKey.c_str(), 0, _cmd, SET_CALLOUT_ICON_KEY, -1);
 	lockOnEntityUid = oldTarget;
 
-	callout.tagID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTag].id;
-	callout.tagSmallID = worldIconEntries[iconEntries[calloutTypeKey].text_map[key].worldIconTagMini].id;
+	IconEntryText_tMirror _calloutText;
+	iconEntries[calloutTypeKey].text_map.get(key, _calloutText);
+	callout.tagID = worldIconEntries[_calloutText.worldIconTag].id;
+	callout.tagSmallID = worldIconEntries[_calloutText.worldIconTagMini].id;
 	if ( uid == 0 && callout.cmd == CALLOUT_CMD_LOOK && multiplayer != CLIENT )
 	{
 		callout.doMessage = false;
@@ -31227,14 +31253,16 @@ void CalloutRadialMenu::drawCalloutMenu()
 		//	}
 		//	else if ( disableOption == -1 ) // disabled due to creature type
 		//	{
-		//		auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["command_unavailable"];
+		//		IconEntryText_tMirror textMap;
+		//FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("command_unavailable", textMap);
 		//		setCalloutBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
 		//			textMap.second, textMap.first.c_str(),
 		//			getMonsterLocalizedName(HUMAN).c_str());
 		//	}
 		//	else if ( disableOption == -3 ) // disabled due to tinkerbot quality
 		//	{
-		//		auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["tinker_quality_low"];
+		//		IconEntryText_tMirror textMap;
+		//FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("tinker_quality_low", textMap);
 		//		setCalloutBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
 		//			textMap.second, textMap.first.c_str(),
 		//			getMonsterLocalizedName(HUMAN).c_str());
@@ -31287,7 +31315,8 @@ void CalloutRadialMenu::drawCalloutMenu()
 		//			currentVal = 0;
 		//		}
 
-		//		auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["skill_missing_leader"];
+		//		IconEntryText_tMirror textMap;
+		//FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("skill_missing_leader", textMap);
 		//		setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
 		//			textMap.second, textMap.first.c_str(),
 		//			currentVal, requirementVal);

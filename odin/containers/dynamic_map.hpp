@@ -100,6 +100,16 @@ extern "C" {
     int32_t   barony_dynamic_map_striconentry_len(DynamicMapRaw*);
     void      barony_dynamic_map_striconentry_destroy(DynamicMapRaw*);
     int32_t   barony_dynamic_map_striconentry_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, IconEntryText_t>
+    void      barony_dynamic_map_striconentrytext_init(DynamicMapRaw*);
+    void      barony_dynamic_map_striconentrytext_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_striconentrytext_get(DynamicMapRaw*, DynamicString, void* out);
+    bool      barony_dynamic_map_striconentrytext_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_striconentrytext_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_striconentrytext_len(DynamicMapRaw*);
+    void      barony_dynamic_map_striconentrytext_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_striconentrytext_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -801,6 +811,114 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_map_striconentry_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, IconEntryText_t> — Callout's IconEntry::text_map.
+// Value owns 8 DynamicStrings + DynamicSetI32; deep-copy on put/get,
+// deep-free on erase/clear/destroy.
+// ---------------------------------------------------------------------------
+struct IconEntryText_tMirror {
+    DynamicString bannerText;
+    DynamicSetI32 bannerHighlights;
+    DynamicString worldMsgSays;
+    DynamicString worldMsg;
+    DynamicString worldMsgEmote;
+    DynamicString worldMsgEmoteYou;
+    DynamicString worldMsgEmoteToYou;
+    DynamicString worldIconTag;
+    DynamicString worldIconTagMini;
+    // copy/move: deep (members are RAII)
+    IconEntryText_tMirror() = default;
+    IconEntryText_tMirror(const IconEntryText_tMirror& o)
+        : bannerText(o.bannerText), bannerHighlights(o.bannerHighlights),
+          worldMsgSays(o.worldMsgSays), worldMsg(o.worldMsg),
+          worldMsgEmote(o.worldMsgEmote), worldMsgEmoteYou(o.worldMsgEmoteYou),
+          worldMsgEmoteToYou(o.worldMsgEmoteToYou), worldIconTag(o.worldIconTag),
+          worldIconTagMini(o.worldIconTagMini) {}
+    IconEntryText_tMirror& operator=(const IconEntryText_tMirror& o) {
+        if (this != &o) {
+            bannerText = o.bannerText; bannerHighlights = o.bannerHighlights;
+            worldMsgSays = o.worldMsgSays; worldMsg = o.worldMsg;
+            worldMsgEmote = o.worldMsgEmote; worldMsgEmoteYou = o.worldMsgEmoteYou;
+            worldMsgEmoteToYou = o.worldMsgEmoteToYou; worldIconTag = o.worldIconTag;
+            worldIconTagMini = o.worldIconTagMini;
+        }
+        return *this;
+    }
+    IconEntryText_tMirror(IconEntryText_tMirror&& o) noexcept = default;
+    IconEntryText_tMirror& operator=(IconEntryText_tMirror&& o) noexcept = default;
+};
+
+class DynamicMapIconEntryText {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapIconEntryText() { barony_dynamic_map_striconentrytext_init(&raw); }
+    ~DynamicMapIconEntryText() { barony_dynamic_map_striconentrytext_destroy(&raw); }
+    DynamicMapIconEntryText(const DynamicMapIconEntryText& other) : raw{} {
+        barony_dynamic_map_striconentrytext_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapIconEntryText& operator=(const DynamicMapIconEntryText& other) {
+        if (this != &other) { barony_dynamic_map_striconentrytext_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapIconEntryText(DynamicMapIconEntryText&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapIconEntryText& operator=(DynamicMapIconEntryText&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_striconentrytext_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    bool get(const char* key, IconEntryText_tMirror& out) const {
+        return barony_dynamic_map_striconentrytext_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, IconEntryText_tMirror& out) const {
+        return barony_dynamic_map_striconentrytext_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const IconEntryText_tMirror& v) {
+        barony_dynamic_map_striconentrytext_put(&raw, DynamicString(key), const_cast<IconEntryText_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const IconEntryText_tMirror& v) {
+        barony_dynamic_map_striconentrytext_put(&raw, key, const_cast<IconEntryText_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        IconEntryText_tMirror tmp;
+        return barony_dynamic_map_striconentrytext_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const std::string& key) const {
+        IconEntryText_tMirror tmp;
+        return barony_dynamic_map_striconentrytext_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        IconEntryText_tMirror tmp;
+        return barony_dynamic_map_striconentrytext_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_striconentrytext_erase(&raw, DynamicString(key)); }
+    bool erase(const std::string& key) { return barony_dynamic_map_striconentrytext_erase(&raw, DynamicString(key.c_str())); }
+    int64_t size() const { return barony_dynamic_map_striconentrytext_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_striconentrytext_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapIconEntryText& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<IconEntryText_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_striconentrytext_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_striconentrytext_put(&raw, key, &vv[i]);
         }
     }
 };
