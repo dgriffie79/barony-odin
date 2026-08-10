@@ -72,6 +72,24 @@ extern "C" {
     DynamicString* barony_dynamic_map_i32str_entry(DynamicMapRaw*, const void* key);
     int32_t   barony_dynamic_map_i32str_entries(DynamicMapRaw*, int* key_ptrs, void** val_ptrs, int32_t* val_lens, int32_t count);
     bool      barony_dynamic_map_i32str_find(DynamicMapRaw*, const void* key, DynamicString*, int32_t*);
+
+    // DynamicSet shims (std::set replacement; map[T]struct{} on the Odin side)
+    void      barony_dynamic_set_i32_init(DynamicMapRaw*);
+    bool      barony_dynamic_set_i32_insert(DynamicMapRaw*, int);
+    bool      barony_dynamic_set_i32_contains(DynamicMapRaw*, int);
+    bool      barony_dynamic_set_i32_erase(DynamicMapRaw*, int);
+    void      barony_dynamic_set_i32_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_set_i32_len(DynamicMapRaw*);
+    void      barony_dynamic_set_i32_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_set_i32_entries(DynamicMapRaw*, int* values, int32_t count);
+    void      barony_dynamic_set_str_init(DynamicMapRaw*);
+    bool      barony_dynamic_set_str_insert(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_set_str_contains(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_set_str_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_set_str_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_set_str_len(DynamicMapRaw*);
+    void      barony_dynamic_set_str_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_set_str_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -567,3 +585,123 @@ private:
 // LightDef); the shims are declared here.
 // ---------------------------------------------------------------------------
 struct DynamicMapLightDefRaw;  // forward (defined in light.hpp)
+
+// ---------------------------------------------------------------------------
+// DynamicSet — std::set replacement (Odin map[T]struct{}, Raw_Map layout).
+// DynamicSetI32 = set<int>; DynamicSetStr = set<std::string> (interned keys,
+// process-lifetime stable, never freed).
+// ---------------------------------------------------------------------------
+class DynamicSetI32 {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicSetI32() { barony_dynamic_set_i32_init(&raw); }
+    ~DynamicSetI32() { barony_dynamic_set_i32_destroy(&raw); }
+    DynamicSetI32(const DynamicSetI32& other) : raw{} {
+        barony_dynamic_set_i32_init(&raw);
+        copyFrom(other);
+    }
+    DynamicSetI32& operator=(const DynamicSetI32& other) {
+        if (this != &other) { barony_dynamic_set_i32_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicSetI32(DynamicSetI32&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicSetI32& operator=(DynamicSetI32&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_set_i32_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    bool insert(int v) { return barony_dynamic_set_i32_insert(&raw, v); }
+    bool contains(int v) const { return barony_dynamic_set_i32_contains(const_cast<DynamicMapRaw*>(&raw), v); }
+    bool erase(int v) { return barony_dynamic_set_i32_erase(&raw, v); }
+    int64_t size() const { return barony_dynamic_set_i32_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_set_i32_clear(&raw); }
+
+    // iteration/copy support: snapshot values into the caller's buffer
+    int32_t entries(int* out, int32_t max) const {
+        return barony_dynamic_set_i32_entries(const_cast<DynamicMapRaw*>(&raw), out, max);
+    }
+private:
+    void copyFrom(const DynamicSetI32& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<int> vals(n);
+        int32_t got = barony_dynamic_set_i32_entries(const_cast<DynamicMapRaw*>(&other.raw), vals.data(), n);
+        for (int32_t i = 0; i < got; ++i) barony_dynamic_set_i32_insert(&raw, vals[i]);
+    }
+};
+
+class DynamicSetStr {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicSetStr() { barony_dynamic_set_str_init(&raw); }
+    ~DynamicSetStr() { barony_dynamic_set_str_destroy(&raw); }
+    DynamicSetStr(const DynamicSetStr& other) : raw{} {
+        barony_dynamic_set_str_init(&raw);
+        copyFrom(other);
+    }
+    DynamicSetStr& operator=(const DynamicSetStr& other) {
+        if (this != &other) { barony_dynamic_set_str_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicSetStr(DynamicSetStr&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicSetStr& operator=(DynamicSetStr&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_set_str_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    bool insert(const char* v) { return barony_dynamic_set_str_insert(&raw, DynamicString(v)); }
+    bool insert(const DynamicString& v) { return barony_dynamic_set_str_insert(&raw, v); }
+    bool insert(const std::string& v) { return barony_dynamic_set_str_insert(&raw, DynamicString(v.c_str())); }
+    bool contains(const char* v) const { return barony_dynamic_set_str_contains(const_cast<DynamicMapRaw*>(&raw), DynamicString(v)); }
+    bool contains(const DynamicString& v) const { return barony_dynamic_set_str_contains(const_cast<DynamicMapRaw*>(&raw), v); }
+    bool contains(const std::string& v) const { return barony_dynamic_set_str_contains(const_cast<DynamicMapRaw*>(&raw), DynamicString(v.c_str())); }
+    bool erase(const char* v) { return barony_dynamic_set_str_erase(&raw, DynamicString(v)); }
+    bool erase(const DynamicString& v) { return barony_dynamic_set_str_erase(&raw, v); }
+    bool erase(const std::string& v) { return barony_dynamic_set_str_erase(&raw, DynamicString(v.c_str())); }
+    int64_t size() const { return barony_dynamic_set_str_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_set_str_clear(&raw); }
+
+    struct Entry { const char* key; int64_t key_len; };
+    int32_t entries(Entry* out, int32_t max) const {
+        int32_t n = (int32_t)size();
+        if (n > max) n = max;
+        if (n <= 0) return 0;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        int32_t got = barony_dynamic_set_str_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            out[i].key = (const char*)kp[i];
+            out[i].key_len = kl[i];
+        }
+        return got;
+    }
+
+private:
+    void copyFrom(const DynamicSetStr& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        int32_t got = barony_dynamic_set_str_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_set_str_insert(&raw, key);
+        }
+    }
+};

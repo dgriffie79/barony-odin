@@ -908,3 +908,190 @@ barony_dynamic_map_i32str_find :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byt
 	out_val_len^ = i32(len(value))
 	return true
 }
+
+// ---------------------------------------------------------------------------
+// DynamicSet — std::set replacement.
+// Odin idiom: map[T]struct{} (same Raw_Map layout as the maps). C++ mirrors
+// DynamicMapRaw (32B). Values are unit (no ownership); keys own themselves
+// (ints) or are interned (strings — process-lifetime stable, never freed).
+// ---------------------------------------------------------------------------
+
+// set<int>: init
+@(export)
+barony_dynamic_set_i32_init :: proc "c" (s: ^map[i32]struct{}) {
+	context = runtime.default_context()
+	s^ = nil
+}
+
+// set<int>: insert (returns true if newly inserted)
+@(export)
+barony_dynamic_set_i32_insert :: proc "c" (s: ^map[i32]struct{}, value: i32) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		s^ = make(map[i32]struct{})
+	}
+	_, was_present := s[value]
+	s[value] = {}
+	return !was_present
+}
+
+// set<int>: contains
+@(export)
+barony_dynamic_set_i32_contains :: proc "c" (s: ^map[i32]struct{}, value: i32) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		return false
+	}
+	_, ok := s[value]
+	return ok
+}
+
+// set<int>: erase (returns true if present)
+@(export)
+barony_dynamic_set_i32_erase :: proc "c" (s: ^map[i32]struct{}, value: i32) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		return false
+	}
+	_, had := s[value]
+	runtime.delete_key(s, value)
+	return had
+}
+
+// set<int>: clear
+@(export)
+barony_dynamic_set_i32_clear :: proc "c" (s: ^map[i32]struct{}) {
+	context = runtime.default_context()
+	if s^ != nil {
+		clear(&s^)
+	}
+}
+
+// set<int>: len
+@(export)
+barony_dynamic_set_i32_len :: proc "c" (s: ^map[i32]struct{}) -> i32 {
+	context = runtime.default_context()
+	if s^ == nil {
+		return 0
+	}
+	return i32(len(s^))
+}
+
+// set<int>: destroy
+@(export)
+barony_dynamic_set_i32_destroy :: proc "c" (s: ^map[i32]struct{}) {
+	context = runtime.default_context()
+	if s^ != nil {
+		delete(s^)
+		s^ = nil
+	}
+}
+
+// set<int>: entries (snapshot for iteration/copy). values = array of int.
+@(export)
+barony_dynamic_set_i32_entries :: proc "c" (s: ^map[i32]struct{}, values: [^]i32, count: i32) -> i32 {
+	context = runtime.default_context()
+	if s^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in s^ {
+		if n >= count {
+			break
+		}
+		values[n] = key
+		n += 1
+	}
+	return n
+}
+
+// set<string>: init
+@(export)
+barony_dynamic_set_str_init :: proc "c" (s: ^map[string]struct{}) {
+	context = runtime.default_context()
+	s^ = nil
+}
+
+// set<string>: insert (interns key; returns true if newly inserted)
+@(export)
+barony_dynamic_set_str_insert :: proc "c" (s: ^map[string]struct{}, value: string) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		s^ = make(map[string]struct{})
+	}
+	k := intern_string(value)
+	_, was_present := s[k]
+	s[k] = {}
+	return !was_present
+}
+
+// set<string>: contains
+@(export)
+barony_dynamic_set_str_contains :: proc "c" (s: ^map[string]struct{}, value: string) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		return false
+	}
+	_, ok := s[value]
+	return ok
+}
+
+// set<string>: erase (returns true if present)
+@(export)
+barony_dynamic_set_str_erase :: proc "c" (s: ^map[string]struct{}, value: string) -> bool {
+	context = runtime.default_context()
+	if s^ == nil {
+		return false
+	}
+	_, had := s[value]
+	runtime.delete_key(s, value)
+	return had
+}
+
+// set<string>: clear
+@(export)
+barony_dynamic_set_str_clear :: proc "c" (s: ^map[string]struct{}) {
+	context = runtime.default_context()
+	if s^ != nil {
+		clear(&s^)
+	}
+}
+
+// set<string>: len
+@(export)
+barony_dynamic_set_str_len :: proc "c" (s: ^map[string]struct{}) -> i32 {
+	context = runtime.default_context()
+	if s^ == nil {
+		return 0
+	}
+	return i32(len(s^))
+}
+
+// set<string>: destroy
+@(export)
+barony_dynamic_set_str_destroy :: proc "c" (s: ^map[string]struct{}) {
+	context = runtime.default_context()
+	if s^ != nil {
+		delete(s^)
+		s^ = nil
+	}
+}
+
+// set<string>: entries (snapshot; keys are interned views — stable, never freed)
+@(export)
+barony_dynamic_set_str_entries :: proc "c" (s: ^map[string]struct{}, key_ptrs: [^]rawptr, key_lens: [^]i32, count: i32) -> i32 {
+	context = runtime.default_context()
+	if s^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in s^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		n += 1
+	}
+	return n
+}
