@@ -3393,8 +3393,8 @@ struct EditorEntityData_t
 		bool boulderDestroys = false;
 		bool showAsWallOnMinimap = false;
 		bool allowNPCPathing = false;
-		std::unordered_set<int> proficiencyBonusDamage;
-		std::unordered_set<int> proficiencyResistDamage;
+		DynamicSetI32 proficiencyBonusDamage;
+		DynamicSetI32 proficiencyResistDamage;
 	};
 	static const int COLLIDER_COLLISION_FLAG_MINO = 2;
 	static const int COLLIDER_COLLISION_FLAG_NPC = 4;

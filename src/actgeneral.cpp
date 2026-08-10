@@ -1162,7 +1162,7 @@ bool Entity::isColliderWeakToSkill(const int proficiency) const
 	if ( !isDamageableCollider() ) { return false; }
 	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
-	return colliderDmgType.proficiencyBonusDamage.find(proficiency) != colliderDmgType.proficiencyBonusDamage.end();
+	return colliderDmgType.proficiencyBonusDamage.contains(proficiency);
 }
 
 bool Entity::isColliderResistToSkill(const int proficiency) const
@@ -1170,7 +1170,7 @@ bool Entity::isColliderResistToSkill(const int proficiency) const
 	if ( !isDamageableCollider() ) { return false; }
 	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
-	return colliderDmgType.proficiencyResistDamage.find(proficiency) != colliderDmgType.proficiencyResistDamage.end();
+	return colliderDmgType.proficiencyResistDamage.contains(proficiency);
 }
 
 bool Entity::isColliderDamageableByMelee() const

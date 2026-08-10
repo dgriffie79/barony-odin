@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "../odin/containers/dynamic_map.hpp"
 #include "stat.hpp"
 #include "json.hpp"
 
@@ -1283,7 +1284,7 @@ struct MonsterData_t
 		};
 		std::map<int, IconLookup_t> iconSpritesAndPaths;
 		std::map<std::string, std::vector<int>> keyToSpriteLookup;
-		std::set<int> modelIndexes;
+		DynamicSetI32 modelIndexes;
 		std::set<int> playerModelIndexes;
 		DynamicString defaultShortDisplayName = "";
 		struct SpecialNPCEntry_t
@@ -1291,7 +1292,7 @@ struct MonsterData_t
 			DynamicString internalName = "";
 			DynamicString name = "";
 			DynamicString shortname = "";
-			std::set<int> modelIndexes;
+			DynamicSetI32 modelIndexes;
 			int baseModel = 0;
 			DynamicString uniqueIcon = "";
 		};

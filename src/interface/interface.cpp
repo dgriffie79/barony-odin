@@ -1851,13 +1851,18 @@ void FollowerRadialMenu::loadFollowerJSON()
 								{
 									DynamicString mapKey = itr3->name.GetString();
 									DynamicString mapText = itr3->value["text"].GetString();
-									std::set<int> mapHighlights;
+									DynamicSetI32 mapHighlights;
 									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
 										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
 									{
 										mapHighlights.insert(highlightItr->GetInt());
 									}
-									FollowerRadialMenu::iconEntries[actionName].text_map[mapKey] = std::make_pair(mapText, mapHighlights);
+									{
+									IconEntryTextMap_t v;
+									v.text = mapText;
+									v.highlights = mapHighlights;
+									FollowerRadialMenu::iconEntries[actionName].text_map.put(mapKey, v);
+								}
 								}
 							}
 						}
@@ -1998,7 +2003,7 @@ void FollowerRadialMenu::createFollowerMenuGUI()
 	wheelStatImg->disabled = true;
 }
 
-void setFollowerBannerTextFormatted(const int player, Field* field, Uint32 color, std::set<int>& highlights, char const * const text, ...)
+void setFollowerBannerTextFormatted(const int player, Field* field, Uint32 color, DynamicSetI32& highlights, char const * const text, ...)
 {
 	if ( !field ) { return; }
 
@@ -2010,9 +2015,11 @@ void setFollowerBannerTextFormatted(const int player, Field* field, Uint32 color
 
 	field->setText(buf);
 	field->clearWordsToHighlight();
-	for ( auto v : highlights )
+	int hl_vals[64];
+	int32_t n_hl = highlights.entries(hl_vals, 64);
+	for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 	{
-		field->addWordToHighlight(v, color);
+		field->addWordToHighlight(hl_vals[_hi], color);
 	}
 }
 
@@ -2023,12 +2030,15 @@ void setFollowerBannerText(const int player, Field* field, const char* iconName,
 	{
 		return;
 	}
-	auto& textMap = FollowerMenu[player].iconEntries[iconName].text_map[textKey];
-	field->setText(textMap.first.c_str());
+	IconEntryTextMap_t textMap;
+	FollowerMenu[player].iconEntries[iconName].text_map.get(textKey, textMap);
+	field->setText(textMap.text.c_str());
 	field->clearWordsToHighlight();
-	for ( auto v : textMap.second )
+	int hl_vals[64];
+	int32_t n_hl = textMap.highlights.entries(hl_vals, 64);
+	for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 	{
-		field->addWordToHighlight(v, color);
+		field->addWordToHighlight(hl_vals[_hi], color);
 	}
 }
 
@@ -3690,23 +3700,26 @@ void FollowerRadialMenu::drawFollowerMenu()
 			}
 			else if ( disableOption == -1 ) // disabled due to creature type
 			{
-				auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["command_unavailable"];
+				IconEntryTextMap_t textMap;
+				FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("command_unavailable", textMap);
 				setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
-					textMap.second, textMap.first.c_str(),
+					textMap.highlights, textMap.text.c_str(),
 					getMonsterLocalizedName(followerStats->type, followerStats).c_str());
 			}
 			else if ( disableOption == -4 ) // disabled due to command spell type
 			{
-				auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["command_unavailable_spell"];
+				IconEntryTextMap_t textMap;
+				FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("command_unavailable_spell", textMap);
 				setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
-					textMap.second, textMap.first.c_str(),
+					textMap.highlights, textMap.text.c_str(),
 					getMonsterLocalizedName(followerStats->type, followerStats).c_str());
 			}
 			else if ( disableOption == -3 ) // disabled due to tinkerbot quality
 			{
-				auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["tinker_quality_low"];
+				IconEntryTextMap_t textMap;
+				FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("tinker_quality_low", textMap);
 				setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
-					textMap.second, textMap.first.c_str(),
+					textMap.highlights, textMap.text.c_str(),
 					getMonsterLocalizedName(followerStats->type, followerStats).c_str());
 			}
 			else
@@ -3786,16 +3799,18 @@ void FollowerRadialMenu::drawFollowerMenu()
 
 				if ( tinkeringFollower )
 				{
-					auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["skill_missing_tinker"];
+					IconEntryTextMap_t textMap;
+					FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("skill_missing_tinker", textMap);
 					setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
-						textMap.second, textMap.first.c_str(),
+						textMap.highlights, textMap.text.c_str(),
 						currentVal, requirementVal);
 				}
 				else
 				{
-					auto& textMap = FollowerMenu[gui_player].iconEntries["invalid_action"].text_map["skill_missing_leader"];
+					IconEntryTextMap_t textMap;
+					FollowerMenu[gui_player].iconEntries["invalid_action"].text_map.get("skill_missing_leader", textMap);
 					setFollowerBannerTextFormatted(gui_player, bannerTxt, hudColors.characterSheetRed,
-						textMap.second,	textMap.first.c_str(),
+						textMap.highlights, textMap.text.c_str(),
 						currentVal, requirementVal);
 				}
 				missingSkillLevel = true;
@@ -27543,7 +27558,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 								{
 									DynamicString mapKey = itr3->name.GetString();
 									DynamicString mapText = itr3->value["text"].GetString();
-									std::set<int> mapHighlights;
+									DynamicSetI32 mapHighlights;
 									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
 										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
 									{
@@ -27615,7 +27630,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 	}
 }
 
-void setCalloutBannerTextFormatted(const int player, Field* field, Uint32 color, std::set<int>& highlights, char const* const text, ...)
+void setCalloutBannerTextFormatted(const int player, Field* field, Uint32 color, DynamicSetI32& highlights, char const* const text, ...)
 {
 	if ( !field ) { return; }
 
@@ -27627,9 +27642,11 @@ void setCalloutBannerTextFormatted(const int player, Field* field, Uint32 color,
 
 	field->setText(buf);
 	field->clearWordsToHighlight();
-	for ( auto v : highlights )
+	int hl_vals[64];
+	int32_t n_hl = highlights.entries(hl_vals, 64);
+	for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 	{
-		field->addWordToHighlight(v, color);
+		field->addWordToHighlight(hl_vals[_hi], color);
 	}
 }
 
@@ -27643,9 +27660,11 @@ void setCalloutBannerTextUnformatted(const int player, Field* field, const char*
 	auto& textMap = CalloutMenu[player].iconEntries[iconName].text_map[textKey];
 	field->setText(textMap.bannerText.c_str());
 	field->clearWordsToHighlight();
-	for ( auto v : textMap.bannerHighlights )
+	int hl_vals[64];
+	int32_t n_hl = textMap.bannerHighlights.entries(hl_vals, 64);
+	for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 	{
-		field->addWordToHighlight(v, color);
+		field->addWordToHighlight(hl_vals[_hi], color);
 	}
 }
 
@@ -27844,9 +27863,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		if ( highlights.size() > 0 )
 		{
 			int indexStart = 0;
-			for ( auto highlight : highlights )
+			int hl_vals[64];
+			int32_t n_hl = highlights.entries(hl_vals, 64);
+			for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 			{
-				indexStart = std::max(highlight, indexStart);
+				indexStart = std::max(hl_vals[_hi], indexStart);
 			}
 			for ( auto c : targetPlayerName )
 			{
@@ -28132,9 +28153,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			if ( highlights.size() > 0 )
 			{
 				int indexStart = 0;
-				for ( auto highlight : highlights )
+				int hl_vals[64];
+				int32_t n_hl = highlights.entries(hl_vals, 64);
+				for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 				{
-					indexStart = std::max(highlight, indexStart);
+					indexStart = std::max(hl_vals[_hi], indexStart);
 				}
 				for ( auto c : targetPlayerName )
 				{
@@ -28198,9 +28221,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 			if ( highlights.size() > 0 )
 			{
 				int indexStart = 0;
-				for ( auto highlight : highlights )
+				int hl_vals[64];
+				int32_t n_hl = highlights.entries(hl_vals, 64);
+				for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 				{
-					indexStart = std::max(highlight, indexStart);
+					indexStart = std::max(hl_vals[_hi], indexStart);
 				}
 				for ( auto c : targetPlayerName )
 				{
@@ -28296,9 +28321,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 				if ( highlights.size() > 0 )
 				{
 					int indexStart = 0;
-					for ( auto highlight : highlights )
+					int hl_vals[64];
+					int32_t n_hl = highlights.entries(hl_vals, 64);
+					for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 					{
-						indexStart = std::max(highlight, indexStart);
+						indexStart = std::max(hl_vals[_hi], indexStart);
 					}
 					for ( auto c : monsterName )
 					{
@@ -28576,9 +28603,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		if ( highlights.size() > 0 )
 		{
 			int indexStart = 0;
-			for ( auto highlight : highlights )
+			int hl_vals[64];
+			int32_t n_hl = highlights.entries(hl_vals, 64);
+			for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 			{
-				indexStart = std::max(highlight, indexStart);
+				indexStart = std::max(hl_vals[_hi], indexStart);
 			}
 			for ( auto c : itemName )
 			{
@@ -28642,9 +28671,11 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		if ( highlights.size() > 0 )
 		{
 			int indexStart = 0;
-			for ( auto highlight : highlights )
+			int hl_vals[64];
+			int32_t n_hl = highlights.entries(hl_vals, 64);
+			for ( int32_t _hi = 0; _hi < n_hl; ++_hi )
 			{
-				indexStart = std::max(highlight, indexStart);
+				indexStart = std::max(hl_vals[_hi], indexStart);
 			}
 			for ( auto c : trapName )
 			{
@@ -28798,7 +28829,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 					trapName = items[entity->skill[21]].getIdentifiedName();
 					if ( highlights.size() > 0 )
 					{
-						highlights.insert(*highlights.begin() + 1);
+						int hl_vals[64];
+						int32_t n_hl = highlights.entries(hl_vals, 64);
+						highlights.insert(hl_vals[0] + 1);
 					}
 				}
 			}
@@ -28833,7 +28866,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 
 			if ( highlights.size() > 0 )
 			{
-				int indexStart = *highlights.begin();
+				int hl_vals[64];
+				int32_t n_hl = highlights.entries(hl_vals, 64);
+				int indexStart = hl_vals[0];
 				for ( auto c : objectName )
 				{
 					if ( c == ' ' )

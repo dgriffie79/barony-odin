@@ -8697,7 +8697,7 @@ void MonsterData_t::loadMonsterDataJSON()
 		{
 			for ( auto sprite : monsterSprites[i] )
 			{
-				if ( monsterDataEntries[i].modelIndexes.find(sprite) == monsterDataEntries[i].modelIndexes.end() )
+				if ( !monsterDataEntries[i].modelIndexes.contains(sprite) )
 				{
 					printlog("[JSON]: Error: Could not find monster %s model index: %d", monstertypename[i], sprite);
 				}

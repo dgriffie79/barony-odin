@@ -90,6 +90,16 @@ extern "C" {
     int32_t   barony_dynamic_set_str_len(DynamicMapRaw*);
     void      barony_dynamic_set_str_destroy(DynamicMapRaw*);
     int32_t   barony_dynamic_set_str_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, int32_t count);
+
+    // map<string, IconEntryTextMap_t> (nested text_map value)
+    void      barony_dynamic_map_striconentry_init(DynamicMapRaw*);
+    void      barony_dynamic_map_striconentry_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_striconentry_get(DynamicMapRaw*, DynamicString, void* out);
+    bool      barony_dynamic_map_striconentry_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_striconentry_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_striconentry_len(DynamicMapRaw*);
+    void      barony_dynamic_map_striconentry_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_striconentry_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -628,6 +638,7 @@ public:
     int32_t entries(int* out, int32_t max) const {
         return barony_dynamic_set_i32_entries(const_cast<DynamicMapRaw*>(&raw), out, max);
     }
+
 private:
     void copyFrom(const DynamicSetI32& other) {
         int32_t n = (int32_t)other.size();
@@ -702,6 +713,94 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_set_str_insert(&raw, key);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, IconEntryTextMap_t> — the triple-nested IconEntry::text_map
+// (was map<string, pair<string, set<int>>>). The value OWNS a DynamicString
+// + DynamicSetI32, so the shim deep-copies on put/get and deep-frees on
+// erase/clear/destroy. operator[] routes through get+put (no raw slot).
+// ---------------------------------------------------------------------------
+struct IconEntryTextMap_t {
+    DynamicString text;
+    DynamicSetI32 highlights;
+
+    IconEntryTextMap_t() = default;
+    IconEntryTextMap_t(const IconEntryTextMap_t& o) : text(o.text), highlights(o.highlights) {}
+    IconEntryTextMap_t& operator=(const IconEntryTextMap_t& o) {
+        if (this != &o) { text = o.text; highlights = o.highlights; }
+        return *this;
+    }
+    IconEntryTextMap_t(IconEntryTextMap_t&& o) noexcept : text(std::move(o.text)), highlights(std::move(o.highlights)) {}
+    IconEntryTextMap_t& operator=(IconEntryTextMap_t&& o) noexcept {
+        if (this != &o) { text = std::move(o.text); highlights = std::move(o.highlights); }
+        return *this;
+    }
+};
+
+class DynamicMapIconEntryTextMap {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapIconEntryTextMap() { barony_dynamic_map_striconentry_init(&raw); }
+    ~DynamicMapIconEntryTextMap() { barony_dynamic_map_striconentry_destroy(&raw); }
+    DynamicMapIconEntryTextMap(const DynamicMapIconEntryTextMap& other) : raw{} {
+        barony_dynamic_map_striconentry_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapIconEntryTextMap& operator=(const DynamicMapIconEntryTextMap& other) {
+        if (this != &other) { barony_dynamic_map_striconentry_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapIconEntryTextMap(DynamicMapIconEntryTextMap&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapIconEntryTextMap& operator=(DynamicMapIconEntryTextMap&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_striconentry_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    // operator[]: reads the value for key (deep copy into out); returns true
+    // if present. Mirrors the pair<string,set<int>> usage: textMap.first ->
+    // .text, textMap.second -> .highlights.
+    bool get(const char* key, IconEntryTextMap_t& out) const {
+        return barony_dynamic_map_striconentry_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, IconEntryTextMap_t& out) const {
+        return barony_dynamic_map_striconentry_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const IconEntryTextMap_t& v) {
+        barony_dynamic_map_striconentry_put(&raw, DynamicString(key), const_cast<IconEntryTextMap_t*>(&v));
+    }
+    void put(const DynamicString& key, const IconEntryTextMap_t& v) {
+        barony_dynamic_map_striconentry_put(&raw, key, const_cast<IconEntryTextMap_t*>(&v));
+    }
+    bool contains(const char* key) const {
+        IconEntryTextMap_t tmp;
+        return barony_dynamic_map_striconentry_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_striconentry_erase(&raw, DynamicString(key)); }
+    int64_t size() const { return barony_dynamic_map_striconentry_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_striconentry_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapIconEntryTextMap& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<IconEntryTextMap_t> vv(n);
+        int32_t got = barony_dynamic_map_striconentry_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_striconentry_put(&raw, key, &vv[i]);
         }
     }
 };

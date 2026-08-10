@@ -1095,3 +1095,180 @@ barony_dynamic_set_str_entries :: proc "c" (s: ^map[string]struct{}, key_ptrs: [
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> IconEntryTextMap_t (map<string, IconEntryTextMap_t>) -- the
+// triple-nested IconEntry::text_map (was map<string, pair<string, set<int>>>).
+// The value OWNS members: text is a DynamicString (Raw_String {data,len}) and
+// highlights is a DynamicSetI32 (Raw_Map over map[i32]struct{}). Both are
+// heap-backed, so put/get/erase/clear/destroy must deep-copy / deep-free —
+// never shallow-copy the struct (double-free / leak).
+// ---------------------------------------------------------------------------
+IconEntryTextMap_t :: struct {
+	text:       DynamicString,       // Raw_String {data, len}
+	highlights: map[i32]struct{},    // Raw_Map (32B)
+}
+
+// deep-free the value's owned members (string buffer + set map)
+icon_entry_text_map_free :: proc(v: ^IconEntryTextMap_t) {
+	if v.text.data != nil {
+		mem.free(v.text.data)
+		v.text.data = nil
+	}
+	if v.highlights != nil {
+		for key in v.highlights {
+			_ = key
+		}
+		delete(v.highlights)
+		v.highlights = nil
+	}
+}
+
+// deep-copy src into dst (dst must be zeroed / freshly allocated)
+icon_entry_text_map_copy :: proc(dst: ^IconEntryTextMap_t, src: ^IconEntryTextMap_t) {
+	// copy the string (owned)
+	if src.text.len > 0 {
+		buf, _ := mem.alloc(src.text.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.text.data, src.text.len)
+			(^u8)(uintptr(buf) + uintptr(src.text.len))^ = 0
+			dst.text = DynamicString{ data = buf, len = src.text.len }
+		}
+	}
+	// copy the set (owned)
+	if src.highlights != nil {
+		dst.highlights = make(map[i32]struct{})
+		for key in src.highlights {
+			dst.highlights[key] = {}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_striconentry_init :: proc "c" (m: ^map[string]IconEntryTextMap_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_striconentry_put :: proc "c" (m: ^map[string]IconEntryTextMap_t, key: string, value: ^IconEntryTextMap_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]IconEntryTextMap_t)
+	}
+	k := intern_string(key)
+	// if key exists, free the old owned value first
+	if old, had := m[k]; had {
+		icon_entry_text_map_free(&old)
+	}
+	new_val: IconEntryTextMap_t
+	icon_entry_text_map_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_striconentry_get :: proc "c" (m: ^map[string]IconEntryTextMap_t, key: string, out: ^IconEntryTextMap_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		// deep-copy into out (out is a fresh C++ struct)
+		icon_entry_text_map_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_striconentry_erase :: proc "c" (m: ^map[string]IconEntryTextMap_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		icon_entry_text_map_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_striconentry_clear :: proc "c" (m: ^map[string]IconEntryTextMap_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_text_map_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_striconentry_len :: proc "c" (m: ^map[string]IconEntryTextMap_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_striconentry_destroy :: proc "c" (m: ^map[string]IconEntryTextMap_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_text_map_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+// entry: returns a pointer to a FRESH deep-copied value (C++ owns it; the
+// caller must write it back via put). We cannot return a pointer into map
+// storage (the C++ side would mutate the shared members). operator[] in the
+// C++ class routes through get + put.
+@(export)
+barony_dynamic_map_striconentry_entry :: proc "c" (m: ^map[string]IconEntryTextMap_t, key: string, out: ^IconEntryTextMap_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]IconEntryTextMap_t)
+	}
+	k := intern_string(key)
+	if v, had := m[k]; had {
+		icon_entry_text_map_copy(out, &v)
+		return true
+	}
+	return false
+}
+
+@(export)
+barony_dynamic_map_striconentry_entries :: proc "c" (m: ^map[string]IconEntryTextMap_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]IconEntryTextMap_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		icon_entry_text_map_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

@@ -15,6 +15,7 @@
 #include "../game.hpp"
 #include "../draw.hpp"
 #include "../ui/Frame.hpp"
+#include "../odin/containers/dynamic_map.hpp"
 #include "../items.hpp"
 
 class Item;
@@ -1692,7 +1693,7 @@ public:
 		DynamicString path_active_hover = "";
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
-		std::map<std::string, std::pair<std::string, std::set<int>>> text_map;
+		DynamicMapIconEntryTextMap text_map;
 	};
 	static std::map<std::string, IconEntry> iconEntries;
 	static int followerWheelRadius;
@@ -1804,7 +1805,7 @@ struct CalloutRadialMenu
 		struct IconEntryText_t
 		{
 			DynamicString bannerText = "";
-			std::set<int> bannerHighlights;
+			DynamicSetI32 bannerHighlights;
 			DynamicString worldMsgSays = "";
 			DynamicString worldMsg = "";
 			DynamicString worldMsgEmote = "";
