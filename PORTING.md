@@ -132,6 +132,14 @@ first live members to leave std::string. ~25 call sites. Required:
 - **Odin `append` uses the array's STORED allocator** (`_reserve_dynamic_array_unsafe`
   falls back to context only if allocator field is nil). Setting `context =
   runtime.default_context()` at shim entry makes it valid.
+- **Odin `int` is 8 bytes on x64; C++ `int` is 4.** Any shim crossing the ABI
+  with ints must use `i32`/`i64` explicitly. `[^]int` pointer arithmetic strides
+  by 8 — writing `values[n]` lands at 2×n in a C++ `int[]` (silent garbage).
+  Affected: set/map entries shims, anything with `int` params. (Found in the
+  DynamicSet entries shim; same class as the i32str entries `[^][4]byte` bug.)
+- **`DynamicSet` (std::set replacement)** = Odin `map[T]struct{}` (same 32B
+  Raw_Map layout). `for key in s^` iterates KEYS (not values — values are
+  empty structs). i32/str families in dynamic_map.odin; `barony_dynamic_set_*`.
 - **Odin's `heap_allocator` is an aligned allocator** — `realloc`-grown memory
   is NOT compatible with it. C++ must never `realloc` a shared buffer.
 - **`std::vector::erase(it)` returns next iterator = same index** in index terms.
