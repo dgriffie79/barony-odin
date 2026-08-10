@@ -723,8 +723,8 @@ int initApp(char const * const title, int fullscreen)
 	return result;
 }
 
-std::map<int, std::string> Language::entries;
-std::map<int, std::string> Language::tmpEntries;
+DynamicMapI32Str Language::entries;
+DynamicMapI32Str Language::tmpEntries;
 DynamicString Language::languageCode;
 const char* Language::get(const int line)
 {

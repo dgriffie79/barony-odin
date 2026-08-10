@@ -732,3 +732,179 @@ barony_dynamic_map_strlightdef_entries :: proc "c" (m: ^map[string]LightDef, key
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// i32 -> string (map[[4]byte]string) -- ID-to-name maps (main.hpp entries,
+// mod_tools itemIDToString etc). Int keys are stored as [4]byte (no interning
+// needed); VALUES are map-owned deep copies (same ownership rule as strstr:
+// the C++ side wraps the value slot in DynamicString& and RAII-assigns, so
+// freeing must be safe).
+// ---------------------------------------------------------------------------
+
+// i32 -> string: init
+@(export)
+barony_dynamic_map_i32str_init :: proc "c" (m: ^map[[4]byte]string) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+// i32 -> string: put (deep-copies value into map-owned memory)
+@(export)
+barony_dynamic_map_i32str_put :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byte, value: string) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[[4]byte]string)
+	}
+	buf, _ := mem.alloc(len(value) + 1, align_of(u8))
+	if buf == nil {
+		return
+	}
+	if len(value) > 0 {
+		runtime.mem_copy(buf, raw_data(value), len(value))
+	}
+	(^u8)(uintptr(buf) + uintptr(len(value)))^ = 0
+	m[key^] = transmute(string)DynamicString{ data = buf, len = len(value) }
+}
+
+// i32 -> string: get -- DEEP-COPY into fresh memory (out is C++ DynamicString RAII)
+@(export)
+barony_dynamic_map_i32str_get :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byte, out: ^string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	value, ok := m[key^]
+	if !ok {
+		return false
+	}
+	if len(value) > 0 {
+		buf, _ := mem.alloc(len(value) + 1, align_of(u8))
+		if buf == nil {
+			return false
+		}
+		runtime.mem_copy(buf, raw_data(value), len(value))
+		(^u8)(uintptr(buf) + uintptr(len(value)))^ = 0
+		out^ = transmute(string)DynamicString{ data = buf, len = len(value) }
+	} else {
+		out^ = ""
+	}
+	return true
+}
+
+// i32 -> string: erase (frees the owned value)
+@(export)
+barony_dynamic_map_i32str_erase :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byte) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	value, ok := m[key^]
+	if ok {
+		if raw_data(value) != nil {
+			mem.free(raw_data(value))
+		}
+		runtime.delete_key(m, key^)
+	}
+	return ok
+}
+
+// i32 -> string: clear (frees all owned values)
+@(export)
+barony_dynamic_map_i32str_clear :: proc "c" (m: ^map[[4]byte]string) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for _, value in m^ {
+			if raw_data(value) != nil {
+				mem.free(raw_data(value))
+			}
+		}
+		clear(&m^)
+	}
+}
+
+// i32 -> string: len
+@(export)
+barony_dynamic_map_i32str_len :: proc "c" (m: ^map[[4]byte]string) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+// i32 -> string: destroy (frees all owned values + the map)
+@(export)
+barony_dynamic_map_i32str_destroy :: proc "c" (m: ^map[[4]byte]string) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for _, value in m^ {
+			if raw_data(value) != nil {
+				mem.free(raw_data(value))
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+// i32 -> string: entry (mutable value slot for operator[]; O(1))
+@(export)
+barony_dynamic_map_i32str_entry :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byte) -> ^string {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[[4]byte]string)
+	}
+	_, vp, _, err := map_entry(m, key^)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+// i32 -> string: entries (snapshot of keys + values)
+@(export)
+barony_dynamic_map_i32str_entries :: proc "c" (m: ^map[[4]byte]string, key_ptrs: [^][4]byte, val_ptrs: [^]rawptr, val_lens: [^]i32, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, value in m^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = key
+		val_ptrs[n] = raw_data(value)
+		val_lens[n] = i32(len(value))
+		n += 1
+	}
+	return n
+}
+
+// i32 -> string: find (non-mutating; DEEP-COPIES the value. out is a C++
+// DynamicString (RAII) that will free it, so we must not hand it a view into
+// map-owned storage.)
+@(export)
+barony_dynamic_map_i32str_find :: proc "c" (m: ^map[[4]byte]string, key: ^[4]byte, out_val: ^string, out_val_len: ^i32) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	value, ok := m[key^]
+	if !ok {
+		return false
+	}
+	if len(value) > 0 {
+		buf, _ := mem.alloc(len(value) + 1, align_of(u8))
+		if buf == nil {
+			return false
+		}
+		runtime.mem_copy(buf, raw_data(value), len(value))
+		(^u8)(uintptr(buf) + uintptr(len(value)))^ = 0
+		out_val^ = transmute(string)DynamicString{ data = buf, len = len(value) }
+	} else {
+		out_val^ = ""
+	}
+	out_val_len^ = i32(len(value))
+	return true
+}

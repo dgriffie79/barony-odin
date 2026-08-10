@@ -28,7 +28,7 @@
 
 //#include "player.hpp"
 
-std::map<int, std::string> modelFileNames;
+DynamicMapI32Str modelFileNames;
 Entity* selectedEntity[MAXPLAYERS] = { nullptr };
 Entity* lastSelectedEntity[MAXPLAYERS] = { nullptr };
 Sint32 mousex = 0, mousey = 0;

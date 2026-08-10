@@ -12608,10 +12608,10 @@ int Compendium_t::CompendiumMagic_t::numUnread = 0;
 int Compendium_t::CompendiumWorld_t::numUnread = 0;
 int Compendium_t::AchievementData_t::numUnread = 0;
 
-std::map<int, std::string> Compendium_t::Events_t::monsterIDToString;
-std::map<int, std::string> Compendium_t::Events_t::codexIDToString;
-std::map<int, std::string> Compendium_t::Events_t::worldIDToString;
-std::map<int, std::string> Compendium_t::Events_t::itemIDToString;
+DynamicMapI32Str Compendium_t::Events_t::monsterIDToString;
+DynamicMapI32Str Compendium_t::Events_t::codexIDToString;
+DynamicMapI32Str Compendium_t::Events_t::worldIDToString;
+DynamicMapI32Str Compendium_t::Events_t::itemIDToString;
 
 void Compendium_t::readContentsLang(std::string name, std::map<std::string, std::vector<std::pair<std::string, std::string>>>& contents,
 	DynamicMapStr& contentsMap)
@@ -17994,8 +17994,8 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 Uint8 Compendium_t::Events_t::clientSequence = 0;
 int Compendium_t::Events_t::previousCurrentLevel = 0;
 bool Compendium_t::Events_t::previousSecretlevel = false;
-std::map<int, std::string> Compendium_t::Events_t::clientDataStrings[MAXPLAYERS];
-std::map<int, std::map<int, std::string>> Compendium_t::Events_t::clientReceiveData;
+DynamicMapI32Str Compendium_t::Events_t::clientDataStrings[MAXPLAYERS];
+DynamicMapI32Str Compendium_t::Events_t::clientReceiveData[256];
 void Compendium_t::Events_t::sendClientDataOverNet(const int playernum)
 {
 	if ( multiplayer == SERVER ) {

@@ -10,6 +10,7 @@ See LICENSE for details.
 -------------------------------------------------------------------------------*/
 
 #pragma once
+#include "../odin/containers/dynamic_map.hpp"
 #include "main.hpp"
 #include "stat.hpp"
 #include "json.hpp"
@@ -4300,10 +4301,10 @@ struct Compendium_t
 		static DynamicMapI32 eventIdLookup;
 		static std::map<int, std::set<EventTags>> itemEventLookup;
 		static DynamicMapI32 monsterUniqueIDLookup;
-		static std::map<int, std::string> itemIDToString;
-		static std::map<int, std::string> monsterIDToString;
-		static std::map<int, std::string> codexIDToString;
-		static std::map<int, std::string> worldIDToString;
+		static DynamicMapI32Str itemIDToString;
+		static DynamicMapI32Str monsterIDToString;
+		static DynamicMapI32Str codexIDToString;
+		static DynamicMapI32Str worldIDToString;
 		static std::map<int, std::vector<EventTags>> itemDisplayedEventsList;
 		static std::map<int, std::vector<std::string>> itemDisplayedCustomEventsList;
 		static DynamicMapStr customEventsValues;
@@ -4334,8 +4335,8 @@ struct Compendium_t
 		static void onEndgameEvent(const int playernum, const bool tutorialend, const bool saveHighscore, const bool died);
 		static void sendClientDataOverNet(const int playernum);
 		static void updateEventsInMainLoop(const int playernum);
-		static std::map<int, std::string> clientDataStrings[MAXPLAYERS];
-		static std::map<int, std::map<int, std::string>> clientReceiveData;
+		static DynamicMapI32Str clientDataStrings[MAXPLAYERS];
+		static DynamicMapI32Str clientReceiveData[256];
 		static Uint8 clientSequence;
 		static const int kEventSpellOffset = 10000;
 		static const int kEventMonsterOffset = 1000;

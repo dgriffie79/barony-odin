@@ -55,6 +55,7 @@ char* stringStr(char* str1, const char* str2, size_t str1_size, size_t str2_size
 #include <list>
 #include <string>
 #include "../odin/containers/dynamic_string.hpp"
+#include "../odin/containers/dynamic_map.hpp"
 #include <vector>
 #include <array>
 //using namespace std; //For C++ strings //This breaks messages on certain systems, due to template<class _CharT> class std::__cxx11::messages
@@ -742,8 +743,8 @@ extern int minotaurlevel;
 struct Language
 {
 	static const char* get(const int line);
-	static std::map<int, std::string> entries;
-	static std::map<int, std::string> tmpEntries;
+	static DynamicMapI32Str entries;
+	static DynamicMapI32Str tmpEntries;
 	static void reset();
 	static int loadLanguage(char const* const lang, bool forceLoadBaseDirectory);
 	static int reloadLanguage();

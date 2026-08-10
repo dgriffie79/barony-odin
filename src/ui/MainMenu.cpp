@@ -9366,7 +9366,7 @@ bind_failed:
         return frame;
     }
 
-	static std::map<int, std::string> lobbyCustomScenarioClient;
+	static DynamicMapI32Str lobbyCustomScenarioClient;
 
 	static void disconnectFromLobby(bool informRemotes = true) {
 		if (informRemotes) {

@@ -6915,7 +6915,10 @@ void doNewGame(bool makeHighscore) {
 		treasure_room_generator.init();
 	}
 
-	Compendium_t::Events_t::clientReceiveData.clear();
+	for ( int c = 0; c < 256; ++c )
+	{
+		Compendium_t::Events_t::clientReceiveData[c].clear();
+	}
 	for ( int c = 0; c < MAXPLAYERS; ++c )
 	{
 		Compendium_t::Events_t::clientDataStrings[c].clear();
@@ -8366,7 +8369,10 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 	}
 
 
-	Compendium_t::Events_t::clientReceiveData.clear();
+	for ( int c = 0; c < 256; ++c )
+	{
+		Compendium_t::Events_t::clientReceiveData[c].clear();
+	}
 	for ( int c = 0; c < MAXPLAYERS; ++c )
 	{
 		GenericGUI[c].assistShrineGUI.onMainMenuEnd();

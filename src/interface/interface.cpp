@@ -29068,7 +29068,7 @@ std::vector<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
 std::map<std::string, CalloutRadialMenu::IconEntry> CalloutRadialMenu::iconEntries;
 std::map<std::string, CalloutRadialMenu::WorldIconEntry_t> CalloutRadialMenu::worldIconEntries;
 DynamicMapStr CalloutRadialMenu::helpDescriptors;
-std::map<int, std::string> CalloutRadialMenu::worldIconIDToEntryKey;
+DynamicMapI32Str CalloutRadialMenu::worldIconIDToEntryKey;
 int CalloutRadialMenu::followerWheelButtonThickness = 70;
 int CalloutRadialMenu::followerWheelRadius = 140;
 int CalloutRadialMenu::followerWheelFrameOffsetX = 0;

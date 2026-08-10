@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+#include "../odin/containers/dynamic_map.hpp"
+
 #include "draw.hpp"
 
 static const unsigned int MAXWIDTH = 2000;
@@ -21,7 +23,7 @@ static const unsigned int MAXHEIGHT = 2000;
 static const unsigned int MINWIDTH = 1;
 static const unsigned int MINHEIGHT =  1;
 
-extern std::map<int, std::string> modelFileNames;
+extern DynamicMapI32Str modelFileNames;
 extern int drawlayer, drawx, drawy, odrawx, odrawy;
 extern int alllayers;
 extern int scroll;
