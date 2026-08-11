@@ -818,3 +818,10 @@ public:
     Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
     Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
 };
+
+// pair<int,int> element helpers (8-byte POD pairs)
+typedef std::pair<int, int> int_pair_t;
+inline int_pair_t* dynarray_pair_at(DynamicArray& a, int64_t i) { return (int_pair_t*)a.data + i; }
+inline const int_pair_t* dynarray_pair_at(const DynamicArray& a, int64_t i) { return (const int_pair_t*)a.data + i; }
+inline int64_t dynarray_pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(int_pair_t); }
+inline void dynarray_pair_push(DynamicArray& a, const int_pair_t& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(int_pair_t)); }

@@ -4964,42 +4964,50 @@ void SaveGameInfo::computeHash(const int playernum, Uint32& hash)
 		hash += djb2Hash(const_cast<char*>(pair.second.c_str()));
 	}
 
-	for ( auto& val : players[playernum].itemDegradeRNG )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].itemDegradeRNG); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].itemDegradeRNG, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].escalatingRngRolls )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].escalatingRngRolls); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].escalatingRngRolls, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].escalatingSpellRngRolls )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].escalatingSpellRngRolls); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].escalatingSpellRngRolls, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].appraisal_item_progress )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].appraisal_item_progress); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].appraisal_item_progress, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].learnedSpells )
+	for ( int64_t _vi = 0; _vi < players[playernum].learnedSpells.size(); ++_vi )
 	{
+		auto& val = players[playernum].learnedSpells[_vi];
 		hash += (Uint32)((Uint32)val << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].sustainedSpellIDCounter )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].sustainedSpellIDCounter); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].sustainedSpellIDCounter, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].ducksInARow )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].ducksInARow); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].ducksInARow, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
-	for ( auto& val : players[playernum].favoriteBooksAchievement )
+	for ( int64_t _vi = 0; _vi < dynarray_pair_size(players[playernum].favoriteBooksAchievement); ++_vi )
 	{
+		auto& val = *dynarray_pair_at(players[playernum].favoriteBooksAchievement, _vi);
 		hash += (Uint32)((Uint32)val.first << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)val.second << (shift % 32)); ++shift;
 	}
@@ -5258,7 +5266,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			}
 			for ( auto& pair : ::players[c]->mechanics.itemDegradeRng )
 			{
-				player.itemDegradeRNG.push_back(pair);
+				dynarray_pair_push(player.itemDegradeRNG, pair);
 			}
 			for ( auto learnedSpell : ::players[c]->mechanics.learnedSpells )
 			{
@@ -5266,23 +5274,23 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			}
 			for ( auto& pair : ::players[c]->mechanics.sustainedSpellIDCounter )
 			{
-				player.sustainedSpellIDCounter.push_back(pair);
+				dynarray_pair_push(player.sustainedSpellIDCounter, pair);
 			}
 			for ( auto& pair : ::players[c]->mechanics.ducksInARow )
 			{
-				player.ducksInARow.push_back(pair);
+				dynarray_pair_push(player.ducksInARow, pair);
 			}
 			for ( auto& pair : ::players[c]->mechanics.favoriteBooksAchievement )
 			{
-				player.favoriteBooksAchievement.push_back(pair);
+				dynarray_pair_push(player.favoriteBooksAchievement, pair);
 			}
 			for ( auto& pair : ::players[c]->mechanics.escalatingRngRolls )
 			{
-				player.escalatingRngRolls.push_back(pair);
+				dynarray_pair_push(player.escalatingRngRolls, pair);
 			}
 			for ( auto& pair : ::players[c]->mechanics.escalatingSpellRngRolls )
 			{
-				player.escalatingSpellRngRolls.push_back(pair);
+				dynarray_pair_push(player.escalatingSpellRngRolls, pair);
 			}
 			player.sustainedSpellMPUsedSorcery = ::players[c]->mechanics.sustainedSpellMPUsedSorcery;
 			player.sustainedSpellMPUsedMysticism = ::players[c]->mechanics.sustainedSpellMPUsedMysticism;
@@ -5376,7 +5384,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				if ( ::players[c]->inventoryUI.appraisal.appraisalProgressionItems.find(item->uid)
 					!= ::players[c]->inventoryUI.appraisal.appraisalProgressionItems.end() )
 				{
-					player.appraisal_item_progress.push_back(std::make_pair(player.stats.inventory.size(), 
+					dynarray_pair_push(player.appraisal_item_progress, std::make_pair(player.stats.inventory.size(), 
 						::players[c]->inventoryUI.appraisal.appraisalProgressionItems[item->uid]));
 				}
 				player.stats.inventory.push_back(
@@ -6061,8 +6069,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 	std::map<int, int> appraisalMap;
 	if ( checkAppraisalProgress )
 	{
-		for ( auto& pair : info.players[player].appraisal_item_progress )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].appraisal_item_progress); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].appraisal_item_progress, _vi);
 			appraisalMap[pair.first] = pair.second;
 		}
 	}
@@ -6277,32 +6286,39 @@ int loadGame(int player, const SaveGameInfo& info) {
 		mechanics.baseSpellLevelUpProcs.clear();
 		mechanics.escalatingRngRolls.clear();
 		mechanics.escalatingSpellRngRolls.clear();
-		for ( auto& pair : info.players[player].itemDegradeRNG )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].itemDegradeRNG); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].itemDegradeRNG, _vi);
 			mechanics.itemDegradeRng[pair.first] = pair.second;
 		}
-		for ( auto learnedSpell : info.players[player].learnedSpells )
+		for ( int64_t _vi = 0; _vi < info.players[player].learnedSpells.size(); ++_vi )
 		{
+			auto& learnedSpell = info.players[player].learnedSpells[_vi];
 			mechanics.learnedSpells.insert(learnedSpell);
 		}
-		for ( auto& duck : info.players[player].ducksInARow )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].ducksInARow); ++_vi )
 		{
+			auto& duck = *dynarray_pair_at(info.players[player].ducksInARow, _vi);
 			mechanics.ducksInARow.push_back(duck);
 		}
-		for ( auto& pair : info.players[player].favoriteBooksAchievement )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].favoriteBooksAchievement); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].favoriteBooksAchievement, _vi);
 			mechanics.favoriteBooksAchievement[pair.first] = pair.second;
 		}
-		for ( auto& pair : info.players[player].sustainedSpellIDCounter )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].sustainedSpellIDCounter); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].sustainedSpellIDCounter, _vi);
 			mechanics.sustainedSpellIDCounter[pair.first] = pair.second;
 		}
-		for ( auto& pair : info.players[player].escalatingRngRolls )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].escalatingRngRolls); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].escalatingRngRolls, _vi);
 			mechanics.escalatingRngRolls[pair.first] = pair.second;
 		}
-		for ( auto& pair : info.players[player].escalatingSpellRngRolls )
+		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].escalatingSpellRngRolls); ++_vi )
 		{
+			auto& pair = *dynarray_pair_at(info.players[player].escalatingSpellRngRolls, _vi);
 			mechanics.escalatingSpellRngRolls[pair.first] = pair.second;
 		}
 		mechanics.sustainedSpellMPUsedSorcery = 0;

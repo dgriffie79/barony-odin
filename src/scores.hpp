@@ -553,14 +553,14 @@ struct SaveGameInfo {
 		};
 		std::vector<std::pair<int, PlayerRaceHostility_t>> shopkeeperHostility;
 		std::vector<std::pair<std::string, std::vector<int>>> compendium_item_events;
-		std::vector<std::pair<int, int>> itemDegradeRNG;
-		std::vector<std::pair<int, int>> escalatingRngRolls;
-		std::vector<std::pair<int, int>> escalatingSpellRngRolls;
-		std::vector<std::pair<int, int>> appraisal_item_progress;
-		std::vector<int> learnedSpells;
-		std::vector<std::pair<int, int>> sustainedSpellIDCounter;
-		std::vector<std::pair<int, int>> ducksInARow;
-		std::vector<std::pair<int, int>> favoriteBooksAchievement;
+		DynamicArray itemDegradeRNG;  // vector<pair<int,int>>
+		DynamicArray escalatingRngRolls;  // vector<pair<int,int>>
+		DynamicArray escalatingSpellRngRolls;  // vector<pair<int,int>>
+		DynamicArray appraisal_item_progress;  // vector<pair<int,int>>
+		DynamicArrayS32 learnedSpells;
+		DynamicArray sustainedSpellIDCounter;  // vector<pair<int,int>>
+		DynamicArray ducksInARow;  // vector<pair<int,int>>
+		DynamicArray favoriteBooksAchievement;  // vector<pair<int,int>>
 		int sustainedSpellMPUsedSorcery = 0;
 		int sustainedSpellMPUsedMysticism = 0;
 		int sustainedSpellMPUsedThaumaturgy = 0;
