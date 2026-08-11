@@ -1674,19 +1674,8 @@ public:
 	};
 	static std::vector<PanelEntry> panelEntries;
 	static std::vector<PanelEntry> panelEntriesAlternate;
-	struct IconEntry
-	{
-		DynamicString name = "";
-		int id = -1;
-		DynamicString path = "";
-		DynamicString path_hover = "";
-		DynamicString path_active = "";
-		DynamicString path_active_hover = "";
-		int icon_offsetx = 0;
-		int icon_offsety = 0;
-		DynamicMapIconEntryTextMap text_map;
-	};
-	static std::map<std::string, IconEntry> iconEntries;
+	typedef IconEntry_tMirror IconEntry;
+	static DynamicMapIconEntryList iconEntries;
 	static int followerWheelRadius;
 	static int followerWheelButtonThickness;
 	static int followerWheelFrameOffsetX;

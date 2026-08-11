@@ -1668,7 +1668,7 @@ bool FollowerRadialMenu::followerMenuIsOpen()
 
 std::vector<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntries;
 std::vector<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntriesAlternate;
-std::map<std::string, FollowerRadialMenu::IconEntry> FollowerRadialMenu::iconEntries;
+DynamicMapIconEntryList FollowerRadialMenu::iconEntries;
 int FollowerRadialMenu::followerWheelButtonThickness = 70;
 int FollowerRadialMenu::followerWheelRadius = 140;
 int FollowerRadialMenu::followerWheelFrameOffsetX = 0;
@@ -2075,7 +2075,7 @@ void setFollowerBannerTextFormatted(const int player, Field* field, Uint32 color
 void setFollowerBannerText(const int player, Field* field, const char* iconName, const char* textKey, Uint32 color)
 {
 	if ( !field ) { return; }
-	if ( FollowerMenu[player].iconEntries.find(iconName) == FollowerMenu[player].iconEntries.end() )
+	if ( !FollowerMenu[player].iconEntries.contains(iconName) )
 	{
 		return;
 	}
