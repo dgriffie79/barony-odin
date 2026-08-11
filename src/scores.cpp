@@ -4927,31 +4927,37 @@ void SaveGameInfo::computeHash(const int playernum, Uint32& hash)
 		{
 			hash += (Uint32)((Uint32)k << (shift % 32)); ++shift;
 		}
-		for ( auto& pair : stats->player_equipment )
+		for ( int64_t _pe = 0; _pe < dynarray_pair_size<std::pair<DynamicString, Uint32>>(stats->player_equipment); ++_pe )
 		{
+			auto& pair = *dynarray_pair_at<std::pair<DynamicString, Uint32>>(stats->player_equipment, _pe);
 			hash += (Uint32)((Uint32)pair.second << (shift % 32)); ++shift;
 		}
-		for ( auto& pair : stats->npc_equipment )
+		for ( int64_t _ne = 0; _ne < dynarray_pair_size<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(stats->npc_equipment); ++_ne )
 		{
+			auto& pair = *dynarray_pair_at<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(stats->npc_equipment, _ne);
 			pair.second.computeHash(hash, shift);
 		}
-		for ( auto& item : stats->inventory )
+		for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(stats->inventory); ++_inv )
 		{
+			auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(stats->inventory, _inv);
 			item.computeHash(hash, shift);
 		}
-		for ( auto& item : stats->void_chest_inventory )
+		for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(stats->void_chest_inventory); ++_inv )
 		{
+			auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(stats->void_chest_inventory, _inv);
 			item.computeHash(hash, shift);
 		}
-		for ( auto& bag : stats->player_lootbags )
+		for ( int64_t _lb = 0; _lb < dynarray_pair_size<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(stats->player_lootbags); ++_lb )
 		{
+			auto& bag = *dynarray_pair_at<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(stats->player_lootbags, _lb);
 			hash += (Uint32)((Uint32)bag.first << (shift % 32)); ++shift;
 			hash += (Uint32)((Uint32)bag.second.spawn_x << (shift % 32)); ++shift;
 			hash += (Uint32)((Uint32)bag.second.spawn_y << (shift % 32)); ++shift;
 			hash += (Uint32)((Uint32)bag.second.looted << (shift % 32)); ++shift;
 			hash += (Uint32)((Uint32)bag.second.spawnedOnGround << (shift % 32)); ++shift;
-			for ( auto& item : bag.second.items )
+			for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(bag.second.items); ++_inv )
 			{
+				auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(bag.second.items, _inv);
 				item.computeHash(hash, shift);
 			}
 		}
@@ -5251,8 +5257,8 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			//player.stats.attributes = ; // players have no key/value table
 			for ( auto& h : ShopkeeperPlayerHostility.playerHostility[c] )
 			{
-				player.shopkeeperHostility.push_back(std::make_pair(h.first, SaveGameInfo::Player::PlayerRaceHostility_t()));
-				auto& h2 = player.shopkeeperHostility.at(player.shopkeeperHostility.size() - 1);
+				dynarray_pair_push<std::pair<int, SaveGameInfo::Player::PlayerRaceHostility_t>>(player.shopkeeperHostility, std::make_pair(h.first, SaveGameInfo::Player::PlayerRaceHostility_t()));
+				auto& h2 = *dynarray_pair_at<std::pair<int, SaveGameInfo::Player::PlayerRaceHostility_t>>(player.shopkeeperHostility, dynarray_pair_size<std::pair<int, SaveGameInfo::Player::PlayerRaceHostility_t>>(player.shopkeeperHostility) - 1);
 				h2.second.wantedLevel = h.second.wantedLevel;
 				h2.second.playerRace = h.second.playerRace;
 				h2.second.sex = h.second.sex;
@@ -5312,17 +5318,17 @@ int SaveGameInfo::populateFromSession(const int playernum)
 
 			for ( auto& loot : stats[c]->player_lootbags )
 			{
-				player.stats.player_lootbags.push_back(std::make_pair(loot.first,
+				dynarray_pair_push<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(player.stats.player_lootbags, std::make_pair(loot.first,
 					SaveGameInfo::Player::stat_t::lootbag_t(
 						loot.second.spawn_x,
 						loot.second.spawn_y,
 						loot.second.spawnedOnGround,
 						loot.second.looted
 					)));
-				auto& loot2 = player.stats.player_lootbags.at(player.stats.player_lootbags.size() - 1);
+				auto& loot2 = *dynarray_pair_at<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(player.stats.player_lootbags, dynarray_pair_size<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(player.stats.player_lootbags) - 1);
 				for ( auto& item : loot.second.items )
 				{
-					loot2.second.items.push_back(SaveGameInfo::Player::stat_t::item_t(
+					dynarray_push<SaveGameInfo::Player::stat_t::item_t>(loot2.second.items, SaveGameInfo::Player::stat_t::item_t(
 						(Uint32)item.type,
 						(Uint32)item.status,
 						item.appearance,
@@ -5351,7 +5357,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				// if this is a local player, we have their inventory, and can store
 				// item indexes in the player_equipment table
 				for ( auto& slot : player_slots ) {
-					player.stats.player_equipment.push_back(std::make_pair(slot.first,
+					dynarray_pair_push<std::pair<DynamicString, Uint32>>(player.stats.player_equipment, std::make_pair(DynamicString(slot.first.c_str()),
 						slot.second ? list_Index(slot.second->node) : UINT32_MAX));
 				}
 			}
@@ -5361,7 +5367,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				// restore later
 				for ( auto& slot : player_slots ) {
 					if ( slot.second ) {
-						player.stats.npc_equipment.push_back(std::make_pair(
+						dynarray_pair_push<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(player.stats.npc_equipment, std::make_pair(
 							slot.first, SaveGameInfo::Player::stat_t::item_t{
 								(Uint32)slot.second->type,
 								(Uint32)slot.second->status,
@@ -5383,10 +5389,10 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				if ( ::players[c]->inventoryUI.appraisal.appraisalProgressionItems.find(item->uid)
 					!= ::players[c]->inventoryUI.appraisal.appraisalProgressionItems.end() )
 				{
-					dynarray_pair_push(player.appraisal_item_progress, std::make_pair(player.stats.inventory.size(), 
+					dynarray_pair_push(player.appraisal_item_progress, std::make_pair(dynarray_size<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory), 
 						::players[c]->inventoryUI.appraisal.appraisalProgressionItems[item->uid]));
 				}
-				player.stats.inventory.push_back(
+				dynarray_push<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory,
 					SaveGameInfo::Player::stat_t::item_t{
 					(Uint32)item->type,
 					(Uint32)item->status,
@@ -5403,7 +5409,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			for ( node_t* node = stats[c]->void_chest_inventory.first;
 				node != nullptr; node = node->next ) {
 				auto item = (Item*)node->element;
-				player.stats.void_chest_inventory.push_back(
+				dynarray_push<SaveGameInfo::Player::stat_t::item_t>(player.stats.void_chest_inventory,
 					SaveGameInfo::Player::stat_t::item_t{
 					(Uint32)item->type,
 					(Uint32)item->status,
@@ -5460,7 +5466,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					DynamicMapStr::Entry attrEntries[64];
 					int32_t attrCount = follower->attributes.entryList(attrEntries, 64);
 					for ( int32_t ai = 0; ai < attrCount; ++ai ) {
-						stats.attributes.push_back(std::make_pair(std::string(attrEntries[ai].key, attrEntries[ai].key_len), std::string(attrEntries[ai].value, attrEntries[ai].value_len)));
+						dynarray_pair_push<std::pair<DynamicString, DynamicString>>(stats.attributes, std::make_pair(DynamicString((const char*)attrEntries[ai].key, attrEntries[ai].key_len), DynamicString((const char*)attrEntries[ai].value, attrEntries[ai].value_len)));
 					}
 
 					// equipment slots
@@ -5478,7 +5484,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					};
 					for ( auto& slot : npc_slots ) {
 						if ( slot.second ) {
-							stats.npc_equipment.push_back(std::make_pair(
+							dynarray_pair_push<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(stats.npc_equipment, std::make_pair(
 								slot.first, SaveGameInfo::Player::stat_t::item_t{
 									(Uint32)slot.second->type,
 									(Uint32)slot.second->status,
@@ -5496,7 +5502,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					for ( node_t* node = follower->inventory.first;
 						node != nullptr; node = node->next ) {
 						auto item = (Item*)node->element;
-						stats.inventory.push_back(
+						dynarray_push<SaveGameInfo::Player::stat_t::item_t>(stats.inventory,
 							SaveGameInfo::Player::stat_t::item_t{
 							(Uint32)item->type,
 							(Uint32)item->status,
@@ -5559,8 +5565,9 @@ int SaveGameInfo::getTotalScore(const int playernum, const int victory)
 	Player::stat_t* stats = &players[playernum].stats;
 	int amount = 0;
 
-	for ( auto& item : stats->inventory )
+	for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(stats->inventory); ++_inv )
 	{
+		auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(stats->inventory, _inv);
 		amount += items[item.type].gold_value;
 	}
 	amount += stats->GOLD;
@@ -5782,8 +5789,9 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 	}
 
 	rapidjson::Value inventory(rapidjson::kArrayType);
-	for ( const auto& item : myStats.inventory )
+	for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(myStats.inventory); ++_inv )
 	{
+		auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(myStats.inventory, _inv);
 		rapidjson::Value itemArray(rapidjson::kArrayType);
 		itemArray.PushBack((int)item.type, d.GetAllocator());
 		itemArray.PushBack((int)item.status, d.GetAllocator());
@@ -5800,12 +5808,13 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 
 	{
 		// equip slots
-		for ( const auto& equipment : player.stats.player_equipment )
+		for ( int64_t _pe = 0; _pe < dynarray_pair_size<std::pair<DynamicString, Uint32>>(player.stats.player_equipment); ++_pe )
 		{
+			auto& equipment = *dynarray_pair_at<std::pair<DynamicString, Uint32>>(player.stats.player_equipment, _pe);
 			rapidjson::Value itemArray(rapidjson::kArrayType);
-			if ( equipment.second != UINT32_MAX && equipment.second < player.stats.inventory.size() )
+			if ( equipment.second != UINT32_MAX && equipment.second < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory) )
 			{
-				auto& item = player.stats.inventory[equipment.second];
+				auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory, equipment.second);
 				itemArray.PushBack((int)item.type, d.GetAllocator());
 				itemArray.PushBack((int)item.status, d.GetAllocator());
 				itemArray.PushBack((int)item.beatitude, d.GetAllocator());
@@ -6041,16 +6050,18 @@ int loadGame(int player, const SaveGameInfo& info) {
 		stats[statsPlayer]->MISC_FLAGS[c] = p.MISC_FLAGS[c];
 	}
 	//stats[statsPlayer]->attributes = p.attributes; // skip attributes for now
-	for ( auto& loot : p.player_lootbags )
+	for ( int64_t _lb = 0; _lb < dynarray_pair_size<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(p.player_lootbags); ++_lb )
 	{
+		auto& loot = *dynarray_pair_at<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(p.player_lootbags, _lb);
 		auto& player_lootbag = stats[statsPlayer]->player_lootbags[loot.first];
 		player_lootbag.spawn_x = loot.second.spawn_x;
 		player_lootbag.spawn_y = loot.second.spawn_y;
 		player_lootbag.spawnedOnGround = loot.second.spawnedOnGround;
 		player_lootbag.looted = loot.second.looted;
 
-		for ( auto& _item : loot.second.items )
+		for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(loot.second.items); ++_inv )
 		{
+			auto& _item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(loot.second.items, _inv);
 			player_lootbag.items.push_back(Item());
 			auto& item = player_lootbag.items.back();
 
@@ -6077,7 +6088,8 @@ int loadGame(int player, const SaveGameInfo& info) {
 
 	// inventory
 	int inventory_index = -1;
-	for (auto& item : p.inventory) {
+	for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(p.inventory); ++_inv ) {
+		auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(p.inventory, _inv);
 		++inventory_index;
 		ItemType type = static_cast<ItemType>(item.type);
 		Status status = static_cast<Status>(item.status);
@@ -6097,7 +6109,8 @@ int loadGame(int player, const SaveGameInfo& info) {
 	}
 
 	// void chest inventory
-	for ( auto& item : p.void_chest_inventory ) {
+	for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(p.void_chest_inventory); ++_inv ) {
+		auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(p.void_chest_inventory, _inv);
 		ItemType type = static_cast<ItemType>(item.type);
 		Status status = static_cast<Status>(item.status);
 		Sint16 beatitude = item.beatitude;
@@ -6127,8 +6140,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 		// if this is a local player, we have their inventory, and can
 		// restore equipment using item indexes in the player_equipment table
 
-		for (auto& item : p.player_equipment) {
-			auto find = slots.find(item.first);
+		for ( int64_t _pe = 0; _pe < dynarray_pair_size<std::pair<DynamicString, Uint32>>(p.player_equipment); ++_pe ) {
+			auto& item = *dynarray_pair_at<std::pair<DynamicString, Uint32>>(p.player_equipment, _pe);
+			auto find = slots.find(item.first.c_str());
 			if (find != slots.end()) {
 				auto& slot = find->second;
 				auto node = list_Node(&stats[statsPlayer]->inventory, item.second);
@@ -6142,8 +6156,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 	} else {
 		// if this is not a local player, we don't have the inventory.
 		// we must restore whole items and assign them directly to each slot
-		for (auto& item : p.npc_equipment) {
-			auto find = slots.find(item.first);
+		for ( int64_t _ne = 0; _ne < dynarray_pair_size<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(p.npc_equipment); ++_ne ) {
+			auto& item = *dynarray_pair_at<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(p.npc_equipment, _ne);
+			auto find = slots.find(item.first.c_str());
 			if (find != slots.end()) {
 				auto& slot = find->second;
 				ItemType type = (ItemType)item.second.type;
@@ -6223,8 +6238,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 	{
 		auto& h = ShopkeeperPlayerHostility.playerHostility[statsPlayer];
 		h.clear();
-		for ( auto& hostility : info.players[player].shopkeeperHostility )
+		for ( int64_t _sh = 0; _sh < dynarray_pair_size<std::pair<int, SaveGameInfo::Player::PlayerRaceHostility_t>>(info.players[player].shopkeeperHostility); ++_sh )
 		{
+			auto& hostility = *dynarray_pair_at<std::pair<int, SaveGameInfo::Player::PlayerRaceHostility_t>>(info.players[player].shopkeeperHostility, _sh);
 			h[(Uint32)hostility.first] = ShopkeeperPlayerHostility_t::PlayerRaceHostility_t();
 			h[(Uint32)hostility.first].wantedLevel = (ShopkeeperPlayerHostility_t::WantedLevel)hostility.second.wantedLevel;
 			if ( info.game_version < 412 )
@@ -6438,7 +6454,8 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 			}
 
 			// read follower attributes
-			for (auto& attr : follower.attributes) {
+			for ( int64_t _at = 0; _at < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(follower.attributes); ++_at ) {
+				auto& attr = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(follower.attributes, _at);
 				char key[32];
 				char value[32];
 				stringCopy(key, attr.first.c_str(), sizeof(key), attr.first.size());
@@ -6447,7 +6464,8 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 			}
 
 			// read follower inventory
-			for (auto& item : follower.inventory) {
+			for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(follower.inventory); ++_inv ) {
+				auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(follower.inventory, _inv);
 				ItemType type = (ItemType)item.type;
 				Status status = (Status)item.status;
 				Sint16 beatitude = item.beatitude;
@@ -6473,8 +6491,9 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 				{"ring", stats->ring},
 				{"mask", stats->mask},
 			};
-			for (auto& item : follower.npc_equipment) {
-				auto find = slots.find(item.first);
+			for ( int64_t _ne = 0; _ne < dynarray_pair_size<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(follower.npc_equipment); ++_ne ) {
+				auto& item = *dynarray_pair_at<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(follower.npc_equipment, _ne);
+				auto find = slots.find(item.first.c_str());
 				if (find != slots.end()) {
 					auto& slot = find->second;
 					ItemType type = (ItemType)item.second.type;

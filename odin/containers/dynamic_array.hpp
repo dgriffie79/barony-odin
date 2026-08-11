@@ -317,6 +317,8 @@ using DynamicArrayEntryVar = DynamicArrayT<EntryVariable_tMirror>;
 template <typename P>
 inline P* dynarray_pair_at(DynamicArray& a, int64_t i) { return reinterpret_cast<P*>(a.data) + i; }
 template <typename P>
+inline const P* dynarray_pair_at(const DynamicArray& a, int64_t i) { return reinterpret_cast<const P*>(a.data) + i; }
+template <typename P>
 inline int64_t dynarray_pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(P); }
 template <typename P>
 inline void dynarray_pair_push(DynamicArray& a, const P& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(P)); }

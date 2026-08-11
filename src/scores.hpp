@@ -481,7 +481,7 @@ struct SaveGameInfo {
 	int hiscore_killed_monster = 0;
 	int hiscore_killed_item = 0;
 	bool hiscore_dummy_loading = false;
-    std::vector<int> players_connected;
+    DynamicArrayS32 players_connected;
 
 	int populateFromSession(const int playernum);
 	int getTotalScore(const int playernum, const int victory);
@@ -551,7 +551,7 @@ struct SaveGameInfo {
 				return true;
 			}
 		};
-		std::vector<std::pair<int, PlayerRaceHostility_t>> shopkeeperHostility;
+		DynamicArray shopkeeperHostility;  // vector<pair<int,PlayerRaceHostility_t>> (POD)
 		std::vector<std::pair<std::string, std::vector<int>>> compendium_item_events;
 		DynamicArray itemDegradeRNG;  // vector<pair<int,int>>
 		DynamicArray escalatingRngRolls;  // vector<pair<int,int>>
@@ -636,7 +636,7 @@ struct SaveGameInfo {
 				int spawn_y = 0;
 				bool spawnedOnGround = false;
 				bool looted = false;
-				std::vector<item_t> items;
+				DynamicArray items;  // vector<item_t> (POD)
 				bool serialize(FileInterface* fp) {
 					fp->property("spawn_x", spawn_x);
 					fp->property("spawn_y", spawn_y);
@@ -670,12 +670,12 @@ struct SaveGameInfo {
 			DynamicArrayS32 EFFECTS_TIMERS;
 			DynamicArrayS32 EFFECTS_ACCRETION_TIME;
 			DynamicArrayS32 MISC_FLAGS;
-			std::vector<std::pair<std::string, std::string>> attributes;
-			std::vector<std::pair<std::string, Uint32>> player_equipment;
-			std::vector<std::pair<std::string, item_t>> npc_equipment;
-			std::vector<item_t> inventory;
-			std::vector<item_t> void_chest_inventory;
-			std::vector<std::pair<Uint32, lootbag_t>> player_lootbags;
+			DynamicArray attributes;  // vector<pair<DynamicString,DynamicString>>
+			DynamicArray player_equipment;  // vector<pair<DynamicString,Uint32>>
+			DynamicArray npc_equipment;  // vector<pair<DynamicString,item_t>>
+			DynamicArray inventory;  // vector<item_t> (POD)
+			DynamicArray void_chest_inventory;  // vector<item_t> (POD)
+			DynamicArray player_lootbags;  // vector<pair<Uint32,lootbag_t>> (lootbag owns items)
 
 			bool serialize(FileInterface* fp) {
 				fp->property("name", name);
