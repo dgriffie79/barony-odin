@@ -18334,9 +18334,10 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 				if ( !slotFrame->isDisabled() && slotFrame->capturesMouse() )
 				{
 					int index = 0;
-					for ( auto& entry : recipes.recipeList )
+					for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList); ++_re )
 					{
-						if ( entry.x == getSelectedAlchemySlotX() && entry.y == getSelectedAlchemySlotY()
+						auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, _re);
+											if ( entry.x == getSelectedAlchemySlotX() && entry.y == getSelectedAlchemySlotY()
 							&& !hideRecipeFromList(entry.resultItem.type) )
 						{
 							setItemDisplayNameAndPrice(&entry.resultItem, true, true);
@@ -18811,9 +18812,10 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 				&& animRecipeAutoAddToSlot2Uid == 0 )
 			{
 				int index = 0;
-				for ( auto& entry : recipes.recipeList )
+				for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList); ++_re )
 				{
-					if ( entry.x == getSelectedAlchemySlotX() && entry.y == getSelectedAlchemySlotY()
+					auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, _re);
+									if ( entry.x == getSelectedAlchemySlotX() && entry.y == getSelectedAlchemySlotY()
 						&& !hideRecipeFromList(entry.resultItem.type) )
 					{
 						if ( recipes.activateRecipeIndex == index )
@@ -18979,9 +18981,10 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 				buildRecipeList(playernum);
 				int index = 0;
 				bool autofilled = false;
-				for ( auto& entry : recipes.recipeList )
+				for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList); ++_re )
 				{
-					if ( !hideRecipeFromList(entry.resultItem.type) )
+					auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, _re);
+									if ( !hideRecipeFromList(entry.resultItem.type) )
 					{
 						if ( entry.dummyPotion1.type == oldPotion1Type && entry.dummyPotion2.type == oldPotion2Type )
 						{
@@ -19906,9 +19909,10 @@ void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceBrew(Item* item, co
 		{
 			recipeMissingMaterials = true;
 			itemActionType = ALCHEMY_ACTION_UNIDENTIFIED_POTION;
-			for ( auto& entry : recipes.recipeList )
+			for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList); ++_re )
 			{
-				if ( &entry.resultItem == item )
+				auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, _re);
+							if ( &entry.resultItem == item )
 				{
 					if ( entry.basePotionUid != 0 && entry.secondaryPotionUid != 0 )
 					{
@@ -20040,9 +20044,10 @@ void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceBrew(Item* item, co
 			{
 				/*if ( !inputs.getVirtualMouse(player)->draw_cursor )
 				{
-					for ( auto& entry : recipes.recipeList )
+					for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList); ++_re )
 					{
-						if ( &entry.resultItem == item )
+						auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, _re);
+											if ( &entry.resultItem == item )
 						{
 							if ( recipes.activateRecipeIndex == index )
 							{
@@ -20401,7 +20406,7 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::closeRecipePanel()
 	bool wasOpen = bOpen;
 	bOpen = false;
 	bFirstTimeSnapCursor = false;
-	recipeList.clear();
+	barony_dynamic_array_clear(&recipeList);
 	activateRecipeIndex = -1;
 	alchemy.animRecipeAutoAddToSlot1Uid = 0;
 	alchemy.animRecipeAutoAddToSlot2Uid = 0;
@@ -20424,8 +20429,8 @@ void buildRecipeList(const int player)
 	int entryx = 0;
 	int entryy = 0;
 
-	auto oldSize = recipes.recipeList.size();
-	recipes.recipeList.clear();
+	auto oldSize = dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList);
+	barony_dynamic_array_clear(&recipes.recipeList);
 
 	std::unordered_map<int, std::pair<std::vector<Item*>, int>> inventoryPotions;
 	bool hasEmptyBottle = false;
@@ -20624,8 +20629,8 @@ void buildRecipeList(const int player)
 
 		if ( !hideRecipe )
 		{
-			recipes.recipeList.push_back(GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t());
-			auto& recipe = recipes.recipeList.at(recipes.recipeList.size() - 1);
+			dynarray_push<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t());
+			auto& recipe = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList, dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList) - 1);
 			recipe.resultItem.type = (ItemType)entry.first;
 			recipe.resultItem.count = 0;
 			if ( inventoryPotions.find(recipe.resultItem.type) != inventoryPotions.end() )
@@ -20712,7 +20717,7 @@ void buildRecipeList(const int player)
 			}
 		}
 	}
-	if ( oldSize != recipes.recipeList.size() )
+	if ( oldSize != dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipes.recipeList) )
 	{
 		recipes.activateRecipeIndex = -1;
 	}
@@ -20854,7 +20859,7 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::updateRecipePanel()
 
 	auto title1 = baseFrame->findField("recipe title 1");
 	char titleBuf[64] = "";
-	snprintf(titleBuf, sizeof(titleBuf), Language::get(4181), recipeList.size());
+	snprintf(titleBuf, sizeof(titleBuf), Language::get(4181), dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList));
 	title1->setText(titleBuf);
 	title1->setTextColor(hudColors.characterSheetLightNeutral);
 	title1->setOutlineColor(makeColor(29, 16, 11, 255));
@@ -20872,13 +20877,14 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::updateRecipePanel()
 		title1->setDisabled(false);
 	}
 
-	if ( !recipeList.empty() && false ) // disable scrolling
+	if ( dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList) > 0 && false ) // disable scrolling
 	{
-		for ( auto it = recipeList.rbegin(); it != recipeList.rend(); ++it )
+		for ( int64_t _re = dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList) - 1; _re >= 0; --_re )
 		{
-			if ( !hideRecipeFromList((*it).resultItem.type) )
+			auto& it = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList, _re);
+			if ( !hideRecipeFromList(it.resultItem.type) )
 			{
-				lowestItemY = std::max(lowestItemY, (*it).y);
+				lowestItemY = std::max(lowestItemY, it.y);
 				break;
 			}
 		}
@@ -20912,9 +20918,13 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::updateRecipePanel()
 		}
 	}
 
-	for ( auto& entry : recipeList )
+	for ( int64_t _re = 0; _re < dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList); ++_re )
+
 	{
-		if ( hideRecipeFromList(entry.resultItem.type) )
+
+		auto& entry = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList, _re);
+
+			if ( hideRecipeFromList(entry.resultItem.type) )
 		{
 			++index;
 			continue;
@@ -21124,13 +21134,14 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::scrollToSlot(int x, int y, 
 	int player = alchemy.parentGUI.getPlayer();
 	int lowestItemY = getNumRecipesToDisplayVertical() - 1;
 	const int slotSize = players[player]->inventoryUI.getSlotSize();
-	if ( !recipeList.empty() )
+	if ( dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList) > 0 )
 	{
-		for ( auto it = recipeList.rbegin(); it != recipeList.rend(); ++it )
+		for ( int64_t _re = dynarray_size<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList) - 1; _re >= 0; --_re )
 		{
-			if ( !hideRecipeFromList((*it).resultItem.type) )
+			auto& it = *dynarray_at<GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t>(recipeList, _re);
+			if ( !hideRecipeFromList(it.resultItem.type) )
 			{
-				lowestItemY = std::max(lowestItemY, (*it).y);
+				lowestItemY = std::max(lowestItemY, it.y);
 				break;
 			}
 		}

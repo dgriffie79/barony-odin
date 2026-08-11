@@ -1263,7 +1263,7 @@ public:
 					resultItem.y = 0;
 				}
 			};
-			std::vector<RecipeEntry_t> recipeList;
+			DynamicArray recipeList;  // vector<RecipeEntry_t> (POD)
 			std::unordered_map<int, Frame::image_t*> stones;
 
 			AlchemyRecipes_t(AlchemyGUI_t& a) :
