@@ -488,6 +488,42 @@ shopkeeper_item_entry_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.identified, &s.identified, size_of(i32), Kind_POD)
 }
 
+// ---------------------------------------------------------------------------
+// VariantPair_t (monster/follower variant name+chance) — owns 1 DynamicString
+// ---------------------------------------------------------------------------
+VariantPair_t :: struct {
+	name:   DynamicString,
+	chance: i32,
+}
+
+variant_pair_free :: proc(p: rawptr) {
+	v := (^VariantPair_t)(p)
+	if v.name.data != nil {
+		mem.free(v.name.data)
+		v.name.data = nil
+	}
+	v.name.len = 0
+}
+
+variant_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^VariantPair_t)(dst)
+	s := (^VariantPair_t)(src)
+	d.chance = s.chance
+	if d.name.data != nil {
+		mem.free(d.name.data)
+		d.name.data = nil
+	}
+	d.name.len = 0
+	if s.name.len > 0 {
+		buf, _ := mem.alloc(s.name.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.name.data, s.name.len)
+			(^u8)(uintptr(buf) + uintptr(s.name.len))^ = 0
+			d.name = DynamicString{ data = buf, len = s.name.len }
+		}
+	}
+}
+
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
 Element_Ops :: struct {
 	free: proc(rawptr),

@@ -354,8 +354,13 @@ public:
 
 		std::vector<std::pair<ItemEntry, int>> equipped_items;
 		std::vector<ItemEntry> inventory_items;
-		std::vector<std::pair<std::string, int>> followerVariants;
-		std::vector<std::pair<std::string, int>> shopkeeperStoreTypes;
+		struct VariantPair_t
+		{
+			DynamicString name = "";
+			int chance = 0;
+		};
+		DynamicArrayT<VariantPair_t> followerVariants;
+		DynamicArrayT<VariantPair_t> shopkeeperStoreTypes;
 		int chosenShopkeeperStore = -1;
 		int shopkeeperMinItems = -1;
 		int shopkeeperMaxItems = -1;
@@ -402,12 +407,12 @@ public:
 				int index = 0;
 				for ( auto& pair : followerVariants )
 				{
-					variantChances.at(index) = pair.second;
+					variantChances.at(index) = pair.chance;
 					++index;
 				}
 
 				int result = monster_stat_rng.discrete(variantChances.data(), variantChances.size());
-				return followerVariants.at(result).first;
+				return followerVariants.at(result).name.c_str();
 			}
 			return "none";
 		}
@@ -1226,7 +1231,10 @@ public:
 				statEntry->followerVariants.clear();
 				for ( rapidjson::Value::ConstMemberIterator follower_itr = followers.MemberBegin(); follower_itr != followers.MemberEnd(); ++follower_itr )
 				{
-					statEntry->followerVariants.push_back(std::make_pair(follower_itr->name.GetString(), follower_itr->value.GetInt()));
+										MonsterStatCustomManager::StatEntry::VariantPair_t vp;
+					vp.name = follower_itr->name.GetString();
+					vp.chance = follower_itr->value.GetInt();
+					statEntry->followerVariants.push_back(vp);
 				}
 			}
 			if ( d.HasMember("properties") )
@@ -1283,7 +1291,10 @@ public:
 					for ( rapidjson::Value::ConstMemberIterator types_itr = d["shopkeeper_properties"]["store_type_chances"].MemberBegin(); 
 						types_itr != d["shopkeeper_properties"]["store_type_chances"].MemberEnd(); ++types_itr )
 					{
-						statEntry->shopkeeperStoreTypes.push_back(std::make_pair(types_itr->name.GetString(), types_itr->value.GetInt()));
+											MonsterStatCustomManager::StatEntry::VariantPair_t vp2;
+					vp2.name = types_itr->name.GetString();
+					vp2.chance = types_itr->value.GetInt();
+					statEntry->shopkeeperStoreTypes.push_back(vp2);
 					}
 					if ( !statEntry->shopkeeperStoreTypes.empty() )
 					{
@@ -1291,11 +1302,11 @@ public:
 						int index = 0;
 						for ( auto& chance : storeChances )
 						{
-							chance = statEntry->shopkeeperStoreTypes.at(index).second;
+							chance = statEntry->shopkeeperStoreTypes.at(index).chance;
 							++index;
 						}
 
-						DynamicString result = statEntry->shopkeeperStoreTypes.at(monster_stat_rng.discrete(storeChances.data(), storeChances.size())).first;
+						DynamicString result = statEntry->shopkeeperStoreTypes.at(monster_stat_rng.discrete(storeChances.data(), storeChances.size())).name;
 						index = 0;
 						for ( auto& lookup : shopkeeperTypeStrings )
 						{
@@ -1352,7 +1363,12 @@ public:
 		int levelmax = 99;
 		int chance = 1;
 		int fallbackMonsterType = NOTHING;
-		std::vector<std::pair<std::string, int>> variants;
+		struct MonsterVariant_t
+		{
+			DynamicString name = "";
+			int chance = 0;
+		};
+		DynamicArrayT<MonsterVariant_t> variants;
 		MonsterCurveEntry(std::string monsterStr, int levelNumMin, int levelNumMax, int chanceNum, std::string fallbackMonsterStr)
 		{
 			monsterType = getMonsterTypeFromString(monsterStr);
@@ -1363,7 +1379,10 @@ public:
 		};
 		void addVariant(std::string variantName, int chance)
 		{
-			variants.push_back(std::make_pair(variantName, chance));
+			MonsterVariant_t v;
+			v.name = variantName.c_str();
+			v.chance = chance;
+			variants.push_back(v);
 		}
 	};
 
@@ -1577,16 +1596,16 @@ public:
 						{
 							for ( auto& pair : monster.variants )
 							{
-								auto find = std::find(variantResults.begin(), variantResults.end(), pair.first);
+								auto find = std::find(variantResults.begin(), variantResults.end(), pair.name);
 								if ( find == variantResults.end() )
 								{
-									variantResults.push_back(pair.first);
-									variantChances.push_back(pair.second);
+									variantResults.push_back(pair.name);
+									variantChances.push_back(pair.chance);
 								}
 								else
 								{
 									size_t dist = static_cast<size_t>(std::distance(variantResults.begin(), find));
-									variantChances.at(dist) += pair.second;
+									variantChances.at(dist) += pair.chance;
 								}
 							}
 
@@ -1616,12 +1635,12 @@ public:
 						int index = 0;
 						for ( auto& pair : monster.variants )
 						{
-							variantChances.at(index) = pair.second;
+							variantChances.at(index) = pair.chance;
 							++index;
 						}
 
 						int result = monster_curve_rng.discrete(variantChances.data(), variantChances.size());
-						return monster.variants.at(result).first;
+						return monster.variants.at(result).name.c_str();
 					}
 				}
 			}
@@ -2444,6 +2463,9 @@ public:
 	}
 };
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::FollowerGenerateDetails_t> { static constexpr int value = Kind_FollowerDetails; };
+template <> struct DynamicArrayKindOf<MonsterStatCustomManager::StatEntry::VariantPair_t> { static constexpr int value = Kind_VariantPair; };
+template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::MonsterCurveEntry::MonsterVariant_t> { static constexpr int value = Kind_VariantPair; };
+
 
 extern GameplayCustomManager gameplayCustomManager;
 
