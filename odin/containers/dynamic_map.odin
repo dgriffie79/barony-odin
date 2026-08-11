@@ -2804,3 +2804,197 @@ barony_dynamic_map_striconentrylist_entries :: proc "c" (m: ^map[string]IconEntr
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> IconEntryCallout_t (map<string, IconEntry>) — CALLOUT radial menu
+// icons. Same as IconEntry_t but text_map is map[string]IconEntryText_t
+// (the Callout variant). entry() for in-place mutation; deep-copy on put/get.
+// ---------------------------------------------------------------------------
+IconEntryCallout_t :: struct {
+	name:            DynamicString,
+	id:              i32,
+	path:            DynamicString,
+	path_hover:      DynamicString,
+	path_active:     DynamicString,
+	path_active_hover: DynamicString,
+	icon_offsetx:    i32,
+	icon_offsety:    i32,
+	text_map:        map[string]IconEntryText_t,
+}
+
+icon_entry_callout_free :: proc(v: ^IconEntryCallout_t) {
+	strings := [?]^DynamicString{ &v.name, &v.path, &v.path_hover, &v.path_active, &v.path_active_hover }
+	for s in strings {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+	if v.text_map != nil {
+		for key in v.text_map {
+			_, vp, _, err := map_entry(&v.text_map, key)
+			if err == nil && vp != nil {
+				icon_entry_text_free(vp)
+			}
+		}
+		delete(v.text_map)
+		v.text_map = nil
+	}
+}
+
+icon_entry_callout_copy :: proc(dst: ^IconEntryCallout_t, src: ^IconEntryCallout_t) {
+	dst.id = src.id
+	dst.icon_offsetx = src.icon_offsetx
+	dst.icon_offsety = src.icon_offsety
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.name, &src.name },
+		{ &dst.path, &src.path },
+		{ &dst.path_hover, &src.path_hover },
+		{ &dst.path_active, &src.path_active },
+		{ &dst.path_active_hover, &src.path_active_hover },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	if src.text_map != nil {
+		dst.text_map = make(map[string]IconEntryText_t)
+		for key in src.text_map {
+			_, vp, _, err := map_entry(&src.text_map, key)
+			if err == nil && vp != nil {
+				new_val: IconEntryText_t
+				icon_entry_text_copy(&new_val, vp)
+				dst.text_map[key] = new_val
+			}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_striconcallout_init :: proc "c" (m: ^map[string]IconEntryCallout_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_striconcallout_put :: proc "c" (m: ^map[string]IconEntryCallout_t, key: string, value: ^IconEntryCallout_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]IconEntryCallout_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		icon_entry_callout_free(&old)
+	}
+	new_val: IconEntryCallout_t
+	icon_entry_callout_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_striconcallout_get :: proc "c" (m: ^map[string]IconEntryCallout_t, key: string, out: ^IconEntryCallout_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		icon_entry_callout_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_striconcallout_entry :: proc "c" (m: ^map[string]IconEntryCallout_t, key: string) -> ^IconEntryCallout_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]IconEntryCallout_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_striconcallout_erase :: proc "c" (m: ^map[string]IconEntryCallout_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		icon_entry_callout_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_striconcallout_clear :: proc "c" (m: ^map[string]IconEntryCallout_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_callout_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_striconcallout_len :: proc "c" (m: ^map[string]IconEntryCallout_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_striconcallout_destroy :: proc "c" (m: ^map[string]IconEntryCallout_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				icon_entry_callout_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_striconcallout_entries :: proc "c" (m: ^map[string]IconEntryCallout_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]IconEntryCallout_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		icon_entry_callout_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

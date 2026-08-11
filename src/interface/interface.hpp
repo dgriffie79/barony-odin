@@ -1772,20 +1772,9 @@ struct CalloutRadialMenu
 		int icon_offsety = 0;
 	};
 	static std::vector<PanelEntry> panelEntries;
-	struct IconEntry
-	{
-		DynamicString name = "";
-		int id = -1;
-		DynamicString path = "";
-		DynamicString path_hover = "";
-		DynamicString path_active = "";
-		DynamicString path_active_hover = "";
-		int icon_offsetx = 0;
-		int icon_offsety = 0;
-		typedef IconEntryText_tMirror IconEntryText_t;
-		DynamicMapIconEntryText text_map;
-	};
-	static std::map<std::string, IconEntry> iconEntries;
+	typedef IconEntryCallout_tMirror IconEntry;
+	typedef IconEntryText_tMirror IconEntryText_t;
+	static DynamicMapIconEntryCallout iconEntries;
 	typedef WorldIconEntry_tMirror WorldIconEntry_t;
 	static DynamicMapWorldIconEntry worldIconEntries;
 	static DynamicMapStr helpDescriptors;
@@ -1931,7 +1920,7 @@ struct CalloutRadialMenu
 		SET_CALLOUT_ICON_KEY
 	};
 	std::string setCalloutText(Field* field, const char* iconName, Uint32 color, CalloutCommand cmd, SetCalloutTextTypes setType, const int targetPlayer);
-	std::string getCalloutMessage(const IconEntry::IconEntryText_t& text_map, const char* object, const int targetPlayer);
+	std::string getCalloutMessage(const IconEntryText_t& text_map, const char* object, const int targetPlayer);
 	void sendCalloutText(CalloutCommand cmd);
 	static std::string getCalloutKeyForCommand(CalloutCommand cmd);
 	static CalloutType getCalloutTypeForUid(const int player, Uint32 uid);

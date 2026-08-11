@@ -27702,7 +27702,7 @@ void setCalloutBannerTextFormatted(const int player, Field* field, Uint32 color,
 void setCalloutBannerTextUnformatted(const int player, Field* field, const char* iconName, const char* textKey, Uint32 color)
 {
 	if ( !field ) { return; }
-	if ( CalloutMenu[player].iconEntries.find(iconName) == CalloutMenu[player].iconEntries.end() )
+	if ( !CalloutMenu[player].iconEntries.contains(iconName) )
 	{
 		return;
 	}
@@ -27718,7 +27718,7 @@ void setCalloutBannerTextUnformatted(const int player, Field* field, const char*
 	}
 }
 
-std::string CalloutRadialMenu::getCalloutMessage(const IconEntry::IconEntryText_t& text_map, const char* object, const int targetPlayer)
+std::string CalloutRadialMenu::getCalloutMessage(const IconEntryText_t& text_map, const char* object, const int targetPlayer)
 {
 	if ( text_map.worldMsgEmote != "" )
 	{
@@ -27815,8 +27815,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	CalloutRadialMenu::CalloutCommand cmd, SetCalloutTextTypes setType, const int targetPlayer)
 {
 	if ( !field && setType == SET_CALLOUT_BANNER_TEXT ) { return ""; }
-	auto findIcon = CalloutRadialMenu::iconEntries.find(iconName);
-	if ( findIcon == CalloutRadialMenu::iconEntries.end() )
+	if ( !CalloutRadialMenu::iconEntries.contains(iconName) )
 	{
 		return "";
 	}
@@ -27868,7 +27867,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		else
 		{
 			IconEntryText_tMirror _defaultText;
-			findIcon->second.text_map.get("default", _defaultText);
+			CalloutRadialMenu::iconEntries[iconName].text_map.get("default", _defaultText);
 			return getCalloutMessage(_defaultText, nullptr, targetPlayer);
 		}
 		return "";
@@ -27911,7 +27910,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		}
 
 		IconEntryText_tMirror textMap;
-		findIcon->second.text_map.get(key, textMap);
+		CalloutRadialMenu::iconEntries[iconName].text_map.get(key, textMap);
 		auto highlights = textMap.bannerHighlights;
 		if ( highlights.size() > 0 )
 		{
@@ -27960,7 +27959,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	}
 
 	auto calloutType = getCalloutTypeForEntity(player, entity);
-	auto& text_map = findIcon->second.text_map;
+	auto& text_map = CalloutRadialMenu::iconEntries[iconName].text_map;
 	switch ( calloutType )
 	{
 	case CALLOUT_TYPE_NO_TARGET:
@@ -29171,7 +29170,7 @@ bool CalloutRadialMenu::calloutMenuIsOpen()
 }
 
 std::vector<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
-std::map<std::string, CalloutRadialMenu::IconEntry> CalloutRadialMenu::iconEntries;
+DynamicMapIconEntryCallout CalloutRadialMenu::iconEntries;
 DynamicMapWorldIconEntry CalloutRadialMenu::worldIconEntries;
 DynamicMapStr CalloutRadialMenu::helpDescriptors;
 DynamicMapI32Str CalloutRadialMenu::worldIconIDToEntryKey;
