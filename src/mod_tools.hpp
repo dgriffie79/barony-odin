@@ -1385,7 +1385,7 @@ public:
 		Uint32 uid = 0;
 		DynamicString followerName = "";
 	};
-	std::vector<FollowerGenerateDetails_t> followersToGenerateForLeaders;
+	DynamicArrayT<FollowerGenerateDetails_t> followersToGenerateForLeaders;
 	inline bool inUse() { return usingCustomManager; };
 
 	void readFromFile(Uint32 seed)
@@ -2443,6 +2443,8 @@ public:
 		return false;
 	}
 };
+template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::FollowerGenerateDetails_t> { static constexpr int value = Kind_FollowerDetails; };
+
 extern GameplayCustomManager gameplayCustomManager;
 
 class GameModeManager_t

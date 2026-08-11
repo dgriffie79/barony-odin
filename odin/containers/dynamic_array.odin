@@ -316,13 +316,55 @@ entry_var_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// FollowerGenerateDetails_t (monster curve custom manager) — owns 1 DynamicString
+// ---------------------------------------------------------------------------
+FollowerGenerateDetails_t :: struct {
+	x:            f64,
+	y:            f64,
+	leaderType:   i32,
+	uid:          u32,
+	followerName: DynamicString,
+}
+
+follower_details_free :: proc(p: rawptr) {
+	v := (^FollowerGenerateDetails_t)(p)
+	if v.followerName.data != nil {
+		mem.free(v.followerName.data)
+		v.followerName.data = nil
+	}
+	v.followerName.len = 0
+}
+
+follower_details_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^FollowerGenerateDetails_t)(dst)
+	s := (^FollowerGenerateDetails_t)(src)
+	d.x = s.x
+	d.y = s.y
+	d.leaderType = s.leaderType
+	d.uid = s.uid
+	if d.followerName.data != nil {
+		mem.free(d.followerName.data)
+		d.followerName.data = nil
+	}
+	d.followerName.len = 0
+	if s.followerName.len > 0 {
+		buf, _ := mem.alloc(s.followerName.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.followerName.data, s.followerName.len)
+			(^u8)(uintptr(buf) + uintptr(s.followerName.len))^ = 0
+			d.followerName = DynamicString{ data = buf, len = s.followerName.len }
+		}
+	}
+}
+
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
 Element_Ops :: struct {
 	free: proc(rawptr),
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [5]Element_Ops{
+element_ops := [6]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
