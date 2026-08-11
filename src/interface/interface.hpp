@@ -1806,18 +1806,8 @@ struct CalloutRadialMenu
 		DynamicMapIconEntryText text_map;
 	};
 	static std::map<std::string, IconEntry> iconEntries;
-	struct WorldIconEntry_t
-	{
-		DynamicString pathDefault = "";
-		DynamicString pathPlayer1 = "";
-		DynamicString pathPlayer2 = "";
-		DynamicString pathPlayer3 = "";
-		DynamicString pathPlayer4 = "";
-		DynamicString pathPlayerX = "";
-		int id = 0;
-		DynamicString& getPlayerIconPath(const int playernum);
-	};
-	static std::map<std::string, WorldIconEntry_t> worldIconEntries;
+	typedef WorldIconEntry_tMirror WorldIconEntry_t;
+	static DynamicMapWorldIconEntry worldIconEntries;
 	static DynamicMapStr helpDescriptors;
 	static DynamicMapI32Str worldIconIDToEntryKey;
 	static int followerWheelRadius;

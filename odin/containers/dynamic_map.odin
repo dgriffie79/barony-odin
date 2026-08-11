@@ -1444,3 +1444,176 @@ barony_dynamic_map_striconentrytext_entries :: proc "c" (m: ^map[string]IconEntr
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> WorldIconEntry_t (map<string, WorldIconEntry_t>) — callout world
+// icons. Value owns 7 DynamicStrings + an int. entry() returns the map's
+// stored slot for in-place mutation (C++ assigns fields; each field's
+// DynamicString op= frees the old map-owned buffer + allocates new — safe).
+// get/put deep-copy for by-value use.
+// ---------------------------------------------------------------------------
+WorldIconEntry_t :: struct {
+	pathDefault:  DynamicString,
+	pathPlayer1:  DynamicString,
+	pathPlayer2:  DynamicString,
+	pathPlayer3:  DynamicString,
+	pathPlayer4:  DynamicString,
+	pathPlayerX:  DynamicString,
+	id:           i32,
+}
+
+world_icon_entry_free :: proc(v: ^WorldIconEntry_t) {
+	fields := [?]^DynamicString{ &v.pathDefault, &v.pathPlayer1, &v.pathPlayer2, &v.pathPlayer3, &v.pathPlayer4, &v.pathPlayerX }
+	for s in fields {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+}
+
+world_icon_entry_copy :: proc(dst: ^WorldIconEntry_t, src: ^WorldIconEntry_t) {
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.pathDefault, &src.pathDefault },
+		{ &dst.pathPlayer1, &src.pathPlayer1 },
+		{ &dst.pathPlayer2, &src.pathPlayer2 },
+		{ &dst.pathPlayer3, &src.pathPlayer3 },
+		{ &dst.pathPlayer4, &src.pathPlayer4 },
+		{ &dst.pathPlayerX, &src.pathPlayerX },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	dst.id = src.id
+}
+
+@(export)
+barony_dynamic_map_strworldicon_init :: proc "c" (m: ^map[string]WorldIconEntry_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strworldicon_put :: proc "c" (m: ^map[string]WorldIconEntry_t, key: string, value: ^WorldIconEntry_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]WorldIconEntry_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		world_icon_entry_free(&old)
+	}
+	new_val: WorldIconEntry_t
+	world_icon_entry_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strworldicon_get :: proc "c" (m: ^map[string]WorldIconEntry_t, key: string, out: ^WorldIconEntry_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		world_icon_entry_copy(out, &v)
+	}
+	return ok
+}
+
+// entry: mutable slot into map storage (in-place field mutation)
+@(export)
+barony_dynamic_map_strworldicon_entry :: proc "c" (m: ^map[string]WorldIconEntry_t, key: string) -> ^WorldIconEntry_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]WorldIconEntry_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strworldicon_erase :: proc "c" (m: ^map[string]WorldIconEntry_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		world_icon_entry_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strworldicon_clear :: proc "c" (m: ^map[string]WorldIconEntry_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				world_icon_entry_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strworldicon_len :: proc "c" (m: ^map[string]WorldIconEntry_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strworldicon_destroy :: proc "c" (m: ^map[string]WorldIconEntry_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				world_icon_entry_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strworldicon_entries :: proc "c" (m: ^map[string]WorldIconEntry_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]WorldIconEntry_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		world_icon_entry_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

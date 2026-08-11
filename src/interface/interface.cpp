@@ -1,14 +1,3 @@
-/*-------------------------------------------------------------------------------
-
-	BARONY
-	File: interface.cpp
-	Desc: contains code for game interface
-
-	Copyright 2013-2016 (c) Turning Wheel LLC, all rights reserved.
-	See LICENSE for details.
-
--------------------------------------------------------------------------------*/
-
 #include "../main.hpp"
 #include "../files.hpp"
 #include "../game.hpp"
@@ -40,6 +29,62 @@
 #include "../ui/Slider.hpp"
 #include "../collision.hpp"
 #include "../classdescriptions.hpp"
+
+DynamicString& WorldIconEntry_tMirror::getPlayerIconPath(const int playernum)
+{
+	if ( colorblind_lobby )
+	{
+		switch ( playernum )
+		{
+		case 0:
+			return pathPlayer3;
+		case 1:
+			return pathPlayer4;
+		case 2:
+			return pathPlayer2;
+		case 3:
+			return pathPlayerX;
+		default:
+			return pathPlayerX;
+			break;
+		}
+	}
+	else
+	{
+		switch ( playernum )
+		{
+		case 0:
+			return pathPlayer1;
+		case 1:
+			return pathPlayer2;
+		case 2:
+			return pathPlayer3;
+		case 3:
+			return pathPlayer4;
+		default:
+			return pathPlayerX;
+			break;
+		}
+	}
+}
+
+const DynamicString& WorldIconEntry_tMirror::getPlayerIconPath(const int playernum) const
+{
+	return const_cast<WorldIconEntry_tMirror*>(this)->getPlayerIconPath(playernum);
+}
+
+/*-------------------------------------------------------------------------------
+
+	BARONY
+	File: interface.cpp
+	Desc: contains code for game interface
+
+	Copyright 2013-2016 (c) Turning Wheel LLC, all rights reserved.
+	See LICENSE for details.
+
+-------------------------------------------------------------------------------*/
+
+
 
 Uint32 svFlags = 30;
 Uint32 settings_svFlags = svFlags;
@@ -27613,11 +27658,11 @@ void CalloutRadialMenu::loadCalloutJSON()
 
 									if ( worldIcon != "" )
 									{
-										assert(worldIconEntries.find(worldIcon) != worldIconEntries.end());
+										assert(worldIconEntries.contains(worldIcon));
 									}
 									if ( worldIconMini != "" )
 									{
-										assert(worldIconEntries.find(worldIconMini) != worldIconEntries.end());
+										assert(worldIconEntries.contains(worldIconMini));
 									}
 								}
 							}
@@ -29123,7 +29168,7 @@ bool CalloutRadialMenu::calloutMenuIsOpen()
 
 std::vector<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
 std::map<std::string, CalloutRadialMenu::IconEntry> CalloutRadialMenu::iconEntries;
-std::map<std::string, CalloutRadialMenu::WorldIconEntry_t> CalloutRadialMenu::worldIconEntries;
+DynamicMapWorldIconEntry CalloutRadialMenu::worldIconEntries;
 DynamicMapStr CalloutRadialMenu::helpDescriptors;
 DynamicMapI32Str CalloutRadialMenu::worldIconIDToEntryKey;
 int CalloutRadialMenu::followerWheelButtonThickness = 70;
@@ -29542,43 +29587,7 @@ void CalloutRadialMenu::closeCalloutMenuGUI()
 	animInvalidActionTicks = 0;
 }
 
-DynamicString& CalloutRadialMenu::WorldIconEntry_t::getPlayerIconPath(const int playernum)
-{
-	if ( colorblind_lobby )
-	{
-		switch ( playernum )
-		{
-		case 0:
-			return pathPlayer3;
-		case 1:
-			return pathPlayer4;
-		case 2:
-			return pathPlayer2;
-		case 3:
-			return pathPlayerX;
-		default:
-			return pathPlayerX;
-			break;
-		}
-	}
-	else
-	{
-		switch ( playernum )
-		{
-		case 0:
-			return pathPlayer1;
-		case 1:
-			return pathPlayer2;
-		case 2:
-			return pathPlayer3;
-		case 3:
-			return pathPlayer4;
-		default:
-			return pathPlayerX;
-			break;
-		}
-	}
-}
+
 
 void CalloutRadialMenu::drawCallouts(const int playernum)
 {
@@ -29654,7 +29663,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			if ( selfCallout )
 			{
 				DynamicString checkTag = CalloutRadialMenu::worldIconIDToEntryKey[callout.second.tagID] + "_display_self";
-				if ( CalloutRadialMenu::worldIconEntries.find(checkTag) != CalloutRadialMenu::worldIconEntries.end() )
+				if ( CalloutRadialMenu::worldIconEntries.contains(checkTag) )
 				{
 					iconPaths = &CalloutRadialMenu::worldIconEntries[checkTag];
 				}
