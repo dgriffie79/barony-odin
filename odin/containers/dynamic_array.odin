@@ -178,6 +178,13 @@ Kind_DynamicString  :: 1
 Kind_Icon           :: 2
 Kind_Option         :: 3
 Kind_EntryVar       :: 4
+Kind_FollowerDetails :: 5
+Kind_LevelT          :: 6
+Kind_CodexItem       :: 7
+Kind_ShopkeeperItem  :: 8
+Kind_VariantPair     :: 9
+Kind_MonsterCurveEntry :: 10
+Kind_LevelCurve      :: 11
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
 dynamic_string_free_elem :: proc(p: rawptr) {
@@ -522,6 +529,68 @@ variant_pair_copy :: proc(dst: rawptr, src: rawptr) {
 			d.name = DynamicString{ data = buf, len = s.name.len }
 		}
 	}
+}
+
+// ---------------------------------------------------------------------------
+// MonsterCurveEntry_t + LevelCurve_t (custom monster curves) — recursive owns
+// ---------------------------------------------------------------------------
+MonsterCurveEntry_t :: struct {
+	monsterType:         i32,
+	levelmin:            i32,
+	levelmax:            i32,
+	chance:              i32,
+	fallbackMonsterType: i32,
+	variants:            Raw_Dynamic_Array,   // DynamicArray of VariantPair_t
+}
+
+monster_curve_entry_free :: proc(p: rawptr) {
+	v := (^MonsterCurveEntry_t)(p)
+	barony_dynamic_array_elem_destroy(&v.variants, size_of(VariantPair_t), Kind_VariantPair)
+}
+
+monster_curve_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^MonsterCurveEntry_t)(dst)
+	s := (^MonsterCurveEntry_t)(src)
+	d.monsterType = s.monsterType
+	d.levelmin = s.levelmin
+	d.levelmax = s.levelmax
+	d.chance = s.chance
+	d.fallbackMonsterType = s.fallbackMonsterType
+	barony_dynamic_array_elem_copy(&d.variants, &s.variants, size_of(VariantPair_t), Kind_VariantPair)
+}
+
+LevelCurve_t :: struct {
+	mapName:     DynamicString,
+	monsterCurve: Raw_Dynamic_Array,   // DynamicArray of MonsterCurveEntry_t
+	fixedSpawns:  Raw_Dynamic_Array,
+}
+
+level_curve_free :: proc(p: rawptr) {
+	v := (^LevelCurve_t)(p)
+	if v.mapName.data != nil {
+		mem.free(v.mapName.data)
+		v.mapName.data = nil
+	}
+	v.mapName.len = 0
+	barony_dynamic_array_elem_destroy(&v.monsterCurve, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
+	barony_dynamic_array_elem_destroy(&v.fixedSpawns, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
+}
+
+level_curve_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^LevelCurve_t)(dst)
+	s := (^LevelCurve_t)(src)
+	if d.mapName.data != nil { mem.free(d.mapName.data); d.mapName.data = nil }
+	d.mapName.len = 0
+	if s.mapName.len > 0 {
+		buf, _ := mem.alloc(s.mapName.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.mapName.data, s.mapName.len)
+			(^u8)(uintptr(buf) + uintptr(s.mapName.len))^ = 0
+			d.mapName = DynamicString{ data = buf, len = s.mapName.len }
+		}
+	}
+	barony_dynamic_array_elem_copy(&d.monsterCurve, &s.monsterCurve, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
+	barony_dynamic_array_elem_copy(&d.fixedSpawns, &s.fixedSpawns, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

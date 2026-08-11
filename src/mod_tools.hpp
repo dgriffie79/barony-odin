@@ -1390,11 +1390,11 @@ public:
 	{
 	public:
 		DynamicString mapName = "";
-		std::vector<MonsterCurveEntry> monsterCurve;
-		std::vector<MonsterCurveEntry> fixedSpawns;
+		DynamicArrayT<MonsterCurveEntry> monsterCurve;
+		DynamicArrayT<MonsterCurveEntry> fixedSpawns;
 	};
 
-	std::vector<LevelCurve> allLevelCurves;
+	DynamicArrayT<LevelCurve> allLevelCurves;
 
 	struct FollowerGenerateDetails_t
 	{
@@ -1514,7 +1514,7 @@ public:
 		}
 		return NOTHING;
 	}
-	void printCurve(std::vector<LevelCurve> toPrint)
+	void printCurve(DynamicArrayT<LevelCurve> toPrint)
 	{
 		return;
 		for ( LevelCurve curve : toPrint )
@@ -2465,6 +2465,9 @@ public:
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::FollowerGenerateDetails_t> { static constexpr int value = Kind_FollowerDetails; };
 template <> struct DynamicArrayKindOf<MonsterStatCustomManager::StatEntry::VariantPair_t> { static constexpr int value = Kind_VariantPair; };
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::MonsterCurveEntry::MonsterVariant_t> { static constexpr int value = Kind_VariantPair; };
+template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::MonsterCurveEntry> { static constexpr int value = Kind_MonsterCurveEntry; };
+template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::LevelCurve> { static constexpr int value = Kind_LevelCurve; };
+
 
 
 extern GameplayCustomManager gameplayCustomManager;
