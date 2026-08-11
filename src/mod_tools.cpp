@@ -770,8 +770,8 @@ int IRCHandler_t::packetReceive()
 	{
 		if ( SDLNet_SocketReady(net_ircsocketset) )
 		{
-			std::fill(recvBuffer.begin(), recvBuffer.end(), '\0');
-			int receiveLen = SDLNet_TCP_Recv(net_ircsocket, &recvBuffer[0], MAX_BUFFER_LEN);
+			if (recvBuffer.data) memset(recvBuffer.data, 0, recvBuffer.len);
+			int receiveLen = SDLNet_TCP_Recv(net_ircsocket, recvBuffer.data, MAX_BUFFER_LEN);
 			if ( receiveLen <= 0 )
 			{
 				printlog("[IRCHandler]: Error in packetReceive: %s", SDLNet_GetError());
@@ -793,7 +793,7 @@ void IRCHandler_t::run()
 	while ( int receiveLen = packetReceive() )
 	{
 		// check incoming messages.
-		std::string msg(recvBuffer.cbegin(), recvBuffer.cend());
+		std::string msg((const char*)recvBuffer.data, recvBuffer.len);
 		handleMessage(msg);
 	}
 }
@@ -10562,8 +10562,8 @@ void EditorEntityData_t::readFromFile()
 	}
 }
 
-std::vector<int> Mods::modelsListModifiedIndexes;
-std::vector<int> Mods::soundsListModifiedIndexes;
+DynamicArrayS32 Mods::modelsListModifiedIndexes;
+DynamicArrayS32 Mods::soundsListModifiedIndexes;
 std::vector<std::pair<SDL_Surface**, std::string>> Mods::systemResourceImagesToReload;
 std::vector<std::pair<std::string, std::string>> Mods::mountedFilepaths;
 std::vector<std::pair<std::string, std::string>> Mods::mountedFilepathsSaved;

@@ -3961,7 +3961,7 @@ bool physfsModelIndexUpdate(int &start, int &end)
 		fp->gets2(modelName, PATH_MAX);
 		bool modelHasBeenModified = false;
 		// has this model index been modified?
-		std::vector<int>::iterator it = Mods::modelsListModifiedIndexes.end();
+		int32_t* it = Mods::modelsListModifiedIndexes.end();
 		if ( !Mods::modelsListModifiedIndexes.empty() )
 		{
 			it = std::find(Mods::modelsListModifiedIndexes.begin(),
@@ -3990,7 +3990,7 @@ bool physfsModelIndexUpdate(int &start, int &end)
 				if ( modelPath.compare("./") == 0 )
 				{
 					// model returned to base directory, remove from the modified index list.
-					Mods::modelsListModifiedIndexes.erase(it);
+					Mods::modelsListModifiedIndexes.erase(it - Mods::modelsListModifiedIndexes.begin());
 				}
 			}
 
@@ -5385,7 +5385,7 @@ void physfsReloadSounds(bool reloadAll)
 		fp->gets2(name, PATH_MAX);
 		bool soundHasBeenModified = false;
 		// has this sound index been modified?
-		std::vector<int>::iterator it = Mods::soundsListModifiedIndexes.end();
+		int32_t* it = Mods::soundsListModifiedIndexes.end();
 		if ( !Mods::soundsListModifiedIndexes.empty() )
 		{
 			it = std::find(Mods::soundsListModifiedIndexes.begin(),
@@ -5414,7 +5414,7 @@ void physfsReloadSounds(bool reloadAll)
 					if ( soundRealDir.compare("./") == 0 )
 					{
 						// model returned to base directory, remove from the modified index list.
-						Mods::soundsListModifiedIndexes.erase(it);
+						Mods::soundsListModifiedIndexes.erase(it - Mods::soundsListModifiedIndexes.begin());
 					}
 				}
 

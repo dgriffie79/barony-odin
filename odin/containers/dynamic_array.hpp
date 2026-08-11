@@ -283,27 +283,10 @@ public:
 
     // range-for: live-slot iterators (operator* = actual array slot, mutations
     // persist; valid until the array mutates).
-    struct Iterator {
-        using iterator_category = std::forward_iterator_tag;
-        using value_type = T;
-        using difference_type = std::ptrdiff_t;
-        using pointer = T*;
-        using reference = T&;
-        DynamicArray* arr = nullptr;
-        int64_t i = 0;
-        T* operator->() const { return (T*)arr->data + i; }
-        T& operator*() const { return *((T*)arr->data + i); }
-        Iterator& operator++() { ++i; return *this; }
-        Iterator operator++(int) { Iterator t = *this; ++*this; return t; }
-        Iterator operator+(difference_type d) const { Iterator t = *this; t.i += d; return t; }
-        bool operator==(const Iterator& o) const { return arr == o.arr && i == o.i; }
-        bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
-    };
-    Iterator begin() { return Iterator{&raw, 0}; }
-    Iterator end() { return Iterator{&raw, size()}; }
-    Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
-    Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
-};
+    T* begin() { return (T*)raw.data; }
+    T* end() { return (T*)raw.data + size(); }
+    const T* begin() const { return (const T*)raw.data; }
+    const T* end() const { return (const T*)raw.data + size(); }};
 
 // ---- typedefs preserve the pre-consolidation names (game code untouched) ----
 using DynamicArrayStr    = DynamicArrayT<DynamicString>;

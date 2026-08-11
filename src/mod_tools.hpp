@@ -2707,7 +2707,7 @@ class IRCHandler_t
 	SDLNet_SocketSet net_ircsocketset = nullptr;
 	bool bSocketConnected = false;
 	const unsigned int MAX_BUFFER_LEN = 1024;
-	std::vector<char> recvBuffer;
+	DynamicArray recvBuffer;
 	struct Auth_t
 	{
 		DynamicString oauth = "";
@@ -2719,8 +2719,8 @@ public:
 	{
 		ip.host = 0;
 		ip.port = 0;
-		recvBuffer.resize(MAX_BUFFER_LEN);
-		std::fill(recvBuffer.begin(), recvBuffer.end(), '\0');
+		barony_dynamic_array_resize(&recvBuffer, 1, (int32_t)MAX_BUFFER_LEN);
+		if (recvBuffer.data) memset(recvBuffer.data, 0, recvBuffer.len);
 	}
 	int packetSend(std::string data);
 	int packetReceive();
@@ -3376,8 +3376,8 @@ extern EditorEntityData_t editorEntityData;
 
 struct Mods
 {
-	static std::vector<int> modelsListModifiedIndexes;
-	static std::vector<int> soundsListModifiedIndexes;
+	static DynamicArrayS32 modelsListModifiedIndexes;
+	static DynamicArrayS32 soundsListModifiedIndexes;
 	static std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImagesToReload;
 	static std::vector<std::pair<std::string, std::string>> mountedFilepaths;
 	static std::vector<std::pair<std::string, std::string>> mountedFilepathsSaved; // saved from config file
