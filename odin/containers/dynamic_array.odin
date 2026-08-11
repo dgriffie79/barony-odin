@@ -195,6 +195,8 @@ Kind_MonsterCurveEntry :: 10
 Kind_LevelCurve      :: 11
 Kind_TmpItem         :: 12
 Kind_MapGeneration   :: 13
+Kind_HotbarEntry     :: 14
+Kind_HotbarEntryArray :: 15
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -738,6 +740,37 @@ map_generation_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.darkFloors), transmute(^map[i32]struct{})(&s.darkFloors))
 	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.shopFloors), transmute(^map[i32]struct{})(&s.shopFloors))
 	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.npcSpawnFloors), transmute(^map[i32]struct{})(&s.npcSpawnFloors))
+}
+
+// ---------------------------------------------------------------------------
+// HotbarEntry_t (class hotbar config) — owns 2 DynamicArrayS32
+// ---------------------------------------------------------------------------
+HotbarEntry_t :: struct {
+	itemTypes:     Raw_Dynamic_Array,   // DynamicArrayS32
+	itemCategories: Raw_Dynamic_Array,
+	slotnum:       i32,
+}
+
+hotbar_entry_free :: proc(p: rawptr) {
+	v := (^HotbarEntry_t)(p)
+	barony_dynamic_array_elem_destroy(&v.itemTypes, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.itemCategories, size_of(i32), Kind_POD)
+}
+
+hotbar_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HotbarEntry_t)(dst)
+	s := (^HotbarEntry_t)(src)
+	d.slotnum = s.slotnum
+	barony_dynamic_array_elem_copy(&d.itemTypes, &s.itemTypes, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.itemCategories, &s.itemCategories, size_of(i32), Kind_POD)
+}
+
+// "array of HotbarEntry_t" element ops (for the nested hotbar_alternates)
+hotbar_entry_array_free :: proc(p: rawptr) {
+	barony_dynamic_array_elem_destroy((^Raw_Dynamic_Array)(p), size_of(HotbarEntry_t), Kind_HotbarEntry)
+}
+hotbar_entry_array_copy :: proc(dst: rawptr, src: rawptr) {
+	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(HotbarEntry_t), Kind_HotbarEntry)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

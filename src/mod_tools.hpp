@@ -3236,8 +3236,8 @@ struct ClassHotbarConfig_t
 	{
 		struct ClassHotbarLayout_t
 		{
-			std::vector<HotbarEntry_t> hotbar;
-			std::vector<std::vector<HotbarEntry_t>> hotbar_alternates;
+			DynamicArrayT<HotbarEntry_t> hotbar;
+			DynamicArrayT<DynamicArrayT<HotbarEntry_t>> hotbar_alternates;
 			void init();
 			bool hasData = false;
 		};
@@ -3261,6 +3261,9 @@ struct ClassHotbarConfig_t
 	static void writeToFile(HotbarConfigType fileWriteType, HotbarConfigWriteMode writeMode);
 	static void init();
 };
+template <> struct DynamicArrayKindOf<ClassHotbarConfig_t::HotbarEntry_t> { static constexpr int value = Kind_HotbarEntry; };
+template <> struct DynamicArrayKindOf<DynamicArrayT<ClassHotbarConfig_t::HotbarEntry_t>> { static constexpr int value = Kind_HotbarEntryArray; };
+
 
 struct LocalAchievements_t
 {

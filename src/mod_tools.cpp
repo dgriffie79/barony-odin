@@ -9409,7 +9409,7 @@ void ClassHotbarConfig_t::ClassHotbar_t::ClassHotbarLayout_t::init()
 	}
 	for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
 	{
-		std::vector<HotbarEntry_t> althotbar;
+		DynamicArrayT<HotbarEntry_t> althotbar;
 		for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
 		{
 			althotbar.push_back(HotbarEntry_t(i));
