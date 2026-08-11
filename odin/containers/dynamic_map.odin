@@ -1617,3 +1617,334 @@ barony_dynamic_map_strworldicon_entries :: proc "c" (m: ^map[string]WorldIconEnt
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> DiscoveryAnim_t (map<string, DiscoveryAnim_t>) — featherGUI
+// label discoveries. Value owns 1 DynamicString + 2 Uint32. entry() for
+// in-place mutation; get/put deep-copy.
+// ---------------------------------------------------------------------------
+DiscoveryAnim_t :: struct {
+	startTicks:      u32,
+	processedOnTick: u32,
+	name:            DynamicString,
+}
+
+discovery_anim_free :: proc(v: ^DiscoveryAnim_t) {
+	if v.name.data != nil {
+		mem.free(v.name.data)
+		v.name.data = nil
+	}
+}
+
+discovery_anim_copy :: proc(dst: ^DiscoveryAnim_t, src: ^DiscoveryAnim_t) {
+	dst.startTicks = src.startTicks
+	dst.processedOnTick = src.processedOnTick
+	if src.name.len > 0 {
+		buf, _ := mem.alloc(src.name.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.name.data, src.name.len)
+			(^u8)(uintptr(buf) + uintptr(src.name.len))^ = 0
+			dst.name = DynamicString{ data = buf, len = src.name.len }
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_init :: proc "c" (m: ^map[string]DiscoveryAnim_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_put :: proc "c" (m: ^map[string]DiscoveryAnim_t, key: string, value: ^DiscoveryAnim_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]DiscoveryAnim_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		discovery_anim_free(&old)
+	}
+	new_val: DiscoveryAnim_t
+	discovery_anim_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_get :: proc "c" (m: ^map[string]DiscoveryAnim_t, key: string, out: ^DiscoveryAnim_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		discovery_anim_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_entry :: proc "c" (m: ^map[string]DiscoveryAnim_t, key: string) -> ^DiscoveryAnim_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]DiscoveryAnim_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_erase :: proc "c" (m: ^map[string]DiscoveryAnim_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		discovery_anim_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_clear :: proc "c" (m: ^map[string]DiscoveryAnim_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				discovery_anim_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_len :: proc "c" (m: ^map[string]DiscoveryAnim_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_destroy :: proc "c" (m: ^map[string]DiscoveryAnim_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				discovery_anim_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strdiscoveryanim_entries :: proc "c" (m: ^map[string]DiscoveryAnim_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]DiscoveryAnim_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		discovery_anim_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}
+
+// ---------------------------------------------------------------------------
+// string -> SpecialNPCEntry_t (map<string, SpecialNPCEntry_t>) — monster
+// special NPCs. Value owns 4 DynamicStrings + DynamicSetI32 + int.
+// entry() for in-place mutation; get/put deep-copy.
+// ---------------------------------------------------------------------------
+SpecialNPCEntry_t :: struct {
+	internalName: DynamicString,
+	name:         DynamicString,
+	shortname:    DynamicString,
+	modelIndexes: map[i32]struct{},
+	baseModel:    i32,
+	uniqueIcon:   DynamicString,
+}
+
+special_npc_free :: proc(v: ^SpecialNPCEntry_t) {
+	strings := [?]^DynamicString{ &v.internalName, &v.name, &v.shortname, &v.uniqueIcon }
+	for s in strings {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+	if v.modelIndexes != nil {
+		delete(v.modelIndexes)
+		v.modelIndexes = nil
+	}
+}
+
+special_npc_copy :: proc(dst: ^SpecialNPCEntry_t, src: ^SpecialNPCEntry_t) {
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.internalName, &src.internalName },
+		{ &dst.name, &src.name },
+		{ &dst.shortname, &src.shortname },
+		{ &dst.uniqueIcon, &src.uniqueIcon },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	if src.modelIndexes != nil {
+		dst.modelIndexes = make(map[i32]struct{})
+		for key in src.modelIndexes {
+			dst.modelIndexes[key] = {}
+		}
+	}
+	dst.baseModel = src.baseModel
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_init :: proc "c" (m: ^map[string]SpecialNPCEntry_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_put :: proc "c" (m: ^map[string]SpecialNPCEntry_t, key: string, value: ^SpecialNPCEntry_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]SpecialNPCEntry_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		special_npc_free(&old)
+	}
+	new_val: SpecialNPCEntry_t
+	special_npc_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_get :: proc "c" (m: ^map[string]SpecialNPCEntry_t, key: string, out: ^SpecialNPCEntry_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		special_npc_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_entry :: proc "c" (m: ^map[string]SpecialNPCEntry_t, key: string) -> ^SpecialNPCEntry_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]SpecialNPCEntry_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_erase :: proc "c" (m: ^map[string]SpecialNPCEntry_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		special_npc_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_clear :: proc "c" (m: ^map[string]SpecialNPCEntry_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				special_npc_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_len :: proc "c" (m: ^map[string]SpecialNPCEntry_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_destroy :: proc "c" (m: ^map[string]SpecialNPCEntry_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				special_npc_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strspecialnpc_entries :: proc "c" (m: ^map[string]SpecialNPCEntry_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]SpecialNPCEntry_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		special_npc_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

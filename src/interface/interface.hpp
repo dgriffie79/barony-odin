@@ -1124,17 +1124,8 @@ public:
 		real_t animQtyChange = 0.0;
 		Uint32 animChargeStartTicks = 0;
 		int highlightedSlot = -1;
-		struct DiscoveryAnim_t
-		{
-			Uint32 startTicks = 0;
-			Uint32 processedOnTick = 0;
-			DynamicString name = "";
-			DiscoveryAnim_t() :
-				startTicks(ticks),
-				processedOnTick(0)
-			{}
-		};
-		std::unordered_map<std::string, DiscoveryAnim_t> labelDiscoveries;
+		typedef DiscoveryAnim_tMirror DiscoveryAnim_t;
+		DynamicMapDiscoveryAnim labelDiscoveries;
 
 		enum InvalidActionFeedback_t : int
 		{

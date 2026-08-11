@@ -30,6 +30,10 @@
 #include "../collision.hpp"
 #include "../classdescriptions.hpp"
 
+DiscoveryAnim_tMirror::DiscoveryAnim_tMirror() : startTicks(ticks), processedOnTick(0) {}
+
+
+
 DynamicString& WorldIconEntry_tMirror::getPlayerIconPath(const int playernum)
 {
 	if ( colorblind_lobby )
@@ -21494,7 +21498,7 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 				camelCaseString(scrollShortName);
 				bodyTxt->setColor(hudColors.characterSheetOffWhiteText);
 
-				if ( labelDiscoveries.find(scroll.first) != labelDiscoveries.end() )
+				if ( labelDiscoveries.contains(scroll.first) )
 				{
 					bool deleted = false;
 					auto& discovery = labelDiscoveries[scroll.first];

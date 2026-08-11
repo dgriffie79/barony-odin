@@ -564,7 +564,7 @@ DynamicString MonsterData_t::getSpecialNPCName(Stat& myStats)
 bool MonsterData_t::nameMatchesSpecialNPCName(Stat& myStats, DynamicString npcKey)
 {
 	auto& specialNPCs = monsterDataEntries[myStats.type].specialNPCs;
-	if ( specialNPCs.find(npcKey) != specialNPCs.end() )
+	if ( specialNPCs.contains(npcKey) )
 	{
 		return specialNPCs[npcKey].name == myStats.name;
 	}

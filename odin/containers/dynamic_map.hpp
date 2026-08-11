@@ -121,6 +121,28 @@ extern "C" {
     int32_t   barony_dynamic_map_strworldicon_len(DynamicMapRaw*);
     void      barony_dynamic_map_strworldicon_destroy(DynamicMapRaw*);
     int32_t   barony_dynamic_map_strworldicon_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, DiscoveryAnim_t>
+    void      barony_dynamic_map_strdiscoveryanim_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strdiscoveryanim_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_strdiscoveryanim_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_strdiscoveryanim_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_strdiscoveryanim_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strdiscoveryanim_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strdiscoveryanim_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strdiscoveryanim_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strdiscoveryanim_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, SpecialNPCEntry_t>
+    void      barony_dynamic_map_strspecialnpc_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strspecialnpc_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_strspecialnpc_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_strspecialnpc_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_strspecialnpc_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strspecialnpc_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strspecialnpc_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strspecialnpc_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strspecialnpc_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -1030,6 +1052,195 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_map_strworldicon_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, DiscoveryAnim_t> — featherGUI label discoveries.
+// Value owns 1 DynamicString + 2 Uint32. entry() for in-place mutation;
+// get/put deep-copy. Default ctor replicates the original (startTicks=ticks).
+// ---------------------------------------------------------------------------
+struct DiscoveryAnim_tMirror {
+    uint32_t startTicks = 0;
+    uint32_t processedOnTick = 0;
+    DynamicString name;
+
+    DiscoveryAnim_tMirror();   // defined in interface.cpp (needs global ticks)
+};
+
+class DynamicMapDiscoveryAnim {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapDiscoveryAnim() { barony_dynamic_map_strdiscoveryanim_init(&raw); }
+    ~DynamicMapDiscoveryAnim() { barony_dynamic_map_strdiscoveryanim_destroy(&raw); }
+    DynamicMapDiscoveryAnim(const DynamicMapDiscoveryAnim& other) : raw{} {
+        barony_dynamic_map_strdiscoveryanim_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapDiscoveryAnim& operator=(const DynamicMapDiscoveryAnim& other) {
+        if (this != &other) { barony_dynamic_map_strdiscoveryanim_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapDiscoveryAnim(DynamicMapDiscoveryAnim&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapDiscoveryAnim& operator=(DynamicMapDiscoveryAnim&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strdiscoveryanim_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    DiscoveryAnim_tMirror& operator[](const char* key) {
+        return *static_cast<DiscoveryAnim_tMirror*>(barony_dynamic_map_strdiscoveryanim_entry(&raw, DynamicString(key)));
+    }
+    DiscoveryAnim_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<DiscoveryAnim_tMirror*>(barony_dynamic_map_strdiscoveryanim_entry(&raw, key));
+    }
+    DiscoveryAnim_tMirror& operator[](const std::string& key) {
+        return *static_cast<DiscoveryAnim_tMirror*>(barony_dynamic_map_strdiscoveryanim_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, DiscoveryAnim_tMirror& out) const {
+        return barony_dynamic_map_strdiscoveryanim_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, DiscoveryAnim_tMirror& out) const {
+        return barony_dynamic_map_strdiscoveryanim_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const DiscoveryAnim_tMirror& v) {
+        barony_dynamic_map_strdiscoveryanim_put(&raw, DynamicString(key), const_cast<DiscoveryAnim_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const DiscoveryAnim_tMirror& v) {
+        barony_dynamic_map_strdiscoveryanim_put(&raw, key, const_cast<DiscoveryAnim_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        DiscoveryAnim_tMirror tmp;
+        return barony_dynamic_map_strdiscoveryanim_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        DiscoveryAnim_tMirror tmp;
+        return barony_dynamic_map_strdiscoveryanim_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        DiscoveryAnim_tMirror tmp;
+        return barony_dynamic_map_strdiscoveryanim_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_strdiscoveryanim_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strdiscoveryanim_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_strdiscoveryanim_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strdiscoveryanim_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapDiscoveryAnim& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<DiscoveryAnim_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_strdiscoveryanim_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_strdiscoveryanim_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, SpecialNPCEntry_t> — monster special NPCs.
+// Value owns 4 DynamicStrings + DynamicSetI32 + int. entry() for in-place
+// mutation; get/put deep-copy.
+// ---------------------------------------------------------------------------
+struct SpecialNPCEntry_tMirror {
+    DynamicString internalName;
+    DynamicString name;
+    DynamicString shortname;
+    DynamicSetI32 modelIndexes;
+    int baseModel = 0;
+    DynamicString uniqueIcon;
+};
+
+class DynamicMapSpecialNPC {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapSpecialNPC() { barony_dynamic_map_strspecialnpc_init(&raw); }
+    ~DynamicMapSpecialNPC() { barony_dynamic_map_strspecialnpc_destroy(&raw); }
+    DynamicMapSpecialNPC(const DynamicMapSpecialNPC& other) : raw{} {
+        barony_dynamic_map_strspecialnpc_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapSpecialNPC& operator=(const DynamicMapSpecialNPC& other) {
+        if (this != &other) { barony_dynamic_map_strspecialnpc_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapSpecialNPC(DynamicMapSpecialNPC&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapSpecialNPC& operator=(DynamicMapSpecialNPC&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strspecialnpc_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    SpecialNPCEntry_tMirror& operator[](const char* key) {
+        return *static_cast<SpecialNPCEntry_tMirror*>(barony_dynamic_map_strspecialnpc_entry(&raw, DynamicString(key)));
+    }
+    SpecialNPCEntry_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<SpecialNPCEntry_tMirror*>(barony_dynamic_map_strspecialnpc_entry(&raw, key));
+    }
+    SpecialNPCEntry_tMirror& operator[](const std::string& key) {
+        return *static_cast<SpecialNPCEntry_tMirror*>(barony_dynamic_map_strspecialnpc_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, SpecialNPCEntry_tMirror& out) const {
+        return barony_dynamic_map_strspecialnpc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, SpecialNPCEntry_tMirror& out) const {
+        return barony_dynamic_map_strspecialnpc_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const SpecialNPCEntry_tMirror& v) {
+        barony_dynamic_map_strspecialnpc_put(&raw, DynamicString(key), const_cast<SpecialNPCEntry_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const SpecialNPCEntry_tMirror& v) {
+        barony_dynamic_map_strspecialnpc_put(&raw, key, const_cast<SpecialNPCEntry_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        SpecialNPCEntry_tMirror tmp;
+        return barony_dynamic_map_strspecialnpc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        SpecialNPCEntry_tMirror tmp;
+        return barony_dynamic_map_strspecialnpc_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        SpecialNPCEntry_tMirror tmp;
+        return barony_dynamic_map_strspecialnpc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_strspecialnpc_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strspecialnpc_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_strspecialnpc_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strspecialnpc_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapSpecialNPC& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<SpecialNPCEntry_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_strspecialnpc_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_strspecialnpc_put(&raw, key, &vv[i]);
         }
     }
 };

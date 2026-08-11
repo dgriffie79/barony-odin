@@ -1287,16 +1287,8 @@ struct MonsterData_t
 		DynamicSetI32 modelIndexes;
 		std::set<int> playerModelIndexes;
 		DynamicString defaultShortDisplayName = "";
-		struct SpecialNPCEntry_t
-		{
-			DynamicString internalName = "";
-			DynamicString name = "";
-			DynamicString shortname = "";
-			DynamicSetI32 modelIndexes;
-			int baseModel = 0;
-			DynamicString uniqueIcon = "";
-		};
-		std::map<std::string, SpecialNPCEntry_t> specialNPCs;
+		typedef SpecialNPCEntry_tMirror SpecialNPCEntry_t;
+		DynamicMapSpecialNPC specialNPCs;
 		MonsterDataEntry_t(int type)
 		{
 			monsterType = type;

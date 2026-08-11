@@ -5391,7 +5391,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					bool found = false;
 					for ( int type = 0; type < NUMMONSTERS; ++type )
 					{
-						if ( MonsterData_t::monsterDataEntries[type].specialNPCs.find(buf) != MonsterData_t::monsterDataEntries[type].specialNPCs.end() )
+						if ( MonsterData_t::monsterDataEntries[type].specialNPCs.contains(buf) )
 						{
 							strcpy(monster->clientStats->name, MonsterData_t::monsterDataEntries[type].specialNPCs[buf].name.c_str());
 							found = true;
