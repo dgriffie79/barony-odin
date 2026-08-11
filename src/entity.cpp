@@ -26203,7 +26203,7 @@ bool Entity::monsterHasSpellbook(int spellbookType)
 
 void Entity::playerStatIncrease(int playerClass, int chosenStats[3])
 {
-	std::vector<unsigned int> statWeights = classStatGrowth[playerClass];
+	std::vector<unsigned int> statWeights(classStatGrowth[playerClass], classStatGrowth[playerClass] + 6);
 
 	// debug to print which vector values are being used.
 	//for ( std::vector<int>::const_iterator i = statWeights.begin(); i != statWeights.end(); ++i )

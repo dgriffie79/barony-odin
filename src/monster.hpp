@@ -80,7 +80,7 @@ enum Monster : int
 const int NUMMONSTERS = MAX_MONSTER;
 extern int kills[NUMMONSTERS];
 
-static std::vector<Sint32> monsterSprites[NUMMONSTERS] = {
+static const DynamicArrayS32 monsterSprites[NUMMONSTERS] = {
     // NOTHING
     {
         0,
@@ -564,7 +564,7 @@ enum DamageTableType : int
 };
 static const int numDamageTableTypes = 7;
 
-static std::vector<std::vector<unsigned int>> classStatGrowth =
+static const unsigned int classStatGrowth[NUMCLASSES][6] =
 {
 	// stat weightings for classes on level up
 	//	STR	DEX	CON	INT	PER	CHR -- sum is approx 24.
