@@ -966,7 +966,7 @@ void Player::SignGUI_t::updateSignGUI()
 		std::vector<Frame::image_t*> imgsThisLine;
 		Field* txt = allFields[line];
 		int imageTopMostY = currentY;
-		for ( auto c : signEntry.rawText[line] )
+		for ( auto c : signEntry.rawText.at(line) )
 		{
 			if ( c == '$' )
 			{
@@ -1171,8 +1171,9 @@ void Player::SignGUI_t::updateSignGUI()
 	{
 		i->pos.y += verticalAdjustY;
 	}
-	for ( auto highlight : signEntry.wordHighlights )
+	for ( int64_t _wi = 0; _wi < signEntry.wordHighlights.size(); ++_wi )
 	{
+		int highlight = signEntry.wordHighlights[_wi];
 		int line = 0;
 		while ( highlight >= Field::TEXT_HIGHLIGHT_WORDS_PER_LINE )
 		{
@@ -1181,8 +1182,9 @@ void Player::SignGUI_t::updateSignGUI()
 		}
 		allFields[line]->addWordToHighlight(highlight, signEntry.fontHighlightColor);
 	}
-	for ( auto highlight : signEntry.wordHighlights2 )
+	for ( int64_t _wi = 0; _wi < signEntry.wordHighlights2.size(); ++_wi )
 	{
+		int highlight = signEntry.wordHighlights2[_wi];
 		int line = 0;
 		while ( highlight >= Field::TEXT_HIGHLIGHT_WORDS_PER_LINE )
 		{

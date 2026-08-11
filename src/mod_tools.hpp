@@ -3074,29 +3074,22 @@ public:
 	struct Entry_t
 	{
 		DynamicString name = "";
-		std::vector<DynamicString> rawText;
-		struct Variable_t
-		{
-			VariableTypes type = TEXT;
-			DynamicString value = "";
-			int numericValue = 0;
-			int sizex = 0;
-			int sizey = 0;
-		};
-		std::vector<Variable_t> variables;
+		DynamicArrayStr rawText;
+		typedef EntryVariable_tMirror Variable_t;
+		DynamicArrayEntryVar variables;
 		DynamicString formattedText = "";
 		ObjectType_t objectType = OBJ_MESSAGE;
 		int hjustify = 4;
 		int vjustify = 0;
-		std::vector<int> padPerLine;
+		DynamicArrayS32 padPerLine;
 		int padTopY = 0;
 		DynamicString font = "";
 		Uint32 fontColor = 0xFFFFFFFF;
 		Uint32 fontOutlineColor = 0xFFFFFFFF;
 		Uint32 fontHighlightColor = 0xFFFFFFFF;
 		Uint32 fontHighlight2Color = 0xFFFFFFFF;
-		std::vector<int> wordHighlights;
-		std::vector<int> wordHighlights2;
+		DynamicArrayS32 wordHighlights;
+		DynamicArrayS32 wordHighlights2;
 		int imageInlineTextAdjustX = 0; // when img is placed inbetween text, move it by this adjustment to center
 		struct AdditionalContentProperties_t
 		{

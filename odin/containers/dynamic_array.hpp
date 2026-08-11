@@ -74,6 +74,15 @@ struct DropdownOption_tMirror {
 };
 
 
+struct EntryVariable_tMirror {
+    int type = 0;
+    DynamicString value;
+    int numericValue = 0;
+    int sizex = 0;
+    int sizey = 0;
+};
+
+
 extern "C" {
 
     void    barony_dynamic_array_init(DynamicArray*);
@@ -154,6 +163,18 @@ extern "C" {
     int32_t barony_dynamic_array_option_len(DynamicArray*);
     void    barony_dynamic_array_option_copy(DynamicArray*, DynamicArray*);
     int32_t barony_dynamic_array_option_entries(DynamicArray*, DropdownOption_tMirror*, int32_t);
+
+    // Entry Variable_t array (i32 + DynamicString + 3 i32, value owned)
+    void    barony_dynamic_array_entryvar_init(DynamicArray*);
+    void    barony_dynamic_array_entryvar_append(DynamicArray*, EntryVariable_tMirror*);
+    bool    barony_dynamic_array_entryvar_get(DynamicArray*, int32_t, EntryVariable_tMirror*);
+    void    barony_dynamic_array_entryvar_set(DynamicArray*, int32_t, EntryVariable_tMirror*);
+    void    barony_dynamic_array_entryvar_erase(DynamicArray*, int32_t);
+    void    barony_dynamic_array_entryvar_clear(DynamicArray*);
+    void    barony_dynamic_array_entryvar_destroy(DynamicArray*);
+    int32_t barony_dynamic_array_entryvar_len(DynamicArray*);
+    void    barony_dynamic_array_entryvar_copy(DynamicArray*, DynamicArray*);
+    int32_t barony_dynamic_array_entryvar_entries(DynamicArray*, EntryVariable_tMirror*, int32_t);
 }
 
 
@@ -707,6 +728,69 @@ public:
         int64_t i = 0;
         DropdownOption_tMirror* operator->() const { return (DropdownOption_tMirror*)arr->data + i; }
         DropdownOption_tMirror& operator*() const { return *((DropdownOption_tMirror*)arr->data + i); }
+        Iterator& operator++() { ++i; return *this; }
+        bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
+    };
+    Iterator begin() { return Iterator{&raw, 0}; }
+    Iterator end() { return Iterator{&raw, size()}; }
+    Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
+    Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
+};
+
+// ---------------------------------------------------------------------------
+// DynamicArrayEntryVar — std::vector<Entry_t::Variable_t> replacement.
+// Element = i32 type + DynamicString value + 3 i32. value is owned.
+// ---------------------------------------------------------------------------
+;
+
+class DynamicArrayEntryVar {
+public:
+    DynamicArray raw{};
+
+    DynamicArrayEntryVar() { barony_dynamic_array_entryvar_init(&raw); }
+    ~DynamicArrayEntryVar() { barony_dynamic_array_entryvar_destroy(&raw); }
+    DynamicArrayEntryVar(const DynamicArrayEntryVar& other) : raw{} {
+        barony_dynamic_array_entryvar_init(&raw);
+        *this = other;
+    }
+    DynamicArrayEntryVar& operator=(const DynamicArrayEntryVar& other) {
+        if (this != &other) { barony_dynamic_array_entryvar_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
+        return *this;
+    }
+    DynamicArrayEntryVar(DynamicArrayEntryVar&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicArray{};
+    }
+    DynamicArrayEntryVar& operator=(DynamicArrayEntryVar&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_array_entryvar_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicArray{};
+        }
+        return *this;
+    }
+
+    int64_t size() const { return barony_dynamic_array_entryvar_len(const_cast<DynamicArray*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_array_entryvar_clear(&raw); }
+    void push_back(const EntryVariable_tMirror& v) { barony_dynamic_array_entryvar_append(&raw, const_cast<EntryVariable_tMirror*>(&v)); }
+    void erase(int64_t i) { barony_dynamic_array_entryvar_erase(&raw, (int32_t)i); }
+    EntryVariable_tMirror at(int64_t i) const {
+        EntryVariable_tMirror out;
+        barony_dynamic_array_entryvar_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
+        return out;
+    }
+    void set(int64_t i, const EntryVariable_tMirror& v) { barony_dynamic_array_entryvar_set(&raw, (int32_t)i, const_cast<EntryVariable_tMirror*>(&v)); }
+    EntryVariable_tMirror& operator[](int64_t i) {
+        static thread_local EntryVariable_tMirror _tmp;
+        barony_dynamic_array_entryvar_get(&raw, (int32_t)i, &_tmp);
+        return _tmp;
+    }
+    // live-slot iterators
+    struct Iterator {
+        DynamicArray* arr = nullptr;
+        int64_t i = 0;
+        EntryVariable_tMirror* operator->() const { return (EntryVariable_tMirror*)arr->data + i; }
+        EntryVariable_tMirror& operator*() const { return *((EntryVariable_tMirror*)arr->data + i); }
         Iterator& operator++() { ++i; return *this; }
         bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
     };

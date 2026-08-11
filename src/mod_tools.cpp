@@ -7798,9 +7798,9 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 					{
 						if ( entry_itr->value["attributes"]["line_padding"].IsInt() )
 						{
-							for ( auto& s : entry.padPerLine )
+							for ( int64_t _pi = 0; _pi < entry.padPerLine.size(); ++_pi )
 							{
-								s = entry_itr->value["attributes"]["line_padding"].GetInt();
+								entry.padPerLine[_pi] = entry_itr->value["attributes"]["line_padding"].GetInt();
 							}
 						}
 						else if ( entry_itr->value["attributes"]["line_padding"].IsArray() )

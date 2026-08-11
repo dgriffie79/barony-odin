@@ -635,3 +635,152 @@ barony_dynamic_array_option_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs
 	}
 	return i32(n)
 }
+
+// ---------------------------------------------------------------------------
+// DynamicArray of Entry_t::Variable_t (std::vector<Variable_t>).
+// Element = i32 type + DynamicString value + 3 i32. value is owned.
+// ---------------------------------------------------------------------------
+EntryVariable_t :: struct {
+	_type:        i32,
+	value:        DynamicString,
+	numericValue: i32,
+	sizex:        i32,
+	sizey:        i32,
+}
+
+entry_var_free :: proc(v: ^EntryVariable_t) {
+	if v.value.data != nil {
+		mem.free(v.value.data)
+		v.value.data = nil
+	}
+}
+
+entry_var_copy :: proc(dst: ^EntryVariable_t, src: ^EntryVariable_t) {
+	dst._type = src._type
+	dst.numericValue = src.numericValue
+	dst.sizex = src.sizex
+	dst.sizey = src.sizey
+	if dst.value.data != nil { mem.free(dst.value.data); dst.value.data = nil }
+	if src.value.len > 0 {
+		buf, _ := mem.alloc(src.value.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.value.data, src.value.len)
+			(^u8)(uintptr(buf) + uintptr(src.value.len))^ = 0
+			dst.value = DynamicString{ data = buf, len = src.value.len }
+		}
+	}
+}
+
+@(export)
+barony_dynamic_array_entryvar_init :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_entryvar_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^EntryVariable_t) {
+	context = runtime.default_context()
+	if elem == nil { return }
+	if a.cap - a.len < size_of(EntryVariable_t) {
+		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(EntryVariable_t))
+	}
+	slot := ([^]EntryVariable_t)(uintptr(a.data) + uintptr(a.len))
+	entry_var_copy(slot, elem)
+	a.len += size_of(EntryVariable_t)
+}
+
+@(export)
+barony_dynamic_array_entryvar_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^EntryVariable_t) -> bool {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return false }
+	elems := ([^]EntryVariable_t)(a.data)
+	entry_var_copy(out, &elems[index])
+	return true
+}
+
+@(export)
+barony_dynamic_array_entryvar_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^EntryVariable_t) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return }
+	elems := ([^]EntryVariable_t)(a.data)
+	entry_var_free(&elems[index])
+	entry_var_copy(&elems[index], elem)
+}
+
+@(export)
+barony_dynamic_array_entryvar_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return }
+	elems := ([^]EntryVariable_t)(a.data)
+	entry_var_free(&elems[index])
+	n := a.len / size_of(EntryVariable_t)
+	for i := int(index); i < n - 1; i += 1 {
+		elems[i] = elems[i + 1]
+	}
+	a.len -= size_of(EntryVariable_t)
+}
+
+@(export)
+barony_dynamic_array_entryvar_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]EntryVariable_t)(a.data)
+		n := a.len / size_of(EntryVariable_t)
+		for i in 0..<n {
+			entry_var_free(&elems[i])
+		}
+	}
+	a.len = 0
+}
+
+@(export)
+barony_dynamic_array_entryvar_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]EntryVariable_t)(a.data)
+		n := a.len / size_of(EntryVariable_t)
+		for i in 0..<n {
+			entry_var_free(&elems[i])
+		}
+	}
+	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_entryvar_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
+	context = runtime.default_context()
+	return i32(a.len / size_of(EntryVariable_t))
+}
+
+@(export)
+barony_dynamic_array_entryvar_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if dst.data != nil {
+		barony_dynamic_array_entryvar_destroy(dst)
+	}
+	if src.data == nil || src.len == 0 { return }
+	src_elems := ([^]EntryVariable_t)(src.data)
+	n := src.len / size_of(EntryVariable_t)
+	for i in 0..<n {
+		if dst.cap - dst.len < size_of(EntryVariable_t) {
+			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(EntryVariable_t))
+		}
+		slot := ([^]EntryVariable_t)(uintptr(dst.data) + uintptr(dst.len))
+		entry_var_copy(slot, &src_elems[i])
+		dst.len += size_of(EntryVariable_t)
+	}
+}
+
+@(export)
+barony_dynamic_array_entryvar_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]EntryVariable_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if a.data == nil || count <= 0 { return 0 }
+	elems := ([^]EntryVariable_t)(a.data)
+	n := a.len / size_of(EntryVariable_t)
+	if n > int(count) { n = int(count) }
+	for i in 0..<n {
+		entry_var_copy(&val_ptrs[i], &elems[i])
+	}
+	return i32(n)
+}
