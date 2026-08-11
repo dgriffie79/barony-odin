@@ -206,6 +206,7 @@ Kind_AlchNotifPair    :: 21
 Kind_CalloutPanel    :: 22
 Kind_HiscoreStat     :: 23
 Kind_HiscoreLootbag  :: 24
+Kind_HiscorePlayer  :: 25
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -792,6 +793,10 @@ dynarrstr_array_copy :: proc(dst: rawptr, src: rawptr) {
 
 // matches src/main.hpp MAXPLAYERS
 MAXPLAYERS :: 4
+NUM_CONDUCT_CHALLENGES :: 32
+NUM_GAMEPLAY_STATISTICS :: 64
+NUM_HOTBAR_SLOTS :: 10
+NUM_HOTBAR_ALTERNATES :: 2
 
 // ---------------------------------------------------------------------------
 // SkillEffect_t + SkillEntry_t (player skill sheet) — recursive owns
@@ -1269,6 +1274,86 @@ hiscore_lootbag_copy :: proc(dst: rawptr, src: rawptr) {
 	d.spawnedOnGround = s.spawnedOnGround
 	d.looted = s.looted
 	barony_dynamic_array_elem_copy(&d.items, &s.items, size_of(HiscoreItem_t), Kind_POD)
+}
+
+// ---------------------------------------------------------------------------
+// HiscorePlayer_t (online hiscore save Player) — recursive owns
+// ---------------------------------------------------------------------------
+HiscorePlayer_t :: struct {
+	char_class:            u32,
+	race:                  u32,
+	kills:                 Raw_Dynamic_Array,   // i32
+	conductPenniless:      bool,
+	conductFoodless:       bool,
+	conductVegetarian:     bool,
+	conductIlliterate:     bool,
+	additionalConducts:    [NUM_CONDUCT_CHALLENGES]i32,
+	gameStatistics:        [NUM_GAMEPLAY_STATISTICS]i32,
+	hotbar:                [NUM_HOTBAR_SLOTS]u32,
+	hotbar_alternate:      [NUM_HOTBAR_ALTERNATES][NUM_HOTBAR_SLOTS]u32,
+	selected_spell:        u32,
+	selected_spell_alternate: [NUM_HOTBAR_ALTERNATES]u32,
+	selected_spell_last_appearance: i32,
+	spells:                Raw_Dynamic_Array,   // u32
+	known_recipes:         Raw_Dynamic_Array,   // recipe_t (3 ints)
+	known_scrolls:         Raw_Dynamic_Array,   // i32
+	shopkeeperHostility:   Raw_Dynamic_Array,   // pair<int,PlayerRaceHostility_t>
+	compendium_item_events: Raw_Dynamic_Array,  // pair<DynamicString, i32 array>
+	itemDegradeRNG:        Raw_Dynamic_Array,
+	escalatingRngRolls:    Raw_Dynamic_Array,
+	escalatingSpellRngRolls: Raw_Dynamic_Array,
+	appraisal_item_progress: Raw_Dynamic_Array,
+	learnedSpells:         Raw_Dynamic_Array,   // i32
+	stats:                 HiscoreStat_t,
+	followers:             Raw_Dynamic_Array,   // HiscoreStat_t
+}
+
+hiscore_player_free :: proc(p: rawptr) {
+	v := (^HiscorePlayer_t)(p)
+	barony_dynamic_array_elem_destroy(&v.kills, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.spells, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.known_recipes, 12, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.known_scrolls, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.shopkeeperHostility, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.compendium_item_events, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.itemDegradeRNG, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.escalatingRngRolls, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.escalatingSpellRngRolls, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.appraisal_item_progress, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.learnedSpells, size_of(i32), Kind_POD)
+	hiscore_stat_free(&v.stats)
+	barony_dynamic_array_elem_destroy(&v.followers, size_of(HiscoreStat_t), Kind_HiscoreStat)
+}
+
+hiscore_player_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscorePlayer_t)(dst)
+	s := (^HiscorePlayer_t)(src)
+	d.char_class = s.char_class
+	d.race = s.race
+	d.conductPenniless = s.conductPenniless
+	d.conductFoodless = s.conductFoodless
+	d.conductVegetarian = s.conductVegetarian
+	d.conductIlliterate = s.conductIlliterate
+	d.additionalConducts = s.additionalConducts
+	d.gameStatistics = s.gameStatistics
+	d.hotbar = s.hotbar
+	d.hotbar_alternate = s.hotbar_alternate
+	d.selected_spell = s.selected_spell
+	d.selected_spell_alternate = s.selected_spell_alternate
+	d.selected_spell_last_appearance = s.selected_spell_last_appearance
+	barony_dynamic_array_elem_copy(&d.kills, &s.kills, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.spells, &s.spells, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.known_recipes, &s.known_recipes, 12, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.known_scrolls, &s.known_scrolls, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.shopkeeperHostility, &s.shopkeeperHostility, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.compendium_item_events, &s.compendium_item_events, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.itemDegradeRNG, &s.itemDegradeRNG, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.escalatingRngRolls, &s.escalatingRngRolls, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.escalatingSpellRngRolls, &s.escalatingSpellRngRolls, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.appraisal_item_progress, &s.appraisal_item_progress, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.learnedSpells, &s.learnedSpells, size_of(i32), Kind_POD)
+	hiscore_stat_copy(&d.stats, &s.stats)
+	barony_dynamic_array_elem_copy(&d.followers, &s.followers, size_of(HiscoreStat_t), Kind_HiscoreStat)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

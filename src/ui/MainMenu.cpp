@@ -20196,8 +20196,9 @@ failed:
 		bool moddedSavegameWarning = false;
 		bool unModdedSavegameWarning = false;
 		int challengeEventSave = 0;
-		for ( auto& pair : saveGameInfo.additional_data )
+		for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(saveGameInfo.additional_data); ++_ad )
 		{
+			auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(saveGameInfo.additional_data, _ad);
 			if ( pair.first == "game_scenario" )
 			{
 				if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != std::string::npos )
@@ -20583,8 +20584,9 @@ failed:
                 // extract savegame info
                 const bool modded = saveGameInfo.players[saveGameInfo.player_num].additionalConducts[CONDUCT_MODDED];
 				int challengeEventSave = 0;
-				for ( auto& pair : saveGameInfo.additional_data )
+				for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(saveGameInfo.additional_data); ++_ad )
 				{
+					auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(saveGameInfo.additional_data, _ad);
 					if ( pair.first == "game_scenario" )
 					{
 						if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != std::string::npos )

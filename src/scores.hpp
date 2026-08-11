@@ -552,7 +552,7 @@ struct SaveGameInfo {
 			}
 		};
 		DynamicArray shopkeeperHostility;  // vector<pair<int,PlayerRaceHostility_t>> (POD)
-		std::vector<std::pair<std::string, std::vector<int>>> compendium_item_events;
+		DynamicArray compendium_item_events;  // vector<pair<DynamicString, DynamicArrayS32>>
 		DynamicArray itemDegradeRNG;  // vector<pair<int,int>>
 		DynamicArray escalatingRngRolls;  // vector<pair<int,int>>
 		DynamicArray escalatingSpellRngRolls;  // vector<pair<int,int>>
@@ -772,9 +772,9 @@ struct SaveGameInfo {
 
 		int isCharacterValidFromDLC();
 	};
-	std::vector<Player> players;
+	DynamicArrayT<Player> players;
 	std::vector<std::pair<std::string, std::string>> map_messages; // map modifiers "sound of pickaxes striking rock" "walls are fortified" etc
-	std::vector<std::pair<std::string, std::string>> additional_data;
+	DynamicArray additional_data;  // vector<pair<DynamicString,DynamicString>>
 	
 	bool serialize(FileInterface* fp) {
 		fp->property("magic_cookie", magic_cookie);
@@ -1020,6 +1020,8 @@ public:
 };
 template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t> { static constexpr int value = Kind_HiscoreStat; };
 template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t::lootbag_t> { static constexpr int value = Kind_HiscoreLootbag; };
+template <> struct DynamicArrayKindOf<SaveGameInfo::Player> { static constexpr int value = Kind_HiscorePlayer; };
+
 
 extern AchievementObserver achievementObserver;
 #endif

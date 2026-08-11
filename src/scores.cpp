@@ -4963,8 +4963,9 @@ void SaveGameInfo::computeHash(const int playernum, Uint32& hash)
 		}
 	}
 
-	for ( auto& pair : additional_data )
+	for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(additional_data); ++_ad )
 	{
+		auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(additional_data, _ad);
 		hash += djb2Hash(const_cast<char*>(pair.first.c_str()));
 		hash += djb2Hash(const_cast<char*>(pair.second.c_str()));
 	}
@@ -5307,8 +5308,8 @@ int SaveGameInfo::populateFromSession(const int playernum)
 
 			for ( auto& pair : ::players[c]->compendiumProgress.itemEvents )
 			{
-				player.compendium_item_events.push_back(std::make_pair(pair.first, std::vector<int>()));
-				auto& vec_entry = player.compendium_item_events.back();
+				dynarray_pair_push<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events, std::make_pair(pair.first, DynamicArrayS32()));
+				auto& vec_entry = *dynarray_pair_at<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events, dynarray_pair_size<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events) - 1);
 				for ( auto& itemValue : pair.second )
 				{
 					vec_entry.second.push_back(itemValue.first);
@@ -5525,7 +5526,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 	info->map_messages = ::Player::Minimap_t::mapDetails;
 	if ( gameModeManager.currentSession.challengeRun.isActive() )
 	{
-		info->additional_data.push_back(std::make_pair("game_scenario", gameModeManager.currentSession.challengeRun.scenarioStr));
+		dynarray_pair_push<std::pair<DynamicString, DynamicString>>(info->additional_data, std::make_pair(DynamicString("game_scenario"), DynamicString(gameModeManager.currentSession.challengeRun.scenarioStr.c_str())));
 	}
 
 
@@ -5677,8 +5678,9 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 	DynamicString lid = "lid";
 	int lid_version = 0;
 	int challengeEventSave = 0;
-	for ( auto& pair : additional_data )
+	for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(additional_data); ++_ad )
 	{
+		auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(additional_data, _ad);
 		if ( pair.first == "game_scenario" )
 		{
 			GameModeManager_t::CurrentSession_t::ChallengeRun_t run;
@@ -5910,8 +5912,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 			printlog("[SESSION]: Using savegame server flags");
 			gameModeManager.currentSession.seededRun.seed = info.customseed;
 			gameModeManager.currentSession.seededRun.seedString = info.customseed_string;
-			for ( auto& pair : info.additional_data )
+			for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(info.additional_data); ++_ad )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(info.additional_data, _ad);
 				if ( pair.first == "game_scenario" )
 				{
 					gameModeManager.currentSession.challengeRun.setup(pair.second);
@@ -6273,18 +6276,19 @@ int loadGame(int player, const SaveGameInfo& info) {
 	// compendium progress
 	{
 		auto& compendiumProgress = players[statsPlayer]->compendiumProgress;
-		for ( auto& compendium_item_events : info.players[player].compendium_item_events )
+		for ( int64_t _ce = 0; _ce < dynarray_pair_size<std::pair<DynamicString, DynamicArrayS32>>(info.players[player].compendium_item_events); ++_ce )
 		{
-			for ( auto itr = compendium_item_events.second.begin(); itr != compendium_item_events.second.end(); )
+			auto& compendium_item_events = *dynarray_pair_at<std::pair<DynamicString, DynamicArrayS32>>(info.players[player].compendium_item_events, _ce);
+			for ( int64_t _it = 0; _it < compendium_item_events.second.size(); )
 			{
-				int first = *itr;
-				++itr;
-				if ( itr != compendium_item_events.second.end() )
+				int first = compendium_item_events.second[_it];
+				++_it;
+				if ( _it < compendium_item_events.second.size() )
 				{
-					Sint32 second = *itr;
+					Sint32 second = compendium_item_events.second[_it];
 					compendiumProgress.itemEvents[compendium_item_events.first][first] = second;
 				}
-				++itr;
+				++_it;
 			}
 		}
 	}
@@ -6374,7 +6378,7 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 	//	return nullptr;
 	//}
 
-	if (info.players_connected.size() != info.players.size()) {
+	if (info.players_connected.size() != (int64_t)info.players.size()) {
 		printlog("loadGameFollowers() failed: player data is malformed");
 		return nullptr;
 	}
@@ -6385,7 +6389,8 @@ list_t* loadGameFollowers(const SaveGameInfo& info) {
 	followers->last = NULL;
 
 	// read the follower data
-	for (auto& player : info.players) {
+	for ( int64_t _pl = 0; _pl < info.players.size(); ++_pl ) {
+		auto& player = info.players[_pl];
 		list_t* followerList = (list_t*) malloc(sizeof(list_t));
 		followerList->first = nullptr;
 		followerList->last = nullptr;
