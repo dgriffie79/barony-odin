@@ -172,7 +172,7 @@ void Entity::actGate()
 	bool somebodyinside = false;
 	if ( this->z > gateStartHeight - 6 && this->flags[PASSABLE] )
 	{
-		std::vector<list_t*> entLists;
+		DynamicArrayT<list_t*> entLists;
 		if ( multiplayer == CLIENT )
 		{
 			entLists.push_back(map.entities); // clients use old map.entities method
@@ -181,7 +181,7 @@ void Entity::actGate()
 		{
 			entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
 		}
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
+		for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
 		{
 			list_t* currentList = *it;
 			for ( node = currentList->first; node != nullptr; node = node->next )

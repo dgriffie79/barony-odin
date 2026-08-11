@@ -838,9 +838,9 @@ void actBomb(Entity* my)
 	}
 
 	// launch bomb
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
 	std::vector<Entity*> entitiesWithinRadius;
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+	for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
 		node_t* node;
@@ -1227,8 +1227,8 @@ bool Entity::entityCheckIfTriggeredWallButton()
 	// check for wall buttons
 	if ( z < height_limit_low && z > height_limit_high )
 	{
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			node_t* node;
@@ -1276,8 +1276,8 @@ bool Entity::entityCheckIfTriggeredBomb(bool triggerBomb)
 		return false;
 	}
 	bool foundBomb = false;
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 2);
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 2);
+	for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
 		node_t* node;
@@ -1344,10 +1344,10 @@ void actDecoyBox(Entity* my)
 	if ( my->ticks % TICKS_PER_SECOND == 0 )
 	{
 		Entity* parent = uidToEntity(my->parent);
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, decoyBoxRange * 2 + 1);
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, decoyBoxRange * 2 + 1);
 		std::vector<Entity*> listOfOtherDecoys;
 		// find other decoys (so monsters don't wiggle back and forth.)
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			node_t* node;
@@ -1366,7 +1366,7 @@ void actDecoyBox(Entity* my)
 		bool message = false;
 		bool detected = false;
 		int lured = 0;
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			node_t* node;

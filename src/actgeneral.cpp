@@ -928,7 +928,7 @@ void actColliderMushroomCap(Entity* my)
 			if ( multiplayer != CLIENT )
 			{
 				Entity* caster = uidToEntity(parent->colliderCreatedParent);
-				std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
+				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
 				for ( auto it : entLists )
 				{
 					node_t* node;
@@ -1389,7 +1389,7 @@ void Entity::colliderOnDestroy()
 
 						// find other matching gold piles
 						auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(entity, 2);
-						for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+						for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 						{
 							list_t* currentList = *it;
 							node_t* node;
@@ -1949,7 +1949,7 @@ void actColliderDecoration(Entity* my)
 	else if ( my->flags[PASSABLE] )
 	{
 		// check inside
-		std::vector<list_t*> entLists;
+		DynamicArrayT<list_t*> entLists;
 		if ( multiplayer == CLIENT )
 		{
 			entLists.push_back(map.entities); // clients use old map.entities method
@@ -1959,7 +1959,7 @@ void actColliderDecoration(Entity* my)
 			entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
 		}
 		bool somebodyinside = false;
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
+		for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
 		{
 			list_t* currentList = *it;
 			for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -2114,7 +2114,7 @@ void actColliderDecoration(Entity* my)
 							int range = colliderGetSpellRange(my);
 							auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
 							std::vector<Entity*> entitiesInRange;
-							for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !found; ++it )
+							for ( list_t** it = entLists.begin(); it != entLists.end() && !found; ++it )
 							{
 								list_t* currentList = *it;
 								node_t* node;
@@ -2234,7 +2234,7 @@ void actColliderDecoration(Entity* my)
 					if ( ticks % TICKS_PER_SECOND == 0 )
 					{
 						auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-						for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !found; ++it )
+						for ( list_t** it = entLists.begin(); it != entLists.end() && !found; ++it )
 						{
 							list_t* currentList = *it;
 							node_t* node;
@@ -5373,7 +5373,7 @@ void bellAttractMonsters(Entity* my)
 
 	auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, decoyBoxRange);
 
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+	for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
 		node_t* node;
@@ -6082,7 +6082,7 @@ void actBell(Entity* my)
 						{
 							Entity* puller = uidToEntity(BELL_PULLED_TO_BREAK);
 							auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(child, 2);
-							for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !collided; ++it )
+							for ( list_t** it = entLists.begin(); it != entLists.end() && !collided; ++it )
 							{
 								list_t* currentList = *it;
 								node_t* node;
@@ -6535,7 +6535,7 @@ void actBell(Entity* my)
 			spawnMagicEffectParticlesBell(my, 1479);
 
 			auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 			{
 				list_t* currentList = *it;
 				node_t* node;

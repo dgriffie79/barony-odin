@@ -4896,8 +4896,8 @@ void actMonster(Entity* my)
 		}
 
 		// being bumped by someone friendly
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			for ( node2 = currentList->first; node2 != nullptr; node2 = node2->next ) //Can't convert to map.creatures because of doorframes.
@@ -14809,8 +14809,8 @@ void batResetIdle(Entity* my)
 	bool canRest = true;
 	int x = my->x / 16;
 	int y = my->y / 16;
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && canRest; ++it )
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+	for ( list_t** it = entLists.begin(); it != entLists.end() && canRest; ++it )
 	{
 		list_t* currentList = *it;
 		for ( node_t* node = currentList->first; node != nullptr; node = node->next )

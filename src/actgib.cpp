@@ -476,7 +476,7 @@ void actFociGib(Entity* my)
 				particle->z = 0;*/
 
 				auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
-				for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && spell; ++it )
+				for ( list_t** it = entLists.begin(); it != entLists.end() && spell; ++it )
 				{
 					list_t* currentList = *it;
 					bool lastEntity = false;
@@ -1612,7 +1612,7 @@ void spawnGreasePuddleSpawner(Entity* caster, real_t x, real_t y, int duration)
 			return;
 		}
 		auto entLists = TileEntityList.getEntitiesWithinRadius(ox, oy, 0);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -1736,7 +1736,7 @@ void actGreasePuddleSpawner(Entity* my)
 			{
 				bool foundGrease = false;
 				auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 0);
-				for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !foundGrease; ++it )
+				for ( list_t** it = entLists.begin(); it != entLists.end() && !foundGrease; ++it )
 				{
 					list_t* currentList = *it;
 					for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -1787,7 +1787,7 @@ void actGreasePuddleSpawner(Entity* my)
 
 			auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 0);
 			Entity* parent = my->parent == 0 ? nullptr : uidToEntity(my->parent);
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 			{
 				list_t* currentList = *it;
 				for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -1876,7 +1876,7 @@ void actGreasePuddleSpawner(Entity* my)
 					my->skill[6] = 0;
 
 					auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
-					for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+					for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 					{
 						list_t* currentList = *it;
 						for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -2340,7 +2340,7 @@ void actLeafPile(Entity* my)
 	{
 		if ( my->skill[3] == 0 )
 		{
-			std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
+			DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
 			for ( auto it : entLists )
 			{
 				if ( my->skill[3] != 0 )
@@ -2454,7 +2454,7 @@ void actLeafPile(Entity* my)
 				spellProps.target_y = my->y;
 				castSpell(my->getUID(), getSpellFromID(SPELL_SLAM), false, true, false, &spellProps);
 
-				std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 				real_t dist = 10000.0;
 				Entity* closestEntity = nullptr;
 				for ( auto it : entLists )

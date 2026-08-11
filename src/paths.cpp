@@ -595,8 +595,8 @@ list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target,
 						continue;
 					}
 
-					std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 0);
-					for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !standingOnTrap; ++it )
+					DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 0);
+					for ( list_t** it = entLists.begin(); it != entLists.end() && !standingOnTrap; ++it )
 					{
 						list_t* currentList = *it;
 						node_t* node;

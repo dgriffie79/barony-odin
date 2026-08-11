@@ -925,8 +925,8 @@ void actMinotaurCeilingBuster(Entity* my)
 					}
 				}
 				node_t* node, *nextnode;
-				std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-				for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+				for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 				{
 					list_t* currentList = *it;
 					for ( node = currentList->first; node != nullptr; node = nextnode )

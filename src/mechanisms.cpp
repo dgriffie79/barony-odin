@@ -415,8 +415,8 @@ void actTrap(Entity* my)
 		my->switchUpdateNeighbors();
 	}
 
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyonme; ++it )
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+	for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyonme; ++it )
 	{
 		list_t* currentList = *it;
 		for ( node = currentList->first; node != nullptr; node = node->next )
@@ -596,8 +596,8 @@ void actTrapPermanent(Entity* my)
 			// skip checking for entities.
 			return;
 		}
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			for ( node = currentList->first; node != nullptr; node = node->next )
@@ -2268,8 +2268,8 @@ void Entity::actWind()
 	{
 		int map_x = static_cast<int>(x / 16);
 		int map_y = static_cast<int>(y / 16);
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(map_x, map_y, actWindTileBonusLength + 2);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(map_x, map_y, actWindTileBonusLength + 2);
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			for ( node_t* node = currentList->first; node != nullptr; node = node->next )

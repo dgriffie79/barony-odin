@@ -20474,7 +20474,7 @@ void buildRecipeList(const int player)
 		else if ( players[player] && players[player]->entity )
 		{
 			auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(players[player]->entity, 2);
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 			{
 				list_t* currentList = *it;
 				node_t* node;

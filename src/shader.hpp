@@ -43,7 +43,7 @@ public:
 
 private:
     const char* name = "untitled";
-    std::vector<uint32_t> shaders;
+    DynamicArrayU32 shaders;
     DynamicMapI32 uniforms;
     uint32_t program = 0;
 };

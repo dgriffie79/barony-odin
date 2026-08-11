@@ -460,7 +460,7 @@ public:
 		int spawn_y = 0;
 		bool spawnedOnGround = false;
 		bool looted = false;
-		std::vector<Item> items;
+		DynamicArrayT<Item> items;
 	};
 	std::map<Uint32, Lootbag_t> player_lootbags;
 	list_t void_chest_inventory;

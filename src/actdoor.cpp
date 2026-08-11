@@ -227,7 +227,7 @@ void actDoor(Entity* my)
 			// don't set impassable if someone's inside, otherwise do
 			node_t* node;
 			bool somebodyinside = false;
-			std::vector<list_t*> entLists;
+			DynamicArrayT<list_t*> entLists;
 			if ( multiplayer == CLIENT )
 			{
 				entLists.push_back(map.entities); // clients use old map.entities method
@@ -240,7 +240,7 @@ void actDoor(Entity* my)
 			real_t oldmyy = my->y;
 			my->x = (static_cast<int>(my->x) >> 4) * 16.0 + 8.0; // door positioning isn't centred on tile so adjust
 			my->y = (static_cast<int>(my->y) >> 4) * 16.0 + 8.0;
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
 			{
 				list_t* currentList = *it;
 				for ( node = currentList->first; node != nullptr; node = node->next )
@@ -619,7 +619,7 @@ void Entity::actIronDoor()
 			// don't set impassable if someone's inside, otherwise do
 			node_t* node;
 			bool somebodyinside = false;
-			std::vector<list_t*> entLists;
+			DynamicArrayT<list_t*> entLists;
 			if ( multiplayer == CLIENT )
 			{
 				entLists.push_back(map.entities); // clients use old map.entities method
@@ -632,7 +632,7 @@ void Entity::actIronDoor()
 			real_t oldmyy = y;
 			x = (static_cast<int>(x) >> 4) * 16.0 + 8.0; // door positioning isn't centred on tile so adjust
 			y = (static_cast<int>(y) >> 4) * 16.0 + 8.0;
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
 			{
 				list_t* currentList = *it;
 				for ( node = currentList->first; node != nullptr; node = node->next )

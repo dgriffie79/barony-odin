@@ -4698,9 +4698,9 @@ bool AchievementObserver::PlayerAchievements::checkTraditionKill(Entity* player,
 		return false;
 	}
 
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(target, 3);
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(target, 3);
 	bool foundFountain = false;
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+	for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
 		node_t* node;

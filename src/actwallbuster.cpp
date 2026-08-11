@@ -80,8 +80,8 @@ void actWallBuilder(Entity* my)
 	if ( my->skill[28] == 2)
 	{
 		bool somebodyinside = false;
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
+		for ( list_t** it = entLists.begin(); it != entLists.end() && !somebodyinside; ++it )
 		{
 			list_t* currentList = *it;
 			for ( node_t* node = currentList->first; node != nullptr; node = node->next )

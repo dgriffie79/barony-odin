@@ -538,7 +538,7 @@ void actItem(Entity* my)
 				{
 					int tier = my->skill[11];
 					auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-					for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+					for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 					{
 						list_t* currentList = *it;
 						node_t* node;

@@ -2162,7 +2162,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 							}
 
 							bool skip = false;
-							std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(ent, 1);
+							DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(ent, 1);
 							for ( auto it : entLists )
 							{
 								node_t* node;
@@ -2286,7 +2286,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 							int y = ent->y / 16;
 
 							bool skip = false;
-							std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(ent, 1);
+							DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(ent, 1);
 							for ( auto it : entLists )
 							{
 								node_t* node;
@@ -2575,7 +2575,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 									if ( stats->leader_uid == 0 || (stats->leader_uid && achievementObserver.checkUidIsFromPlayer(stats->leader_uid) < 0) )
 									{
 										bool skip = false;
-										std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(entity, 1);
+										DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(entity, 1);
 										for ( auto it : entLists )
 										{
 											node_t* node;
@@ -5933,7 +5933,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 				{
 					int searchx = static_cast<int>(caster->x + 32 * cos(caster->yaw)) >> 4;
 					int searchy = static_cast<int>(caster->y + 32 * sin(caster->yaw)) >> 4;
-					std::vector<list_t*> itemsOnGround = TileEntityList.getEntitiesWithinRadius(searchx, searchy, 2);
+					DynamicArrayT<list_t*> itemsOnGround = TileEntityList.getEntitiesWithinRadius(searchx, searchy, 2);
 					int totalMetal = 0;
 					int totalMagic = 0;
 					int numItems = 0;

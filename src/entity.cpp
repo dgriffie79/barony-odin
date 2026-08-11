@@ -7176,7 +7176,7 @@ void Entity::handleEffects(Stat* myStats)
 		{
 			int mapIndex = y * MAPLAYERS + x * MAPLAYERS * map.height;
 			auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 2);
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 			{
 				list_t* currentList = *it;
 				for ( node_t* node = currentList->first; node != nullptr; node = node->next )
@@ -8046,7 +8046,7 @@ void Entity::handleEffects(Stat* myStats)
 		real_t dist = std::max(16, std::min(getSpellDamageSecondaryFromID(SPELL_ATTRACT_ITEMS, this, nullptr, this, 0.0, false),
 			getSpellDamageFromID(SPELL_ATTRACT_ITEMS, this, nullptr, this, 0.0, false)));
 		int tiles = 1 + (dist / 16.0);
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, tiles);
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, tiles);
 		for ( auto it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
@@ -17281,7 +17281,7 @@ Teleports the given entity within a radius of a target entity.
 
 bool teleportCoordHasTrap(const int x, const int y)
 {
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(x, y, 0);
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(x, y, 0);
 	for ( auto it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
@@ -28565,9 +28565,9 @@ list_t* TileEntityListHandler::getTileList(int x, int y)
 }
 
 /* returns list of entities within a radius, e.g 1 radius is a 3x3 area around given center. */
-std::vector<list_t*> TileEntityListHandler::getEntitiesWithinRadius(int u, int v, int radius)
+DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadius(int u, int v, int radius)
 {
-	std::vector<list_t*> return_val;
+	DynamicArrayT<list_t*> return_val;
 	for ( int i = u - radius; i <= u + radius; ++i )
 	{
 		for ( int j = v - radius; j <= v + radius; ++j )
@@ -28584,7 +28584,7 @@ std::vector<list_t*> TileEntityListHandler::getEntitiesWithinRadius(int u, int v
 }
 
 /* returns list of entities within a radius around entity, e.g 1 radius is a 3x3 area around entity. */
-std::vector<list_t*> TileEntityListHandler::getEntitiesWithinRadiusAroundEntity(Entity* entity, int radius)
+DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadiusAroundEntity(Entity* entity, int radius)
 {
 	int u = static_cast<int>(entity->x) >> 4;
 	int v = static_cast<int>(entity->y) >> 4;

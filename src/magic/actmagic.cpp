@@ -11824,7 +11824,7 @@ void actParticleTimer(Entity* my)
 							if ( multiplayer != CLIENT )
 							{
 								int numTargets = 0;
-								std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(caster, 3);
+								DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(caster, 3);
 								for ( auto it : entLists )
 								{
 									node_t* node;
@@ -12025,7 +12025,7 @@ void actParticleTimer(Entity* my)
 						//my->x = parent->x;
 						//my->y = parent->y;
 
-						std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
+						DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);
 						for ( auto it : entLists )
 						{
 							if ( PARTICLE_LIFE <= 0 )
@@ -12223,7 +12223,7 @@ void actParticleTimer(Entity* my)
 							if ( multiplayer != CLIENT )
 							{
 								int numTargets = 0;
-								std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(caster, 3);
+								DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(caster, 3);
 								for ( auto it : entLists )
 								{
 									node_t* node;
@@ -12316,7 +12316,7 @@ void actParticleTimer(Entity* my)
 				Stat* parentStats = parent ? parent->getStats() : nullptr;
 				if ( parent && parentStats && ((parent->behavior == &actPlayer ? parent->skill[9] : parent->monsterAttack) != 0) )
 				{
-					std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 2);
+					DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 2);
 					for ( auto it : entLists )
 					{
 						node_t* node;
@@ -12410,7 +12410,7 @@ void actParticleTimer(Entity* my)
 				Stat* parentStats = parent ? parent->getStats() : nullptr;
 				if ( parent && parentStats && parent->monsterAttack != 0 && parentStats->getEffectActive(EFF_KNOCKBACK) )
 				{
-					std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 1);
+					DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 1);
 					for ( auto it : entLists )
 					{
 						node_t* node;
@@ -12501,7 +12501,7 @@ void actParticleTimer(Entity* my)
 				Stat* parentStats = parent ? parent->getStats() : nullptr;
 				if ( parent && parentStats && parent->monsterAttack == MONSTER_POSE_EARTH_ELEMENTAL_ROLL && parentStats->getEffectActive(EFF_KNOCKBACK) )
 				{
-					std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 1);
+					DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(parent->x / 16, parent->y / 16, 1);
 					for ( auto it : entLists )
 					{
 						node_t* node;
@@ -12645,7 +12645,7 @@ void actParticleTimer(Entity* my)
 
 						Entity* target = uidToEntity(my->particleTimerTarget);
 
-						std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+						DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 						for ( auto it : entLists )
 						{
 							node_t* node;
@@ -12767,7 +12767,7 @@ void actParticleTimer(Entity* my)
 					}
 					if ( my->actmagicOrbitHitTargetUID1 == 0 && my->ticks < 100 )
 					{
-						std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+						DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 						real_t dist = 10000.0;
 						Uint8 hadStaticEffect = 0;
 						for ( auto it : entLists )
@@ -13032,7 +13032,7 @@ void actParticleTimer(Entity* my)
 					}
 					if ( my->actmagicOrbitHitTargetUID1 == 0 )
 					{
-						std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+						DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 						real_t dist = 10000.0;
 						for ( auto it : entLists )
 						{
@@ -13232,7 +13232,7 @@ void actParticleTimer(Entity* my)
 					if ( my->ticks <= 50 && parent )
 					{
 						real_t range = 32.0;
-						std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
+						DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
 						for ( auto it : entLists )
 						{
 							node_t* node;
@@ -14647,8 +14647,8 @@ bool Entity::magicFallingCollision()
 
 	if ( actmagicIsVertical == MAGIC_ISVERTICAL_Z )
 	{
-		std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
-		for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+		DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
+		for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 		{
 			list_t* currentList = *it;
 			node_t* node;
@@ -14719,9 +14719,9 @@ bool Entity::magicOrbitingCollision()
 
 	Entity* caster = uidToEntity(parent);
 
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(this, 1);
 
-	for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+	for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 	{
 		list_t* currentList = *it;
 		node_t* node;
@@ -17453,7 +17453,7 @@ void actParticleFloorMagic(Entity* my)
 				}
 			}
 
-			std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, radius);
+			DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, radius);
 			for ( auto it : entLists )
 			{
 				if ( my->actfloorMagicType == ParticleTimerEffect_t::EffectType::EFFECT_ROOTS_TILE_VOID )
@@ -17943,7 +17943,7 @@ void actParticleFloorMagic(Entity* my)
 									}
 									else
 									{
-										std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, radius);
+										DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, radius);
 										for ( auto it : entLists )
 										{
 											if ( found )
@@ -18505,7 +18505,7 @@ void actParticleWave(Entity* my)
 		if ( my->actParticleWaveMagicType == ParticleTimerEffect_t::EFFECT_CHRONOMIC_FIELD )
 		{
 			int chronomicLimit = getSpellDamageFromID(SPELL_CHRONOMIC_FIELD, caster, nullptr, my);
-			std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+			DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 			for ( auto it : entLists )
 			{
 				if ( my->actParticleWaveVariable1 >= chronomicLimit )
@@ -18589,7 +18589,7 @@ void actParticleWave(Entity* my)
 		}
 		else if ( my->actParticleWaveMagicType == ParticleTimerEffect_t::EFFECT_KINETIC_FIELD )
 		{
-			std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+			DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 			for ( auto it : entLists )
 			{
 				node_t* node;
@@ -18688,7 +18688,7 @@ void actParticleWave(Entity* my)
 		}
 		else if ( my->actParticleWaveMagicType == ParticleTimerEffect_t::EFFECT_FIRE_WAVE )
 		{
-			std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+			DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
 			real_t size = 2;
 			for ( auto it : entLists )
 			{
@@ -21112,7 +21112,7 @@ void doSpellExplosionArea(int spellID, Entity* my, Entity* caster, real_t x, rea
 		}
 	}
 
-	std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(x / 16, y / 16, 1 + (radius / 16));
+	DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadius(x / 16, y / 16, 1 + (radius / 16));
 	for ( auto it : entLists )
 	{
 		node_t* node;

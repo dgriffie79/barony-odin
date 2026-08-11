@@ -46,7 +46,7 @@ void actSummonTrap(Entity* my)
 		if ( ticks % TICKS_PER_SECOND == 0 || SUMMONTRAP_TICKS_TO_FIRE > 0 )
 		{
 			auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, SUMMONTRAP_SPAWN_IN_PLAYER_PROXIMITY);
-			for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end() && !foundTriggerEntity; ++it )
+			for ( list_t** it = entLists.begin(); it != entLists.end() && !foundTriggerEntity; ++it )
 			{
 				list_t* currentList = *it;
 				node_t* node;

@@ -415,8 +415,8 @@ public:
 	list_t* getTileList(int x, int y);
 	node_t* addEntity(Entity& entity);
 	node_t* updateEntity(Entity& entity);
-	std::vector<list_t*> getEntitiesWithinRadius(int u, int v, int radius);
-	std::vector<list_t*> getEntitiesWithinRadiusAroundEntity(Entity* entity, int radius);
+	DynamicArrayT<list_t*> getEntitiesWithinRadius(int u, int v, int radius);
+	DynamicArrayT<list_t*> getEntitiesWithinRadiusAroundEntity(Entity* entity, int radius);
 
 	TileEntityListHandler()
 	{

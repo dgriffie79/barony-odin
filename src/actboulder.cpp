@@ -898,8 +898,8 @@ void actBoulder(Entity* my)
 		{
 			if ( my->z >= -8 && my->z < 0.0 && fabs(my->vel_z) > 2 )
 			{
-				std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-				for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+				for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 				{
 					list_t* currentList = *it;
 					node_t* node;
@@ -1105,8 +1105,8 @@ void actBoulder(Entity* my)
 			// crush objects
 			if ( dist && !BOULDER_NOGROUND )
 			{
-				std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-				for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+				for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 				{
 					list_t* currentList = *it;
 					node_t* node;
@@ -1482,8 +1482,8 @@ void actBoulder(Entity* my)
 							return;
 						}
 					}
-					/*std::vector<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
-					for ( std::vector<list_t*>::iterator it = entLists.begin(); it != entLists.end(); ++it )
+					/*DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 2);
+					for ( list_t** it = entLists.begin(); it != entLists.end(); ++it )
 					{
 						list_t* currentList = *it;
 						node_t* node;
