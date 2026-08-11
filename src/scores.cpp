@@ -4963,9 +4963,9 @@ void SaveGameInfo::computeHash(const int playernum, Uint32& hash)
 		}
 	}
 
-	for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(additional_data); ++_ad )
+	for ( auto& pair : additional_data )
 	{
-		auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(additional_data, _ad);
+		
 		hash += djb2Hash(const_cast<char*>(pair.first.c_str()));
 		hash += djb2Hash(const_cast<char*>(pair.second.c_str()));
 	}
@@ -5526,7 +5526,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 	info->map_messages = ::Player::Minimap_t::mapDetails;
 	if ( gameModeManager.currentSession.challengeRun.isActive() )
 	{
-		dynarray_pair_push<std::pair<DynamicString, DynamicString>>(info->additional_data, std::make_pair(DynamicString("game_scenario"), DynamicString(gameModeManager.currentSession.challengeRun.scenarioStr.c_str())));
+		info->additional_data.push_back(std::make_pair(std::string("game_scenario"), gameModeManager.currentSession.challengeRun.scenarioStr));
 	}
 
 
@@ -5678,9 +5678,9 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 	DynamicString lid = "lid";
 	int lid_version = 0;
 	int challengeEventSave = 0;
-	for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(additional_data); ++_ad )
+	for ( auto& pair : additional_data )
 	{
-		auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(additional_data, _ad);
+		
 		if ( pair.first == "game_scenario" )
 		{
 			GameModeManager_t::CurrentSession_t::ChallengeRun_t run;
@@ -5912,9 +5912,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 			printlog("[SESSION]: Using savegame server flags");
 			gameModeManager.currentSession.seededRun.seed = info.customseed;
 			gameModeManager.currentSession.seededRun.seedString = info.customseed_string;
-			for ( int64_t _ad = 0; _ad < dynarray_pair_size<std::pair<DynamicString, DynamicString>>(info.additional_data); ++_ad )
+			for ( auto& pair : info.additional_data )
 			{
-				auto& pair = *dynarray_pair_at<std::pair<DynamicString, DynamicString>>(info.additional_data, _ad);
+				
 				if ( pair.first == "game_scenario" )
 				{
 					gameModeManager.currentSession.challengeRun.setup(pair.second);

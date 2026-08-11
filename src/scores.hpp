@@ -774,7 +774,7 @@ struct SaveGameInfo {
 	};
 	DynamicArrayT<Player> players;
 	std::vector<std::pair<std::string, std::string>> map_messages; // map modifiers "sound of pickaxes striking rock" "walls are fortified" etc
-	DynamicArray additional_data;  // vector<pair<DynamicString,DynamicString>>
+	std::vector<std::pair<std::string, std::string>> additional_data;
 	
 	bool serialize(FileInterface* fp) {
 		fp->property("magic_cookie", magic_cookie);
