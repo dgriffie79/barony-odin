@@ -2669,7 +2669,7 @@ public:
 			DynamicString description;
 			Uint32 completionTime;
 		};
-		std::vector<Level_t> levels;
+		DynamicArrayT<Level_t> levels;
 
 		void readFromFile();
 		void writeToDocument();

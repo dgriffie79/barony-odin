@@ -258,12 +258,11 @@ public:
     void erase(int64_t i) { barony_dynamic_array_elem_erase(&raw, (int32_t)i, sizeof(T), DynamicArrayKindOf<T>::value); }
     void pop_back() { if (size() > 0) erase(size() - 1); }
 
-    // at: deep-copied element by value (safe for owned types)
-    T at(int64_t i) const {
-        T out{};
-        barony_dynamic_array_elem_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out, sizeof(T), DynamicArrayKindOf<T>::value);
-        return out;
-    }
+    // at: LIVE slot reference (std::vector::at semantics — mutable). For
+    // owned types the returned ref is the stored element (field assigns
+    // free/alloc their own buffers correctly).
+    T& at(int64_t i) { return reinterpret_cast<T*>(raw.data)[i]; }
+    const T& at(int64_t i) const { return reinterpret_cast<const T*>(raw.data)[i]; }
     void set(int64_t i, const T& v) { barony_dynamic_array_elem_set(&raw, (int32_t)i, &v, sizeof(T), DynamicArrayKindOf<T>::value); }
 
     // operator[] — LIVE slot reference. For owned types this is the live

@@ -358,6 +358,51 @@ follower_details_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// Level_t (tutorial scores) — owns 3 DynamicStrings
+// ---------------------------------------------------------------------------
+Level_t :: struct {
+	filename:      DynamicString,
+	title:         DynamicString,
+	description:   DynamicString,
+	completionTime: u32,
+}
+
+level_t_free :: proc(p: rawptr) {
+	v := (^Level_t)(p)
+	fields := [?]^DynamicString{ &v.filename, &v.title, &v.description }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+level_t_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Level_t)(dst)
+	s := (^Level_t)(src)
+	d.completionTime = s.completionTime
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.filename, &s.filename },
+		{ &d.title, &s.title },
+		{ &d.description, &s.description },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
 Element_Ops :: struct {
 	free: proc(rawptr),
