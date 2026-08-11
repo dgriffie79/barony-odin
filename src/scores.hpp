@@ -224,7 +224,7 @@ enum SteamGlobalStatIndexes : int
 	STEAM_GSTAT_MAX
 };
 
-const std::vector<DynamicString> SteamGlobalStatStr =
+const DynamicArrayStr SteamGlobalStatStr =
 {
 	"GAMES_STARTED",
 	"GAMES_WON",
