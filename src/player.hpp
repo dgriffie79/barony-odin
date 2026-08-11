@@ -720,19 +720,7 @@ public:
 		bool dropDownToggleClick = false;
 		int dropdownLinkToModule = 0;
 		bool bClosedThisTick = false;
-		struct DropdownOption_t {
-			DynamicString text = "";
-			DynamicString keyboardGlyph = "";
-			DynamicString controllerGlyph = "";
-			DynamicString action = "";
-			DropdownOption_t(std::string _text, std::string _keyboardGlyph, std::string _controllerGlyph, std::string _action)
-			{
-				text = _text;
-				action = _action;
-				keyboardGlyph = _keyboardGlyph;
-				controllerGlyph = _controllerGlyph;
-			}
-		};
+		typedef DropdownOption_tMirror DropdownOption_t;
 		struct DropDown_t
 		{
 			DynamicString title = "Interact";
@@ -740,7 +728,7 @@ public:
 			bool alignRight = true;
 			int module = 0;
 			int defaultOption = 0;
-			std::vector<DropdownOption_t> options;
+			DynamicArrayOption options;
 		};
 
 		void open(const DynamicString name);

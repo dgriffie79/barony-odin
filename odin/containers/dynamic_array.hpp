@@ -58,6 +58,22 @@ struct ItemTooltipIcons_tMirror {
     }
 };
 
+struct DropdownOption_tMirror {
+    DynamicString text;
+    DynamicString keyboardGlyph;
+    DynamicString controllerGlyph;
+    DynamicString action;
+    DropdownOption_tMirror() = default;
+    DropdownOption_tMirror(const std::string& _text, const std::string& _keyboardGlyph,
+                           const std::string& _controllerGlyph, const std::string& _action) {
+        text = _text.c_str();
+        keyboardGlyph = _keyboardGlyph.c_str();
+        controllerGlyph = _controllerGlyph.c_str();
+        action = _action.c_str();
+    }
+};
+
+
 extern "C" {
 
     void    barony_dynamic_array_init(DynamicArray*);
@@ -126,6 +142,18 @@ extern "C" {
 
     int32_t barony_dynamic_array_icon_entries(DynamicArray*, ItemTooltipIcons_tMirror*, int32_t);
 
+
+    // DropdownOption_t array (4 DynamicStrings, deep-owned)
+    void    barony_dynamic_array_option_init(DynamicArray*);
+    void    barony_dynamic_array_option_append(DynamicArray*, DropdownOption_tMirror*);
+    bool    barony_dynamic_array_option_get(DynamicArray*, int32_t, DropdownOption_tMirror*);
+    void    barony_dynamic_array_option_set(DynamicArray*, int32_t, DropdownOption_tMirror*);
+    void    barony_dynamic_array_option_erase(DynamicArray*, int32_t);
+    void    barony_dynamic_array_option_clear(DynamicArray*);
+    void    barony_dynamic_array_option_destroy(DynamicArray*);
+    int32_t barony_dynamic_array_option_len(DynamicArray*);
+    void    barony_dynamic_array_option_copy(DynamicArray*, DynamicArray*);
+    int32_t barony_dynamic_array_option_entries(DynamicArray*, DropdownOption_tMirror*, int32_t);
 }
 
 
@@ -624,3 +652,66 @@ public:
     Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
 };
 
+
+// ---------------------------------------------------------------------------
+// DynamicArrayOption — std::vector<DropdownOption_t> replacement. Elements
+// are 4 DynamicStrings (deep-owned). Live-slot iterators (like Icon).
+// ---------------------------------------------------------------------------
+;
+
+class DynamicArrayOption {
+public:
+    DynamicArray raw{};
+
+    DynamicArrayOption() { barony_dynamic_array_option_init(&raw); }
+    ~DynamicArrayOption() { barony_dynamic_array_option_destroy(&raw); }
+    DynamicArrayOption(const DynamicArrayOption& other) : raw{} {
+        barony_dynamic_array_option_init(&raw);
+        *this = other;
+    }
+    DynamicArrayOption& operator=(const DynamicArrayOption& other) {
+        if (this != &other) { barony_dynamic_array_option_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
+        return *this;
+    }
+    DynamicArrayOption(DynamicArrayOption&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicArray{};
+    }
+    DynamicArrayOption& operator=(DynamicArrayOption&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_array_option_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicArray{};
+        }
+        return *this;
+    }
+
+    int64_t size() const { return barony_dynamic_array_option_len(const_cast<DynamicArray*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_array_option_clear(&raw); }
+    void push_back(const DropdownOption_tMirror& v) { barony_dynamic_array_option_append(&raw, const_cast<DropdownOption_tMirror*>(&v)); }
+    void erase(int64_t i) { barony_dynamic_array_option_erase(&raw, (int32_t)i); }
+    DropdownOption_tMirror at(int64_t i) const {
+        DropdownOption_tMirror out;
+        barony_dynamic_array_option_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
+        return out;
+    }
+    void set(int64_t i, const DropdownOption_tMirror& v) { barony_dynamic_array_option_set(&raw, (int32_t)i, const_cast<DropdownOption_tMirror*>(&v)); }
+    DropdownOption_tMirror& operator[](int64_t i) {
+        static thread_local DropdownOption_tMirror _tmp;
+        barony_dynamic_array_option_get(&raw, (int32_t)i, &_tmp);
+        return _tmp;
+    }
+    // live-slot iterators (mutations persist)
+    struct Iterator {
+        DynamicArray* arr = nullptr;
+        int64_t i = 0;
+        DropdownOption_tMirror* operator->() const { return (DropdownOption_tMirror*)arr->data + i; }
+        DropdownOption_tMirror& operator*() const { return *((DropdownOption_tMirror*)arr->data + i); }
+        Iterator& operator++() { ++i; return *this; }
+        bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
+    };
+    Iterator begin() { return Iterator{&raw, 0}; }
+    Iterator end() { return Iterator{&raw, size()}; }
+    Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
+    Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
+};

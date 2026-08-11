@@ -479,3 +479,159 @@ barony_dynamic_array_icon_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: 
 	}
 	return i32(n)
 }
+
+// ---------------------------------------------------------------------------
+// DynamicArray of DropdownOption_t (std::vector<DropdownOption_t>).
+// Element = 4 DynamicStrings (text, keyboardGlyph, controllerGlyph, action).
+// Deep-owned.
+// ---------------------------------------------------------------------------
+DropdownOption_t :: struct {
+	text:             DynamicString,
+	keyboardGlyph:    DynamicString,
+	controllerGlyph:  DynamicString,
+	action:           DynamicString,
+}
+
+dropdown_option_free :: proc(v: ^DropdownOption_t) {
+	fields := [?]^DynamicString{ &v.text, &v.keyboardGlyph, &v.controllerGlyph, &v.action }
+	for s in fields {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+}
+
+dropdown_option_copy :: proc(dst: ^DropdownOption_t, src: ^DropdownOption_t) {
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.text, &src.text },
+		{ &dst.keyboardGlyph, &src.keyboardGlyph },
+		{ &dst.controllerGlyph, &src.controllerGlyph },
+		{ &dst.action, &src.action },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_array_option_init :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_option_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^DropdownOption_t) {
+	context = runtime.default_context()
+	if elem == nil { return }
+	if a.cap - a.len < size_of(DropdownOption_t) {
+		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(DropdownOption_t))
+	}
+	slot := ([^]DropdownOption_t)(uintptr(a.data) + uintptr(a.len))
+	dropdown_option_copy(slot, elem)
+	a.len += size_of(DropdownOption_t)
+}
+
+@(export)
+barony_dynamic_array_option_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^DropdownOption_t) -> bool {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return false }
+	elems := ([^]DropdownOption_t)(a.data)
+	dropdown_option_copy(out, &elems[index])
+	return true
+}
+
+@(export)
+barony_dynamic_array_option_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^DropdownOption_t) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return }
+	elems := ([^]DropdownOption_t)(a.data)
+	dropdown_option_free(&elems[index])
+	dropdown_option_copy(&elems[index], elem)
+}
+
+@(export)
+barony_dynamic_array_option_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return }
+	elems := ([^]DropdownOption_t)(a.data)
+	dropdown_option_free(&elems[index])
+	n := a.len / size_of(DropdownOption_t)
+	for i := int(index); i < n - 1; i += 1 {
+		elems[i] = elems[i + 1]
+	}
+	a.len -= size_of(DropdownOption_t)
+}
+
+@(export)
+barony_dynamic_array_option_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]DropdownOption_t)(a.data)
+		n := a.len / size_of(DropdownOption_t)
+		for i in 0..<n {
+			dropdown_option_free(&elems[i])
+		}
+	}
+	a.len = 0
+}
+
+@(export)
+barony_dynamic_array_option_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]DropdownOption_t)(a.data)
+		n := a.len / size_of(DropdownOption_t)
+		for i in 0..<n {
+			dropdown_option_free(&elems[i])
+		}
+	}
+	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_option_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
+	context = runtime.default_context()
+	return i32(a.len / size_of(DropdownOption_t))
+}
+
+@(export)
+barony_dynamic_array_option_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if dst.data != nil {
+		barony_dynamic_array_option_destroy(dst)
+	}
+	if src.data == nil || src.len == 0 { return }
+	src_elems := ([^]DropdownOption_t)(src.data)
+	n := src.len / size_of(DropdownOption_t)
+	for i in 0..<n {
+		if dst.cap - dst.len < size_of(DropdownOption_t) {
+			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(DropdownOption_t))
+		}
+		slot := ([^]DropdownOption_t)(uintptr(dst.data) + uintptr(dst.len))
+		dropdown_option_copy(slot, &src_elems[i])
+		dst.len += size_of(DropdownOption_t)
+	}
+}
+
+@(export)
+barony_dynamic_array_option_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]DropdownOption_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if a.data == nil || count <= 0 { return 0 }
+	elems := ([^]DropdownOption_t)(a.data)
+	n := a.len / size_of(DropdownOption_t)
+	if n > int(count) { n = int(count) }
+	for i in 0..<n {
+		dropdown_option_copy(&val_ptrs[i], &elems[i])
+	}
+	return i32(n)
+}
