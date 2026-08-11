@@ -1624,3 +1624,20 @@ i32_map_find :: proc(m: rawptr, key: rawptr, out_val: rawptr, out_val_len: ^i32,
 	}
 	return true
 }
+
+// set copy: snapshot src entries, insert into dst (dst must be empty/fresh)
+@(export)
+barony_dynamic_set_i32_copy :: proc "c" (dst: ^map[i32]struct{}, src: ^map[i32]struct{}) {
+	context = runtime.default_context()
+	if dst^ != nil {
+		barony_dynamic_set_i32_destroy(dst)
+	}
+	if src^ == nil {
+		return
+	}
+	values: [512]i32
+	n := barony_dynamic_set_i32_entries(src, &values[0], 512)
+	for i in 0..<int(n) {
+		barony_dynamic_set_i32_insert(dst, values[i])
+	}
+}

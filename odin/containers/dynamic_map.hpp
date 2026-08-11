@@ -103,6 +103,12 @@ public:
     }
 
     bool insert(int v) { return barony_dynamic_set_i32_insert(&raw, v); }
+    // find()/end() (std::set-like): find(x) != end()
+    struct Iterator { int value = 0; bool valid = false; };
+    Iterator find(int v) const { Iterator it; it.valid = barony_dynamic_set_i32_contains(const_cast<DynamicMapRaw*>(&raw), v); it.value = v; return it; }
+    Iterator end() const { return Iterator{}; }
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
+    friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
     bool contains(int v) const { return barony_dynamic_set_i32_contains(const_cast<DynamicMapRaw*>(&raw), v); }
     bool erase(int v) { return barony_dynamic_set_i32_erase(&raw, v); }
     int64_t size() const { return barony_dynamic_set_i32_len(const_cast<DynamicMapRaw*>(&raw)); }

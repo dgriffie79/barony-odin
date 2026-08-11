@@ -1905,10 +1905,10 @@ public:
 		MapGeneration(std::string name) { mapName = name; };
 		DynamicString mapName = "";
 		DynamicArrayStr trapTypes;
-		std::unordered_set<int> minoFloors;
-		std::unordered_set<int> darkFloors;
-		std::unordered_set<int> shopFloors;
-		std::unordered_set<int> npcSpawnFloors;
+		DynamicSetI32 minoFloors;
+		DynamicSetI32 darkFloors;
+		DynamicSetI32 shopFloors;
+		DynamicSetI32 npcSpawnFloors;
 		bool usingTrapTypes = false;
 		int minoPercent = -1;
 		int shopPercent = -1;
@@ -1916,7 +1916,7 @@ public:
 		int npcSpawnPercent = -1;
 	};
 
-	std::vector<MapGeneration> allMapGenerations;
+	DynamicArrayT<MapGeneration> allMapGenerations;
 	bool mapGenerationExistsForMapName(std::string name)
 	{
 		for ( auto& it : allMapGenerations )
@@ -2467,6 +2467,8 @@ template <> struct DynamicArrayKindOf<MonsterStatCustomManager::StatEntry::Varia
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::MonsterCurveEntry::MonsterVariant_t> { static constexpr int value = Kind_VariantPair; };
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::MonsterCurveEntry> { static constexpr int value = Kind_MonsterCurveEntry; };
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::LevelCurve> { static constexpr int value = Kind_LevelCurve; };
+template <> struct DynamicArrayKindOf<GameplayCustomManager::MapGeneration> { static constexpr int value = Kind_MapGeneration; };
+
 
 
 

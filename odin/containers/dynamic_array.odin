@@ -194,6 +194,7 @@ Kind_VariantPair     :: 9
 Kind_MonsterCurveEntry :: 10
 Kind_LevelCurve      :: 11
 Kind_TmpItem         :: 12
+Kind_MapGeneration   :: 13
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -681,6 +682,62 @@ tmp_item_copy :: proc(dst: rawptr, src: rawptr) {
 			barony_dynamic_map_str_put(&d.attributes, key_str, &val_ptrs[i], 0)
 		}
 	}
+}
+
+// ---------------------------------------------------------------------------
+// MapGeneration_t (map generation config) — owns string + array + 4 sets
+// ---------------------------------------------------------------------------
+MapGeneration_t :: struct {
+	mapName:        DynamicString,
+	trapTypes:      Raw_Dynamic_Array,   // DynamicArrayStr
+	minoFloors:     Raw_Map,             // map[i32]struct{}
+	darkFloors:     Raw_Map,
+	shopFloors:     Raw_Map,
+	npcSpawnFloors: Raw_Map,
+	usingTrapTypes: bool,
+	minoPercent:    i32,
+	shopPercent:    i32,
+	darkPercent:    i32,
+	npcSpawnPercent: i32,
+}
+
+map_generation_free :: proc(p: rawptr) {
+	v := (^MapGeneration_t)(p)
+	if v.mapName.data != nil {
+		mem.free(v.mapName.data)
+		v.mapName.data = nil
+	}
+	v.mapName.len = 0
+	barony_dynamic_array_elem_destroy(&v.trapTypes, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_set_i32_destroy(transmute(^map[i32]struct{})(&v.minoFloors))
+	barony_dynamic_set_i32_destroy(transmute(^map[i32]struct{})(&v.darkFloors))
+	barony_dynamic_set_i32_destroy(transmute(^map[i32]struct{})(&v.shopFloors))
+	barony_dynamic_set_i32_destroy(transmute(^map[i32]struct{})(&v.npcSpawnFloors))
+}
+
+map_generation_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^MapGeneration_t)(dst)
+	s := (^MapGeneration_t)(src)
+	d.usingTrapTypes = s.usingTrapTypes
+	d.minoPercent = s.minoPercent
+	d.shopPercent = s.shopPercent
+	d.darkPercent = s.darkPercent
+	d.npcSpawnPercent = s.npcSpawnPercent
+	if d.mapName.data != nil { mem.free(d.mapName.data); d.mapName.data = nil }
+	d.mapName.len = 0
+	if s.mapName.len > 0 {
+		buf, _ := mem.alloc(s.mapName.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.mapName.data, s.mapName.len)
+			(^u8)(uintptr(buf) + uintptr(s.mapName.len))^ = 0
+			d.mapName = DynamicString{ data = buf, len = s.mapName.len }
+		}
+	}
+	barony_dynamic_array_elem_copy(&d.trapTypes, &s.trapTypes, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.minoFloors), transmute(^map[i32]struct{})(&s.minoFloors))
+	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.darkFloors), transmute(^map[i32]struct{})(&s.darkFloors))
+	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.shopFloors), transmute(^map[i32]struct{})(&s.shopFloors))
+	barony_dynamic_set_i32_copy(transmute(^map[i32]struct{})(&d.npcSpawnFloors), transmute(^map[i32]struct{})(&s.npcSpawnFloors))
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

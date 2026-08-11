@@ -203,6 +203,7 @@ enum DynamicArrayKind {
     Kind_MonsterCurveEntry = 10,
     Kind_LevelCurve = 11,
     Kind_TmpItem = 12,
+    Kind_MapGeneration = 13,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };
