@@ -14549,27 +14549,26 @@ failed:
 		static const DynamicString prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
 		for (int c = num_classes - 1; c >= 0; --c) {
 			auto name = classes_in_order[c];
-			auto find = classes.find(name);
-			assert(find != classes.end());
-			auto& full_class = find->second;
+			assert(classes.contains(name));
+			auto& full_class = classes[name];
 			auto button = subframe->addButton(name);
 			switch (full_class.dlc) {
-			case DLC::Base:
+			case (int)DLC::Base:
 				button->setBackground((prefix + "ClassSelect_IconBGBase_00.png").c_str());
 				button->setBackgroundHighlighted((prefix + "ClassSelect_IconBGBaseHigh_00.png").c_str());
 				button->setBackgroundActivated((prefix + "ClassSelect_IconBGBasePress_00.png").c_str());
 				break;
-			case DLC::MythsAndOutcasts:
+			case (int)DLC::MythsAndOutcasts:
 				button->setBackground((prefix + "ClassSelect_IconBGMyths_00.png").c_str());
 				button->setBackgroundHighlighted((prefix + "ClassSelect_IconBGMythsHigh_00.png").c_str());
 				button->setBackgroundActivated((prefix + "ClassSelect_IconBGMythsPress_00.png").c_str());
 				break;
-			case DLC::LegendsAndPariahs:
+			case (int)DLC::LegendsAndPariahs:
 				button->setBackground((prefix + "ClassSelect_IconBGLegends_00.png").c_str());
 				button->setBackgroundHighlighted((prefix + "ClassSelect_IconBGLegendsHigh_00.png").c_str());
 				button->setBackgroundActivated((prefix + "ClassSelect_IconBGLegendsPress_00.png").c_str());
 				break;
-			case DLC::DesertersAndDisciples:
+			case (int)DLC::DesertersAndDisciples:
 				button->setBackground((prefix + "ClassSelect_IconBGDeserters_00.png").c_str());
 				button->setBackgroundHighlighted((prefix + "ClassSelect_IconBGDesertersHigh_00.png").c_str());
 				button->setBackgroundActivated((prefix + "ClassSelect_IconBGDesertersPress_00.png").c_str());
@@ -14769,9 +14768,9 @@ failed:
 
 				// update highlight state for class icon
 				const auto name = button->getName();
-				const auto find = classes.find(name);
-				if (find != classes.end()) {
-					const auto& full_class = find->second;
+				if (classes.contains(name)) {
+					Class_tMirror full_class;
+					classes.get(name, full_class);
                     
                     // preview the class
                     if (button->isSelected() || button->isHighlighted() || client_classes[index] == class_index) {
@@ -15427,32 +15426,31 @@ failed:
 
 		static auto class_button_tick_fn = [](Button& button, int index) {
 			int i = std::min(std::max(0, client_classes[index]), num_classes - 1);
-			auto find = classes.find(classes_in_order[i]);
-			if (find != classes.end()) {
-				auto& class_info = find->second;
+			if (classes.contains(classes_in_order[i])) {
+				auto& class_info = classes[classes_in_order[i]];
 				switch (class_info.dlc) {
-				case DLC::Base:
+				case (int)DLC::Base:
 					button.setBackground("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGBase_00.png");
 					button.setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGBaseHigh_00.png");
 					button.setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGBasePress_00.png");
 					break;
-				case DLC::MythsAndOutcasts:
+				case (int)DLC::MythsAndOutcasts:
 					button.setBackground("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGMyths_00.png");
 					button.setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGMythsHigh_00.png");
 					button.setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGMythsPress_00.png");
 					break;
-				case DLC::LegendsAndPariahs:
+				case (int)DLC::LegendsAndPariahs:
 					button.setBackground("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGLegends_00.png");
 					button.setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGLegendsHigh_00.png");
 					button.setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGLegendsPress_00.png");
 					break;
-				case DLC::DesertersAndDisciples:
+				case (int)DLC::DesertersAndDisciples:
 					button.setBackground("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGDeserters_00.png");
 					button.setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGDesertersHigh_00.png");
 					button.setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/ClassSelect_IconBGDesertersPress_00.png");
 					break;
 				}
-				button.setIcon((std::string("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/") + find->second.image_highlighted).c_str());
+				button.setIcon((std::string("*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/") + class_info.image_highlighted).c_str());
 			}
 		};
 
@@ -20430,10 +20428,11 @@ failed:
         const int num_classes = sizeof(classes_in_order) / sizeof(classes_in_order[0]);
         const int class_index = (info.players[player].char_class) % num_classes;
         const auto class_name = classes_in_order[class_index];
-        const auto class_find = classes.find(class_name);
-        if (class_find != classes.end()) {
+        if (classes.contains(class_name)) {
+            Class_tMirror _ci;
+            classes.get(class_name, _ci);
             DynamicString class_img_path = "#*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
-            class_img_path += class_find->second.image_highlighted;
+            class_img_path += _ci.image_highlighted;
             auto class_img = subframe->addImage(
                 SDL_Rect{2, 0, 54, 54},
                 0xffffffff,
@@ -29171,11 +29170,12 @@ failed:
 						}
 
 						const auto class_name = classes_in_order[classnum];
-						const auto class_find = classes.find(class_name);
-						if ( class_find != classes.end() )
+						if ( classes.contains(class_name) )
 						{
+							Class_tMirror _ci;
+							classes.get(class_name, _ci);
 							itemImg->path = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
-							itemImg->path += class_find->second.image_highlighted;
+							itemImg->path += _ci.image_highlighted;
 						}
 					}
 

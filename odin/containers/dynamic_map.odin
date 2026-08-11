@@ -3169,3 +3169,114 @@ barony_dynamic_map_strbinding_entries :: proc "c" (m: ^map[string]binding_t, key
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> Class (map<string, Class>) — main menu class selection icons.
+// Value: 1 i32 (DLC enum) + 3 const char* (NON-OWNING string literals).
+// No owned members — put/get are plain copies.
+// ---------------------------------------------------------------------------
+Class_t :: struct {
+	dlc:               i32,
+	image:             rawptr,  // const char* (non-owning)
+	image_highlighted: rawptr,
+	image_locked:      rawptr,
+}
+
+@(export)
+barony_dynamic_map_strclass_init :: proc "c" (m: ^map[string]Class_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strclass_put :: proc "c" (m: ^map[string]Class_t, key: string, value: ^Class_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Class_t)
+	}
+	k := intern_string(key)
+	m[k] = value^
+}
+
+@(export)
+barony_dynamic_map_strclass_get :: proc "c" (m: ^map[string]Class_t, key: string, out: ^Class_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		out^ = v
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strclass_entry :: proc "c" (m: ^map[string]Class_t, key: string) -> ^Class_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Class_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strclass_erase :: proc "c" (m: ^map[string]Class_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	_, had := m[key]
+	runtime.delete_key(m, key)
+	return had
+}
+
+@(export)
+barony_dynamic_map_strclass_clear :: proc "c" (m: ^map[string]Class_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strclass_len :: proc "c" (m: ^map[string]Class_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strclass_destroy :: proc "c" (m: ^map[string]Class_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strclass_entries :: proc "c" (m: ^map[string]Class_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]Class_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, value in m^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		val_ptrs[n] = value
+		n += 1
+	}
+	return n
+}

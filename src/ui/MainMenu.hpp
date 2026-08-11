@@ -220,172 +220,65 @@ namespace MainMenu {
 		DesertersAndDisciples
 	};
 
-	struct Class {
-		DLC dlc;
-		const char* image;
-		const char* image_highlighted;
-		const char* image_locked;
-	};
+	typedef Class_tMirror Class;
 
-	const std::unordered_map<std::string, Class> classes = {
-		{"barbarian", {
-			DLC::Base,
-			"ClassSelect_Icon_Barbarian_00.png",
-			"ClassSelect_Icon_BarbarianOn_00.png",
-			"ClassSelect_Icon_BarbarianLocked_00.png",
-			}},
-		{"warrior", {
-			DLC::Base,
-			"ClassSelect_Icon_Warrior_00.png",
-			"ClassSelect_Icon_WarriorOn_00.png",
-			"ClassSelect_Icon_WarriorLocked_00.png",
-			}},
-		{"healer", {
-			DLC::Base,
-			"ClassSelect_Icon_Healer_00.png",
-			"ClassSelect_Icon_HealerOn_00.png",
-			"ClassSelect_Icon_HealerLocked_00.png",
-			}},
-		{"rogue", {
-			DLC::Base,
-			"ClassSelect_Icon_Rogue_00.png",
-			"ClassSelect_Icon_RogueOn_00.png",
-			"ClassSelect_Icon_RogueLocked_00.png",
-			}},
-		{"wanderer", {
-			DLC::Base,
-			"ClassSelect_Icon_Wanderer_00.png",
-			"ClassSelect_Icon_WandererOn_00.png",
-			"ClassSelect_Icon_WandererLocked_00.png",
-			}},
-		{"cleric", {
-			DLC::Base,
-			"ClassSelect_Icon_Cleric_00.png",
-			"ClassSelect_Icon_ClericOn_00.png",
-			"ClassSelect_Icon_ClericLocked_00.png",
-			}},
-		{"merchant", {
-			DLC::Base,
-			"ClassSelect_Icon_Merchant_00.png",
-			"ClassSelect_Icon_MerchantOn_00.png",
-			"ClassSelect_Icon_MerchantLocked_00.png",
-			}},
-		{"wizard", {
-			DLC::Base,
-			"ClassSelect_Icon_Wizard_00.png",
-			"ClassSelect_Icon_WizardOn_00.png",
-			"ClassSelect_Icon_WizardLocked_00.png",
-			}},
-		{"arcanist", {
-			DLC::Base,
-			"ClassSelect_Icon_Arcanist_00.png",
-			"ClassSelect_Icon_ArcanistOn_00.png",
-			"ClassSelect_Icon_ArcanistLocked_00.png",
-			}},
-		{"joker", {
-			DLC::Base,
-			"ClassSelect_Icon_Jester_00.png",
-			"ClassSelect_Icon_JesterOn_00.png",
-			"ClassSelect_Icon_JesterLocked_00.png",
-			}},
-		{"sexton", {
-			DLC::Base,
-			"ClassSelect_Icon_Sexton_00.png",
-			"ClassSelect_Icon_SextonOn_00.png",
-			"ClassSelect_Icon_SextonLocked_00.png",
-			}},
-		{"ninja", {
-			DLC::Base,
-			"ClassSelect_Icon_Ninja_00.png",
-			"ClassSelect_Icon_NinjaOn_00.png",
-			"ClassSelect_Icon_NinjaLocked_00.png",
-			}},
-		{"monk", {
-			DLC::Base,
-			"ClassSelect_Icon_Monk_00.png",
-			"ClassSelect_Icon_MonkOn_00.png",
-			"ClassSelect_Icon_MonkLocked_00.png",
-			}},
-		{"conjurer", {
-			DLC::MythsAndOutcasts,
-			"ClassSelect_Icon_Conjurer_00.png",
-			"ClassSelect_Icon_ConjurerOn_00.png",
-			"ClassSelect_Icon_ConjurerLocked_00.png",
-			}},
-		{"accursed", {
-			DLC::MythsAndOutcasts,
-			"ClassSelect_Icon_Accursed_00.png",
-			"ClassSelect_Icon_AccursedOn_00.png",
-			"ClassSelect_Icon_AccursedLocked_00.png",
-			}},
-		{"mesmer", {
-			DLC::MythsAndOutcasts,
-			"ClassSelect_Icon_Mesmer_00.png",
-			"ClassSelect_Icon_MesmerOn_00.png",
-			"ClassSelect_Icon_MesmerLocked_00.png",
-			}},
-		{"brewer", {
-			DLC::MythsAndOutcasts,
-			"ClassSelect_Icon_Brewer_00.png",
-			"ClassSelect_Icon_BrewerOn_00.png",
-			"ClassSelect_Icon_BrewerLocked_00.png",
-			}},
-		{"mechanist", {
-			DLC::LegendsAndPariahs,
-			"ClassSelect_Icon_Mechanist_00.png",
-			"ClassSelect_Icon_MechanistOn_00.png",
-			"ClassSelect_Icon_MechanistLocked_00.png",
-			}},
-		{"punisher", {
-			DLC::LegendsAndPariahs,
-			"ClassSelect_Icon_Punisher_00.png",
-			"ClassSelect_Icon_PunisherOn_00.png",
-			"ClassSelect_Icon_PunisherLocked_00.png",
-			}},
-		{"shaman", {
-			DLC::LegendsAndPariahs,
-			"ClassSelect_Icon_Shaman_00.png",
-			"ClassSelect_Icon_ShamanOn_00.png",
-			"ClassSelect_Icon_ShamanLocked_00.png",
-			}},
-		{"hunter", {
-			DLC::LegendsAndPariahs,
-			"ClassSelect_Icon_Hunter_00.png",
-			"ClassSelect_Icon_HunterOn_00.png",
-			"ClassSelect_Icon_HunterLocked_00.png",
-			}},
-		{ "bard", {
-			DLC::DesertersAndDisciples,
-			"ClassSelect_Icon_Bard_00.png",
-			"ClassSelect_Icon_BardOn_00.png",
-			"ClassSelect_Icon_BardLocked_00.png",
-			}},
-		{ "sapper", {
-			DLC::DesertersAndDisciples,
-			"ClassSelect_Icon_Sapper_00.png",
-			"ClassSelect_Icon_SapperOn_00.png",
-			"ClassSelect_Icon_SapperLocked_00.png",
-			}},
-		{ "scion", {
-			DLC::DesertersAndDisciples,
-			"ClassSelect_Icon_Scion_00.png",
-			"ClassSelect_Icon_ScionOn_00.png",
-			"ClassSelect_Icon_ScionLocked_00.png",
-			}},
-		{ "hermit", {
-			DLC::DesertersAndDisciples,
-			"ClassSelect_Icon_Hermit_00.png",
-			"ClassSelect_Icon_HermitOn_00.png",
-			"ClassSelect_Icon_HermitLocked_00.png",
-			}},
-		{ "paladin", {
-			DLC::DesertersAndDisciples,
-			"ClassSelect_Icon_Paladin_00.png",
-			"ClassSelect_Icon_PaladinOn_00.png",
-			"ClassSelect_Icon_PaladinLocked_00.png",
-			}},
-	};
+		static DynamicMapClass classes = []() {
+		DynamicMapClass m;
 
+				m.put("barbarian", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Barbarian_00.png", "ClassSelect_Icon_BarbarianOn_00.png", "ClassSelect_Icon_BarbarianLocked_00.png" });
+
+				m.put("warrior", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Warrior_00.png", "ClassSelect_Icon_WarriorOn_00.png", "ClassSelect_Icon_WarriorLocked_00.png" });
+
+				m.put("healer", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Healer_00.png", "ClassSelect_Icon_HealerOn_00.png", "ClassSelect_Icon_HealerLocked_00.png" });
+
+				m.put("rogue", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Rogue_00.png", "ClassSelect_Icon_RogueOn_00.png", "ClassSelect_Icon_RogueLocked_00.png" });
+
+				m.put("wanderer", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Wanderer_00.png", "ClassSelect_Icon_WandererOn_00.png", "ClassSelect_Icon_WandererLocked_00.png" });
+
+				m.put("cleric", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Cleric_00.png", "ClassSelect_Icon_ClericOn_00.png", "ClassSelect_Icon_ClericLocked_00.png" });
+
+				m.put("merchant", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Merchant_00.png", "ClassSelect_Icon_MerchantOn_00.png", "ClassSelect_Icon_MerchantLocked_00.png" });
+
+				m.put("wizard", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Wizard_00.png", "ClassSelect_Icon_WizardOn_00.png", "ClassSelect_Icon_WizardLocked_00.png" });
+
+				m.put("arcanist", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Arcanist_00.png", "ClassSelect_Icon_ArcanistOn_00.png", "ClassSelect_Icon_ArcanistLocked_00.png" });
+
+				m.put("joker", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Jester_00.png", "ClassSelect_Icon_JesterOn_00.png", "ClassSelect_Icon_JesterLocked_00.png" });
+
+				m.put("sexton", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Sexton_00.png", "ClassSelect_Icon_SextonOn_00.png", "ClassSelect_Icon_SextonLocked_00.png" });
+
+				m.put("ninja", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Ninja_00.png", "ClassSelect_Icon_NinjaOn_00.png", "ClassSelect_Icon_NinjaLocked_00.png" });
+
+				m.put("monk", Class_tMirror{ (int)DLC::Base, "ClassSelect_Icon_Monk_00.png", "ClassSelect_Icon_MonkOn_00.png", "ClassSelect_Icon_MonkLocked_00.png" });
+
+				m.put("conjurer", Class_tMirror{ (int)DLC::MythsAndOutcasts, "ClassSelect_Icon_Conjurer_00.png", "ClassSelect_Icon_ConjurerOn_00.png", "ClassSelect_Icon_ConjurerLocked_00.png" });
+
+				m.put("accursed", Class_tMirror{ (int)DLC::MythsAndOutcasts, "ClassSelect_Icon_Accursed_00.png", "ClassSelect_Icon_AccursedOn_00.png", "ClassSelect_Icon_AccursedLocked_00.png" });
+
+				m.put("mesmer", Class_tMirror{ (int)DLC::MythsAndOutcasts, "ClassSelect_Icon_Mesmer_00.png", "ClassSelect_Icon_MesmerOn_00.png", "ClassSelect_Icon_MesmerLocked_00.png" });
+
+				m.put("brewer", Class_tMirror{ (int)DLC::MythsAndOutcasts, "ClassSelect_Icon_Brewer_00.png", "ClassSelect_Icon_BrewerOn_00.png", "ClassSelect_Icon_BrewerLocked_00.png" });
+
+				m.put("mechanist", Class_tMirror{ (int)DLC::LegendsAndPariahs, "ClassSelect_Icon_Mechanist_00.png", "ClassSelect_Icon_MechanistOn_00.png", "ClassSelect_Icon_MechanistLocked_00.png" });
+
+				m.put("punisher", Class_tMirror{ (int)DLC::LegendsAndPariahs, "ClassSelect_Icon_Punisher_00.png", "ClassSelect_Icon_PunisherOn_00.png", "ClassSelect_Icon_PunisherLocked_00.png" });
+
+				m.put("shaman", Class_tMirror{ (int)DLC::LegendsAndPariahs, "ClassSelect_Icon_Shaman_00.png", "ClassSelect_Icon_ShamanOn_00.png", "ClassSelect_Icon_ShamanLocked_00.png" });
+
+				m.put("hunter", Class_tMirror{ (int)DLC::LegendsAndPariahs, "ClassSelect_Icon_Hunter_00.png", "ClassSelect_Icon_HunterOn_00.png", "ClassSelect_Icon_HunterLocked_00.png" });
+
+				m.put("bard", Class_tMirror{ (int)DLC::DesertersAndDisciples, "ClassSelect_Icon_Bard_00.png", "ClassSelect_Icon_BardOn_00.png", "ClassSelect_Icon_BardLocked_00.png" });
+
+				m.put("sapper", Class_tMirror{ (int)DLC::DesertersAndDisciples, "ClassSelect_Icon_Sapper_00.png", "ClassSelect_Icon_SapperOn_00.png", "ClassSelect_Icon_SapperLocked_00.png" });
+
+				m.put("scion", Class_tMirror{ (int)DLC::DesertersAndDisciples, "ClassSelect_Icon_Scion_00.png", "ClassSelect_Icon_ScionOn_00.png", "ClassSelect_Icon_ScionLocked_00.png" });
+
+				m.put("hermit", Class_tMirror{ (int)DLC::DesertersAndDisciples, "ClassSelect_Icon_Hermit_00.png", "ClassSelect_Icon_HermitOn_00.png", "ClassSelect_Icon_HermitLocked_00.png" });
+
+				m.put("paladin", Class_tMirror{ (int)DLC::DesertersAndDisciples, "ClassSelect_Icon_Paladin_00.png", "ClassSelect_Icon_PaladinOn_00.png", "ClassSelect_Icon_PaladinLocked_00.png" });
+
+		return m;
+	}();
 	static const char* classes_in_order[] = {
 		"barbarian", "warrior", "healer",
 		"rogue", "wanderer", "cleric", "merchant",

@@ -32349,13 +32349,12 @@ void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 	{
 		int classIndex = pair.second;
 		auto key = MainMenu::classes_in_order[classIndex];
-		auto find = MainMenu::classes.find(key);
 		static const DynamicString prefix = "*images/ui/Main Menus/Play/PlayerCreation/ClassSelection/";
 
 		int x = pair.first % 100;
 		int y = pair.first / 100;
 
-		if ( find != MainMenu::classes.end() )
+		if ( MainMenu::classes.contains(key) )
 		{
 			if ( auto slotFrame = getAssistShrineSlotFrame(x, y) )
 			{
@@ -32365,7 +32364,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 				slotGlyph->disabled = true;*/
 				if ( slotBg && slotFg )
 				{
-					auto& full_class = find->second;
+					auto& full_class = MainMenu::classes[key];
 
 					bool selected = (selectedClass == -1 && savedClass == -1 && client_classes[parentGUI.gui_player] == classIndex)
 						|| (savedClass >= 0 && savedClass == classIndex && selectedClass == -1)
@@ -32434,28 +32433,28 @@ void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 						slotFg->path = (prefix + full_class.image).c_str();
 					}
 					switch ( full_class.dlc ) {
-					case MainMenu::DLC::Base:
+					case (int)MainMenu::DLC::Base:
 						slotBg->path = (prefix + "ClassSelect_IconBGBase_00.png");
 						if ( selected )
 						{
 							slotBg->path = (prefix + "ClassSelect_IconBGBaseHigh_00.png");
 						}
 						break;
-					case MainMenu::DLC::MythsAndOutcasts:
+					case (int)MainMenu::DLC::MythsAndOutcasts:
 						slotBg->path = (prefix + "ClassSelect_IconBGMyths_00.png");
 						if ( selected )
 						{
 							slotBg->path = (prefix + "ClassSelect_IconBGMythsHigh_00.png");
 						}
 						break;
-					case MainMenu::DLC::LegendsAndPariahs:
+					case (int)MainMenu::DLC::LegendsAndPariahs:
 						slotBg->path = (prefix + "ClassSelect_IconBGLegends_00.png");
 						if ( selected )
 						{
 							slotBg->path = (prefix + "ClassSelect_IconBGLegendsHigh_00.png");
 						}
 						break;
-					case MainMenu::DLC::DesertersAndDisciples:
+					case (int)MainMenu::DLC::DesertersAndDisciples:
 						slotBg->path = (prefix + "ClassSelect_IconBGDeserters_00.png");
 						if ( selected )
 						{
