@@ -889,10 +889,9 @@ void loadAchievementData(const char* path) {
 	{
 		if ( steamStatAchStringsAndMaxVals[statNum].first != "BARONY_ACH_NONE" )
 		{
-			auto find = Compendium_t::achievements.find(steamStatAchStringsAndMaxVals[statNum].first);
-			if ( find != Compendium_t::achievements.end() )
+			auto& achProg = Compendium_t::achievements[steamStatAchStringsAndMaxVals[statNum].first];
 			{
-				find->second.achievementProgress = statNum;
+				achProg.achievementProgress = statNum;
 			}
 		}
 	}

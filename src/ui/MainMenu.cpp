@@ -8750,7 +8750,7 @@ bind_failed:
 		int num_locked = 0;
 		int num_hidden = 0;
 		for (auto& item : Compendium_t::achievements ) {
-			if (achievementUnlocked(item.first.c_str())) {
+			if (achievementUnlocked(item.first)) {
 				++num_unlocked;
 			} else {
 				++num_locked;
@@ -8800,11 +8800,12 @@ bind_failed:
 			const char* achName = nullptr;
 			const char* achDesc = nullptr;
 			if (name) {
-				auto achData = Compendium_t::achievements.find(name);
-				if ( achData != Compendium_t::achievements.end() )
+				if ( Compendium_t::achievements.contains(name) )
 				{
-					achName = achData->second.name.c_str();
-					achDesc = achData->second.desc.c_str();
+					AchievementData_tMirror _ach;
+					Compendium_t::achievements.get(name, _ach);
+					achName = _ach.name.c_str();
+					achDesc = _ach.desc.c_str();
 				}
 			}
 
@@ -8884,10 +8885,9 @@ bind_failed:
 			} else {
 				// unlock time
 				assert(name);
-				auto it = Compendium_t::achievements.find(name);
-				if (it != Compendium_t::achievements.end() && it->second.unlocked) {
+				if ( Compendium_t::achievements.contains(name) && Compendium_t::achievements[name].unlocked ) {
 					char buffer[64];
-					time_t t = (time_t)it->second.unlockTime;
+					time_t t = (time_t)Compendium_t::achievements[name].unlockTime;
 
 					char tbuf[64];
 					getTimeAndDateFormatted(t, tbuf, sizeof(tbuf));

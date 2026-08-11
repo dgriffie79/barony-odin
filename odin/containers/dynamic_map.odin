@@ -2118,3 +2118,494 @@ barony_dynamic_map_strcolliderdmg_entries :: proc "c" (m: ^map[string]ColliderDm
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> ItemLocalization_t (map<string, ItemLocalization_t>) — item name
+// localizations. Value owns 2 DynamicStrings. entry() for in-place mutation;
+// get/put deep-copy.
+// ---------------------------------------------------------------------------
+ItemLocalization_t :: struct {
+	name_identified:   DynamicString,
+	name_unidentified: DynamicString,
+}
+
+item_localization_free :: proc(v: ^ItemLocalization_t) {
+	if v.name_identified.data != nil {
+		mem.free(v.name_identified.data)
+		v.name_identified.data = nil
+	}
+	if v.name_unidentified.data != nil {
+		mem.free(v.name_unidentified.data)
+		v.name_unidentified.data = nil
+	}
+}
+
+item_localization_copy :: proc(dst: ^ItemLocalization_t, src: ^ItemLocalization_t) {
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.name_identified, &src.name_identified },
+		{ &dst.name_unidentified, &src.name_unidentified },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_stritemloc_init :: proc "c" (m: ^map[string]ItemLocalization_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_stritemloc_put :: proc "c" (m: ^map[string]ItemLocalization_t, key: string, value: ^ItemLocalization_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]ItemLocalization_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		item_localization_free(&old)
+	}
+	new_val: ItemLocalization_t
+	item_localization_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_stritemloc_get :: proc "c" (m: ^map[string]ItemLocalization_t, key: string, out: ^ItemLocalization_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		item_localization_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_stritemloc_entry :: proc "c" (m: ^map[string]ItemLocalization_t, key: string) -> ^ItemLocalization_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]ItemLocalization_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_stritemloc_erase :: proc "c" (m: ^map[string]ItemLocalization_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		item_localization_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_stritemloc_clear :: proc "c" (m: ^map[string]ItemLocalization_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				item_localization_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_stritemloc_len :: proc "c" (m: ^map[string]ItemLocalization_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_stritemloc_destroy :: proc "c" (m: ^map[string]ItemLocalization_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				item_localization_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_stritemloc_entries :: proc "c" (m: ^map[string]ItemLocalization_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]ItemLocalization_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		item_localization_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}
+
+// ---------------------------------------------------------------------------
+// string -> Achievement_t (map<string, Achievement_t>) — compendium
+// achievements. Value owns 1 DynamicString + bool + i64. entry() for
+// in-place mutation; get/put deep-copy.
+// ---------------------------------------------------------------------------
+Achievement_t :: struct {
+	name:       DynamicString,
+	unlocked:   bool,
+	unlockTime: i64,
+}
+
+achievement_t_free :: proc(v: ^Achievement_t) {
+	if v.name.data != nil {
+		mem.free(v.name.data)
+		v.name.data = nil
+	}
+}
+
+achievement_t_copy :: proc(dst: ^Achievement_t, src: ^Achievement_t) {
+	dst.unlocked = src.unlocked
+	dst.unlockTime = src.unlockTime
+	if src.name.len > 0 {
+		buf, _ := mem.alloc(src.name.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.name.data, src.name.len)
+			(^u8)(uintptr(buf) + uintptr(src.name.len))^ = 0
+			dst.name = DynamicString{ data = buf, len = src.name.len }
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_strachievement_init :: proc "c" (m: ^map[string]Achievement_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strachievement_put :: proc "c" (m: ^map[string]Achievement_t, key: string, value: ^Achievement_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Achievement_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		achievement_t_free(&old)
+	}
+	new_val: Achievement_t
+	achievement_t_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strachievement_get :: proc "c" (m: ^map[string]Achievement_t, key: string, out: ^Achievement_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		achievement_t_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strachievement_entry :: proc "c" (m: ^map[string]Achievement_t, key: string) -> ^Achievement_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Achievement_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strachievement_erase :: proc "c" (m: ^map[string]Achievement_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		achievement_t_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strachievement_clear :: proc "c" (m: ^map[string]Achievement_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				achievement_t_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strachievement_len :: proc "c" (m: ^map[string]Achievement_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strachievement_destroy :: proc "c" (m: ^map[string]Achievement_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				achievement_t_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strachievement_entries :: proc "c" (m: ^map[string]Achievement_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]Achievement_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		achievement_t_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}
+
+// ---------------------------------------------------------------------------
+// string -> AchievementData_t (map<string, AchievementData_t>) — compendium
+// achievements. Value owns 4 DynamicStrings + bool + enum + int + i64 + int.
+// entry() for in-place mutation; get/put deep-copy.
+// ---------------------------------------------------------------------------
+AchievementData_t :: struct {
+	name:             DynamicString,
+	desc:             DynamicString,
+	desc_formatted:   DynamicString,
+	hidden:           bool,
+	dlcType:          i32,
+	category:         DynamicString,
+	lorePoints:       i32,
+	unlockTime:       i64,
+	unlocked:         bool,
+	achievementProgress: i32,
+}
+
+achievement_data_free :: proc(v: ^AchievementData_t) {
+	strings := [?]^DynamicString{ &v.name, &v.desc, &v.desc_formatted, &v.category }
+	for s in strings {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+}
+
+achievement_data_copy :: proc(dst: ^AchievementData_t, src: ^AchievementData_t) {
+	dst.hidden = src.hidden
+	dst.dlcType = src.dlcType
+	dst.lorePoints = src.lorePoints
+	dst.unlockTime = src.unlockTime
+	dst.unlocked = src.unlocked
+	dst.achievementProgress = src.achievementProgress
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.name, &src.name },
+		{ &dst.desc, &src.desc },
+		{ &dst.desc_formatted, &src.desc_formatted },
+		{ &dst.category, &src.category },
+	}
+	for f in fields {
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_strachdata_init :: proc "c" (m: ^map[string]AchievementData_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strachdata_put :: proc "c" (m: ^map[string]AchievementData_t, key: string, value: ^AchievementData_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]AchievementData_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		achievement_data_free(&old)
+	}
+	new_val: AchievementData_t
+	achievement_data_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strachdata_get :: proc "c" (m: ^map[string]AchievementData_t, key: string, out: ^AchievementData_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		achievement_data_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strachdata_entry :: proc "c" (m: ^map[string]AchievementData_t, key: string) -> ^AchievementData_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]AchievementData_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strachdata_erase :: proc "c" (m: ^map[string]AchievementData_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		achievement_data_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strachdata_clear :: proc "c" (m: ^map[string]AchievementData_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				achievement_data_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strachdata_len :: proc "c" (m: ^map[string]AchievementData_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strachdata_destroy :: proc "c" (m: ^map[string]AchievementData_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				achievement_data_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strachdata_entries :: proc "c" (m: ^map[string]AchievementData_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]AchievementData_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		achievement_data_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

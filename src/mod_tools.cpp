@@ -9588,10 +9588,8 @@ void LocalAchievements_t::readFromFile()
 		ach.unlocked = achievement->value["unlocked"].GetBool();
 		ach.unlockTime = achievement->value["unlock_time"].GetInt64();
 
-		auto find = Compendium_t::achievements.find(achievement->name.GetString());
-		if ( find != Compendium_t::achievements.end() )
 		{
-			auto& achData = find->second;
+			auto& achData = Compendium_t::achievements[achievement->name.GetString()];
 			achData.unlocked = ach.unlocked;
 			achData.unlockTime = ach.unlockTime;
 			if ( ach.unlocked )
@@ -9630,15 +9628,15 @@ void LocalAchievements_t::writeToFile()
 	rapidjson::Value allAchObj(rapidjson::kObjectType);
 	for ( auto& ach : Compendium_t::achievements )
 	{
-		if ( LocalAchievements.achievements.find(ach.first) == LocalAchievements.achievements.end() )
+		if ( !LocalAchievements.achievements.contains(ach.first) )
 		{
 			continue;
 		}
 		auto& achData = LocalAchievements.achievements[ach.first];
 
-		rapidjson::Value namekey(ach.first.c_str(), exportDocument.GetAllocator());
+		rapidjson::Value namekey(ach.first, exportDocument.GetAllocator());
 		allAchObj.AddMember(namekey, rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
-		auto& obj = allAchObj[ach.first.c_str()];
+		auto& obj = allAchObj[ach.first];
 		obj.AddMember("unlocked", achData.unlocked, exportDocument.GetAllocator());
 		obj.AddMember("unlock_time", achData.unlockTime, exportDocument.GetAllocator());
 	}
@@ -9695,7 +9693,7 @@ void LocalAchievements_t::init()
 
 void LocalAchievements_t::updateAchievement(const char* name, const bool unlocked)
 {
-	if ( achievements.find(name) != achievements.end() )
+	if ( achievements.contains(name) )
 	{
 		auto& ach = achievements[name];
 		bool oldUnlocked = ach.unlocked;
@@ -19158,7 +19156,7 @@ std::vector<Sint32> Compendium_t::CompendiumMonsters_t::Monster_t::getDisplaySta
 }
 #endif
 
-std::unordered_map<std::string, Compendium_t::AchievementData_t> Compendium_t::achievements;
+DynamicMapAchievementData Compendium_t::achievements;
 bool Compendium_t::AchievementData_t::achievementsNeedResort = true;
 bool Compendium_t::AchievementData_t::achievementsNeedFirstData = true;
 int Compendium_t::lorePointsFromAchievements = 0;

@@ -21,6 +21,7 @@
 // RAII: ctor inits, dtor destroys. copy deep-copies via the entries shim.
 #pragma once
 #include <cstdint>
+#include <memory>
 #include <cstddef>
 #include <cstring>
 #include <string>
@@ -154,6 +155,39 @@ extern "C" {
     int32_t   barony_dynamic_map_strcolliderdmg_len(DynamicMapRaw*);
     void      barony_dynamic_map_strcolliderdmg_destroy(DynamicMapRaw*);
     int32_t   barony_dynamic_map_strcolliderdmg_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, ItemLocalization_t>
+    void      barony_dynamic_map_stritemloc_init(DynamicMapRaw*);
+    void      barony_dynamic_map_stritemloc_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_stritemloc_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_stritemloc_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_stritemloc_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_stritemloc_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_stritemloc_len(DynamicMapRaw*);
+    void      barony_dynamic_map_stritemloc_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_stritemloc_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, Achievement_t>
+    void      barony_dynamic_map_strachievement_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strachievement_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_strachievement_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_strachievement_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_strachievement_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strachievement_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strachievement_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strachievement_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strachievement_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, AchievementData_t>
+    void      barony_dynamic_map_strachdata_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strachdata_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_strachdata_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_strachdata_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_strachdata_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strachdata_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strachdata_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strachdata_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strachdata_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -1351,6 +1385,385 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_map_strcolliderdmg_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, ItemLocalization_t> — item name localizations.
+// Value owns 2 DynamicStrings. entry() for in-place mutation; get/put deep.
+// ---------------------------------------------------------------------------
+struct ItemLocalization_tMirror {
+    DynamicString name_identified;
+    DynamicString name_unidentified;
+};
+
+class DynamicMapItemLoc {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapItemLoc() { barony_dynamic_map_stritemloc_init(&raw); }
+    ~DynamicMapItemLoc() { barony_dynamic_map_stritemloc_destroy(&raw); }
+    DynamicMapItemLoc(const DynamicMapItemLoc& other) : raw{} {
+        barony_dynamic_map_stritemloc_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapItemLoc& operator=(const DynamicMapItemLoc& other) {
+        if (this != &other) { barony_dynamic_map_stritemloc_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapItemLoc(DynamicMapItemLoc&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapItemLoc& operator=(DynamicMapItemLoc&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_stritemloc_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    ItemLocalization_tMirror& operator[](const char* key) {
+        return *static_cast<ItemLocalization_tMirror*>(barony_dynamic_map_stritemloc_entry(&raw, DynamicString(key)));
+    }
+    ItemLocalization_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<ItemLocalization_tMirror*>(barony_dynamic_map_stritemloc_entry(&raw, key));
+    }
+    ItemLocalization_tMirror& operator[](const std::string& key) {
+        return *static_cast<ItemLocalization_tMirror*>(barony_dynamic_map_stritemloc_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, ItemLocalization_tMirror& out) const {
+        return barony_dynamic_map_stritemloc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, ItemLocalization_tMirror& out) const {
+        return barony_dynamic_map_stritemloc_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const ItemLocalization_tMirror& v) {
+        barony_dynamic_map_stritemloc_put(&raw, DynamicString(key), const_cast<ItemLocalization_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const ItemLocalization_tMirror& v) {
+        barony_dynamic_map_stritemloc_put(&raw, key, const_cast<ItemLocalization_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        ItemLocalization_tMirror tmp;
+        return barony_dynamic_map_stritemloc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        ItemLocalization_tMirror tmp;
+        return barony_dynamic_map_stritemloc_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        ItemLocalization_tMirror tmp;
+        return barony_dynamic_map_stritemloc_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_stritemloc_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_stritemloc_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_stritemloc_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_stritemloc_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapItemLoc& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<ItemLocalization_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_stritemloc_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_stritemloc_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, Achievement_t> — compendium achievements.
+// Value owns 1 DynamicString + bool + i64. entry() for in-place mutation;
+// get/put deep-copy. Range-for iterates a snapshot of (key, deep-copied
+// value) pairs.
+// ---------------------------------------------------------------------------
+struct Achievement_tMirror {
+    DynamicString name;
+    bool unlocked = false;
+    int64_t unlockTime = 0;
+};
+
+class DynamicMapAchievement {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapAchievement() { barony_dynamic_map_strachievement_init(&raw); }
+    ~DynamicMapAchievement() { barony_dynamic_map_strachievement_destroy(&raw); }
+    DynamicMapAchievement(const DynamicMapAchievement& other) : raw{} {
+        barony_dynamic_map_strachievement_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapAchievement& operator=(const DynamicMapAchievement& other) {
+        if (this != &other) { barony_dynamic_map_strachievement_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapAchievement(DynamicMapAchievement&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapAchievement& operator=(DynamicMapAchievement&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strachievement_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    Achievement_tMirror& operator[](const char* key) {
+        return *static_cast<Achievement_tMirror*>(barony_dynamic_map_strachievement_entry(&raw, DynamicString(key)));
+    }
+    Achievement_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<Achievement_tMirror*>(barony_dynamic_map_strachievement_entry(&raw, key));
+    }
+    Achievement_tMirror& operator[](const std::string& key) {
+        return *static_cast<Achievement_tMirror*>(barony_dynamic_map_strachievement_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, Achievement_tMirror& out) const {
+        return barony_dynamic_map_strachievement_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, Achievement_tMirror& out) const {
+        return barony_dynamic_map_strachievement_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const Achievement_tMirror& v) {
+        barony_dynamic_map_strachievement_put(&raw, DynamicString(key), const_cast<Achievement_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const Achievement_tMirror& v) {
+        barony_dynamic_map_strachievement_put(&raw, key, const_cast<Achievement_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        Achievement_tMirror tmp;
+        return barony_dynamic_map_strachievement_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        Achievement_tMirror tmp;
+        return barony_dynamic_map_strachievement_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        Achievement_tMirror tmp;
+        return barony_dynamic_map_strachievement_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_strachievement_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strachievement_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_strachievement_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strachievement_clear(&raw); }
+
+    // range-for: std::map-like iteration over a deep-copied snapshot.
+    // .first = interned key (stable), .second = deep-copied value.
+    struct KV { const char* first; int64_t first_len; Achievement_tMirror second; };
+    struct Iterator {
+        std::shared_ptr<std::vector<KV>> snap;  // owned snapshot
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const KV* operator->() const { return &(*snap)[idx]; }
+        const KV& operator*() const { return (*snap)[idx]; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            // o is the end() sentinel (null snap, idx == END): NOT equal iff
+            // this iterator still has elements to visit.
+            if (!o.snap) {
+                return snap && idx < snap->size();
+            }
+            if (!snap) {
+                return o.snap ? o.idx < o.snap->size() : false;
+            }
+            if (snap.get() != o.snap.get()) {
+                return !(idx >= snap->size() && o.idx == END);
+            }
+            return idx != o.idx;
+        }
+    };
+    Iterator begin() const {
+        Iterator it;
+        int64_t n = size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<KV>>();
+            std::vector<void*> kp((size_t)n);
+            std::vector<int32_t> kl((size_t)n);
+            std::vector<Achievement_tMirror> vv((size_t)n);
+            int32_t got = barony_dynamic_map_strachievement_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), (int32_t)n);
+            it.snap->resize((size_t)got);
+            for (int32_t i = 0; i < got; ++i) {
+                (*it.snap)[(size_t)i].first = (const char*)kp[(size_t)i];
+                (*it.snap)[(size_t)i].first_len = kl[(size_t)i];
+                (*it.snap)[(size_t)i].second = vv[(size_t)i];
+            }
+        }
+        return it;
+    }
+    Iterator end() const {
+        Iterator it;
+        it.idx = Iterator::END;  // sentinel: never equals a begin/advancing idx
+        return it;
+    }
+
+private:
+    void copyFrom(const DynamicMapAchievement& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<Achievement_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_strachievement_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_strachievement_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, AchievementData_t> — compendium achievements.
+// Value owns 4 DynamicStrings + scalars. entry() for in-place mutation;
+// get/put deep-copy. Range-for iterates a deep-copied snapshot.
+// ---------------------------------------------------------------------------
+struct AchievementData_tMirror {
+    DynamicString name;
+    DynamicString desc;
+    DynamicString desc_formatted;
+    bool hidden = false;
+    int dlcType = 0;
+    DynamicString category;
+    int lorePoints = 0;
+    int64_t unlockTime = 0;
+    bool unlocked = false;
+    int achievementProgress = -1;
+};
+
+class DynamicMapAchievementData {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapAchievementData() { barony_dynamic_map_strachdata_init(&raw); }
+    ~DynamicMapAchievementData() { barony_dynamic_map_strachdata_destroy(&raw); }
+    DynamicMapAchievementData(const DynamicMapAchievementData& other) : raw{} {
+        barony_dynamic_map_strachdata_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapAchievementData& operator=(const DynamicMapAchievementData& other) {
+        if (this != &other) { barony_dynamic_map_strachdata_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapAchievementData(DynamicMapAchievementData&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapAchievementData& operator=(DynamicMapAchievementData&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strachdata_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    AchievementData_tMirror& operator[](const char* key) {
+        return *static_cast<AchievementData_tMirror*>(barony_dynamic_map_strachdata_entry(&raw, DynamicString(key)));
+    }
+    AchievementData_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<AchievementData_tMirror*>(barony_dynamic_map_strachdata_entry(&raw, key));
+    }
+    AchievementData_tMirror& operator[](const std::string& key) {
+        return *static_cast<AchievementData_tMirror*>(barony_dynamic_map_strachdata_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, AchievementData_tMirror& out) const {
+        return barony_dynamic_map_strachdata_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, AchievementData_tMirror& out) const {
+        return barony_dynamic_map_strachdata_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const AchievementData_tMirror& v) {
+        barony_dynamic_map_strachdata_put(&raw, DynamicString(key), const_cast<AchievementData_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const AchievementData_tMirror& v) {
+        barony_dynamic_map_strachdata_put(&raw, key, const_cast<AchievementData_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        AchievementData_tMirror tmp;
+        return barony_dynamic_map_strachdata_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        AchievementData_tMirror tmp;
+        return barony_dynamic_map_strachdata_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        AchievementData_tMirror tmp;
+        return barony_dynamic_map_strachdata_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_strachdata_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strachdata_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_strachdata_len(const_cast<DynamicMapRaw*>(&raw)); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strachdata_clear(&raw); }
+
+    // range-for over a deep-copied snapshot (END sentinel pattern)
+    struct KV { const char* first; int64_t first_len; AchievementData_tMirror second; };
+    struct Iterator {
+        std::shared_ptr<std::vector<KV>> snap;
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const KV* operator->() const { return &(*snap)[idx]; }
+        const KV& operator*() const { return (*snap)[idx]; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            // o is the end() sentinel (null snap, idx == END): NOT equal iff
+            // this iterator still has elements to visit.
+            if (!o.snap) {
+                return snap && idx < snap->size();
+            }
+            if (!snap) {
+                return o.snap ? o.idx < o.snap->size() : false;
+            }
+            if (snap.get() != o.snap.get()) {
+                return !(idx >= snap->size() && o.idx == END);
+            }
+            return idx != o.idx;
+        }
+    };
+    Iterator begin() const {
+        Iterator it;
+        int64_t n = size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<KV>>();
+            std::vector<void*> kp((size_t)n);
+            std::vector<int32_t> kl((size_t)n);
+            std::vector<AchievementData_tMirror> vv((size_t)n);
+            int32_t got = barony_dynamic_map_strachdata_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), (int32_t)n);
+            it.snap->resize((size_t)got);
+            for (int32_t i = 0; i < got; ++i) {
+                (*it.snap)[(size_t)i].first = (const char*)kp[(size_t)i];
+                (*it.snap)[(size_t)i].first_len = kl[(size_t)i];
+                (*it.snap)[(size_t)i].second = vv[(size_t)i];
+            }
+        }
+        return it;
+    }
+    Iterator end() const {
+        Iterator it;
+        it.idx = Iterator::END;
+        return it;
+    }
+
+private:
+    void copyFrom(const DynamicMapAchievementData& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<AchievementData_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_strachdata_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_strachdata_put(&raw, key, &vv[i]);
         }
     }
 };

@@ -770,10 +770,11 @@ void UIToastNotificationManager_t::createAchievementNotification(const char* nam
 
 	const char* achievementName = "Unknown Achievement";
 	{
-		auto it = Compendium_t::achievements.find(name);
-		if (it != Compendium_t::achievements.end())
+		if ( Compendium_t::achievements.contains(name) )
 		{
-			achievementName = it->second.name.c_str();
+			AchievementData_tMirror _ach;
+			Compendium_t::achievements.get(name, _ach);
+			achievementName = _ach.name.c_str();
 		}
 	}
 
@@ -834,10 +835,11 @@ void UIToastNotificationManager_t::createStatisticUpdateNotification(const char*
 	}
 	else
 	{
-		auto it = Compendium_t::achievements.find(name);
-		if ( it != Compendium_t::achievements.end() )
+		if ( Compendium_t::achievements.contains(name) )
 		{
-			achievementName = it->second.name.c_str();
+			AchievementData_tMirror _ach;
+			Compendium_t::achievements.get(name, _ach);
+			achievementName = _ach.name.c_str();
 		}
 		const DynamicString imgName = unlocked ?
 			std::string("*#images/achievements/") + name + std::string(".png"):

@@ -2892,12 +2892,8 @@ public:
 	std::map<std::string, std::vector<DynamicString>> templates;
 	//std::vector<std::pair<int, Sint32>> itemValueTable;
 	//std::map<int, std::vector<std::pair<int, Sint32>>> itemValueTableByCategory;
-	struct ItemLocalization_t
-	{
-		DynamicString name_identified = "";
-		DynamicString name_unidentified = "";
-	};
-	std::map<std::string, ItemLocalization_t> itemNameLocalizations;
+	typedef ItemLocalization_tMirror ItemLocalization_t;
+	DynamicMapItemLoc itemNameLocalizations;
 	DynamicMapStr bookNameLocalizations;
 	DynamicMapStr spellNameLocalizations;
 	DynamicMapI32 itemNameStringToItemID;
@@ -3255,18 +3251,13 @@ struct ClassHotbarConfig_t
 
 struct LocalAchievements_t
 {
-	struct Achievement_t
-	{
-		DynamicString name;
-		bool unlocked = false;
-		int64_t unlockTime = 0;
-	};
+	typedef Achievement_tMirror Achievement_t;
 	struct Statistic_t
 	{
 		DynamicString name;
 		int value = 0;
 	};
-	std::map<std::string, Achievement_t> achievements;
+	DynamicMapAchievement achievements;
 	std::map<int, Statistic_t> statistics;
 	static void readFromFile();
 	static void writeToFile();
@@ -3610,7 +3601,7 @@ struct Compendium_t
 		static std::map<std::string, CompendiumAchievementsDisplay> achievementsBookDisplay;
 		static bool sortAlphabetical;
 	};
-	static std::unordered_map<std::string, AchievementData_t> achievements;
+	static DynamicMapAchievementData achievements;
 	static DynamicString compendium_sorting;
 	static bool compendium_sorting_hide_undiscovered;
 	static bool compendium_sorting_hide_ach_unlocked;

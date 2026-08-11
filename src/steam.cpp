@@ -57,12 +57,11 @@
 bool achievementUnlocked(const char* achName)
 {
 	// check internal achievement record
-	auto find = Compendium_t::achievements.find(achName);
-	if ( find == Compendium_t::achievements.end() )
+	if ( !Compendium_t::achievements.contains(achName) )
 	{
 		return false;
 	}
-	return find->second.unlocked;
+	return Compendium_t::achievements[achName].unlocked;
 }
 
 /*-------------------------------------------------------------------------------
@@ -130,12 +129,12 @@ void steamAchievement(const char* achName)
 		LocalAchievements.updateAchievement(achName, true);
 #endif
 
-		auto find = Compendium_t::achievements.find(achName);
-		if ( find != Compendium_t::achievements.end() )
+		if ( Compendium_t::achievements.contains(achName) )
 		{
-			find->second.unlocked = true;
-			find->second.unlockTime = getTime();
-			auto& unlockStatus = Compendium_t::AchievementData_t::unlocks[find->second.category];
+			auto& achData = Compendium_t::achievements[achName];
+			achData.unlocked = true;
+			achData.unlockTime = getTime();
+			auto& unlockStatus = Compendium_t::AchievementData_t::unlocks[achData.category];
 			if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 			{
 				unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
