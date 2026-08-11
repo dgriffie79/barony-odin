@@ -24222,7 +24222,7 @@ void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark)
 	static int fov = 50;
 	bool sprite = item->flags[SPRITE];
 
-	std::vector<Entity>* limbsArray = nullptr;
+	DynamicArray* limbsArray = nullptr;
 	Compendium_t::CompendiumView_t* camera = &CompendiumEntries.defaultCamera;
 	DynamicString lookup = "items_single";
 	if ( item->flags[SPRITE] && item->skill[10] == SPELL_ITEM )
@@ -24234,7 +24234,7 @@ void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark)
 	{
 		auto& entry = CompendiumEntries.compendiumObjectLimbs[lookup];
 		limbsArray = &entry.entities;
-		if ( limbsArray->size() == 0 )
+		if ( dynarray_size<Entity>(*limbsArray) == 0 )
 		{
 			return;
 		}
@@ -24283,9 +24283,9 @@ void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark)
 		camera->rotateState = 0;
 	}
 
-	item->scalex = limbsArray->at(0).scalex;
-	item->scaley = limbsArray->at(0).scaley;
-	item->scalez = limbsArray->at(0).scalez;
+	item->scalex = dynarray_at<Entity>(*limbsArray, 0)->scalex;
+	item->scaley = dynarray_at<Entity>(*limbsArray, 0)->scaley;
+	item->scalez = dynarray_at<Entity>(*limbsArray, 0)->scalez;
 
 	/*if ( keystatus[SDLK_KP_0] )
 	{
@@ -24453,7 +24453,7 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 		return;
 	}
 
-	std::vector<Entity>* limbsArray = nullptr;
+	DynamicArray* limbsArray = nullptr;
 	Entity* object = nullptr;
 	Compendium_t::CompendiumView_t* camera = &CompendiumEntries.defaultCamera;
 
@@ -24461,11 +24461,11 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 	{
 		auto& entry = CompendiumEntries.compendiumObjectLimbs[modelsPath];
 		limbsArray = &entry.entities;
-		if ( limbsArray->size() == 0 )
+		if ( dynarray_size<Entity>(*limbsArray) == 0 )
 		{
 			return;
 		}
-		object = &(limbsArray->at(0));
+		object = dynarray_at<Entity>(*limbsArray, 0);
 		camera = &entry.currentCamera;
 	}
 
@@ -24580,8 +24580,9 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 	glBeginCamera(&view, false, map);
 
 	size_t index = 0;
-	for ( auto& e : *limbsArray )
+	for ( int64_t _li3 = 0; _li3 < dynarray_size<Entity>(*limbsArray); ++_li3 )
 	{
+		auto& e = *dynarray_at<Entity>(*limbsArray, _li3);
 		bool b = e.flags[BRIGHT];
 		if ( !dark ) { e.flags[BRIGHT] = true; }
 		if ( !e.flags[INVISIBLE] )
@@ -24590,7 +24591,7 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 			{
 				if ( index < codexEntry->renderedImagePaths.size() )
 				{
-					if ( codexEntry->renderedImagePaths[index] != "" )
+					if ( codexEntry->renderedImagePaths.at(index) != "" )
 					{
 						if ( Compendium_t::compendiumEntityCurrent.modelIndex != -1 )
 						{
@@ -24601,7 +24602,7 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 								continue;
 							}
 						}
-						glDrawSpriteFromImage(&view, &e, codexEntry->renderedImagePaths[index],
+						glDrawSpriteFromImage(&view, &e, codexEntry->renderedImagePaths.at(index),
 							REALCOLORS, true, true);
 					}
 				}
@@ -24917,17 +24918,17 @@ Uint32 drawObjectLastTick = 0;
 void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, real_t offsetyaw, bool dark)
 {
 	static int fov = 50;
-	std::vector<Entity>* limbsArray = nullptr;
+	DynamicArray* limbsArray = nullptr;
 	Compendium_t::CompendiumView_t* camera = &CompendiumEntries.defaultCamera;
 	if ( CompendiumEntries.compendiumObjectLimbs.find(modelsPath) != CompendiumEntries.compendiumObjectLimbs.end() )
 	{
 		auto& entry = CompendiumEntries.compendiumObjectLimbs[modelsPath];
 		limbsArray = &entry.entities;
-		if ( limbsArray->size() == 0 )
+		if ( dynarray_size<Entity>(*limbsArray) == 0 )
 		{
 			return;
 		}
-		object = &(limbsArray->at(0));
+		object = dynarray_at<Entity>(*limbsArray, 0);
 		camera = &entry.currentCamera;
 	}
 
@@ -25092,8 +25093,9 @@ void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, rea
 		if ( doTick )
 		{
 			int limbIndex = -1;
-			for ( auto& limb : *limbsArray )
+			for ( int64_t _li4 = 0; _li4 < dynarray_size<Entity>(*limbsArray); ++_li4 )
 			{
+				auto& limb = *dynarray_at<Entity>(*limbsArray, _li4);
 				++limbIndex;
 				if ( limb.sprite >= 1237 && limb.sprite <= 1242 )
 				{
@@ -25108,15 +25110,15 @@ void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, rea
 					auto& squishAngle = limb.fskill[9];
 
 					Uint32 activeTick = 10;
-					if ( limb.sprite == 1240 || (limbIndex > 0 && limb.sprite == 1237 && (*limbsArray)[limbIndex - 1].sprite == 1240) )
+					if ( limb.sprite == 1240 || (limbIndex > 0 && limb.sprite == 1237 && dynarray_at<Entity>(*limbsArray, limbIndex - 1)->sprite == 1240) )
 					{
 						activeTick = 2 * TICKS_PER_SECOND - 25;
 					}
-					else if ( limb.sprite == 1239 || (limbIndex > 0 && limb.sprite == 1237 && (*limbsArray)[limbIndex - 1].sprite == 1239) )
+					else if ( limb.sprite == 1239 || (limbIndex > 0 && limb.sprite == 1237 && dynarray_at<Entity>(*limbsArray, limbIndex - 1)->sprite == 1239) )
 					{
 						activeTick = 4 * TICKS_PER_SECOND + 25;
 					}
-					else if ( limb.sprite == 1241 || (limbIndex > 0 && limb.sprite == 1237 && (*limbsArray)[limbIndex - 1].sprite == 1241) )
+					else if ( limb.sprite == 1241 || (limbIndex > 0 && limb.sprite == 1237 && dynarray_at<Entity>(*limbsArray, limbIndex - 1)->sprite == 1241) )
 					{
 						activeTick = 6 * TICKS_PER_SECOND - 25;
 					}
@@ -25296,14 +25298,14 @@ void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, rea
 				}
 			}
 		}
-		for ( auto itr = limbsArray->begin(); itr != limbsArray->end(); ++itr )
+		for ( int64_t _li2 = 0; _li2 < dynarray_size<Entity>(*limbsArray); ++_li2 )
 		{
 			if ( c == 0 )
 			{
 				c++;
 				continue;
 			}
-			Entity* entity = &(*itr);
+			Entity* entity = dynarray_at<Entity>(*limbsArray, _li2);
 			if ( !entity->flags[INVISIBLE] )
 			{
 				bool b = entity->flags[BRIGHT];

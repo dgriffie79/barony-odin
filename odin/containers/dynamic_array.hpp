@@ -121,4 +121,116 @@ public:
         out.resize((size_t)n);
         barony_dynamic_array_str_entries(const_cast<DynamicArray*>(&raw), out.data(), (int32_t)n);
     }
+
+    // range-for: iterate a deep-copied snapshot (END sentinel pattern)
+    struct Iterator {
+        std::shared_ptr<std::vector<DynamicString>> snap;
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const DynamicString& operator*() const { return (*snap)[idx]; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            if (!o.snap) return snap && idx < snap->size();
+            if (!snap) return o.snap ? o.idx < o.snap->size() : false;
+            if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
+            return idx != o.idx;
+        }
+    };
+    Iterator begin() const {
+        Iterator it;
+        int64_t n = size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<DynamicString>>();
+            it.snap->resize((size_t)n);
+            barony_dynamic_array_str_entries(const_cast<DynamicArray*>(&raw), it.snap->data(), (int32_t)n);
+        }
+        return it;
+    }
+    Iterator end() const {
+        Iterator it;
+        it.idx = Iterator::END;
+        return it;
+    }
+};
+
+// ---------------------------------------------------------------------------
+// DynamicArrayS32 — std::vector<Sint32> replacement (POD elements, no
+// ownership — raw byte moves are safe). Uses the base DynamicArray shims
+// with elem_size = 4.
+// ---------------------------------------------------------------------------
+class DynamicArrayS32 {
+public:
+    DynamicArray raw{};
+
+    DynamicArrayS32() { barony_dynamic_array_init(&raw); }
+    ~DynamicArrayS32() { barony_dynamic_array_destroy(&raw); }
+    DynamicArrayS32(const DynamicArrayS32& other) : raw{} {
+        barony_dynamic_array_init(&raw);
+        *this = other;
+    }
+    DynamicArrayS32& operator=(const DynamicArrayS32& other) {
+        if (this != &other) { barony_dynamic_array_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
+        return *this;
+    }
+    DynamicArrayS32(DynamicArrayS32&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicArray{};
+    }
+    DynamicArrayS32& operator=(DynamicArrayS32&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_array_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicArray{};
+        }
+        return *this;
+    }
+
+    int64_t size() const { return dynarray_size<int32_t>(raw); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_array_clear(&raw); }
+    void push_back(int32_t v) { dynarray_push<int32_t>(raw, v); }
+    void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(int32_t)); }
+    int32_t& operator[](int64_t i) { return *dynarray_at<int32_t>(raw, i); }
+    const int32_t& operator[](int64_t i) const { return *dynarray_at<int32_t>(raw, i); }
+    int32_t at(int64_t i) const { return *dynarray_at<int32_t>(raw, i); }
+    int32_t* data() { return (int32_t*)raw.data; }
+    const int32_t* data() const { return (const int32_t*)raw.data; }
+};
+
+// ---------------------------------------------------------------------------
+// DynamicArrayU32 — std::vector<Uint32> replacement (POD).
+// ---------------------------------------------------------------------------
+class DynamicArrayU32 {
+public:
+    DynamicArray raw{};
+
+    DynamicArrayU32() { barony_dynamic_array_init(&raw); }
+    ~DynamicArrayU32() { barony_dynamic_array_destroy(&raw); }
+    DynamicArrayU32(const DynamicArrayU32& other) : raw{} {
+        barony_dynamic_array_init(&raw);
+        *this = other;
+    }
+    DynamicArrayU32& operator=(const DynamicArrayU32& other) {
+        if (this != &other) { barony_dynamic_array_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
+        return *this;
+    }
+    DynamicArrayU32(DynamicArrayU32&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicArray{};
+    }
+    DynamicArrayU32& operator=(DynamicArrayU32&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_array_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicArray{};
+        }
+        return *this;
+    }
+
+    int64_t size() const { return dynarray_size<uint32_t>(raw); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_array_clear(&raw); }
+    void push_back(uint32_t v) { dynarray_push<uint32_t>(raw, v); }
+    void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(uint32_t)); }
+    uint32_t& operator[](int64_t i) { return *dynarray_at<uint32_t>(raw, i); }
+    const uint32_t& operator[](int64_t i) const { return *dynarray_at<uint32_t>(raw, i); }
+    uint32_t at(int64_t i) const { return *dynarray_at<uint32_t>(raw, i); }
 };

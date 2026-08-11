@@ -26107,7 +26107,8 @@ failed:
 		if ( name == "containers" && entry.models.size() > 0 )
 		{
 			// hack - only show breakables on levels weve unlocked
-			std::vector<DynamicString> revealed_models = entry.models;
+			std::vector<DynamicString> revealed_models;
+			entry.models.snapshot(revealed_models);
 			std::vector<std::pair<std::string, std::string>> areaUnlockNames = {
 				{"mines", "mines"},
 				{"swamps", "swamps"},
@@ -26160,7 +26161,7 @@ failed:
 		{
 			Compendium_t::compendiumEntityCurrent.set(
 				name,
-				entry.models.empty() ? "" : entry.models[Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size()]
+				entry.models.empty() ? "" : entry.models.at(Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size())
 			);
 		}
 
@@ -29242,7 +29243,7 @@ failed:
 
 		Compendium_t::compendiumEntityCurrent.set(
 			name,
-			entry.models.empty() ? "" : entry.models[Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size()]
+			entry.models.empty() ? "" : entry.models.at(Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size())
 		);
 
 		refreshCompendiumCamera(DynamicString(Compendium_t::compendiumEntityCurrent.modelName));
@@ -29481,7 +29482,7 @@ failed:
 		{
 			Compendium_t::compendiumEntityCurrent.set(
 				name,
-				entry.models.empty() ? "" : entry.models[Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size()]
+				entry.models.empty() ? "" : entry.models.at(Compendium_t::compendiumEntityCurrent.modelRNG % entry.models.size())
 			);
 		}
 

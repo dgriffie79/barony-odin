@@ -12544,7 +12544,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 }
 #endif
 
-void jsonVecToVec(rapidjson::Value& val, std::vector<DynamicString>& vec )
+void jsonVecToVec(rapidjson::Value& val, DynamicArrayStr& vec)
 {
 	for ( auto itr = val.Begin(); itr != val.End(); ++itr )
 	{
@@ -12555,7 +12555,7 @@ void jsonVecToVec(rapidjson::Value& val, std::vector<DynamicString>& vec )
 	}
 }
 
-void jsonVecToVec(rapidjson::Value& val, std::vector<Sint32>& vec)
+void jsonVecToVec(rapidjson::Value& val, DynamicArrayS32& vec)
 {
 	for ( auto itr = val.Begin(); itr != val.End(); ++itr )
 	{
@@ -13669,29 +13669,35 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 			{
 				jsonVecToVec(itr->value["details"], find->second.details);
 			}
-			for ( auto& line : find->second.details )
-			{
-				if ( line.size() > 0 )
-				{
-					if ( line[0] == '-' )
-					{
-						line[0] = '\x1E';
-					}
-					else
-					{
-						for ( size_t c = 0; c < line.size(); ++c )
 						{
-							if ( line[c] == '-' )
+				std::vector<DynamicString> _lines;
+				find->second.details.snapshot(_lines);
+				for ( size_t _li = 0; _li < _lines.size(); ++_li )
+				{
+					auto& line = _lines[_li];
+					if ( line.size() > 0 )
+					{
+						if ( line[0] == '-' )
+						{
+							line[0] = '';
+						}
+						else
+						{
+							for ( size_t c = 0; c < line.size(); ++c )
 							{
-								line[c] = '\x1E';
-								break;
-							}
-							else if ( line[c] != ' ' )
-							{
-								break;
+								if ( line[c] == '-' )
+								{
+									line[c] = '';
+									break;
+								}
+								else if ( line[c] != ' ' )
+								{
+									break;
+								}
 							}
 						}
 					}
+					find->second.details.set((int64_t)_li, line);
 				}
 			}
 
@@ -13819,29 +13825,35 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 			obj.lorePoints = w["lore_points"].GetInt();
 		}
 		obj.linesToHighlight.clear();
-		for ( auto& line : obj.details )
-		{
-			if ( line.size() > 0 )
+				{
+			std::vector<DynamicString> _lines;
+			obj.details.snapshot(_lines);
+			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				if ( line[0] == '-' )
+				auto& line = _lines[_li];
+				if ( line.size() > 0 )
 				{
-					line[0] = '\x1E';
-				}
-				else
-				{
-					for ( size_t c = 0; c < line.size(); ++c )
+					if ( line[0] == '-' )
 					{
-						if ( line[c] == '-' )
+						line[0] = '';
+					}
+					else
+					{
+						for ( size_t c = 0; c < line.size(); ++c )
 						{
-							line[c] = '\x1E';
-							break;
-						}
-						else if ( line[c] != ' ' )
-						{
-							break;
+							if ( line[c] == '-' )
+							{
+								line[c] = '';
+								break;
+							}
+							else if ( line[c] != ' ' )
+							{
+								break;
+							}
 						}
 					}
 				}
+				obj.details.set((int64_t)_li, line);
 			}
 		}
 		if ( w.HasMember("feature_img") )
@@ -14019,29 +14031,35 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 			{
 				jsonVecToVec(itr->value["details"], find->second.details);
 			}
-			for ( auto& line : find->second.details )
-			{
-				if ( line.size() > 0 )
-				{
-					if ( line[0] == '-' )
-					{
-						line[0] = '\x1E';
-					}
-					else
-					{
-						for ( size_t c = 0; c < line.size(); ++c )
 						{
-							if ( line[c] == '-' )
+				std::vector<DynamicString> _lines;
+				find->second.details.snapshot(_lines);
+				for ( size_t _li = 0; _li < _lines.size(); ++_li )
+				{
+					auto& line = _lines[_li];
+					if ( line.size() > 0 )
+					{
+						if ( line[0] == '-' )
+						{
+							line[0] = '';
+						}
+						else
+						{
+							for ( size_t c = 0; c < line.size(); ++c )
 							{
-								line[c] = '\x1E';
-								break;
-							}
-							else if ( line[c] != ' ' )
-							{
-								break;
+								if ( line[c] == '-' )
+								{
+									line[c] = '';
+									break;
+								}
+								else if ( line[c] != ' ' )
+								{
+									break;
+								}
 							}
 						}
 					}
+					find->second.details.set((int64_t)_li, line);
 				}
 			}
 
@@ -14164,29 +14182,35 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 			obj.featureImg = w["feature_img"].GetString();
 		}
 		obj.linesToHighlight.clear();
-		for ( auto& line : obj.details )
-		{
-			if ( line.size() > 0 )
+				{
+			std::vector<DynamicString> _lines;
+			obj.details.snapshot(_lines);
+			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				if ( line[0] == '-' )
+				auto& line = _lines[_li];
+				if ( line.size() > 0 )
 				{
-					line[0] = '\x1E';
-				}
-				else
-				{
-					for ( size_t c = 0; c < line.size(); ++c )
+					if ( line[0] == '-' )
 					{
-						if ( line[c] == '-' )
+						line[0] = '';
+					}
+					else
+					{
+						for ( size_t c = 0; c < line.size(); ++c )
 						{
-							line[c] = '\x1E';
-							break;
-						}
-						else if ( line[c] != ' ' )
-						{
-							break;
+							if ( line[c] == '-' )
+							{
+								line[c] = '';
+								break;
+							}
+							else if ( line[c] != ' ' )
+							{
+								break;
+							}
 						}
 					}
 				}
+				obj.details.set((int64_t)_li, line);
 			}
 		}
 		if ( w.HasMember("details_line_highlights") )
@@ -18130,7 +18154,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 
 			std::string filename = f.substr(0, f.find(".json"));
 			auto& entry = compendiumObjectLimbs[filename];
-			entry.entities.clear();
+			barony_dynamic_array_clear(&entry.entities);
 			entry.baseCamera = CompendiumView_t();
 
 			compendiumObjectMapTiles.erase(filename);
@@ -18262,12 +18286,12 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 					statue.heightOffset = d["height_offset"].GetDouble();
 				}*/
 
-				entry.entities.push_back(Entity(-1, 0, nullptr, nullptr));
-				auto& limb = entry.entities[entry.entities.size() - 1];
+				dynarray_push<Entity>(entry.entities, Entity(-1, 0, nullptr, nullptr));
+				auto& limb = *dynarray_at<Entity>(entry.entities, dynarray_size<Entity>(entry.entities) - 1);
 				if ( index > 0 )
 				{
-					limb.x = entry.entities[0].x - (*itr)["x"].GetDouble();
-					limb.y = entry.entities[0].y - (*itr)["y"].GetDouble();
+					limb.x = dynarray_at<Entity>(entry.entities, 0)->x - (*itr)["x"].GetDouble();
+					limb.y = dynarray_at<Entity>(entry.entities, 0)->y - (*itr)["y"].GetDouble();
 				}
 				else
 				{
@@ -18906,9 +18930,9 @@ void Compendium_t::PointsAnim_t::pointsChangeEvent(Sint32 amount)
 	}
 }
 
-std::vector<Sint32> Compendium_t::CompendiumMonsters_t::Monster_t::getDisplayStat(const char* name)
+DynamicArrayS32 Compendium_t::CompendiumMonsters_t::Monster_t::getDisplayStat(const char* name)
 {
-	std::vector<Sint32> retVal;
+	DynamicArrayS32 retVal;
 	if ( !name )
 	{
 		return retVal;

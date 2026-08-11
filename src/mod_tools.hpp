@@ -4018,26 +4018,26 @@ struct Compendium_t
 		{
 			int monsterType = NOTHING;
 			DynamicString unique_npc = "";
-			std::vector<DynamicString> blurb;
-			std::vector<Sint32> hp;
-			std::vector<Sint32> spd;
-			std::vector<Sint32> ac;
-			std::vector<Sint32> atk;
-			std::vector<Sint32> rangeatk;
-			std::vector<Sint32> pwr;
-			std::vector<Sint32> str;
-			std::vector<Sint32> con;
-			std::vector<Sint32> dex;
+			DynamicArrayStr blurb;
+			DynamicArrayS32 hp;
+			DynamicArrayS32 spd;
+			DynamicArrayS32 ac;
+			DynamicArrayS32 atk;
+			DynamicArrayS32 rangeatk;
+			DynamicArrayS32 pwr;
+			DynamicArrayS32 str;
+			DynamicArrayS32 con;
+			DynamicArrayS32 dex;
 			MonsterSpecies species;
-			std::vector<Sint32> lvl;
+			DynamicArrayS32 lvl;
 			std::array<int, 7> resistances;
-			std::vector<DynamicString> abilities;
-			std::vector<DynamicString> inventory;
+			DynamicArrayStr abilities;
+			DynamicArrayStr inventory;
 			DynamicString imagePath = "";
-			std::vector<DynamicString> models;
-			std::set<std::string> unlockAchievements;
+			DynamicArrayStr models;
+			DynamicSetStr unlockAchievements;
 			int lorePoints = 0;
-			std::vector<Sint32> getDisplayStat(const char* name);
+			DynamicArrayS32 getDisplayStat(const char* name);
 		};
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
@@ -4057,7 +4057,7 @@ struct Compendium_t
 	{
 		CompendiumView_t baseCamera;
 		CompendiumView_t currentCamera;
-		std::vector<Entity> entities;
+		DynamicArray entities;  // vector<Entity> (byte moves)
 	};
 	std::map<std::string, ObjectLimbs_t> compendiumObjectLimbs;
 	CompendiumView_t currentView;
@@ -4075,12 +4075,12 @@ struct Compendium_t
 		{
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<DynamicString> models;
-			std::vector<DynamicString> blurb;
-			std::vector<Uint32> linesToHighlight;
-			std::vector<DynamicString> details;
-			std::set<std::string> unlockAchievements;
-			std::set<EventTags> unlockTags;
+			DynamicArrayStr models;
+			DynamicArrayStr blurb;
+			DynamicArrayU32 linesToHighlight;
+			DynamicArrayStr details;
+			DynamicSetStr unlockAchievements;
+			DynamicSetI32 unlockTags;
 			DynamicString featureImg = "";
 			int id = -1;
 			int lorePoints = 0;
@@ -4102,11 +4102,11 @@ struct Compendium_t
 		{
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<DynamicString> renderedImagePaths;
-			std::vector<DynamicString> blurb;
-			std::vector<Uint32> linesToHighlight;
-			std::vector<DynamicString> details;
-			std::vector<DynamicString> models;
+			DynamicArrayStr renderedImagePaths;
+			DynamicArrayStr blurb;
+			DynamicArrayU32 linesToHighlight;
+			DynamicArrayStr details;
+			DynamicArrayStr models;
 			DynamicString featureImg = "";
 			int id = -1;
 			CompendiumView_t view;
@@ -4140,7 +4140,7 @@ struct Compendium_t
 			};
 			int modelIndex = -1;
 			DynamicString imagePath = "";
-			std::vector<DynamicString> blurb;
+			DynamicArrayStr blurb;
 			std::vector<CodexItem_t> items_in_category;
 			int lorePoints = 0;
 		};
