@@ -323,3 +323,159 @@ barony_dynamic_array_str_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [
 	}
 	return i32(n)
 }
+
+// ---------------------------------------------------------------------------
+// DynamicArray of ItemTooltipIcons_t (std::vector<ItemTooltipIcons_t>).
+// Element = 3 DynamicStrings (iconPath, text, conditionalAttribute) + u32
+// textColor. Elements are deep-owned (strings cloned/freed).
+// ---------------------------------------------------------------------------
+ItemTooltipIcons_t :: struct {
+	iconPath:             DynamicString,
+	text:                 DynamicString,
+	textColor:            u32,
+	conditionalAttribute: DynamicString,
+}
+
+icon_free :: proc(v: ^ItemTooltipIcons_t) {
+	fields := [?]^DynamicString{ &v.iconPath, &v.text, &v.conditionalAttribute }
+	for s in fields {
+		if s.data != nil {
+			mem.free(s.data)
+			s.data = nil
+		}
+	}
+}
+
+icon_copy :: proc(dst: ^ItemTooltipIcons_t, src: ^ItemTooltipIcons_t) {
+	dst.textColor = src.textColor
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &dst.iconPath, &src.iconPath },
+		{ &dst.text, &src.text },
+		{ &dst.conditionalAttribute, &src.conditionalAttribute },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_array_icon_init :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_icon_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^ItemTooltipIcons_t) {
+	context = runtime.default_context()
+	if elem == nil { return }
+	if a.cap - a.len < size_of(ItemTooltipIcons_t) {
+		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(ItemTooltipIcons_t))
+	}
+	slot := ([^]ItemTooltipIcons_t)(uintptr(a.data) + uintptr(a.len))
+	icon_copy(slot, elem)
+	a.len += size_of(ItemTooltipIcons_t)
+}
+
+@(export)
+barony_dynamic_array_icon_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^ItemTooltipIcons_t) -> bool {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return false }
+	elems := ([^]ItemTooltipIcons_t)(a.data)
+	icon_copy(out, &elems[index])
+	return true
+}
+
+@(export)
+barony_dynamic_array_icon_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^ItemTooltipIcons_t) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return }
+	elems := ([^]ItemTooltipIcons_t)(a.data)
+	icon_free(&elems[index])
+	icon_copy(&elems[index], elem)
+}
+
+@(export)
+barony_dynamic_array_icon_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return }
+	elems := ([^]ItemTooltipIcons_t)(a.data)
+	icon_free(&elems[index])
+	n := a.len / size_of(ItemTooltipIcons_t)
+	for i := int(index); i < n - 1; i += 1 {
+		elems[i] = elems[i + 1]
+	}
+	a.len -= size_of(ItemTooltipIcons_t)
+}
+
+@(export)
+barony_dynamic_array_icon_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]ItemTooltipIcons_t)(a.data)
+		n := a.len / size_of(ItemTooltipIcons_t)
+		for i in 0..<n {
+			icon_free(&elems[i])
+		}
+	}
+	a.len = 0
+}
+
+@(export)
+barony_dynamic_array_icon_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if a.data != nil {
+		elems := ([^]ItemTooltipIcons_t)(a.data)
+		n := a.len / size_of(ItemTooltipIcons_t)
+		for i in 0..<n {
+			icon_free(&elems[i])
+		}
+	}
+	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_icon_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
+	context = runtime.default_context()
+	return i32(a.len / size_of(ItemTooltipIcons_t))
+}
+
+@(export)
+barony_dynamic_array_icon_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if dst.data != nil {
+		barony_dynamic_array_icon_destroy(dst)
+	}
+	if src.data == nil || src.len == 0 { return }
+	src_elems := ([^]ItemTooltipIcons_t)(src.data)
+	n := src.len / size_of(ItemTooltipIcons_t)
+	for i in 0..<n {
+		if dst.cap - dst.len < size_of(ItemTooltipIcons_t) {
+			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(ItemTooltipIcons_t))
+		}
+		slot := ([^]ItemTooltipIcons_t)(uintptr(dst.data) + uintptr(dst.len))
+		icon_copy(slot, &src_elems[i])
+		dst.len += size_of(ItemTooltipIcons_t)
+	}
+}
+
+@(export)
+barony_dynamic_array_icon_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]ItemTooltipIcons_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if a.data == nil || count <= 0 { return 0 }
+	elems := ([^]ItemTooltipIcons_t)(a.data)
+	n := a.len / size_of(ItemTooltipIcons_t)
+	if n > int(count) { n = int(count) }
+	for i in 0..<n {
+		icon_copy(&val_ptrs[i], &elems[i])
+	}
+	return i32(n)
+}

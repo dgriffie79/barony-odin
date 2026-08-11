@@ -3280,3 +3280,108 @@ barony_dynamic_map_strclass_entries :: proc "c" (m: ^map[string]Class_t, key_ptr
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> DynamicArrayStr (map<string, std::vector<DynamicString>>) —
+// ItemTooltip_t::detailsText. The value is a DynamicArrayStr (deep-owned
+// strings). put/get deep-copy the whole array; erase/clear/destroy free it.
+// ---------------------------------------------------------------------------
+@(export)
+barony_dynamic_map_strarrstr_init :: proc "c" (m: ^map[string]Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strarrstr_put :: proc "c" (m: ^map[string]Raw_Dynamic_Array, key: string, value: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Raw_Dynamic_Array)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		barony_dynamic_array_str_destroy(&old)
+	}
+	new_val: Raw_Dynamic_Array
+	barony_dynamic_array_str_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strarrstr_get :: proc "c" (m: ^map[string]Raw_Dynamic_Array, key: string, out: ^Raw_Dynamic_Array) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		barony_dynamic_array_str_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strarrstr_entry :: proc "c" (m: ^map[string]Raw_Dynamic_Array, key: string) -> ^Raw_Dynamic_Array {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]Raw_Dynamic_Array)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strarrstr_erase :: proc "c" (m: ^map[string]Raw_Dynamic_Array, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		barony_dynamic_array_str_destroy(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strarrstr_clear :: proc "c" (m: ^map[string]Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				barony_dynamic_array_str_destroy(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strarrstr_len :: proc "c" (m: ^map[string]Raw_Dynamic_Array) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strarrstr_destroy :: proc "c" (m: ^map[string]Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				barony_dynamic_array_str_destroy(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}

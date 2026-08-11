@@ -2838,20 +2838,7 @@ private:
 	Uint32 defaultFaintTextColor = 0xFFFFFFFF;
 
 public:
-	struct ItemTooltipIcons_t
-	{
-		DynamicString iconPath = "";
-		DynamicString text = "";
-		Uint32 textColor = 0xFFFFFFFF;
-		DynamicString conditionalAttribute = "";
-		ItemTooltipIcons_t(std::string _path, std::string _text)
-		{
-			iconPath = _path;
-			text = _text;
-		}
-		void setColor(Uint32 color) { textColor = color; }
-		void setConditionalAttribute(std::string str) { conditionalAttribute = str; }
-	};
+		typedef ItemTooltipIcons_tMirror ItemTooltipIcons_t;
 
 	struct ItemTooltip_t
 	{
@@ -2862,10 +2849,10 @@ public:
 		Uint32 negativeTextColor = 0;
 		Uint32 statusEffectTextColor = 0;
 		Uint32 faintTextColor = 0;
-		std::vector<ItemTooltipIcons_t> icons;
-		std::vector<DynamicString> descriptionText;
-		std::map<std::string, std::vector<DynamicString>> detailsText;
-		std::vector<DynamicString> detailsTextInsertOrder;
+		DynamicArrayIcon icons;
+		DynamicArrayStr descriptionText;
+		DynamicMapStrArrStr detailsText;
+		DynamicArrayStr detailsTextInsertOrder;
 		DynamicMapI32 minWidths;
 		DynamicMapI32 maxWidths;
 		DynamicMapI32 headerMaxWidths;
@@ -2889,7 +2876,7 @@ public:
 	std::map<Sint32, spellItem_t> spellItems;
 	std::map<std::string, ItemTooltip_t> tooltips;
 	std::map<std::string, std::map<std::string, std::string>> adjectives;
-	std::map<std::string, std::vector<DynamicString>> templates;
+	DynamicMapStrArrStr templates;
 	//std::vector<std::pair<int, Sint32>> itemValueTable;
 	//std::map<int, std::vector<std::pair<int, Sint32>>> itemValueTableByCategory;
 	typedef ItemLocalization_tMirror ItemLocalization_t;

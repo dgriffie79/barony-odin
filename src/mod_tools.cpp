@@ -1875,7 +1875,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 			else
 			{
 				std::string template_name = template_itr->name.GetString();
-				if ( templates.find(template_name) != templates.end() )
+				if ( templates.contains(template_name) )
 				{
 					templates[template_name].clear();
 				}
@@ -1954,7 +1954,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 				if ( tooltipType_itr->value["description"].IsString() )
 				{
 					//printlog("[JSON]: Found template string '%s' for tooltip '%s'", tooltipType_itr->value["description"].GetString(), tooltipType_itr->name.GetString());
-					if ( templates.find(tooltipType_itr->value["description"].GetString()) != templates.end() )
+					if ( templates.contains(tooltipType_itr->value["description"].GetString()) )
 					{
 						tooltip.descriptionText = templates[tooltipType_itr->value["description"].GetString()];
 					}
@@ -1988,11 +1988,11 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 							keyValue_itr != details_itr->MemberEnd(); ++keyValue_itr )
 						{
 							tagsRead.insert(keyValue_itr->name.GetString());
-							std::vector<DynamicString> detailEntry;
+							DynamicArrayStr detailEntry;
 							if ( keyValue_itr->value.IsString() )
 							{
 								//printlog("[JSON]: Found template string '%s' for tooltip '%s'", keyValue_itr->value.GetString(), tooltipType_itr->name.GetString());
-								if ( templates.find(keyValue_itr->value.GetString()) != templates.end() )
+								if ( templates.contains(keyValue_itr->value.GetString()) )
 								{
 									detailEntry = templates[keyValue_itr->value.GetString()];
 								}
@@ -2467,7 +2467,7 @@ std::string ItemTooltips_t::getSpellDescriptionText(const int player, Item& item
 	std::string templateName = "template_desc_";
 	templateName += spellItems[spell->ID].internalName;
 
-	if ( templates.find(templateName) == templates.end() )
+	if ( !templates.contains(templateName) )
 	{
 		return defaultString;
 	}
@@ -2811,7 +2811,7 @@ std::string ItemTooltips_t::getSpellIconText(const int player, Item& item, const
 	std::string templateName = "template_icon_";
 	templateName += spellItems[spell->ID].internalName;
 
-	if ( templates.find(templateName) == templates.end() )
+	if ( !templates.contains(templateName) )
 	{
 		return defaultString;
 	}
@@ -4478,7 +4478,7 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 							skillnames += "/";
 							skillnames += getItemProficiencyName(PRO_MACE);
 						}
-						snprintf(tmp, sizeof(tmp), ItemTooltips.templates["template_armor_resist_icon"][0].c_str(),
+						snprintf(tmp, sizeof(tmp), ItemTooltips.templates["template_armor_resist_icon"].at(0).c_str(),
 							skillnames.c_str());
 					}
 					snprintf(buf, sizeof(buf), str.c_str(), (int)(mod * 100),
@@ -6364,7 +6364,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 				real_t damageMult = mult;
 				int healing = getSpellDamageSecondaryFromID(SPELL_HOLY_BEAM, nullptr, nullptr, nullptr, 0.0, false);
 				real_t healingMult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_SECONDARY_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
-				snprintf(buf, sizeof(buf), templates["template_spell_damage_bonus_pwr_dual"][0].c_str(), adjectives["spell_strings"]["effect"].c_str(), damage, adjectives["spell_strings"]["damage"].c_str(),
+				snprintf(buf, sizeof(buf), templates["template_spell_damage_bonus_pwr_dual"].at(0).c_str(), adjectives["spell_strings"]["effect"].c_str(), damage, adjectives["spell_strings"]["damage"].c_str(),
 					bonusINTPercent * damageMult, adjectives["spell_strings"]["damage"].c_str(),
 					healing, adjectives["spell_strings"]["healing"].c_str(),
 					bonusINTPercent * healingMult, adjectives["spell_strings"]["healing"].c_str());
