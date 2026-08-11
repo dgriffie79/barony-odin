@@ -3166,8 +3166,8 @@ struct ShopkeeperConsumables_t
 {
 	struct ItemEntry
 	{
-		std::vector<ItemType> type;
-		std::vector<Status> status;
+		DynamicArrayS32 type;
+		DynamicArrayS32 status;
 		DynamicArrayS32 beatitude;
 		DynamicArrayS32 count;
 		DynamicArrayU32 appearance;
@@ -3182,12 +3182,14 @@ struct ShopkeeperConsumables_t
 	struct StoreSlots_t
 	{
 		int slotTradingReq = 0;
-		std::vector<ItemEntry> itemEntries;
+		DynamicArrayT<ItemEntry> itemEntries;
 	};
 	static int consumableBuyValueMult;
 	static std::map<int, std::vector<StoreSlots_t>> entries; // shop type as key
 	static void readFromFile();
 };
+template <> struct DynamicArrayKindOf<ShopkeeperConsumables_t::ItemEntry> { static constexpr int value = Kind_ShopkeeperItem; };
+
 
 struct ClassHotbarConfig_t
 {

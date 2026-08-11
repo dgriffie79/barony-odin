@@ -445,6 +445,49 @@ codex_item_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// ShopkeeperConsumables_t::ItemEntry — owns 6 DynamicArrays (deep)
+// ---------------------------------------------------------------------------
+ShopkeeperItemEntry_t :: struct {
+	type:            Raw_Dynamic_Array,
+	status:          Raw_Dynamic_Array,
+	beatitude:       Raw_Dynamic_Array,
+	count:           Raw_Dynamic_Array,
+	appearance:      Raw_Dynamic_Array,
+	identified:      Raw_Dynamic_Array,
+	percentChance:   i32,
+	weightedChance:  i32,
+	dropChance:      i32,
+	emptyItemEntry:  bool,
+	dropItemOnDeath: bool,
+}
+
+shopkeeper_item_entry_free :: proc(p: rawptr) {
+	v := (^ShopkeeperItemEntry_t)(p)
+	barony_dynamic_array_elem_destroy(&v.type, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.status, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.beatitude, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.count, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.appearance, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.identified, size_of(i32), Kind_POD)
+}
+
+shopkeeper_item_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^ShopkeeperItemEntry_t)(dst)
+	s := (^ShopkeeperItemEntry_t)(src)
+	d.percentChance = s.percentChance
+	d.weightedChance = s.weightedChance
+	d.dropChance = s.dropChance
+	d.emptyItemEntry = s.emptyItemEntry
+	d.dropItemOnDeath = s.dropItemOnDeath
+	barony_dynamic_array_elem_copy(&d.type, &s.type, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.status, &s.status, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.beatitude, &s.beatitude, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.count, &s.count, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.appearance, &s.appearance, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.identified, &s.identified, size_of(i32), Kind_POD)
+}
+
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
 Element_Ops :: struct {
 	free: proc(rawptr),

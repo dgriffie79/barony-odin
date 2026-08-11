@@ -60,10 +60,10 @@ std::vector<Item*> generateShopkeeperConsumables(Entity& my, Stat& myStats, int 
 			continue;
 		}
 
-		ItemType type = slot.type[rng.uniform(0, slot.type.size() - 1)];
-		Status status = slot.status[rng.uniform(0, slot.status.size() - 1)];
-		Sint16 beatitude = slot.beatitude[rng.uniform(0, slot.beatitude.size() - 1)];
-		Sint16 count = slot.count[rng.uniform(0, slot.count.size() - 1)];
+		ItemType type = static_cast<ItemType>(slot.type[rng.uniform(0, slot.type.size() - 1)]);
+		Status status = static_cast<Status>(slot.status[rng.uniform(0, slot.status.size() - 1)]);
+		Sint16 beatitude = static_cast<Sint16>(slot.beatitude[rng.uniform(0, slot.beatitude.size() - 1)]);
+		Sint16 count = static_cast<Sint16>(slot.count[rng.uniform(0, slot.count.size() - 1)]);
 		if ( !strcmp(map.name, "Mages Guild") )
 		{
 			int numplayers = 0;
