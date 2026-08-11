@@ -93,7 +93,7 @@ public:
 	static int shortDistanceHPBarFadeTicks;
 	static real_t shortDistanceHPBarFadeDistance;
 	static bool bEnemyBarSimpleBlit;
-	static std::map<int, std::vector<int>> damageGibAnimCurves;
+	static DynamicMapI32T<DynamicArrayS32> damageGibAnimCurves;
 	static void dumpCache();
 	static DynamicArray widthHealthBreakpointsMonsters;  // vector<pair<real_t,int>> (POD)
 	static DynamicArray widthHealthBreakpointsFurniture;  // vector<pair<real_t,int>> (POD)
@@ -1983,8 +1983,8 @@ enum ItemContextMenuPrompts {
 	PROMPT_SCEPTER_CHARGE
 };
 
-std::vector<ItemContextMenuPrompts> getContextMenuOptionsForItem(const int player, Item* item);
-std::vector<ItemContextMenuPrompts> getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem);
+DynamicArrayS32 getContextMenuOptionsForItem(const int player, Item* item);
+DynamicArrayS32 getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem);
 const char* getContextMenuLangEntry(const int player, const ItemContextMenuPrompts prompt, Item& item);
 std::string getContextMenuOptionBindingName(const int player, const ItemContextMenuPrompts prompt);
 void cleanupMinimapTextures();

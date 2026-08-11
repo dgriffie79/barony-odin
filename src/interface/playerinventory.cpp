@@ -7331,8 +7331,8 @@ void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, i
 	{
 		auto options = getContextTooltipOptionsForItem(player, item, players[player]->inventoryUI.useItemDropdownOnGamepad, players[player]->GUI.activeModule == Player::GUI_t::MODULE_HOTBAR);
 
-		std::sort(options.begin(), options.end(), [player](const ItemContextMenuPrompts& lhs, const ItemContextMenuPrompts& rhs) {
-			return getContextMenuOptionOrder(player, lhs) < getContextMenuOptionOrder(player, rhs);
+		std::sort(options.begin(), options.end(), [player](const int32_t lhs, const int32_t rhs) {
+			return getContextMenuOptionOrder(player, (ItemContextMenuPrompts)lhs) < getContextMenuOptionOrder(player, (ItemContextMenuPrompts)rhs);
 		});
 
 		if ( !options.empty() )
@@ -7377,7 +7377,7 @@ void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, i
 			{
 				char imgName[16];
 				char fieldName[16];
-				const int order = getContextMenuOptionOrder(player, option);
+				const int order = getContextMenuOptionOrder(player, (ItemContextMenuPrompts)option);
 				promptsAvailable.insert(order);
 
 				snprintf(imgName, sizeof(imgName), "glyph %d", order);
@@ -7395,14 +7395,14 @@ void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, i
 							dropEnabled = true;
 						}
 						txt->setDisabled(true);
-						img->path = Input::inputs[player].getGlyphPathForBinding(getContextMenuOptionBindingName(player, option).c_str());
+						img->path = Input::inputs[player].getGlyphPathForBinding(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str());
 						continue;
 					}
 				}
 
-				img->path = Input::inputs[player].getGlyphPathForBinding(getContextMenuOptionBindingName(player, option).c_str());
+				img->path = Input::inputs[player].getGlyphPathForBinding(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str());
 				txt->setDisabled(false);
-				txt->setText(getContextMenuLangEntry(player, option, *item));
+				txt->setText(getContextMenuLangEntry(player, (ItemContextMenuPrompts)option, *item));
 			}
 
 			int alignx1 = xres;
@@ -9932,7 +9932,7 @@ void Player::Inventory_t::updateInventory()
 						bool bindingPressed = false;
 						for ( auto& option : contextTooltipOptions )
 						{
-							if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, option).c_str()) )
+							if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str()) )
 							{
 								bindingPressed = true;
 
@@ -9972,7 +9972,7 @@ void Player::Inventory_t::updateInventory()
 								}
 								else
 								{
-									activateItemContextMenuOption(item, option);
+									activateItemContextMenuOption(item, (ItemContextMenuPrompts)option);
 									if ( option == ItemContextMenuPrompts::PROMPT_DROPDOWN )
 									{
 										if ( !players[player]->GUI.isDropdownActive() )
@@ -10012,7 +10012,7 @@ void Player::Inventory_t::updateInventory()
 							for ( auto& option : contextTooltipOptions )
 							{
 								// clear the other bindings just in case.
-								Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, option).c_str());
+								Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str());
 							}
 							break;
 						}
@@ -10401,7 +10401,7 @@ void Player::Inventory_t::updateInventory()
 					bool bindingPressed = false;
 					for ( auto& option : contextTooltipOptions )
 					{
-						if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, option).c_str()) )
+						if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str()) )
 						{
 							bindingPressed = true;
 
@@ -10441,7 +10441,7 @@ void Player::Inventory_t::updateInventory()
 							}
 							else
 							{
-								activateItemContextMenuOption(item, option);
+								activateItemContextMenuOption(item, (ItemContextMenuPrompts)option);
 								if ( option == ItemContextMenuPrompts::PROMPT_DROPDOWN )
 								{
 									if ( !players[player]->GUI.isDropdownActive() )
@@ -10487,7 +10487,7 @@ void Player::Inventory_t::updateInventory()
 						for ( auto& option : contextTooltipOptions )
 						{
 							// clear the other bindings just in case.
-							Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, option).c_str());
+							Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str());
 						}
 						break;
 					}
@@ -11380,14 +11380,14 @@ const char* getContextMenuLangEntry(const int player, const ItemContextMenuPromp
 	return "Invalid";
 }
 
-std::vector<ItemContextMenuPrompts> getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem)
+DynamicArrayS32 getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem)
 {
 	if ( (stats[player] && stats[player]->HP <= 0) || players[player]->ghost.isActive() )
 	{
 		// ded, cant do anything with items
-		return std::vector<ItemContextMenuPrompts>();
+		return DynamicArrayS32();
 	}
-	std::vector<ItemContextMenuPrompts> options;
+	DynamicArrayS32 options;
 	if ( useDropdownMenu == Player::Inventory_t::GAMEPAD_DROPDOWN_FULL )
 	{
 		options.push_back(ItemContextMenuPrompts::PROMPT_DROPDOWN);
@@ -11406,7 +11406,7 @@ std::vector<ItemContextMenuPrompts> getContextTooltipOptionsForItem(const int pl
 		int numPrimaryOptions = 0;
 		for ( auto it = options.begin(); it != options.end(); )
 		{
-			if ( getContextMenuOptionBindingName(player, *it) == "MenuConfirm" )
+			if ( getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuConfirm" )
 			{
 				++numPrimaryOptions;
 			}
@@ -11416,7 +11416,7 @@ std::vector<ItemContextMenuPrompts> getContextTooltipOptionsForItem(const int pl
 		{
 			for ( auto it = options.begin(); it != options.end(); )
 			{
-				if ( getContextMenuOptionBindingName(player, *it) == "MenuConfirm" )
+				if ( getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuConfirm" )
 				{
 					it = options.erase(it);
 					continue;
@@ -11439,9 +11439,9 @@ std::vector<ItemContextMenuPrompts> getContextTooltipOptionsForItem(const int pl
 	return options;
 }
 
-std::vector<ItemContextMenuPrompts> getContextMenuOptionsForItem(const int player, Item* item)
+DynamicArrayS32 getContextMenuOptionsForItem(const int player, Item* item)
 {
-	std::vector<ItemContextMenuPrompts> options;
+	DynamicArrayS32 options;
 	if ( !item )
 	{
 		return options;
@@ -11685,8 +11685,8 @@ std::vector<ItemContextMenuPrompts> getContextMenuOptionsForItem(const int playe
 	{
 		if ( sellingToShop || tinkerOpen || alembicOpen || featherOpen || itemfxOpen || mailboxOpen )
 		{
-			if ( getContextMenuOptionBindingName(player, *it) == "MenuConfirm"
-				|| getContextMenuOptionBindingName(player, *it) == "MenuCancel" )
+			if ( getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuConfirm"
+				|| getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuCancel" )
 			{
 				it = options.erase(it);
 				continue;
@@ -11696,17 +11696,17 @@ std::vector<ItemContextMenuPrompts> getContextMenuOptionsForItem(const int playe
 				it = options.erase(it);
 				continue;
 			}
-			if ( alembicOpen && getContextMenuOptionBindingName(player, *it) == "MenuAlt2" )
+			if ( alembicOpen && getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuAlt2" )
 			{
 				it = options.erase(it);
 				continue;
 			}
-			if ( featherOpen && getContextMenuOptionBindingName(player, *it) == "MenuAlt2" )
+			if ( featherOpen && getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuAlt2" )
 			{
 				it = options.erase(it);
 				continue;
 			}
-			if ( itemfxOpen && GenericGUI[player].itemfxGUI.modeHasTransmuteMenu() && getContextMenuOptionBindingName(player, *it) == "MenuAlt2" )
+			if ( itemfxOpen && GenericGUI[player].itemfxGUI.modeHasTransmuteMenu() && getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it) == "MenuAlt2" )
 			{
 				it = options.erase(it);
 				continue;
@@ -11744,7 +11744,7 @@ std::vector<ItemContextMenuPrompts> getContextMenuOptionsForItem(const int playe
 	std::unordered_map<std::string, int> optionsMap;
 	for ( auto it = options.begin(); it != options.end(); ++it )
 	{
-		optionsMap[getContextMenuOptionBindingName(player, *it)] += 1;
+		optionsMap[getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)*it)] += 1;
 	}
 	for ( auto& pair : optionsMap )
 	{

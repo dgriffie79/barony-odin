@@ -1045,6 +1045,13 @@ dynarrstr_value_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(DynamicString), Kind_DynamicString)
 }
 
+dynarrs32_value_free :: proc(p: rawptr) {
+	barony_dynamic_array_elem_destroy((^Raw_Dynamic_Array)(p), size_of(i32), Kind_POD)
+}
+dynarrs32_value_copy :: proc(dst: rawptr, src: rawptr) {
+	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(i32), Kind_POD)
+}
+
 // kind -> ops lookup. POD kinds use {nil, nil} (raw byte copy, no free).
 
 icon_entry_text_map_free_raw :: proc(p: rawptr) {
@@ -1175,6 +1182,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = binding_t_free_raw, copy = binding_t_copy_raw }
 	case 18:
 		return Value_Ops{ free = dynarrstr_value_free, copy = dynarrstr_value_copy }
+	case 19:
+		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	}
 	return Value_Ops{}
 }

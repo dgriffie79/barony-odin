@@ -3159,7 +3159,7 @@ void drawStatusNew(const int player)
 						{
 							continue;
 						}
-						if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, option).c_str()) )
+						if ( Input::inputs[player].binaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str()) )
 						{
 							bindingPressed = true;
 
@@ -3199,7 +3199,7 @@ void drawStatusNew(const int player)
 							}
 							else
 							{
-								players[player]->inventoryUI.activateItemContextMenuOption(item, option);
+								players[player]->inventoryUI.activateItemContextMenuOption(item, (ItemContextMenuPrompts)option);
 								if ( option == ItemContextMenuPrompts::PROMPT_DROPDOWN && tooltipSlotFrame )
 								{
 									if ( !players[player]->GUI.isDropdownActive() )
@@ -3239,7 +3239,7 @@ void drawStatusNew(const int player)
 						for ( auto& option : contextTooltipOptions )
 						{
 							// clear the other bindings just in case.
-							Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, option).c_str());
+							Input::inputs[player].consumeBinaryToggle(getContextMenuOptionBindingName(player, (ItemContextMenuPrompts)option).c_str());
 						}
 					}
 					item = nullptr; // we don't need to use this item anymore

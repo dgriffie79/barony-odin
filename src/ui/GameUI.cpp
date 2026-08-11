@@ -16184,7 +16184,7 @@ void Player::GUIDropdown_t::process()
 	const int textPaddingX = 8;
 
 	auto dropDown = allDropDowns[currentName];
-	std::vector<ItemContextMenuPrompts> contextOptions;
+	DynamicArrayS32 contextOptions;
 	Item* item = uidToItem(dropDownItem);
 	if ( currentName == "chest_interact" )
 	{
@@ -16272,7 +16272,7 @@ void Player::GUIDropdown_t::process()
 			}
 			for ( auto option : contextOptions )
 			{
-				dropDown.options.push_back(DropdownOption_t(getContextMenuLangEntry(player.playernum, option, *item), "", "", ""));
+				dropDown.options.push_back(DropdownOption_t(getContextMenuLangEntry(player.playernum, (ItemContextMenuPrompts)option, *item), "", "", ""));
 			}
 		}
 	}
@@ -16594,7 +16594,7 @@ void Player::GUIDropdown_t::process()
 					}
 					else
 					{
-						player.inventoryUI.activateItemContextMenuOption(item, contextOptions[dropDownOptionSelected]);
+						player.inventoryUI.activateItemContextMenuOption(item, (ItemContextMenuPrompts)contextOptions[dropDownOptionSelected]);
 					}
 				}
 			}
@@ -28989,7 +28989,7 @@ void Player::Inventory_t::updateItemContextMenu()
 			img->disabled = true;
 		}*/
 
-		txt->setText(getContextMenuLangEntry(player.playernum, promptType, *item));
+		txt->setText(getContextMenuLangEntry(player.playernum, (ItemContextMenuPrompts)promptType, *item));
 		if ( auto textGet = Text::get(txt->getText(), txt->getFont(),
 			makeColor(255, 255, 255, 255), makeColor(0, 0, 0, 255)) )
 		{
@@ -29242,7 +29242,7 @@ void Player::Inventory_t::updateItemContextMenu()
 			}
 			else
 			{
-				activateItemContextMenuOption(item, options[itemMenuSelected]);
+				activateItemContextMenuOption(item, (ItemContextMenuPrompts)options[itemMenuSelected]);
 			}
 		}
 		//Close the menu.

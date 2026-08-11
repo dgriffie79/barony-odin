@@ -272,12 +272,31 @@ public:
     }
 
     void push_back(const T& v) { barony_dynamic_array_elem_append(&raw, &v, sizeof(T), DynamicArrayKindOf<T>::value); }
+    // insert at position (std::vector::insert single-element semantics)
+    T* insert(T* pos, const T& v) {
+        int64_t i = (int64_t)(pos - (T*)raw.data);
+        // grow by one at the end, then shift the tail right
+        barony_dynamic_array_elem_append(&raw, &v, sizeof(T), DynamicArrayKindOf<T>::value);
+        int64_t n = size() - 1; // last element index (the appended v)
+        if (i < n) {
+            T* base = (T*)raw.data;
+            for (int64_t k = n; k > i; --k) base[k] = base[k - 1];
+            base[i] = v;
+        }
+        return (T*)raw.data + i;
+    }
     template <typename U = T, std::enable_if_t<std::is_same_v<U, DynamicString>, int> = 0>
     void push_back(const char* v) { T s(v); barony_dynamic_array_elem_append(&raw, &s, sizeof(T), DynamicArrayKindOf<T>::value); }
     template <typename U = T, std::enable_if_t<std::is_same_v<U, DynamicString>, int> = 0>
     void push_back(const std::string& v) { T s(v.c_str()); barony_dynamic_array_elem_append(&raw, &s, sizeof(T), DynamicArrayKindOf<T>::value); }
 
     void erase(int64_t i) { barony_dynamic_array_elem_erase(&raw, (int32_t)i, sizeof(T), DynamicArrayKindOf<T>::value); }
+    // erase(iterator) -> returns pointer to the next element (std::vector::erase semantics)
+    T* erase(T* it) {
+        int64_t i = (int64_t)(it - (T*)raw.data);
+        barony_dynamic_array_elem_erase(&raw, (int32_t)i, sizeof(T), DynamicArrayKindOf<T>::value);
+        return (T*)raw.data + i;
+    }
     void pop_back() { if (size() > 0) erase(size() - 1); }
 
     // at: LIVE slot reference (std::vector::at semantics — mutable). For

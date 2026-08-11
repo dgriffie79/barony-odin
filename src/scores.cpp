@@ -4267,7 +4267,7 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 
 					while ( playerAchievements[player].strungOutTicks.size() >= 10 )
 					{
-						playerAchievements[player].strungOutTicks.erase(0);
+						playerAchievements[player].strungOutTicks.erase((int64_t)0);
 					}
 				}
 			}

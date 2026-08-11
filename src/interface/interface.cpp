@@ -206,7 +206,7 @@ CalloutRadialMenu CalloutMenu[MAXPLAYERS];
 GenericGUIMenu GenericGUI[MAXPLAYERS];
 
 bool EnemyHPDamageBarHandler::bDamageGibTypesEnabled = true;
-std::map<int, std::vector<int>> EnemyHPDamageBarHandler::damageGibAnimCurves;
+DynamicMapI32T<DynamicArrayS32> EnemyHPDamageBarHandler::damageGibAnimCurves;
 int EnemyHPDamageBarHandler::maxTickLifetime = 120;
 int EnemyHPDamageBarHandler::maxTickFurnitureLifetime = 60;
 int EnemyHPDamageBarHandler::shortDistanceHPBarFadeTicks = TICKS_PER_SECOND / 2;
@@ -17721,7 +17721,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 			if ( n.second.animx <= 0.001 )
 			{
 				n.second.state = 3;
-				notifications.erase(0);
+				notifications.erase((int64_t)0);
 			}
 		}
 	}
@@ -35335,7 +35335,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 			if ( n.second.animx <= 0.001 )
 			{
 				n.second.state = 3;
-				notifications.erase(0);
+				notifications.erase((int64_t)0);
 			}
 		}
 	}
@@ -39582,7 +39582,7 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 	//		if ( n.second.animx <= 0.001 )
 	//		{
 	//			n.second.state = 3;
-	//			notifications.erase(0);
+	//			notifications.erase((int64_t)0);
 	//		}
 	//	}
 	//}

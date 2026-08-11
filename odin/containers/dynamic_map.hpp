@@ -381,6 +381,7 @@ enum MapValueKind {
     MK_Binding = 16,
     MK_Class = 17,
     MK_DynArrayStr = 18,
+    MK_DynArrayS32 = 19,
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -401,6 +402,7 @@ template <> struct MapValueKindOf<AchievementData_tMirror> { static constexpr in
 template <> struct MapValueKindOf<binding_tMirror> { static constexpr int value = MK_Binding; };
 template <> struct MapValueKindOf<Class_tMirror> { static constexpr int value = MK_Class; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
+template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 
 // Entry value type: string maps expose const char* (view into map storage);
 // other maps expose V by value.
