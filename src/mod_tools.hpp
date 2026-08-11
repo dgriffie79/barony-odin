@@ -4123,7 +4123,7 @@ struct Compendium_t
 			int modelIndex = -1;
 			DynamicString imagePath = "";
 			DynamicArrayStr blurb;
-			std::vector<CodexItem_t> items_in_category;
+			DynamicArrayT<CodexItem_t> items_in_category;
 			int lorePoints = 0;
 		};
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
@@ -4309,6 +4309,8 @@ struct Compendium_t
 		static bool previousSecretlevel;
 	};
 };
+template <> struct DynamicArrayKindOf<Compendium_t::CompendiumItems_t::Codex_t::CodexItem_t> { static constexpr int value = Kind_CodexItem; };
+
 
 extern Compendium_t CompendiumEntries;
 

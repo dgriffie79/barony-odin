@@ -403,6 +403,48 @@ level_t_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// CodexItem_t (compendium items) — owns 1 DynamicString
+// ---------------------------------------------------------------------------
+CodexItem_t :: struct {
+	name:     DynamicString,
+	rotation: i32,
+	spellID:  i32,
+	effectID: i32,
+	itemID:   i32,
+}
+
+codex_item_free :: proc(p: rawptr) {
+	v := (^CodexItem_t)(p)
+	if v.name.data != nil {
+		mem.free(v.name.data)
+		v.name.data = nil
+	}
+	v.name.len = 0
+}
+
+codex_item_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^CodexItem_t)(dst)
+	s := (^CodexItem_t)(src)
+	d.rotation = s.rotation
+	d.spellID = s.spellID
+	d.effectID = s.effectID
+	d.itemID = s.itemID
+	if d.name.data != nil {
+		mem.free(d.name.data)
+		d.name.data = nil
+	}
+	d.name.len = 0
+	if s.name.len > 0 {
+		buf, _ := mem.alloc(s.name.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.name.data, s.name.len)
+			(^u8)(uintptr(buf) + uintptr(s.name.len))^ = 0
+			d.name = DynamicString{ data = buf, len = s.name.len }
+		}
+	}
+}
+
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
 Element_Ops :: struct {
 	free: proc(rawptr),
