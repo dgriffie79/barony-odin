@@ -3300,10 +3300,10 @@ barony_dynamic_map_strarrstr_put :: proc "c" (m: ^map[string]Raw_Dynamic_Array, 
 	}
 	k := intern_string(key)
 	if old, had := m[k]; had {
-		barony_dynamic_array_str_destroy(&old)
+		barony_dynamic_array_elem_destroy(&old, size_of(DynamicString), Kind_DynamicString)
 	}
 	new_val: Raw_Dynamic_Array
-	barony_dynamic_array_str_copy(&new_val, value)
+	barony_dynamic_array_elem_copy(&new_val, value, size_of(DynamicString), Kind_DynamicString)
 	m[k] = new_val
 }
 
@@ -3315,7 +3315,7 @@ barony_dynamic_map_strarrstr_get :: proc "c" (m: ^map[string]Raw_Dynamic_Array, 
 	}
 	v, ok := m[key]
 	if ok {
-		barony_dynamic_array_str_copy(out, &v)
+		barony_dynamic_array_elem_copy(out, &v, size_of(DynamicString), Kind_DynamicString)
 	}
 	return ok
 }
@@ -3342,7 +3342,7 @@ barony_dynamic_map_strarrstr_erase :: proc "c" (m: ^map[string]Raw_Dynamic_Array
 	}
 	v, had := m[key]
 	if had {
-		barony_dynamic_array_str_destroy(&v)
+		barony_dynamic_array_elem_destroy(&v, size_of(DynamicString), Kind_DynamicString)
 		runtime.delete_key(m, key)
 	}
 	return had
@@ -3355,7 +3355,7 @@ barony_dynamic_map_strarrstr_clear :: proc "c" (m: ^map[string]Raw_Dynamic_Array
 		for key in m^ {
 			_, vp, _, err := map_entry(m, key)
 			if err == nil && vp != nil {
-				barony_dynamic_array_str_destroy(vp)
+				barony_dynamic_array_elem_destroy(vp, size_of(DynamicString), Kind_DynamicString)
 			}
 		}
 		clear(&m^)
@@ -3378,7 +3378,7 @@ barony_dynamic_map_strarrstr_destroy :: proc "c" (m: ^map[string]Raw_Dynamic_Arr
 		for key in m^ {
 			_, vp, _, err := map_entry(m, key)
 			if err == nil && vp != nil {
-				barony_dynamic_array_str_destroy(vp)
+				barony_dynamic_array_elem_destroy(vp, size_of(DynamicString), Kind_DynamicString)
 			}
 		}
 		delete(m^)

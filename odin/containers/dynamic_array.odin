@@ -158,177 +158,50 @@ barony_dynamic_array_sum_ints :: proc "c" (arr: ^Raw_Dynamic_Array, count: i32) 
 }
 
 // ---------------------------------------------------------------------------
-// DynamicArray of DynamicString (std::vector<DynamicString> replacement).
-// Each element is a DynamicString {data,len} — the element OWNS its buffer.
-// Raw DynamicArray ops just move bytes; these shims deep-free elements on
-// clear/erase/destroy/pop_back and deep-copy on copy/insert, so ownership
-// is correct on both sides. Element size is always 16 (Raw_String).
+// GENERIC element-aware array family (replaces the per-type str/icon/option/
+// entryvar families).
+//
+// One exported family of procs handles ANY element type: the C++ side passes
+// elem_size (sizeof(T)) + value_kind (an int from kind_of<T>). The Odin side
+// looks up the element's free/copy procs in Element_Ops and applies them while
+// walking the raw byte buffer. POD types (kind 0) have nil free/copy -> raw
+// byte semantics, identical to the base shims above.
+//
+// This is exactly the Odin idiom `defer { for item in arr { destroy(item) };
+// delete(arr) }` — parameterized so the destroy/copy live in ONE table per
+// element type instead of a whole exported proc family per type.
 // ---------------------------------------------------------------------------
-dynamic_string_free_elem :: proc(s: ^DynamicString) {
+
+// element kinds (must match kind_of<T> on the C++ side)
+Kind_POD            :: 0
+Kind_DynamicString  :: 1
+Kind_Icon           :: 2
+Kind_Option         :: 3
+Kind_EntryVar       :: 4
+
+// element free/copy procs, rawptr-based so the generic walkers can use them
+dynamic_string_free_elem :: proc(p: rawptr) {
+	s := (^DynamicString)(p)
 	if s.data != nil {
 		mem.free(s.data)
 		s.data = nil
 	}
 }
 
-dynamic_string_copy_elem :: proc(dst: ^DynamicString, src: ^DynamicString) {
-	dst^ = DynamicString{}
-	if src.len > 0 {
-		buf, _ := mem.alloc(src.len + 1, align_of(u8))
+dynamic_string_copy_elem :: proc(dst: rawptr, src: rawptr) {
+	d := (^DynamicString)(dst)
+	s := (^DynamicString)(src)
+	d^ = DynamicString{}
+	if s.len > 0 {
+		buf, _ := mem.alloc(s.len + 1, align_of(u8))
 		if buf != nil {
-			runtime.mem_copy(buf, src.data, src.len)
-			(^u8)(uintptr(buf) + uintptr(src.len))^ = 0
-			dst^ = DynamicString{ data = buf, len = src.len }
+			runtime.mem_copy(buf, s.data, s.len)
+			(^u8)(uintptr(buf) + uintptr(s.len))^ = 0
+			d^ = DynamicString{ data = buf, len = s.len }
 		}
 	}
 }
 
-arrstr_free_elements :: proc(a: ^Raw_Dynamic_Array, from: int) {
-	if a.data == nil {
-		return
-	}
-	elems := ([^]DynamicString)(a.data)
-	n := a.len / size_of(DynamicString)
-	for i := from; i < n; i += 1 {
-		dynamic_string_free_elem(&elems[i])
-	}
-}
-
-@(export)
-barony_dynamic_array_str_init :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	a^ = Raw_Dynamic_Array{}
-}
-
-// append one DynamicString element (deep-copied into array-owned storage)
-@(export)
-barony_dynamic_array_str_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^DynamicString) {
-	context = runtime.default_context()
-	if elem == nil {
-		return
-	}
-	raw := transmute(^[dynamic]u8)(a)
-	// grow by one DynamicString slot
-	if a.cap - a.len < size_of(DynamicString) {
-		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(DynamicString))
-	}
-	// deep-copy the element into the new slot
-	slot := ([^]DynamicString)(uintptr(a.data) + uintptr(a.len))
-	dynamic_string_copy_elem(slot, elem)
-	a.len += size_of(DynamicString)
-}
-
-// get: deep-copy the element at index into out (out is C++ RAII)
-@(export)
-barony_dynamic_array_str_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^DynamicString) -> bool {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
-		return false
-	}
-	elems := ([^]DynamicString)(a.data)
-	dynamic_string_copy_elem(out, &elems[index])
-	return true
-}
-
-// set: replace element at index (frees old, deep-copies new)
-@(export)
-barony_dynamic_array_str_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^DynamicString) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
-		return
-	}
-	elems := ([^]DynamicString)(a.data)
-	dynamic_string_free_elem(&elems[index])
-	dynamic_string_copy_elem(&elems[index], elem)
-}
-
-// erase: free the element at index, shift left
-@(export)
-barony_dynamic_array_str_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
-		return
-	}
-	elems := ([^]DynamicString)(a.data)
-	dynamic_string_free_elem(&elems[index])
-	n := a.len / size_of(DynamicString)
-	for i := int(index); i < n - 1; i += 1 {
-		elems[i] = elems[i + 1]
-	}
-	a.len -= size_of(DynamicString)
-}
-
-// clear: free all elements, keep capacity
-@(export)
-barony_dynamic_array_str_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	arrstr_free_elements(a, 0)
-	a.len = 0
-}
-
-// destroy: free all elements + the buffer
-@(export)
-barony_dynamic_array_str_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	arrstr_free_elements(a, 0)
-	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
-	a^ = Raw_Dynamic_Array{}
-}
-
-@(export)
-barony_dynamic_array_str_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
-	context = runtime.default_context()
-	return i32(a.len / size_of(DynamicString))
-}
-
-// copy: deep-copy all elements (dst must be empty/fresh)
-@(export)
-barony_dynamic_array_str_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if dst.data != nil {
-		arrstr_free_elements(dst, 0)
-		runtime.delete_dynamic_array(transmute([dynamic]u8)dst^)
-		dst^ = Raw_Dynamic_Array{}
-	}
-	if src.data == nil || src.len == 0 {
-		return
-	}
-	src_elems := ([^]DynamicString)(src.data)
-	n := src.len / size_of(DynamicString)
-	raw := transmute(^[dynamic]u8)(dst)
-	for i in 0..<n {
-		if dst.cap - dst.len < size_of(DynamicString) {
-			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(DynamicString))
-		}
-		slot := ([^]DynamicString)(uintptr(dst.data) + uintptr(dst.len))
-		dynamic_string_copy_elem(slot, &src_elems[i])
-		dst.len += size_of(DynamicString)
-	}
-}
-
-// entries: deep-copy all elements into val_ptrs (caller frees/owns)
-@(export)
-barony_dynamic_array_str_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]DynamicString, count: i32) -> i32 {
-	context = runtime.default_context()
-	if a.data == nil || count <= 0 {
-		return 0
-	}
-	elems := ([^]DynamicString)(a.data)
-	n := a.len / size_of(DynamicString)
-	if n > int(count) {
-		n = int(count)
-	}
-	for i in 0..<n {
-		dynamic_string_copy_elem(&val_ptrs[i], &elems[i])
-	}
-	return i32(n)
-}
-
-// ---------------------------------------------------------------------------
-// DynamicArray of ItemTooltipIcons_t (std::vector<ItemTooltipIcons_t>).
-// Element = 3 DynamicStrings (iconPath, text, conditionalAttribute) + u32
-// textColor. Elements are deep-owned (strings cloned/freed).
-// ---------------------------------------------------------------------------
 ItemTooltipIcons_t :: struct {
 	iconPath:             DynamicString,
 	text:                 DynamicString,
@@ -336,7 +209,8 @@ ItemTooltipIcons_t :: struct {
 	conditionalAttribute: DynamicString,
 }
 
-icon_free :: proc(v: ^ItemTooltipIcons_t) {
+icon_free :: proc(p: rawptr) {
+	v := (^ItemTooltipIcons_t)(p)
 	fields := [?]^DynamicString{ &v.iconPath, &v.text, &v.conditionalAttribute }
 	for s in fields {
 		if s.data != nil {
@@ -346,12 +220,14 @@ icon_free :: proc(v: ^ItemTooltipIcons_t) {
 	}
 }
 
-icon_copy :: proc(dst: ^ItemTooltipIcons_t, src: ^ItemTooltipIcons_t) {
-	dst.textColor = src.textColor
+icon_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^ItemTooltipIcons_t)(dst)
+	s := (^ItemTooltipIcons_t)(src)
+	d.textColor = s.textColor
 	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
-		{ &dst.iconPath, &src.iconPath },
-		{ &dst.text, &src.text },
-		{ &dst.conditionalAttribute, &src.conditionalAttribute },
+		{ &d.iconPath, &s.iconPath },
+		{ &d.text, &s.text },
+		{ &d.conditionalAttribute, &s.conditionalAttribute },
 	}
 	for f in fields {
 		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
@@ -366,125 +242,6 @@ icon_copy :: proc(dst: ^ItemTooltipIcons_t, src: ^ItemTooltipIcons_t) {
 	}
 }
 
-@(export)
-barony_dynamic_array_icon_init :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	a^ = Raw_Dynamic_Array{}
-}
-
-@(export)
-barony_dynamic_array_icon_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^ItemTooltipIcons_t) {
-	context = runtime.default_context()
-	if elem == nil { return }
-	if a.cap - a.len < size_of(ItemTooltipIcons_t) {
-		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(ItemTooltipIcons_t))
-	}
-	slot := ([^]ItemTooltipIcons_t)(uintptr(a.data) + uintptr(a.len))
-	icon_copy(slot, elem)
-	a.len += size_of(ItemTooltipIcons_t)
-}
-
-@(export)
-barony_dynamic_array_icon_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^ItemTooltipIcons_t) -> bool {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return false }
-	elems := ([^]ItemTooltipIcons_t)(a.data)
-	icon_copy(out, &elems[index])
-	return true
-}
-
-@(export)
-barony_dynamic_array_icon_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^ItemTooltipIcons_t) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return }
-	elems := ([^]ItemTooltipIcons_t)(a.data)
-	icon_free(&elems[index])
-	icon_copy(&elems[index], elem)
-}
-
-@(export)
-barony_dynamic_array_icon_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(ItemTooltipIcons_t) >= a.len { return }
-	elems := ([^]ItemTooltipIcons_t)(a.data)
-	icon_free(&elems[index])
-	n := a.len / size_of(ItemTooltipIcons_t)
-	for i := int(index); i < n - 1; i += 1 {
-		elems[i] = elems[i + 1]
-	}
-	a.len -= size_of(ItemTooltipIcons_t)
-}
-
-@(export)
-barony_dynamic_array_icon_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if a.data != nil {
-		elems := ([^]ItemTooltipIcons_t)(a.data)
-		n := a.len / size_of(ItemTooltipIcons_t)
-		for i in 0..<n {
-			icon_free(&elems[i])
-		}
-	}
-	a.len = 0
-}
-
-@(export)
-barony_dynamic_array_icon_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if a.data != nil {
-		elems := ([^]ItemTooltipIcons_t)(a.data)
-		n := a.len / size_of(ItemTooltipIcons_t)
-		for i in 0..<n {
-			icon_free(&elems[i])
-		}
-	}
-	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
-	a^ = Raw_Dynamic_Array{}
-}
-
-@(export)
-barony_dynamic_array_icon_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
-	context = runtime.default_context()
-	return i32(a.len / size_of(ItemTooltipIcons_t))
-}
-
-@(export)
-barony_dynamic_array_icon_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if dst.data != nil {
-		barony_dynamic_array_icon_destroy(dst)
-	}
-	if src.data == nil || src.len == 0 { return }
-	src_elems := ([^]ItemTooltipIcons_t)(src.data)
-	n := src.len / size_of(ItemTooltipIcons_t)
-	for i in 0..<n {
-		if dst.cap - dst.len < size_of(ItemTooltipIcons_t) {
-			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(ItemTooltipIcons_t))
-		}
-		slot := ([^]ItemTooltipIcons_t)(uintptr(dst.data) + uintptr(dst.len))
-		icon_copy(slot, &src_elems[i])
-		dst.len += size_of(ItemTooltipIcons_t)
-	}
-}
-
-@(export)
-barony_dynamic_array_icon_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]ItemTooltipIcons_t, count: i32) -> i32 {
-	context = runtime.default_context()
-	if a.data == nil || count <= 0 { return 0 }
-	elems := ([^]ItemTooltipIcons_t)(a.data)
-	n := a.len / size_of(ItemTooltipIcons_t)
-	if n > int(count) { n = int(count) }
-	for i in 0..<n {
-		icon_copy(&val_ptrs[i], &elems[i])
-	}
-	return i32(n)
-}
-
-// ---------------------------------------------------------------------------
-// DynamicArray of DropdownOption_t (std::vector<DropdownOption_t>).
-// Element = 4 DynamicStrings (text, keyboardGlyph, controllerGlyph, action).
-// Deep-owned.
-// ---------------------------------------------------------------------------
 DropdownOption_t :: struct {
 	text:             DynamicString,
 	keyboardGlyph:    DynamicString,
@@ -492,7 +249,8 @@ DropdownOption_t :: struct {
 	action:           DynamicString,
 }
 
-dropdown_option_free :: proc(v: ^DropdownOption_t) {
+dropdown_option_free :: proc(p: rawptr) {
+	v := (^DropdownOption_t)(p)
 	fields := [?]^DynamicString{ &v.text, &v.keyboardGlyph, &v.controllerGlyph, &v.action }
 	for s in fields {
 		if s.data != nil {
@@ -502,12 +260,14 @@ dropdown_option_free :: proc(v: ^DropdownOption_t) {
 	}
 }
 
-dropdown_option_copy :: proc(dst: ^DropdownOption_t, src: ^DropdownOption_t) {
+dropdown_option_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^DropdownOption_t)(dst)
+	s := (^DropdownOption_t)(src)
 	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
-		{ &dst.text, &src.text },
-		{ &dst.keyboardGlyph, &src.keyboardGlyph },
-		{ &dst.controllerGlyph, &src.controllerGlyph },
-		{ &dst.action, &src.action },
+		{ &d.text, &s.text },
+		{ &d.keyboardGlyph, &s.keyboardGlyph },
+		{ &d.controllerGlyph, &s.controllerGlyph },
+		{ &d.action, &s.action },
 	}
 	for f in fields {
 		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
@@ -522,124 +282,6 @@ dropdown_option_copy :: proc(dst: ^DropdownOption_t, src: ^DropdownOption_t) {
 	}
 }
 
-@(export)
-barony_dynamic_array_option_init :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	a^ = Raw_Dynamic_Array{}
-}
-
-@(export)
-barony_dynamic_array_option_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^DropdownOption_t) {
-	context = runtime.default_context()
-	if elem == nil { return }
-	if a.cap - a.len < size_of(DropdownOption_t) {
-		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(DropdownOption_t))
-	}
-	slot := ([^]DropdownOption_t)(uintptr(a.data) + uintptr(a.len))
-	dropdown_option_copy(slot, elem)
-	a.len += size_of(DropdownOption_t)
-}
-
-@(export)
-barony_dynamic_array_option_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^DropdownOption_t) -> bool {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return false }
-	elems := ([^]DropdownOption_t)(a.data)
-	dropdown_option_copy(out, &elems[index])
-	return true
-}
-
-@(export)
-barony_dynamic_array_option_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^DropdownOption_t) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return }
-	elems := ([^]DropdownOption_t)(a.data)
-	dropdown_option_free(&elems[index])
-	dropdown_option_copy(&elems[index], elem)
-}
-
-@(export)
-barony_dynamic_array_option_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(DropdownOption_t) >= a.len { return }
-	elems := ([^]DropdownOption_t)(a.data)
-	dropdown_option_free(&elems[index])
-	n := a.len / size_of(DropdownOption_t)
-	for i := int(index); i < n - 1; i += 1 {
-		elems[i] = elems[i + 1]
-	}
-	a.len -= size_of(DropdownOption_t)
-}
-
-@(export)
-barony_dynamic_array_option_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if a.data != nil {
-		elems := ([^]DropdownOption_t)(a.data)
-		n := a.len / size_of(DropdownOption_t)
-		for i in 0..<n {
-			dropdown_option_free(&elems[i])
-		}
-	}
-	a.len = 0
-}
-
-@(export)
-barony_dynamic_array_option_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if a.data != nil {
-		elems := ([^]DropdownOption_t)(a.data)
-		n := a.len / size_of(DropdownOption_t)
-		for i in 0..<n {
-			dropdown_option_free(&elems[i])
-		}
-	}
-	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
-	a^ = Raw_Dynamic_Array{}
-}
-
-@(export)
-barony_dynamic_array_option_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
-	context = runtime.default_context()
-	return i32(a.len / size_of(DropdownOption_t))
-}
-
-@(export)
-barony_dynamic_array_option_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
-	context = runtime.default_context()
-	if dst.data != nil {
-		barony_dynamic_array_option_destroy(dst)
-	}
-	if src.data == nil || src.len == 0 { return }
-	src_elems := ([^]DropdownOption_t)(src.data)
-	n := src.len / size_of(DropdownOption_t)
-	for i in 0..<n {
-		if dst.cap - dst.len < size_of(DropdownOption_t) {
-			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(DropdownOption_t))
-		}
-		slot := ([^]DropdownOption_t)(uintptr(dst.data) + uintptr(dst.len))
-		dropdown_option_copy(slot, &src_elems[i])
-		dst.len += size_of(DropdownOption_t)
-	}
-}
-
-@(export)
-barony_dynamic_array_option_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]DropdownOption_t, count: i32) -> i32 {
-	context = runtime.default_context()
-	if a.data == nil || count <= 0 { return 0 }
-	elems := ([^]DropdownOption_t)(a.data)
-	n := a.len / size_of(DropdownOption_t)
-	if n > int(count) { n = int(count) }
-	for i in 0..<n {
-		dropdown_option_copy(&val_ptrs[i], &elems[i])
-	}
-	return i32(n)
-}
-
-// ---------------------------------------------------------------------------
-// DynamicArray of Entry_t::Variable_t (std::vector<Variable_t>).
-// Element = i32 type + DynamicString value + 3 i32. value is owned.
-// ---------------------------------------------------------------------------
 EntryVariable_t :: struct {
 	_type:        i32,
 	value:        DynamicString,
@@ -648,99 +290,155 @@ EntryVariable_t :: struct {
 	sizey:        i32,
 }
 
-entry_var_free :: proc(v: ^EntryVariable_t) {
+entry_var_free :: proc(p: rawptr) {
+	v := (^EntryVariable_t)(p)
 	if v.value.data != nil {
 		mem.free(v.value.data)
 		v.value.data = nil
 	}
 }
 
-entry_var_copy :: proc(dst: ^EntryVariable_t, src: ^EntryVariable_t) {
-	dst._type = src._type
-	dst.numericValue = src.numericValue
-	dst.sizex = src.sizex
-	dst.sizey = src.sizey
-	if dst.value.data != nil { mem.free(dst.value.data); dst.value.data = nil }
-	if src.value.len > 0 {
-		buf, _ := mem.alloc(src.value.len + 1, align_of(u8))
+entry_var_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^EntryVariable_t)(dst)
+	s := (^EntryVariable_t)(src)
+	d._type = s._type
+	d.numericValue = s.numericValue
+	d.sizex = s.sizex
+	d.sizey = s.sizey
+	if d.value.data != nil { mem.free(d.value.data); d.value.data = nil }
+	if s.value.len > 0 {
+		buf, _ := mem.alloc(s.value.len + 1, align_of(u8))
 		if buf != nil {
-			runtime.mem_copy(buf, src.value.data, src.value.len)
-			(^u8)(uintptr(buf) + uintptr(src.value.len))^ = 0
-			dst.value = DynamicString{ data = buf, len = src.value.len }
+			runtime.mem_copy(buf, s.value.data, s.value.len)
+			(^u8)(uintptr(buf) + uintptr(s.value.len))^ = 0
+			d.value = DynamicString{ data = buf, len = s.value.len }
 		}
 	}
 }
 
+// kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
+Element_Ops :: struct {
+	free: proc(rawptr),
+	copy: proc(dst: rawptr, src: rawptr),
+}
+
+element_ops := [5]Element_Ops{
+	0 = { free = nil,                   copy = nil },
+	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
+	2 = { free = icon_free,             copy = icon_copy },
+	3 = { free = dropdown_option_free,  copy = dropdown_option_copy },
+	4 = { free = entry_var_free,        copy = entry_var_copy },
+}
+
 @(export)
-barony_dynamic_array_entryvar_init :: proc "c" (a: ^Raw_Dynamic_Array) {
+barony_dynamic_array_elem_init :: proc "c" (a: ^Raw_Dynamic_Array) {
 	context = runtime.default_context()
 	a^ = Raw_Dynamic_Array{}
 }
 
+// append one element (elem_size bytes, kind's copy applied if any)
 @(export)
-barony_dynamic_array_entryvar_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^EntryVariable_t) {
+barony_dynamic_array_elem_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: rawptr, elem_size: int, value_kind: i32) -> i32 {
 	context = runtime.default_context()
-	if elem == nil { return }
-	if a.cap - a.len < size_of(EntryVariable_t) {
-		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(EntryVariable_t))
+	if elem == nil || elem_size <= 0 {
+		return 0
 	}
-	slot := ([^]EntryVariable_t)(uintptr(a.data) + uintptr(a.len))
-	entry_var_copy(slot, elem)
-	a.len += size_of(EntryVariable_t)
+	ops := element_ops[value_kind]
+	if a.cap - a.len < elem_size {
+		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + elem_size)
+	}
+	slot := ([^]u8)(uintptr(a.data) + uintptr(a.len))
+	if ops.copy != nil {
+		ops.copy(slot, elem)
+	} else {
+		runtime.mem_copy(slot, elem, elem_size)
+	}
+	a.len += elem_size
+	return i32(a.len / elem_size)
 }
 
+// get: copy the element at index into out (out is C++ RAII / caller-owned)
 @(export)
-barony_dynamic_array_entryvar_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^EntryVariable_t) -> bool {
+barony_dynamic_array_elem_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: rawptr, elem_size: int, value_kind: i32) -> bool {
 	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return false }
-	elems := ([^]EntryVariable_t)(a.data)
-	entry_var_copy(out, &elems[index])
+	if a.data == nil || index < 0 || int(index)*elem_size >= a.len {
+		return false
+	}
+	ops := element_ops[value_kind]
+	slot := ([^]u8)(uintptr(a.data) + uintptr(int(index) * elem_size))
+	if ops.copy != nil {
+		ops.copy(out, slot)
+	} else {
+		runtime.mem_copy(out, slot, elem_size)
+	}
 	return true
 }
 
+// set: replace element at index (frees old, copies new)
 @(export)
-barony_dynamic_array_entryvar_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^EntryVariable_t) {
+barony_dynamic_array_elem_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: rawptr, elem_size: int, value_kind: i32) {
 	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return }
-	elems := ([^]EntryVariable_t)(a.data)
-	entry_var_free(&elems[index])
-	entry_var_copy(&elems[index], elem)
-}
-
-@(export)
-barony_dynamic_array_entryvar_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
-	context = runtime.default_context()
-	if a.data == nil || index < 0 || int(index)*size_of(EntryVariable_t) >= a.len { return }
-	elems := ([^]EntryVariable_t)(a.data)
-	entry_var_free(&elems[index])
-	n := a.len / size_of(EntryVariable_t)
-	for i := int(index); i < n - 1; i += 1 {
-		elems[i] = elems[i + 1]
+	if a.data == nil || index < 0 || int(index)*elem_size >= a.len {
+		return
 	}
-	a.len -= size_of(EntryVariable_t)
+	ops := element_ops[value_kind]
+	slot := ([^]u8)(uintptr(a.data) + uintptr(int(index) * elem_size))
+	if ops.free != nil {
+		ops.free(slot)
+	}
+	if ops.copy != nil {
+		ops.copy(slot, elem)
+	} else {
+		runtime.mem_copy(slot, elem, elem_size)
+	}
 }
 
+// erase: free the element at index, shift left
 @(export)
-barony_dynamic_array_entryvar_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
+barony_dynamic_array_elem_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem_size: int, value_kind: i32) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*elem_size >= a.len {
+		return
+	}
+	ops := element_ops[value_kind]
+	slot := ([^]u8)(uintptr(a.data) + uintptr(int(index) * elem_size))
+	if ops.free != nil {
+		ops.free(slot)
+	}
+	n := a.len / elem_size
+	for i := int(index); i < n - 1; i += 1 {
+		runtime.mem_copy(([^]u8)(uintptr(a.data) + uintptr(i) * uintptr(elem_size)), ([^]u8)(uintptr(a.data) + uintptr(i+1) * uintptr(elem_size)), elem_size)
+	}
+	a.len -= elem_size
+}
+
+// clear: free all elements, keep capacity
+@(export)
+barony_dynamic_array_elem_clear :: proc "c" (a: ^Raw_Dynamic_Array, elem_size: int, value_kind: i32) {
 	context = runtime.default_context()
 	if a.data != nil {
-		elems := ([^]EntryVariable_t)(a.data)
-		n := a.len / size_of(EntryVariable_t)
-		for i in 0..<n {
-			entry_var_free(&elems[i])
+		ops := element_ops[value_kind]
+		if ops.free != nil {
+			n := a.len / elem_size
+			for i in 0..<n {
+				ops.free(([^]u8)(uintptr(a.data) + uintptr(i) * uintptr(elem_size)))
+			}
 		}
 	}
 	a.len = 0
 }
 
+// destroy: free all elements + the buffer
 @(export)
-barony_dynamic_array_entryvar_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
+barony_dynamic_array_elem_destroy :: proc "c" (a: ^Raw_Dynamic_Array, elem_size: int, value_kind: i32) {
 	context = runtime.default_context()
 	if a.data != nil {
-		elems := ([^]EntryVariable_t)(a.data)
-		n := a.len / size_of(EntryVariable_t)
-		for i in 0..<n {
-			entry_var_free(&elems[i])
+		ops := element_ops[value_kind]
+		if ops.free != nil {
+			n := a.len / elem_size
+			for i in 0..<n {
+				ops.free(([^]u8)(uintptr(a.data) + uintptr(i) * uintptr(elem_size)))
+			}
 		}
 	}
 	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
@@ -748,39 +446,58 @@ barony_dynamic_array_entryvar_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
 }
 
 @(export)
-barony_dynamic_array_entryvar_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
+barony_dynamic_array_elem_len :: proc "c" (a: ^Raw_Dynamic_Array, elem_size: int) -> i32 {
 	context = runtime.default_context()
-	return i32(a.len / size_of(EntryVariable_t))
+	return i32(a.len / elem_size)
 }
 
+// copy: deep-copy all elements (dst must be empty/fresh)
 @(export)
-barony_dynamic_array_entryvar_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
+barony_dynamic_array_elem_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array, elem_size: int, value_kind: i32) {
 	context = runtime.default_context()
 	if dst.data != nil {
-		barony_dynamic_array_entryvar_destroy(dst)
+		barony_dynamic_array_elem_destroy(dst, elem_size, value_kind)
 	}
-	if src.data == nil || src.len == 0 { return }
-	src_elems := ([^]EntryVariable_t)(src.data)
-	n := src.len / size_of(EntryVariable_t)
+	if src.data == nil || src.len == 0 {
+		return
+	}
+	ops := element_ops[value_kind]
+	n := src.len / elem_size
 	for i in 0..<n {
-		if dst.cap - dst.len < size_of(EntryVariable_t) {
-			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(EntryVariable_t))
+		if dst.cap - dst.len < elem_size {
+			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + elem_size)
 		}
-		slot := ([^]EntryVariable_t)(uintptr(dst.data) + uintptr(dst.len))
-		entry_var_copy(slot, &src_elems[i])
-		dst.len += size_of(EntryVariable_t)
+		slot := ([^]u8)(uintptr(dst.data) + uintptr(dst.len))
+		src_slot := ([^]u8)(uintptr(src.data) + uintptr(i) * uintptr(elem_size))
+		if ops.copy != nil {
+			ops.copy(slot, src_slot)
+		} else {
+			runtime.mem_copy(slot, src_slot, elem_size)
+		}
+		dst.len += elem_size
 	}
 }
 
+// entries: copy all elements into val_ptrs (caller owns/frees)
 @(export)
-barony_dynamic_array_entryvar_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]EntryVariable_t, count: i32) -> i32 {
+barony_dynamic_array_elem_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: rawptr, count: i32, elem_size: int, value_kind: i32) -> i32 {
 	context = runtime.default_context()
-	if a.data == nil || count <= 0 { return 0 }
-	elems := ([^]EntryVariable_t)(a.data)
-	n := a.len / size_of(EntryVariable_t)
-	if n > int(count) { n = int(count) }
+	if a.data == nil || count <= 0 {
+		return 0
+	}
+	ops := element_ops[value_kind]
+	n := a.len / elem_size
+	if n > int(count) {
+		n = int(count)
+	}
+	out := ([^]u8)(val_ptrs)
 	for i in 0..<n {
-		entry_var_copy(&val_ptrs[i], &elems[i])
+		slot := ([^]u8)(uintptr(a.data) + uintptr(i) * uintptr(elem_size))
+		if ops.copy != nil {
+			ops.copy(([^]u8)(uintptr(out) + uintptr(i) * uintptr(elem_size)), slot)
+		} else {
+			runtime.mem_copy(([^]u8)(uintptr(out) + uintptr(i) * uintptr(elem_size)), slot, elem_size)
+		}
 	}
 	return i32(n)
 }

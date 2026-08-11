@@ -105,76 +105,18 @@ extern "C" {
 
 
 
-    // string-aware array (elements are DynamicString, deep-owned)
-
-    void    barony_dynamic_array_str_init(DynamicArray*);
-
-    void    barony_dynamic_array_str_append(DynamicArray*, DynamicString*);
-
-    bool    barony_dynamic_array_str_get(DynamicArray*, int32_t, DynamicString*);
-
-    void    barony_dynamic_array_str_set(DynamicArray*, int32_t, DynamicString*);
-
-    void    barony_dynamic_array_str_erase(DynamicArray*, int32_t);
-
-    void    barony_dynamic_array_str_clear(DynamicArray*);
-
-    void    barony_dynamic_array_str_destroy(DynamicArray*);
-
-    int32_t barony_dynamic_array_str_len(DynamicArray*);
-
-    void    barony_dynamic_array_str_copy(DynamicArray* dst, DynamicArray* src);
-
-    int32_t barony_dynamic_array_str_entries(DynamicArray*, DynamicString* val_ptrs, int32_t count);
-
-
-
-    // ItemTooltipIcons_t array (3 DynamicStrings + u32, deep-owned)
-
-    void    barony_dynamic_array_icon_init(DynamicArray*);
-
-    void    barony_dynamic_array_icon_append(DynamicArray*, ItemTooltipIcons_tMirror*);
-
-    bool    barony_dynamic_array_icon_get(DynamicArray*, int32_t, ItemTooltipIcons_tMirror*);
-
-    void    barony_dynamic_array_icon_set(DynamicArray*, int32_t, ItemTooltipIcons_tMirror*);
-
-    void    barony_dynamic_array_icon_erase(DynamicArray*, int32_t);
-
-    void    barony_dynamic_array_icon_clear(DynamicArray*);
-
-    void    barony_dynamic_array_icon_destroy(DynamicArray*);
-
-    int32_t barony_dynamic_array_icon_len(DynamicArray*);
-
-    void    barony_dynamic_array_icon_copy(DynamicArray*, DynamicArray*);
-
-    int32_t barony_dynamic_array_icon_entries(DynamicArray*, ItemTooltipIcons_tMirror*, int32_t);
-
-
-    // DropdownOption_t array (4 DynamicStrings, deep-owned)
-    void    barony_dynamic_array_option_init(DynamicArray*);
-    void    barony_dynamic_array_option_append(DynamicArray*, DropdownOption_tMirror*);
-    bool    barony_dynamic_array_option_get(DynamicArray*, int32_t, DropdownOption_tMirror*);
-    void    barony_dynamic_array_option_set(DynamicArray*, int32_t, DropdownOption_tMirror*);
-    void    barony_dynamic_array_option_erase(DynamicArray*, int32_t);
-    void    barony_dynamic_array_option_clear(DynamicArray*);
-    void    barony_dynamic_array_option_destroy(DynamicArray*);
-    int32_t barony_dynamic_array_option_len(DynamicArray*);
-    void    barony_dynamic_array_option_copy(DynamicArray*, DynamicArray*);
-    int32_t barony_dynamic_array_option_entries(DynamicArray*, DropdownOption_tMirror*, int32_t);
-
-    // Entry Variable_t array (i32 + DynamicString + 3 i32, value owned)
-    void    barony_dynamic_array_entryvar_init(DynamicArray*);
-    void    barony_dynamic_array_entryvar_append(DynamicArray*, EntryVariable_tMirror*);
-    bool    barony_dynamic_array_entryvar_get(DynamicArray*, int32_t, EntryVariable_tMirror*);
-    void    barony_dynamic_array_entryvar_set(DynamicArray*, int32_t, EntryVariable_tMirror*);
-    void    barony_dynamic_array_entryvar_erase(DynamicArray*, int32_t);
-    void    barony_dynamic_array_entryvar_clear(DynamicArray*);
-    void    barony_dynamic_array_entryvar_destroy(DynamicArray*);
-    int32_t barony_dynamic_array_entryvar_len(DynamicArray*);
-    void    barony_dynamic_array_entryvar_copy(DynamicArray*, DynamicArray*);
-    int32_t barony_dynamic_array_entryvar_entries(DynamicArray*, EntryVariable_tMirror*, int32_t);
+        // GENERIC element-aware array (elem_size + value_kind dispatch).
+    // value_kind: 0=POD(raw bytes) 1=DynamicString 2=Icon 3=Option 4=EntryVar
+    void    barony_dynamic_array_elem_init(DynamicArray*);
+    int32_t barony_dynamic_array_elem_append(DynamicArray*, const void* elem, int64_t elem_size, int32_t value_kind);
+    bool    barony_dynamic_array_elem_get(DynamicArray*, int32_t index, void* out, int64_t elem_size, int32_t value_kind);
+    void    barony_dynamic_array_elem_set(DynamicArray*, int32_t index, const void* elem, int64_t elem_size, int32_t value_kind);
+    void    barony_dynamic_array_elem_erase(DynamicArray*, int32_t index, int64_t elem_size, int32_t value_kind);
+    void    barony_dynamic_array_elem_clear(DynamicArray*, int64_t elem_size, int32_t value_kind);
+    void    barony_dynamic_array_elem_destroy(DynamicArray*, int64_t elem_size, int32_t value_kind);
+    int32_t barony_dynamic_array_elem_len(DynamicArray*, int64_t elem_size);
+    void    barony_dynamic_array_elem_copy(DynamicArray* dst, DynamicArray* src, int64_t elem_size, int32_t value_kind);
+    int32_t barony_dynamic_array_elem_entries(DynamicArray*, void* val_ptrs, int32_t count, int64_t elem_size, int32_t value_kind);
 }
 
 
@@ -233,459 +175,124 @@ inline int64_t dynarray_psize(const DynamicArray& a) { return a.len / (int64_t)s
 
 // append/set/copy).
 
+
+// ---------------------------------------------------------------------------
+// DynamicArray<T> — single template replacement for std::vector<T> in shared
+// structs. The element type T determines:
+//   - kind_of<T>: which Element_Ops (free/copy) the Odin side applies
+//   - sizeof(T):  the stride for byte walking
+// POD types (int32_t, uint32_t, pointers, pairs) are kind 0 (raw bytes).
+// Owning types (DynamicString, ItemTooltipIcons_tMirror, ...) deep-free/
+// deep-copy via the Odin elem_* shims. This replaces the per-type families
+// (DynamicArrayStr/S32/U32/Icon/Option/EntryVar) — the typedefs below keep
+// the old names so game code is untouched.
 // ---------------------------------------------------------------------------
 
-class DynamicArrayStr {
+// element kinds (must match Kind_* in dynamic_array.odin)
+enum DynamicArrayKind {
+    Kind_POD = 0,
+    Kind_DynamicString = 1,
+    Kind_Icon = 2,
+    Kind_Option = 3,
+    Kind_EntryVar = 4,
+};
 
+template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };
+template <> struct DynamicArrayKindOf<DynamicString> { static constexpr int value = Kind_DynamicString; };
+template <> struct DynamicArrayKindOf<ItemTooltipIcons_tMirror> { static constexpr int value = Kind_Icon; };
+template <> struct DynamicArrayKindOf<DropdownOption_tMirror> { static constexpr int value = Kind_Option; };
+template <> struct DynamicArrayKindOf<EntryVariable_tMirror> { static constexpr int value = Kind_EntryVar; };
+
+template <typename T>
+class DynamicArrayT {
 public:
-
     DynamicArray raw{};
 
-
-
-    DynamicArrayStr() { barony_dynamic_array_str_init(&raw); }
-
-    ~DynamicArrayStr() { barony_dynamic_array_str_destroy(&raw); }
-
-    DynamicArrayStr(const DynamicArrayStr& other) : raw{} {
-
-        barony_dynamic_array_str_init(&raw);
-
+    DynamicArrayT() { barony_dynamic_array_elem_init(&raw); }
+    ~DynamicArrayT() { barony_dynamic_array_elem_destroy(&raw, sizeof(T), DynamicArrayKindOf<T>::value); }
+    DynamicArrayT(const DynamicArrayT& other) : raw{} {
+        barony_dynamic_array_elem_init(&raw);
         *this = other;
-
     }
-
-    DynamicArrayStr& operator=(const DynamicArrayStr& other) {
-
-        if (this != &other) { barony_dynamic_array_str_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-
+    DynamicArrayT& operator=(const DynamicArrayT& other) {
+        if (this != &other) { barony_dynamic_array_elem_copy(&raw, const_cast<DynamicArray*>(&other.raw), sizeof(T), DynamicArrayKindOf<T>::value); }
         return *this;
-
     }
-
-    DynamicArrayStr(DynamicArrayStr&& other) noexcept : raw(other.raw) {
-
+    DynamicArrayT(DynamicArrayT&& other) noexcept : raw(other.raw) {
         other.raw = DynamicArray{};
-
     }
-
-    DynamicArrayStr& operator=(DynamicArrayStr&& other) noexcept {
-
+    DynamicArrayT& operator=(DynamicArrayT&& other) noexcept {
         if (this != &other) {
-
-            barony_dynamic_array_str_destroy(&raw);
-
+            barony_dynamic_array_elem_destroy(&raw, sizeof(T), DynamicArrayKindOf<T>::value);
             raw = other.raw;
-
             other.raw = DynamicArray{};
-
         }
-
         return *this;
-
     }
 
-
-
-    int64_t size() const { return barony_dynamic_array_str_len(const_cast<DynamicArray*>(&raw)); }
-
+    int64_t size() const { return barony_dynamic_array_elem_len(const_cast<DynamicArray*>(&raw), sizeof(T)); }
     bool empty() const { return size() == 0; }
-
-    void clear() { barony_dynamic_array_str_clear(&raw); }
-
-    void push_back(const DynamicString& v) { barony_dynamic_array_str_append(&raw, const_cast<DynamicString*>(&v)); }
-
-    void push_back(const char* v) { DynamicString s(v); barony_dynamic_array_str_append(&raw, &s); }
-
-    void push_back(const std::string& v) { DynamicString s(v.c_str()); barony_dynamic_array_str_append(&raw, &s); }
-
-    void erase(int64_t index) { barony_dynamic_array_str_erase(&raw, (int32_t)index); }
-
-    void pop_back() {
-
-        if (size() > 0) { DynamicString e; barony_dynamic_array_str_get(&raw, (int32_t)(size() - 1), &e); barony_dynamic_array_str_erase(&raw, (int32_t)(size() - 1)); }
-
+    T& back() { return (*this)[size() - 1]; }
+    const T& back() const { return (*this)[size() - 1]; }
+    T& front() { return (*this)[0]; }
+    const T& front() const { return (*this)[0]; }
+    void clear() { barony_dynamic_array_elem_clear(&raw, sizeof(T), DynamicArrayKindOf<T>::value); }
+    void reserve(int64_t n) { if (raw.cap < n * (int64_t)sizeof(T)) { barony_dynamic_array_elem_append(&raw, nullptr, 0, DynamicArrayKindOf<T>::value); } }
+    void resize(int64_t n) {
+        int64_t cur = size();
+        if (n > cur) { T zero{}; for (int64_t i = cur; i < n; ++i) push_back(zero); }
+        else if (n < cur) { for (int64_t i = cur - 1; i >= n; --i) erase(i); }
     }
 
+    void push_back(const T& v) { barony_dynamic_array_elem_append(&raw, &v, sizeof(T), DynamicArrayKindOf<T>::value); }
+    template <typename U = T, std::enable_if_t<std::is_same_v<U, DynamicString>, int> = 0>
+    void push_back(const char* v) { T s(v); barony_dynamic_array_elem_append(&raw, &s, sizeof(T), DynamicArrayKindOf<T>::value); }
+    template <typename U = T, std::enable_if_t<std::is_same_v<U, DynamicString>, int> = 0>
+    void push_back(const std::string& v) { T s(v.c_str()); barony_dynamic_array_elem_append(&raw, &s, sizeof(T), DynamicArrayKindOf<T>::value); }
 
+    void erase(int64_t i) { barony_dynamic_array_elem_erase(&raw, (int32_t)i, sizeof(T), DynamicArrayKindOf<T>::value); }
+    void pop_back() { if (size() > 0) erase(size() - 1); }
 
-    // operator[] — returns a deep-copied element (safe; mutations via set())
-
-    DynamicString at(int64_t i) const {
-
-        DynamicString out;
-
-        barony_dynamic_array_str_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
-
+    // at: deep-copied element by value (safe for owned types)
+    T at(int64_t i) const {
+        T out{};
+        barony_dynamic_array_elem_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out, sizeof(T), DynamicArrayKindOf<T>::value);
         return out;
-
     }
+    void set(int64_t i, const T& v) { barony_dynamic_array_elem_set(&raw, (int32_t)i, &v, sizeof(T), DynamicArrayKindOf<T>::value); }
 
-    void set(int64_t i, const DynamicString& v) { barony_dynamic_array_str_set(&raw, (int32_t)i, const_cast<DynamicString*>(&v)); }
-
-    void set(int64_t i, const char* v) { DynamicString s(v); barony_dynamic_array_str_set(&raw, (int32_t)i, &s); }
-
-    void set(int64_t i, const std::string& v) { DynamicString s(v.c_str()); barony_dynamic_array_str_set(&raw, (int32_t)i, &s); }
-
-
+    // operator[] — LIVE slot reference. For owned types this is the live
+    // element (mutations persist), matching the live-slot iterator semantics.
+    T& operator[](int64_t i) { return reinterpret_cast<T*>(raw.data)[i]; }
+    const T& operator[](int64_t i) const { return reinterpret_cast<const T*>(raw.data)[i]; }
+    // NOTE: operator[] returns the live slot. For owned types, reading via []
+    // gives the stored element (not a copy). at() is the deep-copy read.
 
     // snapshot: deep-copy all elements into the caller's vector
-
-    void snapshot(std::vector<DynamicString>& out) const {
-
+    void snapshot(std::vector<T>& out) const {
         int64_t n = size();
-
         out.clear();
-
         if (n <= 0) return;
-
         out.resize((size_t)n);
-
-        barony_dynamic_array_str_entries(const_cast<DynamicArray*>(&raw), out.data(), (int32_t)n);
-
+        barony_dynamic_array_elem_entries(const_cast<DynamicArray*>(&raw), out.data(), (int32_t)n, sizeof(T), DynamicArrayKindOf<T>::value);
     }
 
-
-
-    // range-for: iterate a deep-copied snapshot (END sentinel pattern)
-
+    // range-for: live-slot iterators (operator* = actual array slot, mutations
+    // persist; valid until the array mutates).
     struct Iterator {
         using iterator_category = std::forward_iterator_tag;
-        using value_type = DynamicString;
+        using value_type = T;
         using difference_type = std::ptrdiff_t;
-        using pointer = const DynamicString*;
-        using reference = const DynamicString&;
-        std::shared_ptr<std::vector<DynamicString>> snap;
-        size_t idx = 0;
-        static constexpr size_t END = SIZE_MAX;
-        const DynamicString& operator*() const { return (*snap)[idx]; }
-        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        using pointer = T*;
+        using reference = T&;
+        DynamicArray* arr = nullptr;
+        int64_t i = 0;
+        T* operator->() const { return (T*)arr->data + i; }
+        T& operator*() const { return *((T*)arr->data + i); }
+        Iterator& operator++() { ++i; return *this; }
         Iterator operator++(int) { Iterator t = *this; ++*this; return t; }
-        Iterator operator+(difference_type d) const { Iterator t = *this; t.idx = (size_t)((ptrdiff_t)t.idx + d); return t; }
-        bool operator==(const Iterator& o) const { return !(*this != o); }
-        bool operator!=(const Iterator& o) const {
-            if (!o.snap) return snap && idx < snap->size();
-            if (!snap) return o.snap ? o.idx < o.snap->size() : false;
-            if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
-            return idx != o.idx;
-        }
-    };;
-
-    Iterator begin() const {
-
-        Iterator it;
-
-        int64_t n = size();
-
-        if (n > 0) {
-
-            it.snap = std::make_shared<std::vector<DynamicString>>();
-
-            it.snap->resize((size_t)n);
-
-            barony_dynamic_array_str_entries(const_cast<DynamicArray*>(&raw), it.snap->data(), (int32_t)n);
-
-        }
-
-        return it;
-
-    }
-
-    Iterator end() const {
-
-        Iterator it;
-
-        it.idx = Iterator::END;
-
-        return it;
-
-    }
-
-};
-
-
-
-// ---------------------------------------------------------------------------
-
-// DynamicArrayS32 — std::vector<Sint32> replacement (POD elements, no
-
-// ownership — raw byte moves are safe). Uses the base DynamicArray shims
-
-// with elem_size = 4.
-
-// ---------------------------------------------------------------------------
-
-class DynamicArrayS32 {
-
-public:
-
-    DynamicArray raw{};
-
-
-
-    DynamicArrayS32() { barony_dynamic_array_init(&raw); }
-
-    ~DynamicArrayS32() { barony_dynamic_array_destroy(&raw); }
-
-    DynamicArrayS32(const DynamicArrayS32& other) : raw{} {
-
-        barony_dynamic_array_init(&raw);
-
-        *this = other;
-
-    }
-
-    DynamicArrayS32& operator=(const DynamicArrayS32& other) {
-
-        if (this != &other) { barony_dynamic_array_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-
-        return *this;
-
-    }
-
-    DynamicArrayS32(DynamicArrayS32&& other) noexcept : raw(other.raw) {
-
-        other.raw = DynamicArray{};
-
-    }
-
-    DynamicArrayS32& operator=(DynamicArrayS32&& other) noexcept {
-
-        if (this != &other) {
-
-            barony_dynamic_array_destroy(&raw);
-
-            raw = other.raw;
-
-            other.raw = DynamicArray{};
-
-        }
-
-        return *this;
-
-    }
-
-
-
-    int64_t size() const { return dynarray_size<int32_t>(raw); }
-
-    bool empty() const { return size() == 0; }
-
-    void clear() { barony_dynamic_array_clear(&raw); }
-    void reserve(int64_t n) { if (raw.cap < n * (int64_t)sizeof(int32_t)) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(int32_t), (int32_t)dynarray_size<int32_t>(raw)); } }
-    int32_t* begin() { return (int32_t*)raw.data; }
-    int32_t* end() { return (int32_t*)raw.data + size(); }
-    const int32_t* begin() const { return (const int32_t*)raw.data; }
-    const int32_t* end() const { return (const int32_t*)raw.data + size(); }
-
-    void push_back(int32_t v) { dynarray_push<int32_t>(raw, v); }
-    void resize(int64_t n) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(int32_t), (int32_t)n); }
-
-    void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(int32_t)); }
-
-    int32_t& operator[](int64_t i) { return *dynarray_at<int32_t>(raw, i); }
-
-    const int32_t& operator[](int64_t i) const { return *dynarray_at<int32_t>(raw, i); }
-
-    int32_t at(int64_t i) const { return *dynarray_at<int32_t>(raw, i); }
-
-    int32_t* data() { return (int32_t*)raw.data; }
-
-    const int32_t* data() const { return (const int32_t*)raw.data; }
-
-};
-
-
-
-// ---------------------------------------------------------------------------
-
-// DynamicArrayU32 — std::vector<Uint32> replacement (POD).
-
-// ---------------------------------------------------------------------------
-
-class DynamicArrayU32 {
-
-public:
-
-    DynamicArray raw{};
-
-
-
-    DynamicArrayU32() { barony_dynamic_array_init(&raw); }
-
-    ~DynamicArrayU32() { barony_dynamic_array_destroy(&raw); }
-
-    DynamicArrayU32(const DynamicArrayU32& other) : raw{} {
-
-        barony_dynamic_array_init(&raw);
-
-        *this = other;
-
-    }
-
-    DynamicArrayU32& operator=(const DynamicArrayU32& other) {
-
-        if (this != &other) { barony_dynamic_array_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-
-        return *this;
-
-    }
-
-    DynamicArrayU32(DynamicArrayU32&& other) noexcept : raw(other.raw) {
-
-        other.raw = DynamicArray{};
-
-    }
-
-    DynamicArrayU32& operator=(DynamicArrayU32&& other) noexcept {
-
-        if (this != &other) {
-
-            barony_dynamic_array_destroy(&raw);
-
-            raw = other.raw;
-
-            other.raw = DynamicArray{};
-
-        }
-
-        return *this;
-
-    }
-
-
-
-    int64_t size() const { return dynarray_size<uint32_t>(raw); }
-
-    bool empty() const { return size() == 0; }
-
-    void clear() { barony_dynamic_array_clear(&raw); }
-
-    void push_back(uint32_t v) { dynarray_push<uint32_t>(raw, v); }
-    void resize(int64_t n) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(uint32_t), (int32_t)n); }
-    uint32_t* begin() { return (uint32_t*)raw.data; }
-    uint32_t* end() { return (uint32_t*)raw.data + size(); }
-    const uint32_t* begin() const { return (const uint32_t*)raw.data; }
-    const uint32_t* end() const { return (const uint32_t*)raw.data + size(); }
-
-    void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(uint32_t)); }
-
-    uint32_t& operator[](int64_t i) { return *dynarray_at<uint32_t>(raw, i); }
-    uint32_t back() const { return *dynarray_at<uint32_t>(raw, size() - 1); }
-    uint32_t front() const { return *dynarray_at<uint32_t>(raw, 0); }
-
-    const uint32_t& operator[](int64_t i) const { return *dynarray_at<uint32_t>(raw, i); }
-
-    uint32_t at(int64_t i) const { return *dynarray_at<uint32_t>(raw, i); }
-
-};
-
-
-
-// ---------------------------------------------------------------------------
-
-// DynamicArrayIcon — std::vector<ItemTooltipIcons_t> replacement. Elements
-
-// are 3 DynamicStrings + u32 (deep-owned). All mutations via the icon shims.
-
-// ---------------------------------------------------------------------------
-
-;
-
-
-
-class DynamicArrayIcon {
-
-public:
-
-    DynamicArray raw{};
-
-
-
-    DynamicArrayIcon() { barony_dynamic_array_icon_init(&raw); }
-
-    ~DynamicArrayIcon() { barony_dynamic_array_icon_destroy(&raw); }
-
-    DynamicArrayIcon(const DynamicArrayIcon& other) : raw{} {
-
-        barony_dynamic_array_icon_init(&raw);
-
-        *this = other;
-
-    }
-
-    DynamicArrayIcon& operator=(const DynamicArrayIcon& other) {
-
-        if (this != &other) { barony_dynamic_array_icon_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-
-        return *this;
-
-    }
-
-    DynamicArrayIcon(DynamicArrayIcon&& other) noexcept : raw(other.raw) {
-
-        other.raw = DynamicArray{};
-
-    }
-
-    DynamicArrayIcon& operator=(DynamicArrayIcon&& other) noexcept {
-
-        if (this != &other) {
-
-            barony_dynamic_array_icon_destroy(&raw);
-
-            raw = other.raw;
-
-            other.raw = DynamicArray{};
-
-        }
-
-        return *this;
-
-    }
-
-
-
-    int64_t size() const { return barony_dynamic_array_icon_len(const_cast<DynamicArray*>(&raw)); }
-
-    bool empty() const { return size() == 0; }
-
-    void clear() { barony_dynamic_array_icon_clear(&raw); }
-
-    void push_back(const ItemTooltipIcons_tMirror& v) { barony_dynamic_array_icon_append(&raw, const_cast<ItemTooltipIcons_tMirror*>(&v)); }
-
-    void erase(int64_t i) { barony_dynamic_array_icon_erase(&raw, (int32_t)i); }
-
-    ItemTooltipIcons_tMirror at(int64_t i) const {
-
-        ItemTooltipIcons_tMirror out;
-
-        barony_dynamic_array_icon_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
-
-        return out;
-
-    }
-
-    void set(int64_t i, const ItemTooltipIcons_tMirror& v) { barony_dynamic_array_icon_set(&raw, (int32_t)i, const_cast<ItemTooltipIcons_tMirror*>(&v)); }
-
-    ItemTooltipIcons_tMirror& operator[](int64_t i) {
-
-        // NOTE: returns a temporary-based ref is unsafe for owned structs.
-        // Use at()/set(). This only supports reads via the copy.
-        static thread_local ItemTooltipIcons_tMirror _tmp;
-        barony_dynamic_array_icon_get(&raw, (int32_t)i, &_tmp);
-        return _tmp;
-    }
-
-    // live-slot iterators: operator* returns a pointer to the ACTUAL array
-    // slot (mutations persist, &*it is the live element). Valid until the
-    // array mutates.
-    struct Iterator {
-        DynamicArray* arr = nullptr;
-        int64_t i = 0;
-        ItemTooltipIcons_tMirror* operator->() const { return (ItemTooltipIcons_tMirror*)arr->data + i; }
-        ItemTooltipIcons_tMirror& operator*() const { return *((ItemTooltipIcons_tMirror*)arr->data + i); }
-        Iterator& operator++() { ++i; return *this; }
+        Iterator operator+(difference_type d) const { Iterator t = *this; t.i += d; return t; }
+        bool operator==(const Iterator& o) const { return arr == o.arr && i == o.i; }
         bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
     };
     Iterator begin() { return Iterator{&raw, 0}; }
@@ -694,132 +301,13 @@ public:
     Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
 };
 
-
-// ---------------------------------------------------------------------------
-// DynamicArrayOption — std::vector<DropdownOption_t> replacement. Elements
-// are 4 DynamicStrings (deep-owned). Live-slot iterators (like Icon).
-// ---------------------------------------------------------------------------
-;
-
-class DynamicArrayOption {
-public:
-    DynamicArray raw{};
-
-    DynamicArrayOption() { barony_dynamic_array_option_init(&raw); }
-    ~DynamicArrayOption() { barony_dynamic_array_option_destroy(&raw); }
-    DynamicArrayOption(const DynamicArrayOption& other) : raw{} {
-        barony_dynamic_array_option_init(&raw);
-        *this = other;
-    }
-    DynamicArrayOption& operator=(const DynamicArrayOption& other) {
-        if (this != &other) { barony_dynamic_array_option_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-        return *this;
-    }
-    DynamicArrayOption(DynamicArrayOption&& other) noexcept : raw(other.raw) {
-        other.raw = DynamicArray{};
-    }
-    DynamicArrayOption& operator=(DynamicArrayOption&& other) noexcept {
-        if (this != &other) {
-            barony_dynamic_array_option_destroy(&raw);
-            raw = other.raw;
-            other.raw = DynamicArray{};
-        }
-        return *this;
-    }
-
-    int64_t size() const { return barony_dynamic_array_option_len(const_cast<DynamicArray*>(&raw)); }
-    bool empty() const { return size() == 0; }
-    void clear() { barony_dynamic_array_option_clear(&raw); }
-    void push_back(const DropdownOption_tMirror& v) { barony_dynamic_array_option_append(&raw, const_cast<DropdownOption_tMirror*>(&v)); }
-    void erase(int64_t i) { barony_dynamic_array_option_erase(&raw, (int32_t)i); }
-    DropdownOption_tMirror at(int64_t i) const {
-        DropdownOption_tMirror out;
-        barony_dynamic_array_option_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
-        return out;
-    }
-    void set(int64_t i, const DropdownOption_tMirror& v) { barony_dynamic_array_option_set(&raw, (int32_t)i, const_cast<DropdownOption_tMirror*>(&v)); }
-    DropdownOption_tMirror& operator[](int64_t i) {
-        static thread_local DropdownOption_tMirror _tmp;
-        barony_dynamic_array_option_get(&raw, (int32_t)i, &_tmp);
-        return _tmp;
-    }
-    // live-slot iterators (mutations persist)
-    struct Iterator {
-        DynamicArray* arr = nullptr;
-        int64_t i = 0;
-        DropdownOption_tMirror* operator->() const { return (DropdownOption_tMirror*)arr->data + i; }
-        DropdownOption_tMirror& operator*() const { return *((DropdownOption_tMirror*)arr->data + i); }
-        Iterator& operator++() { ++i; return *this; }
-        bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
-    };
-    Iterator begin() { return Iterator{&raw, 0}; }
-    Iterator end() { return Iterator{&raw, size()}; }
-    Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
-    Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
-};
-
-// ---------------------------------------------------------------------------
-// DynamicArrayEntryVar — std::vector<Entry_t::Variable_t> replacement.
-// Element = i32 type + DynamicString value + 3 i32. value is owned.
-// ---------------------------------------------------------------------------
-;
-
-class DynamicArrayEntryVar {
-public:
-    DynamicArray raw{};
-
-    DynamicArrayEntryVar() { barony_dynamic_array_entryvar_init(&raw); }
-    ~DynamicArrayEntryVar() { barony_dynamic_array_entryvar_destroy(&raw); }
-    DynamicArrayEntryVar(const DynamicArrayEntryVar& other) : raw{} {
-        barony_dynamic_array_entryvar_init(&raw);
-        *this = other;
-    }
-    DynamicArrayEntryVar& operator=(const DynamicArrayEntryVar& other) {
-        if (this != &other) { barony_dynamic_array_entryvar_copy(&raw, const_cast<DynamicArray*>(&other.raw)); }
-        return *this;
-    }
-    DynamicArrayEntryVar(DynamicArrayEntryVar&& other) noexcept : raw(other.raw) {
-        other.raw = DynamicArray{};
-    }
-    DynamicArrayEntryVar& operator=(DynamicArrayEntryVar&& other) noexcept {
-        if (this != &other) {
-            barony_dynamic_array_entryvar_destroy(&raw);
-            raw = other.raw;
-            other.raw = DynamicArray{};
-        }
-        return *this;
-    }
-
-    int64_t size() const { return barony_dynamic_array_entryvar_len(const_cast<DynamicArray*>(&raw)); }
-    bool empty() const { return size() == 0; }
-    void clear() { barony_dynamic_array_entryvar_clear(&raw); }
-    void push_back(const EntryVariable_tMirror& v) { barony_dynamic_array_entryvar_append(&raw, const_cast<EntryVariable_tMirror*>(&v)); }
-    void erase(int64_t i) { barony_dynamic_array_entryvar_erase(&raw, (int32_t)i); }
-    EntryVariable_tMirror at(int64_t i) const {
-        EntryVariable_tMirror out;
-        barony_dynamic_array_entryvar_get(const_cast<DynamicArray*>(&raw), (int32_t)i, &out);
-        return out;
-    }
-    void set(int64_t i, const EntryVariable_tMirror& v) { barony_dynamic_array_entryvar_set(&raw, (int32_t)i, const_cast<EntryVariable_tMirror*>(&v)); }
-    EntryVariable_tMirror& operator[](int64_t i) {
-        static thread_local EntryVariable_tMirror _tmp;
-        barony_dynamic_array_entryvar_get(&raw, (int32_t)i, &_tmp);
-        return _tmp;
-    }
-    // live-slot iterators
-    struct Iterator {
-        DynamicArray* arr = nullptr;
-        int64_t i = 0;
-        EntryVariable_tMirror* operator->() const { return (EntryVariable_tMirror*)arr->data + i; }
-        EntryVariable_tMirror& operator*() const { return *((EntryVariable_tMirror*)arr->data + i); }
-        Iterator& operator++() { ++i; return *this; }
-        bool operator!=(const Iterator& o) const { return arr != o.arr || i != o.i; }
-    };
-    Iterator begin() { return Iterator{&raw, 0}; }
-    Iterator end() { return Iterator{&raw, size()}; }
-    Iterator begin() const { return Iterator{const_cast<DynamicArray*>(&raw), 0}; }
-    Iterator end() const { return Iterator{const_cast<DynamicArray*>(&raw), size()}; }
-};
+// ---- typedefs preserve the pre-consolidation names (game code untouched) ----
+using DynamicArrayStr    = DynamicArrayT<DynamicString>;
+using DynamicArrayS32    = DynamicArrayT<int32_t>;
+using DynamicArrayU32    = DynamicArrayT<uint32_t>;
+using DynamicArrayIcon   = DynamicArrayT<ItemTooltipIcons_tMirror>;
+using DynamicArrayOption = DynamicArrayT<DropdownOption_tMirror>;
+using DynamicArrayEntryVar = DynamicArrayT<EntryVariable_tMirror>;
 
 // pair<int,int> element helpers (8-byte POD pairs)
 typedef std::pair<int, int> int_pair_t;
