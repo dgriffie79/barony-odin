@@ -130,6 +130,26 @@ public:
 		}
 	}
 
+
+	// Serialize a generic DynamicArrayT<T> (owning elements serialize via value())
+	template <typename T>
+	bool value(DynamicArrayT<T>& v, Uint32 maxLength = 0) {
+		Uint32 size = (Uint32)v.size();
+		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
+		    v.clear();
+		    bool result = true;
+		    for (Uint32 index = 0; index < size; ++index) {
+			    T elem{};
+			    result = value(elem) ? result : false;
+			    v.push_back(elem);
+		    }
+		    endArray();
+		    return result;
+		} else {
+		    return false;
+		}
+	}
+
 	// Serialize a DynamicArrayU32 (std::vector<Uint32> replacement)
 	bool value(DynamicArrayU32& v, Uint32 maxLength = 0) {
 		Uint32 size = (Uint32)v.size();

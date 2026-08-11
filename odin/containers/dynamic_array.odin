@@ -204,6 +204,8 @@ Kind_PanelEntry       :: 19
 Kind_AssistNotifPair  :: 20
 Kind_AlchNotifPair    :: 21
 Kind_CalloutPanel    :: 22
+Kind_HiscoreStat     :: 23
+Kind_HiscoreLootbag  :: 24
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -1133,6 +1135,140 @@ callout_panel_entry_copy :: proc(dst: rawptr, src: rawptr) {
 			}
 		}
 	}
+}
+
+// ---------------------------------------------------------------------------
+// HiscoreStat_t + HiscorePlayer_t (online hiscore save) — recursive owns
+// ---------------------------------------------------------------------------
+HiscoreItem_t :: struct {
+	type:       u32,
+	status:     u32,
+	appearance: u32,
+	beatitude:  i32,
+	count:      i32,
+	identified: bool,
+	x:          i32,
+	y:          i32,
+}
+
+HiscoreLootbag_t :: struct {
+	spawn_x:         i32,
+	spawn_y:         i32,
+	spawnedOnGround: bool,
+	looted:          bool,
+	items:           Raw_Dynamic_Array,   // HiscoreItem_t
+}
+
+HiscoreStat_t :: struct {
+	name:                DynamicString,
+	type:                u32,
+	sex:                 u32,
+	statscore_appearance: u32,
+	HP:                  i32,
+	maxHP:               i32,
+	MP:                  i32,
+	maxMP:               i32,
+	STR:                 i32,
+	DEX:                 i32,
+	CON:                 i32,
+	INT:                 i32,
+	PER:                 i32,
+	CHR:                 i32,
+	EXP:                 i32,
+	LVL:                 i32,
+	GOLD:                i32,
+	HUNGER:              i32,
+	PROFICIENCIES:       Raw_Dynamic_Array,  // i32
+	EFFECTS:             Raw_Dynamic_Array,
+	EFFECTS_TIMERS:      Raw_Dynamic_Array,
+	EFFECTS_ACCRETION_TIME: Raw_Dynamic_Array,
+	MISC_FLAGS:          Raw_Dynamic_Array,
+	attributes:          Raw_Dynamic_Array,  // pair<DynamicString,DynamicString>
+	player_equipment:    Raw_Dynamic_Array,  // pair<DynamicString,u32>
+	npc_equipment:       Raw_Dynamic_Array,  // pair<DynamicString,HiscoreItem_t>
+	inventory:           Raw_Dynamic_Array,  // HiscoreItem_t
+	void_chest_inventory: Raw_Dynamic_Array,
+	player_lootbags:     Raw_Dynamic_Array,  // pair<u32,HiscoreLootbag_t>
+}
+
+
+// hiscore stat free/copy: free the name + all arrays (recursive via POD/elem kinds)
+hiscore_stat_free :: proc(p: rawptr) {
+	v := (^HiscoreStat_t)(p)
+	if v.name.data != nil {
+		mem.free(v.name.data)
+		v.name.data = nil
+	}
+	v.name.len = 0
+	barony_dynamic_array_elem_destroy(&v.PROFICIENCIES, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.EFFECTS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.EFFECTS_TIMERS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.EFFECTS_ACCRETION_TIME, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.MISC_FLAGS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.attributes, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.player_equipment, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.npc_equipment, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.inventory, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.void_chest_inventory, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.player_lootbags, size_of(HiscoreLootbag_t), Kind_HiscoreLootbag)
+}
+
+hiscore_stat_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreStat_t)(dst)
+	s := (^HiscoreStat_t)(src)
+	d.type = s.type
+	d.sex = s.sex
+	d.statscore_appearance = s.statscore_appearance
+	d.HP = s.HP
+	d.maxHP = s.maxHP
+	d.MP = s.MP
+	d.maxMP = s.maxMP
+	d.STR = s.STR
+	d.DEX = s.DEX
+	d.CON = s.CON
+	d.INT = s.INT
+	d.PER = s.PER
+	d.CHR = s.CHR
+	d.EXP = s.EXP
+	d.LVL = s.LVL
+	d.GOLD = s.GOLD
+	d.HUNGER = s.HUNGER
+	if d.name.data != nil { mem.free(d.name.data); d.name.data = nil }
+	d.name.len = 0
+	if s.name.len > 0 {
+		buf, _ := mem.alloc(s.name.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, s.name.data, s.name.len)
+			(^u8)(uintptr(buf) + uintptr(s.name.len))^ = 0
+			d.name = DynamicString{ data = buf, len = s.name.len }
+		}
+	}
+	barony_dynamic_array_elem_copy(&d.PROFICIENCIES, &s.PROFICIENCIES, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.EFFECTS, &s.EFFECTS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.EFFECTS_TIMERS, &s.EFFECTS_TIMERS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.EFFECTS_ACCRETION_TIME, &s.EFFECTS_ACCRETION_TIME, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.MISC_FLAGS, &s.MISC_FLAGS, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.attributes, &s.attributes, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.player_equipment, &s.player_equipment, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.npc_equipment, &s.npc_equipment, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.inventory, &s.inventory, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.void_chest_inventory, &s.void_chest_inventory, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.player_lootbags, &s.player_lootbags, size_of(HiscoreLootbag_t), Kind_HiscoreLootbag)
+}
+
+// HiscoreLootbag element ops (owns items array)
+hiscore_lootbag_free :: proc(p: rawptr) {
+	v := (^HiscoreLootbag_t)(p)
+	barony_dynamic_array_elem_destroy(&v.items, size_of(HiscoreItem_t), Kind_POD)
+}
+hiscore_lootbag_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreLootbag_t)(dst)
+	s := (^HiscoreLootbag_t)(src)
+	d.spawn_x = s.spawn_x
+	d.spawn_y = s.spawn_y
+	d.spawnedOnGround = s.spawnedOnGround
+	d.looted = s.looted
+	barony_dynamic_array_elem_copy(&d.items, &s.items, size_of(HiscoreItem_t), Kind_POD)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

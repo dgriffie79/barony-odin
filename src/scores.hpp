@@ -712,7 +712,7 @@ struct SaveGameInfo {
 		};
 
 		stat_t stats;
-		std::vector<stat_t> followers;
+		DynamicArrayT<stat_t> followers;
 		
 		bool serialize(FileInterface* fp) {
 			fp->property("char_class", char_class);
@@ -1018,6 +1018,9 @@ public:
 	void checkMapScriptsOnVariableSet();
 	void updateGlobalStat(int index, int player);
 };
+template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t> { static constexpr int value = Kind_HiscoreStat; };
+template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t::lootbag_t> { static constexpr int value = Kind_HiscoreLootbag; };
+
 extern AchievementObserver achievementObserver;
 #endif
 
