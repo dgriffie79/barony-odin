@@ -2759,7 +2759,7 @@ GameController::Haptic_t::HapticEffect* GameController::handleRumble()
 	{
 		++haptics.hapticTick;
 	}
-	size_t size = haptics.activeRumbles.size();
+	int64_t size = dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles);
 	if ( size == 0 )
 	{
 		return nullptr;
@@ -2768,59 +2768,64 @@ GameController::Haptic_t::HapticEffect* GameController::handleRumble()
 
 	Uint32 highestPriority = 0;
 	Uint32 earliestTick = std::numeric_limits<Uint32>::max();
-	for ( auto it = haptics.activeRumbles.begin(); it != haptics.activeRumbles.end(); /*blank*/ )
+	for ( int64_t _ri = 0; _ri < dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles); )
 	{
-		Uint32 priority = it->first;
-		auto& rumble = it->second;
+		auto& it = *dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, _ri);
+		Uint32 priority = it.first;
+		auto& rumble = it.second;
 		if ( haptics.hapticTick - rumble.startTick >= rumble.length ) // expired length
 		{
-			it = haptics.activeRumbles.erase(it);
+			auto& _ar = haptics.activeRumbles;
+			for ( int64_t _k = _ri; _k < dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(_ar) - 1; ++_k )
+				(*dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(_ar, _k)) = (*dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(_ar, _k + 1));
+			_ar.len -= (int64_t)sizeof(std::pair<Uint32, Haptic_t::Rumble>);
 			continue;
 		}
-		++it;
+		++_ri;
 	}
 
-	std::vector<std::pair<Uint32, Haptic_t::Rumble>>::iterator rumbleToPlay = haptics.activeRumbles.end();
-	for ( auto it = haptics.activeRumbles.begin(); it != haptics.activeRumbles.end(); ++it )
+	int64_t rumbleToPlay = -1;
+	for ( int64_t _ri = 0; _ri < dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles); ++_ri )
 	{
-		Uint32 priority = it->first;
-		auto& rumble = it->second;
+		auto& it = *dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, _ri);
+		Uint32 priority = it.first;
+		auto& rumble = it.second;
 		if ( priority > highestPriority )
 		{
 			highestPriority = priority;
 			earliestTick = rumble.startTick;
-			rumbleToPlay = it;
+			rumbleToPlay = _ri;
 		}
 		else if ( highestPriority == priority )
 		{
 			if ( rumble.startTick < earliestTick )
 			{
 				earliestTick = rumble.startTick;
-				rumbleToPlay = it;
+				rumbleToPlay = _ri;
 			}
 		}
 	}
 
-	for ( auto it = haptics.activeRumbles.begin(); it != haptics.activeRumbles.end(); ++it )
+	for ( int64_t _ri = 0; _ri < dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles); ++_ri )
 	{
-		if ( it != rumbleToPlay )
+		if ( _ri != rumbleToPlay )
 		{
-			it->second.isPlaying = false;
+			dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, _ri)->second.isPlaying = false;
 		}
 	}
 
-	if ( rumbleToPlay != haptics.activeRumbles.end() 
-		&& (!rumbleToPlay->second.isPlaying 
-			|| rumbleToPlay->second.pattern == Haptic_t::RUMBLE_BOULDER 
-			|| rumbleToPlay->second.pattern == Haptic_t::RUMBLE_BOULDER_BOUNCE
-			|| rumbleToPlay->second.pattern == Haptic_t::RUMBLE_DEATH
-			|| rumbleToPlay->second.pattern == Haptic_t::RUMBLE_TMP
-			|| rumbleToPlay->second.pattern == Haptic_t::RUMBLE_SPELL))
+	if ( rumbleToPlay >= 0
+		&& (!dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.isPlaying
+			|| dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.pattern == Haptic_t::RUMBLE_BOULDER
+			|| dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.pattern == Haptic_t::RUMBLE_BOULDER_BOUNCE
+			|| dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.pattern == Haptic_t::RUMBLE_DEATH
+			|| dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.pattern == Haptic_t::RUMBLE_TMP
+			|| dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.pattern == Haptic_t::RUMBLE_SPELL))
 	{
-		Uint32 newStartTime = (haptics.hapticTick - rumbleToPlay->second.startTick);
-		rumbleToPlay->second.startTime = newStartTime; // move the playhead forward.
-		rumbleToPlay->second.isPlaying = true;
-		return doRumble(&rumbleToPlay->second);
+		Uint32 newStartTime = (haptics.hapticTick - dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.startTick);
+		dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.startTime = newStartTime; // move the playhead forward.
+		dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second.isPlaying = true;
+		return doRumble(&dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, rumbleToPlay)->second);
 	}
 	return nullptr;
 }
@@ -2864,8 +2869,8 @@ void GameController::addRumble(Haptic_t::RumblePattern pattern, Uint16 smallMagn
 	{
 		priority = 1;
 	}
-	haptics.activeRumbles.push_back(std::make_pair(priority, Haptic_t::Rumble(smallMagnitude, largeMagnitude, length, haptics.hapticTick, srcEntityUid)));
-	haptics.activeRumbles.back().second.pattern = pattern;
+	dynarray_pair_push<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, std::make_pair(priority, Haptic_t::Rumble(smallMagnitude, largeMagnitude, length, haptics.hapticTick, srcEntityUid)));
+	dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles) - 1)->second.pattern = pattern;
 }
 
 void Inputs::addRumbleForPlayerHPLoss(const int player, Sint32 damageAmount)
@@ -3162,8 +3167,8 @@ void Player::init() // for use on new/restart game, UI related
 	hamletShopkeeperSkillLimit[playernum].clear();
 	mechanics.baseSpellLevelUpProcs.clear();
 	mechanics.learnedSpells.clear();
-	mechanics.ducksInARow.clear();
-	mechanics.pendingDucks.clear();
+	barony_dynamic_array_clear(&mechanics.ducksInARow);
+	barony_dynamic_array_clear(&mechanics.pendingDucks);
 	mechanics.numFishingCaught = 0;
 	mechanics.sustainedSpellMPUsedSorcery = 0;
 	mechanics.sustainedSpellMPUsedMysticism = 0;
@@ -3218,7 +3223,7 @@ void Player::cleanUpOnEntityRemoval()
 	mechanics.fociHolyChargeTime = 0;
 	mechanics.lastFociHeldType = 0;
 
-	mechanics.pendingDucks.clear();
+	barony_dynamic_array_clear(&mechanics.pendingDucks);
 	mechanics.numFishingCaught = 0;
 
 	mechanics.gremlinBreakableCounter = 0;
@@ -3264,14 +3269,15 @@ void Player::PlayerMovement_t::reset()
 real_t Player::WorldUI_t::tooltipHeightOffsetZ = 0.0;
 void Player::WorldUI_t::reset()
 {
-	for ( auto& tooltip : tooltipsInRange )
+	for ( int64_t _ti = 0; _ti < dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange); ++_ti )
 	{
+		auto& tooltip = *dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, _ti);
 		if ( bTooltipActiveForPlayer(*tooltip.first) )
 		{
 			setTooltipDisabled(*tooltip.first);
 		}
 	}
-	tooltipsInRange.clear();
+	barony_dynamic_array_clear(&tooltipsInRange);
 	bTooltipInView = false;
 	uidForActiveTooltip = 0;
 }
@@ -4374,15 +4380,16 @@ bool Player::WorldUI_t::bTooltipActiveForPlayer(Entity& tooltip)
 
 void Player::WorldUI_t::cycleToNextTooltip()
 {
-	if ( tooltipsInRange.empty() )
+	if ( dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange) == 0 )
 	{
 		return;
 	}
 	int index = 0;
 	int newIndex = 0;
 	bool bFound = false;
-	for ( auto& pair : tooltipsInRange )
+	for ( int64_t _ti = 0; _ti < dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange); ++_ti )
 	{
+		auto& pair = *dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, _ti);
 		if ( pair.first->getUID() == UID_TOOLTIP_ACTIVE )
 		{
 			if ( !bFound )
@@ -4397,29 +4404,30 @@ void Player::WorldUI_t::cycleToNextTooltip()
 
 	if ( !bFound )
 	{
-		setTooltipActive(*tooltipsInRange.front().first);
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, 0)->first);
 	}
-	else if ( newIndex >= tooltipsInRange.size() - 1 )
+	else if ( newIndex >= dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange) - 1 )
 	{
-		setTooltipActive(*tooltipsInRange.front().first);
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, 0)->first);
 	}
 	else
 	{
-		setTooltipActive(*tooltipsInRange.at(newIndex + 1).first);
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, newIndex + 1)->first);
 	}
 }
 
 void Player::WorldUI_t::cycleToPreviousTooltip()
 {
-	if ( tooltipsInRange.empty() )
+	if ( dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange) == 0 )
 	{
 		return;
 	}
 	int index = 0;
 	int newIndex = 0;
 	bool bFound = false;
-	for ( auto& pair : tooltipsInRange )
+	for ( int64_t _ti = 0; _ti < dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange); ++_ti )
 	{
+		auto& pair = *dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, _ti);
 		if ( pair.first->getUID() == UID_TOOLTIP_ACTIVE )
 		{
 			if ( !bFound )
@@ -4434,15 +4442,15 @@ void Player::WorldUI_t::cycleToPreviousTooltip()
 
 	if ( !bFound )
 	{
-		setTooltipActive(*tooltipsInRange.front().first);
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, 0)->first);
 	}
 	else if ( newIndex == 0 )
 	{
-		setTooltipActive(*tooltipsInRange.at(tooltipsInRange.size() - 1).first); // set as last
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange) - 1)->first); // set as last
 	}
 	else
 	{
-		setTooltipActive(*tooltipsInRange.at(newIndex - 1).first);
+		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, newIndex - 1)->first);
 	}
 }
 
@@ -4700,7 +4708,7 @@ void Player::WorldUI_t::handleTooltips()
 
 		bool cycleNext = Input::inputs[player].consumeBinaryToggle("Interact Tooltip Next");
 		bool cyclePrev = Input::inputs[player].consumeBinaryToggle("Interact Tooltip Prev");
-		if ( !bDoingActionHideTooltips && players[player]->worldUI.tooltipsInRange.size() > 1 )
+		if ( !bDoingActionHideTooltips && dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) > 1 )
 		{
 			if ( cyclePrev )
 			{
@@ -4795,7 +4803,7 @@ void Player::WorldUI_t::handleTooltips()
 				real_t newDist = players[player]->worldUI.tooltipInRange(*tooltip);
 				if ( newDist > 0.01 )
 				{
-					players[player]->worldUI.tooltipsInRange.push_back(std::make_pair(tooltip, newDist));
+					dynarray_pair_push<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange, std::make_pair(tooltip, newDist));
 					if ( selectInteract && parent && closestTooltip && parent->behavior != &actMonster )
 					{
 						// follower interaction - monsters have higher priority than interactibles.
@@ -4834,7 +4842,7 @@ void Player::WorldUI_t::handleTooltips()
 				}
 				players[player]->worldUI.setTooltipActive(*closestTooltip);
 			}
-			std::sort(players[player]->worldUI.tooltipsInRange.begin(), players[player]->worldUI.tooltipsInRange.end(),
+			std::sort((std::pair<Entity*, real_t>*)players[player]->worldUI.tooltipsInRange.data, (std::pair<Entity*, real_t>*)players[player]->worldUI.tooltipsInRange.data + dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange),
 				[](const std::pair<Entity*, real_t>& lhs, const std::pair<Entity*, real_t>& rhs)
 			{
 				return lhs.second < rhs.second;
@@ -4847,7 +4855,7 @@ void Player::WorldUI_t::handleTooltips()
 		}
 		else if ( players[player]->worldUI.tooltipView == TOOLTIP_VIEW_LOCKED )
 		{
-			if ( players[player]->worldUI.tooltipsInRange.empty() )
+			if ( dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) == 0 )
 			{
 				players[player]->worldUI.tooltipView = TOOLTIP_VIEW_RESCAN;
 				continue;
@@ -4934,8 +4942,9 @@ void Player::WorldUI_t::handleTooltips()
 				continue;
 			}
 
-			for ( auto& tooltip : players[player]->worldUI.tooltipsInRange )
+			for ( int64_t _ti = 0; _ti < dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange); ++_ti )
 			{
+				auto& tooltip = *dynarray_pair_at<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange, _ti);
 				if ( players[player]->worldUI.bTooltipActiveForPlayer(*tooltip.first) )
 				{
 					if ( Entity* parent = uidToEntity(tooltip.first->parent) )

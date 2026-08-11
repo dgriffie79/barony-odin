@@ -270,8 +270,9 @@ void actSpriteWorldTooltip(Entity* my)
 		{
 			int index = 0;
 			bool bFound = false;
-			for ( auto& tooltip : players[i]->worldUI.tooltipsInRange )
+			for ( int64_t _ti = 0; _ti < dynarray_pair_size<std::pair<Entity*, real_t>>(players[i]->worldUI.tooltipsInRange); ++_ti )
 			{
+				auto& tooltip = *dynarray_pair_at<std::pair<Entity*, real_t>>(players[i]->worldUI.tooltipsInRange, _ti);
 				if ( tooltip.first == my )
 				{
 					bFound = true;
@@ -279,13 +280,16 @@ void actSpriteWorldTooltip(Entity* my)
 				}
 				++index;
 			}
-			if ( bFound && index >= 0 && index < players[i]->worldUI.tooltipsInRange.size() )
+			if ( bFound && index >= 0 && index < dynarray_pair_size<std::pair<Entity*, real_t>>(players[i]->worldUI.tooltipsInRange) )
 			{
-				if ( players[i]->worldUI.bTooltipActiveForPlayer(*my) && players[i]->worldUI.tooltipsInRange.size() > 1 )
+				if ( players[i]->worldUI.bTooltipActiveForPlayer(*my) && dynarray_pair_size<std::pair<Entity*, real_t>>(players[i]->worldUI.tooltipsInRange) > 1 )
 				{
 					players[i]->worldUI.cycleToNextTooltip();
 				}
-				players[i]->worldUI.tooltipsInRange.erase(players[i]->worldUI.tooltipsInRange.begin() + index);
+				auto& _tr = players[i]->worldUI.tooltipsInRange;
+				for ( int64_t _k = index; _k < dynarray_pair_size<std::pair<Entity*, real_t>>(_tr) - 1; ++_k )
+					(*dynarray_pair_at<std::pair<Entity*, real_t>>(_tr, _k)) = (*dynarray_pair_at<std::pair<Entity*, real_t>>(_tr, _k + 1));
+				_tr.len -= (int64_t)sizeof(std::pair<Entity*, real_t>);
 			}
 		}
 

@@ -5275,9 +5275,9 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			{
 				dynarray_pair_push(player.sustainedSpellIDCounter, pair);
 			}
-			for ( auto& pair : ::players[c]->mechanics.ducksInARow )
+			for ( int64_t _vi2 = 0; _vi2 < dynarray_pair_size(::players[c]->mechanics.ducksInARow); ++_vi2 )
 			{
-				dynarray_pair_push(player.ducksInARow, pair);
+				dynarray_pair_push(player.ducksInARow, *dynarray_pair_at(::players[c]->mechanics.ducksInARow, _vi2));
 			}
 			for ( auto& pair : ::players[c]->mechanics.favoriteBooksAchievement )
 			{
@@ -6278,7 +6278,7 @@ int loadGame(int player, const SaveGameInfo& info) {
 		auto& mechanics = players[statsPlayer]->mechanics;
 		mechanics.itemDegradeRng.clear();
 		mechanics.learnedSpells.clear();
-		mechanics.ducksInARow.clear();
+		barony_dynamic_array_clear(&mechanics.ducksInARow);
 		mechanics.favoriteBooksAchievement.clear();
 		mechanics.sustainedSpellIDCounter.clear();
 		hamletShopkeeperSkillLimit[statsPlayer].clear();
@@ -6298,7 +6298,7 @@ int loadGame(int player, const SaveGameInfo& info) {
 		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].ducksInARow); ++_vi )
 		{
 			auto& duck = *dynarray_pair_at(info.players[player].ducksInARow, _vi);
-			mechanics.ducksInARow.push_back(duck);
+			dynarray_pair_push(mechanics.ducksInARow, duck);
 		}
 		for ( int64_t _vi = 0; _vi < dynarray_pair_size(info.players[player].favoriteBooksAchievement); ++_vi )
 		{

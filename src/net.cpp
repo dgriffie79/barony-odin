@@ -2345,7 +2345,7 @@ static void changeLevel() {
         auto& camera = players[i]->camera();
         camera.globalLightModifierActive = GLOBAL_LIGHT_MODIFIER_STOPPED;
         camera.luminance = defaultLuminance;
-		players[i]->hud.followerBars.clear();
+		barony_dynamic_array_clear(&players[i]->hud.followerBars);
 		spellcastingAnimationManager_deactivate(&cast_animation[i]);
 	}
 	EnemyHPDamageBarHandler::dumpCache();
@@ -8457,8 +8457,8 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 	{ 'DUCK', []() {
 		const int player = std::min(net_packet->data[4], (Uint8)(MAXPLAYERS - 1));
 		const int duck = net_packet->data[5];
-		players[player]->mechanics.pendingDucks.push_back(
-			std::make_pair(duck, ticks + (3 + (local_rng.rand() % 30)) * TICKS_PER_SECOND));
+		dynarray_pair_push<std::pair<int, Uint32>>(players[player]->mechanics.pendingDucks, std::make_pair(
+			duck, ticks + (3 + (local_rng.rand() % 30)) * TICKS_PER_SECOND));
 	} },
 
 	//The client failed some alchemy.

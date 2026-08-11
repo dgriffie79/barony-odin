@@ -148,7 +148,7 @@ public:
 				startTick = tick;
 			};
 		};
-		std::vector<std::pair<Uint32, Rumble>> activeRumbles;
+		DynamicArray activeRumbles;  // vector<pair<Uint32,Rumble>>
 		bool vibrationEnabled = true;
 	} haptics;
 
@@ -1660,8 +1660,8 @@ public:
 			bool bOpenFollowerMenuDisabled = false;
 		};
 		FollowerDisplay_t followerDisplay;
-		std::vector<std::pair<Uint32, FollowerBar_t>> followerBars;
-		std::vector<std::pair<Uint32, FollowerBar_t>> playerBars;
+		DynamicArray followerBars;  // vector<pair<Uint32,FollowerBar_t>>
+		DynamicArray playerBars;  // vector<pair<Uint32,FollowerBar_t>>
 
 		enum CompactLayoutModes : int {
 			COMPACT_LAYOUT_INVENTORY,
@@ -2104,7 +2104,7 @@ public:
 		{};
 		~WorldUI_t() {};
 		TooltipView tooltipView = TOOLTIP_VIEW_FREE;
-		std::vector<std::pair<Entity*, real_t>> tooltipsInRange;
+		DynamicArray tooltipsInRange;  // vector<pair<Entity*,real_t>>
 		static real_t tooltipHeightOffsetZ;
 		real_t modifiedTooltipDrawHeight = 0.0;
 		real_t playerLastYaw = 0.0;
@@ -2379,8 +2379,8 @@ public:
 	public:
 		std::map<int, int> itemDegradeRng;
 		std::set<int> learnedSpells;
-		std::vector<std::pair<int, int>> ducksInARow;
-		std::vector<std::pair<int, Uint32>> pendingDucks;
+		DynamicArray ducksInARow;  // vector<pair<int,int>>
+		DynamicArray pendingDucks;  // vector<pair<int,Uint32>>
 		std::map<int, int> favoriteBooksAchievement;
 		int numFishingCaught = 0;
 		bool itemDegradeRoll(Item* item, int skillID = -1, int* checkInterval = nullptr);

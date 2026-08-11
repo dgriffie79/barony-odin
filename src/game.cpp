@@ -2235,7 +2235,7 @@ void gameLogic(void)
 							FollowerMenu[i].closeFollowerMenuGUI(true);
 							CalloutMenu[i].closeCalloutMenuGUI();
 						}
-						players[i]->hud.followerBars.clear();
+						barony_dynamic_array_clear(&players[i]->hud.followerBars);
 						spellcastingAnimationManager_deactivate(&cast_animation[i]);
 					}
 					EnemyHPDamageBarHandler::dumpCache();
@@ -5516,7 +5516,7 @@ void ingameHud()
 					players[player]->minimap.bExpandPromptEnabled = players[player]->shootmode || players[player]->gui_mode == GUI_MODE_NONE;
 					if ( players[player]->worldUI.isEnabled()
 						&& players[player]->worldUI.bTooltipInView
-						&& players[player]->worldUI.tooltipsInRange.size() > 1 )
+						&& dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) > 1 )
 					{
 						DynamicString expandBinding = input.binding("Toggle Minimap");
 						DynamicString cycleNextBinding = input.binding("Interact Tooltip Next");
@@ -5877,7 +5877,7 @@ void ingameHud()
 		bool worldUIBlocksFollowerCycle = (
 				players[player]->worldUI.isEnabled()
 				&& players[player]->worldUI.bTooltipInView
-				&& players[player]->worldUI.tooltipsInRange.size() > 1);
+				&& dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) > 1);
 		if ( worldUIBlocksFollowerCycle )
 		{
 			DynamicString cycleNPCbinding = input.binding("Cycle NPCs");

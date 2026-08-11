@@ -158,7 +158,7 @@ Entity* entityClicked(bool* clickedOnGUI, bool clickCheckOverride, int player, E
 	if ( players[player]->worldUI.isEnabled() )
 	{
 		bool waitingForInputHeld = false;
-		if ( players[player]->worldUI.tooltipsInRange.size() > 0 )
+		if ( dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) > 0 )
 		{
 			for ( node_t* node = map.worldUI->first; node; node = node->next )
 			{

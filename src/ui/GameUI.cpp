@@ -1069,7 +1069,7 @@ void updateCalloutPromptFrame(const int player)
 	if ( hud_t.allyPlayerFrame && !hud_t.allyPlayerFrame->isDisabled()
 		&& hud_t.allyPlayerFrame->getOpacity() > 0.0 )
 	{
-		if ( hud_t.playerBars.size() > 0 )
+		if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) > 0 )
 		{
 			if ( *cvar_callout_prompt_horizontal )
 			{
@@ -1077,7 +1077,7 @@ void updateCalloutPromptFrame(const int player)
 			}
 			else
 			{
-				alignY += hud_t.playerBars.size() * 36;
+				alignY += dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) * 36;
 			}
 		}
 	}
@@ -1230,9 +1230,9 @@ void updateVoicePromptFrame(const int player, Frame* baseFrame, Frame* allyFrame
 	if ( allyPlayerFrame && !allyPlayerFrame->isDisabled()
 		&& allyPlayerFrame->getOpacity() > 0.0 )
 	{
-		if ( hud_t.playerBars.size() > 0 )
+		if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) > 0 )
 		{
-			alignY += hud_t.playerBars.size() * 36;
+			alignY += dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) * 36;
 		}
 	}
 
@@ -2045,11 +2045,10 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 
 	bool audioSliderBars = bPlayerBars && !strcmp(baseFrame->getName(), "pause player status audio");
 
-	for ( auto it = (bPlayerBars ? hud_t.playerBars.begin() : hud_t.followerBars.begin()); 
-		it != (bPlayerBars ? hud_t.playerBars.end() : hud_t.followerBars.end()); )
+	for ( int64_t _bi = 0; _bi < (bPlayerBars ? dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) : dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars)); ++_bi )
 	{
 		++barIndex;
-		auto& followerBar = (*it).second;
+		auto& followerBar = (bPlayerBars ? dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, _bi) : dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _bi))->second;
 		Frame* entryFrame = allyFrames[barIndex];
 
 		bool doAnimation = true;
@@ -2183,7 +2182,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 			pos.h *= (1.0 - followerBar.animy);
 		}
 
-		Uint32 uid = (*it).first;
+		Uint32 uid = (bPlayerBars ? dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, _bi) : dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _bi))->first;
 		Entity* follower = bPlayerBars ? players[uid]->entity : uidToEntity(uid);
 		if ( (!bPlayerBars && (!follower || followerUids.find(uid) == followerUids.end())) || (bPlayerBars && client_disconnected[uid]) )
 		{
@@ -2206,7 +2205,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 		{
 			if ( doAnimation )
 			{
-				if ( hud_t.followerBars.size() > kNumEntriesToShow && !infiniteScrolling )
+				if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) > kNumEntriesToShow && !infiniteScrolling )
 				{
 					if ( barIndex >= followerDisplay.scrollSetpoint
 						&& barIndex < (followerDisplay.scrollSetpoint + kNumEntriesToShow) )
@@ -3398,7 +3397,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 		else
 		{
 			updateTitleFrame = false;
-			++it;
+			++_bi;
 		}
 	}
 
@@ -3508,7 +3507,7 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame);
 Frame* createPauseMenuPlayerBars()
 {
 	Frame* frame = nullptr;
-	if ( clientnum < 0 || players[clientnum]->hud.playerBars.size() == 0 )
+	if ( clientnum < 0 || dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(players[clientnum]->hud.playerBars) == 0 )
 	{
 		return frame;
 	}
@@ -3766,15 +3765,16 @@ void updateAllyFollowerFrame(const int player)
 		if ( follower )
 		{
 			Uint32 uid = follower->getUID();
-			auto it = std::find_if(hud_t.followerBars.begin(), hud_t.followerBars.end(),
-				[&uid](const std::pair<Uint32, Player::HUD_t::FollowerBar_t>& bar)
+			int64_t foundIdx = -1;
+			for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
-				return bar.first == uid && !bar.second.expired;
-			});
-			if ( it == hud_t.followerBars.end() )
+				auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
+				if ( bar.first == uid && !bar.second.expired ) { foundIdx = _fi; break; }
+			}
+			if ( foundIdx < 0 )
 			{
-				hud_t.followerBars.push_back(std::make_pair(uid, Player::HUD_t::FollowerBar_t()));
-				auto& bar = hud_t.followerBars.at(hud_t.followerBars.size() - 1);
+				dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, std::make_pair(uid, Player::HUD_t::FollowerBar_t()));
+				auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) - 1);
 				bar.second.animFadeScroll = 1.0;
 				bar.second.animFadeScrollDummy = 1.0;
 			}
@@ -3784,22 +3784,29 @@ void updateAllyFollowerFrame(const int player)
 	int activeBars = 0;
 	int realActiveBars = 0;
 	bool erasedEntry = false;
-	for ( auto it = hud_t.followerBars.begin(); it != hud_t.followerBars.end(); )
+	for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); )
 	{
-		if ( it->second.dummy )
+		auto& it = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
+		if ( it.second.dummy )
 		{
-			it = hud_t.followerBars.erase(it);
+			auto& _fb = hud_t.followerBars;
+			for ( int64_t _k = _fi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb) - 1; ++_k )
+				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k + 1));
+			_fb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
 		}
-		else if ( it->second.expired && it->second.animy >= 0.999 )
+		else if ( it.second.expired && it.second.animy >= 0.999 )
 		{
-			it = hud_t.followerBars.erase(it);
+			auto& _fb = hud_t.followerBars;
+			for ( int64_t _k = _fi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb) - 1; ++_k )
+				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k + 1));
+			_fb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
 			erasedEntry = true;
 		}
 		else
 		{
 			++activeBars;
 			++realActiveBars;
-			++it;
+			++_fi;
 		}
 	}
 
@@ -3811,8 +3818,9 @@ void updateAllyFollowerFrame(const int player)
 		if ( infiniteScrolling )
 		{
 			int index = 0;
-			for ( auto& pair : hud_t.followerBars )
+			for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 				if ( index >= followerDisplay.scrollSetpoint && index < kNumEntriesToShow )
 				{
 					if ( Entity* follower = uidToEntity(pair.first) )
@@ -3828,11 +3836,12 @@ void updateAllyFollowerFrame(const int player)
 				++index;
 			}
 		}
-		else if ( hud_t.followerBars.size() > kNumEntriesToShow )
+		else if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) > kNumEntriesToShow )
 		{
 			int index = 0;
-			for ( auto& pair : hud_t.followerBars )
+			for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 				if ( index >= followerDisplay.scrollSetpoint
 					&& index < (followerDisplay.scrollSetpoint + kNumEntriesToShow) )
 				{
@@ -3852,8 +3861,9 @@ void updateAllyFollowerFrame(const int player)
 
 		if ( !FollowerMenu[player].recentEntity ) // find the first one if nothing found before
 		{
-			for ( auto& pair : hud_t.followerBars )
+			for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 				if ( Entity* follower = uidToEntity(pair.first) )
 				{
 					// check is valid follower in list
@@ -3871,8 +3881,9 @@ void updateAllyFollowerFrame(const int player)
 	Uint32 recentFollowerUID = FollowerMenu[player].recentEntity ? FollowerMenu[player].recentEntity->getUID() : 0;
 	{
 		int index = 0;
-		for ( auto& pair : hud_t.followerBars )
+		for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 		{
+			auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 			pair.second.selected = false;
 			if ( FollowerMenu[player].recentEntity )
 			{
@@ -3921,9 +3932,9 @@ void updateAllyFollowerFrame(const int player)
 		size_t position = 0;
 		for ( Uint32 uid : sortedUids ) // sort the displayed list to match the stats->FOLLOWERS list order
 		{
-			if ( position < hud_t.followerBars.size() )
+			if ( position < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) )
 			{
-				auto it2 = std::find(sortedUids.begin(), sortedUids.end(), hud_t.followerBars.at(position).first);
+				auto it2 = std::find(sortedUids.begin(), sortedUids.end(), dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, position)->first);
 				if ( it2 == sortedUids.end() )
 				{
 					// this bar isn't in the follower list and expired, skip position to sort
@@ -3931,19 +3942,21 @@ void updateAllyFollowerFrame(const int player)
 				}
 			}
 
-			auto it = std::find_if(hud_t.followerBars.begin() + position, hud_t.followerBars.end(),
-				[uid](std::pair<Uint32, Player::HUD_t::FollowerBar_t>& pair) {
-				return pair.first == uid;
-			});
-
-			while ( it != hud_t.followerBars.end() )
+			int64_t itIdx = -1;
+			for ( int64_t _fi = position; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
-				std::iter_swap(hud_t.followerBars.begin() + position, it);
+				auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
+				if ( pair.first == uid ) { itIdx = _fi; break; }
+			}
+
+			while ( itIdx >= 0 )
+			{
+				std::swap(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, position), *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, itIdx));
 				++position;
 
-				if ( position < hud_t.followerBars.size() )
+				if ( position < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) )
 				{
-					auto it2 = std::find(sortedUids.begin(), sortedUids.end(), hud_t.followerBars.at(position).first);
+					auto it2 = std::find(sortedUids.begin(), sortedUids.end(), dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, position)->first);
 					if ( it2 == sortedUids.end() )
 					{
 						// this bar isn't in the follower list and expired, skip position to sort
@@ -3951,10 +3964,12 @@ void updateAllyFollowerFrame(const int player)
 					}
 				}
 
-				it = std::find_if(hud_t.followerBars.begin() + position, hud_t.followerBars.end(),
-					[uid](std::pair<Uint32, Player::HUD_t::FollowerBar_t>& pair) {
-					return pair.first == uid;
-				});
+				itIdx = -1;
+				for ( int64_t _fi = position; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
+				{
+					auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
+					if ( pair.first == uid ) { itIdx = _fi; break; }
+				}
 
 			}
 		}
@@ -3962,18 +3977,18 @@ void updateAllyFollowerFrame(const int player)
 		if ( infiniteScrolling )
 		{
 			int barIndex = -1;
-			size_t vecIndex = 0;
-			while ( vecIndex < hud_t.followerBars.size() )
+			int64_t vecIndex = 0;
+			while ( vecIndex < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) )
 			{
 				++barIndex;
-				if ( hud_t.followerBars[vecIndex].second.dummy )
+				if ( dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, vecIndex)->second.dummy )
 				{
 					break;
 				}
 				if ( barIndex < (followerDisplay.scrollSetpoint - 1) )
 				{
-					hud_t.followerBars.push_back(hud_t.followerBars[vecIndex]);
-					hud_t.followerBars[hud_t.followerBars.size() - 1].second.dummy = true;
+					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, vecIndex));
+					dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) - 1)->second.dummy = true;
 					//messagePlayer(0, MESSAGE_DEBUG, "%.2f", hud_t.followerBars[hud_t.followerBars.size() - 1].second.animFadeScrollDummy);
 					//hud_t.followerBars[hud_t.followerBars.size() - 1].second.animFadeScroll = 0.0;
 					++activeBars;
@@ -4001,19 +4016,20 @@ void updateAllyFollowerFrame(const int player)
 		int scrollAmount = 0;
 		if ( infiniteScrolling )
 		{
-			scrollAmount = hud_t.followerBars.size();
+			scrollAmount = (int)dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars);
 		}
-		else if ( hud_t.followerBars.size() > kNumEntriesToShow )
+		else if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) > kNumEntriesToShow )
 		{
-			scrollAmount = (hud_t.followerBars.size() - kNumEntriesToShow);
+			scrollAmount = ((int)dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) - kNumEntriesToShow);
 		}
 		int oldSetpoint = followerDisplay.scrollSetpoint;
 		if ( scrollAmount > 0 )
 		{
 			int index = 0;
 			bool foundSelected = false;
-			for ( auto& pair : hud_t.followerBars )
+			for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 				if ( pair.second.selected )
 				{
 					foundSelected = true;
@@ -4064,8 +4080,9 @@ void updateAllyFollowerFrame(const int player)
 
 					int index = 0;
 					std::vector<real_t> oldAnimFadeScrolls;
-					for ( auto& pair : hud_t.followerBars )
+					for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 					{
+						auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 						if ( index >= oldSetpoint )
 						{
 							oldAnimFadeScrolls.push_back(pair.second.dummy ? pair.second.animFadeScrollDummy : pair.second.animFadeScroll);
@@ -4073,8 +4090,9 @@ void updateAllyFollowerFrame(const int player)
 						++index;
 					}
 					index = 0;
-					for ( auto& pair : hud_t.followerBars )
+					for ( int64_t _fi = 0; _fi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars); ++_fi )
 					{
+						auto& pair = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 						if ( oldAnimFadeScrolls.size() > 0 )
 						{
 							if ( pair.second.dummy )
@@ -4246,16 +4264,16 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 	{
 		if ( *cvar_playerbars_debug >= 0 )
 		{
-			if ( hud_t.playerBars.size() < *cvar_playerbars_debug )
+			if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) < *cvar_playerbars_debug )
 			{
-				while ( hud_t.playerBars.size() < *cvar_playerbars_debug )
+				while ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) < *cvar_playerbars_debug )
 				{
-					hud_t.playerBars.push_back(std::make_pair(0, Player::HUD_t::FollowerBar_t()));
+					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(0, Player::HUD_t::FollowerBar_t()));
 				}
 			}
-			else if ( hud_t.playerBars.size() > *cvar_playerbars_debug )
+			else if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) > *cvar_playerbars_debug )
 			{
-				hud_t.playerBars.clear();
+				barony_dynamic_array_clear(&hud_t.playerBars);
 			}
 		}
 		/*if ( enableDebugKeys && keystatus[SDLK_H] )
@@ -4267,7 +4285,7 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 		if ( enableDebugKeys && keystatus[SDLK_J] )
 		{
 			keystatus[SDLK_J] = 0;
-			if ( hud_t.playerBars.size() > 0 )
+			if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) > 0 )
 			{
 				auto it = hud_t.playerBars.begin() + local_rng.rand() % hud_t.playerBars.size();
 				it->second.expired = true;
@@ -4282,15 +4300,16 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 			}
 			if ( !client_disconnected[i] && players[i]->entity && !splitscreen )
 			{
-				auto it = std::find_if(hud_t.playerBars.begin(), hud_t.playerBars.end(),
-					[&i](const std::pair<Uint32, Player::HUD_t::FollowerBar_t>& bar)
-					{
-						return bar.first == i && !bar.second.expired;
-					});
-				if ( it == hud_t.playerBars.end() )
+				int64_t foundPB = -1;
+				for ( int64_t _pi = 0; _pi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars); ++_pi )
 				{
-					hud_t.playerBars.push_back(std::make_pair(i, Player::HUD_t::FollowerBar_t()));
-					auto& bar = hud_t.playerBars.at(hud_t.playerBars.size() - 1);
+					auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, _pi);
+					if ( bar.first == i && !bar.second.expired ) { foundPB = _pi; break; }
+				}
+				if ( foundPB < 0 )
+				{
+					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(i, Player::HUD_t::FollowerBar_t()));
+					auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) - 1);
 					bar.second.animFadeScroll = 1.0;
 					bar.second.animFadeScrollDummy = 1.0;
 				}
@@ -4299,22 +4318,29 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 	}
 
 	int activeBars = 0;
-	for ( auto it = hud_t.playerBars.begin(); it != hud_t.playerBars.end(); )
+	for ( int64_t _pi = 0; _pi < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars); )
 	{
-		int playernum = it->first;
+		auto& it = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, _pi);
+		int playernum = it.first;
 		if ( playernum >= 0 && playernum < MAXPLAYERS
 			&& client_disconnected[playernum] )
 		{
-			it = hud_t.playerBars.erase(it);
+			auto& _pb = hud_t.playerBars;
+			for ( int64_t _k = _pi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb) - 1; ++_k )
+				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k + 1));
+			_pb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
 		}
-		else if ( it->second.expired && it->second.animy >= 0.999 )
+		else if ( it.second.expired && it.second.animy >= 0.999 )
 		{
-			it = hud_t.playerBars.erase(it);
+			auto& _pb = hud_t.playerBars;
+			for ( int64_t _k = _pi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb) - 1; ++_k )
+				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k + 1));
+			_pb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
 		}
 		else
 		{
 			++activeBars;
-			++it;
+			++_pi;
 		}
 	}
 
@@ -11575,7 +11601,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 
 	if ( player.worldUI.isEnabled() )
 	{
-		if ( !text->isDisabled() && !glyph->disabled && player.worldUI.tooltipsInRange.size() > 1 )
+		if ( !text->isDisabled() && !glyph->disabled && dynarray_pair_size<std::pair<Entity*, real_t>>(player.worldUI.tooltipsInRange) > 1 )
 		{
 			if ( Input::inputs[player.playernum].input("Interact Tooltip Next").type != Input::binding_t::bindtype_t::INVALID )
 			{
@@ -13190,7 +13216,7 @@ static Frame* createMinimap(int player) {
 		}
 		else if ( players[player]->worldUI.isEnabled()
 			&& players[player]->worldUI.bTooltipInView
-			&& players[player]->worldUI.tooltipsInRange.size() > 1 )
+			&& dynarray_pair_size<std::pair<Entity*, real_t>>(players[player]->worldUI.tooltipsInRange) > 1 )
 		{
 			const DynamicString scaleBinding = input.binding("Minimap Scale");
             const DynamicString expandBinding = input.binding("Toggle Minimap");

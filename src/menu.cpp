@@ -6734,9 +6734,9 @@ void doNewGame(bool makeHighscore) {
 			players[i]->was_connected_to_game = true;
 		}
 		players[i]->hud.reset();
-		players[i]->hud.followerBars.clear();
-		players[i]->hud.playerBars.clear();
-		players[i]->worldUI.tooltipsInRange.clear(); // fix bug if multiplayer was ghost and host disconnect, then start new solo game
+		barony_dynamic_array_clear(&players[i]->hud.followerBars);
+		barony_dynamic_array_clear(&players[i]->hud.playerBars);
+		barony_dynamic_array_clear(&players[i]->worldUI.tooltipsInRange); // fix bug if multiplayer was ghost and host disconnect, then start new solo game
 		deinitShapeshiftHotbar(i);
 		for ( int c = 0; c < NUM_HOTBAR_ALTERNATES; ++c )
 		{
@@ -8235,9 +8235,9 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 		players[i]->inventoryUI.appraisal.timer = 0;
 		players[i]->inventoryUI.appraisal.current_item = 0;
 		players[i]->hud.reset();
-		players[i]->hud.followerBars.clear();
-		players[i]->hud.playerBars.clear();
-		players[i]->worldUI.tooltipsInRange.clear(); // fix bug if multiplayer was ghost and host disconnect, then start new solo game
+		barony_dynamic_array_clear(&players[i]->hud.followerBars);
+		barony_dynamic_array_clear(&players[i]->hud.playerBars);
+		barony_dynamic_array_clear(&players[i]->worldUI.tooltipsInRange); // fix bug if multiplayer was ghost and host disconnect, then start new solo game
 		deinitShapeshiftHotbar(i);
 		for ( c = 0; c < NUM_HOTBAR_ALTERNATES; ++c )
 		{

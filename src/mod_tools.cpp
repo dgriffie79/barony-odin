@@ -6587,8 +6587,9 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 		}
 		if ( owner == player && !compendiumTooltipIntro )
 		{
-			for ( auto& duck : players[player]->mechanics.ducksInARow )
+			for ( int64_t _dk = 0; _dk < dynarray_pair_size<std::pair<int, int>>(players[player]->mechanics.ducksInARow); ++_dk )
 			{
+				auto& duck = *dynarray_pair_at<std::pair<int, int>>(players[player]->mechanics.ducksInARow, _dk);
 				if ( duck.first == ((item.appearance % items[TOOL_DUCK].variations) / MAXPLAYERS) )
 				{
 					if ( duck.second >= 15 * 60 * TICKS_PER_SECOND )

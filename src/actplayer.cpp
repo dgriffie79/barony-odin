@@ -1193,7 +1193,7 @@ void Player::Ghost_t::handleActions()
 			showCalloutCommandsInputStr = _b.input;
 		}
 
-		if ( player.worldUI.bTooltipInView && player.worldUI.tooltipsInRange.size() > 1 )
+		if ( player.worldUI.bTooltipInView && dynarray_pair_size<std::pair<Entity*, real_t>>(player.worldUI.tooltipsInRange) > 1 )
 		{
 			if ( showCalloutCommandsOnGamepad &&
 				(showCalloutCommandsInputStr == input.binding("Interact Tooltip Next")
@@ -1353,7 +1353,7 @@ void Player::Ghost_t::handleActions()
 			lastNPCCommandInputStr = _b.input;
 		}
 
-		if ( players[player.playernum]->worldUI.bTooltipInView && players[player.playernum]->worldUI.tooltipsInRange.size() > 1 )
+		if ( players[player.playernum]->worldUI.bTooltipInView && dynarray_pair_size<std::pair<Entity*, real_t>>(players[player.playernum]->worldUI.tooltipsInRange) > 1 )
 		{
 			if ( showNPCCommandsOnGamepad &&
 				(showNPCCommandsInputStr == input.binding("Interact Tooltip Next")
@@ -2577,9 +2577,9 @@ void actDeathGhost(Entity* my)
 		{
 			int appearance = GHOSTCAM_PLAYERNUM;
 			cosmeticSprite = 2225;
-			if ( player->mechanics.ducksInARow.size() )
+			if ( dynarray_pair_size<std::pair<int, int>>(player->mechanics.ducksInARow) )
 			{
-				appearance = player->mechanics.ducksInARow.at(0).first;
+				appearance = dynarray_pair_at<std::pair<int, int>>(player->mechanics.ducksInARow, 0)->first;
 			}
 			if ( appearance == 0 )
 			{
@@ -7831,8 +7831,9 @@ void actPlayer(Entity* my)
 
 		if ( players[PLAYER_NUM]->isLocalPlayer() && PLAYER_ALIVETIME == 1 && currentlevel > 0 )
 		{
-			for ( auto duck : players[PLAYER_NUM]->mechanics.ducksInARow )
+			for ( int64_t _dk = 0; _dk < dynarray_pair_size<std::pair<int, int>>(players[PLAYER_NUM]->mechanics.ducksInARow); ++_dk )
 			{
+				auto duck = *dynarray_pair_at<std::pair<int, int>>(players[PLAYER_NUM]->mechanics.ducksInARow, _dk);
 				bool birdInHand = false;
 				for ( auto node = stats[PLAYER_NUM]->inventory.first; node; node = node->next )
 				{
@@ -7867,33 +7868,37 @@ void actPlayer(Entity* my)
 					}
 					else
 					{
-						players[PLAYER_NUM]->mechanics.pendingDucks.push_back(
-							std::make_pair(duck.first, ticks + (3 + (local_rng.rand() % 30)) * TICKS_PER_SECOND));
+						dynarray_pair_push<std::pair<int, Uint32>>(players[PLAYER_NUM]->mechanics.pendingDucks, std::make_pair(
+							duck.first, ticks + (3 + (local_rng.rand() % 30)) * TICKS_PER_SECOND));
 					}
 				}
 			}
 		}
 
-		if ( PLAYER_ALIVETIME > 300 && players[PLAYER_NUM]->mechanics.pendingDucks.size() )
+		if ( PLAYER_ALIVETIME > 300 && dynarray_pair_size<std::pair<int, Uint32>>(players[PLAYER_NUM]->mechanics.pendingDucks) )
 		{
-			for ( auto it = players[PLAYER_NUM]->mechanics.pendingDucks.begin(); it != players[PLAYER_NUM]->mechanics.pendingDucks.end(); )
+			for ( int64_t _pd = 0; _pd < dynarray_pair_size<std::pair<int, Uint32>>(players[PLAYER_NUM]->mechanics.pendingDucks); )
 			{
-				if ( ticks >= it->second )
+				auto& it = *dynarray_pair_at<std::pair<int, Uint32>>(players[PLAYER_NUM]->mechanics.pendingDucks, _pd);
+				if ( ticks >= it.second )
 				{
 					int dirx = local_rng.rand() % 2;
 					int diry = local_rng.rand() % 2;
 					int mapx = dirx ? 1 : map.width - 2;
 					int mapy = diry ? 1 : map.height - 2;
 
-					int appearance = it->first * MAXPLAYERS + PLAYER_NUM;
+					int appearance = it.first * MAXPLAYERS + PLAYER_NUM;
 					Item* duckItem = newItem(TOOL_DUCK, EXCELLENT, 0, 1, appearance, true, nullptr);
 					duckItem->applyDuck(0, mapx * 16 + 8.0, mapy * 16 + 8.0, nullptr, true);
 					free(duckItem);
-					it = players[PLAYER_NUM]->mechanics.pendingDucks.erase(it);
+					auto& _pdArr = players[PLAYER_NUM]->mechanics.pendingDucks;
+					for ( int64_t _k = _pd; _k < dynarray_pair_size<std::pair<int, Uint32>>(_pdArr) - 1; ++_k )
+						(*dynarray_pair_at<std::pair<int, Uint32>>(_pdArr, _k)) = (*dynarray_pair_at<std::pair<int, Uint32>>(_pdArr, _k + 1));
+					_pdArr.len -= (int64_t)sizeof(std::pair<int, Uint32>);
 				}
 				else
 				{
-					++it;
+					++_pd;
 				}
 			}
 		}
@@ -8156,8 +8161,9 @@ void actPlayer(Entity* my)
 			{
 				if ( stats[PLAYER_NUM]->shield->getDuckPlayer() == PLAYER_NUM )
 				{
-					for ( auto& duck : players[PLAYER_NUM]->mechanics.ducksInARow )
+					for ( int64_t _dk = 0; _dk < dynarray_pair_size<std::pair<int, int>>(players[PLAYER_NUM]->mechanics.ducksInARow); ++_dk )
 					{
+						auto& duck = *dynarray_pair_at<std::pair<int, int>>(players[PLAYER_NUM]->mechanics.ducksInARow, _dk);
 						if ( duck.first == ((stats[PLAYER_NUM]->shield->appearance % items[TOOL_DUCK].variations) / MAXPLAYERS) )
 						{
 							duck.second++;
@@ -10006,7 +10012,7 @@ void actPlayer(Entity* my)
 					showCalloutCommandsInputStr = _b.input;
 				}
 
-				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && players[PLAYER_NUM]->worldUI.tooltipsInRange.size() > 1 )
+				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && dynarray_pair_size<std::pair<Entity*, real_t>>(players[PLAYER_NUM]->worldUI.tooltipsInRange) > 1 )
 				{
 					if ( showCalloutCommandsOnGamepad &&
 						(showCalloutCommandsInputStr == input.binding("Interact Tooltip Next")
@@ -10169,7 +10175,7 @@ void actPlayer(Entity* my)
 					lastNPCCommandInputStr = _b.input;
 				}
 				
-				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && players[PLAYER_NUM]->worldUI.tooltipsInRange.size() > 1 )
+				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && dynarray_pair_size<std::pair<Entity*, real_t>>(players[PLAYER_NUM]->worldUI.tooltipsInRange) > 1 )
 				{
 					if ( showNPCCommandsOnGamepad &&
 						(showNPCCommandsInputStr == input.binding("Interact Tooltip Next")
