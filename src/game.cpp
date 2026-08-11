@@ -2229,7 +2229,7 @@ void gameLogic(void)
 					// clear follower menu entities.
 					for ( int i = 0; i < MAXPLAYERS; ++i )
 					{
-						minimapPings[i].clear(); // clear minimap pings
+						barony_dynamic_array_clear(&minimapPings[i]); // clear minimap pings
 						if ( players[i]->isLocalPlayer() )
 						{
 							FollowerMenu[i].closeFollowerMenuGUI(true);

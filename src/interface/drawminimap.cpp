@@ -33,7 +33,7 @@
 -------------------------------------------------------------------------------*/
 
 Uint32 minotaur_timer = 0;
-std::vector<MinimapPing> minimapPings[MAXPLAYERS];
+DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
 int minimapPingGimpTimer[MAXPLAYERS] = { 0 };
 Uint32 lastMapTick = 0;
 SDL_Rect minimaps[MAXPLAYERS];
@@ -891,14 +891,14 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 	lastMapTick = ticks;
 
 	// draw player pings
-	if ( !minimapPings[player].empty() )
+	if ( dynarray_size<MinimapPing>(minimapPings[player]) > 0 )
 	{
 	    int minimapTotalScale = minimapScale;
 		const int DEFAULT_PING_TIME = TICKS_PER_SECOND * 2.5;
 		const int DEATH_PING_TIME = TICKS_PER_SECOND * 9.5;
-		for ( std::vector<MinimapPing>::iterator it = minimapPings[player].begin(); it != minimapPings[player].end();)
+		for ( int64_t _mp = 0; _mp < dynarray_size<MinimapPing>(minimapPings[player]); )
 		{
-			MinimapPing ping = *it;
+			MinimapPing ping = *dynarray_at<MinimapPing>(minimapPings[player], _mp);
 
 			int aliveTime = ticks - ping.tickStart;
 			if ( (aliveTime < TICKS_PER_SECOND * DEFAULT_PING_TIME && ping.pingType == MinimapPing::PING_DEFAULT)
@@ -965,11 +965,16 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 						}
 					}
 				}
-				it = minimapPings[player].erase(it);
+				{
+				auto& _mparr = minimapPings[player];
+				for ( int64_t _k = _mp; _k < dynarray_size<MinimapPing>(_mparr) - 1; ++_k )
+					(*dynarray_at<MinimapPing>(_mparr, _k)) = (*dynarray_at<MinimapPing>(_mparr, _k + 1));
+				_mparr.len -= (int64_t)sizeof(MinimapPing);
+			}
 			}
 			else
 			{
-				++it;
+				++_mp;
 			}
 		}
 	}
@@ -1298,12 +1303,12 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 		return;
 	}
 
-	if ( !minimapPings[destPlayer].empty() )
+	if ( dynarray_size<MinimapPing>(minimapPings[destPlayer]) > 0 )
 	{
 		int numPlayerPings = 0;
-		for ( std::vector<MinimapPing>::iterator it = minimapPings[destPlayer].begin(); it != minimapPings[destPlayer].end();)
+		for ( int64_t _mp = 0; _mp < dynarray_size<MinimapPing>(minimapPings[destPlayer]); )
 		{
-			MinimapPing ping = *it;
+			MinimapPing ping = *dynarray_at<MinimapPing>(minimapPings[destPlayer], _mp);
 			if ( ping.player == newPing.player && !newPing.radiusPing && newPing.pingType == MinimapPing::PING_DEFAULT )
 			{
 				++numPlayerPings;
@@ -1315,11 +1320,16 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 						// this is the player creating the sound source.
 						minimapPingGimpTimer[srcPlayer] = TICKS_PER_SECOND * 2; // 2 second penalty for spam.
 					}
-					it = minimapPings[destPlayer].erase(it);
+					{
+				auto& _mparr = minimapPings[destPlayer];
+				for ( int64_t _k = _mp; _k < dynarray_size<MinimapPing>(_mparr) - 1; ++_k )
+					(*dynarray_at<MinimapPing>(_mparr, _k)) = (*dynarray_at<MinimapPing>(_mparr, _k + 1));
+				_mparr.len -= (int64_t)sizeof(MinimapPing);
+			}
 					continue;
 				}
 			}
-			++it;
+			++_mp;
 		}
 	}
 	if ( !minimapPingMute && !newPing.radiusPing && newPing.pingType == MinimapPing::PING_DEFAULT )
@@ -1333,7 +1343,13 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 			playSound(399, 64); 
 		}
 	}
-	minimapPings[destPlayer].insert(minimapPings[destPlayer].begin(), newPing);
+	minimapPings[destPlayer].len += (int64_t)sizeof(MinimapPing);
+	{
+		auto& _mpa = minimapPings[destPlayer];
+		for ( int64_t _k = dynarray_size<MinimapPing>(_mpa) - 1; _k > 0; --_k )
+			(*dynarray_at<MinimapPing>(_mpa, _k)) = (*dynarray_at<MinimapPing>(_mpa, _k - 1));
+		*dynarray_at<MinimapPing>(_mpa, 0) = newPing;
+	}
 }
 
 static ConsoleVariable<float> cvar_shrine_reveal_steps("/shrine_reveal_steps", 8.0);

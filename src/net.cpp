@@ -2341,7 +2341,7 @@ static void changeLevel() {
 
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		minimapPings[i].clear(); // clear minimap pings
+		barony_dynamic_array_clear(&minimapPings[i]); // clear minimap pings
         auto& camera = players[i]->camera();
         camera.globalLightModifierActive = GLOBAL_LIGHT_MODIFIER_STOPPED;
         camera.luminance = defaultLuminance;

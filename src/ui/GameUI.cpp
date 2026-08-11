@@ -27002,7 +27002,7 @@ void loadHUDSettingsJSON()
 					}
 					if ( d["enemy_hp_bars"].HasMember("monster_bar_width_to_hp_intervals") )
 					{
-						EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters.clear();
+						barony_dynamic_array_clear(&EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters);
 						for ( rapidjson::Value::ConstValueIterator itr = d["enemy_hp_bars"]["monster_bar_width_to_hp_intervals"].Begin();
 							itr != d["enemy_hp_bars"]["monster_bar_width_to_hp_intervals"].End(); ++itr )
 						{
@@ -27017,13 +27017,13 @@ void loadHUDSettingsJSON()
 							real_t widthPercent = widthPercentMember->value.GetInt();
 							widthPercent /= 100.0;
 							int hpThreshold = hpThresholdMember->value.GetInt();
-							EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters.push_back(
+							dynarray_pair_push<std::pair<real_t, int>>(EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters,
 								std::make_pair(widthPercent, hpThreshold));
 						}
 					}
 					if ( d["enemy_hp_bars"].HasMember("furniture_bar_width_to_hp_intervals") )
 					{
-						EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture.clear();
+						barony_dynamic_array_clear(&EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture);
 						for ( rapidjson::Value::ConstValueIterator itr = d["enemy_hp_bars"]["furniture_bar_width_to_hp_intervals"].Begin();
 							itr != d["enemy_hp_bars"]["furniture_bar_width_to_hp_intervals"].End(); ++itr )
 						{
@@ -27038,7 +27038,7 @@ void loadHUDSettingsJSON()
 							real_t widthPercent = widthPercentMember->value.GetInt();
 							widthPercent /= 100.0;
 							int hpThreshold = hpThresholdMember->value.GetInt();
-							EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture.push_back(
+							dynarray_pair_push<std::pair<real_t, int>>(EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture,
 								std::make_pair(widthPercent, hpThreshold));
 						}
 					}
@@ -32784,7 +32784,7 @@ void Player::HUD_t::updateEnemyBar2(Frame* whichFrame, void* enemyHPDetails)
 
 	// handle bar size changing
 	{
-		std::vector<std::pair<real_t, int>> widthHealthBreakpoints;
+		DynamicArray widthHealthBreakpoints;  // vector<pair<real_t,int>>
 		if ( enemyDetails->barType == EnemyHPDamageBarHandler::BAR_TYPE_CREATURE )
 		{
 			widthHealthBreakpoints = EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters;
@@ -32793,32 +32793,33 @@ void Player::HUD_t::updateEnemyBar2(Frame* whichFrame, void* enemyHPDetails)
 		{
 			widthHealthBreakpoints = EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture;
 		}
-		if ( widthHealthBreakpoints.empty() ) // width %, then HP value
+		if ( dynarray_pair_size<std::pair<real_t, int>>(widthHealthBreakpoints) == 0 ) // width %, then HP value
 		{
 			// build some defaults
-			widthHealthBreakpoints.push_back(std::make_pair(0.5, 10));
-			widthHealthBreakpoints.push_back(std::make_pair(0.60, 20));
-			widthHealthBreakpoints.push_back(std::make_pair(0.70, 50));
-			widthHealthBreakpoints.push_back(std::make_pair(0.80, 100));
-			widthHealthBreakpoints.push_back(std::make_pair(0.90, 250));
-			widthHealthBreakpoints.push_back(std::make_pair(1.00, 1000));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.5, 10));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.60, 20));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.70, 50));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.80, 100));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.90, 250));
+			dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(1.00, 1000));
 		}
 
 		enemyDetails->animator.widthMultiplier = 1.0;
-		auto prevIt = widthHealthBreakpoints.end();
+		int64_t prevIt = -1;
 		bool foundBreakpoint = false;
-		for ( auto it = widthHealthBreakpoints.begin(); it != widthHealthBreakpoints.end(); ++it )
+		for ( int64_t _wb = 0; _wb < dynarray_pair_size<std::pair<real_t, int>>(widthHealthBreakpoints); ++_wb )
 		{
-			int healthThreshold = (*it).second;
-			real_t widthEntry = (*it).first;
+			auto& it = *dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, _wb);
+			int healthThreshold = it.second;
+			real_t widthEntry = it.first;
 			if ( (int)enemyDetails->animator.maxValue <= healthThreshold )
 			{
 				real_t width = 0.0;
-				if ( prevIt != widthHealthBreakpoints.end() )
+				if ( prevIt >= 0 )
 				{
-					width = (*prevIt).first;
+					width = dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->first;
 					// get linear scaled value between the breakponts
-					width += (widthEntry - (*prevIt).first) * ((int)enemyDetails->animator.maxValue - (*prevIt).second) / ((*it).second - (*prevIt).second);
+					width += (widthEntry - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->first) * ((int)enemyDetails->animator.maxValue - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->second) / (it.second - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->second);
 				}
 				else
 				{
@@ -32829,11 +32830,11 @@ void Player::HUD_t::updateEnemyBar2(Frame* whichFrame, void* enemyHPDetails)
 				foundBreakpoint = true;
 				break;
 			}
-			prevIt = it;
+			prevIt = _wb;
 		}
 		if ( !foundBreakpoint )
 		{
-			enemyDetails->animator.widthMultiplier = widthHealthBreakpoints[widthHealthBreakpoints.size() - 1].first;
+			enemyDetails->animator.widthMultiplier = dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, dynarray_pair_size<std::pair<real_t, int>>(widthHealthBreakpoints) - 1)->first;
 		}
 
 		real_t multiplier = enemyDetails->animator.widthMultiplier;
@@ -33244,29 +33245,30 @@ void Player::HUD_t::updateEnemyBar(Frame* whichFrame)
 
 	// handle bar size changing
 	{
-		std::vector<std::pair<real_t, int>>widthHealthBreakpoints; // width %, then HP value
-		widthHealthBreakpoints.push_back(std::make_pair(0.5, 10));
-		widthHealthBreakpoints.push_back(std::make_pair(0.60, 20));
-		widthHealthBreakpoints.push_back(std::make_pair(0.70, 50));
-		widthHealthBreakpoints.push_back(std::make_pair(0.80, 100));
-		widthHealthBreakpoints.push_back(std::make_pair(0.90, 250));
-		widthHealthBreakpoints.push_back(std::make_pair(1.00, 1000));
+		DynamicArray widthHealthBreakpoints;  // vector<pair<real_t,int>>
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.5, 10));
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.60, 20));
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.70, 50));
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.80, 100));
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(0.90, 250));
+		dynarray_pair_push<std::pair<real_t, int>>(widthHealthBreakpoints, std::make_pair(1.00, 1000));
 
 		enemyBar->widthMultiplier = 1.0;
-		auto prevIt = widthHealthBreakpoints.end();
+		int64_t prevIt = -1;
 		bool foundBreakpoint = false;
-		for ( auto it = widthHealthBreakpoints.begin(); it != widthHealthBreakpoints.end(); ++it )
+		for ( int64_t _wb = 0; _wb < dynarray_pair_size<std::pair<real_t, int>>(widthHealthBreakpoints); ++_wb )
 		{
-			int healthThreshold = (*it).second;
-			real_t widthEntry = (*it).first;
+			auto& it = *dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, _wb);
+			int healthThreshold = it.second;
+			real_t widthEntry = it.first;
 			if ( (int)enemyBar->maxValue <= healthThreshold )
 			{
 				real_t width = 0.0;
-				if ( prevIt != widthHealthBreakpoints.end() )
+				if ( prevIt >= 0 )
 				{
-					width = (*prevIt).first;
+					width = dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->first;
 					// get linear scaled value between the breakponts
-					width += (widthEntry - (*prevIt).first) * ((int)enemyBar->maxValue - (*prevIt).second) / ((*it).second - (*prevIt).second);
+					width += (widthEntry - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->first) * ((int)enemyBar->maxValue - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->second) / (it.second - dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, prevIt)->second);
 				}
 				else
 				{
@@ -33277,11 +33279,11 @@ void Player::HUD_t::updateEnemyBar(Frame* whichFrame)
 				foundBreakpoint = true;
 				break;
 			}
-			prevIt = it;
+			prevIt = _wb;
 		}
 		if ( !foundBreakpoint )
 		{
-			enemyBar->widthMultiplier = widthHealthBreakpoints[widthHealthBreakpoints.size() - 1].first;
+			enemyBar->widthMultiplier = dynarray_pair_at<std::pair<real_t, int>>(widthHealthBreakpoints, dynarray_pair_size<std::pair<real_t, int>>(widthHealthBreakpoints) - 1)->first;
 		}
 
 		real_t multiplier = enemyBar->widthMultiplier;
@@ -42387,8 +42389,9 @@ void handleDamageIndicatorTicks()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		for ( auto& ind : DamageIndicatorHandler.indicators[i] )
+		for ( int64_t _di = 0; _di < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(DamageIndicatorHandler.indicators[i]); ++_di )
 		{
+			auto& ind = *dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(DamageIndicatorHandler.indicators[i], _di);
 			if ( ind.ticks > 0 )
 			{
 				--ind.ticks;
@@ -42401,33 +42404,43 @@ void DamageIndicatorHandler_t::update()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		for ( auto it = indicators[i].begin(); it != indicators[i].end(); )
+		for ( int64_t _di = 0; _di < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[i]); )
 		{
-			it->process();
-			if ( it->expired )
+			auto& it = *dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[i], _di);
+			it.process();
+			if ( it.expired )
 			{
-				it = indicators[i].erase(it);
+				auto& _darr = indicators[i];
+				for ( int64_t _k = _di; _k < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(_darr) - 1; ++_k )
+					(*dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(_darr, _k)) = (*dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(_darr, _k + 1));
+				_darr.len -= (int64_t)sizeof(DamageIndicatorHandler_t::DamageIndicator_t);
 			}
 			else
 			{
-				++it;
+				++_di;
 			}
 		}
 	}
 }
 void DamageIndicatorHandler_t::insert(const int player, const real_t _x, const real_t _y, const bool damaged)
 {
-	for ( auto it = indicators[player].begin(); it != indicators[player].end(); ++it )
+	for ( int64_t _di = 0; _di < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player]); ++_di )
 	{
-		if ( !it->expired && it->x == _x && it->y == _y && it->hitDealtDamage == damaged )
+		auto& it = *dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player], _di);
+		if ( !it.expired && it.x == _x && it.y == _y && it.hitDealtDamage == damaged )
 		{
 			// matching, delete this one
-			indicators[player].erase(it);
+			{
+				auto& _darr = indicators[player];
+				for ( int64_t _k = _di; _k < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(_darr) - 1; ++_k )
+					(*dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(_darr, _k)) = (*dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(_darr, _k + 1));
+				_darr.len -= (int64_t)sizeof(DamageIndicatorHandler_t::DamageIndicator_t);
+			}
 			break;
 		}
 	}
-	indicators[player].push_back(DamageIndicator_t(player));
-	auto& i = indicators[player].at(indicators[player].size() - 1);
+	dynarray_push<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player], DamageIndicatorHandler_t::DamageIndicator_t(player));
+	auto& i = *dynarray_at<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player], dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player]) - 1);
 	i.alpha = 255.0;
 	i.ticks = damageIndicatorSettings.deleteAfterTicks;
 	i.x = _x;

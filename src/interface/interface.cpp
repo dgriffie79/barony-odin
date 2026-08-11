@@ -211,8 +211,8 @@ int EnemyHPDamageBarHandler::maxTickLifetime = 120;
 int EnemyHPDamageBarHandler::maxTickFurnitureLifetime = 60;
 int EnemyHPDamageBarHandler::shortDistanceHPBarFadeTicks = TICKS_PER_SECOND / 2;
 real_t EnemyHPDamageBarHandler::shortDistanceHPBarFadeDistance = 1.0;
-std::vector<std::pair<real_t, int>> EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters;
-std::vector<std::pair<real_t, int>> EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture;
+DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters;  // vector<pair<real_t,int>>
+DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture;  // vector<pair<real_t,int>>
 
 std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImages =
 {

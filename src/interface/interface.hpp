@@ -48,7 +48,7 @@ struct DamageIndicatorHandler_t
 	};
 	void update();
 	void insert(const int player, const real_t _x, const real_t _y, const bool damaged);
-	std::vector<DamageIndicator_t> indicators[MAXPLAYERS];
+	DynamicArray indicators[MAXPLAYERS];  // vector<DamageIndicator_t> (POD)
 };
 extern DamageIndicatorHandler_t DamageIndicatorHandler;
 
@@ -95,8 +95,8 @@ public:
 	static bool bEnemyBarSimpleBlit;
 	static std::map<int, std::vector<int>> damageGibAnimCurves;
 	static void dumpCache();
-	static std::vector<std::pair<real_t, int>>widthHealthBreakpointsMonsters;
-	static std::vector<std::pair<real_t, int>>widthHealthBreakpointsFurniture;
+	static DynamicArray widthHealthBreakpointsMonsters;  // vector<pair<real_t,int>> (POD)
+	static DynamicArray widthHealthBreakpointsFurniture;  // vector<pair<real_t,int>> (POD)
 	enum HPBarType {
 		BAR_TYPE_CREATURE,
 		BAR_TYPE_FURNITURE
@@ -848,7 +848,7 @@ public:
 
 		AssistShrineView_t currentView = ASSIST_SHRINE_VIEW_ITEMS;
 		std::map<int, int> classSlots;
-		std::vector<int> raceSlots;
+		DynamicArrayS32 raceSlots;
 		int selectedClass = -1;
 		int selectedRace = -1;
 		int selectedSex = -1;
@@ -1592,7 +1592,7 @@ public:
 		pingType(pingType) {}
 };
 
-extern std::vector<MinimapPing> minimapPings[MAXPLAYERS];
+extern DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
 void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPing);
 extern int minimapPingGimpTimer[MAXPLAYERS];
 extern SDL_Rect minimaps[MAXPLAYERS];
