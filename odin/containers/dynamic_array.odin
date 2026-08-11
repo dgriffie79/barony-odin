@@ -197,6 +197,7 @@ Kind_TmpItem         :: 12
 Kind_MapGeneration   :: 13
 Kind_HotbarEntry     :: 14
 Kind_HotbarEntryArray :: 15
+Kind_DynArrayStrArray :: 16
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -771,6 +772,14 @@ hotbar_entry_array_free :: proc(p: rawptr) {
 }
 hotbar_entry_array_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(HotbarEntry_t), Kind_HotbarEntry)
+}
+
+// "array of DynamicArrayStr" element ops (for nested pages)
+dynarrstr_array_free :: proc(p: rawptr) {
+	barony_dynamic_array_elem_destroy((^Raw_Dynamic_Array)(p), size_of(DynamicString), Kind_DynamicString)
+}
+dynarrstr_array_copy :: proc(dst: rawptr, src: rawptr) {
+	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(DynamicString), Kind_DynamicString)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

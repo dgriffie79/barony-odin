@@ -3612,7 +3612,7 @@ struct Compendium_t
 
 		struct CompendiumAchievementsDisplay
 		{
-			std::vector<std::vector<DynamicString>> pages;
+			DynamicArrayT<DynamicArrayStr> pages;
 			int currentPage = 0;
 			int numHidden = 0;
 		};
@@ -4345,6 +4345,8 @@ struct Compendium_t
 		static bool previousSecretlevel;
 	};
 };
+
+template <> struct DynamicArrayKindOf<DynamicArrayT<DynamicArrayStr>> { static constexpr int value = Kind_DynArrayStrArray; };
 template <> struct DynamicArrayKindOf<Compendium_t::CompendiumItems_t::Codex_t::CodexItem_t> { static constexpr int value = Kind_CodexItem; };
 
 

@@ -1034,7 +1034,7 @@ void sortAchievementsForDisplay()
 		auto& achDisplay = Compendium_t::AchievementData_t::achievementsBookDisplay[entry.first];
 		if ( entry.second.size() > 0 )
 		{
-			achDisplay.pages.push_back(std::vector<DynamicString>());
+			achDisplay.pages.push_back(DynamicArrayStr());
 		}
 		int numEntries = 0;
 		bool foundHidden = false;
@@ -1064,7 +1064,7 @@ void sortAchievementsForDisplay()
 			++numEntries;
 			if ( numEntries > 1 && ((numEntries - 1) % 8 == 0) )
 			{
-				achDisplay.pages.push_back(std::vector<DynamicString>());
+				achDisplay.pages.push_back(DynamicArrayStr());
 			}
 			auto& list = achDisplay.pages.back();
 			list.push_back(name.first);
