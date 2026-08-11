@@ -26,6 +26,14 @@ Raw_Dynamic_Array :: struct {
 	allocator: mem.Allocator,
 }
 
+// 32 bytes on x64 — mirrors Odin's native map header (C++ Raw_Map).
+// Only used as an opaque slot inside owning structs (attributes map).
+Raw_Map :: struct {
+	data:      rawptr,
+	len:       int,
+	allocator: mem.Allocator,
+}
+
 @(export)
 barony_dynamic_array_init :: proc "c" (arr: ^Raw_Dynamic_Array) {
 	arr^ = Raw_Dynamic_Array{}
@@ -185,6 +193,8 @@ Kind_ShopkeeperItem  :: 8
 Kind_VariantPair     :: 9
 Kind_MonsterCurveEntry :: 10
 Kind_LevelCurve      :: 11
+Kind_TmpItem         :: 12
+Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
 dynamic_string_free_elem :: proc(p: rawptr) {
@@ -591,6 +601,86 @@ level_curve_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 	barony_dynamic_array_elem_copy(&d.monsterCurve, &s.monsterCurve, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
 	barony_dynamic_array_elem_copy(&d.fixedSpawns, &s.fixedSpawns, size_of(MonsterCurveEntry_t), Kind_MonsterCurveEntry)
+}
+
+// ---------------------------------------------------------------------------
+// TmpItem_t (ItemTooltips data table) — owns strings + array + map
+// ---------------------------------------------------------------------------
+TmpItem_t :: struct {
+	internalName:  DynamicString,
+	itemId:        i32,
+	fpIndex:       i32,
+	tpIndex:       i32,
+	tpShortIndex:  i32,
+	gold:          i32,
+	weight:        i32,
+	itemLevel:     i32,
+	category:      DynamicString,
+	equipSlot:     DynamicString,
+	imagePaths:    Raw_Dynamic_Array,   // DynamicArrayStr
+	attributes:    Raw_Map,             // map[string]i32
+	tooltip:       DynamicString,
+	iconLabelPath: DynamicString,
+}
+
+tmp_item_free :: proc(p: rawptr) {
+	v := (^TmpItem_t)(p)
+	fields := [?]^DynamicString{ &v.internalName, &v.category, &v.equipSlot, &v.tooltip, &v.iconLabelPath }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+	barony_dynamic_array_elem_destroy(&v.imagePaths, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_map_str_destroy(&v.attributes, Kind_I32Map)
+}
+
+tmp_item_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^TmpItem_t)(dst)
+	s := (^TmpItem_t)(src)
+	d.itemId = s.itemId
+	d.fpIndex = s.fpIndex
+	d.tpIndex = s.tpIndex
+	d.tpShortIndex = s.tpShortIndex
+	d.gold = s.gold
+	d.weight = s.weight
+	d.itemLevel = s.itemLevel
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.internalName, &s.internalName },
+		{ &d.category, &s.category },
+		{ &d.equipSlot, &s.equipSlot },
+		{ &d.tooltip, &s.tooltip },
+		{ &d.iconLabelPath, &s.iconLabelPath },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	barony_dynamic_array_elem_copy(&d.imagePaths, &s.imagePaths, size_of(DynamicString), Kind_DynamicString)
+	if d.attributes.data != nil {
+		barony_dynamic_map_str_destroy(&d.attributes, 0)
+	}
+	if s.attributes.data != nil {
+		barony_dynamic_map_str_init(&d.attributes, 0)
+		key_ptrs: [256]rawptr
+		key_lens: [256]i32
+		val_ptrs: [256]i32
+		n := barony_dynamic_map_str_entries(&s.attributes, &key_ptrs[0], &key_lens[0], &val_ptrs[0], 256, 0)
+		for i in 0..<int(n) {
+			key_str := string(([^]u8)(key_ptrs[i])[:key_lens[i]])
+			barony_dynamic_map_str_put(&d.attributes, key_str, &val_ptrs[i], 0)
+		}
+	}
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

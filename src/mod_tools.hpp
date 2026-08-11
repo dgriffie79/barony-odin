@@ -2776,7 +2776,7 @@ class ItemTooltips_t
 		DynamicArrayStr imagePaths;
 		DynamicMapI32 attributes;
 		DynamicString tooltip = "tooltip_default";
-		std::string iconLabelPath = "";
+		DynamicString iconLabelPath = "";
 	};
 
 public:
@@ -2899,7 +2899,7 @@ public:
 	void readItemLocalizationsFromFile(bool forceLoadBaseDirectory = false);
 	void readTooltipsFromFile(bool forceLoadBaseDirectory = false);
 	void readBookLocalizationsFromFile(bool forceLoadBaseDirectory = false);
-	std::vector<tmpItem_t> tmpItems;
+	DynamicArrayT<tmpItem_t> tmpItems;
 	std::map<Sint32, spellItem_t> spellItems;
 	std::map<std::string, ItemTooltip_t> tooltips;
 	std::map<std::string, std::map<std::string, std::string>> adjectives;
@@ -2912,28 +2912,28 @@ public:
 	DynamicMapStr spellNameLocalizations;
 	DynamicMapI32 itemNameStringToItemID;
 	DynamicMapI32 spellNameStringToSpellID;
-	std::string defaultString = "";
+	DynamicString defaultString = "";
 	char buf[2048];
 	bool autoReload = false;
 	bool itemDebug = false;
-	std::string& getItemStatusAdjective(Uint32 itemType, Status status);
-	std::string& getItemBeatitudeAdjective(Sint16 beatitude);
-	std::string& getItemPotionAlchemyAdjective(const int player, Uint32 itemType);
-	std::string& getItemPotionHarmAllyAdjective(Item& item);
-	std::string& getItemProficiencyName(int proficiency);
-	std::string& getItemSlotName(ItemEquippableSlot slotname);
-	std::string& getItemStatShortName(const char* attribute);
-	std::string& getItemStatFullName(const char* attribute);
-	std::string& getItemEquipmentEffectsForIconText(std::string& attribute);
-	std::string& getItemEquipmentEffectsForAttributesText(std::string& attribute);
-	std::string& getProficiencyLevelName(Sint32 proficiencyLevel);
-	std::string& getIconLabel(Item& item);
+	const DynamicString& getItemStatusAdjective(Uint32 itemType, Status status);
+	const DynamicString& getItemBeatitudeAdjective(Sint16 beatitude);
+	const DynamicString& getItemPotionAlchemyAdjective(const int player, Uint32 itemType);
+	const DynamicString& getItemPotionHarmAllyAdjective(Item& item);
+	const DynamicString& getItemProficiencyName(int proficiency);
+	const DynamicString& getItemSlotName(ItemEquippableSlot slotname);
+	const DynamicString& getItemStatShortName(const char* attribute);
+	const DynamicString& getItemStatFullName(const char* attribute);
+	const DynamicString& getItemEquipmentEffectsForIconText(std::string& attribute);
+	const DynamicString& getItemEquipmentEffectsForAttributesText(std::string& attribute);
+	const DynamicString& getProficiencyLevelName(Sint32 proficiencyLevel);
+	const char* getIconLabel(Item& item);
 	std::string getSpellIconText(const int player, Item& item, const bool excludePlayerStats);
 	std::string getSpellIconFormatText(const int player, Item& item, std::string& format, const spell_t* spell, const int iconIndex, const bool compendiumTooltipIntro);
 	std::string getSpellDescriptionText(const int player, Item& item);
 	std::string getSpellIconPath(const int player, Item& item, int spellID);
 	std::string getCostOfSpellString(const int player, Item& item);
-	std::string& getSpellTypeString(const int player, Item& item);
+	const DynamicString& getSpellTypeString(const int player, Item& item);
 	node_t* getSpellNodeFromSpellID(int spellID);
 	real_t getSpellSustainCostPerSecond(int spellID);
 	int getSpellDamageOrHealAmount(const int player, spell_t* spell, Item* spellbook, const bool excludePlayerStats);
@@ -2955,6 +2955,8 @@ public:
 	void getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
 		std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
 };
+template <> struct DynamicArrayKindOf<ItemTooltips_t::tmpItem_t> { static constexpr int value = Kind_TmpItem; };
+
 extern ItemTooltips_t ItemTooltips;
 
 class StatueManager_t

@@ -2075,7 +2075,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
-std::string& ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status status)
+const DynamicString& ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status status)
 {
 	if ( itemType >= ARTIFACT_ORB_BLUE && itemType <= ARTIFACT_ORB_GREEN )
 	{
@@ -2280,7 +2280,7 @@ std::string& ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status stat
 	return defaultString;
 }
 
-std::string& ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
+const DynamicString& ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 {
 	if ( adjectives.find("beatitude_status") == adjectives.end() )
 	{
@@ -2301,7 +2301,7 @@ std::string& ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 	}
 }
 
-std::string& ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
+const DynamicString& ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
 {
 	if ( adjectives.find("proficiency_levels") == adjectives.end() )
 	{
@@ -2486,11 +2486,11 @@ std::string ItemTooltips_t::getSpellDescriptionText(const int player, Item& item
 #endif
 }
 
-std::string& ItemTooltips_t::getIconLabel(Item& item)
+const char* ItemTooltips_t::getIconLabel(Item& item)
 {
 #ifndef EDITOR
-	if ( item.type == SPELL_ITEM && !item.spellNotifyIcon ) { return defaultString; }
-	return tmpItems[item.type].iconLabelPath;
+	if ( item.type == SPELL_ITEM && !item.spellNotifyIcon ) { return defaultString.c_str(); }
+	return tmpItems[item.type].iconLabelPath.c_str();
 #endif
 }
 
@@ -2919,7 +2919,7 @@ real_t ItemTooltips_t::getSpellSustainCostPerSecond(int spellID)
 	return cost;
 }
 
-std::string& ItemTooltips_t::getSpellTypeString(const int player, Item& item)
+const DynamicString& ItemTooltips_t::getSpellTypeString(const int player, Item& item)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3177,7 +3177,7 @@ std::string ItemTooltips_t::getSpellIconPath(const int player, Item& item, int s
 #endif
 }
 
-std::string& ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uint32 itemType)
+const DynamicString& ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uint32 itemType)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3205,7 +3205,7 @@ std::string& ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uin
 #endif
 }
 
-std::string& ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
+const DynamicString& ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3227,7 +3227,7 @@ std::string& ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 #endif
 }
 
-std::string& ItemTooltips_t::getItemProficiencyName(int proficiency)
+const DynamicString& ItemTooltips_t::getItemProficiencyName(int proficiency)
 {
 	if ( adjectives.find("proficiency_types") == adjectives.end() )
 	{
@@ -3257,7 +3257,7 @@ std::string& ItemTooltips_t::getItemProficiencyName(int proficiency)
 	}
 }
 
-std::string& ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
+const DynamicString& ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
 {
 	switch ( slotname )
 	{
@@ -3287,7 +3287,7 @@ std::string& ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
 	return adjectives["equipment_slot_types"]["unknown"];
 }
 
-std::string& ItemTooltips_t::getItemStatShortName(const char* attr)
+const DynamicString& ItemTooltips_t::getItemStatShortName(const char* attr)
 {
     const std::string attribute = attr;
 	if ( attribute == "STR" )
@@ -3321,7 +3321,7 @@ std::string& ItemTooltips_t::getItemStatShortName(const char* attr)
 	return defaultString;
 }
 
-std::string& ItemTooltips_t::getItemStatFullName(const char* attr)
+const DynamicString& ItemTooltips_t::getItemStatFullName(const char* attr)
 {
     const std::string attribute = attr;
 	if ( attribute == "STR" )
@@ -3355,7 +3355,7 @@ std::string& ItemTooltips_t::getItemStatFullName(const char* attr)
 	return defaultString;
 }
 
-std::string& ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& attribute)
+const DynamicString& ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_icon_text"].find(attribute) != adjectives["equipment_effects_icon_text"].end() )
 	{
@@ -3364,7 +3364,7 @@ std::string& ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& att
 	return defaultString;
 }
 
-std::string& ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::string& attribute)
+const DynamicString& ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_attributes_text"].find(attribute) != adjectives["equipment_effects_attributes_text"].end() )
 	{
