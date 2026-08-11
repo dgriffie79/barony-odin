@@ -3383,22 +3383,10 @@ struct EditorEntityData_t
 			return 0;
 		}
 	};
-	struct ColliderDmgProperties_t
-	{
-		bool burnable = false;
-		bool minotaurPathThroughAndBreak = false;
-		bool meleeAffects = false;
-		bool magicAffects = false;
-		bool bombsAttach = false;
-		bool boulderDestroys = false;
-		bool showAsWallOnMinimap = false;
-		bool allowNPCPathing = false;
-		DynamicSetI32 proficiencyBonusDamage;
-		DynamicSetI32 proficiencyResistDamage;
-	};
+	typedef ColliderDmgProperties_tMirror ColliderDmgProperties_t;
 	static const int COLLIDER_COLLISION_FLAG_MINO = 2;
 	static const int COLLIDER_COLLISION_FLAG_NPC = 4;
-	static std::map<std::string, ColliderDmgProperties_t> colliderDmgTypes;
+	static DynamicMapColliderDmg colliderDmgTypes;
 	static std::map<int, EntityColliderData_t> colliderData;
 	static std::map<std::string, std::map<int, int>> colliderRandomGenPool;
 	static DynamicMapI32 colliderNameIndexes;

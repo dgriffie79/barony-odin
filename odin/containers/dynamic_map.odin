@@ -1948,3 +1948,173 @@ barony_dynamic_map_strspecialnpc_entries :: proc "c" (m: ^map[string]SpecialNPCE
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> ColliderDmgProperties_t (map<string, ColliderDmgProperties_t>)
+// Value owns 2 DynamicSetI32 + 8 bools. entry() for in-place mutation;
+// get/put deep-copy (the sets must be copied, not shared).
+// ---------------------------------------------------------------------------
+ColliderDmgProperties_t :: struct {
+	burnable:                  bool,
+	minotaurPathThroughAndBreak: bool,
+	meleeAffects:              bool,
+	magicAffects:              bool,
+	bombsAttach:               bool,
+	boulderDestroys:           bool,
+	showAsWallOnMinimap:       bool,
+	allowNPCPathing:           bool,
+	proficiencyBonusDamage:    map[i32]struct{},
+	proficiencyResistDamage:   map[i32]struct{},
+}
+
+collider_dmg_free :: proc(v: ^ColliderDmgProperties_t) {
+	if v.proficiencyBonusDamage != nil {
+		delete(v.proficiencyBonusDamage)
+		v.proficiencyBonusDamage = nil
+	}
+	if v.proficiencyResistDamage != nil {
+		delete(v.proficiencyResistDamage)
+		v.proficiencyResistDamage = nil
+	}
+}
+
+collider_dmg_copy :: proc(dst: ^ColliderDmgProperties_t, src: ^ColliderDmgProperties_t) {
+	dst^ = src^
+	dst.proficiencyBonusDamage = nil
+	dst.proficiencyResistDamage = nil
+	if src.proficiencyBonusDamage != nil {
+		dst.proficiencyBonusDamage = make(map[i32]struct{})
+		for key in src.proficiencyBonusDamage {
+			dst.proficiencyBonusDamage[key] = {}
+		}
+	}
+	if src.proficiencyResistDamage != nil {
+		dst.proficiencyResistDamage = make(map[i32]struct{})
+		for key in src.proficiencyResistDamage {
+			dst.proficiencyResistDamage[key] = {}
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_init :: proc "c" (m: ^map[string]ColliderDmgProperties_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_put :: proc "c" (m: ^map[string]ColliderDmgProperties_t, key: string, value: ^ColliderDmgProperties_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]ColliderDmgProperties_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		collider_dmg_free(&old)
+	}
+	new_val: ColliderDmgProperties_t
+	collider_dmg_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_get :: proc "c" (m: ^map[string]ColliderDmgProperties_t, key: string, out: ^ColliderDmgProperties_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		collider_dmg_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_entry :: proc "c" (m: ^map[string]ColliderDmgProperties_t, key: string) -> ^ColliderDmgProperties_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]ColliderDmgProperties_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_erase :: proc "c" (m: ^map[string]ColliderDmgProperties_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		collider_dmg_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_clear :: proc "c" (m: ^map[string]ColliderDmgProperties_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				collider_dmg_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_len :: proc "c" (m: ^map[string]ColliderDmgProperties_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_destroy :: proc "c" (m: ^map[string]ColliderDmgProperties_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				collider_dmg_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strcolliderdmg_entries :: proc "c" (m: ^map[string]ColliderDmgProperties_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]ColliderDmgProperties_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		collider_dmg_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}

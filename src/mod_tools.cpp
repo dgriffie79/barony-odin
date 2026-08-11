@@ -10264,7 +10264,7 @@ void GameplayPreferences_t::serverProcessGameConfig()
 
 EditorEntityData_t editorEntityData;
 std::map<int, EditorEntityData_t::EntityColliderData_t> EditorEntityData_t::colliderData;
-std::map<std::string, EditorEntityData_t::ColliderDmgProperties_t> EditorEntityData_t::colliderDmgTypes;
+DynamicMapColliderDmg EditorEntityData_t::colliderDmgTypes;
 std::map<std::string, std::map<int, int>> EditorEntityData_t::colliderRandomGenPool;
 DynamicMapI32 EditorEntityData_t::colliderNameIndexes;
 void EditorEntityData_t::readFromFile()
