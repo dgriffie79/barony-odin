@@ -31,53 +31,8 @@ public:
 	static void defaultBindings();
 
 	//! input mapping
-	struct binding_t {
-		std::string input = "";
-		float analog = 0.f; // input power [0.0 - 1.0]
-		bool binary = false; // input is "active" (ie button is pressed or not)
-		bool consumed = false; // input is "consumed" (ie it has been used for an action)
-		Uint32 heldTicks = 0; // tick when the binding was first activated
-
-		//! bind type
-		enum bindtype_t {
-			INVALID,
-			KEYBOARD,
-			CONTROLLER_AXIS,
-			CONTROLLER_BUTTON,
-			MOUSE_BUTTON,
-			JOYSTICK_AXIS,
-			JOYSTICK_BUTTON,
-			JOYSTICK_HAT,
-			//JOYSTICK_BALL,
-			NUM
-		};
-		bindtype_t type = INVALID;
-
-		//! keyboard binding info
-		SDL_Keycode keycode = SDLK_UNKNOWN;
-
-		//! gamepad binding info
-		int padIndex = -1;
-		SDL_GameController* pad = nullptr;
-		SDL_GameControllerAxis padAxis = SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_INVALID;
-		SDL_GameControllerButton padButton = SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID;
-		bool padAxisNegative = false;
-
-		//! joystick binding info
-		SDL_Joystick* joystick = nullptr;
-		int joystickAxis = 0;
-		bool joystickAxisNegative = false;
-		int joystickButton = 0;
-		int joystickHat = 0;
-		Uint8 joystickHatState = 0;
-
-		//! mouse button info
-		int mouseButton = 0;
-
-		//! checks type is a gamepad-adjacent input (i.e not keyboard or mouse)
-		bool isBindingUsingGamepad() const { return (type != KEYBOARD && type != MOUSE_BUTTON && type != INVALID); }
-		bool isBindingUsingKeyboard() const { return (type == KEYBOARD || type == MOUSE_BUTTON); }
-	};
+	typedef binding_tMirror binding_t;
+;
 
 	//! useful way to get direct access to bindings
 	auto& getBindings() const { return bindings; }
@@ -210,7 +165,7 @@ public:
     std::vector<DynamicString> getBindingsForInput(const char* input) const;
     
 private:
-	std::unordered_map<std::string, binding_t> bindings;
+	DynamicMapBinding bindings;
 
 	//! bindings written by the config file
 	DynamicMapStr kb_bindings;

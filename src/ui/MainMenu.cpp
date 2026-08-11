@@ -2250,9 +2250,11 @@ namespace MainMenu {
 
 			// scan for any held buttons and make sure we re-consume them to not double press anything
 			input.update();
-			for ( auto& b : input.getBindings() )
+			std::vector<const char*> _bkeys;
+			input.getBindings().keys(_bkeys);
+			for ( const char* _bk : _bkeys )
 			{
-				input.consumeBinaryToggle(b.first.c_str());
+				input.consumeBinaryToggle(_bk);
 			}
 		}
 	}

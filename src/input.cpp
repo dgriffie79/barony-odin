@@ -178,8 +178,10 @@ float Input::analog(const char* binding) const {
 		return inputs[0].analog(binding);
 	}
     if (disabled) { return 0.f; }
-	auto b = bindings.find(binding);
-	return b != bindings.end() ? (*b).second.analog : 0.f;
+	if ( !bindings.contains(binding) ) { return 0.f; }
+	binding_tMirror _b;
+	bindings.get(binding, _b);
+	return _b.analog;
 }
 
 bool Input::binary(const char* binding) const {
@@ -187,14 +189,14 @@ bool Input::binary(const char* binding) const {
 		return inputs[0].binary(binding);
 	}
     if (disabled) { return false; }
-	auto b = bindings.find(binding);
-	if (b == bindings.end()) {
+	if ( !bindings.contains(binding) ) {
 		return false;
 	} else {
-		auto& bind = b->second;
-		return bind.binary;
+		binding_tMirror _b;
+		bindings.get(binding, _b);
+		return _b.binary;
 	}
-	//return b != bindings.end() ? (*b).second.binary : false;
+	//return b != bindings.end() ? _b.binary : false;
 }
 
 bool Input::binaryToggle(const char* binding) const {
@@ -202,23 +204,22 @@ bool Input::binaryToggle(const char* binding) const {
 		return inputs[0].binaryToggle(binding);
 	}
     if (disabled) { return false; }
-	auto b = bindings.find(binding);
-	if (b == bindings.end()) {
+	if ( !bindings.contains(binding) ) {
 		return false;
 	} else {
-		auto& bind = b->second;
-		return bind.binary && !bind.consumed;
+		binding_tMirror _b;
+		bindings.get(binding, _b);
+		return _b.binary && !_b.consumed;
 	}
-	//return b != bindings.end() ? (*b).second.binary && !(*b).second.consumed : false;
+	//return b != bindings.end() ? _b.binary && !_b.consumed : false;
 }
 
 bool Input::consumeBinary(const char* binding) {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].consumeBinary(binding);
 	}
-	auto b = bindings.find(binding);
-	if (b != bindings.end() && !(*b).second.consumed) {
-		(*b).second.consumed = true;
+	if ( bindings.contains(binding) && !bindings[binding].consumed ) {
+		bindings[binding].consumed = true;
 		return disabled == false;
 	} else {
 		return false;
@@ -229,9 +230,8 @@ bool Input::consumeBinaryToggle(const char* binding) {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].consumeBinaryToggle(binding);
 	}
-	auto b = bindings.find(binding);
-	if (b != bindings.end() && (*b).second.binary && !(*b).second.consumed) {
-		(*b).second.consumed = true;
+	if ( bindings.contains(binding) && bindings[binding].binary && !bindings[binding].consumed ) {
+		bindings[binding].consumed = true;
 		return disabled == false;
 	} else {
 		return false;
@@ -243,18 +243,20 @@ bool Input::binaryHeldToggle(const char* binding) const {
 		return inputs[0].binaryHeldToggle(binding);
 	}
     if (disabled) { return false; }
-	auto b = bindings.find(binding);
-	return b != bindings.end() 
-		? ((*b).second.binary && !(*b).second.consumed && (ticks - (*b).second.heldTicks) > BUTTON_HELD_TICKS)
-		: false;
+	if ( !bindings.contains(binding) ) { return false; }
+	binding_tMirror _b;
+	bindings.get(binding, _b);
+	return (_b.binary && !_b.consumed && (ticks - _b.heldTicks) > BUTTON_HELD_TICKS);
 }
 
 const char* Input::binding(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].binding(binding);
 	}
-	auto b = bindings.find(binding);
-	return b != bindings.end() ? (*b).second.input.c_str() : "";
+	if ( !bindings.contains(binding) ) { return ""; }
+	binding_tMirror _b;
+	bindings.get(binding, _b);
+	return _b.input.c_str();
 }
 
 void Input::refresh() {
@@ -295,8 +297,7 @@ void Input::refresh() {
 		for ( int32_t bi = 0; bi < gamepadUserCount; ++bi ) {
 			if ( strcmp(gamepadUserEntries[bi].value, MainMenu::hiddenBinding) == 0 )
 			{
-				auto b = bindings.find(gamepadUserEntries[bi].key);
-				if ( b != bindings.end() && b->second.isBindingUsingGamepad() )
+				if ( bindings.contains(gamepadUserEntries[bi].key) && bindings[gamepadUserEntries[bi].key].isBindingUsingGamepad() )
 				{
 					// hidden binding, don't override existing bind by the defaults.
 					continue;
@@ -340,8 +341,10 @@ Input::binding_t Input::input(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].input(binding);
 	}
-	auto b = bindings.find(binding);
-	return b != bindings.end() ? (*b).second : Input::binding_t();
+	if ( !bindings.contains(binding) ) { return Input::binding_t(); }
+	binding_tMirror _b;
+	bindings.get(binding, _b);
+	return _b;
 }
 
 Input::ControllerType Input::getControllerType() const {
@@ -615,14 +618,10 @@ std::string Input::getGlyphPathForBinding(const binding_t& binding, bool pressed
 }
 
 void Input::bind(const char* binding, const char* input) {
-	auto b = bindings.find(binding);
-	if (b == bindings.end()) {
-		auto result = bindings.emplace(binding, binding_t());
-		b = result.first;
-	}
-	(*b).second.input.assign(input);
+	binding_tMirror& _b = bindings[binding];
+	_b.input.assign(input);
 	if (input == nullptr) {
-		(*b).second.type = binding_t::INVALID;
+		_b.type = binding_t::INVALID;
 		return;
 	}
 
@@ -642,141 +641,141 @@ void Input::bind(const char* binding, const char* input) {
 		}
 #endif
 		if ( foundControllerForPlayer ) {
-			(*b).second.pad = pad;
-			(*b).second.padIndex = index;
+			_b.pad = pad;
+			_b.padIndex = index;
 			if (strncmp(type, "Button", 6) == 0) {
 				if (strcmp((const char*)(type + 6), "A") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_A;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_A;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "B") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_B;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_B;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "X") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_X;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_X;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "Y") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_Y;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_Y;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "Back") == 0) {
-					(*b).second.padButton = getControllerType() == ControllerType::PlayStation ?
+					_b.padButton = getControllerType() == ControllerType::PlayStation ?
                         SDL_CONTROLLER_BUTTON_TOUCHPAD : SDL_CONTROLLER_BUTTON_BACK;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "Start") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_START;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_START;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "LeftStick") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_LEFTSTICK;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_LEFTSTICK;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "RightStick") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "LeftBumper") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 6), "RightBumper") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else {
-					(*b).second.type = binding_t::INVALID;
+					_b.type = binding_t::INVALID;
 					return;
 				}
 			} else if (strncmp(type, "StickLeft", 9) == 0) {
 				if (strcmp((const char*)(type + 9), "X-") == 0) {
-					(*b).second.padAxisNegative = true;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_LEFTX;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = true;
+					_b.padAxis = SDL_CONTROLLER_AXIS_LEFTX;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 9), "X+") == 0) {
-					(*b).second.padAxisNegative = false;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_LEFTX;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = false;
+					_b.padAxis = SDL_CONTROLLER_AXIS_LEFTX;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 9), "Y-") == 0) {
-					(*b).second.padAxisNegative = true;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_LEFTY;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = true;
+					_b.padAxis = SDL_CONTROLLER_AXIS_LEFTY;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 9), "Y+") == 0) {
-					(*b).second.padAxisNegative = false;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_LEFTY;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = false;
+					_b.padAxis = SDL_CONTROLLER_AXIS_LEFTY;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else {
-					(*b).second.type = binding_t::INVALID;
+					_b.type = binding_t::INVALID;
 					return;
 				}
 			} else if (strncmp(type, "StickRight", 10) == 0) {
 				if (strcmp((const char*)(type + 10), "X-") == 0) {
-					(*b).second.padAxisNegative = true;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_RIGHTX;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = true;
+					_b.padAxis = SDL_CONTROLLER_AXIS_RIGHTX;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 10), "X+") == 0) {
-					(*b).second.padAxisNegative = false;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_RIGHTX;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = false;
+					_b.padAxis = SDL_CONTROLLER_AXIS_RIGHTX;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 10), "Y-") == 0) {
-					(*b).second.padAxisNegative = true;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_RIGHTY;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = true;
+					_b.padAxis = SDL_CONTROLLER_AXIS_RIGHTY;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else if (strcmp((const char*)(type + 10), "Y+") == 0) {
-					(*b).second.padAxisNegative = false;
-					(*b).second.padAxis = SDL_CONTROLLER_AXIS_RIGHTY;
-					(*b).second.type = binding_t::CONTROLLER_AXIS;
+					_b.padAxisNegative = false;
+					_b.padAxis = SDL_CONTROLLER_AXIS_RIGHTY;
+					_b.type = binding_t::CONTROLLER_AXIS;
 					return;
 				} else {
-					(*b).second.type = binding_t::INVALID;
+					_b.type = binding_t::INVALID;
 					return;
 				}
 			} else if (strncmp(type, "Dpad", 4) == 0) {
 				if (strcmp((const char*)(type + 4), "X-") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 4), "X+") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 4), "Y-") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_DPAD_UP;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_DPAD_UP;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else if (strcmp((const char*)(type + 4), "Y+") == 0) {
-					(*b).second.padButton = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-					(*b).second.type = binding_t::CONTROLLER_BUTTON;
+					_b.padButton = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+					_b.type = binding_t::CONTROLLER_BUTTON;
 					return;
 				} else {
-					(*b).second.type = binding_t::INVALID;
+					_b.type = binding_t::INVALID;
 					return;
 				}
 			} else if (strncmp(type, "LeftTrigger", 11) == 0) {
-				(*b).second.padAxisNegative = false;
-				(*b).second.padAxis = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
-				(*b).second.type = binding_t::CONTROLLER_AXIS;
+				_b.padAxisNegative = false;
+				_b.padAxis = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+				_b.type = binding_t::CONTROLLER_AXIS;
 				return;
 			} else if (strncmp(type, "RightTrigger", 12) == 0) {
-				(*b).second.padAxisNegative = false;
-				(*b).second.padAxis = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
-				(*b).second.type = binding_t::CONTROLLER_AXIS;
+				_b.padAxisNegative = false;
+				_b.padAxis = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
+				_b.type = binding_t::CONTROLLER_AXIS;
 				return;
 			} else {
-				(*b).second.type = binding_t::INVALID;
+				_b.type = binding_t::INVALID;
 				return;
 			}
 		} else {
-			(*b).second.type = binding_t::INVALID;
+			_b.type = binding_t::INVALID;
 			return;
 		}
 	} else if (len >= 3 && strncmp(input, "Joy", 3) == 0) {
@@ -788,59 +787,59 @@ void Input::bind(const char* binding, const char* input) {
 		auto find = list.find(index);
 		if (find != list.end()) {
 			SDL_Joystick* joystick = (*find).second;
-			(*b).second.joystick = joystick;
+			_b.joystick = joystick;
 			if (strncmp(type, "Button", 6) == 0) {
-				(*b).second.type = binding_t::JOYSTICK_BUTTON;
-				(*b).second.joystickButton = (Uint32)strtol((const char*)(type + 6), nullptr, 10);
+				_b.type = binding_t::JOYSTICK_BUTTON;
+				_b.joystickButton = (Uint32)strtol((const char*)(type + 6), nullptr, 10);
 				return;
 			} else if (strncmp(type, "Axis-", 5) == 0) {
-				(*b).second.type = binding_t::JOYSTICK_AXIS;
-				(*b).second.joystickAxisNegative = true;
-				(*b).second.joystickAxis = (Uint32)strtol((const char*)(type + 5), nullptr, 10);
+				_b.type = binding_t::JOYSTICK_AXIS;
+				_b.joystickAxisNegative = true;
+				_b.joystickAxis = (Uint32)strtol((const char*)(type + 5), nullptr, 10);
 				return;
 			} else if (strncmp(type, "Axis+", 5) == 0) {
-				(*b).second.type = binding_t::JOYSTICK_AXIS;
-				(*b).second.joystickAxisNegative = false;
-				(*b).second.joystickAxis = (Uint32)strtol((const char*)(type + 5), nullptr, 10);
+				_b.type = binding_t::JOYSTICK_AXIS;
+				_b.joystickAxisNegative = false;
+				_b.joystickAxis = (Uint32)strtol((const char*)(type + 5), nullptr, 10);
 				return;
 			} else if (strncmp(type, "Hat", 3) == 0) {
-				(*b).second.type = binding_t::JOYSTICK_HAT;
-				(*b).second.joystickHat = (Uint32)strtol((const char*)(type + 3), nullptr, 10);
+				_b.type = binding_t::JOYSTICK_HAT;
+				_b.joystickHat = (Uint32)strtol((const char*)(type + 3), nullptr, 10);
 				if (type[3]) {
 					if (strncmp((const char*)(type + 4), "LeftUp", 6) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_LEFTUP;
+						_b.joystickHatState = SDL_HAT_LEFTUP;
 						return;
 					} else if (strncmp((const char*)(type + 4), "Up", 2) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_UP;
+						_b.joystickHatState = SDL_HAT_UP;
 						return;
 					} else if (strncmp((const char*)(type + 4), "RightUp", 7) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_RIGHTUP;
+						_b.joystickHatState = SDL_HAT_RIGHTUP;
 						return;
 					} else if (strncmp((const char*)(type + 4), "Right", 5) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_RIGHT;
+						_b.joystickHatState = SDL_HAT_RIGHT;
 						return;
 					} else if (strncmp((const char*)(type + 4), "RightDown", 9) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_RIGHTDOWN;
+						_b.joystickHatState = SDL_HAT_RIGHTDOWN;
 						return;
 					} else if (strncmp((const char*)(type + 4), "Down", 4) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_DOWN;
+						_b.joystickHatState = SDL_HAT_DOWN;
 						return;
 					} else if (strncmp((const char*)(type + 4), "LeftDown", 8) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_LEFTDOWN;
+						_b.joystickHatState = SDL_HAT_LEFTDOWN;
 						return;
 					} else if (strncmp((const char*)(type + 4), "Left", 4) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_LEFT;
+						_b.joystickHatState = SDL_HAT_LEFT;
 						return;
 					} else if (strncmp((const char*)(type + 4), "Centered", 8) == 0) {
-						(*b).second.joystickHatState = SDL_HAT_CENTERED;
+						_b.joystickHatState = SDL_HAT_CENTERED;
 						return;
 					} else {
-						(*b).second.type = binding_t::INVALID;
+						_b.type = binding_t::INVALID;
 						return;
 					}
 				}
 			} else {
-				(*b).second.type = binding_t::INVALID;
+				_b.type = binding_t::INVALID;
 				return;
 			}
 		}
@@ -848,32 +847,34 @@ void Input::bind(const char* binding, const char* input) {
 		return;
 	} else if (len >= 5 && strncmp(input, "Mouse", 5) == 0) {
 		// mouse
-		(*b).second.type = binding_t::MOUSE_BUTTON;
+		_b.type = binding_t::MOUSE_BUTTON;
 		if ( (strncmp((const char*)(input + 5), "WheelUp", 7) == 0) )
 		{
-			(*b).second.mouseButton = MOUSE_WHEEL_UP;
+			_b.mouseButton = MOUSE_WHEEL_UP;
 			return;
 		}
 		else if ( (strncmp((const char*)(input + 5), "WheelDown", 9) == 0) )
 		{
-			(*b).second.mouseButton = MOUSE_WHEEL_DOWN;
+			_b.mouseButton = MOUSE_WHEEL_DOWN;
 			return;
 		}
 		Uint32 index = (Uint32)strtol((const char*)(input + 5), nullptr, 10);
 		int result = std::min(index, 15U);
-		(*b).second.mouseButton = result;
+		_b.mouseButton = result;
 		return;
 	} else {
 		// keyboard
-		(*b).second.type = binding_t::KEYBOARD;
-		(*b).second.keycode = getKeycodeFromName(input);
+		_b.type = binding_t::KEYBOARD;
+		_b.keycode = getKeycodeFromName(input);
 		return;
 	}
 }
 
 void Input::update() {
-	for (auto& pair : bindings) {
-		auto& binding = pair.second;
+	std::vector<const char*> _keys;
+	bindings.keys(_keys);
+	for ( const char* _k : _keys ) {
+		auto& binding = bindings[_k];
 		//const float oldAnalog = binding.analog;
 		binding.analog = analogOf(binding);
 		const bool oldBinary = binding.binary;
@@ -894,21 +895,21 @@ void Input::update() {
 bool Input::binaryOf(binding_t& binding) {
 	if (binding.type == binding_t::CONTROLLER_AXIS ||
 		binding.type == binding_t::CONTROLLER_BUTTON) {
-		SDL_GameController* pad = binding.pad;
+		SDL_GameController* pad = (SDL_GameController*)binding.pad;
 		if (binding.type == binding_t::CONTROLLER_BUTTON) {
-			return SDL_GameControllerGetButton(pad, binding.padButton) == 1;
+			return SDL_GameControllerGetButton(pad, (SDL_GameControllerButton)binding.padButton) == 1;
 		} else {
 			if (binding.padAxisNegative) {
-				return SDL_GameControllerGetAxis(pad, binding.padAxis) < -16384;
+				return SDL_GameControllerGetAxis(pad, (SDL_GameControllerAxis)binding.padAxis) < -16384;
 			} else {
-				return SDL_GameControllerGetAxis(pad, binding.padAxis) > 16384;
+				return SDL_GameControllerGetAxis(pad, (SDL_GameControllerAxis)binding.padAxis) > 16384;
 			}
 		}
 	} else if (
 		binding.type == binding_t::JOYSTICK_AXIS ||
 		binding.type == binding_t::JOYSTICK_BUTTON ||
 		binding.type == binding_t::JOYSTICK_HAT) {
-		SDL_Joystick* joystick = binding.joystick;
+		SDL_Joystick* joystick = (SDL_Joystick*)binding.joystick;
 		if (binding.type == binding_t::JOYSTICK_BUTTON) {
 			return SDL_JoystickGetButton(joystick, binding.joystickButton) == 1;
 		} else if (binding.type == binding_t::JOYSTICK_AXIS) {
@@ -935,15 +936,15 @@ bool Input::binaryOf(binding_t& binding) {
 float Input::analogOf(binding_t& binding) {
 	if (binding.type == binding_t::CONTROLLER_AXIS ||
 		binding.type == binding_t::CONTROLLER_BUTTON) {
-		SDL_GameController* pad = binding.pad;
+		SDL_GameController* pad = (SDL_GameController*)binding.pad;
 		if (binding.type == binding_t::CONTROLLER_BUTTON) {
-			return SDL_GameControllerGetButton(pad, binding.padButton) ? 1.f : 0.f;
+			return SDL_GameControllerGetButton(pad, (SDL_GameControllerButton)binding.padButton) ? 1.f : 0.f;
 		} else {
 			if (binding.padAxisNegative) {
-				float result = std::min(SDL_GameControllerGetAxis(pad, binding.padAxis) / 32768.f, 0.f) * -1.f;
+				float result = std::min(SDL_GameControllerGetAxis(pad, (SDL_GameControllerAxis)binding.padAxis) / 32768.f, 0.f) * -1.f;
 				return (fabs(result) > deadzone) ? result : 0.f;
 			} else {
-				float result = std::max(SDL_GameControllerGetAxis(pad, binding.padAxis) / 32767.f, 0.f);
+				float result = std::max(SDL_GameControllerGetAxis(pad, (SDL_GameControllerAxis)binding.padAxis) / 32767.f, 0.f);
 				return (fabs(result) > deadzone) ? result : 0.f;
 			}
 		}
@@ -951,7 +952,7 @@ float Input::analogOf(binding_t& binding) {
 		binding.type == binding_t::JOYSTICK_AXIS ||
 		binding.type == binding_t::JOYSTICK_BUTTON ||
 		binding.type == binding_t::JOYSTICK_HAT) {
-		SDL_Joystick* joystick = binding.joystick;
+		SDL_Joystick* joystick = (SDL_Joystick*)binding.joystick;
 		if (binding.type == binding_t::JOYSTICK_BUTTON) {
 			return SDL_JoystickGetButton(joystick, binding.joystickButton) ? 1.f : 0.f;
 		} else if (binding.type == binding_t::JOYSTICK_AXIS) {
@@ -1010,17 +1011,21 @@ Input::playerControlType_t Input::getPlayerControlType()
 
 std::vector<DynamicString> Input::getBindingsForInput(const char* input) const {
     std::vector<DynamicString> result;
-    for (auto& b : bindings) {
+    std::vector<const char*> _keys;
+    bindings.keys(_keys);
+    for ( const char* _k : _keys ) {
+        binding_tMirror _b;
+        bindings.get(_k, _b);
         const bool isController =
-            b.second.type == binding_t::bindtype_t::CONTROLLER_AXIS ||
-            b.second.type == binding_t::bindtype_t::CONTROLLER_BUTTON;
+            _b.type == binding_t::bindtype_t::CONTROLLER_AXIS ||
+            _b.type == binding_t::bindtype_t::CONTROLLER_BUTTON;
         if (isController) {
-            if (b.second.input.substr(4) == input) {
-                result.emplace_back(b.first);
+            if (_b.input.substr(4) == input) {
+                result.emplace_back(_k);
             }
         } else {
-            if (b.second.input == input) {
-                result.emplace_back(b.first);
+            if (_b.input == input) {
+                result.emplace_back(_k);
             }
         }
     }
@@ -1083,79 +1088,82 @@ void Input::consumeBindingsSharedWithBinding(const char* binding)
 	}
 	const std::pair<std::string, binding_t> checkBinding =
 		std::make_pair(binding, input(binding));
-	for ( auto& b : bindings )
+	std::vector<const char*> _keys;
+	bindings.keys(_keys);
+	for ( const char* _k : _keys )
 	{
-		if ( !b.second.binary )
+		auto& _b = bindings[_k];
+		if ( !_b.binary )
 		{
 			continue; // don't pre-consume non-pressed buttons
 		}
-		if ( b.second.consumed )
+		if ( _b.consumed )
 		{
 			continue; // no need to consume again
 		}
-		if ( b.second.type == checkBinding.second.type )
+		if ( _b.type == checkBinding.second.type )
 		{
-			if ( b.first == checkBinding.first )
+			if ( _k == checkBinding.first )
 			{
 				continue; // skip the hotbar bindings
 			}
-			if ( b.second.type == binding_t::CONTROLLER_AXIS ||
-				b.second.type == binding_t::CONTROLLER_BUTTON )
+			if ( _b.type == binding_t::CONTROLLER_AXIS ||
+				_b.type == binding_t::CONTROLLER_BUTTON )
 			{
-				if ( b.second.type == binding_t::CONTROLLER_BUTTON )
+				if ( _b.type == binding_t::CONTROLLER_BUTTON )
 				{
-					if ( b.second.padButton == checkBinding.second.padButton )
+					if ( _b.padButton == checkBinding.second.padButton )
 					{
-						b.second.consumed = true;
+						_b.consumed = true;
 					}
 				}
 				else
 				{
-					if ( b.second.padAxis == checkBinding.second.padAxis )
+					if ( _b.padAxis == checkBinding.second.padAxis )
 					{
-						b.second.consumed = true;
+						_b.consumed = true;
 					}
 				}
 			}
 			else if (
-				b.second.type == binding_t::JOYSTICK_AXIS ||
-				b.second.type == binding_t::JOYSTICK_BUTTON ||
-				b.second.type == binding_t::JOYSTICK_HAT )
+				_b.type == binding_t::JOYSTICK_AXIS ||
+				_b.type == binding_t::JOYSTICK_BUTTON ||
+				_b.type == binding_t::JOYSTICK_HAT )
 			{
-				if ( b.second.type == binding_t::JOYSTICK_BUTTON )
+				if ( _b.type == binding_t::JOYSTICK_BUTTON )
 				{
-					if ( b.second.joystickButton == checkBinding.second.joystickButton )
+					if ( _b.joystickButton == checkBinding.second.joystickButton )
 					{
-						b.second.consumed = true;
+						_b.consumed = true;
 					}
 				}
-				else if ( b.second.type == binding_t::JOYSTICK_AXIS )
+				else if ( _b.type == binding_t::JOYSTICK_AXIS )
 				{
-					if ( b.second.joystickAxis == checkBinding.second.joystickAxis )
+					if ( _b.joystickAxis == checkBinding.second.joystickAxis )
 					{
-						b.second.consumed = true;
+						_b.consumed = true;
 					}
 				}
 				else
 				{
-					if ( b.second.joystickHat == checkBinding.second.joystickHat )
+					if ( _b.joystickHat == checkBinding.second.joystickHat )
 					{
-						b.second.consumed = true;
+						_b.consumed = true;
 					}
 				}
 			}
-			else if ( b.second.type == binding_t::MOUSE_BUTTON )
+			else if ( _b.type == binding_t::MOUSE_BUTTON )
 			{
-				if ( b.second.mouseButton == checkBinding.second.mouseButton )
+				if ( _b.mouseButton == checkBinding.second.mouseButton )
 				{
-					b.second.consumed = true;
+					_b.consumed = true;
 				}
 			}
-			else if ( b.second.type == binding_t::KEYBOARD )
+			else if ( _b.type == binding_t::KEYBOARD )
 			{
-				if ( b.second.keycode == checkBinding.second.keycode )
+				if ( _b.keycode == checkBinding.second.keycode )
 				{
-					b.second.consumed = true;
+					_b.consumed = true;
 				}
 			}
 		}
@@ -1178,7 +1186,7 @@ void Input::consumeBindingsSharedWithFaceHotbar()
 	{
 		if ( players[player]->hotbar.faceMenuButtonHeld != Player::Hotbar_t::FaceMenuGroup::GROUP_NONE )
 		{
-			const std::unordered_map<std::string, binding_t> faceMenuBindings =
+			const std::map<std::string, binding_tMirror> faceMenuBindings =
 			{
 				std::make_pair("Hotbar Right", input("Hotbar Right")),
 				std::make_pair("Hotbar Left", input("Hotbar Left")),
@@ -1187,81 +1195,84 @@ void Input::consumeBindingsSharedWithFaceHotbar()
 				std::make_pair("HotbarFacebarModifierLeft", input("HotbarFacebarModifierLeft")),
 				std::make_pair("HotbarFacebarModifierRight", input("HotbarFacebarModifierRight"))
 			};
-			for ( auto& b : bindings )
+			std::vector<const char*> _keys2;
+			bindings.keys(_keys2);
+			for ( const char* _k2 : _keys2 )
 			{
-				if ( !b.second.binary )
+				auto& _b = bindings[_k2];
+				if ( !_b.binary )
 				{
 					continue; // don't pre-consume non-pressed buttons
 				}
-				if ( b.second.consumed )
+				if ( _b.consumed )
 				{
 					continue; // no need to consume again
 				}
 				for ( auto& faceMenuBinding : faceMenuBindings )
 				{
-					if ( b.second.type == faceMenuBinding.second.type )
+					if ( _b.type == faceMenuBinding.second.type )
 					{
-						if ( b.first == faceMenuBinding.first )
+						if ( _k2 == faceMenuBinding.first )
 						{
 							continue; // skip the hotbar bindings
 						}
-						if ( b.second.type == binding_t::CONTROLLER_AXIS ||
-							b.second.type == binding_t::CONTROLLER_BUTTON ) 
+						if ( _b.type == binding_t::CONTROLLER_AXIS ||
+							_b.type == binding_t::CONTROLLER_BUTTON ) 
 						{
-							if ( b.second.type == binding_t::CONTROLLER_BUTTON )
+							if ( _b.type == binding_t::CONTROLLER_BUTTON )
 							{
-								if ( b.second.padButton == faceMenuBinding.second.padButton )
+								if ( _b.padButton == faceMenuBinding.second.padButton )
 								{
-									b.second.consumed = true;
+									_b.consumed = true;
 								}
 							}
 							else 
 							{
-								if ( b.second.padAxis == faceMenuBinding.second.padAxis )
+								if ( _b.padAxis == faceMenuBinding.second.padAxis )
 								{
-									b.second.consumed = true;
+									_b.consumed = true;
 								}
 							}
 						}
 						else if (
-							b.second.type == binding_t::JOYSTICK_AXIS ||
-							b.second.type == binding_t::JOYSTICK_BUTTON ||
-							b.second.type == binding_t::JOYSTICK_HAT ) 
+							_b.type == binding_t::JOYSTICK_AXIS ||
+							_b.type == binding_t::JOYSTICK_BUTTON ||
+							_b.type == binding_t::JOYSTICK_HAT ) 
 						{
-							if ( b.second.type == binding_t::JOYSTICK_BUTTON ) 
+							if ( _b.type == binding_t::JOYSTICK_BUTTON ) 
 							{
-								if ( b.second.joystickButton == faceMenuBinding.second.joystickButton )
+								if ( _b.joystickButton == faceMenuBinding.second.joystickButton )
 								{
-									b.second.consumed = true;
+									_b.consumed = true;
 								}
 							}
-							else if ( b.second.type == binding_t::JOYSTICK_AXIS ) 
+							else if ( _b.type == binding_t::JOYSTICK_AXIS ) 
 							{
-								if ( b.second.joystickAxis == faceMenuBinding.second.joystickAxis )
+								if ( _b.joystickAxis == faceMenuBinding.second.joystickAxis )
 								{
-									b.second.consumed = true;
+									_b.consumed = true;
 								}
 							}
 							else 
 							{
-								if ( b.second.joystickHat == faceMenuBinding.second.joystickHat )
+								if ( _b.joystickHat == faceMenuBinding.second.joystickHat )
 								{
-									b.second.consumed = true;
+									_b.consumed = true;
 								}
 							}
 						}
-						else if ( b.second.type == binding_t::MOUSE_BUTTON ) 
+						else if ( _b.type == binding_t::MOUSE_BUTTON ) 
 						{
-							if ( b.second.mouseButton == faceMenuBinding.second.mouseButton )
+							if ( _b.mouseButton == faceMenuBinding.second.mouseButton )
 							{
-								b.second.consumed = true;
+								_b.consumed = true;
 							}
 						}
-						else if ( b.second.type == binding_t::KEYBOARD ) 
+						else if ( _b.type == binding_t::KEYBOARD ) 
 						{
-							if ( b.second.keycode == faceMenuBinding.second.keycode )
+							if ( _b.keycode == faceMenuBinding.second.keycode )
 							{
-								b.second.consumed = true;
+								_b.consumed = true;
 							}
 						}
 					}

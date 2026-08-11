@@ -210,6 +210,17 @@ extern "C" {
     int32_t   barony_dynamic_map_striconcallout_len(DynamicMapRaw*);
     void      barony_dynamic_map_striconcallout_destroy(DynamicMapRaw*);
     int32_t   barony_dynamic_map_striconcallout_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
+
+    // map<string, binding_t>
+    void      barony_dynamic_map_strbinding_init(DynamicMapRaw*);
+    void      barony_dynamic_map_strbinding_put(DynamicMapRaw*, DynamicString, const void* value);
+    bool      barony_dynamic_map_strbinding_get(DynamicMapRaw*, DynamicString, void* out);
+    void*     barony_dynamic_map_strbinding_entry(DynamicMapRaw*, DynamicString);
+    bool      barony_dynamic_map_strbinding_erase(DynamicMapRaw*, DynamicString);
+    void      barony_dynamic_map_strbinding_clear(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strbinding_len(DynamicMapRaw*);
+    void      barony_dynamic_map_strbinding_destroy(DynamicMapRaw*);
+    int32_t   barony_dynamic_map_strbinding_entries(DynamicMapRaw*, void** key_ptrs, int32_t* key_lens, void* val_ptrs, int32_t count);
 }
 
 // 32 bytes on x64 — matches Odin Raw_Map {data, len, allocator}
@@ -1982,6 +1993,139 @@ private:
         for (int32_t i = 0; i < got; ++i) {
             DynamicString key((const char*)kp[i], kl[i]);
             barony_dynamic_map_striconcallout_put(&raw, key, &vv[i]);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// map<string, binding_t> — input bindings. Mirror uses raw integer types for
+// the SDL fields (dynamic_map.hpp is included before SDL in some TUs);
+// binding_t in input.hpp is typedef'd to this. Pointers are NON-OWNING
+// (copied by value, never freed). input is the only owned member.
+// ---------------------------------------------------------------------------
+struct binding_tMirror {
+    DynamicString input;
+    float analog = 0.f;
+    bool binary = false;
+    bool consumed = false;
+    uint32_t heldTicks = 0;
+    int type = 0;            // bindtype_t
+    int64_t keycode = 0;     // SDL_Keycode
+    int padIndex = -1;
+    void* pad = nullptr;     // SDL_GameController*
+    int padAxis = 0;         // SDL_GameControllerAxis
+    int padButton = 0;       // SDL_GameControllerButton
+    bool padAxisNegative = false;
+    void* joystick = nullptr; // SDL_Joystick*
+    int joystickAxis = 0;
+    bool joystickAxisNegative = false;
+    int joystickButton = 0;
+    int joystickHat = 0;
+    uint8_t joystickHatState = 0;
+    int mouseButton = 0;
+
+    enum bindtype_t {
+        INVALID = 0,
+        KEYBOARD = 1,
+        CONTROLLER_AXIS = 2,
+        CONTROLLER_BUTTON = 3,
+        MOUSE_BUTTON = 4,
+        JOYSTICK_AXIS = 5,
+        JOYSTICK_BUTTON = 6,
+        JOYSTICK_HAT = 7,
+        NUM = 8
+    };
+    bool isBindingUsingGamepad() const { return (type != KEYBOARD && type != MOUSE_BUTTON && type != INVALID); }
+    bool isBindingUsingKeyboard() const { return (type == KEYBOARD || type == MOUSE_BUTTON); }
+};
+
+class DynamicMapBinding {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapBinding() { barony_dynamic_map_strbinding_init(&raw); }
+    ~DynamicMapBinding() { barony_dynamic_map_strbinding_destroy(&raw); }
+    DynamicMapBinding(const DynamicMapBinding& other) : raw{} {
+        barony_dynamic_map_strbinding_init(&raw);
+        copyFrom(other);
+    }
+    DynamicMapBinding& operator=(const DynamicMapBinding& other) {
+        if (this != &other) { barony_dynamic_map_strbinding_clear(&raw); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapBinding(DynamicMapBinding&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapBinding& operator=(DynamicMapBinding&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_strbinding_destroy(&raw);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    binding_tMirror& operator[](const char* key) {
+        return *static_cast<binding_tMirror*>(barony_dynamic_map_strbinding_entry(&raw, DynamicString(key)));
+    }
+    binding_tMirror& operator[](const DynamicString& key) {
+        return *static_cast<binding_tMirror*>(barony_dynamic_map_strbinding_entry(&raw, key));
+    }
+    binding_tMirror& operator[](const std::string& key) {
+        return *static_cast<binding_tMirror*>(barony_dynamic_map_strbinding_entry(&raw, DynamicString(key.c_str())));
+    }
+
+    bool get(const char* key, binding_tMirror& out) const {
+        return barony_dynamic_map_strbinding_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &out);
+    }
+    bool get(const DynamicString& key, binding_tMirror& out) const {
+        return barony_dynamic_map_strbinding_get(const_cast<DynamicMapRaw*>(&raw), key, &out);
+    }
+    void put(const char* key, const binding_tMirror& v) {
+        barony_dynamic_map_strbinding_put(&raw, DynamicString(key), const_cast<binding_tMirror*>(&v));
+    }
+    void put(const DynamicString& key, const binding_tMirror& v) {
+        barony_dynamic_map_strbinding_put(&raw, key, const_cast<binding_tMirror*>(&v));
+    }
+    bool contains(const char* key) const {
+        binding_tMirror tmp;
+        return barony_dynamic_map_strbinding_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &tmp);
+    }
+    bool contains(const DynamicString& key) const {
+        binding_tMirror tmp;
+        return barony_dynamic_map_strbinding_get(const_cast<DynamicMapRaw*>(&raw), key, &tmp);
+    }
+    bool contains(const std::string& key) const {
+        binding_tMirror tmp;
+        return barony_dynamic_map_strbinding_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &tmp);
+    }
+    bool erase(const char* key) { return barony_dynamic_map_strbinding_erase(&raw, DynamicString(key)); }
+    bool erase(const DynamicString& key) { return barony_dynamic_map_strbinding_erase(&raw, key); }
+    int64_t size() const { return barony_dynamic_map_strbinding_len(const_cast<DynamicMapRaw*>(&raw)); }
+    // collect keys (interned, stable) into the caller's vector
+    void keys(std::vector<const char*>& out) const {
+        int64_t n = size();
+        if (n <= 0) return;
+        std::vector<void*> kp((size_t)n);
+        std::vector<int32_t> kl((size_t)n);
+        std::vector<binding_tMirror> vv((size_t)n);
+        int32_t got = barony_dynamic_map_strbinding_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), (int32_t)n);
+        for (int32_t i = 0; i < got; ++i) out.push_back((const char*)kp[(size_t)i]);
+    }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_strbinding_clear(&raw); }
+
+private:
+    void copyFrom(const DynamicMapBinding& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<int32_t> kl(n);
+        std::vector<binding_tMirror> vv(n);
+        int32_t got = barony_dynamic_map_strbinding_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), kl.data(), vv.data(), n);
+        for (int32_t i = 0; i < got; ++i) {
+            DynamicString key((const char*)kp[i], kl[i]);
+            barony_dynamic_map_strbinding_put(&raw, key, &vv[i]);
         }
     }
 };

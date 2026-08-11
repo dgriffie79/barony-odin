@@ -1184,12 +1184,13 @@ void Player::Ghost_t::handleActions()
 		&& !gamePaused && CalloutRadialMenu::calloutMenuEnabledForGamemode() )
 	{
 		bool showCalloutCommandsOnGamepad = false;
-		auto showCalloutCommandsFind = b.find("Call Out");
 		DynamicString showCalloutCommandsInputStr = "";
-		if ( showCalloutCommandsFind != b.end() )
+		if ( b.contains("Call Out") )
 		{
-			showCalloutCommandsOnGamepad = (*showCalloutCommandsFind).second.isBindingUsingGamepad();
-			showCalloutCommandsInputStr = (*showCalloutCommandsFind).second.input;
+			binding_tMirror _b;
+			b.get("Call Out", _b);
+			showCalloutCommandsOnGamepad = _b.isBindingUsingGamepad();
+			showCalloutCommandsInputStr = _b.input;
 		}
 
 		if ( player.worldUI.bTooltipInView && player.worldUI.tooltipsInRange.size() > 1 )
@@ -1334,20 +1335,22 @@ void Player::Ghost_t::handleActions()
 	{
 		auto& b = (multiplayer != SINGLE && player.playernum != 0) ? Input::inputs[0].getBindings() : input.getBindings();
 		bool showNPCCommandsOnGamepad = false;
-		auto showNPCCommandsFind = b.find("Show NPC Commands");
 		DynamicString showNPCCommandsInputStr = "";
 		DynamicString lastNPCCommandInputStr = "";
-		if ( showNPCCommandsFind != b.end() )
+		if ( b.contains("Show NPC Commands") )
 		{
-			showNPCCommandsOnGamepad = (*showNPCCommandsFind).second.isBindingUsingGamepad();
-			showNPCCommandsInputStr = (*showNPCCommandsFind).second.input;
+			binding_tMirror _b;
+			b.get("Show NPC Commands", _b);
+			showNPCCommandsOnGamepad = _b.isBindingUsingGamepad();
+			showNPCCommandsInputStr = _b.input;
 		}
 		bool lastNPCCommandOnGamepad = false;
-		auto lastNPCCommandFind = b.find("Command NPC");
-		if ( lastNPCCommandFind != b.end() )
+		if ( b.contains("Command NPC") )
 		{
-			lastNPCCommandOnGamepad = (*lastNPCCommandFind).second.isBindingUsingGamepad();
-			lastNPCCommandInputStr = (*lastNPCCommandFind).second.input;
+			binding_tMirror _b;
+			b.get("Command NPC", _b);
+			lastNPCCommandOnGamepad = _b.isBindingUsingGamepad();
+			lastNPCCommandInputStr = _b.input;
 		}
 
 		if ( players[player.playernum]->worldUI.bTooltipInView && players[player.playernum]->worldUI.tooltipsInRange.size() > 1 )
@@ -9991,12 +9994,13 @@ void actPlayer(Entity* my)
 				&& !gamePaused && CalloutRadialMenu::calloutMenuEnabledForGamemode() )
 			{
 				bool showCalloutCommandsOnGamepad = false;
-				auto showCalloutCommandsFind = b.find("Call Out");
 				DynamicString showCalloutCommandsInputStr = "";
-				if ( showCalloutCommandsFind != b.end() )
+				if ( b.contains("Call Out") )
 				{
-					showCalloutCommandsOnGamepad = (*showCalloutCommandsFind).second.isBindingUsingGamepad();
-					showCalloutCommandsInputStr = (*showCalloutCommandsFind).second.input;
+					binding_tMirror _b;
+					b.get("Call Out", _b);
+					showCalloutCommandsOnGamepad = _b.isBindingUsingGamepad();
+					showCalloutCommandsInputStr = _b.input;
 				}
 
 				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && players[PLAYER_NUM]->worldUI.tooltipsInRange.size() > 1 )
@@ -10144,20 +10148,22 @@ void actPlayer(Entity* my)
 			{
 				auto& b = (multiplayer != SINGLE && PLAYER_NUM != 0) ? Input::inputs[0].getBindings() : input.getBindings();
 				bool showNPCCommandsOnGamepad = false;
-				auto showNPCCommandsFind = b.find("Show NPC Commands");
 				DynamicString showNPCCommandsInputStr = "";
 				DynamicString lastNPCCommandInputStr = "";
-				if ( showNPCCommandsFind != b.end() )
+				if ( b.contains("Show NPC Commands") )
 				{
-					showNPCCommandsOnGamepad = (*showNPCCommandsFind).second.isBindingUsingGamepad();
-					showNPCCommandsInputStr = (*showNPCCommandsFind).second.input;
+					binding_tMirror _b;
+					b.get("Show NPC Commands", _b);
+					showNPCCommandsOnGamepad = _b.isBindingUsingGamepad();
+					showNPCCommandsInputStr = _b.input;
 				}
 				bool lastNPCCommandOnGamepad = false;
-				auto lastNPCCommandFind = b.find("Command NPC");
-				if ( lastNPCCommandFind != b.end() )
+				if ( b.contains("Command NPC") )
 				{
-					lastNPCCommandOnGamepad = (*lastNPCCommandFind).second.isBindingUsingGamepad();
-					lastNPCCommandInputStr = (*lastNPCCommandFind).second.input;
+					binding_tMirror _b;
+					b.get("Command NPC", _b);
+					lastNPCCommandOnGamepad = _b.isBindingUsingGamepad();
+					lastNPCCommandInputStr = _b.input;
 				}
 				
 				if ( players[PLAYER_NUM]->worldUI.bTooltipInView && players[PLAYER_NUM]->worldUI.tooltipsInRange.size() > 1 )

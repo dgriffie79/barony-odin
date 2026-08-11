@@ -2998,3 +2998,174 @@ barony_dynamic_map_striconcallout_entries :: proc "c" (m: ^map[string]IconEntryC
 	}
 	return n
 }
+
+// ---------------------------------------------------------------------------
+// string -> binding_t (map<string, binding_t>) — input bindings.
+// Value: 1 DynamicString (input) + scalars + NON-OWNING pointers (SDL
+// controller/joystick, copied by value, never freed). entry() for in-place
+// mutation; get/put deep-copy (only the DynamicString needs cloning).
+// ---------------------------------------------------------------------------
+binding_t :: struct {
+	input:       DynamicString,
+	analog:      f32,
+	binary:      bool,
+	consumed:    bool,
+	heldTicks:   u32,
+	_type:       i32,   // bindtype_t enum (INVALID..NUM)
+	keycode:     i64,   // SDL_Keycode
+	padIndex:    i32,
+	pad:         rawptr,  // SDL_GameController* (non-owning)
+	padAxis:     i32,     // SDL_GameControllerAxis
+	padButton:   i32,     // SDL_GameControllerButton
+	padAxisNegative: bool,
+	joystick:    rawptr,  // SDL_Joystick* (non-owning)
+	joystickAxis: i32,
+	joystickAxisNegative: bool,
+	joystickButton: i32,
+	joystickHat: i32,
+	joystickHatState: u8,
+	mouseButton: i32,
+}
+
+binding_t_free :: proc(v: ^binding_t) {
+	if v.input.data != nil {
+		mem.free(v.input.data)
+		v.input.data = nil
+	}
+}
+
+binding_t_copy :: proc(dst: ^binding_t, src: ^binding_t) {
+	dst^ = src^
+	dst.input = DynamicString{}
+	if src.input.len > 0 {
+		buf, _ := mem.alloc(src.input.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.input.data, src.input.len)
+			(^u8)(uintptr(buf) + uintptr(src.input.len))^ = 0
+			dst.input = DynamicString{ data = buf, len = src.input.len }
+		}
+	}
+}
+
+@(export)
+barony_dynamic_map_strbinding_init :: proc "c" (m: ^map[string]binding_t) {
+	context = runtime.default_context()
+	m^ = nil
+}
+
+@(export)
+barony_dynamic_map_strbinding_put :: proc "c" (m: ^map[string]binding_t, key: string, value: ^binding_t) {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]binding_t)
+	}
+	k := intern_string(key)
+	if old, had := m[k]; had {
+		binding_t_free(&old)
+	}
+	new_val: binding_t
+	binding_t_copy(&new_val, value)
+	m[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_strbinding_get :: proc "c" (m: ^map[string]binding_t, key: string, out: ^binding_t) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, ok := m[key]
+	if ok {
+		binding_t_copy(out, &v)
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_strbinding_entry :: proc "c" (m: ^map[string]binding_t, key: string) -> ^binding_t {
+	context = runtime.default_context()
+	if m^ == nil {
+		m^ = make(map[string]binding_t)
+	}
+	k := intern_string(key)
+	_, vp, _, err := map_entry(m, k)
+	if err != nil {
+		return nil
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_strbinding_erase :: proc "c" (m: ^map[string]binding_t, key: string) -> bool {
+	context = runtime.default_context()
+	if m^ == nil {
+		return false
+	}
+	v, had := m[key]
+	if had {
+		binding_t_free(&v)
+		runtime.delete_key(m, key)
+	}
+	return had
+}
+
+@(export)
+barony_dynamic_map_strbinding_clear :: proc "c" (m: ^map[string]binding_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				binding_t_free(vp)
+			}
+		}
+		clear(&m^)
+	}
+}
+
+@(export)
+barony_dynamic_map_strbinding_len :: proc "c" (m: ^map[string]binding_t) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil {
+		return 0
+	}
+	return i32(len(m^))
+}
+
+@(export)
+barony_dynamic_map_strbinding_destroy :: proc "c" (m: ^map[string]binding_t) {
+	context = runtime.default_context()
+	if m^ != nil {
+		for key in m^ {
+			_, vp, _, err := map_entry(m, key)
+			if err == nil && vp != nil {
+				binding_t_free(vp)
+			}
+		}
+		delete(m^)
+		m^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_strbinding_entries :: proc "c" (m: ^map[string]binding_t, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: [^]binding_t, count: i32) -> i32 {
+	context = runtime.default_context()
+	if m^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key in m^ {
+		if n >= count {
+			break
+		}
+		_, vp, _, err := map_entry(m, key)
+		if err != nil || vp == nil {
+			continue
+		}
+		key_ptrs[n] = raw_data(key)
+		key_lens[n] = i32(len(key))
+		binding_t_copy(&val_ptrs[n], vp)
+		n += 1
+	}
+	return n
+}
