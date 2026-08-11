@@ -5197,7 +5197,10 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			}
 
 			// known alchemy recipes and known scrolls
-			player.known_recipes = clientLearnedAlchemyRecipes[c];
+			player.known_recipes.len = 0;
+			for ( const auto& _r : clientLearnedAlchemyRecipes[c] ) {
+				dynarray_push<SaveGameInfo::Player::recipe_t>(player.known_recipes, _r);
+			}
 			for ( auto& entry : clientLearnedScrollLabels[c] ) {
 				player.known_scrolls.push_back(entry);
 			}
@@ -5965,8 +5968,9 @@ int loadGame(int player, const SaveGameInfo& info) {
 
 	// read alchemy recipes
 	clientLearnedAlchemyRecipes[statsPlayer].clear();
-	for (auto& r : info.players[player].known_recipes) {
-		clientLearnedAlchemyRecipes[statsPlayer].push_back(r);
+	for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(info.players[player].known_recipes); ++_ri ) {
+		SaveGameInfo::Player::recipe_t _r = *dynarray_at<SaveGameInfo::Player::recipe_t>(info.players[player].known_recipes, _ri);
+		clientLearnedAlchemyRecipes[statsPlayer].push_back(_r);
 	}
 
 	// read scroll labels

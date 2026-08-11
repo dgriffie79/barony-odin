@@ -490,7 +490,7 @@ struct SaveGameInfo {
 	struct Player {
 		Uint32 char_class = 0;
 		Uint32 race = 0;
-		std::vector<int> kills;
+		DynamicArrayS32 kills;
 
 		bool conductPenniless = false;
 		bool conductFoodless = false;
@@ -504,11 +504,11 @@ struct SaveGameInfo {
 		Uint32 selected_spell;
 		Uint32 selected_spell_alternate[NUM_HOTBAR_ALTERNATES];
 		int selected_spell_last_appearance;
-		std::vector<Uint32> spells;
+		DynamicArrayU32 spells;
 
 		typedef std::pair<int, std::pair<int, int>> recipe_t;
-		std::vector<recipe_t> known_recipes;
-		std::vector<int> known_scrolls;
+		DynamicArray known_recipes;  // vector<recipe_t> (3 ints)
+		DynamicArrayS32 known_scrolls;
 
 		struct PlayerRaceHostility_t
 		{

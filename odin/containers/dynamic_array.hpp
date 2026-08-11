@@ -479,6 +479,7 @@ public:
     const int32_t* end() const { return (const int32_t*)raw.data + size(); }
 
     void push_back(int32_t v) { dynarray_push<int32_t>(raw, v); }
+    void resize(int64_t n) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(int32_t), (int32_t)n); }
 
     void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(int32_t)); }
 
@@ -561,6 +562,11 @@ public:
     void clear() { barony_dynamic_array_clear(&raw); }
 
     void push_back(uint32_t v) { dynarray_push<uint32_t>(raw, v); }
+    void resize(int64_t n) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(uint32_t), (int32_t)n); }
+    uint32_t* begin() { return (uint32_t*)raw.data; }
+    uint32_t* end() { return (uint32_t*)raw.data + size(); }
+    const uint32_t* begin() const { return (const uint32_t*)raw.data; }
+    const uint32_t* end() const { return (const uint32_t*)raw.data + size(); }
 
     void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(uint32_t)); }
 
