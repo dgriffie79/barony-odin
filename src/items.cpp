@@ -33,7 +33,7 @@ ItemGeneric items[NUMITEMS];
 const real_t potionDamageSkillMultipliers[6] = { 1.f, 1.1, 1.25, 1.5, 2.5, 4.f };
 const real_t thrownDamageSkillMultipliers[6] = { 1.f, 1.1, 1.25, 1.5, 2.f, 3.f };
 Uint32 enchantedFeatherScrollSeed;
-std::vector<int> enchantedFeatherScrollsShuffled;
+DynamicArrayS32 enchantedFeatherScrollsShuffled;
 bool overrideTinkeringLimit = false;
 int decoyBoxRange = 15;
 

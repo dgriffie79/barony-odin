@@ -113,7 +113,12 @@ static void updateMapNames()
 		printlog("failed to open map directory for viewing!\n");
 		return;
 	}
-	std::sort(mapNames.begin(), mapNames.end());
+	{
+		std::vector<DynamicString> _sorted;
+		mapNames.snapshot(_sorted);
+		std::sort(_sorted.begin(), _sorted.end());
+		for ( size_t _si = 0; _si < _sorted.size(); ++_si ) { mapNames.set((int64_t)_si, _sorted[_si]); }
+	}
 }
 
 static void updateModFolderNames()
@@ -129,7 +134,12 @@ static void updateModFolderNames()
 		{
 			modFolderNames.erase(it);
 		}
-		std::sort(mapNames.begin(), mapNames.end());
+		{
+		std::vector<DynamicString> _sorted;
+		mapNames.snapshot(_sorted);
+		std::sort(_sorted.begin(), _sorted.end());
+		for ( size_t _si = 0; _si < _sorted.size(); ++_si ) { mapNames.set((int64_t)_si, _sorted[_si]); }
+	}
 	}
 }
 
@@ -588,10 +598,10 @@ void buttonNewConfirm(button_t* my)
 		}
 	}
     for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-        lightmaps[c].clear();
-        lightmaps[c].resize(map.width * map.height);
-        lightmapsSmoothed[c].clear();
-        lightmapsSmoothed[c].resize((map.width + 2) * (map.height + 2));
+        barony_dynamic_array_clear(&lightmaps[c]);
+        barony_dynamic_array_resize(&lightmaps[c], (int64_t)sizeof(vec4_t), map.width * map.height);
+        barony_dynamic_array_clear(&lightmapsSmoothed[c]);
+        barony_dynamic_array_resize(&lightmapsSmoothed[c], (int64_t)sizeof(vec4_t), (map.width + 2) * (map.height + 2));
     }
 	strcpy(message, "                             Created a new map.");
 	filename[0] = 0;
@@ -1492,10 +1502,10 @@ void buttonAttributesConfirm(button_t* my)
 	strcpy(map.name, nametext);
 	strcpy(map.author, authortext);
     for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-        lightmaps[c].clear();
-        lightmaps[c].resize(map.width * map.height);
-        lightmapsSmoothed[c].clear();
-        lightmapsSmoothed[c].resize((map.width + 2) * (map.height + 2));
+        barony_dynamic_array_clear(&lightmaps[c]);
+        barony_dynamic_array_resize(&lightmaps[c], (int64_t)sizeof(vec4_t), map.width * map.height);
+        barony_dynamic_array_clear(&lightmapsSmoothed[c]);
+        barony_dynamic_array_resize(&lightmapsSmoothed[c], (int64_t)sizeof(vec4_t), (map.width + 2) * (map.height + 2));
     }
 
 	// transfer data from the new map to the old map and fill extra space with empty data
@@ -1766,16 +1776,18 @@ void buttonOpenNextMap(button_t* my)
 		searchStr += ".lmp";
 	}
 
-	for ( auto it = mapNames.begin(); it != mapNames.end(); )
+	for ( int64_t _mi = 0; _mi < mapNames.size(); ++_mi )
 	{
-		if ( (*it) == searchStr )
+		DynamicString _cur = mapNames.at(_mi);
+		if ( _cur == searchStr )
 		{
-			++it;
-			if ( it != mapNames.end() )
+			_mi += 1;
+			if ( _mi < mapNames.size() )
 			{
-				if ( it->size() > 0 && it->front() != '.' )
+				DynamicString _next = mapNames.at(_mi);
+				if ( _next.size() > 0 && _next.front() != '.' )
 				{
-					DynamicString f = *it;
+					DynamicString f = _next;
 					auto find = f.find(".lmp");
 					if ( find != std::string::npos )
 					{
@@ -1789,7 +1801,7 @@ void buttonOpenNextMap(button_t* my)
 		}
 		else
 		{
-			++it;
+			// (index advanced by loop)
 		}
 	}
 
@@ -1810,16 +1822,18 @@ void buttonOpenPrevMap(button_t* my)
 		searchStr += ".lmp";
 	}
 
-	for ( auto it = mapNames.rbegin(); it != mapNames.rend(); )
+	for ( int64_t _mi2 = mapNames.size(); _mi2 > 0; --_mi2 )
 	{
-		if ( (*it) == searchStr )
+		DynamicString _cur = mapNames.at(_mi2 - 1);
+		if ( _cur == searchStr )
 		{
-			++it;
-			if ( it != mapNames.rend() )
+			_mi2 -= 1;
+			if ( _mi2 > 0 )
 			{
-				if ( it->size() > 0 && it->front() != '.' )
+				DynamicString _next = mapNames.at(_mi2 - 1);
+				if ( _next.size() > 0 && _next.front() != '.' )
 				{
-					DynamicString f = *it;
+					DynamicString f = _next;
 					auto find = f.find(".lmp");
 					if ( find != std::string::npos )
 					{
@@ -1834,7 +1848,7 @@ void buttonOpenPrevMap(button_t* my)
 		}
 		else
 		{
-			++it;
+			// (index advanced by loop)
 		}
 	}
 

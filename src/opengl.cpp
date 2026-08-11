@@ -580,8 +580,8 @@ static void fillSmoothLightmap(int which, map_t& map) {
     }
 #endif
 
-    auto lightmap = lightmaps[which].data();
-    auto lightmapSmoothed = lightmapsSmoothed[which].data();
+    auto lightmap = (vec4_t*)lightmaps[which].data;
+    auto lightmapSmoothed = (vec4_t*)lightmapsSmoothed[which].data;
     
     constexpr float epsilon = 1.f;
     constexpr float defaultSmoothRate = 4.f;
@@ -638,7 +638,7 @@ static inline bool testTileOccludes(const map_t& map, int index) {
 }
 
 static void loadLightmapTexture(int which, map_t& map) {
-    auto lightmapSmoothed = lightmapsSmoothed[which].data();
+    auto lightmapSmoothed = (vec4_t*)lightmapsSmoothed[which].data;
     
     // allocate lightmap pixel data
     static std::vector<float> pixels;

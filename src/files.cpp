@@ -3119,12 +3119,12 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
         for (int c = 0; c < MAXPLAYERS + 1; ++c) {
             auto& lightmap = lightmaps[c];
             auto& lightmapSmoothed = lightmapsSmoothed[c];
-            lightmap.resize(destmap->width * destmap->height);
-            lightmapSmoothed.resize((destmap->width + 2) * (destmap->height + 2));
+            barony_dynamic_array_resize(&lightmap, (int64_t)sizeof(vec4_t), destmap->width * destmap->height);
+            barony_dynamic_array_resize(&lightmapSmoothed, (int64_t)sizeof(vec4_t), (destmap->width + 2) * (destmap->height + 2));
             if ( strncmp(map.name, "Hell", 4) )
             {
-                memset(lightmap.data(), 0, sizeof(vec4_t) * map.width * map.height);
-                memset(lightmapSmoothed.data(), 0, sizeof(vec4_t) * (map.width + 2) * (map.height + 2));
+                memset(lightmap.data, 0, sizeof(vec4_t) * map.width * map.height);
+                memset(lightmapSmoothed.data, 0, sizeof(vec4_t) * (map.width + 2) * (map.height + 2));
 
 #ifndef EDITOR
 				if ( !strncmp(map.filename, "fortress", 8) )
@@ -3135,15 +3135,15 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 					ambienceColor.z *= ambienceColor.w;
 					for ( int c = 0; c < destmap->width * destmap->height; c++ )
 					{
-						lightmap[c].x = ambienceColor.x;
-						lightmap[c].y = ambienceColor.y;
-						lightmap[c].z = ambienceColor.z;
+						dynarray_at<vec4_t>(lightmap, c)->x = ambienceColor.x;
+						dynarray_at<vec4_t>(lightmap, c)->y = ambienceColor.y;
+						dynarray_at<vec4_t>(lightmap, c)->z = ambienceColor.z;
 					}
 					for ( int c = 0; c < (destmap->width + 2) * (destmap->height + 2); c++ )
 					{
-						lightmapSmoothed[c].x = ambienceColor.x;
-						lightmapSmoothed[c].y = ambienceColor.y;
-						lightmapSmoothed[c].z = ambienceColor.z;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->x = ambienceColor.x;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->y = ambienceColor.y;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->z = ambienceColor.z;
 					}
 				}
 				if ( (svFlags & SV_FLAG_CHEATS) && 
@@ -3157,15 +3157,15 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 					ambienceColor.z *= ambienceColor.w;
 					for ( int c = 0; c < destmap->width * destmap->height; c++ )
 					{
-						lightmap[c].x = ambienceColor.x;
-						lightmap[c].y = ambienceColor.y;
-						lightmap[c].z = ambienceColor.z;
+						dynarray_at<vec4_t>(lightmap, c)->x = ambienceColor.x;
+						dynarray_at<vec4_t>(lightmap, c)->y = ambienceColor.y;
+						dynarray_at<vec4_t>(lightmap, c)->z = ambienceColor.z;
 					}
 					for ( int c = 0; c < (destmap->width + 2) * (destmap->height + 2); c++ )
 					{
-						lightmapSmoothed[c].x = ambienceColor.x;
-						lightmapSmoothed[c].y = ambienceColor.y;
-						lightmapSmoothed[c].z = ambienceColor.z;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->x = ambienceColor.x;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->y = ambienceColor.y;
+						dynarray_at<vec4_t>(lightmapSmoothed, c)->z = ambienceColor.z;
 					}
 				}
 #endif
@@ -3174,29 +3174,29 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
             {
                 for (int c = 0; c < destmap->width * destmap->height; c++ )
                 {
-                    lightmap[c].x = hellAmbience;
-                    lightmap[c].y = hellAmbience;
-                    lightmap[c].z = hellAmbience;
+                    dynarray_at<vec4_t>(lightmap, c)->x = hellAmbience;
+                    dynarray_at<vec4_t>(lightmap, c)->y = hellAmbience;
+                    dynarray_at<vec4_t>(lightmap, c)->z = hellAmbience;
 #ifndef EDITOR
                     if ( svFlags & SV_FLAG_CHEATS )
                     {
-                        lightmap[c].x = *cvar_hell_ambience;
-                        lightmap[c].y = *cvar_hell_ambience;
-                        lightmap[c].z = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmap, c)->x = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmap, c)->y = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmap, c)->z = *cvar_hell_ambience;
                     }
 #endif
                 }
                 for (int c = 0; c < (destmap->width + 2) * (destmap->height + 2); c++ )
                 {
-                    lightmapSmoothed[c].x = hellAmbience;
-                    lightmapSmoothed[c].y = hellAmbience;
-                    lightmapSmoothed[c].z = hellAmbience;
+                    dynarray_at<vec4_t>(lightmapSmoothed, c)->x = hellAmbience;
+                    dynarray_at<vec4_t>(lightmapSmoothed, c)->y = hellAmbience;
+                    dynarray_at<vec4_t>(lightmapSmoothed, c)->z = hellAmbience;
 #ifndef EDITOR
                     if ( svFlags & SV_FLAG_CHEATS )
                     {
-                        lightmapSmoothed[c].x = *cvar_hell_ambience;
-                        lightmapSmoothed[c].y = *cvar_hell_ambience;
-                        lightmapSmoothed[c].z = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmapSmoothed, c)->x = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmapSmoothed, c)->y = *cvar_hell_ambience;
+                        dynarray_at<vec4_t>(lightmapSmoothed, c)->z = *cvar_hell_ambience;
                     }
 #endif
                 }

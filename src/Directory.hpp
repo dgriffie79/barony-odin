@@ -21,12 +21,17 @@ public:
 			std::string entry(ent->d_name);
 			if (ent->d_name[0] != '.')
 			{
-				list.emplace_back(ent->d_name);
+				list.push_back(ent->d_name);
 			}
 		}
 		closedir(dir);
-		std::sort(list.begin(), list.end());
+		{
+			std::vector<DynamicString> _sorted;
+			list.snapshot(_sorted);
+			std::sort(_sorted.begin(), _sorted.end());
+			for ( size_t _si = 0; _si < _sorted.size(); ++_si ) { list.set((int64_t)_si, _sorted[_si]); }
+		}
 	}
-	std::vector<DynamicString> list;
+	DynamicArrayStr list;
 	const char* path;
 };

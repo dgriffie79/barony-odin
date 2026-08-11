@@ -930,35 +930,36 @@ bool itemIsConsumableByAutomaton(const Item& item);
 extern const real_t potionDamageSkillMultipliers[6];
 extern const real_t thrownDamageSkillMultipliers[6];
 extern Uint32 enchantedFeatherScrollSeed;
-extern std::vector<int> enchantedFeatherScrollsShuffled;
-static const std::vector<int> enchantedFeatherScrollsFixedList =
-{
-	SCROLL_BLANK,
-	SCROLL_MAIL,
-	SCROLL_DESTROYARMOR,
-	SCROLL_DESTROYARMOR,
-	SCROLL_DESTROYARMOR,
-	SCROLL_FIRE,
-	SCROLL_FIRE,
-	SCROLL_FIRE,
-	SCROLL_LIGHT,
-	SCROLL_LIGHT,
-	SCROLL_SUMMON,
-	SCROLL_SUMMON,
-	SCROLL_IDENTIFY,
-	SCROLL_IDENTIFY,
-	SCROLL_REMOVECURSE,
-	SCROLL_CONJUREARROW,
-	SCROLL_FOOD,
-	SCROLL_FOOD,
-	SCROLL_TELEPORTATION,
-	SCROLL_TELEPORTATION,
-	SCROLL_CHARGING,
-	SCROLL_REPAIR,
-	SCROLL_MAGICMAPPING,
-	SCROLL_ENCHANTWEAPON,
-	SCROLL_ENCHANTARMOR
-};
+extern DynamicArrayS32 enchantedFeatherScrollsShuffled;
+static DynamicArrayS32 enchantedFeatherScrollsFixedList = []() {
+	DynamicArrayS32 m;
+		m.push_back(SCROLL_BLANK);
+		m.push_back(SCROLL_MAIL);
+		m.push_back(SCROLL_DESTROYARMOR);
+		m.push_back(SCROLL_DESTROYARMOR);
+		m.push_back(SCROLL_DESTROYARMOR);
+		m.push_back(SCROLL_FIRE);
+		m.push_back(SCROLL_FIRE);
+		m.push_back(SCROLL_FIRE);
+		m.push_back(SCROLL_LIGHT);
+		m.push_back(SCROLL_LIGHT);
+		m.push_back(SCROLL_SUMMON);
+		m.push_back(SCROLL_SUMMON);
+		m.push_back(SCROLL_IDENTIFY);
+		m.push_back(SCROLL_IDENTIFY);
+		m.push_back(SCROLL_REMOVECURSE);
+		m.push_back(SCROLL_CONJUREARROW);
+		m.push_back(SCROLL_FOOD);
+		m.push_back(SCROLL_FOOD);
+		m.push_back(SCROLL_TELEPORTATION);
+		m.push_back(SCROLL_TELEPORTATION);
+		m.push_back(SCROLL_CHARGING);
+		m.push_back(SCROLL_REPAIR);
+		m.push_back(SCROLL_MAGICMAPPING);
+		m.push_back(SCROLL_ENCHANTWEAPON);
+		m.push_back(SCROLL_ENCHANTARMOR);
+	return m;
+}();
 static const int ENCHANTED_FEATHER_MAX_DURABILITY = 101;
 static const int QUIVER_MAX_AMMO_QTY = 51;
 static const int SCRAP_MAX_STACK_QTY = 101;

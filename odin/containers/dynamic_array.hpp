@@ -464,6 +464,11 @@ public:
     bool empty() const { return size() == 0; }
 
     void clear() { barony_dynamic_array_clear(&raw); }
+    void reserve(int64_t n) { if (raw.cap < n * (int64_t)sizeof(int32_t)) { barony_dynamic_array_resize(&raw, (int64_t)sizeof(int32_t), (int32_t)dynarray_size<int32_t>(raw)); } }
+    int32_t* begin() { return (int32_t*)raw.data; }
+    int32_t* end() { return (int32_t*)raw.data + size(); }
+    const int32_t* begin() const { return (const int32_t*)raw.data; }
+    const int32_t* end() const { return (const int32_t*)raw.data + size(); }
 
     void push_back(int32_t v) { dynarray_push<int32_t>(raw, v); }
 

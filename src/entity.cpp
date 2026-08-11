@@ -533,7 +533,7 @@ int Entity::entityLight()
 	}
 	int light_x = (int)this->x / 16;
 	int light_y = (int)this->y / 16;
-    const auto& light = lightmaps[0][light_y + light_x * map.height];
+    const auto& light = *dynarray_at<vec4_t>(lightmaps[0], light_y + light_x * map.height);
     //return (light.x + light.y + light.z) / 3.f;
 	float level = (light.x + light.y + light.z) / 3.f;
 	if ( !strncmp(map.filename, "fortress", 8) )

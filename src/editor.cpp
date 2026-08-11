@@ -48,7 +48,7 @@ void mainLogic(void);
 std::vector<Entity*> groupedEntities;
 bool moveSelectionNegativeX = false;
 bool moveSelectionNegativeY = false;
-std::vector<DynamicString> mapNames;
+DynamicArrayStr mapNames;
 std::list<std::string> modFolderNames;
 std::string physfs_saveDirectory = BASE_DATA_DIR;
 std::string physfs_openDirectory = BASE_DATA_DIR;
@@ -1713,10 +1713,10 @@ extern "C" int barony_main(int argc, char** argv)
 		}
 	}
     for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-        lightmaps[c].clear();
-        lightmaps[c].resize(map.width * map.height);
-        lightmapsSmoothed[c].clear();
-        lightmapsSmoothed[c].resize((map.width + 2) * (map.height + 2));
+        barony_dynamic_array_clear(&lightmaps[c]);
+        barony_dynamic_array_resize(&lightmaps[c], (int64_t)sizeof(vec4_t), map.width * map.height);
+        barony_dynamic_array_clear(&lightmapsSmoothed[c]);
+        barony_dynamic_array_resize(&lightmapsSmoothed[c], (int64_t)sizeof(vec4_t), (map.width + 2) * (map.height + 2));
     }
 
 	// initialize camera position
@@ -2827,7 +2827,7 @@ extern "C" int barony_main(int argc, char** argv)
 							slidery = std::min(std::max(suby1 + 21, slidery), suby2 - 53 - slidersize);
 							y2 = ((real_t)(slidery - suby1 - 20) / ((suby2 - 52) - (suby1 + 20))) * (mapNames.size() + 1);
 							selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(mapNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-							strcpy(filename, mapNames[selectedFile].c_str());
+							strcpy(filename, mapNames.at(selectedFile).c_str());
 							inputstr = filename;
 							scroll = 0;
 						}
@@ -2838,7 +2838,7 @@ extern "C" int barony_main(int argc, char** argv)
 							y2 = ((real_t)(slidery - suby1 - 20) / ((suby2 - 52) - (suby1 + 20))) * (mapNames.size() + 1);
 							mclick = 1;
 							selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(mapNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-							strcpy(filename, mapNames[selectedFile].c_str());
+							strcpy(filename, mapNames.at(selectedFile).c_str());
 							inputstr = filename;
 						}
 						else
@@ -2853,7 +2853,7 @@ extern "C" int barony_main(int argc, char** argv)
 							{
 								selectedFile = y2 + ((omousey - suby1 - 24) >> 3);
 								selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(mapNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-								strcpy(filename, mapNames[selectedFile].c_str());
+								strcpy(filename, mapNames.at(selectedFile).c_str());
 								inputstr = filename;
 							}
 						}
@@ -2869,7 +2869,7 @@ extern "C" int barony_main(int argc, char** argv)
 						c = std::min<long unsigned int>(mapNames.size(), 20 + y2); //TODO: Why are long unsigned int and int being compared?
 						for (z = y2; z < c; z++)
 						{
-							printText(font8x8_bmp, x, y, mapNames[z].c_str());
+							printText(font8x8_bmp, x, y, mapNames.at(z).c_str());
 							y += 8;
 						}
 					}

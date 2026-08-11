@@ -384,7 +384,7 @@ void Player::BookGUI_t::updateBookGUI()
 
 	if ( currentBookPage < numPages )
 	{
-		leftColumn->setText(allBooks[bookIndex].formattedPages[currentBookPage].c_str());
+		leftColumn->setText(allBooks[bookIndex].formattedPages.at(currentBookPage).c_str());
 	}
 	else
 	{
@@ -392,7 +392,7 @@ void Player::BookGUI_t::updateBookGUI()
 	}
 	if ( currentBookPage + 1 < numPages )
 	{
-		rightColumn->setText(allBooks[bookIndex].formattedPages[currentBookPage + 1].c_str());
+		rightColumn->setText(allBooks[bookIndex].formattedPages.at(currentBookPage + 1).c_str());
 	}
 	else
 	{

@@ -47,7 +47,7 @@ extern int openwindow, savewindow, newwindow;
 extern int slidery, slidersize;
 extern int menuDisappear;
 extern int selectedFile;
-extern std::vector<DynamicString> mapNames;
+extern DynamicArrayStr mapNames;
 extern std::list<std::string> modFolderNames;
 extern std::string physfs_saveDirectory;
 extern std::string physfs_openDirectory;

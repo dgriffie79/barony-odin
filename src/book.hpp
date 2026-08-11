@@ -19,7 +19,7 @@ public:
 	Book_t() {};
 	DynamicString text = "";
 	DynamicString default_name = "";
-	std::vector<DynamicString> formattedPages;
+	DynamicArrayStr formattedPages;
 };
 extern std::vector<Book_t> allBooks;
 

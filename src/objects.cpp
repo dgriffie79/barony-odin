@@ -137,14 +137,14 @@ void lightDeconstructor(void* data)
                         continue;
                     }
                     if (light->index) {
-                        auto& d = lightmaps[light->index][doff];
+                        auto& d = *dynarray_at<vec4_t>(lightmaps[light->index], doff);
                         d.x -= s.x;
                         d.y -= s.y;
                         d.z -= s.z;
                         d.w -= s.w;
                     } else {
                         for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-                            auto& d = lightmaps[c][doff];
+                            auto& d = *dynarray_at<vec4_t>(lightmaps[c], doff);
                             d.x -= s.x;
                             d.y -= s.y;
                             d.z -= s.z;

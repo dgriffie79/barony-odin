@@ -7614,7 +7614,7 @@ void doNewGame(bool makeHighscore) {
 	    while (!shuffle.empty()) {
 	        int index = feather_rng.getU8() % shuffle.size();
 	        enchantedFeatherScrollsShuffled.push_back(shuffle[index]);
-	        shuffle.erase(shuffle.begin() + index);
+	        shuffle.erase(index);
 	    }
 	}
 	/*for ( auto it = enchantedFeatherScrollsShuffled.begin(); it != enchantedFeatherScrollsShuffled.end(); ++it )

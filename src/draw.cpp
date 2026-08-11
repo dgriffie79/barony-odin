@@ -1984,11 +1984,11 @@ void raycast(const view_t& camera, Sint8 (*minimap)[MINIMAP_MAX_DIMENSION], bool
     auto t = std::chrono::high_resolution_clock::now();
 
     // shoot the rays
-    const vec4_t* lightmap = lightmaps[0].data();
+    const vec4_t* lightmap = (const vec4_t*)lightmaps[0].data;
 	int player = -1;
     for (int c = 0; c < MAXPLAYERS; ++c) {
         if (&camera == &cameras[c]) {
-            lightmap = lightmaps[c + 1].data();
+            lightmap = (const vec4_t*)lightmaps[c + 1].data;
 			player = c;
             break;
         }

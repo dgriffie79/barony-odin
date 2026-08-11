@@ -103,14 +103,14 @@ light_t* lightSphereShadow(int index, Sint32 x, Sint32 y, Sint32 radius, float r
                     s.w += a - a * falloff;
                     const auto doff = v + u * map.height;
                     if (index) {
-                        auto& d = lightmaps[index][doff];
+                        auto& d = *dynarray_at<vec4_t>(lightmaps[index], doff);
                         d.x += s.x;
                         d.y += s.y;
                         d.z += s.z;
                         d.w += s.w;
                     } else {
                         for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-                            auto& d = lightmaps[c][doff];
+                            auto& d = *dynarray_at<vec4_t>(lightmaps[c], doff);
                             d.x += s.x;
                             d.y += s.y;
                             d.z += s.z;
@@ -156,14 +156,14 @@ light_t* lightSphere(int index, Sint32 x, Sint32 y, Sint32 radius, float r, floa
                 s.w += a - a * falloff;
                 const auto doff = v + u * map.height;
                 if (index) {
-                    auto& d = lightmaps[index][doff];
+                    auto& d = *dynarray_at<vec4_t>(lightmaps[index], doff);
                     d.x += s.x;
                     d.y += s.y;
                     d.z += s.z;
                     d.w += s.w;
                 } else {
                     for (int c = 0; c < MAXPLAYERS + 1; ++c) {
-                        auto& d = lightmaps[c][doff];
+                        auto& d = *dynarray_at<vec4_t>(lightmaps[c], doff);
                         d.x += s.x;
                         d.y += s.y;
                         d.z += s.z;
