@@ -73,8 +73,8 @@ public:
 class MonsterStatCustomManager
 {
 public:
-	static const std::vector<DynamicString> itemStatusStrings;
-	static const std::vector<DynamicString> shopkeeperTypeStrings;
+	static const DynamicArrayStr itemStatusStrings;
+	static const DynamicArrayStr shopkeeperTypeStrings;
 	MonsterStatCustomManager() = default;
 	static BaronyRNG monster_stat_rng;
 
@@ -1885,7 +1885,7 @@ public:
 	public:
 		MapGeneration(std::string name) { mapName = name; };
 		DynamicString mapName = "";
-		std::vector<DynamicString> trapTypes;
+		DynamicArrayStr trapTypes;
 		std::unordered_set<int> minoFloors;
 		std::unordered_set<int> darkFloors;
 		std::unordered_set<int> shopFloors;
@@ -2495,8 +2495,8 @@ public:
 			void setup(DynamicString _seedString);
 			void reset();
 
-			static std::vector<DynamicString> prefixes;
-			static std::vector<DynamicString> suffixes;
+			static DynamicArrayStr prefixes;
+			static DynamicArrayStr suffixes;
 			static void readSeedNamesFromFile();
 		} seededRun;
 
@@ -2746,7 +2746,7 @@ class ItemTooltips_t
 		Sint32 itemLevel = -1;
 		DynamicString category = "nothing";
 		DynamicString equipSlot = "nothing";
-		std::vector<DynamicString> imagePaths;
+		DynamicArrayStr imagePaths;
 		DynamicMapI32 attributes;
 		DynamicString tooltip = "tooltip_default";
 		std::string iconLabelPath = "";
@@ -2796,10 +2796,10 @@ private:
 		Sint32 spellbookId = -1;
 		Sint32 magicstaffId = -1;
 		Sint32 fociId = -1;
-		std::vector<DynamicString> spellTagsStr;
+		DynamicArrayStr spellTagsStr;
 		std::set<SpellTagTypes> spellTags;
-		std::vector<DynamicString> spellFormatTags;
-		std::vector<int> spellbookItemIconPaddingLines;
+		DynamicArrayStr spellFormatTags;
+		DynamicArrayS32 spellbookItemIconPaddingLines;
 		std::set<spell_t::SpellOnCastEventTypes> spellLevelTags;
 
 		bool hasExpandedJSON = false;
@@ -2978,7 +2978,7 @@ public:
 		real_t heightOffset = 0.0;
 	};
 
-	const std::vector<DynamicString> directionKeys{ "east", "south", "west", "north" };
+	const DynamicArrayStr directionKeys{ "east", "south", "west", "north" };
 	std::map<Uint32, Statue_t> allStatues;
 };
 extern StatueManager_t StatueManager;
@@ -3166,10 +3166,10 @@ struct ShopkeeperConsumables_t
 	{
 		std::vector<ItemType> type;
 		std::vector<Status> status;
-		std::vector<Sint16> beatitude;
-		std::vector<Sint16> count;
-		std::vector<Uint32> appearance;
-		std::vector<bool> identified;
+		DynamicArrayS32 beatitude;
+		DynamicArrayS32 count;
+		DynamicArrayU32 appearance;
+		DynamicArrayS32 identified;
 		
 		int percentChance = 100;
 		int weightedChance = 1;
@@ -3191,8 +3191,8 @@ struct ClassHotbarConfig_t
 {
 	struct HotbarEntry_t
 	{
-		std::vector<int> itemTypes;
-		std::vector<int> itemCategories;
+		DynamicArrayS32 itemTypes;
+		DynamicArrayS32 itemCategories;
 		int slotnum = -1;
 		HotbarEntry_t(int _slotnum)
 		{
@@ -3318,8 +3318,8 @@ struct EditorEntityData_t
 	struct EntityColliderData_t
 	{
 		int gib = 0;
-		std::vector<int> gib_hit;
-		std::vector<int> sfxBreak;
+		DynamicArrayS32 gib_hit;
+		DynamicArrayS32 sfxBreak;
 		int sfxHit = 0;
 		DynamicString damageCalculationType = "default";
 		DynamicString name = "";
@@ -3328,7 +3328,7 @@ struct EditorEntityData_t
 		int hitMessageLangEntry = 2509;
 		int breakMessageLangEntry = 2510;
 		std::map<std::string, std::vector<int>> hideMonsters;
-		std::vector<int> spellTriggers;
+		DynamicArrayS32 spellTriggers;
 		std::set<int> pathableMonsters;
 		int colliderJumpLangEntry = 6234;
 		DynamicMapI32 overrideProperties;

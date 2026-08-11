@@ -209,6 +209,10 @@ public:
     DynamicArray raw{};
 
     DynamicArrayT() { barony_dynamic_array_elem_init(&raw); }
+    DynamicArrayT(std::initializer_list<T> init) {
+        barony_dynamic_array_elem_init(&raw);
+        for (const T& v : init) push_back(v);
+    }
     ~DynamicArrayT() { barony_dynamic_array_elem_destroy(&raw, sizeof(T), DynamicArrayKindOf<T>::value); }
     DynamicArrayT(const DynamicArrayT& other) : raw{} {
         barony_dynamic_array_elem_init(&raw);

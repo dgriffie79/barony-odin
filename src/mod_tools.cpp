@@ -45,7 +45,7 @@ IRCHandler_t IRCHandler;
 StatueManager_t StatueManager;
 DebugTimers_t DebugTimers;
 
-const std::vector<DynamicString> MonsterStatCustomManager::itemStatusStrings =
+const DynamicArrayStr MonsterStatCustomManager::itemStatusStrings =
 {
 	"broken",
 	"decrepit",
@@ -54,7 +54,7 @@ const std::vector<DynamicString> MonsterStatCustomManager::itemStatusStrings =
 	"excellent"
 };
 
-const std::vector<DynamicString> MonsterStatCustomManager::shopkeeperTypeStrings =
+const DynamicArrayStr MonsterStatCustomManager::shopkeeperTypeStrings =
 {
 	"equipment",
 	"hats",
@@ -597,8 +597,8 @@ bool GameModeManager_t::allowsBoulderBreak()
 	return false;
 }
 
-std::vector<DynamicString> GameModeManager_t::CurrentSession_t::SeededRun_t::prefixes;
-std::vector<DynamicString> GameModeManager_t::CurrentSession_t::SeededRun_t::suffixes;
+DynamicArrayStr GameModeManager_t::CurrentSession_t::SeededRun_t::prefixes;
+DynamicArrayStr GameModeManager_t::CurrentSession_t::SeededRun_t::suffixes;
 
 void GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile()
 {
