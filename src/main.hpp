@@ -315,7 +315,7 @@ extern bool stop;
 #define IN_HOTBAR_SCROLL_RIGHT 23
 #define IN_HOTBAR_SCROLL_SELECT 24
 #define NUMIMPULSES 25
-static const std::vector<DynamicString> impulseStrings =
+static const DynamicArrayStr impulseStrings =
 {
 	"IN_FORWARD",
 	"IN_LEFT",

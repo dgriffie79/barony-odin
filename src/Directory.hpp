@@ -26,7 +26,7 @@ public:
 		}
 		closedir(dir);
 		{
-			std::vector<DynamicString> _sorted;
+			DynamicArrayStr _sorted;
 			list.snapshot(_sorted);
 			std::sort(_sorted.begin(), _sorted.end());
 			for ( size_t _si = 0; _si < _sorted.size(); ++_si ) { list.set((int64_t)_si, _sorted[_si]); }

@@ -294,8 +294,10 @@ public:
     // NOTE: operator[] returns the live slot. For owned types, reading via []
     // gives the stored element (not a copy). at() is the deep-copy read.
 
-    // snapshot: deep-copy all elements into the caller's vector
-    void snapshot(std::vector<T>& out) const {
+    // snapshot: deep-copy all elements into the caller's container
+    // (works with both std::vector<T> and DynamicArrayT<T> out-params)
+    template<typename OutT>
+    void snapshot(OutT& out) const {
         int64_t n = size();
         out.clear();
         if (n <= 0) return;

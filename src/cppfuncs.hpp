@@ -18,17 +18,6 @@
 #include "../odin/containers/dynamic_array.hpp"
 #include "prng.hpp"
 
-template<typename T>
-T randomEntryFromVector(std::vector<T> vector)
-{
-	if ( !vector.size() )
-	{
-		throw "Empty vector!";
-	}
-
-    static BaronyRNG rng;
-	return vector[rng.rand() % vector.size()];
-}
 
 // DynamicArrayStr overload (for the name-list pickers)
 inline DynamicString randomEntryFromVector(DynamicArrayStr& vector)

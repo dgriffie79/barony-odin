@@ -1566,8 +1566,8 @@ enum EntityHungerIntervals : int
 int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerIntervals hungerInterval);
 
 //Fountain potion drop chance variables.
-extern const std::vector<unsigned int> fountainPotionDropChances;
-extern const std::vector<std::pair<int, int>> potionStandardAppearanceMap;
+extern const DynamicArrayU32 fountainPotionDropChances;
+extern const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap;
 std::pair<int, int> fountainGeneratePotionDrop(BaronyRNG& rng);
 
 class TextSourceScript

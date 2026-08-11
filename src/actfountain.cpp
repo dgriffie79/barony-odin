@@ -26,7 +26,7 @@
 #include "mod_tools.hpp"
 
 //Fountain functions.
-const std::vector<unsigned int> fountainPotionDropChances =
+const DynamicArrayU32 fountainPotionDropChances =
 {
 	5,	//POTION_WATER,
 	20,	//POTION_BOOZE,
@@ -46,7 +46,7 @@ const std::vector<unsigned int> fountainPotionDropChances =
 	2	//POTION_POLYMORPH
 };
 
-const std::vector<std::pair<int, int>> potionStandardAppearanceMap =
+const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap =
 {
 	// second element is appearance.
 	{ POTION_WATER, 0 },
