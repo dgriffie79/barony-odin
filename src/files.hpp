@@ -41,7 +41,13 @@ public:
 			return 0U;
 		}
 		const size_t writeSize = size * count;
-		(void)data.insert(data.begin() + pos, (const uint8_t*)src, (const uint8_t*)src + writeSize);
+		if (pos + writeSize > (size_t)data.len) {
+		    barony_dynamic_array_resize(&data, 1, (int32_t)(pos + writeSize));
+		}
+		if (writeSize) {
+		    memmove((uint8_t*)data.data + pos + writeSize, (uint8_t*)data.data + pos, (size_t)data.len - pos - writeSize);
+		    memcpy((uint8_t*)data.data + pos, src, writeSize);
+		}
 		pos += writeSize;
 		return writeSize / size;
 	}
@@ -61,7 +67,7 @@ public:
 		size_t end = std::min(this->size(), pos + size * count);
 		uint8_t* buf = (uint8_t*)buffer;
 		for (size_t c = pos; c < end; ++c) {
-			*buf = data[c]; ++buf;
+			*buf = ((uint8_t*)data.data)[c]; ++buf;
 			++readSize;
 		}
 		pos += readSize;
@@ -72,7 +78,7 @@ public:
 	// @return the size in bytes
 	size_t size()
 	{
-		return data.size();
+		return (size_t)data.len;
 	}
 
 	// determine whether we have reached the end of the file or not
@@ -245,13 +251,13 @@ public:
 	        size_t c = 0u;
 	        size_t end = size();
 		    for (; c < end;) {
-		        size_t result = fwrite(data.data(), sizeof(uint8_t), end - c, fp);
+		        size_t result = fwrite((uint8_t*)data.data, sizeof(uint8_t), end - c, fp);
 		        if (!result) {
 		            // failed to write, try to write just a chunk
 		            constexpr size_t chunk_size = 1024;
 		            size_t chunk = std::min(end - c, chunk_size);
 		            printlog("[FILES] failed to write %llu bytes to '%s', trying %llu bytes instead", end - c, path.c_str(), chunk);
-		            result = fwrite(data.data(), sizeof(uint8_t), chunk, fp);
+		            result = fwrite((uint8_t*)data.data, sizeof(uint8_t), chunk, fp);
 		            assert(result);
 		        }
 		        c += result;
@@ -273,16 +279,16 @@ private:
 		    (void)fseek(fp, 0, SEEK_END);
 		    size_t end = ftell(fp);
 		    (void)fseek(fp, 0, SEEK_SET);
-		    data.resize(end);
+		    barony_dynamic_array_resize(&data, 1, (int32_t)end);
 		    size_t c = 0;
 		    for (; c < end;) {
-		        size_t result = fread(data.data(), sizeof(uint8_t), end - c, fp);
+		        size_t result = fread((uint8_t*)data.data, sizeof(uint8_t), end - c, fp);
 		        if (!result) {
 		            // failed to read, try to read just a chunk
 		            constexpr size_t chunk_size = 1024;
 		            size_t chunk = std::min(end - c, chunk_size);
 		            printlog("[FILES] failed to read %llu bytes from '%s', trying %llu bytes instead", end - c, path, chunk);
-		            result = fread(data.data(), sizeof(uint8_t), chunk, fp);
+		            result = fread((uint8_t*)data.data, sizeof(uint8_t), chunk, fp);
 		            assert(result);
 		        }
 		        c += result;
@@ -298,7 +304,7 @@ private:
 	FileMode mode = FileMode::INVALID;
 	std::string path;
 	FILE* fp = nullptr;
-	std::vector<uint8_t> data;
+	DynamicArray data;  // byte buffer (vector<uint8_t>)
 	size_t pos = 0u;
 };
 

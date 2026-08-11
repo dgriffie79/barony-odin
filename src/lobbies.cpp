@@ -108,7 +108,7 @@ LobbyHandler_t::LobbyServiceType LobbyHandler_t::getDisplayedResultLobbyType(int
 	{
 		return LOBBY_DISABLE;
 	}
-	return lobbyDisplayedSearchResults.at(selection).second;
+	return lobbyDisplayedSearchResults[selection].second;
 }
 Sint32 LobbyHandler_t::getDisplayedResultLobbyIndex(int selection)
 {
@@ -116,7 +116,7 @@ Sint32 LobbyHandler_t::getDisplayedResultLobbyIndex(int selection)
 	{
 		return -1;
 	}
-	return lobbyDisplayedSearchResults.at(selection).first;
+	return lobbyDisplayedSearchResults[selection].first;
 }
 
 

@@ -15,12 +15,16 @@ See LICENSE for details.
 
 class LobbyHandler_t
 {
-	const int kNumSearchResults = 200;
+	static constexpr int kNumSearchResults = 200;
 	bool filterShowInProgressLobbies = false;
 public:
 	LobbyHandler_t() :
-		lobbyDisplayedSearchResults(kNumSearchResults, std::make_pair(-1, LOBBY_DISABLE))
+		lobbyDisplayedSearchResults{}
 	{
+		for ( int _i = 0; _i < kNumSearchResults; ++_i )
+		{
+			lobbyDisplayedSearchResults[_i] = std::make_pair(-1, LOBBY_DISABLE);
+		}
 	};
 
 	enum LobbyServiceType : int
@@ -41,7 +45,7 @@ public:
 	void drawLobbyFilters();
 	LobbyServiceType getDisplayedResultLobbyType(int selection);
 	Sint32 getDisplayedResultLobbyIndex(int selection);
-	std::vector<std::pair<Sint32, LobbyServiceType>> lobbyDisplayedSearchResults;
+	std::pair<Sint32, LobbyServiceType> lobbyDisplayedSearchResults[kNumSearchResults];
 	Uint32 numLobbyDisplaySearchResults = 0;
 	int selectedLobbyInList = 0;
 	bool showLobbyFilters = false;

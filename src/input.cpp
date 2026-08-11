@@ -1009,8 +1009,8 @@ Input::playerControlType_t Input::getPlayerControlType()
 	return Input::PLAYER_CONTROLLED_BY_INVALID;
 }
 
-std::vector<DynamicString> Input::getBindingsForInput(const char* input) const {
-    std::vector<DynamicString> result;
+DynamicArrayStr Input::getBindingsForInput(const char* input) const {
+    DynamicArrayStr result;
     std::vector<const char*> _keys;
     bindings.keys(_keys);
     for ( const char* _k : _keys ) {
@@ -1021,11 +1021,11 @@ std::vector<DynamicString> Input::getBindingsForInput(const char* input) const {
             _b.type == binding_t::bindtype_t::CONTROLLER_BUTTON;
         if (isController) {
             if (_b.input.substr(4) == input) {
-                result.emplace_back(_k);
+                result.push_back(_k);
             }
         } else {
             if (_b.input == input) {
-                result.emplace_back(_k);
+                result.push_back(_k);
             }
         }
     }

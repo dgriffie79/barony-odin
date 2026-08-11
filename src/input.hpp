@@ -162,7 +162,7 @@ public:
 	bool bindingIsSharedWithKeyboardSystemBinding(const char* binding);
  
     //! get list of bindings for given input
-    std::vector<DynamicString> getBindingsForInput(const char* input) const;
+    DynamicArrayStr getBindingsForInput(const char* input) const;
     
 private:
 	DynamicMapBinding bindings;
