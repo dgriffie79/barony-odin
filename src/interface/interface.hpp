@@ -944,7 +944,7 @@ public:
 				notificationType = _notifType;
 			}
 		};
-		std::vector<std::pair<Uint32, AssistNotification_t>> notifications;
+		DynamicArrayT<std::pair<Uint32, AssistNotification_t>> notifications;
 		AssistNotification_t* addNotification(DynamicString _title, DynamicString _body, DynamicString _img, AssistNotification_t::NotificationTypes _notifType);
 
 		enum AssistItemActions_t
@@ -1346,7 +1346,7 @@ public:
 				body = _body;
 			}
 		};
-		std::vector<std::pair<Uint32, AlchNotification_t>> notifications;
+		DynamicArrayT<std::pair<Uint32, AlchNotification_t>> notifications;
 		AlchemyView_t currentView = ALCHEMY_VIEW_BREW;
 		bool hasTinOpener = false;
 		Frame* alchFrame = nullptr;
@@ -1672,8 +1672,8 @@ public:
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 	};
-	static std::vector<PanelEntry> panelEntries;
-	static std::vector<PanelEntry> panelEntriesAlternate;
+	static DynamicArrayT<PanelEntry> panelEntries;
+	static DynamicArrayT<PanelEntry> panelEntriesAlternate;
 	typedef IconEntry_tMirror IconEntry;
 	static DynamicMapIconEntryList iconEntries;
 	static int followerWheelRadius;
@@ -1711,6 +1711,8 @@ public:
 	void setPlayer(const int p) { gui_player = p; }
 	const int getPlayer() const { return gui_player; }
 };
+template <> struct DynamicArrayKindOf<FollowerRadialMenu::PanelEntry> { static constexpr int value = Kind_PanelEntry; };
+
 extern FollowerRadialMenu FollowerMenu[MAXPLAYERS];
 
 struct CalloutRadialMenu
@@ -1771,7 +1773,7 @@ struct CalloutRadialMenu
 		int icon_offsetx = 0;
 		int icon_offsety = 0;
 	};
-	static std::vector<PanelEntry> panelEntries;
+	static DynamicArrayT<PanelEntry> panelEntries;
 	typedef IconEntryCallout_tMirror IconEntry;
 	typedef IconEntryText_tMirror IconEntryText_t;
 	static DynamicMapIconEntryCallout iconEntries;

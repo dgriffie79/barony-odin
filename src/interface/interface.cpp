@@ -1666,8 +1666,8 @@ bool FollowerRadialMenu::followerMenuIsOpen()
 	return false;
 }
 
-std::vector<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntries;
-std::vector<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntriesAlternate;
+DynamicArrayT<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntries;
+DynamicArrayT<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntriesAlternate;
 DynamicMapIconEntryList FollowerRadialMenu::iconEntries;
 int FollowerRadialMenu::followerWheelButtonThickness = 70;
 int FollowerRadialMenu::followerWheelRadius = 140;
@@ -2091,7 +2091,7 @@ void setFollowerBannerText(const int player, Field* field, const char* iconName,
 	}
 }
 
-std::vector<FollowerRadialMenu::PanelEntry>& getPanelEntriesForFollower(bool isTinkeringCreation)
+DynamicArrayT<FollowerRadialMenu::PanelEntry>& getPanelEntriesForFollower(bool isTinkeringCreation)
 {
 	if ( isTinkeringCreation )
 	{
@@ -17721,7 +17721,7 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 			if ( n.second.animx <= 0.001 )
 			{
 				n.second.state = 3;
-				notifications.erase(notifications.begin());
+				notifications.erase(0);
 			}
 		}
 	}
@@ -29183,7 +29183,7 @@ bool CalloutRadialMenu::calloutMenuIsOpen()
 	return false;
 }
 
-std::vector<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
+DynamicArrayT<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
 DynamicMapIconEntryCallout CalloutRadialMenu::iconEntries;
 DynamicMapWorldIconEntry CalloutRadialMenu::worldIconEntries;
 DynamicMapStr CalloutRadialMenu::helpDescriptors;
@@ -29196,7 +29196,7 @@ int CalloutRadialMenu::followerWheelInnerCircleRadiusOffset = 0;
 int CalloutRadialMenu::followerWheelInnerCircleRadiusOffsetAlternate = 0;
 Uint32 CalloutRadialMenu::CalloutParticle_t::kParticleLifetime = TICKS_PER_SECOND * 5;
 
-std::vector<CalloutRadialMenu::PanelEntry>& getPanelEntriesForCallout()
+DynamicArrayT<CalloutRadialMenu::PanelEntry>& getPanelEntriesForCallout()
 {
 	return CalloutRadialMenu::panelEntries;
 }
@@ -32776,36 +32776,38 @@ GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t* GenericGUIMenu::AssistS
 {
 	if ( _notifType == AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK )
 	{
-		for ( auto it = notifications.begin(); it != notifications.end(); ++it )
+		for ( int64_t _nn = 0; _nn < notifications.size(); ++_nn )
 		{
-			if ( it->second.notificationType == AssistNotification_t::NOTIF_SEND_REQ )
+			auto& it = notifications[_nn];
+			if ( it.second.notificationType == AssistNotification_t::NOTIF_SEND_REQ )
 			{
 				// replace this notification
-				it->second.state = 0;
-				it->second.animx = 0.0;
-				it->second.notificationType = _notifType;
-				it->first = ticks;
-				it->second.body = _body;
-				it->second.title = _title;
-				it->second.img = _img;
-				it->second.lifetime = 4 * TICKS_PER_SECOND;
-				return &it->second;
+				it.second.state = 0;
+				it.second.animx = 0.0;
+				it.second.notificationType = _notifType;
+				it.first = ticks;
+				it.second.body = _body;
+				it.second.title = _title;
+				it.second.img = _img;
+				it.second.lifetime = 4 * TICKS_PER_SECOND;
+				return &it.second;
 			}
 		}
 	}
 	
-	for ( auto it = notifications.begin(); it != notifications.end(); )
+	for ( int64_t _nn = 0; _nn < notifications.size(); )
 	{
-		if ( it->second.notificationType == _notifType
+		auto& it = notifications[_nn];
+		if ( it.second.notificationType == _notifType
 			|| (_notifType == AssistNotification_t::NOTIF_SEND_REQ
-				&& (it->second.notificationType == AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK)) )
+				&& (it.second.notificationType == AssistNotification_t::NOTIF_CHARACTER_CHANGE_OK)) )
 		{
 			// erase matching types
-			it = notifications.erase(it);
+			notifications.erase(_nn);
 		}
 		else
 		{
-			++it;
+			++_nn;
 		}
 	}
 	notifications.push_back(std::make_pair(ticks, AssistNotification_t(_title, _body, _img, _notifType)));
@@ -35333,7 +35335,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 			if ( n.second.animx <= 0.001 )
 			{
 				n.second.state = 3;
-				notifications.erase(notifications.begin());
+				notifications.erase(0);
 			}
 		}
 	}
@@ -39580,7 +39582,7 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 	//		if ( n.second.animx <= 0.001 )
 	//		{
 	//			n.second.state = 3;
-	//			notifications.erase(notifications.begin());
+	//			notifications.erase(0);
 	//		}
 	//	}
 	//}

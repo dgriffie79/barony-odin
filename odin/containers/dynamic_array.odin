@@ -200,6 +200,10 @@ Kind_HotbarEntryArray :: 15
 Kind_DynArrayStrArray :: 16
 Kind_SkillEffect      :: 17
 Kind_SkillEntry       :: 18
+Kind_PanelEntry       :: 19
+Kind_AssistNotifPair  :: 20
+Kind_AlchNotifPair    :: 21
+Kind_CalloutPanel    :: 22
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -917,6 +921,218 @@ skill_entry_copy :: proc(dst: rawptr, src: rawptr) {
 		}
 	}
 	barony_dynamic_array_elem_copy(&d.effects, &s.effects, size_of(SkillEffect_t), Kind_SkillEffect)
+}
+
+// ---------------------------------------------------------------------------
+// PanelEntry_t (follower radial menu) — owns 4 DynamicStrings
+// ---------------------------------------------------------------------------
+PanelEntry_t :: struct {
+	x:              i32,
+	y:              i32,
+	path:           DynamicString,
+	path_locked:    DynamicString,
+	path_hover:     DynamicString,
+	path_locked_hover: DynamicString,
+	icon_offsetx:   i32,
+	icon_offsety:   i32,
+}
+
+panel_entry_free :: proc(p: rawptr) {
+	v := (^PanelEntry_t)(p)
+	fields := [?]^DynamicString{ &v.path, &v.path_locked, &v.path_hover, &v.path_locked_hover }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+panel_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^PanelEntry_t)(dst)
+	s := (^PanelEntry_t)(src)
+	d.x = s.x
+	d.y = s.y
+	d.icon_offsetx = s.icon_offsetx
+	d.icon_offsety = s.icon_offsety
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.path, &s.path },
+		{ &d.path_locked, &s.path_locked },
+		{ &d.path_hover, &s.path_hover },
+		{ &d.path_locked_hover, &s.path_locked_hover },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// AssistNotificationPair (pair<Uint32, AssistNotification_t> owning value)
+// ---------------------------------------------------------------------------
+AssistNotification_t :: struct {
+	img:              DynamicString,
+	title:            DynamicString,
+	body:             DynamicString,
+	lifetime:         u32,
+	notificationType: i32,
+	animx:            f64,
+	state:            i32,
+}
+
+AssistNotificationPair_t :: struct {
+	first:  u32,
+	second: AssistNotification_t,
+}
+
+assist_notif_free :: proc(p: rawptr) {
+	v := (^AssistNotificationPair_t)(p)
+	fields := [?]^DynamicString{ &v.second.img, &v.second.title, &v.second.body }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+assist_notif_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^AssistNotificationPair_t)(dst)
+	s := (^AssistNotificationPair_t)(src)
+	d.first = s.first
+	d.second.lifetime = s.second.lifetime
+	d.second.notificationType = s.second.notificationType
+	d.second.animx = s.second.animx
+	d.second.state = s.second.state
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.second.img, &s.second.img },
+		{ &d.second.title, &s.second.title },
+		{ &d.second.body, &s.second.body },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// AlchNotificationPair (pair<Uint32, AlchNotification_t> owning value)
+// ---------------------------------------------------------------------------
+AlchNotification_t :: struct {
+	img:    DynamicString,
+	title:  DynamicString,
+	body:   DynamicString,
+	animx:  f64,
+	state:  i32,
+}
+
+AlchNotificationPair_t :: struct {
+	first:  u32,
+	second: AlchNotification_t,
+}
+
+alch_notif_free :: proc(p: rawptr) {
+	v := (^AlchNotificationPair_t)(p)
+	fields := [?]^DynamicString{ &v.second.img, &v.second.title, &v.second.body }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+alch_notif_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^AlchNotificationPair_t)(dst)
+	s := (^AlchNotificationPair_t)(src)
+	d.first = s.first
+	d.second.animx = s.second.animx
+	d.second.state = s.second.state
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.second.img, &s.second.img },
+		{ &d.second.title, &s.second.title },
+		{ &d.second.body, &s.second.body },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// CalloutRadialMenu::PanelEntry — owns 2 DynamicStrings
+// ---------------------------------------------------------------------------
+CalloutPanelEntry_t :: struct {
+	x:            i32,
+	y:            i32,
+	path:         DynamicString,
+	path_hover:   DynamicString,
+	icon_offsetx: i32,
+	icon_offsety: i32,
+}
+
+callout_panel_entry_free :: proc(p: rawptr) {
+	v := (^CalloutPanelEntry_t)(p)
+	fields := [?]^DynamicString{ &v.path, &v.path_hover }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+callout_panel_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^CalloutPanelEntry_t)(dst)
+	s := (^CalloutPanelEntry_t)(src)
+	d.x = s.x
+	d.y = s.y
+	d.icon_offsetx = s.icon_offsetx
+	d.icon_offsety = s.icon_offsety
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.path, &s.path },
+		{ &d.path_hover, &s.path_hover },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.
