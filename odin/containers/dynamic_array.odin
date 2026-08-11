@@ -156,3 +156,170 @@ barony_dynamic_array_sum_ints :: proc "c" (arr: ^Raw_Dynamic_Array, count: i32) 
 	}
 	return sum
 }
+
+// ---------------------------------------------------------------------------
+// DynamicArray of DynamicString (std::vector<DynamicString> replacement).
+// Each element is a DynamicString {data,len} — the element OWNS its buffer.
+// Raw DynamicArray ops just move bytes; these shims deep-free elements on
+// clear/erase/destroy/pop_back and deep-copy on copy/insert, so ownership
+// is correct on both sides. Element size is always 16 (Raw_String).
+// ---------------------------------------------------------------------------
+dynamic_string_free_elem :: proc(s: ^DynamicString) {
+	if s.data != nil {
+		mem.free(s.data)
+		s.data = nil
+	}
+}
+
+dynamic_string_copy_elem :: proc(dst: ^DynamicString, src: ^DynamicString) {
+	dst^ = DynamicString{}
+	if src.len > 0 {
+		buf, _ := mem.alloc(src.len + 1, align_of(u8))
+		if buf != nil {
+			runtime.mem_copy(buf, src.data, src.len)
+			(^u8)(uintptr(buf) + uintptr(src.len))^ = 0
+			dst^ = DynamicString{ data = buf, len = src.len }
+		}
+	}
+}
+
+arrstr_free_elements :: proc(a: ^Raw_Dynamic_Array, from: int) {
+	if a.data == nil {
+		return
+	}
+	elems := ([^]DynamicString)(a.data)
+	n := a.len / size_of(DynamicString)
+	for i := from; i < n; i += 1 {
+		dynamic_string_free_elem(&elems[i])
+	}
+}
+
+@(export)
+barony_dynamic_array_str_init :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	a^ = Raw_Dynamic_Array{}
+}
+
+// append one DynamicString element (deep-copied into array-owned storage)
+@(export)
+barony_dynamic_array_str_append :: proc "c" (a: ^Raw_Dynamic_Array, elem: ^DynamicString) {
+	context = runtime.default_context()
+	if elem == nil {
+		return
+	}
+	raw := transmute(^[dynamic]u8)(a)
+	// grow by one DynamicString slot
+	if a.cap - a.len < size_of(DynamicString) {
+		runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(a), a.len + size_of(DynamicString))
+	}
+	// deep-copy the element into the new slot
+	slot := ([^]DynamicString)(uintptr(a.data) + uintptr(a.len))
+	dynamic_string_copy_elem(slot, elem)
+	a.len += size_of(DynamicString)
+}
+
+// get: deep-copy the element at index into out (out is C++ RAII)
+@(export)
+barony_dynamic_array_str_get :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, out: ^DynamicString) -> bool {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
+		return false
+	}
+	elems := ([^]DynamicString)(a.data)
+	dynamic_string_copy_elem(out, &elems[index])
+	return true
+}
+
+// set: replace element at index (frees old, deep-copies new)
+@(export)
+barony_dynamic_array_str_set :: proc "c" (a: ^Raw_Dynamic_Array, index: i32, elem: ^DynamicString) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
+		return
+	}
+	elems := ([^]DynamicString)(a.data)
+	dynamic_string_free_elem(&elems[index])
+	dynamic_string_copy_elem(&elems[index], elem)
+}
+
+// erase: free the element at index, shift left
+@(export)
+barony_dynamic_array_str_erase :: proc "c" (a: ^Raw_Dynamic_Array, index: i32) {
+	context = runtime.default_context()
+	if a.data == nil || index < 0 || int(index)*size_of(DynamicString) >= a.len {
+		return
+	}
+	elems := ([^]DynamicString)(a.data)
+	dynamic_string_free_elem(&elems[index])
+	n := a.len / size_of(DynamicString)
+	for i := int(index); i < n - 1; i += 1 {
+		elems[i] = elems[i + 1]
+	}
+	a.len -= size_of(DynamicString)
+}
+
+// clear: free all elements, keep capacity
+@(export)
+barony_dynamic_array_str_clear :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	arrstr_free_elements(a, 0)
+	a.len = 0
+}
+
+// destroy: free all elements + the buffer
+@(export)
+barony_dynamic_array_str_destroy :: proc "c" (a: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	arrstr_free_elements(a, 0)
+	runtime.delete_dynamic_array(transmute([dynamic]u8)a^)
+	a^ = Raw_Dynamic_Array{}
+}
+
+@(export)
+barony_dynamic_array_str_len :: proc "c" (a: ^Raw_Dynamic_Array) -> i32 {
+	context = runtime.default_context()
+	return i32(a.len / size_of(DynamicString))
+}
+
+// copy: deep-copy all elements (dst must be empty/fresh)
+@(export)
+barony_dynamic_array_str_copy :: proc "c" (dst: ^Raw_Dynamic_Array, src: ^Raw_Dynamic_Array) {
+	context = runtime.default_context()
+	if dst.data != nil {
+		arrstr_free_elements(dst, 0)
+		runtime.delete_dynamic_array(transmute([dynamic]u8)dst^)
+		dst^ = Raw_Dynamic_Array{}
+	}
+	if src.data == nil || src.len == 0 {
+		return
+	}
+	src_elems := ([^]DynamicString)(src.data)
+	n := src.len / size_of(DynamicString)
+	raw := transmute(^[dynamic]u8)(dst)
+	for i in 0..<n {
+		if dst.cap - dst.len < size_of(DynamicString) {
+			runtime.reserve_dynamic_array(transmute(^[dynamic]u8)(dst), dst.len + size_of(DynamicString))
+		}
+		slot := ([^]DynamicString)(uintptr(dst.data) + uintptr(dst.len))
+		dynamic_string_copy_elem(slot, &src_elems[i])
+		dst.len += size_of(DynamicString)
+	}
+}
+
+// entries: deep-copy all elements into val_ptrs (caller frees/owns)
+@(export)
+barony_dynamic_array_str_entries :: proc "c" (a: ^Raw_Dynamic_Array, val_ptrs: [^]DynamicString, count: i32) -> i32 {
+	context = runtime.default_context()
+	if a.data == nil || count <= 0 {
+		return 0
+	}
+	elems := ([^]DynamicString)(a.data)
+	n := a.len / size_of(DynamicString)
+	if n > int(count) {
+		n = int(count)
+	}
+	for i in 0..<n {
+		dynamic_string_copy_elem(&val_ptrs[i], &elems[i])
+	}
+	return i32(n)
+}
