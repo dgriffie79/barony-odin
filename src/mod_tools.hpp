@@ -352,8 +352,8 @@ public:
 
 		Sint32 PROFICIENCIES[NUMPROFICIENCIES];
 
-		std::vector<std::pair<ItemEntry, int>> equipped_items;
-		std::vector<ItemEntry> inventory_items;
+		DynamicArray equipped_items;  // vector<pair<ItemEntry,int>>
+		DynamicArray inventory_items;  // vector<ItemEntry> (POD)
 		struct VariantPair_t
 		{
 			DynamicString name = "";
@@ -504,8 +504,9 @@ public:
 		void setItems(Stat* myStats)
 		{
 			std::unordered_set<int> equippedSlots;
-			for ( auto& it : equipped_items )
+			for ( int64_t _ei = 0; _ei < dynarray_pair_size<std::pair<ItemEntry, int>>(equipped_items); ++_ei )
 			{
+				auto& it = *dynarray_pair_at<std::pair<ItemEntry, int>>(equipped_items, _ei);
 				equippedSlots.insert(it.second);
 				if ( it.first.percentChance < 100 )
 				{
@@ -610,8 +611,9 @@ public:
 					}
 				}
 			}
-			for ( auto& it : inventory_items )
+			for ( int64_t _ii = 0; _ii < dynarray_size<ItemEntry>(inventory_items); ++_ii )
 			{
+				auto& it = *dynarray_at<ItemEntry>(inventory_items, _ii);
 				if ( it.emptyItemEntry )
 				{
 					continue;
@@ -1147,7 +1149,7 @@ public:
 				DynamicString slotName = itemSlot_itr->name.GetString();
 				if ( itemSlot_itr->value.IsArray() )
 				{
-					std::vector<std::pair<ItemEntry, int>> itemsToChoose;
+					DynamicArray itemsToChoose;  // vector<pair<ItemEntry,int>>
 					// a selection of items in the slot. need to choose 1.
 					for ( rapidjson::Value::ConstValueIterator itemArray_itr = itemSlot_itr->value.Begin(); itemArray_itr != itemSlot_itr->value.End(); ++itemArray_itr )
 					{
@@ -1156,20 +1158,20 @@ public:
 						{
 							item.readKeyToItemEntry(item_itr);
 						}
-						itemsToChoose.push_back(std::make_pair(item, getSlotFromKeyName(slotName)));
+						dynarray_pair_push<std::pair<ItemEntry, int>>(itemsToChoose, std::make_pair(item, getSlotFromKeyName(slotName)));
 					}
-					if ( itemsToChoose.size() > 0 )
+					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
 					{
-						std::vector<unsigned int> itemChances(itemsToChoose.size(), 0);
+						std::vector<unsigned int> itemChances((size_t)dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose), 0);
 						int index = 0;
-						for ( auto& pair : itemsToChoose )
+						for ( int64_t _pi = 0; _pi < dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose); ++_pi )
 						{
-							itemChances.at(index) = pair.first.weightedChance;
+							itemChances.at(index) = dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, _pi)->first.weightedChance;
 							++index;
 						}
 
 						int result = monster_stat_rng.discrete(itemChances.data(), itemChances.size());
-						statEntry->equipped_items.push_back(std::make_pair(itemsToChoose.at(result).first, itemsToChoose.at(result).second));
+						dynarray_pair_push<std::pair<ItemEntry, int>>(statEntry->equipped_items, std::make_pair(dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, result)->first, dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, result)->second));
 					}
 				}
 				else if ( itemSlot_itr->value.MemberCount() > 0 )
@@ -1179,7 +1181,7 @@ public:
 					{
 						item.readKeyToItemEntry(item_itr);
 					}
-					statEntry->equipped_items.push_back(std::make_pair(item, getSlotFromKeyName(slotName)));
+					dynarray_pair_push<std::pair<ItemEntry, int>>(statEntry->equipped_items, std::make_pair(item, getSlotFromKeyName(slotName)));
 				}
 			}
 			const rapidjson::Value& inventory_items = d["inventory_items"];
@@ -1187,7 +1189,7 @@ public:
 			{
 				if ( itemSlot_itr->IsArray() )
 				{
-					std::vector<ItemEntry> itemsToChoose;
+					DynamicArray itemsToChoose;  // vector<ItemEntry>
 					// a selection of items in the slot. need to choose 1.
 					for ( rapidjson::Value::ConstValueIterator itemArray_itr = itemSlot_itr->Begin(); itemArray_itr != itemSlot_itr->End(); ++itemArray_itr )
 					{
@@ -1196,20 +1198,20 @@ public:
 						{
 							item.readKeyToItemEntry(item_itr);
 						}
-						itemsToChoose.push_back(item);
+						dynarray_push<ItemEntry>(itemsToChoose, item);
 					}
-					if ( itemsToChoose.size() > 0 )
+					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
 					{
-						std::vector<unsigned int> itemChances(itemsToChoose.size(), 0);
+						std::vector<unsigned int> itemChances((size_t)dynarray_size<ItemEntry>(itemsToChoose), 0);
 						int index = 0;
-						for ( auto& i : itemsToChoose )
+						for ( int64_t _ii2 = 0; _ii2 < dynarray_size<ItemEntry>(itemsToChoose); ++_ii2 )
 						{
-							itemChances.at(index) = i.weightedChance;
+							itemChances.at(index) = dynarray_at<ItemEntry>(itemsToChoose, _ii2)->weightedChance;
 							++index;
 						}
 
 						int result = monster_stat_rng.discrete(itemChances.data(), itemChances.size());
-						statEntry->inventory_items.push_back(itemsToChoose.at(result));
+						dynarray_push<ItemEntry>(statEntry->inventory_items, *dynarray_at<ItemEntry>(itemsToChoose, result));
 					}
 				}
 				else
@@ -1219,7 +1221,7 @@ public:
 					{
 						item.readKeyToItemEntry(item_itr);
 					}
-					statEntry->inventory_items.push_back(item);
+					dynarray_push<ItemEntry>(statEntry->inventory_items, item);
 				}
 			}
 			if ( d.HasMember("followers") )

@@ -306,6 +306,15 @@ using DynamicArrayIcon   = DynamicArrayT<ItemTooltipIcons_tMirror>;
 using DynamicArrayOption = DynamicArrayT<DropdownOption_tMirror>;
 using DynamicArrayEntryVar = DynamicArrayT<EntryVariable_tMirror>;
 
+
+// generic pair<T,U> element helpers (for pair-valued POD arrays)
+template <typename P>
+inline P* dynarray_pair_at(DynamicArray& a, int64_t i) { return reinterpret_cast<P*>(a.data) + i; }
+template <typename P>
+inline int64_t dynarray_pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(P); }
+template <typename P>
+inline void dynarray_pair_push(DynamicArray& a, const P& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(P)); }
+
 // pair<int,int> element helpers (8-byte POD pairs)
 typedef std::pair<int, int> int_pair_t;
 inline int_pair_t* dynarray_pair_at(DynamicArray& a, int64_t i) { return (int_pair_t*)a.data + i; }
