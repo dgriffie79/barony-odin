@@ -797,9 +797,9 @@ public:
 		GUIDropdown_t dropdownMenu;
 		void closeDropdowns();
 		bool isDropdownActive();
-		static void imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<DynamicString>& imgNames);
-		static void imageSetWidthHeight9x9(Frame* container, const std::vector<DynamicString>& imgNames);
-		static const std::vector<DynamicString> tooltipEffectBackgroundImages;
+		static void imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const DynamicArrayStr& imgNames);
+		static void imageSetWidthHeight9x9(Frame* container, const DynamicArrayStr& imgNames);
+		static const DynamicArrayStr tooltipEffectBackgroundImages;
 		enum ImageIndexes9x9 : int
 		{
 			TOP_LEFT,
@@ -1164,7 +1164,7 @@ public:
 			std::unordered_map<Uint32, ItemNotifyHoverStates> itemsToNotify;
 			void updateAppraisalAnim();
 			static void readFromFile();
-			static std::vector<std::pair<int, int>> appraisal_time_points;
+			static DynamicArray appraisal_time_points;  // vector<pair<int,int>>
 			struct AppraisalBreakpoint_t
 			{
 				int skillLVL = 0;
@@ -1173,7 +1173,7 @@ public:
 			};
 			static int fastTimeAppraisal;
 			static int perStatMult;
-			static std::vector<AppraisalBreakpoint_t> appraisal_tables;
+			static DynamicArray appraisal_tables;  // vector<AppraisalBreakpoint_t> (POD)
 		} appraisal;
 		bool bNewInventoryLayout = true;
 	} inventoryUI;
@@ -2192,7 +2192,7 @@ public:
 		PaperDollSlotType paperDollSlotFromCoordinates(int x, int y) const;
 		void getCoordinatesFromSlotType(PaperDollSlotType slot, int& outx, int& outy) const;
 		void selectPaperDollCoordinatesFromSlotType(PaperDollSlotType slot) const;
-		std::vector<Uint32> returningItemsToInventory;
+		DynamicArrayU32 returningItemsToInventory;
 		void warpMouseToMostRecentReturnedInventoryItem();
 		bool portraitActiveToEdit = false;
 		real_t portraitRotationInertia = 0.0;

@@ -483,7 +483,7 @@ std::string EnemyBarSettings_t::getEnemyBarSpriteName(Entity* entity)
 	return "default";
 }
 
-const std::vector<DynamicString> Player::GUI_t::tooltipEffectBackgroundImages =
+const DynamicArrayStr Player::GUI_t::tooltipEffectBackgroundImages =
 {
 	"9x9 bg top left",
 	"9x9 bg top right",
@@ -496,7 +496,7 @@ const std::vector<DynamicString> Player::GUI_t::tooltipEffectBackgroundImages =
 	"9x9 bg bottom middle"
 };
 
-void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const std::vector<DynamicString>& imgNames)
+void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const DynamicArrayStr& imgNames)
 {
 	for ( auto& img : imgNames )
 	{
@@ -512,7 +512,7 @@ void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const std::vector<D
 }
 
 // for 9x9 images stretched to fit a container
-void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const std::vector<DynamicString>& imgNames)
+void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const DynamicArrayStr& imgNames)
 {
 	assert(imgNames.size() == 9);
 	// adjust inner background image elements
@@ -36616,8 +36616,9 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 				}
 				else
 				{
-					for ( auto& table : Player::Inventory_t::Appraisal_t::appraisal_tables )
+					for ( int64_t _at = 0; _at < dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(Player::Inventory_t::Appraisal_t::appraisal_tables); ++_at )
 					{
+						auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(Player::Inventory_t::Appraisal_t::appraisal_tables, _at);
 						if ( skillLVL >= table.skillLVL )
 						{
 							val = table.goldValueLimit;
@@ -36650,8 +36651,9 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 				}
 				else
 				{
-					for ( auto& table : Player::Inventory_t::Appraisal_t::appraisal_tables )
+					for ( int64_t _at = 0; _at < dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(Player::Inventory_t::Appraisal_t::appraisal_tables); ++_at )
 					{
+						auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(Player::Inventory_t::Appraisal_t::appraisal_tables, _at);
 						if ( skillLVL >= table.skillLVL )
 						{
 							val = table.fastTimeGold;

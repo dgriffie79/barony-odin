@@ -7635,8 +7635,9 @@ void doNewGame(bool makeHighscore) {
 	// make some messages
 	Player::MessageZone_t::startMessages();
 
-	for ( auto& pair : Player::Minimap_t::mapDetails )
+	for ( int64_t _md = 0; _md < Player::Minimap_t::mapDetails.size(); ++_md )
 	{
+		auto& pair = Player::Minimap_t::mapDetails[_md];
 		if ( pair.second != "" )
 		{
 			messagePlayer(clientnum, MESSAGE_HINT, pair.second.c_str());

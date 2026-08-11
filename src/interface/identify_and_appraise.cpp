@@ -374,8 +374,9 @@ bool Player::Inventory_t::Appraisal_t::appraisalPossible(Item* item)
 		int skillLVL = stats[player.playernum]->getModifiedProficiency(PRO_APPRAISAL)
 			+ statGetPER(stats[player.playernum], player.entity) * Player::Inventory_t::Appraisal_t::perStatMult;
 
-		for ( auto& table : appraisal_tables )
+		for ( int64_t _at = 0; _at < dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables); ++_at )
 		{
+			auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, _at);
 			if ( skillLVL >= table.skillLVL )
 			{
 				return value <= table.goldValueLimit;
@@ -578,8 +579,8 @@ void Player::Inventory_t::Appraisal_t::appraiseItem(Item* item)
 	old_item = 0;
 }
 
-std::vector<std::pair<int, int>> Player::Inventory_t::Appraisal_t::appraisal_time_points;
-std::vector<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t> Player::Inventory_t::Appraisal_t::appraisal_tables;
+DynamicArray Player::Inventory_t::Appraisal_t::appraisal_time_points;  // vector<pair<int,int>>
+DynamicArray Player::Inventory_t::Appraisal_t::appraisal_tables;  // vector<AppraisalBreakpoint_t> (POD)
 int Player::Inventory_t::Appraisal_t::fastTimeAppraisal = 10 * TICKS_PER_SECOND;
 int Player::Inventory_t::Appraisal_t::perStatMult = 3;
 void Player::Inventory_t::Appraisal_t::readFromFile()
@@ -624,8 +625,8 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 		return;
 	}
 
-	appraisal_time_points.clear();
-	appraisal_tables.clear();
+	barony_dynamic_array_clear(&appraisal_time_points);
+	barony_dynamic_array_clear(&appraisal_tables);
 
 	fastTimeAppraisal = d["fast_time_seconds"].GetInt() * TICKS_PER_SECOND;
 	perStatMult = d["per_stat_mult"].GetInt();
@@ -635,7 +636,7 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 		int value = (*itr)["value"].GetInt();
 		int slow_time = (*itr)["slow_time_seconds"].GetInt() * TICKS_PER_SECOND;
 
-		appraisal_time_points.push_back(std::make_pair(value, slow_time));
+		dynarray_pair_push<std::pair<int, int>>(appraisal_time_points, std::make_pair(value, slow_time));
 	}
 
 	for ( auto itr = d["appraisal_tables"].Begin(); itr != d["appraisal_tables"].End(); ++itr )
@@ -644,8 +645,8 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 		int gold_value_limit = (*itr)["gold_value_limit"].GetInt();
 		int fast_time_gold = (*itr)["fast_time_gold"].GetInt();
 
-		appraisal_tables.push_back(AppraisalBreakpoint_t());
-		auto& table = appraisal_tables.back();
+		dynarray_push<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t());
+		auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables) - 1);
 
 		table.skillLVL = skill;
 		table.goldValueLimit = gold_value_limit;
@@ -665,8 +666,9 @@ int Player::Inventory_t::Appraisal_t::getAppraisalTime(Item* item)
 
 		bool fast_time = false;
 
-		for ( auto& table : appraisal_tables )
+		for ( int64_t _at = 0; _at < dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables); ++_at )
 		{
+			auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, _at);
 			if ( skillLVL >= table.skillLVL )
 			{
 				fast_time = value <= table.fastTimeGold;
@@ -677,8 +679,9 @@ int Player::Inventory_t::Appraisal_t::getAppraisalTime(Item* item)
 		appraisal_time = Player::Inventory_t::Appraisal_t::fastTimeAppraisal;
 		if ( !fast_time )
 		{
-			for ( auto& pair : appraisal_time_points )
+			for ( int64_t _tp = 0; _tp < dynarray_pair_size<std::pair<int, int>>(appraisal_time_points); ++_tp )
 			{
+				auto& pair = *dynarray_pair_at<std::pair<int, int>>(appraisal_time_points, _tp);
 				if ( value >= pair.first )
 				{
 					appraisal_time = pair.second;
