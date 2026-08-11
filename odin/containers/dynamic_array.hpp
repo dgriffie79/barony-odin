@@ -257,6 +257,8 @@ public:
 
     int64_t size() const { return barony_dynamic_array_elem_len(const_cast<DynamicArray*>(&raw), sizeof(T)); }
     bool empty() const { return size() == 0; }
+    T* data() { return (T*)raw.data; }
+    const T* data() const { return (const T*)raw.data; }
     T& back() { return (*this)[size() - 1]; }
     const T& back() const { return (*this)[size() - 1]; }
     T& front() { return (*this)[0]; }

@@ -1588,8 +1588,8 @@ public:
 		{
 			if ( curve.mapName.compare(currentMap) == 0 )
 			{
-				std::vector<DynamicString> variantResults;
-				std::vector<unsigned int> variantChances;
+				DynamicArrayStr variantResults;
+				DynamicArrayU32 variantChances;
 				for ( MonsterCurveEntry& monster : curve.monsterCurve )
 				{
 					if ( currentlevel >= monster.levelmin && currentlevel <= monster.levelmax )
