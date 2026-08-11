@@ -571,6 +571,8 @@ public:
     void erase(int64_t i) { barony_dynamic_array_erase(&raw, (int32_t)i, (int64_t)sizeof(uint32_t)); }
 
     uint32_t& operator[](int64_t i) { return *dynarray_at<uint32_t>(raw, i); }
+    uint32_t back() const { return *dynarray_at<uint32_t>(raw, size() - 1); }
+    uint32_t front() const { return *dynarray_at<uint32_t>(raw, 0); }
 
     const uint32_t& operator[](int64_t i) const { return *dynarray_at<uint32_t>(raw, i); }
 
@@ -825,3 +827,10 @@ inline int_pair_t* dynarray_pair_at(DynamicArray& a, int64_t i) { return (int_pa
 inline const int_pair_t* dynarray_pair_at(const DynamicArray& a, int64_t i) { return (const int_pair_t*)a.data + i; }
 inline int64_t dynarray_pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(int_pair_t); }
 inline void dynarray_pair_push(DynamicArray& a, const int_pair_t& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(int_pair_t)); }
+
+// pair<Uint32,Uint32> element helpers (8-byte)
+typedef std::pair<unsigned, unsigned> u32pair_t;
+inline u32pair_t* dynarray_u32pair_at(DynamicArray& a, int64_t i) { return (u32pair_t*)a.data + i; }
+inline const u32pair_t* dynarray_u32pair_at(const DynamicArray& a, int64_t i) { return (const u32pair_t*)a.data + i; }
+inline int64_t dynarray_u32pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(u32pair_t); }
+inline void dynarray_u32pair_push(DynamicArray& a, const u32pair_t& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(u32pair_t)); }

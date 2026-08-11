@@ -412,17 +412,17 @@ extern Uint32 loadingsavegame;
 extern Uint32 loadinglobbykey;
 extern Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES];
 extern Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS];
-extern std::vector<std::pair<Uint32, Uint32>> achievementRhythmOfTheKnightVec[MAXPLAYERS];
+extern DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS];  // vector<pair<Uint32,Uint32>>
 extern bool achievementStatusRhythmOfTheKnight[MAXPLAYERS];
 extern bool achievementRhythmOfTheKnight[MAXPLAYERS];
 extern std::map<Uint32, Uint32> achievementThankTheTankPair[MAXPLAYERS];
 extern bool achievementStatusBaitAndSwitch[MAXPLAYERS];
 extern Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS];
 extern std::unordered_set<int> clientLearnedAlchemyIngredients[MAXPLAYERS];
-extern std::vector<std::pair<int, std::pair<int, int>>> clientLearnedAlchemyRecipes[MAXPLAYERS];
+extern DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
 extern std::unordered_set<int> clientLearnedScrollLabels[MAXPLAYERS];
 extern bool achievementStatusThankTheTank[MAXPLAYERS];
-extern std::vector<Uint32> achievementStrobeVec[MAXPLAYERS];
+extern DynamicArrayU32 achievementStrobeVec[MAXPLAYERS];
 extern bool achievementStatusStrobe[MAXPLAYERS];
 extern bool playerFailedRangedOnlyConduct[MAXPLAYERS];
 extern bool achievementBrawlerMode;
@@ -665,11 +665,11 @@ struct SaveGameInfo {
 			int LVL = 0;
 			int GOLD = 0;
 			int HUNGER = 0;
-			std::vector<int> PROFICIENCIES;
-			std::vector<int> EFFECTS;
-			std::vector<int> EFFECTS_TIMERS;
-			std::vector<int> EFFECTS_ACCRETION_TIME;
-			std::vector<int> MISC_FLAGS;
+			DynamicArrayS32 PROFICIENCIES;
+			DynamicArrayS32 EFFECTS;
+			DynamicArrayS32 EFFECTS_TIMERS;
+			DynamicArrayS32 EFFECTS_ACCRETION_TIME;
+			DynamicArrayS32 MISC_FLAGS;
 			std::vector<std::pair<std::string, std::string>> attributes;
 			std::vector<std::pair<std::string, Uint32>> player_equipment;
 			std::vector<std::pair<std::string, item_t>> npc_equipment;
@@ -989,14 +989,14 @@ public:
 
 		std::pair<int, int> realBoy;
 		std::unordered_map<Uint32, int> caughtInAMoshTargets;
-		std::vector<Uint32> strungOutTicks;
+		DynamicArrayU32 strungOutTicks;
 		std::unordered_set<Uint32> ironicPunishmentTargets;
 		std::pair<real_t, real_t> flutterShyCoordinates;
 		std::pair<int, Uint32> gastricBypassSpell;
 		std::unordered_set<Uint32> rat5000secondRule;
 		std::unordered_set<Uint32> phantomMaskFirstStrikes;
 		std::unordered_set<Uint32> bountyTargets;
-		std::vector<Uint32> manifestDestinyChests;
+		DynamicArrayU32 manifestDestinyChests;
 		Uint32 manifestDestinyChestSequence = 0;
 		bool updatedBountyTargets = false;
 		bool wearingBountyHat = false;

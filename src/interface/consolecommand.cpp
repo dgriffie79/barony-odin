@@ -4668,16 +4668,18 @@ namespace ConsoleCommands {
 			{
 				player = clientnum;
 			}
-			for (auto& entry : clientLearnedAlchemyRecipes[player])
+			for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player]); ++_ri )
 			{
+				auto& entry = *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player], _ri);
 				messagePlayer(clientnum, MESSAGE_MISC, "[%s]: %s | %s",
 					items[entry.first].getIdentifiedName(), items[entry.second.first].getIdentifiedName(),
 					items[entry.second.second].getIdentifiedName());
 			}
 		}
 		else {
-			for (auto& entry : clientLearnedAlchemyRecipes[clientnum])
+			for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[clientnum]); ++_ri )
 			{
+				auto& entry = *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[clientnum], _ri);
 				messagePlayer(clientnum, MESSAGE_MISC, "[%s]: %s | %s",
 					items[entry.first].getIdentifiedName(), items[entry.second.first].getIdentifiedName(),
 					items[entry.second.second].getIdentifiedName());

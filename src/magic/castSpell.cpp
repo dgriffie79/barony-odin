@@ -1125,7 +1125,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 					achievementStrobeVec[player].push_back(ticks);
 					if ( achievementStrobeVec[player].size() > 20 )
 					{
-						achievementStrobeVec[player].erase(achievementStrobeVec[player].begin());
+						achievementStrobeVec[player].erase(0);
 					}
 					Uint32 timeDiff = achievementStrobeVec[player].back() - achievementStrobeVec[player].front();
 					if ( achievementStrobeVec[player].size() == 20 )

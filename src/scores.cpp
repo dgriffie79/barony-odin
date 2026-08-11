@@ -41,17 +41,17 @@ bool conductVegetarian = true;
 bool conductIlliterate = true;
 Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES] = { 0 }; // additional 'conducts' to be stored in here.
 Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS] = { 0 }; // general saved game statistics to be stored in here.
-std::vector<std::pair<Uint32, Uint32>> achievementRhythmOfTheKnightVec[MAXPLAYERS] = {};
+DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS] = {};
 bool achievementStatusRhythmOfTheKnight[MAXPLAYERS] = { false };
 bool achievementRhythmOfTheKnight[MAXPLAYERS] = { false };
 std::map<Uint32, Uint32> achievementThankTheTankPair[MAXPLAYERS];
 bool achievementStatusBaitAndSwitch[MAXPLAYERS] = { false };
 Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS] = { 0 };
 std::unordered_set<int> clientLearnedAlchemyIngredients[MAXPLAYERS];
-std::vector<std::pair<int, std::pair<int, int>>> clientLearnedAlchemyRecipes[MAXPLAYERS];
+DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
 std::unordered_set<int> clientLearnedScrollLabels[MAXPLAYERS];
 bool achievementStatusThankTheTank[MAXPLAYERS] = { false };
-std::vector<Uint32> achievementStrobeVec[MAXPLAYERS] = {};
+DynamicArrayU32 achievementStrobeVec[MAXPLAYERS] = {};
 bool achievementStatusStrobe[MAXPLAYERS] = { false };
 bool playerFailedRangedOnlyConduct[MAXPLAYERS] = { false };
 list_t booksRead;
@@ -2746,14 +2746,14 @@ void setDefaultPlayerConducts()
 		achievementRhythmOfTheKnight[c] = false;
 		achievementStatusStrobe[c] = false;
 		achievementStatusThankTheTank[c] = false;
-		achievementRhythmOfTheKnightVec[c].clear();
+		barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[c]);
 		achievementThankTheTankPair[c].clear();
 		achievementStrobeVec[c].clear();
 		achievementStatusBaitAndSwitch[c] = false;
 		achievementBaitAndSwitchTimer[c] = 0;
 		playerFailedRangedOnlyConduct[c] = false;
 		clientLearnedAlchemyIngredients[c].clear();
-		clientLearnedAlchemyRecipes[c].clear();
+		barony_dynamic_array_clear(&clientLearnedAlchemyRecipes[c]);
 		clientLearnedScrollLabels[c].clear();
 	}
 	achievementObserver.clearPlayerAchievementData();
@@ -3403,26 +3403,26 @@ void updateAchievementRhythmOfTheKnight(int player, Entity* target, bool playerI
 	if ( !playerIsHit )
 	{
 		// player attacking a monster, needs to be after a block (vec size 1, 3 or 5)
-		if ( !achievementRhythmOfTheKnightVec[player].empty() )
+		if ( dynarray_u32pair_size(achievementRhythmOfTheKnightVec[player]) > 0 )
 		{
-			if ( achievementRhythmOfTheKnightVec[player].at(0).second != targetUid ) 
+			if ( dynarray_u32pair_at(achievementRhythmOfTheKnightVec[player], 0)->second != targetUid ) 
 			{
 				// check first uid entry, if not matching the monster, we swapped targets and should reset.
-				achievementRhythmOfTheKnightVec[player].clear();
+				barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]);
 				//messagePlayer(0, "cleared, not attacking same target");
 				return;
 			}
 			else
 			{
-				int size = achievementRhythmOfTheKnightVec[player].size();
+				int size = (int)dynarray_u32pair_size(achievementRhythmOfTheKnightVec[player]);
 				if ( size % 2 == 1 ) // 1, 3, 5
 				{
 					// we're on correct sequence and same monster, add entry to vector.
-					achievementRhythmOfTheKnightVec[player].push_back(std::make_pair(target->ticks, targetUid));
+					dynarray_u32pair_push(achievementRhythmOfTheKnightVec[player], std::make_pair(target->ticks, targetUid));
 					if ( size == 5 )
 					{
 						// we pushed back to a total of 6 entries, get achievement.
-						real_t timeTaken = (achievementRhythmOfTheKnightVec[player].at(5).first - achievementRhythmOfTheKnightVec[player].at(0).first) / 50.f;
+						real_t timeTaken = (dynarray_u32pair_at(achievementRhythmOfTheKnightVec[player], 5)->first - dynarray_u32pair_at(achievementRhythmOfTheKnightVec[player], 0)->first) / 50.f;
 						if ( timeTaken <= 3 )
 						{
 							//messagePlayer(0, "achievement get!, time taken %f", timeTaken);
@@ -3433,13 +3433,13 @@ void updateAchievementRhythmOfTheKnight(int player, Entity* target, bool playerI
 								achievementRhythmOfTheKnight[player] = true;
 							}
 						}
-						achievementRhythmOfTheKnightVec[player].clear();
+						barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]);
 					}
 				}
 				else
 				{
 					// we attacked twice and we're out of sequence.
-					achievementRhythmOfTheKnightVec[player].clear();
+					barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]);
 					//messagePlayer(0, "cleared, out of sequence");
 					return;
 				}
@@ -3449,25 +3449,25 @@ void updateAchievementRhythmOfTheKnight(int player, Entity* target, bool playerI
 	else
 	{
 		// rhythm is initiated on first successful block
-		if ( achievementRhythmOfTheKnightVec[player].empty() )
+		if ( dynarray_u32pair_size(achievementRhythmOfTheKnightVec[player]) == 0 )
 		{
-			achievementRhythmOfTheKnightVec[player].push_back(std::make_pair(target->ticks, targetUid));
+			dynarray_u32pair_push(achievementRhythmOfTheKnightVec[player], std::make_pair(target->ticks, targetUid));
 		}
 		else
 		{
-			if ( achievementRhythmOfTheKnightVec[player].at(0).second != targetUid )
+			if ( dynarray_u32pair_at(achievementRhythmOfTheKnightVec[player], 0)->second != targetUid )
 			{
 				// check first uid entry, if not matching the monster, we swapped targets and should reset.
-				achievementRhythmOfTheKnightVec[player].clear();
+				barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]);
 				//messagePlayer(0, "cleared, not blocking same target");
 			}
-			int size = achievementRhythmOfTheKnightVec[player].size();
+			int size = (int)dynarray_u32pair_size(achievementRhythmOfTheKnightVec[player]);
 			if ( size == 1 || size == 3 || size == 5 )
 			{
-				achievementRhythmOfTheKnightVec[player].clear();
+				barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]);
 				//messagePlayer(0, "cleared, out of sequence");
 			}
-			achievementRhythmOfTheKnightVec[player].push_back(std::make_pair(target->ticks, targetUid));
+			dynarray_u32pair_push(achievementRhythmOfTheKnightVec[player], std::make_pair(target->ticks, targetUid));
 		}
 	}
 }
@@ -4267,8 +4267,7 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 
 					while ( playerAchievements[player].strungOutTicks.size() >= 10 )
 					{
-						auto it = playerAchievements[player].strungOutTicks.begin();
-						playerAchievements[player].strungOutTicks.erase(it);
+						playerAchievements[player].strungOutTicks.erase(0);
 					}
 				}
 			}
@@ -5206,8 +5205,8 @@ int SaveGameInfo::populateFromSession(const int playernum)
 
 			// known alchemy recipes and known scrolls
 			player.known_recipes.len = 0;
-			for ( const auto& _r : clientLearnedAlchemyRecipes[c] ) {
-				dynarray_push<SaveGameInfo::Player::recipe_t>(player.known_recipes, _r);
+			for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[c]); ++_ri ) {
+				dynarray_push<SaveGameInfo::Player::recipe_t>(player.known_recipes, *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[c], _ri));
 			}
 			for ( auto& entry : clientLearnedScrollLabels[c] ) {
 				player.known_scrolls.push_back(entry);
@@ -5975,10 +5974,10 @@ int loadGame(int player, const SaveGameInfo& info) {
 	players[statsPlayer]->magic.selected_spell_last_appearance = info.players[player].selected_spell_last_appearance;
 
 	// read alchemy recipes
-	clientLearnedAlchemyRecipes[statsPlayer].clear();
+	barony_dynamic_array_clear(&clientLearnedAlchemyRecipes[statsPlayer]);
 	for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(info.players[player].known_recipes); ++_ri ) {
 		SaveGameInfo::Player::recipe_t _r = *dynarray_at<SaveGameInfo::Player::recipe_t>(info.players[player].known_recipes, _ri);
-		clientLearnedAlchemyRecipes[statsPlayer].push_back(_r);
+		dynarray_push<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[statsPlayer], _r);
 	}
 
 	// read scroll labels

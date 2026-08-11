@@ -14744,7 +14744,7 @@ void Entity::attack(int pose, int charge, Entity* target)
 								}
 							}
 							achievementStatusRhythmOfTheKnight[player] = false;
-							achievementRhythmOfTheKnightVec[player].clear(); // reset for the next one
+							barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[player]); // reset for the next one
 						}
 					}
 
@@ -15513,14 +15513,14 @@ void Entity::attack(int pose, int charge, Entity* target)
 									}
 								}
 								achievementStatusRhythmOfTheKnight[playerhit] = false;
-								achievementRhythmOfTheKnightVec[playerhit].clear(); // reset for the next one
+								barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[playerhit]); // reset for the next one
 							}
 							updateAchievementThankTheTank(playerhit, this, false);
 						}
 						else
 						{
 							achievementStatusRhythmOfTheKnight[playerhit] = false;
-							achievementRhythmOfTheKnightVec[playerhit].clear();
+							barony_dynamic_array_clear(&achievementRhythmOfTheKnightVec[playerhit]);
 							achievementThankTheTankPair[playerhit].erase(this->getUID());
 							//messagePlayer(0, "used AC!");
 						}

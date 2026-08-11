@@ -9097,8 +9097,9 @@ bool alchemyAddRecipe(int player, int basePotion, int secondaryPotion, int resul
 		secondaryPotion = swapBasePotion;
 	}
 	bool found = false;
-	for ( auto& entry : clientLearnedAlchemyRecipes[player] )
+	for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player]); ++_ri )
 	{
+		auto& entry = *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player], _ri);
 		if ( entry.first == result
 			&& ((entry.second.first == basePotion && entry.second.second == secondaryPotion)
 				|| (entry.second.first == secondaryPotion && entry.second.second == basePotion)) )
@@ -9108,7 +9109,7 @@ bool alchemyAddRecipe(int player, int basePotion, int secondaryPotion, int resul
 	}
 	if ( !found )
 	{
-		clientLearnedAlchemyRecipes[player].push_back(std::make_pair(result, std::make_pair(basePotion, secondaryPotion)));
+		dynarray_push<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player], std::make_pair(result, std::make_pair(basePotion, secondaryPotion)));
 		if ( !hideRecipeFromList(result) )
 		{
 			DynamicString itemName = items[result].getIdentifiedName();
@@ -17005,8 +17006,9 @@ void buttonAlchemyUpdateSelectorOnHighlight(const int player, Button* button)
 
 bool playerKnowsRecipe(const int player, ItemType basePotion, ItemType secondaryPotion, ItemType result)
 {
-	for ( auto& entry : clientLearnedAlchemyRecipes[player] )
+	for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player]); ++_ri )
 	{
+		auto& entry = *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player], _ri);
 		if ( entry.first == result
 			&& ((entry.second.first == basePotion && entry.second.second == secondaryPotion)
 				|| (entry.second.first == secondaryPotion && entry.second.second == basePotion)) )
@@ -20488,8 +20490,9 @@ void buildRecipeList(const int player)
 
 	alchemy.emptyBottleCount.count = hasEmptyBottle ? inventoryPotions[POTION_EMPTY].second : 0;
 
-	for ( auto& entry : clientLearnedAlchemyRecipes[player] )
+	for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player]); ++_ri )
 	{
+		auto& entry = *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[player], _ri);
 		bool hideRecipe = hideRecipeFromList(entry.first);
 		Item* basePotion = nullptr;
 		Item* secondaryPotion = nullptr;
