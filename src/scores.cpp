@@ -4642,7 +4642,7 @@ bool AchievementObserver::PlayerAchievements::checkPathBetweenObjects(Entity* pl
 		// use a bodypart entity
 		if ( !target )
 		{
-			target = player->bodyparts.at(0);
+			target = dynarray_pget<Entity*>(player->bodyparts, 0);
 			oldx = target->x;
 			oldy = target->y;
 		}

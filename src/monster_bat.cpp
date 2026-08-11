@@ -101,7 +101,7 @@ void initBat(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// head
 	entity = newEntity(1409, 1, map.entities, nullptr); //Limb entity.
@@ -121,7 +121,7 @@ void initBat(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// wingleft
 	entity = newEntity(1410, 1, map.entities, nullptr); //Limb entity.
@@ -141,7 +141,7 @@ void initBat(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// wingright
 	entity = newEntity(1411, 1, map.entities, nullptr); //Limb entity.
@@ -161,7 +161,7 @@ void initBat(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	if ( multiplayer == CLIENT || MONSTER_INIT )
 	{
@@ -239,9 +239,9 @@ bool Entity::disturbBat(Entity* touched, bool takenDamage, bool doMessage)
 		monsterHitTime = HITRATE;
 
 		setEffect(EFF_STUNNED, true, 10, false);
-		if ( bodyparts.size() >= 1 )
+		if ( dynarray_psize<Entity*>(bodyparts) >= 1 )
 		{
-			auto& body = bodyparts[0];
+			auto body = dynarray_pget<Entity*>(bodyparts, 0);
 			if ( body->z < -15 )
 			{
 				setEffect(EFF_STUNNED, true, 30, false);

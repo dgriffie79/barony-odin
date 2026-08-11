@@ -155,34 +155,36 @@ enum PlayerClasses : int
 	CLASS_PALADIN
 };
 
-static const std::vector<DynamicString> playerClassInternalNames = {
-	"class_barbarian",
-	"class_warrior",
-	"class_healer",
-	"class_rogue",
-	"class_wanderer",
-	"class_cleric",
-	"class_merchant",
-	"class_wizard",
-	"class_arcanist",
-	"class_joker",
-	"class_sexton",
-	"class_ninja",
-	"class_monk",
-	"class_conjurer",
-	"class_accursed",
-	"class_mesmer",
-	"class_brewer",
-	"class_machinist",
-	"class_punisher",
-	"class_shaman",
-	"class_hunter",
-	"class_bard",
-	"class_sapper",
-	"class_scion",
-	"class_hermit",
-	"class_paladin"
-};
+static DynamicArrayStr playerClassInternalNames = []() {
+	DynamicArrayStr m;
+		m.push_back("class_barbarian");
+		m.push_back("class_warrior");
+		m.push_back("class_healer");
+		m.push_back("class_rogue");
+		m.push_back("class_wanderer");
+		m.push_back("class_cleric");
+		m.push_back("class_merchant");
+		m.push_back("class_wizard");
+		m.push_back("class_arcanist");
+		m.push_back("class_joker");
+		m.push_back("class_sexton");
+		m.push_back("class_ninja");
+		m.push_back("class_monk");
+		m.push_back("class_conjurer");
+		m.push_back("class_accursed");
+		m.push_back("class_mesmer");
+		m.push_back("class_brewer");
+		m.push_back("class_machinist");
+		m.push_back("class_punisher");
+		m.push_back("class_shaman");
+		m.push_back("class_hunter");
+		m.push_back("class_bard");
+		m.push_back("class_sapper");
+		m.push_back("class_scion");
+		m.push_back("class_hermit");
+		m.push_back("class_paladin");
+	return m;
+}();
 
 static const int CLASS_SHAMAN_NUM_STARTING_SPELLS = 15;
 
@@ -387,14 +389,14 @@ static const DynamicString PLAYERNAMES_MALE_FILE = "playernames-male.txt";
 static const DynamicString PLAYERNAMES_FEMALE_FILE = "playernames-female.txt";
 static const DynamicString NPCNAMES_MALE_FILE = "npcnames-male.txt";
 static const DynamicString NPCNAMES_FEMALE_FILE = "npcnames-female.txt";
-extern std::vector<DynamicString> randomPlayerNamesMale;
-extern std::vector<DynamicString> randomPlayerNamesFemale;
-extern std::vector<DynamicString> randomNPCNamesMale;
-extern std::vector<DynamicString> randomNPCNamesFemale;
+extern DynamicArrayStr randomPlayerNamesMale;
+extern DynamicArrayStr randomPlayerNamesFemale;
+extern DynamicArrayStr randomNPCNamesMale;
+extern DynamicArrayStr randomNPCNamesFemale;
 extern bool enabledDLCPack1;
 extern bool enabledDLCPack2;
 extern bool enabledDLCPack3;
-extern std::vector<DynamicString> physFSFilesInDirectory;
+extern DynamicArrayStr physFSFilesInDirectory;
 void loadRandomNames();
 int mapLevel(int player, int radius, int _x, int _y, bool usingSpell);
 void mapLevel2(int player);

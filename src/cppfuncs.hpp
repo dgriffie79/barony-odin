@@ -15,6 +15,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "../odin/containers/dynamic_array.hpp"
 #include "prng.hpp"
 
 template<typename T>
@@ -27,4 +28,16 @@ T randomEntryFromVector(std::vector<T> vector)
 
     static BaronyRNG rng;
 	return vector[rng.rand() % vector.size()];
+}
+
+// DynamicArrayStr overload (for the name-list pickers)
+inline DynamicString randomEntryFromVector(DynamicArrayStr& vector)
+{
+	if ( !vector.size() )
+	{
+		throw "Empty vector!";
+	}
+
+    static BaronyRNG rng;
+	return vector.at(rng.rand() % vector.size());
 }

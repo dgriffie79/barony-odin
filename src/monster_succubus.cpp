@@ -160,7 +160,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right leg
 	entity = newEntity(my->sprite == 1126 ? 1128 : 195, 1, map.entities, nullptr); //Limb entity.
@@ -179,7 +179,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left leg
 	entity = newEntity(my->sprite == 1126 ? 1127 : 194, 1, map.entities, nullptr); //Limb entity.
@@ -198,7 +198,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right arm
 	entity = newEntity(my->sprite == 1126 ? 1124 : 193, 1, map.entities, nullptr); //Limb entity.
@@ -217,7 +217,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left arm
 	entity = newEntity(my->sprite == 1126 ? 1122 : 192, 1, map.entities, nullptr); //Limb entity.
@@ -236,7 +236,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// world weapon
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -257,7 +257,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// shield
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -277,7 +277,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// cloak
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -301,7 +301,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// helmet
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -325,7 +325,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// mask
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -346,7 +346,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actSuccubusLimb(Entity* my)

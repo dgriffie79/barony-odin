@@ -7037,8 +7037,9 @@ int StatueManager_t::processStatueExport()
 	std::vector<Entity*> allLimbs;
 	allLimbs.push_back(player);
 
-	for ( auto& bodypart : player->bodyparts )
+	for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(player->bodyparts); ++_bi )
 	{
+		auto bodypart = dynarray_pget<Entity*>(player->bodyparts, _bi);
 		allLimbs.push_back(bodypart);
 	}
 
@@ -9078,7 +9079,7 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 
 	if ( fileWriteType == HOTBAR_LAYOUT_CUSTOM_CONFIG )
 	{
-		std::string classname = playerClassInternalNames[client_classes[clientnum]];
+		std::string classname = playerClassInternalNames.at(client_classes[clientnum]);
 		if ( writeNewFile )
 		{
 			CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
@@ -9470,7 +9471,7 @@ void ClassHotbarConfig_t::assignHotbarSlots(const int player)
 	}
 	if ( layoutCustom.hasData )
 	{
-		printlog("[Class Hotbar]: Found custom layout for class '%s'", playerClassInternalNames[classnum].c_str());
+		printlog("[Class Hotbar]: Found custom layout for class '%s'", playerClassInternalNames.at(classnum).c_str());
 		itemsAndSlots.clear();
 		for ( auto& slot : layoutCustom.hotbar )
 		{
@@ -18395,8 +18396,9 @@ void Compendium_t::exportCurrentMonster(Entity* monster)
 	std::vector<Entity*> allLimbs;
 	allLimbs.push_back(monster);
 
-	for ( auto& bodypart : monster->bodyparts )
+	for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(monster->bodyparts); ++_bi )
 	{
+		auto bodypart = dynarray_pget<Entity*>(monster->bodyparts, _bi);
 		allLimbs.push_back(bodypart);
 	}
 

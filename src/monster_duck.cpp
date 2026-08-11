@@ -127,7 +127,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// body sit
 	entity = newEntity(appearance == 3 ? 2307 : 2225 + appearance * 6, 1, map.entities, nullptr); //Limb entity.
@@ -153,7 +153,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// wingleft
 	entity = newEntity(appearance == 3 ? 2309 : 2227 + appearance * 6, 1, map.entities, nullptr); //Limb entity.
@@ -179,7 +179,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// wingright
 	entity = newEntity(appearance == 3 ? 2310 : 2228 + appearance * 6, 1, map.entities, nullptr); //Limb entity.
@@ -205,7 +205,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// leg left
 	entity = newEntity(2229, 1, map.entities, nullptr); //Limb entity.
@@ -231,7 +231,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// leg right
 	entity = newEntity(2230, 1, map.entities, nullptr); //Limb entity.
@@ -257,7 +257,7 @@ void initDuck(Entity* my, Stat* myStats)
 		entity->behavior = my->behavior;
 		entity->flags[GENIUS] = true;
 	}
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actDuckLimb(Entity* my)

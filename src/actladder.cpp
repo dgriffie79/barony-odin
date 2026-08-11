@@ -1147,15 +1147,15 @@ int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int le
 		mapsDirectory.append(PHYSFS_getDirSeparator()).append(SECRETLEVELSFILE);
 	}
 	printlog("Maps directory: %s", mapsDirectory.c_str());
-	std::vector<DynamicString> levelsList = getLinesFromDataFile(mapsDirectory);
-	DynamicString line = levelsList.front();
+	DynamicArrayStr levelsList = getLinesFromDataFile(mapsDirectory);
+	DynamicString line = levelsList.at(0);
 	int levelsCounted = 0;
 
 	std::vector<int> eligibleLevels;
 
-	for ( auto it = levelsList.begin(); it != levelsList.end(); ++it )
+	for ( int64_t _li = 0; _li < levelsList.size(); ++_li )
 	{
-		line = *it;
+		line = levelsList.at(_li);
 		if ( line[0] == '\n' )
 		{
 			continue;

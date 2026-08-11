@@ -219,11 +219,11 @@ ConsoleVariable<bool> cvar_enableKeepAlives("/keepalive_enabled", true);
 ConsoleVariable<bool> cvar_animate_tiles("/animate_tiles", true);
 ConsoleVariable<bool> cvar_map_sequence_rng("/map_sequence_rng", true);
 
-std::vector<DynamicString> randomPlayerNamesMale;
-std::vector<DynamicString> randomPlayerNamesFemale;
-std::vector<DynamicString> randomNPCNamesMale;
-std::vector<DynamicString> randomNPCNamesFemale;
-std::vector<DynamicString> physFSFilesInDirectory;
+DynamicArrayStr randomPlayerNamesMale;
+DynamicArrayStr randomPlayerNamesFemale;
+DynamicArrayStr randomNPCNamesMale;
+DynamicArrayStr randomNPCNamesFemale;
+DynamicArrayStr physFSFilesInDirectory;
 TileEntityListHandler TileEntityList;
 // recommended for valgrind debugging:
 // res of 480x270
@@ -497,8 +497,9 @@ void TimerExperiments::postRenderRestore(view_t& camera, int player)
 	return;
 	/*players[player]->entity->x = playerBodypartOffsets[player].entity_ox;
 	players[player]->entity->y = playerBodypartOffsets[player].entity_oy;
-	for ( Entity *bodypart : players[player]->entity->bodyparts )
+	for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(players[player]->entity->bodyparts); ++_bi )
 	{
+		auto bodypart = dynarray_pget<Entity*>(players[player]->entity->bodyparts, _bi);
 		if ( players[player]->isLocalPlayer() )
 		{
 			if ( bodypart->behavior == &actHudAdditional
@@ -3453,8 +3454,9 @@ void gameLogic(void)
 											if ( entity->behavior == &actPlayer || entity->behavior == &actMonster
 												|| entity->behavior == &actDeathGhost )
 											{
-												for ( Entity *bodypart : entity->bodyparts )
+												for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(entity->bodyparts); ++_bi )
 												{
+													auto bodypart = dynarray_pget<Entity*>(entity->bodyparts, _bi);
 													bodypart->x += entity->x - ox;
 													bodypart->y += entity->y - oy;
 													bodypart->new_x += entity->new_x - onewx;
@@ -3481,8 +3483,9 @@ void gameLogic(void)
 										if ( entity->behavior == &actPlayer || entity->behavior == &actMonster
 											|| entity->behavior == &actDeathGhost )
 										{
-											for (Entity *bodypart : entity->bodyparts)
+											for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(entity->bodyparts); ++_bi )
 											{
+												auto bodypart = dynarray_pget<Entity*>(entity->bodyparts, _bi);
 												bodypart->x += entity->x - ox;
 												bodypart->y += entity->y - oy;
 												bodypart->new_x += entity->new_x - onewx;

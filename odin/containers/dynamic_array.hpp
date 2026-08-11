@@ -213,6 +213,14 @@ inline int64_t dynarray_size(const DynamicArray& a) {
 
 }
 
+// pointer-element helpers (non-owning pointer arrays like vector<Entity*>)
+template <typename T>
+inline T dynarray_pget(const DynamicArray& a, int64_t i) { T* p = (T*)a.data; return p[i]; }
+template <typename T>
+inline T*& dynarray_pget_ref(DynamicArray& a, int64_t i) { T* p = (T*)a.data; return p[i]; }
+template <typename T>
+inline int64_t dynarray_psize(const DynamicArray& a) { return a.len / (int64_t)sizeof(T*); }
+
 
 
 // ---------------------------------------------------------------------------

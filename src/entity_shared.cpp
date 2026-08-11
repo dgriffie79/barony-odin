@@ -1780,257 +1780,258 @@ char itemStringsByType[10][NUM_ITEM_STRINGS_BY_TYPE][32] =
 	
 };
 
-std::vector<const char*> spriteEditorNameStrings =
-{
-	"NULL",	
-	"PLAYER START",
-	"DOOR (East-West)",
-	"DOOR (North-South)",
-	"TORCH (West Wall)",
-	"TORCH (North Wall)",
-	"TORCH (East Wall)",
-	"TORCH (South Wall)",
-	"ITEM",
-	"GOLD",
-	"RANDOM (Dependent on Level)",
-	"LADDER",
-	"FIREPLACE",
-	"Flame Sprite (Not Used)",
-	"FOUNTAIN",
-	"SINK",
-	"Flame Sprite (Not Used)",
-	"Lever",
-	"Wire",
-	"GATE (North-South)",
-	"GATE (East-West)",
-	"CHEST",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"HUMAN",
-	"NOT USED",
-	"NOT USED",
-	"TROLL",
-	"NOT USED",
-	"ARROW TRAP",
-	"PRESSURE PLATE",
-	"PRESSURE PLATE (Latch On)",
-	"SHOPKEEPER",
-	"GOBLIN",
-	"MINOTAUR SPAWN TRAP",
-	"BOULDER TRAP",
-	"HEADSTONE",
-	"NULL",
-	"LAVA",
-	"NOT USED",
-	"LADDER HOLE",
-	"BOULDER",
-	"PORTAL",
-	"SECRET LADDER",
-	"NOT USED",
-	"SPIDER",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"TABLE",
-	"CHAIR",
-	"DIAMOND PICKAXE",
-	"LICH",
-	"END PORTAL",
-	"SPEAR TRAP",
-	"MAGIC TRAP",
-	"WALL BUSTER",
-	"WALL BUILDER",
-	"MAGIC BOW",
-	"MAGIC SPEAR",
-	"GNOME",
-	"DEVIL",
-	"DEVIL TELEPORT LOCATION",
-	"DEVIL TELEPORT LOCATION",
-	"DEVIL TELEPORT LOCATION",
-	"DEMON",
-	"IMP",
-	"MINOTAUR",
-	"SCORPION",
-	"SLIME",
-	"SUCCUBUS",
-	"RAT",
-	"GHOUL",
-	"SKELETON",
-	"KOBOLD",
-	"SCARAB",
-	"CRYSTALGOLEM",
-	"INCUBUS",
-	"VAMPIRE",
-	"SHADOW",
-	"COCKATRICE",
-	"INSECTOID",
-	"GOATMAN",
-	"AUTOMATON",
-	"LICH ICE",
-	"LICH FIRE",
-	"NOT USED",
-	"SUMMON TRAP",
-	"CRYSTAL SHARD (West Wall)",
-	"CRYSTAL SHARD (North Wall)",
-	"CRYSTAL SHARD (East Wall)",
-	"CRYSTAL SHARD (South Wall)",
-	"BOULDER TRAP SINGLE (Roll East)",
-	"BOULDER TRAP SINGLE (Roll South)",
-	"BOULDER TRAP SINGLE (Roll West)",
-	"BOULDER TRAP SINGLE (Roll North)",
-	"POWER CRYSTAL",
-	"ARMED BEAR TRAP",
-	"STALAG-COLUMN",
-	"STALAGMITE SINGLE",
-	"STALAGMITE MULTIPLE",
-	"STALAGTITE SINGLE",
-	"STALAGTITE MULTIPLE",
-	"GATE INVERTED (North-South)",
-	"GATE INVERTED (East-West)",
-	"LEVER WITH TIMER",
-	"PEDESTAL",
-	"MID PORTAL",
-	"TELEPORTER",
-	"CEILING TILE MODEL",
-	"SPELL TRAP CEILING",
-	"ARCANE CHAIR",
-	"ARCANE BED",
-	"BUNK BED",
-	"COLUMN DECO",
-	"PODIUM",
-	"PISTONS",
-	"DECORATION",
-	"TELEPORT LOCATION",
-	"ENDEND PORTAL",
-	"SOUND SOURCE",
-	"LIGHT SOURCE",
-	"TEXT SOURCE",
-	"SIGNAL TIMER",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"CUSTOM EXIT",
-	"READABLE BOOK",
-	"SENTRYBOT",
-	"SPELLBOT",
-	"DUMMYBOT",
-	"GYROBOT",
-	"UNUSED",
-	"STATUE ANIMATOR",
-	"STATUE",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"TELEPORT SHRINE",
-	"SPELL SHRINE",
-	"COLLIDER DECORATION",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"AND GATE",
-	"AND GATE",
-	"AND GATE",
-	"BAT",
-	"BUGBEAR",
-	"DAEDALUS SHRINE",
-	"BELL",
-	"NOT USED",
-	"SLIME (GREEN)",
-	"SLIME (BLUE)",
-	"SLIME (RED)",
-	"SLIME (TAR)",
-	"SLIME (METAL)",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"ASSIST SHRINE",
-	"NOT USED",
-	"NOT USED",
-	"DRYAD",
-	"MYCONID",
-	"SALAMANDER",
-	"GREMLIN",
-	"WALL LOCK (East)",
-	"WALL LOCK (South)",
-	"WALL LOCK (West)",
-	"WALL LOCK (North)",
-	"WALL BUTTON (East)",
-	"WALL BUTTON (South)",
-	"WALL BUTTON (West)",
-	"WALL BUTTON (North)",
-	"NO DIG TILE",
-	"IRON DOOR (North-South)",
-	"IRON DOOR (East-West)",
-	"SLIPPERY TILE",
-	"WIND TILE",
-	"SLOW TILE",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"NOT USED",
-	"REVENANT_SKULL",
-	"ADORCISED_WEAPON"
-};
+DynamicArray spriteEditorNameStrings = []() {
+	DynamicArray m;
+	dynarray_push<const char*>(m, "NULL");
+	dynarray_push<const char*>(m, "PLAYER START");
+	dynarray_push<const char*>(m, "DOOR (East-West)");
+	dynarray_push<const char*>(m, "DOOR (North-South)");
+	dynarray_push<const char*>(m, "TORCH (West Wall)");
+	dynarray_push<const char*>(m, "TORCH (North Wall)");
+	dynarray_push<const char*>(m, "TORCH (East Wall)");
+	dynarray_push<const char*>(m, "TORCH (South Wall)");
+	dynarray_push<const char*>(m, "ITEM");
+	dynarray_push<const char*>(m, "GOLD");
+	dynarray_push<const char*>(m, "RANDOM (Dependent on Level)");
+	dynarray_push<const char*>(m, "LADDER");
+	dynarray_push<const char*>(m, "FIREPLACE");
+	dynarray_push<const char*>(m, "Flame Sprite (Not Used)");
+	dynarray_push<const char*>(m, "FOUNTAIN");
+	dynarray_push<const char*>(m, "SINK");
+	dynarray_push<const char*>(m, "Flame Sprite (Not Used)");
+	dynarray_push<const char*>(m, "Lever");
+	dynarray_push<const char*>(m, "Wire");
+	dynarray_push<const char*>(m, "GATE (North-South)");
+	dynarray_push<const char*>(m, "GATE (East-West)");
+	dynarray_push<const char*>(m, "CHEST");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "HUMAN");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "TROLL");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "ARROW TRAP");
+	dynarray_push<const char*>(m, "PRESSURE PLATE");
+	dynarray_push<const char*>(m, "PRESSURE PLATE (Latch On)");
+	dynarray_push<const char*>(m, "SHOPKEEPER");
+	dynarray_push<const char*>(m, "GOBLIN");
+	dynarray_push<const char*>(m, "MINOTAUR SPAWN TRAP");
+	dynarray_push<const char*>(m, "BOULDER TRAP");
+	dynarray_push<const char*>(m, "HEADSTONE");
+	dynarray_push<const char*>(m, "NULL");
+	dynarray_push<const char*>(m, "LAVA");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "LADDER HOLE");
+	dynarray_push<const char*>(m, "BOULDER");
+	dynarray_push<const char*>(m, "PORTAL");
+	dynarray_push<const char*>(m, "SECRET LADDER");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "SPIDER");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "TABLE");
+	dynarray_push<const char*>(m, "CHAIR");
+	dynarray_push<const char*>(m, "DIAMOND PICKAXE");
+	dynarray_push<const char*>(m, "LICH");
+	dynarray_push<const char*>(m, "END PORTAL");
+	dynarray_push<const char*>(m, "SPEAR TRAP");
+	dynarray_push<const char*>(m, "MAGIC TRAP");
+	dynarray_push<const char*>(m, "WALL BUSTER");
+	dynarray_push<const char*>(m, "WALL BUILDER");
+	dynarray_push<const char*>(m, "MAGIC BOW");
+	dynarray_push<const char*>(m, "MAGIC SPEAR");
+	dynarray_push<const char*>(m, "GNOME");
+	dynarray_push<const char*>(m, "DEVIL");
+	dynarray_push<const char*>(m, "DEVIL TELEPORT LOCATION");
+	dynarray_push<const char*>(m, "DEVIL TELEPORT LOCATION");
+	dynarray_push<const char*>(m, "DEVIL TELEPORT LOCATION");
+	dynarray_push<const char*>(m, "DEMON");
+	dynarray_push<const char*>(m, "IMP");
+	dynarray_push<const char*>(m, "MINOTAUR");
+	dynarray_push<const char*>(m, "SCORPION");
+	dynarray_push<const char*>(m, "SLIME");
+	dynarray_push<const char*>(m, "SUCCUBUS");
+	dynarray_push<const char*>(m, "RAT");
+	dynarray_push<const char*>(m, "GHOUL");
+	dynarray_push<const char*>(m, "SKELETON");
+	dynarray_push<const char*>(m, "KOBOLD");
+	dynarray_push<const char*>(m, "SCARAB");
+	dynarray_push<const char*>(m, "CRYSTALGOLEM");
+	dynarray_push<const char*>(m, "INCUBUS");
+	dynarray_push<const char*>(m, "VAMPIRE");
+	dynarray_push<const char*>(m, "SHADOW");
+	dynarray_push<const char*>(m, "COCKATRICE");
+	dynarray_push<const char*>(m, "INSECTOID");
+	dynarray_push<const char*>(m, "GOATMAN");
+	dynarray_push<const char*>(m, "AUTOMATON");
+	dynarray_push<const char*>(m, "LICH ICE");
+	dynarray_push<const char*>(m, "LICH FIRE");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "SUMMON TRAP");
+	dynarray_push<const char*>(m, "CRYSTAL SHARD (West Wall)");
+	dynarray_push<const char*>(m, "CRYSTAL SHARD (North Wall)");
+	dynarray_push<const char*>(m, "CRYSTAL SHARD (East Wall)");
+	dynarray_push<const char*>(m, "CRYSTAL SHARD (South Wall)");
+	dynarray_push<const char*>(m, "BOULDER TRAP SINGLE (Roll East)");
+	dynarray_push<const char*>(m, "BOULDER TRAP SINGLE (Roll South)");
+	dynarray_push<const char*>(m, "BOULDER TRAP SINGLE (Roll West)");
+	dynarray_push<const char*>(m, "BOULDER TRAP SINGLE (Roll North)");
+	dynarray_push<const char*>(m, "POWER CRYSTAL");
+	dynarray_push<const char*>(m, "ARMED BEAR TRAP");
+	dynarray_push<const char*>(m, "STALAG-COLUMN");
+	dynarray_push<const char*>(m, "STALAGMITE SINGLE");
+	dynarray_push<const char*>(m, "STALAGMITE MULTIPLE");
+	dynarray_push<const char*>(m, "STALAGTITE SINGLE");
+	dynarray_push<const char*>(m, "STALAGTITE MULTIPLE");
+	dynarray_push<const char*>(m, "GATE INVERTED (North-South)");
+	dynarray_push<const char*>(m, "GATE INVERTED (East-West)");
+	dynarray_push<const char*>(m, "LEVER WITH TIMER");
+	dynarray_push<const char*>(m, "PEDESTAL");
+	dynarray_push<const char*>(m, "MID PORTAL");
+	dynarray_push<const char*>(m, "TELEPORTER");
+	dynarray_push<const char*>(m, "CEILING TILE MODEL");
+	dynarray_push<const char*>(m, "SPELL TRAP CEILING");
+	dynarray_push<const char*>(m, "ARCANE CHAIR");
+	dynarray_push<const char*>(m, "ARCANE BED");
+	dynarray_push<const char*>(m, "BUNK BED");
+	dynarray_push<const char*>(m, "COLUMN DECO");
+	dynarray_push<const char*>(m, "PODIUM");
+	dynarray_push<const char*>(m, "PISTONS");
+	dynarray_push<const char*>(m, "DECORATION");
+	dynarray_push<const char*>(m, "TELEPORT LOCATION");
+	dynarray_push<const char*>(m, "ENDEND PORTAL");
+	dynarray_push<const char*>(m, "SOUND SOURCE");
+	dynarray_push<const char*>(m, "LIGHT SOURCE");
+	dynarray_push<const char*>(m, "TEXT SOURCE");
+	dynarray_push<const char*>(m, "SIGNAL TIMER");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "CUSTOM EXIT");
+	dynarray_push<const char*>(m, "READABLE BOOK");
+	dynarray_push<const char*>(m, "SENTRYBOT");
+	dynarray_push<const char*>(m, "SPELLBOT");
+	dynarray_push<const char*>(m, "DUMMYBOT");
+	dynarray_push<const char*>(m, "GYROBOT");
+	dynarray_push<const char*>(m, "UNUSED");
+	dynarray_push<const char*>(m, "STATUE ANIMATOR");
+	dynarray_push<const char*>(m, "STATUE");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "TELEPORT SHRINE");
+	dynarray_push<const char*>(m, "SPELL SHRINE");
+	dynarray_push<const char*>(m, "COLLIDER DECORATION");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "AND GATE");
+	dynarray_push<const char*>(m, "AND GATE");
+	dynarray_push<const char*>(m, "AND GATE");
+	dynarray_push<const char*>(m, "BAT");
+	dynarray_push<const char*>(m, "BUGBEAR");
+	dynarray_push<const char*>(m, "DAEDALUS SHRINE");
+	dynarray_push<const char*>(m, "BELL");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "SLIME (GREEN)");
+	dynarray_push<const char*>(m, "SLIME (BLUE)");
+	dynarray_push<const char*>(m, "SLIME (RED)");
+	dynarray_push<const char*>(m, "SLIME (TAR)");
+	dynarray_push<const char*>(m, "SLIME (METAL)");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "ASSIST SHRINE");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "DRYAD");
+	dynarray_push<const char*>(m, "MYCONID");
+	dynarray_push<const char*>(m, "SALAMANDER");
+	dynarray_push<const char*>(m, "GREMLIN");
+	dynarray_push<const char*>(m, "WALL LOCK (East)");
+	dynarray_push<const char*>(m, "WALL LOCK (South)");
+	dynarray_push<const char*>(m, "WALL LOCK (West)");
+	dynarray_push<const char*>(m, "WALL LOCK (North)");
+	dynarray_push<const char*>(m, "WALL BUTTON (East)");
+	dynarray_push<const char*>(m, "WALL BUTTON (South)");
+	dynarray_push<const char*>(m, "WALL BUTTON (West)");
+	dynarray_push<const char*>(m, "WALL BUTTON (North)");
+	dynarray_push<const char*>(m, "NO DIG TILE");
+	dynarray_push<const char*>(m, "IRON DOOR (North-South)");
+	dynarray_push<const char*>(m, "IRON DOOR (East-West)");
+	dynarray_push<const char*>(m, "SLIPPERY TILE");
+	dynarray_push<const char*>(m, "WIND TILE");
+	dynarray_push<const char*>(m, "SLOW TILE");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "NOT USED");
+	dynarray_push<const char*>(m, "REVENANT_SKULL");
+	dynarray_push<const char*>(m, "ADORCISED_WEAPON");
+	return m;
+}();;
 
 char monsterEditorNameStrings[NUMMONSTERS][32] =
 {

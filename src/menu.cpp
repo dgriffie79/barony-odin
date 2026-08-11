@@ -9701,7 +9701,7 @@ void buttonRandomName(button_t* my)
 		return;
 	}
 
-	std::vector<DynamicString> *names;
+	DynamicArrayStr *names;
 
 	if ( stats[0]->sex == MALE )
 	{

@@ -10120,16 +10120,16 @@ extern "C" int barony_main(int argc, char** argv)
 				default:	strcpy(action,"STATIC"); break;
 			}*/
 
-			int numsprites = spriteEditorNameStrings.size();
+			int numsprites = (int)dynarray_psize<const char*>(spriteEditorNameStrings);
 
 			if ( (mousex <= xres && mousey <= yres) && palette[mousey + mousex * yres] >= 0 && palette[mousey + mousex * yres] < numsprites )
 			{
 				printTextFormatted(font8x8_bmp, 0, yres - 8, "Sprite index:%5d", palette[mousey + mousex * yres]);
-				printTextFormatted(font8x8_bmp, 0, yres - 16, "%s", spriteEditorNameStrings[palette[mousey + mousex * yres]]);
+				printTextFormatted(font8x8_bmp, 0, yres - 16, "%s", dynarray_pget<const char*>(spriteEditorNameStrings, palette[mousey + mousex * yres]));
 
 				char hoverTextString[1024] = "";
 				snprintf(hoverTextString, 5, "%d: ", palette[mousey + mousex * yres]);
-				strcat(hoverTextString, spriteEditorNameStrings[palette[mousey + mousex * yres]]);
+				strcat(hoverTextString, dynarray_pget<const char*>(spriteEditorNameStrings, palette[mousey + mousex * yres]));
 				int hoverTextWidth = strlen(hoverTextString);
 
 				if ( mousey - 20 <= 0 )

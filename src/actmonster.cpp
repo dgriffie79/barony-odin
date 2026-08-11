@@ -2116,8 +2116,8 @@ bool makeFollower(int monsterclicked, bool ringconflict, char namesays[64],
 			auto& names = myStats->sex == FEMALE ?
 				randomNPCNamesFemale : randomNPCNamesMale;
 			const int choice = local_rng.uniform(0, (int)names.size() - 1);
-			auto name = names[choice].c_str();
-			size_t len = names[choice].size();
+			auto name = names.at(choice).c_str();
+			size_t len = names.at(choice).size();
 			stringCopy(myStats->name, name, sizeof(Stat::name), len);
 		}
 		else if ( myStats->type == SLIME
@@ -11210,8 +11210,8 @@ bool forceFollower(Entity& leader, Entity& follower)
 			auto& names = followerStats->sex == FEMALE ?
 				randomNPCNamesFemale : randomNPCNamesMale;
 			const int choice = local_rng.uniform(0, (int)names.size() - 1);
-			auto name = names[choice].c_str();
-			size_t len = names[choice].size();
+			auto name = names.at(choice).c_str();
+			size_t len = names.at(choice).size();
 			stringCopy(followerStats->name, name, sizeof(Stat::name), len);
 		}
 		else if ( followerStats->type == SLIME
@@ -14748,9 +14748,9 @@ bool Entity::isUntargetableBat(real_t* outDist) const
 {
 	if ( behavior == &actMonster && getMonsterTypeFromSprite() == BAT_SMALL )
 	{
-		if ( bodyparts.size() >= 1 )
+		if ( dynarray_psize<Entity*>(bodyparts) >= 1 )
 		{
-			auto& body = bodyparts[0];
+			auto body = dynarray_pget<Entity*>(bodyparts, 0);
 			if ( body->z < -7.5 )
 			{
 				if ( outDist )

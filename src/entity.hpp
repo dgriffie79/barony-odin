@@ -1263,7 +1263,7 @@ public:
 
 	void addToCreatureList(list_t* list);
 	void addToWorldUIList(list_t *list);
-	std::vector<Entity*> bodyparts;
+	DynamicArray bodyparts;  // vector<Entity*> (non-owning pointers)
 	std::set<Uint32> collisionIgnoreTargets;
 
 	bool collisionProjectileMiss(Entity* parent, Entity* projectile);
@@ -1493,7 +1493,7 @@ static const int FURNITURE_PODIUM = 4;
 
 int checkSpriteType(Sint32 sprite);
 Monster editorSpriteTypeToMonster(Sint32 sprite);
-extern std::vector<const char*>spriteEditorNameStrings;
+extern DynamicArray spriteEditorNameStrings;  // vector<const char*> (non-owning)
 extern char tileEditorNameStrings[NUM_EDITOR_TILES][44];
 extern char monsterEditorNameStrings[NUMMONSTERS][32];
 extern char itemStringsByType[10][NUM_ITEM_STRINGS_BY_TYPE][32];

@@ -3969,7 +3969,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		playerEntity->x = (tele_x << 4) + 8;
 		playerEntity->y = (tele_y << 4) + 8;
 		playerEntity->bNeedsRenderPositionInit = true;
-        for (auto part : playerEntity->bodyparts) {
+        for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(playerEntity->bodyparts); ++_bi ) {
+            auto part = dynarray_pget<Entity*>(playerEntity->bodyparts, _bi);
             part->bNeedsRenderPositionInit = true;
         }
         for (auto node = map.entities->first; node != nullptr; node = node->next) {
@@ -3996,7 +3997,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		playerEntity->x = (tele_x << 4) + 8;
 		playerEntity->y = (tele_y << 4) + 8;
 		playerEntity->bNeedsRenderPositionInit = true;
-		for ( auto part : playerEntity->bodyparts ) {
+		for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(playerEntity->bodyparts); ++_bi ) {
+			auto part = dynarray_pget<Entity*>(playerEntity->bodyparts, _bi);
 			part->bNeedsRenderPositionInit = true;
 		}
 

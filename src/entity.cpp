@@ -17168,7 +17168,8 @@ bool Entity::teleport(int tele_x, int tele_y)
     const float poofy = y + sinf(yaw) * 4.f;
     spawnPoof(poofx, poofy, 0, 1.0, true);
     bNeedsRenderPositionInit = true;
-    for (auto part : bodyparts) {
+    for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(bodyparts); ++_bi ) {
+        auto part = dynarray_pget<Entity*>(bodyparts, _bi);
         part->bNeedsRenderPositionInit = true;
     }
     for (auto node = map.entities->first; node != nullptr; node = node->next) {
@@ -17498,14 +17499,15 @@ bool Entity::teleportAroundEntity(Entity* target, int dist, int effectType)
 							if ( effectType == SPELL_JUMP && (this == target) )
 							{
 								Entity* ohit = hit.entity;
-								if ( this->bodyparts.size() )
+								if ( dynarray_psize<Entity*>(this->bodyparts) )
 								{
 									// check LOS
 									TileEntityList.updateEntity(*this); // important - lineTrace needs the TileEntityListUpdated.
 
 									Entity* tmpTarget = nullptr;
-									for ( auto limb : bodyparts )
+									for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(bodyparts); ++_bi )
 									{
+										auto limb = dynarray_pget<Entity*>(bodyparts, _bi);
 										if ( limb->behavior == &actPlayerLimb )
 										{
 											tmpTarget = limb;
@@ -31533,12 +31535,12 @@ void Entity::alertAlliesOnBeingHit(Entity* attacker, std::unordered_set<Entity*>
 						}
 
 						real_t tangent = atan2(entity->y - this->y, entity->x - this->x);
-						if ( buddystats->type == BAT_SMALL && entity->isUntargetableBat() && entity->bodyparts.size() > 0 && entity->monsterSpecialState == BAT_REST )
+						if ( buddystats->type == BAT_SMALL && entity->isUntargetableBat() && dynarray_psize<Entity*>(entity->bodyparts) > 0 && entity->monsterSpecialState == BAT_REST )
 						{
-							real_t oldZ = entity->bodyparts[0]->z;
-							entity->bodyparts[0]->z = 0.0; // hack to make it linetraceable
+							real_t oldZ = dynarray_pget<Entity*>(entity->bodyparts, 0)->z;
+							dynarray_pget<Entity*>(entity->bodyparts, 0)->z = 0.0; // hack to make it linetraceable
 							lineTrace(this, this->x, this->y, tangent, 64.0, 0, false);
-							entity->bodyparts[0]->z = oldZ;
+							dynarray_pget<Entity*>(entity->bodyparts, 0)->z = oldZ;
 						}
 						else
 						{

@@ -13743,9 +13743,9 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 			worldZ = entity->lerpRenderState.z.position + enemyBarSettings.getHeightOffset(entity);
 			if ( entity->behavior == &actMonster && entity->getMonsterTypeFromSprite() == BAT_SMALL )
 			{
-				if ( entity->bodyparts.size() > 0 )
+				if ( dynarray_psize<Entity*>(entity->bodyparts) > 0 )
 				{
-					worldZ += entity->bodyparts[0]->lerpRenderState.z.position;
+					worldZ += dynarray_pget<Entity*>(entity->bodyparts, 0)->lerpRenderState.z.position;
 				}
 			}
 		}
@@ -13756,9 +13756,9 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 			worldZ = entity->z + enemyBarSettings.getHeightOffset(entity);
 			if ( entity->behavior == &actMonster && entity->getMonsterTypeFromSprite() == BAT_SMALL )
 			{
-				if ( entity->bodyparts.size() > 0 )
+				if ( dynarray_psize<Entity*>(entity->bodyparts) > 0 )
 				{
-					worldZ += entity->bodyparts[0]->z;
+					worldZ += dynarray_pget<Entity*>(entity->bodyparts, 0)->z;
 				}
 			}
 		}
@@ -13790,9 +13790,9 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 				enemy_name = getMonsterLocalizedName(MIMIC);
 			}
 
-			if ( entity->bodyparts.size() > 0 )
+			if ( dynarray_psize<Entity*>(entity->bodyparts) > 0 )
 			{
-				auto limb = entity->bodyparts[0];
+				auto limb = dynarray_pget<Entity*>(entity->bodyparts, 0);
 				worldZ += (limb->z - entity->z) / 2; // offset to trunk animation
 			}
 		}
@@ -29832,9 +29832,9 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			bool drawMini = false;
 
 			Entity* playerEntity = Player::getPlayerInteractEntity(playernum);
-			if ( playerEntity && playerEntity->bodyparts.size() > 0 )
+			if ( playerEntity && dynarray_psize<Entity*>(playerEntity->bodyparts) > 0 )
 			{
-				auto bodypart = playerEntity->bodyparts[0];
+				auto bodypart = dynarray_pget<Entity*>(playerEntity->bodyparts, 0);
 				real_t tempx = bodypart->x;
 				real_t tempy = bodypart->y;
 				bodypart->x = callout.second.x;
@@ -30079,9 +30079,9 @@ void CalloutRadialMenu::update()
 				callout.z -= 4;
 				if ( entity->behavior == &actMonster && entity->getMonsterTypeFromSprite() == BAT_SMALL )
 				{
-					if ( entity->bodyparts.size() > 0 )
+					if ( dynarray_psize<Entity*>(entity->bodyparts) > 0 )
 					{
-						callout.z += entity->bodyparts[0]->lerpRenderState.z.position;
+						callout.z += dynarray_pget<Entity*>(entity->bodyparts, 0)->lerpRenderState.z.position;
 					}
 				}
 			}
@@ -30093,9 +30093,9 @@ void CalloutRadialMenu::update()
 				callout.z -= 4;
 				if ( entity->behavior == &actMonster && entity->getMonsterTypeFromSprite() == BAT_SMALL )
 				{
-					if ( entity->bodyparts.size() > 0 )
+					if ( dynarray_psize<Entity*>(entity->bodyparts) > 0 )
 					{
-						callout.z += entity->bodyparts[0]->z;
+						callout.z += dynarray_pget<Entity*>(entity->bodyparts, 0)->z;
 					}
 				}
 			}

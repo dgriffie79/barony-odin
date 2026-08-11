@@ -727,7 +727,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right leg
 	entity = newEntity(107, 1, map.entities, nullptr); //Limb entity.
@@ -746,7 +746,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left leg
 	entity = newEntity(108, 1, map.entities, nullptr); //Limb entity.
@@ -765,7 +765,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right arm
 	entity = newEntity(109, 1, map.entities, nullptr); //Limb entity.
@@ -784,7 +784,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left arm
 	entity = newEntity(110, 1, map.entities, nullptr); //Limb entity.
@@ -803,7 +803,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// world weapon
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -824,7 +824,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// shield
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -844,7 +844,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// cloak
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -867,7 +867,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// helmet
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -890,7 +890,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// mask
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -913,7 +913,7 @@ void initHuman(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	if ( multiplayer == CLIENT )
 	{

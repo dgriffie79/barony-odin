@@ -84,7 +84,7 @@ void initDevil(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right bicep
 	entity = newEntity(305, 1, map.entities, nullptr); //Limb entity.
@@ -103,7 +103,7 @@ void initDevil(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right forearm
 	entity = newEntity(306, 1, map.entities, nullptr); //Limb entity.
@@ -122,7 +122,7 @@ void initDevil(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left bicep
 	entity = newEntity(307, 1, map.entities, nullptr); //Limb entity.
@@ -141,7 +141,7 @@ void initDevil(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left forearm
 	entity = newEntity(308, 1, map.entities, nullptr); //Limb entity.
@@ -160,7 +160,7 @@ void initDevil(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actDevilLimb(Entity* my)

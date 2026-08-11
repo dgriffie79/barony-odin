@@ -136,7 +136,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right leg
 	entity = newEntity(my->sprite == 1008 ? 1013 : 263, 1, map.entities, nullptr); //Limb entity.
@@ -155,7 +155,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left leg
 	entity = newEntity(my->sprite == 1008 ? 1011 : 262, 1, map.entities, nullptr); //Limb entity.
@@ -174,7 +174,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right arm
 	entity = newEntity(my->sprite == 1008 ? 1012 : 261, 1, map.entities, nullptr); //Limb entity.
@@ -193,7 +193,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left arm
 	entity = newEntity(my->sprite == 1008 ? 1010 : 260, 1, map.entities, nullptr); //Limb entity.
@@ -212,7 +212,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// jaw
 	entity = newEntity(my->sprite == 1008 ? 1009 : 259, 1, map.entities, nullptr); //Limb entity.
@@ -231,7 +231,7 @@ void initDemon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actDemonLimb(Entity* my)

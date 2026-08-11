@@ -15014,7 +15014,7 @@ failed:
 			auto& names = stats[index]->sex == sex_t::MALE ?
 				randomPlayerNamesMale : randomPlayerNamesFemale;
 			auto choice = RNG.uniform(0, (int)names.size() - 1);
-			auto name = names[choice].c_str();
+			auto name = names.at(choice).c_str();
 			name_field_fn(nullptr, name, index);
 			auto card = static_cast<Frame*>(button.getParent());
 			auto field = card->findField("name"); assert(field);
@@ -16493,8 +16493,8 @@ failed:
 						auto& names = stats[c]->sex == sex_t::MALE ?
 						    randomPlayerNamesMale : randomPlayerNamesFemale;
 						const int choice = RNG.uniform(0, (int)names.size() - 1);
-						auto name = names[choice].c_str();
-						size_t len = names[choice].size();
+						auto name = names.at(choice).c_str();
+						size_t len = names.at(choice).size();
 						len = std::min(sizeof(Stat::name) - 1, len);
 						memcpy(stats[c]->name, name, len);
 						stats[c]->name[len] = '\0';

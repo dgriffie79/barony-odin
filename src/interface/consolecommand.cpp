@@ -2182,7 +2182,7 @@ namespace ConsoleCommands {
 					stats[i]->playerRace = RACE_HUMAN;
 					stats[i]->stat_appearance = local_rng.rand() % 18;
 				}
-				strcpy(stats[i]->name, randomPlayerNamesFemale[local_rng.rand() % randomPlayerNamesFemale.size()].c_str());
+				strcpy(stats[i]->name, randomPlayerNamesFemale.at(local_rng.rand() % randomPlayerNamesFemale.size()).c_str());
 				bool oldIntro = intro;
 				intro = true; // so initClass doesn't add items to hotbar.
 				initClass(i);

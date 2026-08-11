@@ -2780,7 +2780,7 @@ void drawEntities2D(long camx, long camy)
 		pos.h = TEXTURESIZE;
 		//ttfPrintText(ttf8, 100, 100, inputstr); debug any errant text input in editor
 
-		if ( entity->sprite >= 0 && entity->sprite < numsprites && entity->sprite < spriteEditorNameStrings.size() )
+		if ( entity->sprite >= 0 && entity->sprite < numsprites && entity->sprite < (int)dynarray_psize<const char*>(spriteEditorNameStrings) )
 		{
 			if ( sprites[entity->sprite] != nullptr )
 			{
@@ -2798,7 +2798,7 @@ void drawEntities2D(long camx, long camy)
 						case 1: //monsters
 							pady += 10;
 							if ( entity->getStats() != nullptr ) {
-								strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+								strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 								ttfPrintText(ttf8, padx, pady - 10, tmpStr);
 								snprintf(tmpStr, sizeof(entity->getStats()->name), "Name: %s", entity->getStats()->name);
 								ttfPrintText(ttf8, padx, pady, tmpStr);
@@ -2810,7 +2810,7 @@ void drawEntities2D(long camx, long camy)
 							break;
 						case 15: // light source
 							pady += 15;
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady, tmpStr);
 
 							snprintf(tmpStr, sizeof(tmpStr), "R: %d G: %d B: %d",
@@ -2821,7 +2821,7 @@ void drawEntities2D(long camx, long camy)
 							break;
 						case 2: //chest
 							pady += 5;
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady, tmpStr);
 							switch ( (int)entity->yaw )
 							{
@@ -2882,7 +2882,7 @@ void drawEntities2D(long camx, long camy)
 						case 27: // collider
 						{
 							pady += 5;
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady - 10, tmpStr);
 							int model = selectedEntity[0]->colliderDecorationModel;
 							if ( EditorEntityData_t::colliderData.find(selectedEntity[0]->colliderDamageTypes)
@@ -3000,7 +3000,7 @@ void drawEntities2D(long camx, long camy)
 						case 4: //summoning trap
 							pady += 5;
 							offsety = -40;
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady + offsety, tmpStr);
 
 							offsety += 10;
@@ -3055,7 +3055,7 @@ void drawEntities2D(long camx, long camy)
 						case 5: //power crystal
 							pady += 5;
 							offsety = -20;
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady + offsety, tmpStr);
 
 							offsety += 10;
@@ -3157,7 +3157,7 @@ void drawEntities2D(long camx, long camy)
 								buf[totalChars] = '\0';
 							}
 							std::vector<DynamicString> lines;
-							lines.push_back(spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							lines.push_back(dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 
 							strncpy(tmpStr, buf, 48);
 							if ( strcmp(tmpStr, "") )
@@ -3245,7 +3245,7 @@ void drawEntities2D(long camx, long camy)
 						}
 							break;
 						default:
-							strcpy(tmpStr, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady + 20, tmpStr);
 							break;
 
@@ -3254,7 +3254,7 @@ void drawEntities2D(long camx, long camy)
 				else if ( (omousex / TEXTURESIZE) * 32 == pos.x
 						&& (omousey / TEXTURESIZE) * 32 == pos.y
 						&& selectedEntity[0] == NULL
-						&& entity->sprite < spriteEditorNameStrings.size()
+						&& entity->sprite < (int)dynarray_psize<const char*>(spriteEditorNameStrings)
 						&& hovertext
 						)
 				{
@@ -3274,7 +3274,7 @@ void drawEntities2D(long camx, long camy)
 								ttfPrintText(ttf8, padx, pady - offsety, tmpStats->name);
 								offsety += 10;
 							}
-							ttfPrintText(ttf8, padx, pady - offsety, spriteEditorNameStrings[entity->sprite]);
+							ttfPrintText(ttf8, padx, pady - offsety, dynarray_pget<const char*>(spriteEditorNameStrings, entity->sprite));
 							offsety += 10;
 						}
 					}
@@ -3285,7 +3285,7 @@ void drawEntities2D(long camx, long camy)
 					}
 					else
 					{
-						ttfPrintText(ttf8, padx, pady - offsety, spriteEditorNameStrings[entity->sprite]);
+						ttfPrintText(ttf8, padx, pady - offsety, dynarray_pget<const char*>(spriteEditorNameStrings, entity->sprite));
 						offsety += 10;
 					}
 				}

@@ -1160,7 +1160,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right leg
 	entity = newEntity(222, 1, map.entities, nullptr); //Limb entity.
@@ -1179,7 +1179,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left leg
 	entity = newEntity(221, 1, map.entities, nullptr); //Limb entity.
@@ -1198,7 +1198,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right arm
 	entity = newEntity(220, 1, map.entities, nullptr); //Limb entity.
@@ -1217,7 +1217,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left arm
 	entity = newEntity(219, 1, map.entities, nullptr); //Limb entity.
@@ -1236,7 +1236,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// world weapon
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -1257,7 +1257,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// shield
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -1277,7 +1277,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// cloak
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -1300,7 +1300,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// helmet
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -1323,7 +1323,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// mask
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -1346,7 +1346,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actShopkeeperLimb(Entity* my)

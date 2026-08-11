@@ -580,7 +580,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right leg
 	entity = newEntity(my->sprite == 1519 ? 1532 : 1533, 1, map.entities, nullptr); //Limb entity.
@@ -599,7 +599,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left leg
 	entity = newEntity(my->sprite == 1519 ? 1530 : 1531, 1, map.entities, nullptr); //Limb entity.
@@ -618,7 +618,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// right arm
 	entity = newEntity(1523, 1, map.entities, nullptr); //Limb entity.
@@ -637,7 +637,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// left arm
 	entity = newEntity(1521, 1, map.entities, nullptr); //Limb entity.
@@ -656,7 +656,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// world weapon
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -677,7 +677,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// shield
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -697,7 +697,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// cloak
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -717,7 +717,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// helmet
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -740,7 +740,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// mask
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -760,7 +760,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// head left
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -779,7 +779,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// head right
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -798,7 +798,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// head center
 	entity = newEntity(-1, 1, map.entities, nullptr); //Limb entity.
@@ -820,7 +820,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	if ( multiplayer == CLIENT || MONSTER_INIT )
 	{

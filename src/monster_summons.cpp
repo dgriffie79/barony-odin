@@ -103,7 +103,7 @@ void initRevenantSkull(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void initAdorcisedWeapon(Entity* my, Stat* myStats)
@@ -202,7 +202,7 @@ void initAdorcisedWeapon(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void initFlameElemental(Entity* my, Stat* myStats)
@@ -274,7 +274,7 @@ void initFlameElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 void actRevenantSkullLimb(Entity* my)
@@ -1348,7 +1348,7 @@ void initHologram(Entity* my, Stat* myStats)
 		node->element = entity;
 		node->deconstructor = &emptyDeconstructor;
 		node->size = sizeof(Entity*);
-		my->bodyparts.push_back(entity);
+		dynarray_push<Entity*>(my->bodyparts, entity);
 	}
 
 	my->mistformGLRender = 2.0;
@@ -1507,8 +1507,9 @@ void actEarthElementalDeathGib(Entity* my)
 void earthElementalDie(Entity* my)
 {
 	int index = -1;
-	for ( auto bodypart : my->bodyparts )
+	for ( int64_t _bi = 0; _bi < dynarray_psize<Entity*>(my->bodyparts); ++_bi )
 	{
+		auto bodypart = dynarray_pget<Entity*>(my->bodyparts, _bi);
 		++index;
 		if ( index == 1 ) // eyes
 		{
@@ -1642,7 +1643,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	// eyes
 	entity = newEntity(1873, 1, map.entities, nullptr); //Limb entity.
@@ -1663,7 +1664,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	//fistleft
 	entity = newEntity(1875, 1, map.entities, nullptr); //Limb entity.
@@ -1684,7 +1685,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	//fistright
 	entity = newEntity(1875, 1, map.entities, nullptr); //Limb entity.
@@ -1705,7 +1706,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	//pebble1
 	entity = newEntity(1874, 1, map.entities, nullptr); //Limb entity.
@@ -1726,7 +1727,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	//pebble1
 	entity = newEntity(1874, 1, map.entities, nullptr); //Limb entity.
@@ -1747,7 +1748,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 
 	//pebble1
 	entity = newEntity(1874, 1, map.entities, nullptr); //Limb entity.
@@ -1768,7 +1769,7 @@ void initEarthElemental(Entity* my, Stat* myStats)
 	node->element = entity;
 	node->deconstructor = &emptyDeconstructor;
 	node->size = sizeof(Entity*);
-	my->bodyparts.push_back(entity);
+	dynarray_push<Entity*>(my->bodyparts, entity);
 }
 
 #define EARTH_BODY 2

@@ -5019,7 +5019,7 @@ void actHudShield(Entity* my)
 	}
 
 	Entity*& hudarm = players[HUDSHIELD_PLAYERNUM]->hud.arm;
-	if ( playerRace == SPIDER && hudarm && players[HUDSHIELD_PLAYERNUM]->entity->bodyparts.at(0) )
+	if ( playerRace == SPIDER && hudarm && dynarray_pget<Entity*>(players[HUDSHIELD_PLAYERNUM]->entity->bodyparts, 0) )
 	{
 		my->sprite = arachnophobia_filter ? 1006 : 854;
 		my->x = hudarm->x;
@@ -5027,7 +5027,7 @@ void actHudShield(Entity* my)
 		my->z = hudarm->z;
 		my->pitch = hudarm->pitch - camera_shakey2 / 200.f;
 		my->roll = -hudarm->roll;
-		my->yaw = -players[HUDSHIELD_PLAYERNUM]->entity->bodyparts.at(0)->yaw + players[HUDSHIELD_PLAYERNUM]->entity->fskill[10] - camera_shakex2;
+		my->yaw = -dynarray_pget<Entity*>(players[HUDSHIELD_PLAYERNUM]->entity->bodyparts, 0)->yaw + players[HUDSHIELD_PLAYERNUM]->entity->fskill[10] - camera_shakex2;
 		my->scalex = hudarm->scalex;
 		my->scaley = hudarm->scaley;
 		my->scalez = hudarm->scalez;
@@ -5468,9 +5468,9 @@ void actHudAdditional(Entity* my)
 	}
 
 	Entity* shieldLimb = nullptr;
-	if ( players[HUDSHIELD_PLAYERNUM]->entity->bodyparts.size() > 2 )
+	if ( dynarray_psize<Entity*>(players[HUDSHIELD_PLAYERNUM]->entity->bodyparts) > 2 )
 	{
-		shieldLimb = players[HUDSHIELD_PLAYERNUM]->entity->bodyparts.at(2);
+		shieldLimb = dynarray_pget<Entity*>(players[HUDSHIELD_PLAYERNUM]->entity->bodyparts, 2);
 	}
 
 	if ( stats[HUDSHIELD_PLAYERNUM]->shield == nullptr )

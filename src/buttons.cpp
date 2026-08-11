@@ -4025,7 +4025,7 @@ void initMonsterPropertiesWindow() {
 	suby1 = yres / 2 - 190;
 	suby2 = yres / 2 + 190;
 	strcpy(subtext, "Sprite properties: ");
-	strcat(subtext, spriteEditorNameStrings[selectedEntity[0]->sprite]);
+	strcat(subtext, (const char*)dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 }
 
 void copyMonsterStatToPropertyStrings(Stat* tmpSpriteStats)
