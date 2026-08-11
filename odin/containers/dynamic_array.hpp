@@ -207,6 +207,8 @@ enum DynamicArrayKind {
     Kind_HotbarEntry = 14,
     Kind_HotbarEntryArray = 15,
     Kind_DynArrayStrArray = 16,
+    Kind_SkillEffect = 17,
+    Kind_SkillEntry = 18,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };

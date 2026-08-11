@@ -7614,7 +7614,7 @@ bind_failed:
 			char buf[1024];
 			if ( kills_show_proficiencies )
 			{
-				size_t numEntries = std::min((size_t)NUMPROFICIENCIES, Player::SkillSheet_t::skillSheetData.skillEntries.size());
+				size_t numEntries = std::min((size_t)NUMPROFICIENCIES, (size_t)Player::SkillSheet_t::skillSheetData.skillEntries.size());
 				for ( size_t index = 0; index < NUMPROFICIENCIES / 2; ++index )
 				{
 					int loops = 1;
@@ -7627,7 +7627,7 @@ bind_failed:
 						}
 						int c = Player::SkillSheet_t::skillSheetData.skillEntries[index + loops * (NUMPROFICIENCIES / 2)].skillId;
 						int val = score->stats->getProficiency(c);
-						snprintf(buf, sizeof(buf), "%3d %s", val, Player::SkillSheet_t::skillSheetData.skillEntries[index + loops * (NUMPROFICIENCIES / 2)].getSkillName(true).c_str());
+						snprintf(buf, sizeof(buf), "%3d %s", val, Player::SkillSheet_t::skillSheetData.skillEntries[index + loops * (NUMPROFICIENCIES / 2)].getSkillName(true));
 						auto skill = kills->addEntry(buf, true);
 						//skill->color = makeColor(203, 171, 101, 255);
 						if ( val >= SKILL_LEVEL_LEGENDARY )

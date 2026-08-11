@@ -198,6 +198,8 @@ Kind_MapGeneration   :: 13
 Kind_HotbarEntry     :: 14
 Kind_HotbarEntryArray :: 15
 Kind_DynArrayStrArray :: 16
+Kind_SkillEffect      :: 17
+Kind_SkillEntry       :: 18
 Kind_I32Map          :: 13
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -780,6 +782,141 @@ dynarrstr_array_free :: proc(p: rawptr) {
 }
 dynarrstr_array_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(DynamicString), Kind_DynamicString)
+}
+
+// matches src/main.hpp MAXPLAYERS
+MAXPLAYERS :: 4
+
+// ---------------------------------------------------------------------------
+// SkillEffect_t + SkillEntry_t (player skill sheet) — recursive owns
+// ---------------------------------------------------------------------------
+SkillEffect_t :: struct {
+	tag:                       DynamicString,
+	title:                     DynamicString,
+	titleShort:                DynamicString,
+	rawValue:                  DynamicString,
+	value:                     DynamicString,
+	valueCustomWidthOffset:    i32,
+	bAllowAutoResizeValue:     bool,
+	bAllowRealtimeUpdate:      bool,
+	marquee:                   [MAXPLAYERS]f64,
+	marqueeTicks:              [MAXPLAYERS]u32,
+	marqueeCompleted:          [MAXPLAYERS]bool,
+	effectUpdatedAtSkillLevel: i32,
+	effectUpdatedAtBaseSkillLevel: i32,
+	effectUpdatedAtMonsterType: i32,
+	cachedWidth:               i32,
+}
+
+skill_effect_free :: proc(p: rawptr) {
+	v := (^SkillEffect_t)(p)
+	fields := [?]^DynamicString{ &v.tag, &v.title, &v.titleShort, &v.rawValue, &v.value }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+}
+
+skill_effect_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SkillEffect_t)(dst)
+	s := (^SkillEffect_t)(src)
+	d.valueCustomWidthOffset = s.valueCustomWidthOffset
+	d.bAllowAutoResizeValue = s.bAllowAutoResizeValue
+	d.bAllowRealtimeUpdate = s.bAllowRealtimeUpdate
+	d.marquee = s.marquee
+	d.marqueeTicks = s.marqueeTicks
+	d.marqueeCompleted = s.marqueeCompleted
+	d.effectUpdatedAtSkillLevel = s.effectUpdatedAtSkillLevel
+	d.effectUpdatedAtBaseSkillLevel = s.effectUpdatedAtBaseSkillLevel
+	d.effectUpdatedAtMonsterType = s.effectUpdatedAtMonsterType
+	d.cachedWidth = s.cachedWidth
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.tag, &s.tag },
+		{ &d.title, &s.title },
+		{ &d.titleShort, &s.titleShort },
+		{ &d.rawValue, &s.rawValue },
+		{ &d.value, &s.value },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+}
+
+SkillEntry_t :: struct {
+	skillName:               DynamicString,
+	skillShortName:          DynamicString,
+	skillId:                 i32,
+	skillIconPath:           DynamicString,
+	skillIconPathLegend:     DynamicString,
+	skillIconPath32px:       DynamicString,
+	skillIconPathLegend32px: DynamicString,
+	statIconPath:            DynamicString,
+	description:             DynamicString,
+	legendaryDescription:    DynamicString,
+	skillSfx:                i32,
+	effectStartOffsetX:      i32,
+	effectBackgroundOffsetX: i32,
+	effectBackgroundWidth:   i32,
+	effects:                 Raw_Dynamic_Array,   // DynamicArray of SkillEffect_t
+}
+
+skill_entry_free :: proc(p: rawptr) {
+	v := (^SkillEntry_t)(p)
+	fields := [?]^DynamicString{ &v.skillName, &v.skillShortName, &v.skillIconPath, &v.skillIconPathLegend, &v.skillIconPath32px, &v.skillIconPathLegend32px, &v.statIconPath, &v.description, &v.legendaryDescription }
+	for f in fields {
+		if f.data != nil {
+			mem.free(f.data)
+			f.data = nil
+		}
+		f.len = 0
+	}
+	barony_dynamic_array_elem_destroy(&v.effects, size_of(SkillEffect_t), Kind_SkillEffect)
+}
+
+skill_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SkillEntry_t)(dst)
+	s := (^SkillEntry_t)(src)
+	d.skillId = s.skillId
+	d.skillSfx = s.skillSfx
+	d.effectStartOffsetX = s.effectStartOffsetX
+	d.effectBackgroundOffsetX = s.effectBackgroundOffsetX
+	d.effectBackgroundWidth = s.effectBackgroundWidth
+	fields := [?]struct{ d: ^DynamicString, s: ^DynamicString }{
+		{ &d.skillName, &s.skillName },
+		{ &d.skillShortName, &s.skillShortName },
+		{ &d.skillIconPath, &s.skillIconPath },
+		{ &d.skillIconPathLegend, &s.skillIconPathLegend },
+		{ &d.skillIconPath32px, &s.skillIconPath32px },
+		{ &d.skillIconPathLegend32px, &s.skillIconPathLegend32px },
+		{ &d.statIconPath, &s.statIconPath },
+		{ &d.description, &s.description },
+		{ &d.legendaryDescription, &s.legendaryDescription },
+	}
+	for f in fields {
+		if f.d.data != nil { mem.free(f.d.data); f.d.data = nil }
+		f.d.len = 0
+		if f.s.len > 0 {
+			buf, _ := mem.alloc(f.s.len + 1, align_of(u8))
+			if buf != nil {
+				runtime.mem_copy(buf, f.s.data, f.s.len)
+				(^u8)(uintptr(buf) + uintptr(f.s.len))^ = 0
+				f.d^ = DynamicString{ data = buf, len = f.s.len }
+			}
+		}
+	}
+	barony_dynamic_array_elem_copy(&d.effects, &s.effects, size_of(SkillEffect_t), Kind_SkillEffect)
 }
 
 // kind -> {free, copy} ops table. POD (kind 0) = nil/nil = raw bytes.

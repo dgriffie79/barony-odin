@@ -19098,7 +19098,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						if ( skill.skillId == spell->skillID )
 						{
 							char buf[128];
-							snprintf(buf, sizeof(buf), getHoverTextString("attributes_pwr_title_skill").c_str(), skill.getSkillName().c_str());
+							snprintf(buf, sizeof(buf), getHoverTextString("attributes_pwr_title_skill").c_str(), skill.getSkillName());
 							titleText = buf;
 							break;
 						}
@@ -35352,7 +35352,7 @@ void Player::SkillSheet_t::createSkillSheet()
 		profName->setTextColor(skillSheetData.defaultTextColor);
 		if ( i < skillSheetData.skillEntries.size() )
 		{
-			profName->setText(skillSheetData.skillEntries[i].getSkillName(true).c_str());
+			profName->setText(skillSheetData.skillEntries[i].getSkillName(true));
 		}
 		else
 		{
@@ -35403,7 +35403,7 @@ void Player::SkillSheet_t::createSkillSheet()
 		profName->setTextColor(skillSheetData.defaultTextColor);
 		if ( i < skillSheetData.skillEntries.size() )
 		{
-			profName->setText(skillSheetData.skillEntries[i].getSkillName(true).c_str());
+			profName->setText(skillSheetData.skillEntries[i].getSkillName(true));
 		}
 		else
 		{
@@ -38484,7 +38484,7 @@ void Player::SkillSheet_t::processSkillSheet()
 				if ( !bSkillSheetEntryLoaded )
 				{
 					auto skillTitleTxt = innerFrame->findField("skill title txt");
-					skillTitleTxt->setText(skillSheetData.skillEntries[selectedSkill].getSkillName().c_str());
+					skillTitleTxt->setText(skillSheetData.skillEntries[selectedSkill].getSkillName());
 
 					auto statTypeTxt = scrollArea->findField("stat type txt");
 					auto statIcon = scrollArea->findImage("stat icon");
@@ -39684,7 +39684,7 @@ void Player::Inventory_t::SpellPanel_t::updateSpellPanel()
 					skillIcon->path = skillEntry.skillIconPath.c_str();
 				}
 				char buf[128];
-				snprintf(buf, sizeof(buf), Language::get(6842), skillEntry.getSkillName().c_str());
+				snprintf(buf, sizeof(buf), Language::get(6842), skillEntry.getSkillName());
 				filterText->setText(buf);
 				filterText->setDisabled(false);
 				filterTooltipImg->disabled = false;
@@ -44060,7 +44060,7 @@ void updateSkillUpFrame(const int player)
 			else
 			{
 				char buf[128];
-				snprintf(buf, sizeof(buf), Language::get(4327), Player::SkillSheet_t::skillSheetData.skillEntries[skillsheetIndex].getSkillName().c_str());
+				snprintf(buf, sizeof(buf), Language::get(4327), Player::SkillSheet_t::skillSheetData.skillEntries[skillsheetIndex].getSkillName());
 				skillNameTxt->setText(buf);
 			}
 			if ( auto textGet = skillNameTxt->getTextObject() )

@@ -1399,16 +1399,16 @@ public:
 				{
 					skillShortName = name;
 				}
-				std::string getSkillName(bool shortName = false)
+				const char* getSkillName(bool shortName = false)
 				{
 					if ( shortName )
 					{
-						if ( skillShortName != "" )
+						if ( skillShortName.len > 0 )
 						{
-							return skillShortName;
+							return skillShortName.c_str();
 						}
 					}
-					return skillName;
+					return skillName.c_str();
 				}
 				SkillEntry_t() {};
 				~SkillEntry_t() {};
@@ -1444,9 +1444,9 @@ public:
 					int effectUpdatedAtMonsterType = -1;
 					int cachedWidth = -1;
 				};
-				std::vector<SkillEffect_t> effects;
+				DynamicArrayT<SkillEffect_t> effects;
 			};
-			std::vector<SkillEntry_t> skillEntries;
+			DynamicArrayT<SkillEntry_t> skillEntries;
 			DynamicString iconBgPathDefault = "";
 			DynamicString iconBgPathNovice = "";
 			DynamicString iconBgPathExpert = "";
@@ -1459,7 +1459,7 @@ public:
 			DynamicString selectSkillImg = "";
 			DynamicString highlightSkillImg_Right = "";
 			DynamicString selectSkillImg_Right = "";
-			std::vector<DynamicString> potionNamesToFilter;
+			DynamicArrayStr potionNamesToFilter;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableBase;
 			std::map<Monster, std::vector<Monster>> leadershipAllyTableLegendary;
 			std::map<Monster, std::vector<std::pair<Monster, std::string>>> leadershipAllyTableSpecialRecruitment;
@@ -2458,6 +2458,9 @@ public:
 	static void soundStatusClose();
 	static void soundHotbarShootmodeMovement();
 };
+template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::SkillEffect_t> { static constexpr int value = Kind_SkillEffect; };
+template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t> { static constexpr int value = Kind_SkillEntry; };
+
 
 extern Player* players[MAXPLAYERS];
 //In the process of switching from the old entity player array, all of the old uses of player need to be hunted down and then corrected to account for the new array.
