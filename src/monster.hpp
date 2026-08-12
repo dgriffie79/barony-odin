@@ -1283,7 +1283,7 @@ struct MonsterData_t
 			DynamicString iconPath = "";
 		};
 		std::map<int, IconLookup_t> iconSpritesAndPaths;
-		std::map<std::string, std::vector<int>> keyToSpriteLookup;
+		DynamicMapStrT<DynamicArrayS32> keyToSpriteLookup;
 		DynamicSetI32 modelIndexes;
 		std::set<int> playerModelIndexes;
 		DynamicString defaultShortDisplayName = "";
@@ -1399,7 +1399,7 @@ struct MonsterAllyFormation_t
 	void updateOnPathSucceed(Uint32 uid, Entity* entity);
 	void updateOnFollowCommand(Uint32 uid, Entity* entity);
 	std::unordered_map<Uint32, MonsterAllies_t> units;
-	std::vector<std::pair<int, int>> formationShape;
+	DynamicArrayT<std::pair<int, int>> formationShape;
 	MonsterAllyFormation_t()
 	{
 		formationShape.push_back(std::make_pair(-2, 0));
