@@ -4275,7 +4275,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			{
 				if ( players[clientnum]->isLocalPlayer() )
 				{
-					std::unordered_set<Uint32> appearancesOfSimilarItems;
+					DynamicSetI32 appearancesOfSimilarItems;
 					std::vector<Item*> itemsToReroll;
 					for ( node_t* node = stats[clientnum]->inventory.first; node != NULL; node = node->next )
 					{

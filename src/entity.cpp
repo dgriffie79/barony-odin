@@ -25877,7 +25877,7 @@ bool Entity::degradeArmor(Stat& hitstats, Item& armor, int armornum)
 
 	if ( playerhit >= 0 && players[playerhit]->isLocalPlayer() )
 	{
-		std::unordered_set<Uint32> appearancesOfSimilarItems;
+		DynamicSetI32 appearancesOfSimilarItems;
 		std::vector<Item*> itemsToReroll;
 		for ( node_t* node = stats[playerhit]->inventory.first; node != NULL; node = node->next )
 		{

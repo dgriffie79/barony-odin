@@ -3922,7 +3922,7 @@ Item* itemPickup(const int player, Item* const item, Item* addToSpecificInventor
 	}
 	else
 	{
-		std::unordered_set<Uint32> appearancesOfSimilarItems;
+		DynamicSetI32 appearancesOfSimilarItems;
 		bool doSpecificItemCheck = (addToSpecificInventoryItem != nullptr);
 		bool hasRunSpecificItemCheck = false;
 		for ( node_t* node = stats[player]->inventory.first; node != nullptr; node = node->next )
@@ -7709,7 +7709,7 @@ int Item::getLootBagNumItems() const
 	return 0;
 }
 
-void Item::itemFindUniqueAppearance(Item* tempItem, std::unordered_set<Uint32>& appearancesOfSimilarItems)
+void Item::itemFindUniqueAppearance(Item* tempItem, DynamicSetI32& appearancesOfSimilarItems)
 {
 	if ( !appearancesOfSimilarItems.empty() && tempItem )
 	{
@@ -7790,7 +7790,7 @@ void Item::onItemIdentified(int player, Item* tempItem)
 {
 	if ( player >= 0 && player < MAXPLAYERS && players[player]->isLocalPlayer() && stats[player] )
 	{
-		std::unordered_set<Uint32> appearancesOfSimilarItems;
+		DynamicSetI32 appearancesOfSimilarItems;
 		for ( node_t* node = stats[player]->inventory.first; node != NULL; node = node->next )
 		{
 			Item* item2 = static_cast<Item*>(node->element);

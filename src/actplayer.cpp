@@ -8486,7 +8486,7 @@ void actPlayer(Entity* my)
 				players[PLAYER_NUM]->inventoryUI.appraisal.timer = 0;
 
 				// update inventory by trying to stack the newly identified item.
-				std::unordered_set<Uint32> appearancesOfSimilarItems;
+				DynamicSetI32 appearancesOfSimilarItems;
 				for ( node = stats[PLAYER_NUM]->inventory.first; node != NULL; node = node->next )
 				{
 					Item* item2 = (Item*)node->element;
@@ -8703,7 +8703,7 @@ void actPlayer(Entity* my)
 					if ( success )
 					{
 						// update inventory by trying to stack the newly identified item.
-						std::unordered_set<Uint32> appearancesOfSimilarItems;
+						DynamicSetI32 appearancesOfSimilarItems;
 						for ( node = stats[PLAYER_NUM]->inventory.first; node != NULL; node = node->next )
 						{
 							Item* item2 = (Item*)node->element;

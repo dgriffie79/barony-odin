@@ -7154,7 +7154,7 @@ void GenericGUIMenu::alterItem(Item* item)
 	}
 	messagePlayer(gui_player, MESSAGE_HINT, Language::get(6515), prevItem.c_str(), item->description());
 
-	std::unordered_set<Uint32> appearancesOfSimilarItems;
+	DynamicSetI32 appearancesOfSimilarItems;
 	// reroll any other conflicting items
 	for ( node_t* node = stats[gui_player]->inventory.first; node != nullptr; node = node->next )
 	{
