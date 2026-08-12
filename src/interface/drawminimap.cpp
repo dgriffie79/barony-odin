@@ -96,7 +96,7 @@ inline real_t getMinimapZoom()
 	return minimapObjectZoom + 50;
 }
 
-std::map<int, MinimapHighlight_t> minimapHighlights;
+DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
 
 void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 {
@@ -252,7 +252,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 				auto find = minimapHighlights.find(mapkey);
 				if ( find != minimapHighlights.end() )
 				{
-					if ( find->second.ticks <= ticks )
+					if ( minimapHighlights[find->first].ticks <= ticks )
 					{
 						if ( map.tiles[OBSTACLELAYER + y * MAPLAYERS + x * MAPLAYERS * map.height] )
 						{
@@ -322,13 +322,13 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 				if ( find != minimapHighlights.end() )
 				{
 					real_t percent = 100.0;
-					if ( find->second.ticks > ticks )
+					if ( minimapHighlights[find->first].ticks > ticks )
 					{
 						percent = 0.0;
 					}
-					else if ( (ticks - find->second.ticks) > TICKS_PER_SECOND )
+					else if ( (ticks - minimapHighlights[find->first].ticks) > TICKS_PER_SECOND )
 					{
-						percent = std::max(0.0, percent - 4 * ((ticks - find->second.ticks) - TICKS_PER_SECOND));
+						percent = std::max(0.0, percent - 4 * ((ticks - minimapHighlights[find->first].ticks) - TICKS_PER_SECOND));
 						if ( percent < 0.01 )
 						{
 							minimapHighlights.erase(mapkey);

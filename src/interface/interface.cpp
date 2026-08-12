@@ -29661,8 +29661,9 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 	{
 		for ( auto& callout : CalloutMenu[i].callouts )
 		{
+			CalloutParticle_t& calloutRef = CalloutMenu[i].callouts[callout.first];
 			bool selfCallout = false;
-			if ( uidMatchesPlayer(playernum, callout.second.entityUid) )
+			if ( uidMatchesPlayer(playernum, calloutRef.entityUid) )
 			{
 				if ( i == playernum && players[i]->entity && players[i]->entity->skill[3] != 0 && !players[i]->ghost.isActive() )
 				{
@@ -29721,7 +29722,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			int bottomOfWindow = player->camera_virtualy2() - offset;
 
 			mat4x4_t id;
-			vec4_t world{ (float)callout.second.x * 2.f, -(float)callout.second.z * 2.f, (float)callout.second.y * 2.f, 1.f };
+			vec4_t world{ (float)calloutRef.x * 2.f, -(float)calloutRef.z * 2.f, (float)calloutRef.y * 2.f, 1.f };
 			if ( selfCallout )
 			{
 				world.x = 32.0 * camera->x + 32.0 * cos(camera->ang);
@@ -29730,7 +29731,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			vec4_t window2{ (float)0, (float)0,
 				(float)player->camera_virtualWidth(), (float)player->camera_virtualHeight() };
 			SDL_Rect dest{ 0, 0, 0, 0 };
-			if ( callout.second.lockOnScreen[playernum] )
+			if ( calloutRef.lockOnScreen[playernum] )
 			{
 				auto screen_position = project_clipped2(&world, &id, &camera->projview, &window2);
 				dest = SDL_Rect{ player->camera_virtualx1() + (int)screen_position.clipped_coords.x,
@@ -29740,7 +29741,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 					&& (screen_position.direction == ClipResult::Direction::Front
 						|| screen_position.direction == ClipResult::Direction::Invalid) )
 				{
-					callout.second.lockOnScreen[playernum] = false;
+					calloutRef.lockOnScreen[playernum] = false;
 				}
 
 				dest.x = std::min(rightOfWindow, std::max(leftOfWindow, dest.x));
@@ -29817,7 +29818,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 			{
 				for ( int i = 0; i < MAXPLAYERS; ++i )
 				{
-					if ( uidMatchesPlayer(i, callout.second.entityUid) )
+					if ( uidMatchesPlayer(i, calloutRef.entityUid) )
 					{
 						if ( callout.second.cmd == CALLOUT_CMD_AFFIRMATIVE
 							|| callout.second.cmd == CALLOUT_CMD_THANKS
@@ -29851,8 +29852,8 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 				auto bodypart = dynarray_pget<Entity*>(playerEntity->bodyparts, 0);
 				real_t tempx = bodypart->x;
 				real_t tempy = bodypart->y;
-				bodypart->x = callout.second.x;
-				bodypart->y = callout.second.y;
+				bodypart->x = calloutRef.x;
+				bodypart->y = calloutRef.y;
 
 				real_t tangent = atan2(camera->y * 16.0 - bodypart->y, camera->x * 16.0 - bodypart->x);
 				Entity* ohitentity = hit.entity;
@@ -29875,7 +29876,7 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 				bodypart->y = tempy;
 			}
 
-			callout.second.big[playernum] = !drawMini;
+			calloutRef.big[playernum] = !drawMini;
 			drawMini = false;
 
 			real_t dist = pow(camera->y * 32.0 - world.z, 2) + pow(camera->x * 32.0 - world.x, 2);
@@ -30078,9 +30079,15 @@ void CalloutRadialMenu::CalloutParticle_t::animate()
 
 void CalloutRadialMenu::update()
 {
-	for ( auto& c : callouts )
 	{
-		auto& callout = c.second;
+		std::vector<int> calloutKeys;
+		for ( auto& c : callouts )
+		{
+			calloutKeys.push_back(c.first);
+		}
+		for ( int ck : calloutKeys )
+		{
+		auto& callout = callouts[ck];
 		Entity* entity = uidToEntity(callout.entityUid);
 		callout.animate();
 		if ( entity )
@@ -30118,32 +30125,43 @@ void CalloutRadialMenu::update()
 		{
 			callout.expired = true;
 		}
+		}
 	}
 
 
 	if ( updatedThisTick == 0 || ticks != updatedThisTick )
 	{
 		updatedThisTick = ticks;
-		for ( auto it = callouts.begin(); it != callouts.end(); ++it )
 		{
-			it->second.ticks++;
-			if ( it->second.ticks >= it->second.lifetime )
+			std::vector<int> calloutKeys;
+			for ( auto it = callouts.begin(); it != callouts.end(); ++it )
 			{
-				it->second.expired = true;
+				calloutKeys.push_back(it->first);
+			}
+			for ( int ck : calloutKeys )
+			{
+				auto& callout = callouts[ck];
+				callout.ticks++;
+				if ( callout.ticks >= callout.lifetime )
+				{
+					callout.expired = true;
+				}
 			}
 		}
 	}
 
-	for ( auto it = callouts.begin(); it != callouts.end(); )
 	{
-		if ( it->second.expired )
+		std::vector<int> calloutKeys;
+		for ( auto it = callouts.begin(); it != callouts.end(); ++it )
 		{
-			it = callouts.erase(it);
-			continue;
+			calloutKeys.push_back(it->first);
 		}
-		else
+		for ( int ck : calloutKeys )
 		{
-			++it;
+			if ( callouts[ck].expired )
+			{
+				callouts.erase(ck);
+			}
 		}
 	}
 }
@@ -30195,16 +30213,16 @@ bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu:
 		while ( CalloutMenu[i].callouts.size() > 3 )
 		{
 			Uint32 earliestTick = ::ticks;
-			auto itToDelete = CalloutMenu[i].callouts.end();
+			int itToDelete = -1;
 			for ( auto it = CalloutMenu[i].callouts.begin(); it != CalloutMenu[i].callouts.end(); ++it )
 			{
 				if ( it->second.creationTick < earliestTick )
 				{
 					earliestTick = it->second.creationTick;
-					itToDelete = it;
+					itToDelete = it->first;
 				}
 			}
-			if ( itToDelete == CalloutMenu[i].callouts.end() )
+			if ( itToDelete == -1 )
 			{
 				break;
 			}
@@ -30327,16 +30345,16 @@ bool CalloutRadialMenu::createParticleCallout(real_t x, real_t y, real_t z, Uint
 		while ( CalloutMenu[i].callouts.size() > 3 )
 		{
 			Uint32 earliestTick = ::ticks;
-			auto itToDelete = CalloutMenu[i].callouts.end();
+			int itToDelete = -1;
 			for ( auto it = CalloutMenu[i].callouts.begin(); it != CalloutMenu[i].callouts.end(); ++it )
 			{
 				if ( it->second.creationTick < earliestTick )
 				{
 					earliestTick = it->second.creationTick;
-					itToDelete = it;
+					itToDelete = it->first;
 				}
 			}
-			if ( itToDelete == CalloutMenu[i].callouts.end() )
+			if ( itToDelete == -1 )
 			{
 				break;
 			}

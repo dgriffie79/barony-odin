@@ -248,7 +248,7 @@ struct MinimapHighlight_t
 {
 	Uint32 ticks = 0;
 };
-extern std::map<int, MinimapHighlight_t> minimapHighlights;
+extern DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
 void handleDamageIndicatorTicks();
 void drawStatus(const int player);
 void drawStatusNew(const int player);
@@ -1900,7 +1900,7 @@ struct CalloutRadialMenu
 		};
 		static Uint32 kParticleLifetime;
 	};
-	std::map<Uint32, CalloutParticle_t> callouts;
+	DynamicMapI32T<CalloutParticle_t> callouts;
 
 	real_t animTitle = 0.0;
 	real_t animWheel = 0.0;
