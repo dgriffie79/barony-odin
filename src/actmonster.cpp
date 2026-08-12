@@ -882,24 +882,26 @@ void MonsterAllyFormation_t::updateOnPathFail(Uint32 uid, Entity* entity)
 				auto find2 = find->second.meleeUnits.find(uid);
 				if ( find2 != find->second.meleeUnits.end() )
 				{
-					find2->second.pathingDelay = std::min(10, find2->second.pathingDelay + 1);
-					find2->second.tryExtendPath = std::max(0, find2->second.tryExtendPath - 2);
-					if ( find2->second.pathingDelay == 5 )
+					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					mo.pathingDelay = std::min(10, mo.pathingDelay + 1);
+					mo.tryExtendPath = std::max(0, mo.tryExtendPath - 2);
+					if ( mo.pathingDelay == 5 )
 					{
 						// see if we can't do an extended search to succeed
-						find2->second.tryExtendPath = 10;
+						mo.tryExtendPath = 10;
 					}
 					return;
 				}
 				auto find3 = find->second.rangedUnits.find(uid);
 				if ( find3 != find->second.rangedUnits.end() )
 				{
-					find3->second.pathingDelay = std::min(10, find3->second.pathingDelay + 1);
-					find3->second.tryExtendPath = std::max(0, find3->second.tryExtendPath - 2);
-					if ( find3->second.pathingDelay == 5 )
+					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					ro.pathingDelay = std::min(10, ro.pathingDelay + 1);
+					ro.tryExtendPath = std::max(0, ro.tryExtendPath - 2);
+					if ( ro.pathingDelay == 5 )
 					{
 						// see if we can't do an extended search to succeed
-						find3->second.tryExtendPath = 10; 
+						ro.tryExtendPath = 10; 
 					}
 					return;
 				}
@@ -930,15 +932,17 @@ void MonsterAllyFormation_t::updateOnPathSucceed(Uint32 uid, Entity* entity)
 				auto find2 = find->second.meleeUnits.find(uid);
 				if ( find2 != find->second.meleeUnits.end() )
 				{
-					find2->second.pathingDelay = std::max(0, find2->second.pathingDelay - 2);
-					find2->second.tryExtendPath = std::max(0, find2->second.tryExtendPath - 1);
+					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					mo.pathingDelay = std::max(0, mo.pathingDelay - 2);
+					mo.tryExtendPath = std::max(0, mo.tryExtendPath - 1);
 					return;
 				}
 				auto find3 = find->second.rangedUnits.find(uid);
 				if ( find3 != find->second.rangedUnits.end() )
 				{
-					find3->second.pathingDelay = std::max(0, find3->second.pathingDelay - 2);
-					find3->second.tryExtendPath = std::max(0, find3->second.tryExtendPath - 1);
+					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					ro.pathingDelay = std::max(0, ro.pathingDelay - 2);
+					ro.tryExtendPath = std::max(0, ro.tryExtendPath - 1);
 					return;
 				}
 			}
@@ -968,15 +972,17 @@ void MonsterAllyFormation_t::updateOnFollowCommand(Uint32 uid, Entity* entity)
 				auto find2 = find->second.meleeUnits.find(uid);
 				if ( find2 != find->second.meleeUnits.end() )
 				{
-					find2->second.pathingDelay = 0;
-					find2->second.tryExtendPath = 10;
+					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					mo.pathingDelay = 0;
+					mo.tryExtendPath = 10;
 					return;
 				}
 				auto find3 = find->second.rangedUnits.find(uid);
 				if ( find3 != find->second.rangedUnits.end() )
 				{
-					find3->second.pathingDelay = 0;
-					find3->second.tryExtendPath = 10;
+					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					ro.pathingDelay = 0;
+					ro.tryExtendPath = 10;
 					return;
 				}
 			}
@@ -994,12 +1000,12 @@ int MonsterAllyFormation_t::getFollowerChaseLeaderInterval(Entity& my, Stat& myS
 			auto find2 = find->second.meleeUnits.find(my.getUID());
 			if ( find2 != find->second.meleeUnits.end() )
 			{
-				return find2->second.pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
+				return find->second.meleeUnits[find2->first].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
 			}
 			auto find3 = find->second.rangedUnits.find(my.getUID());
 			if ( find3 != find->second.rangedUnits.end() )
 			{
-				return find3->second.pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
+				return find->second.rangedUnits[find3->first].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -1127,11 +1133,12 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 	size_t formationIndex = 0;
 	for ( auto& unit : leaderUnits.meleeUnits )
 	{
-		if ( unit.second.expired ) { continue; }
+		MonsterAllies_t::FormationInfo_t& ux = leaderUnits.meleeUnits[unit.first];
+		if ( ux.expired ) { continue; }
 		Entity* ally = uidToEntity(unit.first);
 		if ( !ally )
 		{
-			unit.second.expired = true;
+			ux.expired = true;
 			continue;
 		}
 		bool found = false;
@@ -1176,9 +1183,9 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 			if ( hit.entity == leader )
 			{
 				found = true;
-				unit.second.x = (static_cast<int>(x) >> 4);
-				unit.second.y = (static_cast<int>(y) >> 4);
-				unit.second.init = true;
+				ux.x = (static_cast<int>(x) >> 4);
+				ux.y = (static_cast<int>(y) >> 4);
+				ux.init = true;
 			}
 			ally->x = oldx;
 			ally->y = oldy;
@@ -1188,11 +1195,12 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 	}
 	for ( auto& unit : leaderUnits.rangedUnits )
 	{
-		if ( unit.second.expired ) { continue; }
+		MonsterAllies_t::FormationInfo_t& ux = leaderUnits.rangedUnits[unit.first];
+		if ( ux.expired ) { continue; }
 		Entity* ally = uidToEntity(unit.first);
 		if ( !ally )
 		{
-			unit.second.expired = true;
+			ux.expired = true;
 			continue;
 		}
 		bool found = false;
@@ -1237,9 +1245,9 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 			if ( hit.entity == leader )
 			{
 				found = true;
-				unit.second.x = (static_cast<int>(x) >> 4);
-				unit.second.y = (static_cast<int>(y) >> 4);
-				unit.second.init = true;
+				ux.x = (static_cast<int>(x) >> 4);
+				ux.y = (static_cast<int>(y) >> 4);
+				ux.init = true;
 			}
 			ally->x = oldx;
 			ally->y = oldy;

@@ -1389,8 +1389,8 @@ struct MonsterAllyFormation_t
 			bool init = false;
 			bool expired = false;
 		};
-		std::unordered_map<Uint32, FormationInfo_t> meleeUnits;
-		std::unordered_map<Uint32, FormationInfo_t> rangedUnits;
+		DynamicMapI32T<FormationInfo_t> meleeUnits;
+		DynamicMapI32T<FormationInfo_t> rangedUnits;
 		Uint32 updatedOnTick = 0;
 	};
 	void updateFormation(Uint32 leaderUid, Uint32 monsterUpdateUid = 0);
@@ -1429,8 +1429,8 @@ extern MonsterAllyFormation_t monsterAllyFormations;
 struct MimicGenerator
 {
 	BaronyRNG mimic_rng;
-	std::unordered_set<unsigned int> mimic_floors;
-	std::unordered_set<unsigned int> mimic_secret_floors;
+	DynamicSetI32 mimic_floors;
+	DynamicSetI32 mimic_secret_floors;
 	void init();
 	bool bForceSpawnForCurrentFloor();
 };
