@@ -381,16 +381,24 @@ void ShopkeeperPlayerHostility_t::resetPlayerHostility(const int player, bool cl
 			type |= (0x7F & (equipment)) << 9;
 		}
 
-		for ( auto h2 = playerHostility[player].begin(); h2 != playerHostility[player].end(); ++h2 )
 		{
-			if ( h2->first == type )
+			std::vector<int> hostilityKeys;
+			for ( auto h2 = playerHostility[player].begin(); h2 != playerHostility[player].end(); ++h2 )
 			{
-				continue;
+				hostilityKeys.push_back(h2->first);
 			}
-			if ( h2->second.wantedLevel != NO_WANTED_LEVEL && h2->second.wantedLevel != FAILURE_TO_IDENTIFY )
+			for ( int hk : hostilityKeys )
 			{
-				h2->second.wantedLevel = NO_WANTED_LEVEL;
-				h2->second.bRequiresNetUpdate = true;
+				if ( hk == type )
+				{
+					continue;
+				}
+				auto& hostility = playerHostility[player][hk];
+				if ( hostility.wantedLevel != NO_WANTED_LEVEL && hostility.wantedLevel != FAILURE_TO_IDENTIFY )
+				{
+					hostility.wantedLevel = NO_WANTED_LEVEL;
+					hostility.bRequiresNetUpdate = true;
+				}
 			}
 		}
 	}
@@ -470,7 +478,7 @@ ShopkeeperPlayerHostility_t::PlayerRaceHostility_t* ShopkeeperPlayerHostility_t:
 		{
 			wantedLevel = FAILURE_TO_IDENTIFY;
 		}
-		playerHostility[player].emplace(std::make_pair(type, PlayerRaceHostility_t(type, wantedLevel, player)));
+		playerHostility[player].put(type, PlayerRaceHostility_t(type, wantedLevel, player));
 	}
 	else
 	{
@@ -694,7 +702,7 @@ void ShopkeeperPlayerHostility_t::serverSendClientUpdate(const bool force)
 		
 		for ( auto& entry : playerHostility[c] )
 		{
-			auto& hostility = entry.second;
+			PlayerRaceHostility_t& hostility = playerHostility[c][entry.first];
 			if ( !force && !hostility.bRequiresNetUpdate )
 			{
 				continue;

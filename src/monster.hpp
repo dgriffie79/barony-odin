@@ -1285,7 +1285,7 @@ struct MonsterData_t
 		std::map<int, IconLookup_t> iconSpritesAndPaths;
 		DynamicMapStrT<DynamicArrayS32> keyToSpriteLookup;
 		DynamicSetI32 modelIndexes;
-		std::set<int> playerModelIndexes;
+		DynamicSetI32 playerModelIndexes;
 		DynamicString defaultShortDisplayName = "";
 		typedef SpecialNPCEntry_tMirror SpecialNPCEntry_t;
 		DynamicMapSpecialNPC specialNPCs;
@@ -1372,7 +1372,7 @@ public:
 	void onShopkeeperDeath(Entity* my, Stat* myStats, Entity* attacker);
 	void onShopkeeperHit(Entity* my, Stat* myStats, Entity* attacker);
 	void updateShopkeeperActMonster(Entity& my, Stat& myStats, bool ringconflict);
-	std::map<Uint32, PlayerRaceHostility_t> playerHostility[MAXPLAYERS];
+	DynamicMapI32T<PlayerRaceHostility_t> playerHostility[MAXPLAYERS];
 };
 extern ShopkeeperPlayerHostility_t ShopkeeperPlayerHostility;
 
