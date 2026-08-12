@@ -21,7 +21,11 @@ public:
 	DynamicString default_name = "";
 	DynamicArrayStr formattedPages;
 };
-extern std::vector<Book_t> allBooks;
+extern DynamicArrayT<Book_t> allBooks;
+
+// DynamicArrayKindOf for Book_t (owning: DynamicString text/default_name +
+// DynamicArrayStr formattedPages) — must be at namespace scope
+template <> struct DynamicArrayKindOf<Book_t> { static constexpr int value = Kind_Book; };
 
 class BookParser_t
 {

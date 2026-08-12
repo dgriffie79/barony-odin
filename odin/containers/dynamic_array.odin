@@ -207,7 +207,29 @@ Kind_CalloutPanel    :: 22
 Kind_HiscoreStat     :: 23
 Kind_HiscoreLootbag  :: 24
 Kind_HiscorePlayer  :: 25
+Kind_Book            :: 26
 Kind_I32Map          :: 13
+
+Book_t :: struct {
+	text:           DynamicString,
+	default_name:   DynamicString,
+	formattedPages: Raw_Dynamic_Array,
+}
+
+book_free :: proc(p: rawptr) {
+	b := (^Book_t)(p)
+	dynamic_string_free_elem(rawptr(&b.text))
+	dynamic_string_free_elem(rawptr(&b.default_name))
+	barony_dynamic_array_elem_destroy(&b.formattedPages, size_of(DynamicString), Kind_DynamicString)
+}
+
+book_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Book_t)(dst)
+	s := (^Book_t)(src)
+	dynamic_string_copy_elem(rawptr(&d.text), rawptr(&s.text))
+	dynamic_string_copy_elem(rawptr(&d.default_name), rawptr(&s.default_name))
+	barony_dynamic_array_elem_copy(&d.formattedPages, &s.formattedPages, size_of(DynamicString), Kind_DynamicString)
+}
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
 dynamic_string_free_elem :: proc(p: rawptr) {
@@ -1362,12 +1384,34 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [6]Element_Ops{
+element_ops := [27]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
 	3 = { free = dropdown_option_free,  copy = dropdown_option_copy },
 	4 = { free = entry_var_free,        copy = entry_var_copy },
+	5 = { free = follower_details_free, copy = follower_details_copy },
+	6 = { free = level_t_free,          copy = level_t_copy },
+	7 = { free = codex_item_free,       copy = codex_item_copy },
+	8 = { free = shopkeeper_item_entry_free, copy = shopkeeper_item_entry_copy },
+	9 = { free = variant_pair_free,     copy = variant_pair_copy },
+	10 = { free = monster_curve_entry_free, copy = monster_curve_entry_copy },
+	11 = { free = level_curve_free,     copy = level_curve_copy },
+	12 = { free = tmp_item_free,        copy = tmp_item_copy },
+	13 = { free = map_generation_free,  copy = map_generation_copy },
+	14 = { free = hotbar_entry_free,    copy = hotbar_entry_copy },
+	15 = { free = hotbar_entry_array_free, copy = hotbar_entry_array_copy },
+	16 = { free = dynarrstr_array_free, copy = dynarrstr_array_copy },
+	17 = { free = skill_effect_free,    copy = skill_effect_copy },
+	18 = { free = skill_entry_free,     copy = skill_entry_copy },
+	19 = { free = panel_entry_free,     copy = panel_entry_copy },
+	20 = { free = assist_notif_free,    copy = assist_notif_copy },
+	21 = { free = alch_notif_free,      copy = alch_notif_copy },
+	22 = { free = callout_panel_entry_free, copy = callout_panel_entry_copy },
+	23 = { free = hiscore_stat_free,    copy = hiscore_stat_copy },
+	24 = { free = hiscore_lootbag_free, copy = hiscore_lootbag_copy },
+	25 = { free = hiscore_player_free,  copy = hiscore_player_copy },
+	26 = { free = book_free,            copy = book_copy },
 }
 
 @(export)

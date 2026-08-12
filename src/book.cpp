@@ -34,7 +34,7 @@ constexpr int32_t TAB_WIDTH = 3;
 //#define MIN_LENGTH_TO_SPLIT_WORD_TITLE (characterspace_x / 2) //This only works in the formatTitle() function, since it uses a local variable characterspace_x in there.
 //#define SPLIT_WORD_IN_TITLE false //Whether or not to split a word in the book's title. If set to false, will only split words if they have to be split. If set to true, will split words if they're a minimum length of MIN_LENGTH_TO_SPLIT_WORD_TITLE.;
 
-std::vector<Book_t> allBooks;
+DynamicArrayT<Book_t> allBooks;
 BookParser_t bookParser_t;
 int numbooks = 0;
 
