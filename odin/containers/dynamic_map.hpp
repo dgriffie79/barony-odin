@@ -416,6 +416,7 @@ enum MapValueKind {
     MK_SetOfI32 = 23,
     MK_Lootbag = 24,
     MK_EnemyHPDetails = 25,
+    MK_U64 = 26,
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -423,6 +424,7 @@ template <typename V> struct MapValueKindOf { static constexpr int value = MK_I3
 template <> struct MapValueKindOf<int32_t> { static constexpr int value = MK_I32; };
 template <> struct MapValueKindOf<float> { static constexpr int value = MK_F32; };
 template <> struct MapValueKindOf<uint32_t> { static constexpr int value = MK_U32; };
+template <> struct MapValueKindOf<uint64_t> { static constexpr int value = MK_U64; };
 template <> struct MapValueKindOf<DynamicString> { static constexpr int value = MK_String; };
 template <> struct MapValueKindOf<IconEntryTextMap_t> { static constexpr int value = MK_IconEntryTextMap; };
 template <> struct MapValueKindOf<IconEntryText_tMirror> { static constexpr int value = MK_IconEntryText; };

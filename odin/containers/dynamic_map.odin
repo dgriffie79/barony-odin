@@ -1293,7 +1293,7 @@ binding_t_copy_raw :: proc(dst: rawptr, src: rawptr) {
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
 	switch kind {
-	case 0, 1, 2, 4, 17:
+	case 0, 1, 2, 4, 17, 26:
 		return Value_Ops{}
 	case 3:
 		return Value_Ops{ free = string_value_free, copy = string_value_copy }
@@ -1628,6 +1628,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	switch value_kind {
 	case 0:  i32_map_put(m, key, value, i32, ops)
 	case 2:  i32_map_put(m, key, value, u32, ops)
+	case 26: i32_map_put(m, key, value, u64, ops)
 	case 3:  i32_map_put(m, key, value, string, ops)
 	case 18: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case 19: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
@@ -1647,6 +1648,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	switch value_kind {
 	case 0:  return i32_map_get(m, key, out, i32, ops)
 	case 2:  return i32_map_get(m, key, out, u32, ops)
+	case 26: return i32_map_get(m, key, out, u64, ops)
 	case 3:  return i32_map_get(m, key, out, string, ops)
 	case 18: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case 19: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
@@ -1666,6 +1668,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	switch value_kind {
 	case 0:  return i32_map_len(m, i32)
 	case 2:  return i32_map_len(m, u32)
+	case 26: return i32_map_len(m, u32)
 	case 3:  return i32_map_len(m, string)
 	case 18: return i32_map_len(m, Raw_Dynamic_Array)
 	case 19: return i32_map_len(m, Raw_Dynamic_Array)
@@ -1686,6 +1689,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	switch value_kind {
 	case 0:  i32_map_clear(m, i32, ops)
 	case 2:  i32_map_clear(m, u32, ops)
+	case 26: i32_map_clear(m, u64, ops)
 	case 3:  i32_map_clear(m, string, ops)
 	case 18: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	case 19: i32_map_clear(m, Raw_Dynamic_Array, ops)
@@ -1705,6 +1709,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	switch value_kind {
 	case 0:  i32_map_destroy(m, i32, ops)
 	case 2:  i32_map_destroy(m, u32, ops)
+	case 26: i32_map_destroy(m, u64, ops)
 	case 3:  i32_map_destroy(m, string, ops)
 	case 18: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	case 19: i32_map_destroy(m, Raw_Dynamic_Array, ops)
@@ -1723,6 +1728,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	switch value_kind {
 	case 0:  return i32_map_entry(m, key, i32)
 	case 2:  return i32_map_entry(m, key, u32)
+	case 26: return i32_map_entry(m, key, u32)
 	case 3:  return i32_map_entry(m, key, string)
 	case 18: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	case 19: return i32_map_entry(m, key, Raw_Dynamic_Array)
@@ -1743,6 +1749,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	switch value_kind {
 	case 0:  return i32_map_entries(m, key_ptrs, val_ptrs, count, i32, ops)
 	case 2:  return i32_map_entries(m, key_ptrs, val_ptrs, count, u32, ops)
+	case 26: return i32_map_entries(m, key_ptrs, val_ptrs, count, u64, ops)
 	case 3:  return i32_map_entries(m, key_ptrs, val_ptrs, count, string, ops)
 	case 18: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case 19: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
@@ -1763,6 +1770,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	switch value_kind {
 	case 0:  return i32_map_erase(m, key, i32, ops)
 	case 2:  return i32_map_erase(m, key, u32, ops)
+	case 26: return i32_map_erase(m, key, u64, ops)
 	case 3:  return i32_map_erase(m, key, string, ops)
 	case 18: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case 19: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
@@ -1852,6 +1860,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	switch value_kind {
 	case 0:  return i32_map_find(m, key, out_val, out_val_len, i32, ops)
 	case 2:  return i32_map_find(m, key, out_val, out_val_len, u32, ops)
+	case 26: return i32_map_find(m, key, out_val, out_val_len, u64, ops)
 	case 3:  return i32_map_find(m, key, out_val, out_val_len, string, ops)
 	case 18: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	case 19: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
