@@ -8399,7 +8399,7 @@ Frame* StatusEffectQueue_t::getStatusEffectFrame()
 	return statusEffectFrame;
 }
 
-void StatusEffectQueue_t::handleNavigation(std::map<int, StatusEffectQueueEntry_t*>& grid, 
+void StatusEffectQueue_t::handleNavigation(DynamicMapI32T<StatusEffectQueueEntry_t*>& grid, 
 	bool& tooltipShowing, const bool hungerEffectInEffectQueue)
 {
 	if ( !inputs.hasController(player) 
@@ -9537,7 +9537,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 
 	int gridx = 1;
 	int gridy = 0;
-	std::map<int, StatusEffectQueueEntry_t*> grid;
+	DynamicMapI32T<StatusEffectQueueEntry_t*> grid;
 	size_t index = 0;
 	bool hungerEffectInEffectQueue = false;
 	bool moduleActive = players[player]->GUI.activeModule == Player::GUI_t::MODULE_STATUS_EFFECTS;

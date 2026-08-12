@@ -213,7 +213,7 @@ struct StatusEffectQueue_t
 	void updateEntryImage(StatusEffectQueueEntry_t& entry, Frame::image_t* img);
 	void createStatusEffectTooltip();
 	Frame* getStatusEffectFrame();
-	void handleNavigation(std::map<int, StatusEffectQueueEntry_t*>& grid, 
+	void handleNavigation(DynamicMapI32T<StatusEffectQueueEntry_t*>& grid, 
 		bool& tooltipShowing, const bool hungerEffectInEffectQueue);
 	void resetQueue()
 	{
