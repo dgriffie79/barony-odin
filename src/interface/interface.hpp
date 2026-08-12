@@ -676,7 +676,7 @@ public:
 		int selectedTinkerSlotY = -1;
 		static const int MAX_TINKER_X;
 		static const int MAX_TINKER_Y;
-		std::unordered_map<int, Frame*> tinkerSlotFrames;
+		DynamicMapI32T<Frame*> tinkerSlotFrames;
 		bool isTinkerConstructItemSelected(Item* item);
 		bool isSalvageOrRepairItemSelected(Item* item);
 		void selectTinkerSlot(const int x, const int y);
@@ -885,7 +885,7 @@ public:
 		void updateAssistShrine();
 		void createAssistShrine();
 		bool assistShrineGUIHasBeenCreated() const;
-		std::unordered_map<int, Frame*> assistShrineSlotFrames;
+		DynamicMapI32T<Frame*> assistShrineSlotFrames;
 		void selectAssistShrineSlot(const int x, const int y);
 		int getAssistPointsSaved();
 		int getAssistPointsPreview();
@@ -1045,7 +1045,7 @@ public:
 		bool itemRequiresTitleReflow = true;
 		int selectedMailSlotX = -1;
 		int selectedMailSlotY = -1;
-		std::unordered_map<int, Frame*> mailSlotFrames;
+		DynamicMapI32T<Frame*> mailSlotFrames;
 		void selectMailSlot(const int x, const int y);
 		const int getSelectedMailSlotX() const { return selectedMailSlotX; }
 		const int getSelectedMailSlotY() const { return selectedMailSlotY; }
@@ -1139,7 +1139,7 @@ public:
 		int selectedFeatherSlotY = -1;
 		static const int MAX_FEATHER_X;
 		static const int MAX_FEATHER_Y;
-		std::unordered_map<int, Frame*> featherSlotFrames;
+		DynamicMapI32T<Frame*> featherSlotFrames;
 		void selectFeatherSlot(const int x, const int y);
 		const int getSelectedFeatherSlotX() const { return selectedFeatherSlotX; }
 		const int getSelectedFeatherSlotY() const { return selectedFeatherSlotY; }
@@ -1264,7 +1264,7 @@ public:
 				}
 			};
 			DynamicArray recipeList;  // vector<RecipeEntry_t> (POD)
-			std::unordered_map<int, Frame::image_t*> stones;
+			DynamicMapI32T<Frame::image_t*> stones;
 
 			AlchemyRecipes_t(AlchemyGUI_t& a) :
 				alchemy(a) 
@@ -1396,7 +1396,7 @@ public:
 		int selectedAlchemySlotY = -1;
 		static const int MAX_ALCH_X;
 		static const int MAX_ALCH_Y;
-		std::unordered_map<int, Frame*> alchemySlotFrames;
+		DynamicMapI32T<Frame*> alchemySlotFrames;
 		//bool isTinkerConstructItemSelected(Item* item);
 		//bool isSalvageOrRepairItemSelected(Item* item);
 		void selectAlchemySlot(const int x, const int y);
