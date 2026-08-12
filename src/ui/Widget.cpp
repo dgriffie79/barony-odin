@@ -164,7 +164,7 @@ Widget* Widget::handleInput() {
 		// move to another widget
 		for (auto& move : widgetMovements) {
 			if (!move.second.empty()) {
-				if (input.consumeBinaryToggle(move.first.c_str())) {
+				if (input.consumeBinaryToggle(move.first)) {
 					root = root ? root : findSearchRoot();
 					Widget* result = root->findWidget(move.second.c_str(), true);
 					if (!result && !dontSearchAncestors) {
@@ -172,7 +172,7 @@ Widget* Widget::handleInput() {
 					}
 					//printlog("%s: %p", move.second.c_str(), (void*)result);
 					if (result && !result->disabled && !result->invisible) {
-						auto in = input.input(move.first.c_str());
+						auto in = input.input(move.first);
 #ifndef EDITOR
 						if (in.type != Input::binding_t::bindtype_t::MOUSE_BUTTON &&
 							in.type != Input::binding_t::bindtype_t::KEYBOARD) {
@@ -190,7 +190,7 @@ Widget* Widget::handleInput() {
 		// move to another widget and activate it
 		for (auto& action : widgetActions) {
 			if (!action.second.empty()) {
-				if (input.consumeBinaryToggle(action.first.c_str()) && !inputstr) {
+				if (input.consumeBinaryToggle(action.first) && !inputstr) {
 					root = root ? root : findSearchRoot();
 					Widget* result = root->findWidget(action.second.c_str(), true);
 					if (!result && !dontSearchAncestors) {
@@ -198,7 +198,7 @@ Widget* Widget::handleInput() {
 					}
 					//printlog("%s: %p", action.second.c_str(), (void*)result);
 					if (result && !result->disabled) {
-						auto in = input.input(action.first.c_str());
+						auto in = input.input(action.first);
 #ifndef EDITOR
 						if (in.type != Input::binding_t::bindtype_t::MOUSE_BUTTON &&
 							in.type != Input::binding_t::bindtype_t::KEYBOARD) {

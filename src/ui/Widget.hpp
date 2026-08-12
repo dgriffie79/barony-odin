@@ -213,9 +213,9 @@ protected:
     void* userData = nullptr;                                       //!< user data
     bool dontSearchAncestors = false;                               //!< if true, doesn't fall back to a full-search if a widget can't be found for a binding
 
-    std::unordered_map<std::string, std::string>
+    DynamicMapStr
         widgetActions;                              //!< widgets to select and activate when input is pressed
-    std::unordered_map<std::string, std::string>
+    DynamicMapStr
         widgetMovements;                            //!< widgets to select when input is pressed
     DynamicString widgetSearchParent;                 //!< widget to search from for actions and movements
 

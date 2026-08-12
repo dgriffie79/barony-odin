@@ -4324,7 +4324,7 @@ namespace MainMenu {
 		    }
 
 			auto resolution_button = settings_subwindow->findButton("setting_resolution_dropdown_button"); assert(resolution_button);
-			auto& list = const_cast<std::unordered_map<std::string, std::string>&>(resolution_button->getWidgetActions());
+			auto& list = const_cast<DynamicMapStr&>(resolution_button->getWidgetActions());
 			list.clear();
 		    for (int i = 0; i < resolutions_formatted.size(); ++i) {
 				resolution_button->addWidgetAction((std::string("__") + std::to_string(i)).c_str(), resolutions_formatted[i].c_str());
