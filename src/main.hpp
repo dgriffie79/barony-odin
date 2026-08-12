@@ -450,15 +450,15 @@ typedef struct map_t
 	unsigned int width, height, skybox;  // size of the map + skybox
 	Sint32 flags[16];
 	Sint32* tiles = nullptr;
-	std::unordered_map<Sint32, node_t*> entities_map;
+	DynamicMapI32T<node_t*> entities_map;
 	list_t* entities = nullptr;
 	list_t* creatures = nullptr; //A list of Entity* pointers.
 	list_t* worldUI = nullptr; //A list of Entity* pointers.
 	bool* trapexcludelocations = nullptr;
 	bool* monsterexcludelocations = nullptr;
 	bool* lootexcludelocations = nullptr;
-	std::set<int> liquidSfxPlayedTiles;
-	std::map<int, Uint32> tileAttributes;
+	DynamicSetI32 liquidSfxPlayedTiles;
+	DynamicMapI32T<Uint32> tileAttributes;
 	static const Uint32 TILE_ATTRIBUTE_NODIG = 1 << 0;
 	static const Uint32 TILE_ATTRIBUTE_SLIPPERY = 1 << 1;
 	static const Uint32 TILE_ATTRIBUTE_SLOW = 1 << 2;

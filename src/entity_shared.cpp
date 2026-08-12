@@ -489,7 +489,7 @@ Entity::Entity(Sint32 in_sprite, Uint32 pos, list_t* entlist, list_t* creatureli
 		{
 			uid = entity_uids;
 			entity_uids++;
-			map.entities_map.insert({ uid, mynode });
+			map.entities_map.put(uid, mynode);
 		}
 		else
 		{

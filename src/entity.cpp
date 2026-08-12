@@ -49,7 +49,7 @@ void Entity::setUID(Uint32 new_uid)
 	if ( mynode->list == map.entities )
 	{
 		map.entities_map.erase(uid);
-		map.entities_map.insert({ new_uid, mynode });
+		map.entities_map.put(new_uid, mynode);
 	}
 	uid = new_uid;
 }
