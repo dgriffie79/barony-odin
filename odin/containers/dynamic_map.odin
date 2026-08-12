@@ -1243,6 +1243,8 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case 16: str_map_put(m, key, value, binding_t, ops)
 	case 17: str_map_put(m, key, value, Class_t, ops)
 	case 18: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case 19: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case 20: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1270,6 +1272,8 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case 16: return str_map_get(m, key, out, binding_t, ops)
 	case 17: return str_map_get(m, key, out, Class_t, ops)
 	case 18: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case 19: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case 20: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1297,6 +1301,8 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case 16: return str_map_len(m, binding_t)
 	case 17: return str_map_len(m, Class_t)
 	case 18: return str_map_len(m, Raw_Dynamic_Array)
+	case 19: return str_map_len(m, Raw_Dynamic_Array)
+	case 20: return str_map_len(m, Raw_Dynamic_Array)
 	}
 	return 0
 }
@@ -1325,6 +1331,8 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case 16: str_map_clear(m, binding_t, ops)
 	case 17: str_map_clear(m, Class_t, ops)
 	case 18: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case 19: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case 20: str_map_clear(m, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1352,6 +1360,8 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case 16: str_map_destroy(m, binding_t, ops)
 	case 17: str_map_destroy(m, Class_t, ops)
 	case 18: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case 19: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case 20: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1378,6 +1388,8 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case 16: return str_map_entry(m, key, binding_t)
 	case 17: return str_map_entry(m, key, Class_t)
 	case 18: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case 19: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case 20: return str_map_entry(m, key, Raw_Dynamic_Array)
 	}
 	return nil
 }
@@ -1406,6 +1418,8 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case 16: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, binding_t, ops)
 	case 17: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Class_t, ops)
 	case 18: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case 19: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case 20: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	}
 	return 0
 }
@@ -1440,6 +1454,8 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case 16: return str_map_erase(m, key, binding_t, ops)
 	case 17: return str_map_erase(m, key, Class_t, ops)
 	case 18: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case 19: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case 20: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1475,6 +1491,9 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case 0:  i32_map_put(m, key, value, i32, ops)
 	case 2:  i32_map_put(m, key, value, u32, ops)
 	case 3:  i32_map_put(m, key, value, string, ops)
+	case 18: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case 19: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case 20: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1486,6 +1505,9 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case 0:  return i32_map_get(m, key, out, i32, ops)
 	case 2:  return i32_map_get(m, key, out, u32, ops)
 	case 3:  return i32_map_get(m, key, out, string, ops)
+	case 18: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case 19: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case 20: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1497,6 +1519,9 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case 0:  return i32_map_len(m, i32)
 	case 2:  return i32_map_len(m, u32)
 	case 3:  return i32_map_len(m, string)
+	case 18: return i32_map_len(m, Raw_Dynamic_Array)
+	case 19: return i32_map_len(m, Raw_Dynamic_Array)
+	case 20: return i32_map_len(m, Raw_Dynamic_Array)
 	}
 	return 0
 }
@@ -1509,6 +1534,9 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case 0:  i32_map_clear(m, i32, ops)
 	case 2:  i32_map_clear(m, u32, ops)
 	case 3:  i32_map_clear(m, string, ops)
+	case 18: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case 19: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case 20: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1520,6 +1548,9 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case 0:  i32_map_destroy(m, i32, ops)
 	case 2:  i32_map_destroy(m, u32, ops)
 	case 3:  i32_map_destroy(m, string, ops)
+	case 18: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case 19: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case 20: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1530,6 +1561,9 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 0:  return i32_map_entry(m, key, i32)
 	case 2:  return i32_map_entry(m, key, u32)
 	case 3:  return i32_map_entry(m, key, string)
+	case 18: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case 19: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case 20: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	}
 	return nil
 }
@@ -1542,6 +1576,9 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case 0:  return i32_map_entries(m, key_ptrs, val_ptrs, count, i32, ops)
 	case 2:  return i32_map_entries(m, key_ptrs, val_ptrs, count, u32, ops)
 	case 3:  return i32_map_entries(m, key_ptrs, val_ptrs, count, string, ops)
+	case 18: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case 19: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case 20: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	}
 	return 0
 }
@@ -1554,6 +1591,9 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 0:  return i32_map_erase(m, key, i32, ops)
 	case 2:  return i32_map_erase(m, key, u32, ops)
 	case 3:  return i32_map_erase(m, key, string, ops)
+	case 18: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case 19: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case 20: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1599,6 +1639,8 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case 16: return str_map_find(m, key, out_key, out_key_len, out_val, binding_t, ops)
 	case 17: return str_map_find(m, key, out_key, out_key_len, out_val, Class_t, ops)
 	case 18: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case 19: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case 20: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1632,6 +1674,9 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case 0:  return i32_map_find(m, key, out_val, out_val_len, i32, ops)
 	case 2:  return i32_map_find(m, key, out_val, out_val_len, u32, ops)
 	case 3:  return i32_map_find(m, key, out_val, out_val_len, string, ops)
+	case 18: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case 19: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case 20: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	}
 	return false
 }

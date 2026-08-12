@@ -304,7 +304,7 @@ private:
 	FileMode mode = FileMode::INVALID;
 	std::string path;
 	FILE* fp = nullptr;
-	DynamicArray data;  // byte buffer (vector<uint8_t>)
+	DynamicArray data{};  // byte buffer (vector<uint8_t>)
 	size_t pos = 0u;
 };
 
