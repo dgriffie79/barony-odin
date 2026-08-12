@@ -42,7 +42,7 @@
 #define BEARTRAP_IDENTIFIED my->skill[15]
 #define BEARTRAP_OWNER my->skill[17]
 
-std::map<Uint32, MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
+DynamicMapI32T<MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
 
 void actBeartrap(Entity* my)
 {

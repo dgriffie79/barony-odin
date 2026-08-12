@@ -384,6 +384,7 @@ enum MapValueKind {
     MK_DynArrayS32 = 19,
     MK_StatueLimbArray = 20,
     MK_StoreSlotsArray = 21,
+    MK_MonsterTrapIgnore = 22,
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

@@ -39,7 +39,10 @@ int checkObstacle(long x, long y, Entity* my, Entity* target, bool useTileEntity
 
 struct MonsterTrapIgnoreEntities_t
 {
-	std::set<Uint32> ignoreEntities;
+	DynamicSetI32 ignoreEntities;
 	Uint32 parent = 0;
 };
-extern std::map<Uint32, MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
+extern DynamicMapI32T<MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
+
+// MapValueKindOf for MonsterTrapIgnoreEntities_t (owns a DynamicSetI32)
+template <> struct MapValueKindOf<MonsterTrapIgnoreEntities_t> { static constexpr int value = MK_MonsterTrapIgnore; };
