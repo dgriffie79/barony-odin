@@ -50,7 +50,7 @@ public:
 		rapidjson::Value val(value, d.GetAllocator());        // some value
 		d[subkey.c_str()].PushBack(val, d.GetAllocator());
 	}
-	static bool isLevelPartOfSet(int level, bool secret, std::pair<std::unordered_set<int>, std::unordered_set<int>>& pairOfSets)
+	static bool isLevelPartOfSet(int level, bool secret, std::pair<DynamicSetI32, DynamicSetI32>& pairOfSets)
 	{
 		if ( !secret )
 		{
@@ -1867,11 +1867,11 @@ class GameplayCustomManager
 public:
 	bool usingCustomManager = false;
 	int xpShareRange = XPSHARERANGE;
-	std::pair<std::unordered_set<int>, std::unordered_set<int>> minotaurForceEnableFloors;
-	std::pair<std::unordered_set<int>, std::unordered_set<int>> minotaurForceDisableFloors;
-	std::pair<std::unordered_set<int>, std::unordered_set<int>> hungerDisableFloors;
-	std::pair<std::unordered_set<int>, std::unordered_set<int>> herxChatterDisableFloors;
-	std::pair<std::unordered_set<int>, std::unordered_set<int>> minimapDisableFloors;
+	std::pair<DynamicSetI32, DynamicSetI32> minotaurForceEnableFloors;
+	std::pair<DynamicSetI32, DynamicSetI32> minotaurForceDisableFloors;
+	std::pair<DynamicSetI32, DynamicSetI32> hungerDisableFloors;
+	std::pair<DynamicSetI32, DynamicSetI32> herxChatterDisableFloors;
+	std::pair<DynamicSetI32, DynamicSetI32> minimapDisableFloors;
 	int globalXPPercent = 100;
 	int globalGoldPercent = 100;
 	bool minimapShareProgress = false;
