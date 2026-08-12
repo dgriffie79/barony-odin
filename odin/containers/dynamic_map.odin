@@ -1228,6 +1228,25 @@ glyph_data_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// SteamAchievements_t::Statistic_t — 1 DynamicString + int (owning)
+Statistic_t :: struct {
+	name: DynamicString,
+	value: i32,
+}
+
+statistic_free :: proc(p: rawptr) {
+	s := (^Statistic_t)(p)
+	if s.name.data != nil { mem.free(s.name.data); s.name.data = nil }
+	s.name.len = 0
+}
+
+statistic_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Statistic_t)(dst)
+	s := (^Statistic_t)(src)
+	d^ = s^
+	dynamic_string_copy_elem(rawptr(&d.name), rawptr(&s.name))
+}
+
 // kind -> ops lookup. POD kinds use {nil, nil} (raw byte copy, no free).
 
 icon_entry_text_map_free_raw :: proc(p: rawptr) {
@@ -1374,6 +1393,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = enemy_hp_details_free, copy = enemy_hp_details_copy }
 	case 27:
 		return Value_Ops{ free = glyph_data_free, copy = glyph_data_copy }
+	case 28:
+		return Value_Ops{ free = statistic_free, copy = statistic_copy }
 	}
 	return Value_Ops{}
 }
@@ -1676,6 +1697,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case 24: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case 25: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case 27: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
+	case 28: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1697,6 +1719,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case 24: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case 25: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case 27: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
+	case 28: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }
@@ -1718,6 +1741,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case 24: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case 25: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case 27: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
+	case 28: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	}
 	return 0
 }
@@ -1740,6 +1764,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case 24: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case 25: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case 27: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
+	case 28: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1761,6 +1786,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case 24: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case 25: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case 27: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
+	case 28: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1781,6 +1807,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 24: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case 25: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case 27: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
+	case 28: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	}
 	return nil
 }
@@ -1803,6 +1830,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case 24: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case 25: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case 27: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
+	case 28: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return 0
 }
@@ -1825,6 +1853,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 24: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case 25: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case 27: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
+	case 28: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }
@@ -1916,6 +1945,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case 24: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case 25: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case 27: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
+	case 28: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }

@@ -418,6 +418,7 @@ enum MapValueKind {
     MK_EnemyHPDetails = 25,
     MK_U64 = 26,
     MK_GlyphData = 27,
+    MK_Statistic = 28,
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

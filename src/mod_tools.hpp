@@ -3284,13 +3284,15 @@ struct LocalAchievements_t
 		int value = 0;
 	};
 	DynamicMapAchievement achievements;
-	std::map<int, Statistic_t> statistics;
+	DynamicMapI32T<Statistic_t> statistics;
 	static void readFromFile();
 	static void writeToFile();
 	static void init();
 	void updateAchievement(const char* name, const bool unlocked);
 	void updateStatistic(const int stat_num, const int value);
 };
+// MapValueKindOf for LocalAchievements_t::Statistic_t (owns 1 DynamicString) — kind 28 = MK_Statistic
+template <> struct MapValueKindOf<LocalAchievements_t::Statistic_t> { static constexpr int value = MK_Statistic; };
 extern LocalAchievements_t LocalAchievements;
 
 class GameplayPreferences_t
