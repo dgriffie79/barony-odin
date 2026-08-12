@@ -5120,7 +5120,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		stats[clientnum]->PLAYER_LVL_STAT_TIMER[STAT_PER + NUMSTATS] = (Uint8)net_packet->data[15];
 		stats[clientnum]->PLAYER_LVL_STAT_TIMER[STAT_CHR + NUMSTATS] = (Uint8)net_packet->data[16];
 
-		std::vector<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
+		DynamicArrayT<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
 		for ( int i = 0; i < NUMSTATS; ++i )
 		{
 			if ( stats[clientnum]->PLAYER_LVL_STAT_TIMER[i] > 0 )

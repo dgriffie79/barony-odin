@@ -244,10 +244,10 @@ struct StatusEffectQueue_t
 		DynamicString name = "";
 		DynamicString desc = "";
 		DynamicString imgPath = "";
-		std::vector<DynamicString> nameVariations;
-		std::vector<DynamicString> descVariations;
-		std::vector<int> useSpellIDForImgVariations;
-		std::vector<DynamicString> imgPathVariations;
+		DynamicArrayStr nameVariations;
+		DynamicArrayStr descVariations;
+		DynamicArrayS32 useSpellIDForImgVariations;
+		DynamicArrayStr imgPathVariations;
 		int useSpellIDForImg = -1;
 		bool neverDisplay = false;
 		int sustainedSpellID = -1;
@@ -455,7 +455,7 @@ struct LevelUpAnimation_t
 		void animateTitle(SDL_Rect basePos);
 	};
 	std::deque<LevelUp_t> lvlUps;
-	void addLevelUp(const int currentLvl, const int addLvl, std::vector<LevelUp_t::StatUp_t>& statInfo);
+	void addLevelUp(const int currentLvl, const int addLvl, DynamicArrayT<LevelUp_t::StatUp_t>& statInfo);
 };
 
 extern LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];

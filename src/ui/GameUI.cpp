@@ -42628,7 +42628,7 @@ void createLevelUpFrame(const int player)
 
 static ConsoleVariable<int> cvar_lvlup_sfx("/lvlup_sfx", 526);
 Uint32 levelupSoundDelay = 0;
-void LevelUpAnimation_t::addLevelUp(const int currentLvl, const int increaseLvl, std::vector<LevelUp_t::StatUp_t>& statInfo)
+void LevelUpAnimation_t::addLevelUp(const int currentLvl, const int increaseLvl, DynamicArrayT<LevelUp_t::StatUp_t>& statInfo)
 {
 	if ( lvlUps.size() > 2 )
 	{
@@ -43012,7 +43012,7 @@ void updateLevelUpFrame(const int player)
 		}
 		int currentStat = 0;
 		int increaseStat = 1;
-		std::vector<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
+		DynamicArrayT<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
 		for ( int i = 0; i < statPicks.size(); ++i )
 		{
 			if ( *cvar_lvlup_debug != 1 )

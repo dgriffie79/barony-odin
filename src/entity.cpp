@@ -4292,7 +4292,7 @@ void Entity::handleEffects(Stat* myStats)
 			bool rolledBonusStat = false;
 			int statIconTicks = 250;
 
-			std::vector<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
+			DynamicArrayT<LevelUpAnimation_t::LevelUp_t::StatUp_t> StatUps;
 			for ( int i = 0; i < 3; i++ )
 			{
 				messagePlayerColor(player, MESSAGE_SPAM_MISC, color, Language::get(623 + increasestat[i]));

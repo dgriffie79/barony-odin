@@ -129,11 +129,11 @@ namespace MainMenu {
 			DynamicString text;
 			DynamicString internal_name;
 			std::vector<std::tuple<int, std::string, Uint32>> survivalComplexity;
-			std::vector<Uint32> statRatings;
-			std::vector<DynamicString> statRatingsStrings;
+			DynamicArrayU32 statRatings;
+			DynamicArrayStr statRatingsStrings;
 			Sint32 hp = DEFAULT_HP;
 			Sint32 mp = DEFAULT_MP;
-			std::vector<int> linePaddings;
+			DynamicArrayS32 linePaddings;
 		};
 		static std::unordered_map<int, DescData_t> data;
 		static void readFromFile();
@@ -149,7 +149,7 @@ namespace MainMenu {
 			DynamicString textRight;
 			std::set<int> traitLines;
 			std::set<int> proLines;
-			std::vector<int> linePaddings;
+			DynamicArrayS32 linePaddings;
 			DynamicString title;
 			DynamicString traitsBasedOnPlayerRace;
 			DynamicString traitsBasedOnMonsterType;
