@@ -147,7 +147,7 @@ void handleScanPacket(); // when we receive a SCAN packet (request for lobby inf
 
 struct PingNetworkStatus_t
 {
-	std::map<Uint32, Uint32> pings;
+	DynamicMapI32T<Uint32> pings;
 	Uint32 lastPingtime = 0;
 	Uint32 lastSequence = 0;
 	Uint32 oldestSequenceTicks = 0;
