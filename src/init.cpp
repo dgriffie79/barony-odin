@@ -601,7 +601,7 @@ int initApp(char const * const title, int fullscreen)
                     str = end + 1;
                     ++index;
                 } while (end && *end == ' ' && index < numIndices);
-                tileAnimations.insert({animation.indices[0], animation});
+                tileAnimations.put(animation.indices[0], animation);
             }
             FileIO::close(fp);
         }

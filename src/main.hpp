@@ -830,7 +830,7 @@ extern bool* shoparea;
 struct AnimatedTile {
     int indices[8] = { 0 };
 };
-extern std::unordered_map<int, AnimatedTile> tileAnimations;
+extern DynamicMapI32T<AnimatedTile> tileAnimations;
 
 // function prototypes for main.c:
 int sgn(real_t x);

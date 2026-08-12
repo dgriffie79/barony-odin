@@ -667,10 +667,39 @@ public:
     // find-family
     struct KV { int first; int64_t first_len; V second; };
     struct Iterator {
-        KV kv{};
+        std::shared_ptr<std::vector<KV>> snap;   // snapshot for begin(); null for find()
+        KV kv{};                                  // single result for find()
         bool valid = false;
-        const KV* operator->() const { return &kv; }
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const KV* operator->() const { return snap ? &(*snap)[idx] : &kv; }
+        const KV& operator*() const { return snap ? (*snap)[idx] : kv; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            if (!o.snap) return valid;
+            if (!snap) return o.snap ? o.idx < o.snap->size() : false;
+            if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
+            return idx != o.idx;
+        }
+        bool operator==(const Iterator& o) const { return !(*this != o); }
     };
+    Iterator begin() const {
+        Iterator it;
+        int32_t n = (int32_t)size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<KV>>();
+            it.snap->resize((size_t)n);
+            std::vector<void*> kp(n);
+            std::vector<V> vv(n);
+            int32_t got = barony_dynamic_map_i32_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), vv.data(), n, MapValueKindOf<V>::value);
+            for (int32_t i = 0; i < got; ++i) {
+                (*it.snap)[i].first = *(int*)kp[i];
+                (*it.snap)[i].first_len = 4;
+                (*it.snap)[i].second = vv[i];
+            }
+        }
+        return it;
+    }
     Iterator find(int key) const {
         Iterator it;
         int32_t vl = 0;
@@ -680,9 +709,7 @@ public:
         }
         return it;
     }
-    Iterator end() const { return Iterator{}; }
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
-    friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
+    Iterator end() const { Iterator it; it.valid = false; it.idx = Iterator::END; return it; }
 
     // entryList
     struct Entry { int key; int64_t key_len; typename MapEntryValue<V>::type value; int64_t value_len; };
