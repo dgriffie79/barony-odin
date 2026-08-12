@@ -2955,9 +2955,9 @@ public:
 	void stripOutHighlightBracketText(std::string& str, std::string& bracketText);
 	void stripOutHighlightBracketText(DynamicString& str, DynamicString& bracketText);
 	void getWordIndexesItemDetails(void* field, std::string& str, std::string& highlightValues, std::string& positiveValues, std::string& negativeValues,
-		std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
+		DynamicMapI32T<Uint32>& highlightIndexes, DynamicMapI32T<Uint32>& positiveIndexes, DynamicMapI32T<Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
 	void getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
-		std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
+		DynamicMapI32T<Uint32>& highlightIndexes, DynamicMapI32T<Uint32>& positiveIndexes, DynamicMapI32T<Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
 };
 template <> struct DynamicArrayKindOf<ItemTooltips_t::tmpItem_t> { static constexpr int value = Kind_TmpItem; };
 
@@ -3511,8 +3511,8 @@ struct EquipmentModelOffsets_t
 			real_t scaley = 0.0;
 			real_t scalez = 0.0;
 		};
-		std::map<int, AdditionalOffset_t> adjustToOversizeMask;
-		std::map<int, AdditionalOffset_t> adjustToExpandedHelm;
+		DynamicMapI32T<AdditionalOffset_t> adjustToOversizeMask;
+		DynamicMapI32T<AdditionalOffset_t> adjustToExpandedHelm;
 	};
 	std::map<int, std::map<int, ModelOffset_t>> monsterModelsMap;
 	std::map<int, ModelOffset_t> miscItemsBaseOffsets;

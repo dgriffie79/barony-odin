@@ -6700,7 +6700,7 @@ bool charIsWordSeparator(char c)
 }
 
 void ItemTooltips_t::getWordIndexesItemDetails(void* field, std::string& str, std::string& highlightValues, std::string& positiveValues, std::string& negativeValues,
-	std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
+	DynamicMapI32T<Uint32>& highlightIndexes, DynamicMapI32T<Uint32>& positiveIndexes, DynamicMapI32T<Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
 {
 	positiveIndexes.clear();
 	negativeIndexes.clear();
@@ -6782,7 +6782,7 @@ void ItemTooltips_t::getWordIndexesItemDetails(void* field, std::string& str, st
 
 // DynamicString overload (bridges  writes into the string params)
 void ItemTooltips_t::getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
-	std::map<int, Uint32>& highlightIndexes, std::map<int, Uint32>& positiveIndexes, std::map<int, Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
+	DynamicMapI32T<Uint32>& highlightIndexes, DynamicMapI32T<Uint32>& positiveIndexes, DynamicMapI32T<Uint32>& negativeIndexes, ItemTooltip_t& tooltip)
 {
 	std::string s(str.c_str()), h(highlightValues.c_str()), p(positiveValues.c_str()), n(negativeValues.c_str());
 	getWordIndexesItemDetails(field, s, h, p, n, highlightIndexes, positiveIndexes, negativeIndexes, tooltip);

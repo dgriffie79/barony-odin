@@ -5510,9 +5510,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                     }
                 }
                 
-                std::map<int, Uint32> positiveWordIndexes;
-                std::map<int, Uint32> negativeWordIndexes;
-                std::map<int, Uint32> highlightWordIndexes;
+                DynamicMapI32T<Uint32> positiveWordIndexes;
+                DynamicMapI32T<Uint32> negativeWordIndexes;
+                DynamicMapI32T<Uint32> highlightWordIndexes;
                 
                 if ( index == 0 )
                 {
@@ -6392,9 +6392,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             detailsTextString = txtDescription->getText();
             ItemTooltips.stripOutPositiveNegativeItemDetails(detailsTextString, detailsPositiveText, detailsNegativeText);
             
-            std::map<int, Uint32> positiveWordIndexes;
-            std::map<int, Uint32> negativeWordIndexes;
-            std::map<int, Uint32> highlightWordIndexes;
+            DynamicMapI32T<Uint32> positiveWordIndexes;
+            DynamicMapI32T<Uint32> negativeWordIndexes;
+            DynamicMapI32T<Uint32> highlightWordIndexes;
             DynamicString empty;
             ItemTooltips.getWordIndexesItemDetails(txtDescription, detailsTextString, empty, detailsPositiveText, detailsNegativeText,
                                                    highlightWordIndexes, positiveWordIndexes, negativeWordIndexes, itemTooltip);
