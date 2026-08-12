@@ -3221,10 +3221,11 @@ struct ShopkeeperConsumables_t
 		DynamicArrayT<ItemEntry> itemEntries;
 	};
 	static int consumableBuyValueMult;
-	static std::map<int, std::vector<StoreSlots_t>> entries; // shop type as key
+	static DynamicMapI32T<DynamicArrayT<StoreSlots_t>> entries; // shop type as key
 	static void readFromFile();
 };
 template <> struct DynamicArrayKindOf<ShopkeeperConsumables_t::ItemEntry> { static constexpr int value = Kind_ShopkeeperItem; };
+template <> struct MapValueKindOf<DynamicArrayT<ShopkeeperConsumables_t::StoreSlots_t>> { static constexpr int value = MK_StoreSlotsArray; };
 
 
 struct ClassHotbarConfig_t

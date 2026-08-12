@@ -208,6 +208,7 @@ Kind_HiscoreStat     :: 23
 Kind_HiscoreLootbag  :: 24
 Kind_HiscorePlayer  :: 25
 Kind_Book            :: 26
+Kind_StoreSlots      :: 27
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -229,6 +230,23 @@ book_copy :: proc(dst: rawptr, src: rawptr) {
 	dynamic_string_copy_elem(rawptr(&d.text), rawptr(&s.text))
 	dynamic_string_copy_elem(rawptr(&d.default_name), rawptr(&s.default_name))
 	barony_dynamic_array_elem_copy(&d.formattedPages, &s.formattedPages, size_of(DynamicString), Kind_DynamicString)
+}
+
+StoreSlots_t :: struct {
+	slotTradingReq: i32,
+	itemEntries:    Raw_Dynamic_Array,
+}
+
+store_slots_free :: proc(p: rawptr) {
+	s := (^StoreSlots_t)(p)
+	barony_dynamic_array_elem_destroy(&s.itemEntries, size_of(ShopkeeperItemEntry_t), Kind_ShopkeeperItem)
+}
+
+store_slots_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^StoreSlots_t)(dst)
+	s := (^StoreSlots_t)(src)
+	d.slotTradingReq = s.slotTradingReq
+	barony_dynamic_array_elem_copy(&d.itemEntries, &s.itemEntries, size_of(ShopkeeperItemEntry_t), Kind_ShopkeeperItem)
 }
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -1384,7 +1402,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [27]Element_Ops{
+element_ops := [28]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1412,6 +1430,7 @@ element_ops := [27]Element_Ops{
 	24 = { free = hiscore_lootbag_free, copy = hiscore_lootbag_copy },
 	25 = { free = hiscore_player_free,  copy = hiscore_player_copy },
 	26 = { free = book_free,            copy = book_copy },
+	27 = { free = store_slots_free,    copy = store_slots_copy },
 }
 
 @(export)

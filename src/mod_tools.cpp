@@ -8724,7 +8724,7 @@ void MonsterData_t::loadMonsterDataJSON()
 #endif
 
 #ifndef EDITOR
-std::map<int, std::vector<ShopkeeperConsumables_t::StoreSlots_t>> ShopkeeperConsumables_t::entries;
+DynamicMapI32T<DynamicArrayT<ShopkeeperConsumables_t::StoreSlots_t>> ShopkeeperConsumables_t::entries;
 int ShopkeeperConsumables_t::consumableBuyValueMult = 100;
 void ShopkeeperConsumables_t::readFromFile()
 {
