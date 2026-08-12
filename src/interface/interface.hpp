@@ -190,13 +190,17 @@ public:
 		void updateWorldCoordinates();
 	};
 
-	std::unordered_map<Uint32, EnemyHPDetails> HPBars;
+	DynamicMapI32T<EnemyHPDetails> HPBars;
 	EnemyHPDetails* addEnemyToList(Sint32 HP, Sint32 maxHP, Sint32 oldHP, Uint32 uid, const char* name, bool isLowPriority, DamageGib gibDmgType);
 	void displayCurrentHPBar(const int player);
 	void cullExpiredHPBars();
 	EnemyHPDetails* getMostRecentHPBar(int index = 0);
 	Uint32 lastEnemyUid = 0;
 };
+
+// MapValueKindOf for EnemyHPDamageBarHandler::EnemyHPDetails (owns a DynamicString) — kind 25 = MK_EnemyHPDetails
+template <> struct MapValueKindOf<EnemyHPDamageBarHandler::EnemyHPDetails> { static constexpr int value = MK_EnemyHPDetails; };
+
 extern EnemyHPDamageBarHandler enemyHPDamageBarHandler[MAXPLAYERS];
 
 #ifndef SHOPWINDOW_SIZE

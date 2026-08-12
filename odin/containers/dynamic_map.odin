@@ -1135,6 +1135,64 @@ lootbag_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.items, &s.items, size_of(Item_Game), Kind_POD)
 }
 
+// EnemyHPDamageBarHandler::EnemyHPDetails — POD fields + one DynamicString
+BarAnimator_t :: struct {
+	foregroundValue: f32,
+	backgroundValue: f32,
+	previousSetpoint: f32,
+	setpoint: i32,
+	animateTicks: u32,
+	damageTaken: i32,
+	widthMultiplier: f32,
+	maxValue: f32,
+	currentOpacity: f32,
+	fadeOut: f32,
+	fadeIn: f32,
+	skullOpacities: [4]f32,
+	damageFrameOpacity: f32,
+}
+
+EnemyHPDetails_t :: struct {
+	barType: i32,
+	animator: BarAnimator_t,
+	enemy_name: DynamicString,
+	enemy_hp: i32,
+	enemy_maxhp: i32,
+	enemy_oldhp: i32,
+	enemy_timer: u32,
+	enemy_uid: u32,
+	enemy_statusEffects1: u32,
+	enemy_statusEffects2: u32,
+	enemy_statusEffects3: u32,
+	enemy_statusEffects4: u32,
+	enemy_statusEffects5: u32,
+	enemy_statusEffectsLowDuration1: u32,
+	enemy_statusEffectsLowDuration2: u32,
+	enemy_statusEffectsLowDuration3: u32,
+	enemy_statusEffectsLowDuration4: u32,
+	enemy_statusEffectsLowDuration5: u32,
+	lowPriorityTick: bool,
+	shouldDisplay: bool,
+	hasDistanceCheck: bool,
+	displayOnHUD: bool,
+	expired: bool,
+	detectMonsterCheckStatus: bool,
+	depletionAnimationPercent: f32,
+}
+
+enemy_hp_details_free :: proc(p: rawptr) {
+	v := (^EnemyHPDetails_t)(p)
+	dynamic_string_free_elem(rawptr(&v.enemy_name))
+}
+
+enemy_hp_details_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^EnemyHPDetails_t)(dst)
+	s := (^EnemyHPDetails_t)(src)
+	d^ = s^
+	d.enemy_name = DynamicString{}
+	dynamic_string_copy_elem(rawptr(&d.enemy_name), rawptr(&s.enemy_name))
+}
+
 // kind -> ops lookup. POD kinds use {nil, nil} (raw byte copy, no free).
 
 icon_entry_text_map_free_raw :: proc(p: rawptr) {
@@ -1277,6 +1335,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = set_i32_value_free, copy = set_i32_value_copy }
 	case 24:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
+	case 25:
+		return Value_Ops{ free = enemy_hp_details_free, copy = enemy_hp_details_copy }
 	}
 	return Value_Ops{}
 }
@@ -1576,6 +1636,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case 22: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case 23: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case 24: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
+	case 25: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1594,6 +1655,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case 22: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case 23: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case 24: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
+	case 25: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }
@@ -1612,6 +1674,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case 22: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case 23: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case 24: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
+	case 25: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	}
 	return 0
 }
@@ -1631,6 +1694,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case 22: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case 23: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case 24: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
+	case 25: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1649,6 +1713,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case 22: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case 23: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case 24: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
+	case 25: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	}
 }
 
@@ -1666,6 +1731,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 22: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case 23: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case 24: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
+	case 25: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	}
 	return nil
 }
@@ -1685,6 +1751,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case 22: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case 23: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case 24: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
+	case 25: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return 0
 }
@@ -1704,6 +1771,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case 22: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case 23: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case 24: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
+	case 25: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }
@@ -1792,6 +1860,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case 22: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case 23: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case 24: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
+	case 25: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	}
 	return false
 }

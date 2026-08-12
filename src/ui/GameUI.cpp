@@ -12809,7 +12809,7 @@ void Player::HUD_t::processHUD()
 	enemyBarFrameHUD->setDisabled(true);
 	for ( auto& HPBar : enemyHPDamageBarHandler[player.playernum].HPBars )
 	{
-		updateEnemyBar2(enemyBarFrame, &HPBar.second);
+		updateEnemyBar2(enemyBarFrame, &enemyHPDamageBarHandler[player.playernum].HPBars[HPBar.first]);
 	}
 	updateStatusEffectQueue(player.playernum);
 }

@@ -2335,9 +2335,10 @@ void drawEntities3D(view_t* camera, int mode)
 	{
 		for ( auto& enemybar : enemyHPDamageBarHandler[i].HPBars )
 		{
-			real_t camDist = (pow(camera->x * 16.0 - enemybar.second.worldX, 2)
-				+ pow(camera->y * 16.0 - enemybar.second.worldY, 2));
-			spritesToDraw.push_back(std::make_tuple(camDist, &enemybar, SPRITE_HPBAR));
+			EnemyHPDamageBarHandler::EnemyHPDetails& enemybarRef = enemyHPDamageBarHandler[i].HPBars[enemybar.first];
+			real_t camDist = (pow(camera->x * 16.0 - enemybarRef.worldX, 2)
+				+ pow(camera->y * 16.0 - enemybarRef.worldY, 2));
+			spritesToDraw.push_back(std::make_tuple(camDist, &enemybarRef, SPRITE_HPBAR));
 		}
 		if ( players[i]->worldUI.worldTooltipDialogue.playerDialogue.init && players[i]->worldUI.worldTooltipDialogue.playerDialogue.draw )
 		{

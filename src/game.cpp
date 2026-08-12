@@ -7648,7 +7648,7 @@ extern "C" int barony_main(int argc, char** argv)
 
 					for ( auto& HPBar : enemyHPDamageBarHandler[c].HPBars )
 					{
-						HPBar.second.updateWorldCoordinates(); // update enemy bar world coordinates before drawEntities3D called
+						enemyHPDamageBarHandler[c].HPBars[HPBar.first].updateWorldCoordinates(); // update enemy bar world coordinates before drawEntities3D called
 					}
 					players[c]->worldUI.worldTooltipDialogue.playerDialogue.updateWorldCoordinates(); // update dialogue world coordinates before drawEntities3D called
 					for ( auto& worldTooltipDialogue : players[c]->worldUI.worldTooltipDialogue.sharedDialogues )
