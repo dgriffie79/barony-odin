@@ -462,7 +462,7 @@ public:
 		bool looted = false;
 		DynamicArrayT<Item> items;
 	};
-	std::map<Uint32, Lootbag_t> player_lootbags;
+	DynamicMapI32T<Lootbag_t> player_lootbags;
 	list_t void_chest_inventory;
 	list_t magic_effects; //Makes things like the invisibility spell work.
 	Stat(Sint32 sprite);
@@ -539,8 +539,12 @@ public:
 		void modifyProjectile(Entity& my, Entity& projectile);
 	};
 	MonsterRangedAccuracy monsterRangedAccuracy;
-	std::map<ItemType, Uint32> itemLastDegradeTick;
+	DynamicMapI32T<Uint32> itemLastDegradeTick;
 };
+
+// MapValueKindOf for Stat::Lootbag_t (owns a POD Item array) — kind 24 = MK_Lootbag
+template <> struct MapValueKindOf<Stat::Lootbag_t> { static constexpr int value = MK_Lootbag; };
+
 extern Stat* stats[MAXPLAYERS];
 
 inline bool skillCapstoneUnlocked(int player, int proficiency)
