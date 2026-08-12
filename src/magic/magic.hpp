@@ -1077,7 +1077,7 @@ bool magicDig(Entity* parent, Entity* projectile, int numRocks, int randRocks);
 
 spell_t* copySpell(spell_t* spell, int subElementToCopy = -1);
 void spellConstructor(spell_t* spell, int ID);
-spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, std::vector<int> elements);
+spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements);
 void spellDeconstructor(void* data);
 void spellChanneledClientDeconstructor(void* data);
 void copySpellElement(spellElement_t* spellElement, spellElement_t* spellElementToSet);
