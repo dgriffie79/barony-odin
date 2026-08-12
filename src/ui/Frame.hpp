@@ -320,12 +320,12 @@ public:
 	const SDL_Rect&					getSize() const { return size; }
 	const SDL_Rect&					getActualSize() const { return actualSize; }
 	int								getBorderStyle() const { return borderStyle; }
-	std::vector<Frame*>&			getFrames() { return frames; }
-	std::vector<Field*>&			getFields() { return fields; }
-	std::vector<Button*>&			getButtons() { return buttons; }
-	std::vector<Slider*>&			getSliders() { return sliders; }
-	std::vector<entry_t*>&			getEntries() { return list; }
-	std::vector<image_t*>&			getImages() { return images; }
+	DynamicArrayT<Frame*>&			getFrames() { return frames; }
+	DynamicArrayT<Field*>&			getFields() { return fields; }
+	DynamicArrayT<Button*>&			getButtons() { return buttons; }
+	DynamicArrayT<Slider*>&			getSliders() { return sliders; }
+	DynamicArrayT<entry_t*>&			getEntries() { return list; }
+	DynamicArrayT<image_t*>&			getImages() { return images; }
 	const bool						isDisabled() const { return disabled; }
 	const bool						isHollow() const { return hollow; }
 	const bool						isDropDown() const { return dropDown; }
@@ -442,14 +442,14 @@ private:
 	bool allowScrollParent = false;						//!< if true, scrolls parent when widget movement called
 
 
-	std::vector<Frame*> frames;
-	std::vector<Button*> buttons;
-	std::vector<Field*> fields;
-	std::vector<image_t*> images;
-	std::vector<Slider*> sliders;
-	std::vector<entry_t*> list;
+	DynamicArrayT<Frame*> frames;
+	DynamicArrayT<Button*> buttons;
+	DynamicArrayT<Field*> fields;
+	DynamicArrayT<image_t*> images;
+	DynamicArrayT<Slider*> sliders;
+	DynamicArrayT<entry_t*> list;
 
-	std::vector<DynamicString> syncScrollTargets;
+	DynamicArrayStr syncScrollTargets;
 
 	SDL_Surface* blitSurface = nullptr;					//!< cached surface to blit to if bBlitChildrenToTexture
 	TempTexture* blitTexture = nullptr;					//!< cached texture to draw to if bBlitChildrenToTexture
