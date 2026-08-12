@@ -3057,7 +3057,7 @@ public:
 		int render_offsety = 0;
 		int keycode = SDLK_UNKNOWN;
 	};
-	std::map<int, GlyphData_t> allGlyphs;
+	DynamicMapI32T<GlyphData_t> allGlyphs;
 
 	GlyphRenderer_t() {};
 	~GlyphRenderer_t() {};
@@ -3079,6 +3079,8 @@ public:
 		return defaultstring;
 	}
 };
+// MapValueKindOf for GlyphRenderer_t::GlyphData_t (owns 8 DynamicStrings) — kind 27 = MK_GlyphData
+template <> struct MapValueKindOf<GlyphRenderer_t::GlyphData_t> { static constexpr int value = MK_GlyphData; };
 extern GlyphRenderer_t GlyphHelper;
 
 bool charIsWordSeparator(char c);

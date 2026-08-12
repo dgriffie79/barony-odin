@@ -7389,7 +7389,7 @@ bool GlyphRenderer_t::readFromFile()
 
 		for ( auto& keyValue : allGlyphs )
 		{
-			auto& glyphData = keyValue.second;
+			GlyphData_t& glyphData = allGlyphs[keyValue.first];
             glyphData.fullpath = "";
             glyphData.pressedRenderedFullpath = "";
             glyphData.unpressedRenderedFullpath = "";
@@ -7464,7 +7464,7 @@ void GlyphRenderer_t::renderGlyphsToPNGs()
 			unpressedPath.erase((size_t)0, (size_t)1);
 		}
 
-		auto& glyphData = keyValue.second;
+		GlyphData_t& glyphData = allGlyphs[keyValue.first];
 
 		Image* base = Image::get(unpressedPath.c_str());
 		if ( base->getWidth() != 0 )
