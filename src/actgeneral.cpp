@@ -2984,7 +2984,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 
 	printlog("[SCRIPT]: Starting Execution...");
 	DynamicString executionLog = "[SCRIPT]: Processed tokens:";
-	std::vector<Entity*> attachedEntities = textSourceScript.getScriptAttachedEntities(src);
+	DynamicArrayT<Entity*> attachedEntities = textSourceScript.getScriptAttachedEntities(src);
 
 	for ( auto it = tokens.begin(); it != tokens.end(); ++it )
 	{

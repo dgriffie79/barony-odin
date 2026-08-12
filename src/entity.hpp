@@ -1729,9 +1729,9 @@ public:
 		skill &= 0xFFFF0FFF;
 		skill |= ((setValue << 12) & 0xF000);
 	}
-	std::vector<Entity*> getScriptAttachedEntities(Entity& script)
+	DynamicArrayT<Entity*> getScriptAttachedEntities(Entity& script)
 	{
-		std::vector<Entity*> entities;
+		DynamicArrayT<Entity*> entities;
 		for ( node_t* node = script.children.first; node; node = node->next )
 		{
 			Uint32 entityUid = *((Uint32*)node->element);
