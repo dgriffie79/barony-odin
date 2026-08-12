@@ -285,8 +285,8 @@ StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS] = { {0}, {1}, {2}, {3}, {4}, {
 #else
 StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS] = { {0}, {1}, {2}, {3} };
 #endif
-std::unordered_map<int, StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allEffects;
-std::unordered_map<int, StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allSustainedSpells;
+DynamicMapI32T<StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allEffects;
+DynamicMapI32T<StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allSustainedSpells;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipDescColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipHeadingColor = 0xFFFFFFFF;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::notificationTextColor = 0xFFFFFFFF;
@@ -5978,8 +5978,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 						{
 							spellID = itr->value["spell_id"].GetInt();
 						}
-						StatusEffectDefinitions_t::allSustainedSpells.insert(
-							std::make_pair(spellID, EffectDefinitionEntry_t()));
+						StatusEffectDefinitions_t::allSustainedSpells.put(spellID, EffectDefinitionEntry_t());
 						auto& entry = StatusEffectDefinitions_t::allSustainedSpells[spellID];
 						entry.effect_id = id;
 						entry.spell_id = spellID;
@@ -6045,8 +6044,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 						{
 							id = itr->value["id"].GetInt();
 						}
-						StatusEffectDefinitions_t::allEffects.insert(
-							std::make_pair(id, EffectDefinitionEntry_t()));
+						StatusEffectDefinitions_t::allEffects.put(id, EffectDefinitionEntry_t());
 						auto& entry = StatusEffectDefinitions_t::allEffects[id];
 						entry.effect_id = id;
 						if ( itr->value["name"].IsArray() )

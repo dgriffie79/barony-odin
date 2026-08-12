@@ -304,6 +304,14 @@ public:
         return (T*)raw.data + i;
     }
     void pop_back() { if (size() > 0) erase(size() - 1); }
+    void pop_front() { if (size() > 0) erase((int64_t)0); }
+    // reverse iteration (std::deque/vector rbegin/rend)
+    using reverse_iterator = std::reverse_iterator<T*>;
+    using const_reverse_iterator = std::reverse_iterator<const T*>;
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
+    reverse_iterator rend() { return reverse_iterator(begin()); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
     // at: LIVE slot reference (std::vector::at semantics — mutable). For
     // owned types the returned ref is the stored element (field assigns

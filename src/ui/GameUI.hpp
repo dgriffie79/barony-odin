@@ -140,7 +140,7 @@ struct StatusEffectQueueEntry_t
 		DOWN,
 		RIGHT
 	};
-	std::map<Dir_t, size_t> navigation;
+	DynamicMapI32T<size_t> navigation;
 	size_t index = 0;
 	int getEffectSpriteNormalWidth();
 	int getEffectSpriteNormalHeight();
@@ -190,8 +190,8 @@ struct StatusEffectQueue_t
 	Frame* statusEffectFrame = nullptr;
 	Frame* statusEffectTooltipFrame = nullptr;
 	int player = -1;
-	std::deque<StatusEffectQueueEntry_t> effectQueue;
-	std::deque<StatusEffectQueueEntry_t> notificationQueue;
+	DynamicArrayT<StatusEffectQueueEntry_t> effectQueue;
+	DynamicArrayT<StatusEffectQueueEntry_t> notificationQueue;
 	int getBaseEffectPosX();
 	int getBaseEffectPosY();
 	real_t tooltipOpacitySetpoint = 100;
@@ -257,8 +257,8 @@ struct StatusEffectQueue_t
 	};
 	struct StatusEffectDefinitions_t
 	{
-		static std::unordered_map<int, EffectDefinitionEntry_t> allEffects;
-		static std::unordered_map<int, EffectDefinitionEntry_t> allSustainedSpells;
+		static DynamicMapI32T<EffectDefinitionEntry_t> allEffects;
+		static DynamicMapI32T<EffectDefinitionEntry_t> allSustainedSpells;
 		static Uint32 tooltipHeadingColor;
 		static Uint32 tooltipDescColor;
 		static Uint32 notificationTextColor;
@@ -441,7 +441,7 @@ struct LevelUpAnimation_t
 			void setAnimatePosition(int destx, int desty);
 			void setAnimatePosition(int destx, int desty, int destw, int desth);
 		};
-		std::deque<StatUp_t> statUps;
+		DynamicArrayT<StatUp_t> statUps;
 		LevelUp_t(const int _currentLvl, const int _increaseLvl)
 		{
 			currentLvl = _currentLvl;
@@ -454,7 +454,7 @@ struct LevelUpAnimation_t
 		bool titleFinishAnim = false;
 		void animateTitle(SDL_Rect basePos);
 	};
-	std::deque<LevelUp_t> lvlUps;
+	DynamicArrayT<LevelUp_t> lvlUps;
 	void addLevelUp(const int currentLvl, const int addLvl, DynamicArrayT<LevelUp_t::StatUp_t>& statInfo);
 };
 
@@ -528,7 +528,7 @@ struct SkillUpAnimation_t
 	};
 
 	real_t animFrameFadeIn = 1.0;
-	std::deque<SkillUp_t> skillUps;
+	DynamicArrayT<SkillUp_t> skillUps;
 	void addSkillUp(const int _numSkill, const int _currentSkill, const int _increaseSkill);
 	void addSpellLearned(const int _spellID);
 	size_t getSkillUpIndexToDisplay();
