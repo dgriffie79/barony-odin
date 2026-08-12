@@ -29,14 +29,28 @@ DynamicString shopspeech[MAXPLAYERS];
 int shopkeepertype[MAXPLAYERS] = { 0 };
 DynamicString shopkeepername[MAXPLAYERS];
 char shopkeepername_client[MAXPLAYERS][64];
-std::map<Uint32, int> hamletShopkeeperSkillLimit[MAXPLAYERS];
+DynamicMapI32T<int> hamletShopkeeperSkillLimit[MAXPLAYERS];
 
-std::unordered_map<int, std::unordered_set<int>> shopkeeperMysteriousItems(
-{
-	{ ARTIFACT_ORB_GREEN, { ARTIFACT_BOW, QUIVER_HUNTING, QUIVER_PIERCE } },
-	{ ARTIFACT_ORB_BLUE, { ARTIFACT_MACE, ENCHANTED_FEATHER } },
-	{ ARTIFACT_ORB_RED, { CRYSTAL_SWORD, CRYSTAL_BATTLEAXE, CRYSTAL_SPEAR, CRYSTAL_MACE, MASK_ARTIFACT_VISOR } }
-});
+DynamicMapI32T<DynamicSetI32> shopkeeperMysteriousItems = []() {
+    DynamicMapI32T<DynamicSetI32> m;
+    {
+        DynamicSetI32 s;
+        s.insert(ARTIFACT_BOW); s.insert(QUIVER_HUNTING); s.insert(QUIVER_PIERCE);
+        m.put(ARTIFACT_ORB_GREEN, s);
+    }
+    {
+        DynamicSetI32 s;
+        s.insert(ARTIFACT_MACE); s.insert(ENCHANTED_FEATHER);
+        m.put(ARTIFACT_ORB_BLUE, s);
+    }
+    {
+        DynamicSetI32 s;
+        s.insert(CRYSTAL_SWORD); s.insert(CRYSTAL_BATTLEAXE); s.insert(CRYSTAL_SPEAR);
+        s.insert(CRYSTAL_MACE); s.insert(MASK_ARTIFACT_VISOR);
+        m.put(ARTIFACT_ORB_RED, s);
+    }
+    return m;
+}();
 
 void closeShop(const int player)
 {

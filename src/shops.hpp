@@ -24,7 +24,7 @@ extern DynamicString shopspeech[MAXPLAYERS];
 extern int shopkeepertype[MAXPLAYERS];
 extern DynamicString shopkeepername[MAXPLAYERS];
 extern char shopkeepername_client[MAXPLAYERS][64];
-extern std::map<Uint32, int> hamletShopkeeperSkillLimit[MAXPLAYERS];
+extern DynamicMapI32T<int> hamletShopkeeperSkillLimit[MAXPLAYERS];
 static const int hamletTradingSkillLimit = 7;
 
 void startTradingServer(Entity* entity, int player);
@@ -33,7 +33,7 @@ bool hideItemFromShopView(Item& item);
 bool buyItemFromShop(const int player, Item* item, bool& bOutConsumedEntireStack);
 bool sellItemToShop(const int player, Item* item);
 bool shopIsMysteriousShopkeeper(Entity* entity);
-extern std::unordered_map<int, std::unordered_set<int>> shopkeeperMysteriousItems;
+extern DynamicMapI32T<DynamicSetI32> shopkeeperMysteriousItems;
 void buyItemFromMysteriousShopkeepConsumeOrb(const int player, Entity& entity, Item& boughtItem);
 void closeShop(const int player);
 void shopChangeGoldEvent(const int player, Sint32 amount);

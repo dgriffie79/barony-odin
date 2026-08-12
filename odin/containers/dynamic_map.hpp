@@ -104,11 +104,35 @@ public:
 
     bool insert(int v) { return barony_dynamic_set_i32_insert(&raw, v); }
     // find()/end() (std::set-like): find(x) != end()
-    struct Iterator { int value = 0; bool valid = false; };
+    struct Iterator {
+        std::shared_ptr<std::vector<int>> snap;  // snapshot for begin(); null for find()
+        int value = 0; bool valid = false;
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const int* operator->() const { return snap ? &(*snap)[idx] : &value; }
+        int operator*() const { return snap ? (*snap)[idx] : value; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            if (!o.snap) return valid;
+            if (!snap) return o.snap ? o.idx < o.snap->size() : false;
+            if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
+            return idx != o.idx;
+        }
+        bool operator==(const Iterator& o) const { return !(*this != o); }
+    };
+    Iterator begin() const {
+        Iterator it;
+        int32_t n = (int32_t)size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<int>>();
+            it.snap->resize((size_t)n);
+            int32_t got = barony_dynamic_set_i32_entries(const_cast<DynamicMapRaw*>(&raw), it.snap->data(), n);
+            if (got < n) it.snap->resize((size_t)got);
+        }
+        return it;
+    }
     Iterator find(int v) const { Iterator it; it.valid = barony_dynamic_set_i32_contains(const_cast<DynamicMapRaw*>(&raw), v); it.value = v; return it; }
-    Iterator end() const { return Iterator{}; }
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
-    friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
+    Iterator end() const { Iterator it; it.valid = false; it.idx = Iterator::END; return it; }
     bool contains(int v) const { return barony_dynamic_set_i32_contains(const_cast<DynamicMapRaw*>(&raw), v); }
     bool erase(int v) { return barony_dynamic_set_i32_erase(&raw, v); }
     int64_t size() const { return barony_dynamic_set_i32_len(const_cast<DynamicMapRaw*>(&raw)); }
@@ -385,6 +409,7 @@ enum MapValueKind {
     MK_StatueLimbArray = 20,
     MK_StoreSlotsArray = 21,
     MK_MonsterTrapIgnore = 22,
+    MK_SetOfI32 = 23,
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -406,6 +431,7 @@ template <> struct MapValueKindOf<binding_tMirror> { static constexpr int value 
 template <> struct MapValueKindOf<Class_tMirror> { static constexpr int value = MK_Class; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
+template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
 
 // Entry value type: string maps expose const char* (view into map storage);
 // other maps expose V by value.
