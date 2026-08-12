@@ -3517,7 +3517,7 @@ struct EquipmentModelOffsets_t
 		DynamicMapI32T<AdditionalOffset_t> adjustToExpandedHelm;
 	};
 	std::map<int, std::map<int, ModelOffset_t>> monsterModelsMap;
-	std::map<int, ModelOffset_t> miscItemsBaseOffsets;
+	DynamicMapI32T<ModelOffset_t> miscItemsBaseOffsets;
 	void readBaseItemsFromFile();
 	void readFromFile(std::string monsterName, int monsterType = NOTHING);
 	int modelOffsetExists(int monster, int sprite, int monsterSprite);
@@ -4174,7 +4174,7 @@ struct Compendium_t
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
 		static DynamicMapI32 unlocks;
-		static std::map<int, CompendiumUnlockStatus> itemUnlocks;
+		static DynamicMapI32T<CompendiumUnlockStatus> itemUnlocks;
 		static int completionPercent;
 		static int numUnread;
 	};

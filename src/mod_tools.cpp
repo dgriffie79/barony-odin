@@ -12589,7 +12589,7 @@ DynamicMapI32 Compendium_t::CompendiumCodex_t::unlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumItems_t::contents;
 DynamicMapStr Compendium_t::CompendiumItems_t::contentsMap;
 DynamicMapI32 Compendium_t::CompendiumItems_t::unlocks;
-std::map<int, Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::itemUnlocks;
+DynamicMapI32T<Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::itemUnlocks;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMagic_t::contents;
 DynamicMapStr Compendium_t::CompendiumMagic_t::contentsMap;
 std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::AchievementData_t::contents;
