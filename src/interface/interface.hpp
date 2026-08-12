@@ -851,7 +851,7 @@ public:
 		};
 
 		AssistShrineView_t currentView = ASSIST_SHRINE_VIEW_ITEMS;
-		std::map<int, int> classSlots;
+		DynamicMapI32T<int> classSlots;
 		DynamicArrayS32 raceSlots;
 		int selectedClass = -1;
 		int selectedRace = -1;
@@ -877,7 +877,7 @@ public:
 		Uint32 animTooltipTicks = 0;
 		real_t animClassRaceTooltipOpacity = 0.0;
 		Uint32 animClassRaceTooltipTicks = 0;
-		std::set<ItemType> claimedItems;
+		DynamicSetI32 claimedItems;
 		bool isInteractable = true;
 		bool bOpen = false;
 		bool bFirstTimeSnapCursor = false;
