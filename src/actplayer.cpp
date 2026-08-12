@@ -10854,11 +10854,11 @@ void actPlayer(Entity* my)
 							spellTimer->particleTimerVariable4 = 0;
 
 							my->thrownProjectileParticleTimerUID = spellTimer->getUID();
-							particleTimerEffects.emplace(std::pair<Uint32, ParticleTimerEffect_t>(spellTimer->getUID(), ParticleTimerEffect_t()));
+							particleTimerEffects.put(spellTimer->getUID(), ParticleTimerEffect_t());
 
-							auto findEffects = particleTimerEffects.find(spellTimer->getUID());
-							auto& effect = findEffects->second.effectMap[spellTimer->ticks + 1]; // insert x ticks beyond last effect
-							if ( findEffects->second.effectMap.size() == 1 )
+							auto& timerEffects = particleTimerEffects[spellTimer->getUID()];
+							auto& effect = timerEffects.effectMap[spellTimer->ticks + 1]; // insert x ticks beyond last effect
+							if ( timerEffects.effectMap.size() == 1 )
 							{
 								effect.firstEffect = true;
 							}

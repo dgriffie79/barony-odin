@@ -504,7 +504,7 @@ void actThrown(Entity* my)
 				spellTimer->particleTimerVariable4 = my->getUID();
 
 				my->thrownProjectileParticleTimerUID = spellTimer->getUID();
-				particleTimerEffects.emplace(std::pair<Uint32, ParticleTimerEffect_t>(spellTimer->getUID(), ParticleTimerEffect_t()));
+				particleTimerEffects.put(spellTimer->getUID(), ParticleTimerEffect_t());
 			}
 			if ( Entity* fx = spawnMagicParticleCustom(my, 1886, 1.0, 1.0) )
 			{
@@ -2637,28 +2637,26 @@ void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y)
 {
 	if ( my.sprite == items[DUST_BALL].index )
 	{
-		auto findEffects = particleTimerEffects.find(my.thrownProjectileParticleTimerUID);
-		if ( findEffects != particleTimerEffects.end() )
+		auto& findEffects = particleTimerEffects[my.thrownProjectileParticleTimerUID];
+		if ( auto spellTimer = uidToEntity(my.thrownProjectileParticleTimerUID) )
 		{
-			if ( auto spellTimer = uidToEntity(my.thrownProjectileParticleTimerUID) )
-			{
 				int x = static_cast<int>(_x) / 16;
 				int y = static_cast<int>(_y) / 16;
 				bool freeSpot = true;
 				Uint32 lastTick = 1;
-				for ( auto& eff : findEffects->second.effectMap )
+				for ( auto& eff : findEffects.effectMap )
 				{
 					if ( static_cast<int>(eff.second.x) / 16 == x
 						&& static_cast<int>(eff.second.y) / 16 == y )
 					{
 						freeSpot = false;
 					}
-					lastTick = std::max(eff.first, lastTick);
+					lastTick = std::max((Uint32)eff.first, lastTick);
 				}
 				if ( freeSpot )
 				{
-					auto& effect = findEffects->second.effectMap[std::max(spellTimer->ticks + 1, lastTick + 2)]; // insert x ticks beyond last effect
-					if ( findEffects->second.effectMap.size() == 1 )
+					auto& effect = findEffects.effectMap[std::max(spellTimer->ticks + 1, lastTick + 2)]; // insert x ticks beyond last effect
+					if ( findEffects.effectMap.size() == 1 )
 					{
 						effect.firstEffect = true;
 					}
@@ -2673,5 +2671,4 @@ void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y)
 				}
 			}
 		}
-	}
 }

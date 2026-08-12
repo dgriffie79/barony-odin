@@ -13805,7 +13805,7 @@ void actParticleTimer(Entity* my)
 									{
 										if ( findEffects->second.effectMap.find(nextTickEffect) != findEffects->second.effectMap.end() )
 										{
-											auto& data = findEffects->second.effectMap[nextTickEffect];
+											auto& data = particleTimerEffects[my->getUID()].effectMap[nextTickEffect];
 											real_t tangent = atan2(fx->y - data.y, fx->x - data.x);
 											fx->monsterKnockbackTangentDir = tangent;
 										}
