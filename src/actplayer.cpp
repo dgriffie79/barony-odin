@@ -11740,25 +11740,27 @@ void actPlayer(Entity* my)
 
 			for ( auto& pair : players[PLAYER_NUM]->compendiumProgress.playerEquipSlotTime )
 			{
-				if ( pair.second > 0 )
+				auto& equipTime = players[PLAYER_NUM]->compendiumProgress.playerEquipSlotTime[pair.first];
+				if ( equipTime > 0 )
 				{
 					if ( items[pair.first].item_slot == EQUIPPABLE_IN_SLOT_RING )
 					{
-						Compendium_t::Events_t::eventUpdate(PLAYER_NUM, Compendium_t::CPDM_TIME_WORN, (ItemType)(pair.first), pair.second);
+						Compendium_t::Events_t::eventUpdate(PLAYER_NUM, Compendium_t::CPDM_TIME_WORN, (ItemType)(pair.first), equipTime);
 					}
 				}
-				pair.second = 0;
+				equipTime = 0;
 			}
 			for ( auto& pair : players[PLAYER_NUM]->compendiumProgress.allyTimeSpent )
 			{
-				if ( pair.second > 0 )
+				auto& allyTime = players[PLAYER_NUM]->compendiumProgress.allyTimeSpent[pair.first];
+				if ( allyTime > 0 )
 				{
 					if ( pair.first == GYROBOT )
 					{
-						Compendium_t::Events_t::eventUpdate(PLAYER_NUM, Compendium_t::CPDM_GYROBOT_TIME_SPENT, TOOL_GYROBOT, pair.second);
+						Compendium_t::Events_t::eventUpdate(PLAYER_NUM, Compendium_t::CPDM_GYROBOT_TIME_SPENT, TOOL_GYROBOT, allyTime);
 					}
 				}
-				pair.second = 0;
+				allyTime = 0;
 			}
 		}
 	}

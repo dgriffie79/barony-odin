@@ -10308,7 +10308,7 @@ void Player::Inventory_t::updateInventory()
 				{
 					if ( itemNotify.first != item->uid && itemNotify.second == Appraisal_t::NOTIFY_ITEM_HOVERED )
 					{
-						itemNotify.second = Appraisal_t::NOTIFY_ITEM_REMOVE;
+						appraisal.itemsToNotify.put(itemNotify.first, Appraisal_t::NOTIFY_ITEM_REMOVE);
 					}
 				}
 

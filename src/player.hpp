@@ -844,9 +844,9 @@ public:
 		Frame* selectedItemCursorFrame = nullptr;
 		Frame* spellFrame = nullptr;
 		Frame* chestFrame = nullptr;
-		std::unordered_map<int, Frame*> slotFrames;
-		std::unordered_map<int, Frame*> spellSlotFrames;
-		std::unordered_map<int, Frame*> chestSlotFrames;
+		DynamicMapI32T<Frame*> slotFrames;
+		DynamicMapI32T<Frame*> spellSlotFrames;
+		DynamicMapI32T<Frame*> chestSlotFrames;
 		bool bCompactView = false;
 		real_t slideOutPercent = 0.0;
 		static int slideOutWidth;
@@ -1144,7 +1144,7 @@ public:
 			int timer = 0; //There is a delay after the appraisal skill is activated before the item is identified.
 			int timermax = 0;
 			Uint32 current_item = 0; //The item being appraised (or rather its uid)
-			std::map<Uint32, int> appraisalProgressionItems;
+			DynamicMapI32T<int> appraisalProgressionItems;
 			Uint32 old_item = 0;
 			Uint32 manual_appraised_item = 0;
 			int getAppraisalTime(Item* item); // Return time in ticks needed to appraise an item
@@ -1161,7 +1161,7 @@ public:
 				NOTIFY_ITEM_HOVERED,
 				NOTIFY_ITEM_REMOVE
 			};
-			std::unordered_map<Uint32, ItemNotifyHoverStates> itemsToNotify;
+			DynamicMapI32T<ItemNotifyHoverStates> itemsToNotify;
 			void updateAppraisalAnim();
 			static void readFromFile();
 			static DynamicArray appraisal_time_points;  // vector<pair<int,int>>
@@ -1212,7 +1212,7 @@ public:
 		int selectedShopSlotY = -1;
 		static const int MAX_SHOP_X;
 		static const int MAX_SHOP_Y;
-		std::unordered_map<int, Frame*> shopSlotFrames;
+		DynamicMapI32T<Frame*> shopSlotFrames;
 		bool isShopSelected();
 		void selectShopSlot(const int x, const int y);
 		const int getSelectedShopX() const { return selectedShopSlotX; }
@@ -2365,8 +2365,8 @@ public:
 		Uint32 playerAliveTimeStopped = 0;
 		Uint32 playerAliveTimeTotal = 0;
 		Uint32 playerGameTimeTotal = 0;
-		std::map<int, Uint32> playerEquipSlotTime;
-		std::map<int, Uint32> allyTimeSpent;
+		DynamicMapI32T<Uint32> playerEquipSlotTime;
+		DynamicMapI32T<Uint32> allyTimeSpent;
 		CompendiumProgress_t(Player& p) : player(p)
 		{};
 		~CompendiumProgress_t() {};
@@ -2377,11 +2377,11 @@ public:
 	{
 		Player& player;
 	public:
-		std::map<int, int> itemDegradeRng;
-		std::set<int> learnedSpells;
+		DynamicMapI32T<int> itemDegradeRng;
+		DynamicSetI32 learnedSpells;
 		DynamicArray ducksInARow;  // vector<pair<int,int>>
 		DynamicArray pendingDucks;  // vector<pair<int,Uint32>>
-		std::map<int, int> favoriteBooksAchievement;
+		DynamicMapI32T<int> favoriteBooksAchievement;
 		int numFishingCaught = 0;
 		bool itemDegradeRoll(Item* item, int skillID = -1, int* checkInterval = nullptr);
 		void onItemDegrade(Item* item);
@@ -2404,8 +2404,8 @@ public:
 			RNG_ROLL_SPELL_LEVELS,
 			RNG_ROLL_ENUM_END
 		};
-		std::map<int, int> escalatingRngRolls;
-		std::map<int, int> escalatingSpellRngRolls;
+		DynamicMapI32T<int> escalatingRngRolls;
+		DynamicMapI32T<int> escalatingSpellRngRolls;
 		bool sustainedSpellLevelChance(int skillID);
 		int baseSpellLevelChance(int skillID);
 		int baseSpellMPSpent(int skillID);
@@ -2413,8 +2413,8 @@ public:
 		void baseSpellIncrementMP(int mpChange, int skillID);
 		void sustainedSpellClearMP(int skillID);
 		void baseSpellClearMP(int skillID);
-		std::map<int, int> baseSpellLevelUpProcs;
-		std::map<int, real_t> sustainedSpellIDCounter;
+		DynamicMapI32T<int> baseSpellLevelUpProcs;
+		DynamicMapI32T<real_t> sustainedSpellIDCounter;
 		bool updateSustainedSpellEvent(int spellID, real_t value, real_t scaleValue, Entity* hitEntity);
 		bool rollRngProc(RngRollTypes rngType, int chance, int spellID = -1);
 		std::map<Uint32, int> enemyRaisedBlockingAgainst;
@@ -2429,7 +2429,7 @@ public:
 		Uint32 donationRevealedOnFloor = 0;
 		bool donationClaimed = false;
 		std::map<Uint32, std::map<Uint32, Uint32>> targetsCompelled;
-		std::set<Uint32> targetsRefuseCompel;
+		DynamicSetI32 targetsRefuseCompel;
 		static void ensembleMusicUpdateServer();
 		static void ensembleMusicUpdate();
 		enum class BreakableEvent

@@ -2420,7 +2420,7 @@ void drawStatusNew(const int player)
 					{
 						if ( itemNotify.first != item->uid && itemNotify.second == Player::Inventory_t::Appraisal_t::NOTIFY_ITEM_HOVERED )
 						{
-							itemNotify.second = Player::Inventory_t::Appraisal_t::NOTIFY_ITEM_REMOVE;
+							appraisal.itemsToNotify.put(itemNotify.first, Player::Inventory_t::Appraisal_t::NOTIFY_ITEM_REMOVE);
 						}
 					}
 
