@@ -81,6 +81,10 @@ public:
     DynamicMapRaw raw{};
 
     DynamicSetI32() { barony_dynamic_set_i32_init(&raw); }
+    DynamicSetI32(std::initializer_list<int> init) {
+        barony_dynamic_set_i32_init(&raw);
+        for (int v : init) barony_dynamic_set_i32_insert(&raw, v);
+    }
     ~DynamicSetI32() { barony_dynamic_set_i32_destroy(&raw); }
     DynamicSetI32(const DynamicSetI32& other) : raw{} {
         barony_dynamic_set_i32_init(&raw);

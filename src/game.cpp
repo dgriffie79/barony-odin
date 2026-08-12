@@ -1583,7 +1583,7 @@ void gameLogic(void)
 											}
 											else
 											{
-												achievementObserver.playerAchievements[c].caughtInAMoshTargets.insert(std::make_pair(static_cast<Uint32>(follower->monsterTarget), 1));
+												achievementObserver.playerAchievements[c].caughtInAMoshTargets.put(static_cast<Uint32>(follower->monsterTarget), 1);
 											}
 										}
 									}

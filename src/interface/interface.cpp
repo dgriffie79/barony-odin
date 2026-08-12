@@ -21430,7 +21430,7 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 				{
 					if ( label == scroll_label[i] )
 					{
-						for ( auto& s : clientLearnedScrollLabels[parentGUI.getPlayer()] )
+						for ( auto s : clientLearnedScrollLabels[parentGUI.getPlayer()] )
 						{
 							if ( s == i )
 							{
@@ -23820,7 +23820,7 @@ GenericGUIMenu::FeatherGUI_t::FeatherActions_t GenericGUIMenu::FeatherGUI_t::set
 				{
 					if ( label == scroll_label[i] )
 					{
-						for ( auto& s : clientLearnedScrollLabels[parentGUI.getPlayer()] )
+						for ( auto s : clientLearnedScrollLabels[parentGUI.getPlayer()] )
 						{
 							if ( s == i )
 							{

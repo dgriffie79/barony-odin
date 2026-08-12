@@ -44,12 +44,12 @@ Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS] = { 0 }; // general saved game st
 DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS] = {};
 bool achievementStatusRhythmOfTheKnight[MAXPLAYERS] = { false };
 bool achievementRhythmOfTheKnight[MAXPLAYERS] = { false };
-std::map<Uint32, Uint32> achievementThankTheTankPair[MAXPLAYERS];
+DynamicMapI32T<Uint32> achievementThankTheTankPair[MAXPLAYERS];
 bool achievementStatusBaitAndSwitch[MAXPLAYERS] = { false };
 Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS] = { 0 };
-std::unordered_set<int> clientLearnedAlchemyIngredients[MAXPLAYERS];
+DynamicSetI32 clientLearnedAlchemyIngredients[MAXPLAYERS];
 DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
-std::unordered_set<int> clientLearnedScrollLabels[MAXPLAYERS];
+DynamicSetI32 clientLearnedScrollLabels[MAXPLAYERS];
 bool achievementStatusThankTheTank[MAXPLAYERS] = { false };
 DynamicArrayU32 achievementStrobeVec[MAXPLAYERS] = {};
 bool achievementStatusStrobe[MAXPLAYERS] = { false };
@@ -4007,7 +4007,7 @@ void AchievementObserver::checkMapScriptsOnVariableSet()
 }
 
 std::map<ItemType, Uint32> dapperItems;
-std::set<ItemType> AchievementObserver::PlayerAchievements::startingClassItems =
+DynamicSetI32 AchievementObserver::PlayerAchievements::startingClassItems =
 {
 	LEATHER_HELM,
 	HAT_PHRYGIAN,
@@ -5215,7 +5215,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 			for ( int64_t _ri = 0; _ri < dynarray_size<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[c]); ++_ri ) {
 				dynarray_push<SaveGameInfo::Player::recipe_t>(player.known_recipes, *dynarray_at<SaveGameInfo::Player::recipe_t>(clientLearnedAlchemyRecipes[c], _ri));
 			}
-			for ( auto& entry : clientLearnedScrollLabels[c] ) {
+			for ( auto entry : clientLearnedScrollLabels[c] ) {
 				player.known_scrolls.push_back(entry);
 			}
 

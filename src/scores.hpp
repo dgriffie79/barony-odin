@@ -415,12 +415,12 @@ extern Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS];
 extern DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS];  // vector<pair<Uint32,Uint32>>
 extern bool achievementStatusRhythmOfTheKnight[MAXPLAYERS];
 extern bool achievementRhythmOfTheKnight[MAXPLAYERS];
-extern std::map<Uint32, Uint32> achievementThankTheTankPair[MAXPLAYERS];
+extern DynamicMapI32T<Uint32> achievementThankTheTankPair[MAXPLAYERS];
 extern bool achievementStatusBaitAndSwitch[MAXPLAYERS];
 extern Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS];
-extern std::unordered_set<int> clientLearnedAlchemyIngredients[MAXPLAYERS];
+extern DynamicSetI32 clientLearnedAlchemyIngredients[MAXPLAYERS];
 extern DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
-extern std::unordered_set<int> clientLearnedScrollLabels[MAXPLAYERS];
+extern DynamicSetI32 clientLearnedScrollLabels[MAXPLAYERS];
 extern bool achievementStatusThankTheTank[MAXPLAYERS];
 extern DynamicArrayU32 achievementStrobeVec[MAXPLAYERS];
 extern bool achievementStatusStrobe[MAXPLAYERS];
@@ -988,19 +988,19 @@ public:
 		int parryTank = 0;
 
 		std::pair<int, int> realBoy;
-		std::unordered_map<Uint32, int> caughtInAMoshTargets;
+		DynamicMapI32T<int> caughtInAMoshTargets;
 		DynamicArrayU32 strungOutTicks;
-		std::unordered_set<Uint32> ironicPunishmentTargets;
+		DynamicSetI32 ironicPunishmentTargets;
 		std::pair<real_t, real_t> flutterShyCoordinates;
 		std::pair<int, Uint32> gastricBypassSpell;
-		std::unordered_set<Uint32> rat5000secondRule;
-		std::unordered_set<Uint32> phantomMaskFirstStrikes;
-		std::unordered_set<Uint32> bountyTargets;
+		DynamicSetI32 rat5000secondRule;
+		DynamicSetI32 phantomMaskFirstStrikes;
+		DynamicSetI32 bountyTargets;
 		DynamicArrayU32 manifestDestinyChests;
 		Uint32 manifestDestinyChestSequence = 0;
 		bool updatedBountyTargets = false;
 		bool wearingBountyHat = false;
-		static std::set<ItemType> startingClassItems;
+		static DynamicSetI32 startingClassItems;
 		
 		PlayerAchievements()
 		{
