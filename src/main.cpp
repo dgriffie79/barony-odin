@@ -326,7 +326,7 @@ UDPpacket* net_packet = nullptr;
 TCPsocket* net_tcpclients = nullptr;
 SDLNet_SocketSet tcpset = nullptr;
 list_t safePacketsSent;
-std::unordered_map<int, Uint32> safePacketsReceivedMap[MAXPLAYERS];
+DynamicMapI32T<Uint32> safePacketsReceivedMap[MAXPLAYERS];
 bool receivedclientnum = false;
 char const * window_title = nullptr;
 SDL_Window* screen = nullptr;

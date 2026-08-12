@@ -6749,7 +6749,7 @@ void clientHandlePacket()
 				}
 				else
 				{
-					DebugStats.entityUpdatePackets.insert(std::make_pair(sprite, 1));
+					DebugStats.entityUpdatePackets.put(sprite, 1);
 				}
 			}
 		}
@@ -9427,15 +9427,19 @@ bool handleSafePacket()
 			if ( ticks > (60 * TICKS_PER_SECOND) && (ticks % (TICKS_PER_SECOND / 2) == 0) )
 			{
 				// clear old packets > 60 secs
-				for ( auto it = safePacketsReceivedMap[fromClientnum].begin(); it != safePacketsReceivedMap[fromClientnum].end(); )
 				{
-					if ( it->second < (ticks - 60 * TICKS_PER_SECOND) )
+					// collect stale keys, then erase (snapshot iterate)
+					std::vector<int> staleKeys;
+					for ( auto it = safePacketsReceivedMap[fromClientnum].begin(); it != safePacketsReceivedMap[fromClientnum].end(); ++it )
 					{
-						it = safePacketsReceivedMap[fromClientnum].erase(it);
+						if ( it->second < (ticks - 60 * TICKS_PER_SECOND) )
+						{
+							staleKeys.push_back(it->first);
+						}
 					}
-					else
+					for ( int sk : staleKeys )
 					{
-						++it;
+						safePacketsReceivedMap[fromClientnum].erase(sk);
 					}
 				}
 			}
@@ -9452,7 +9456,7 @@ bool handleSafePacket()
 				std::chrono::duration_cast<std::chrono::duration<double>>(tmp2 - tmp1);
 			double timer = time_span.count() * 1000;*/
 
-			safePacketsReceivedMap[fromClientnum].insert(std::make_pair(receivedPacketNum, ticks));
+			safePacketsReceivedMap[fromClientnum].put(receivedPacketNum, ticks);
 
 			// send an ack
 			j = net_packet->data[4];

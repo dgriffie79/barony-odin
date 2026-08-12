@@ -48,7 +48,7 @@ typedef struct packetsend_t
 	int hostnum;
 } packetsend_t;
 extern list_t safePacketsSent;
-extern std::unordered_map<int, Uint32> safePacketsReceivedMap[MAXPLAYERS];
+extern DynamicMapI32T<Uint32> safePacketsReceivedMap[MAXPLAYERS];
 extern bool receivedclientnum;
 
 extern Sint32 numplayers;
@@ -514,7 +514,7 @@ public:
 	bool handlePacketStartLoop = false;
 
 	std::unordered_map<unsigned long, std::pair<std::string, int>> networkPackets;
-	std::unordered_map<int, int> entityUpdatePackets;
+	DynamicMapI32T<int> entityUpdatePackets;
 
 	bool displayStats = false;
 	char debugOutput[1024];
