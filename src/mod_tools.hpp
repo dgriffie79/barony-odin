@@ -503,7 +503,7 @@ public:
 
 		void setItems(Stat* myStats)
 		{
-			std::unordered_set<int> equippedSlots;
+			DynamicSetI32 equippedSlots;
 			for ( int64_t _ei = 0; _ei < dynarray_pair_size<std::pair<ItemEntry, int>>(equipped_items); ++_ei )
 			{
 				auto& it = *dynarray_pair_at<std::pair<ItemEntry, int>>(equipped_items, _ei);
