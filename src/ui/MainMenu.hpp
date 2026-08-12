@@ -147,8 +147,8 @@ namespace MainMenu {
 		{
 			DynamicString textLeft;
 			DynamicString textRight;
-			std::set<int> traitLines;
-			std::set<int> proLines;
+			DynamicSetI32 traitLines;
+			DynamicSetI32 proLines;
 			DynamicArrayS32 linePaddings;
 			DynamicString title;
 			DynamicString traitsBasedOnPlayerRace;

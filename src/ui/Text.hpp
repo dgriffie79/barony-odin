@@ -80,7 +80,7 @@ public:
 	void addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
 
 	//! gets map for highlighted words
-	const std::map<int, Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
+	const DynamicMapI32T<Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
 
 	//! reset the highlighted word map
 	void clearWordsToHighlight() { wordsToHighlight.clear(); }
@@ -94,7 +94,7 @@ private:
 	int num_text_lines = 0;
 	
 	// words with index matching the key (first word == 0) will be drawn with the value color
-	std::map<int, Uint32> wordsToHighlight; 
+	DynamicMapI32T<Uint32> wordsToHighlight; 
 
 	//! get the number of text lines occupied by the text
 	//! @return number of lines of text

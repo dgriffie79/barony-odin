@@ -115,7 +115,7 @@ char* Field::tokenize(char* str, const char* const delimiters) {
 	}
 }
 
-static bool bWordHighlightMapAreSame(const std::map<int, Uint32>& textMap, const std::map<int, Uint32>& fieldMap, int currentLine)
+static bool bWordHighlightMapAreSame(const DynamicMapI32T<Uint32>& textMap, const DynamicMapI32T<Uint32>& fieldMap, int currentLine)
 {
 	std::vector<int> fieldKeys;
 	for ( auto& keyValue : fieldMap )

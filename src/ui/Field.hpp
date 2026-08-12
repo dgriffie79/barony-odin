@@ -97,7 +97,7 @@ public:
 	void addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
 
 	//! gets map for highlighted words
-	const std::map<int, Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
+	const DynamicMapI32T<Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
 
 	//! reset the highlighted word map
 	void clearWordsToHighlight() { wordsToHighlight.clear(); }
@@ -185,7 +185,7 @@ private:
 	bool activated = false;								//!< whether field is active for text editing
 	void (*callback)(Field&) = nullptr;					//!< the callback to use after text is entered
 	bool ontop = false;									//!< whether the field is drawn ontop of others
-	std::map<int, Uint32> wordsToHighlight;				//!< word indexes in the field matching the keys in the map will be colored with the mapped value
+	DynamicMapI32T<Uint32> wordsToHighlight;				//!< word indexes in the field matching the keys in the map will be colored with the mapped value
 	std::map<int, Uint32> linesToColor;                 //!< lines that have a particular color
 	int paddingPerLine = 0;								//!< +/- pixel padding for multiple lines
 	std::map<int, int> individualLinePadding;			//!< lines that have a particular padding
