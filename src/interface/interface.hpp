@@ -370,8 +370,8 @@ public:
 	list_t tinkeringTotalItems;
 	node_t* tinkeringTotalLastCraftableNode;
 	TinkeringFilter tinkeringFilter;
-	std::unordered_set<Uint32> tinkeringMetalScrap;
-	std::unordered_set<Uint32> tinkeringMagicScrap;
+	DynamicSetI32 tinkeringMetalScrap;
+	DynamicSetI32 tinkeringMagicScrap;
 	Item* tinkeringAutoSalvageKitItem;
 	Item* tinkeringAutoSalvageThisItem;
 	Uint32 tinkeringSfxLastTicks = 0;
