@@ -2417,8 +2417,8 @@ public:
 		DynamicMapI32T<real_t> sustainedSpellIDCounter;
 		bool updateSustainedSpellEvent(int spellID, real_t value, real_t scaleValue, Entity* hitEntity);
 		bool rollRngProc(RngRollTypes rngType, int chance, int spellID = -1);
-		std::map<Uint32, int> enemyRaisedBlockingAgainst;
-		std::map<Uint32, int> enemyRaisedStealthAgainst;
+		DynamicMapI32T<int> enemyRaisedBlockingAgainst;
+		DynamicMapI32T<int> enemyRaisedStealthAgainst;
 		bool allowedRaiseBlockingAgainstEntity(Entity& attacker);
 		bool allowedRaiseStealthAgainstEntity(Entity& attacker);
 		int getWealthTier();
