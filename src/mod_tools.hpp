@@ -3003,7 +3003,7 @@ public:
 			Sint32 sprite;
 			bool visible = true;
 		};
-		std::map<std::string, std::vector<StatueLimb_t>> limbs;
+		DynamicMapStrT<DynamicArrayT<StatueLimb_t>> limbs;
 		Statue_t() {
 			id = statueId; 
 			++statueId;
@@ -3013,6 +3013,11 @@ public:
 
 	const DynamicArrayStr directionKeys{ "east", "south", "west", "north" };
 	std::map<Uint32, Statue_t> allStatues;
+};  // StatueManager_t
+
+// MapValueKindOf for StatueLimb_t POD arrays (kind 20 = MK_StatueLimbArray)
+template <> struct MapValueKindOf<DynamicArrayT<StatueManager_t::Statue_t::StatueLimb_t>> {
+    static constexpr int value = MK_StatueLimbArray;
 };
 extern StatueManager_t StatueManager;
 
