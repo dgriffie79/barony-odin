@@ -14762,8 +14762,8 @@ std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t:
 DynamicMapI32 Compendium_t::Events_t::eventWorldIDLookup;
 DynamicMapI32 Compendium_t::Events_t::eventCodexIDLookup;
 std::map<Compendium_t::EventTags, std::map<int, int>> Compendium_t::Events_t::eventClassIds;
-std::map<int, std::vector<Compendium_t::EventTags>> Compendium_t::Events_t::itemDisplayedEventsList;
-std::map<int, std::vector<DynamicString>> Compendium_t::Events_t::itemDisplayedCustomEventsList;
+DynamicMapI32T<DynamicArrayS32> Compendium_t::Events_t::itemDisplayedEventsList;
+DynamicMapI32T<DynamicArrayStr> Compendium_t::Events_t::itemDisplayedCustomEventsList;
 DynamicMapStr Compendium_t::Events_t::customEventsValues;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::playerEvents;
 std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::serverPlayerEvents[MAXPLAYERS];

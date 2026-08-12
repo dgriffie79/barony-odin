@@ -403,7 +403,7 @@ public:
 		{
 			if ( followerVariants.size() > 0 )
 			{
-				std::vector<unsigned int> variantChances(followerVariants.size(), 0);
+				DynamicArrayU32 variantChances(followerVariants.size(), 0);
 				int index = 0;
 				for ( auto& pair : followerVariants )
 				{
@@ -1162,7 +1162,7 @@ public:
 					}
 					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
 					{
-						std::vector<unsigned int> itemChances((size_t)dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose), 0);
+						DynamicArrayU32 itemChances((size_t)dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose), 0);
 						int index = 0;
 						for ( int64_t _pi = 0; _pi < dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose); ++_pi )
 						{
@@ -1202,7 +1202,7 @@ public:
 					}
 					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
 					{
-						std::vector<unsigned int> itemChances((size_t)dynarray_size<ItemEntry>(itemsToChoose), 0);
+						DynamicArrayU32 itemChances((size_t)dynarray_size<ItemEntry>(itemsToChoose), 0);
 						int index = 0;
 						for ( int64_t _ii2 = 0; _ii2 < dynarray_size<ItemEntry>(itemsToChoose); ++_ii2 )
 						{
@@ -1300,7 +1300,7 @@ public:
 					}
 					if ( !statEntry->shopkeeperStoreTypes.empty() )
 					{
-						std::vector<unsigned int> storeChances(statEntry->shopkeeperStoreTypes.size(), 0);
+						DynamicArrayU32 storeChances(statEntry->shopkeeperStoreTypes.size(), 0);
 						int index = 0;
 						for ( auto& chance : storeChances )
 						{
@@ -1551,7 +1551,7 @@ public:
 	}
 	int rollMonsterFromCurve(std::string currentMap)
 	{
-		std::vector<unsigned int> monsterCurveChances(NUMMONSTERS, 0);
+		DynamicArrayU32 monsterCurveChances(NUMMONSTERS, 0);
 
 		for ( LevelCurve curve : allLevelCurves )
 		{
@@ -1633,7 +1633,7 @@ public:
 				{
 					if ( monster.monsterType == monsterType && monster.variants.size() > 0 )
 					{
-						std::vector<unsigned int> variantChances(monster.variants.size(), 0);
+						DynamicArrayU32 variantChances(monster.variants.size(), 0);
 						int index = 0;
 						for ( auto& pair : monster.variants )
 						{
@@ -3365,7 +3365,7 @@ struct EditorEntityData_t
 		int entityLangEntry = 4335;
 		int hitMessageLangEntry = 2509;
 		int breakMessageLangEntry = 2510;
-		std::map<std::string, std::vector<int>> hideMonsters;
+		DynamicMapStrT<DynamicArrayS32> hideMonsters;
 		DynamicArrayS32 spellTriggers;
 		std::set<int> pathableMonsters;
 		int colliderJumpLangEntry = 6234;
@@ -4302,8 +4302,8 @@ struct Compendium_t
 		static DynamicMapI32Str monsterIDToString;
 		static DynamicMapI32Str codexIDToString;
 		static DynamicMapI32Str worldIDToString;
-		static std::map<int, std::vector<EventTags>> itemDisplayedEventsList;
-		static std::map<int, std::vector<DynamicString>> itemDisplayedCustomEventsList;
+		static DynamicMapI32T<DynamicArrayS32> itemDisplayedEventsList;
+		static DynamicMapI32T<DynamicArrayStr> itemDisplayedCustomEventsList;
 		static DynamicMapStr customEventsValues;
 		static std::map<EventTags, std::set<int>> eventItemLookup;
 		static std::map<EventTags, std::set<int>> eventMonsterLookup;

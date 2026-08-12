@@ -26434,10 +26434,10 @@ failed:
 	static std::vector<std::pair<Sint32, std::string>> getRecordEventValue(const char* entryName, Compendium_t::EventTags tag)
 	{
 		std::vector<std::pair<Sint32, std::string>> results;
-		auto findEvent = Compendium_t::Events_t::events.find(tag);
+		auto findEvent = Compendium_t::Events_t::events.find((Compendium_t::EventTags)tag);
 		if ( findEvent != Compendium_t::Events_t::events.end() )
 		{
-			auto findTag = Compendium_t::Events_t::playerEvents.find(tag);
+			auto findTag = Compendium_t::Events_t::playerEvents.find((Compendium_t::EventTags)tag);
 			if ( findTag != Compendium_t::Events_t::playerEvents.end() )
 			{
 				bool firstValue = true;
@@ -26511,47 +26511,47 @@ failed:
 						{
 							if ( !strcmp(entryName, "str") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_STR, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_STR, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 							else if ( !strcmp(entryName, "dex") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_DEX, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_DEX, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 							else if ( !strcmp(entryName, "con") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CON, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CON, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 							else if ( !strcmp(entryName, "int") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_INT, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_INT, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 							else if ( !strcmp(entryName, "per") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_PER, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_PER, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 							else if ( !strcmp(entryName, "chr") )
 							{
-								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CHR, Compendium_t::Events_t::eventLangEntries[tag]);
+								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CHR, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 						}
 						else if ( findEvent->second.attributes.find("class") != findEvent->second.attributes.end() )
 						{
-							output = Compendium_t::Events_t::formatEventRecordText(value, "class", entryNum % Compendium_t::Events_t::kEventClassesMax, Compendium_t::Events_t::eventLangEntries[tag]);
+							output = Compendium_t::Events_t::formatEventRecordText(value, "class", entryNum % Compendium_t::Events_t::kEventClassesMax, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 						}
 						else if ( findEvent->second.attributes.find("race") != findEvent->second.attributes.end() )
 						{
-							output = Compendium_t::Events_t::formatEventRecordText(value, "race", entryNum, Compendium_t::Events_t::eventLangEntries[tag]);
+							output = Compendium_t::Events_t::formatEventRecordText(value, "race", entryNum, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 						}
 						else
 						{
-							output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+							output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 						}
 						results.push_back(std::make_pair(value, output));
 					}
 				}
 				if ( useSum )
 				{
-					DynamicString output = Compendium_t::Events_t::formatEventRecordText(sum, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+					DynamicString output = Compendium_t::Events_t::formatEventRecordText(sum, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 					results.push_back(std::make_pair(sum, output));
 				}
 				else
@@ -26605,7 +26605,7 @@ failed:
 			rec4Val->setDisabled(true);
 
 			bool foundEvents = false;
-			std::vector<Compendium_t::EventTags> displayedEvents;
+			DynamicArrayS32 displayedEvents;
 			if ( entryType >= Compendium_t::Events_t::kEventMonsterOffset
 				&& entryType < Compendium_t::Events_t::kEventMonsterOffset + 1000 )
 			{
@@ -26957,13 +26957,13 @@ failed:
 						DynamicString itemname = "default";
 						if ( entryType >= 0 && entryType < NUMITEMS )
 						{
-							if ( Compendium_t::Events_t::eventLangEntries[tag].find(itemNameStrings[entryType + 2])
-								!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+							if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(itemNameStrings[entryType + 2])
+								!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 							{
 								itemname = itemNameStrings[entryType + 2];
 							}
-							else if ( Compendium_t::Events_t::eventLangEntries[tag].find(compendium_contents_current[compendium_current])
-								!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+							else if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(compendium_contents_current[compendium_current])
+								!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 							{
 								itemname = compendium_contents_current[compendium_current];
 							}
@@ -26971,8 +26971,8 @@ failed:
 						else if ( entryType >= Compendium_t::Events_t::kEventMonsterOffset 
 							&& entryType < Compendium_t::Events_t::kEventMonsterOffset + 1000 )
 						{
-							if ( Compendium_t::Events_t::eventLangEntries[tag].find(entryName)
-								!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+							if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(entryName)
+								!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 							{
 								itemname = entryName;
 							}
@@ -26980,8 +26980,8 @@ failed:
 						else if ( entryType >= Compendium_t::Events_t::kEventWorldOffset 
 							&& entryType < Compendium_t::Events_t::kEventWorldOffset + 1000 )
 						{
-							if ( Compendium_t::Events_t::eventLangEntries[tag].find(entryName)
-								!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+							if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(entryName)
+								!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 							{
 								itemname = entryName;
 							}
@@ -26989,8 +26989,8 @@ failed:
 						else if ( entryType >= Compendium_t::Events_t::kEventCodexOffset
 							&& entryType <= Compendium_t::Events_t::kEventCodexOffsetMax )
 						{
-							if ( Compendium_t::Events_t::eventLangEntries[tag].find(entryName)
-								!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+							if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(entryName)
+								!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 							{
 								itemname = entryName;
 							}
@@ -27001,20 +27001,20 @@ failed:
 							int spellID = entryType - Compendium_t::Events_t::kEventSpellOffset;
 							if ( spellID >= 0 && spellID < NUM_SPELLS )
 							{
-								if ( Compendium_t::Events_t::eventLangEntries[tag].find(ItemTooltips.spellItems[spellID].internalName)
-									!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+								if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find(ItemTooltips.spellItems[spellID].internalName)
+									!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 								{
 									itemname = ItemTooltips.spellItems[spellID].internalName;
 								}
-								else if ( Compendium_t::Events_t::eventLangEntries[tag].find("spells")
-									!= Compendium_t::Events_t::eventLangEntries[tag].end() )
+								else if ( Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].find("spells")
+									!= Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag].end() )
 								{
 									itemname = "spells";
 								}
 							}
 						}
 
-						DynamicString str = Compendium_t::Events_t::eventLangEntries[tag][itemname];
+						DynamicString str = Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag][itemname];
 						if ( tag == Compendium_t::EventTags::CPDM_CUSTOM_TAG )
 						{
 							auto find = Compendium_t::Events_t::itemDisplayedCustomEventsList.find(entryType);
@@ -27221,7 +27221,7 @@ failed:
 							std::vector<std::pair<Sint32, std::string>> results;
 							int value = 0;
 							{
-								auto findTag = Compendium_t::Events_t::playerEvents.find(tag);
+								auto findTag = Compendium_t::Events_t::playerEvents.find((Compendium_t::EventTags)tag);
 								if ( findTag != Compendium_t::Events_t::playerEvents.end() )
 								{
 									auto find = findTag->second.find(entryType);
@@ -27247,7 +27247,7 @@ failed:
 							}
 							if ( value > 0 )
 							{
-								DynamicString output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+								DynamicString output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 								// get monster plural
 								{
 									auto find = Compendium_t::Events_t::monsterIDToString.find(entryType);
@@ -27280,10 +27280,10 @@ failed:
 						}
 						else if ( entryType >= Compendium_t::Events_t::kEventCodexOffset
 							&& entryType <= Compendium_t::Events_t::kEventCodexOffsetMax
-							&& Compendium_t::Events_t::eventClassIds.find(tag) != Compendium_t::Events_t::eventClassIds.end() )
+							&& Compendium_t::Events_t::eventClassIds.find((Compendium_t::EventTags)tag) != Compendium_t::Events_t::eventClassIds.end() )
 						{
 							val->setText("-");
-							std::vector<std::pair<Sint32, std::string>> results = getRecordEventValue(entryName, tag);
+							std::vector<std::pair<Sint32, std::string>> results = getRecordEventValue(entryName, (Compendium_t::EventTags)tag);
 							if ( tag == Compendium_t::CPDM_CLASS_GAMES_WON )
 							{
 								{
@@ -27343,7 +27343,7 @@ failed:
 						}
 						else
 						{
-							auto findTag = Compendium_t::Events_t::playerEvents.find(tag);
+							auto findTag = Compendium_t::Events_t::playerEvents.find((Compendium_t::EventTags)tag);
 							if ( findTag != Compendium_t::Events_t::playerEvents.end() )
 							{
 								auto find = findTag->second.find(entryType);
@@ -27418,7 +27418,7 @@ failed:
 									}
 								}
 								DynamicString output = "";
-								auto findEvent = Compendium_t::Events_t::events.find(tag);
+								auto findEvent = Compendium_t::Events_t::events.find((Compendium_t::EventTags)tag);
 								if ( find == findTag->second.end() )
 								{
 									// no matching record
@@ -27429,27 +27429,27 @@ failed:
 								{
 									if ( !strcmp(entryName, "str") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_STR, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_STR, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else if ( !strcmp(entryName, "dex") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_DEX, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_DEX, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else if ( !strcmp(entryName, "con") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CON, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CON, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else if ( !strcmp(entryName, "int") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_INT, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_INT, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else if ( !strcmp(entryName, "per") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_PER, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_PER, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else if ( !strcmp(entryName, "chr") )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CHR, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CHR, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									val->setText(output.c_str());
 								}
@@ -27457,7 +27457,7 @@ failed:
 								{
 									if ( tag == Compendium_t::CPDM_RUNS_COLLECTED )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 										auto findTag = Compendium_t::Events_t::playerEvents.find(Compendium_t::CPDM_MINEHEAD_ENTER);
 										if ( findTag != Compendium_t::Events_t::playerEvents.end() )
 										{
@@ -27477,11 +27477,11 @@ failed:
 									}
 									else if ( entryType >= 0 && entryType < NUMITEMS )
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, compendium_contents_current[compendium_current].c_str(), entryType, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, compendium_contents_current[compendium_current].c_str(), entryType, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									else
 									{
-										output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[tag]);
+										output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 									}
 									val->setText(output.c_str());
 								}

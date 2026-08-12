@@ -230,6 +230,10 @@ public:
     DynamicArray raw{};
 
     DynamicArrayT() { barony_dynamic_array_elem_init(&raw); }
+    DynamicArrayT(int64_t count, const T& value) {
+        barony_dynamic_array_elem_init(&raw);
+        for (int64_t i = 0; i < count; ++i) push_back(value);
+    }
     DynamicArrayT(std::initializer_list<T> init) {
         barony_dynamic_array_elem_init(&raw);
         for (const T& v : init) push_back(v);
