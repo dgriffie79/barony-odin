@@ -36497,7 +36497,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		{
 			DynamicString outputList = "";
 			Monster playerRace = stats[playernum]->type;
-			std::map<Monster, std::vector<Monster>>* allyTable = &Player::SkillSheet_t::skillSheetData.leadershipAllyTableBase;
+			DynamicMapI32T<DynamicArrayS32>* allyTable = &Player::SkillSheet_t::skillSheetData.leadershipAllyTableBase;
 			enum TableOrder : int 
 			{
 				LEADER_BASE_TABLE,
@@ -36528,7 +36528,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 							{
 								if ( ally < 0 || ally >= NUMMONSTERS ) { continue; }
 								DynamicString monsterName = "";
-								monsterName = getMonsterLocalizedName(ally);
+								monsterName = getMonsterLocalizedName((Monster)ally);
 								capitalizeString(monsterName);
 								if ( outputList != "" )
 								{

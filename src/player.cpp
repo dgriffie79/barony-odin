@@ -3360,7 +3360,7 @@ bool monsterIsFriendlyForTooltip(const int player, Entity& entity)
 	}
 	if ( targetEntityType != NOTHING )
 	{
-		std::map<Monster, std::vector<Monster>>* allyTable = &Player::SkillSheet_t::skillSheetData.leadershipAllyTableBase;
+		DynamicMapI32T<DynamicArrayS32>* allyTable = &Player::SkillSheet_t::skillSheetData.leadershipAllyTableBase;
 		int loops = 1;
 		if ( skillCapstoneUnlocked(player, PRO_LEADERSHIP) )
 		{

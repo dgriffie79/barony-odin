@@ -1460,8 +1460,8 @@ public:
 			DynamicString highlightSkillImg_Right = "";
 			DynamicString selectSkillImg_Right = "";
 			DynamicArrayStr potionNamesToFilter;
-			std::map<Monster, std::vector<Monster>> leadershipAllyTableBase;
-			std::map<Monster, std::vector<Monster>> leadershipAllyTableLegendary;
+			DynamicMapI32T<DynamicArrayS32> leadershipAllyTableBase;
+			DynamicMapI32T<DynamicArrayS32> leadershipAllyTableLegendary;
 			std::map<Monster, std::vector<std::pair<Monster, std::string>>> leadershipAllyTableSpecialRecruitment;
 		} skillSheetData;
 
