@@ -756,7 +756,7 @@ extern spellElement_t spellElement_slimeFire;
 extern spellElement_t spellElement_slimeTar;
 extern spellElement_t spellElement_slimeMetal;
 extern spellElement_t spellElement_slime_spray;
-extern std::map<int, spellElement_t> spellElementMap;
+extern DynamicMapI32T<spellElement_t> spellElementMap;
 
 enum SpellElementIDs_t
 {

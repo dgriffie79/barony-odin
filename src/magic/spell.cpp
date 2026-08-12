@@ -535,7 +535,7 @@ spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, Dyn
 			if ( find != spellElementMap.end() )
 			{
 				node_t* node = list_AddNodeLast(list);
-				node->element = copySpellElement(&find->second);
+				node->element = copySpellElement(const_cast<spellElement_t*>(&find->second));
 				node->size = sizeof(spellElement_t);
 				node->deconstructor = &spellElementDeconstructor;
 				spellElement_t* element = (spellElement_t*)node->element;

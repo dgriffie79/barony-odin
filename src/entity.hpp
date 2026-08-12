@@ -1264,7 +1264,7 @@ public:
 	void addToCreatureList(list_t* list);
 	void addToWorldUIList(list_t *list);
 	DynamicArray bodyparts;  // vector<Entity*> (non-owning pointers)
-	std::set<Uint32> collisionIgnoreTargets;
+	DynamicSetI32 collisionIgnoreTargets;
 
 	bool collisionProjectileMiss(Entity* parent, Entity* projectile);
 
