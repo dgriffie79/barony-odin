@@ -81,7 +81,7 @@ spellElement_t spellElement_slimeFire;
 spellElement_t spellElement_slimeTar;
 spellElement_t spellElement_slimeMetal;
 spellElement_t spellElement_slime_spray;
-std::map<int, spellElement_t> spellElementMap;
+DynamicMapI32T<spellElement_t> spellElementMap;
 
 spell_t spell_forcebolt;
 spell_t spell_magicmissile;
