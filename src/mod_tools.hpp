@@ -2828,10 +2828,10 @@ private:
 		Sint32 magicstaffId = -1;
 		Sint32 fociId = -1;
 		DynamicArrayStr spellTagsStr;
-		std::set<SpellTagTypes> spellTags;
+		DynamicSetI32 spellTags;
 		DynamicArrayStr spellFormatTags;
 		DynamicArrayS32 spellbookItemIconPaddingLines;
-		std::set<spell_t::SpellOnCastEventTypes> spellLevelTags;
+		DynamicSetI32 spellLevelTags;
 
 		bool hasExpandedJSON = false;
 		int damage = 0;
@@ -3373,7 +3373,7 @@ struct EditorEntityData_t
 		int breakMessageLangEntry = 2510;
 		DynamicMapStrT<DynamicArrayS32> hideMonsters;
 		DynamicArrayS32 spellTriggers;
-		std::set<int> pathableMonsters;
+		DynamicSetI32 pathableMonsters;
 		int colliderJumpLangEntry = 6234;
 		DynamicMapI32 overrideProperties;
 		bool hasOverride(std::string key)
