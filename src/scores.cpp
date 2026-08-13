@@ -3846,87 +3846,80 @@ bool AchievementObserver::addEntityAchievementTimer(Entity* entity, int achievem
 		return false;
 	}
 
-	auto it = entityAchievementsToProcess.find(uid);
-	if ( it != entityAchievementsToProcess.end() )
+	if ( entityAchievementsToProcess.contains(uid) )
 	{
-		auto inner_it = (*it).second.find(achievement);
-		if ( inner_it != (*it).second.end() )
+		auto& inner = entityAchievementsToProcess[uid];
+		if ( inner.contains(achievement) )
 		{
 			//achievement exists, need to update the ticks value.
 			if ( resetTimerIfActive )
 			{
-				entityAchievementsToProcess[uid][achievement].first = ticks;
+				inner[achievement].first = ticks;
 			}
-			entityAchievementsToProcess[uid][achievement].second += optionalIncrement;
+			inner[achievement].second += optionalIncrement;
 			return false;
 		}
 		else
 		{
 			//uid exists, but achievement is not in map. make entry.
-			entityAchievementsToProcess[uid].insert(std::make_pair(achievement, std::make_pair(ticks, optionalIncrement))); // set the inner map properties.
+			inner.put(achievement, IntPair_t{ ticks, optionalIncrement });
 			return true;
 		}
 	}
 	else
 	{
 		// uid does not exist in map, make new entry.
-		entityAchievementsToProcess.insert(std::make_pair(uid, std::unordered_map<int, std::pair<int, int>>())); // add a map object at the first key.
-		entityAchievementsToProcess[uid].insert(std::make_pair(achievement, std::make_pair(ticks, optionalIncrement))); // set the inner map properties.
+		entityAchievementsToProcess[uid].put(achievement, IntPair_t{ ticks, optionalIncrement });
 		return true;
 	}
 }
 
 void AchievementObserver::printActiveAchievementTimers()
 {
-	for ( auto it = entityAchievementsToProcess.begin(); it != entityAchievementsToProcess.end(); ++it )
-	{
-		for ( auto inner_it = (*it).second.begin(); inner_it != (*it).second.end(); ++inner_it )
-		{
-			messagePlayer(0, MESSAGE_DEBUG, "Uid: %d, achievement: %d, ticks: %d, counter: %d", (*it).first, (*inner_it).first, (*inner_it).second.first, (*inner_it).second.second);
-		}
-	}
+	entityAchievementsToProcess.forEach([&](Uint32 uid, DynamicMapI32IntPair& inner) {
+		inner.forEach([&](int achievement, IntPair_t& p) {
+			messagePlayer(0, MESSAGE_DEBUG, "Uid: %d, achievement: %d, ticks: %d, counter: %d", uid, achievement, p.first, p.second);
+		});
+	});
 }
 
 void AchievementObserver::achievementTimersTickDown()
 {
-	for ( auto it = entityAchievementsToProcess.begin(); it != entityAchievementsToProcess.end(); /* don't iterate here*/ )
-	{
-		for ( auto inner_it = (*it).second.begin(); inner_it != (*it).second.end(); /* don't iterate here*/ )
-		{
+	// Collect entries to remove (cannot erase while forEach is iterating).
+	std::vector<Uint32> emptyUids;
+	entityAchievementsToProcess.forEach([&](Uint32 uid, DynamicMapI32IntPair& inner) {
+		std::vector<int> removeAchievements;
+		inner.forEach([&](int achievement, IntPair_t& p) {
 			bool removeEntry = false;
-			if ( (*inner_it).second.first > 0 )
+			if ( p.first > 0 )
 			{
-				--((*inner_it).second.first);
-				if ( (*inner_it).second.first == 0 )
+				--p.first;
+				if ( p.first == 0 )
 				{
-					// remove me.
 					removeEntry = true;
 				}
 			}
-			else if ( (*inner_it).second.first == 0 )
+			else if ( p.first == 0 )
 			{
-				// remove me.
 				removeEntry = true;
 			}
-
 			if ( removeEntry )
 			{
-				inner_it = (*it).second.erase(inner_it);
+				removeAchievements.push_back(achievement);
 			}
-			else
-			{
-				++inner_it;
-			}
-		}
-
-		if ( (*it).second.empty() )
+		});
+		for ( int achievement : removeAchievements )
 		{
-			it = entityAchievementsToProcess.erase(it);
+			inner.erase(achievement);
 		}
-		else
+		if ( inner.empty() )
 		{
-			++it;
+			emptyUids.push_back(uid);
 		}
+	});
+	for ( Uint32 uid : emptyUids )
+	{
+		entityAchievementsToProcess.erase(uid);
 	}
 
 	//printActiveAchievementTimers();
@@ -3939,22 +3932,21 @@ void AchievementObserver::awardAchievementIfActive(int player, Entity* entity, i
 		return;
 	}
 	Uint32 uid = entity->getUID();
-	auto it = entityAchievementsToProcess.find(uid);
-	if ( it != entityAchievementsToProcess.end() )
+	if ( entityAchievementsToProcess.contains(uid) )
 	{
-		auto inner_it = (*it).second.find(achievement);
-		if ( inner_it != (*it).second.end() && (*it).second[achievement].first != 0 )
+		auto& inner = entityAchievementsToProcess[uid];
+		if ( inner.contains(achievement) && inner[achievement].first != 0 )
 		{
 			if ( achievement == BARONY_ACH_BOMBTRACK )
 			{
-				if ( (*it).second[achievement].second >= 5 )
+				if ( inner[achievement].second >= 5 )
 				{
 					awardAchievement(player, achievement);
 				}
 			}
 			else if ( achievement == BARONY_ACH_FOOD_FIGHT )
 			{
-				if ( (*it).second[achievement].second >= 4 )
+				if ( inner[achievement].second >= 4 )
 				{
 					awardAchievement(player, achievement);
 				}

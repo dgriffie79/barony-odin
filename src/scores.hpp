@@ -834,7 +834,7 @@ public:
 	bool updateOnLevelChange();
 	void updateData();
 	int checkUidIsFromPlayer(Uint32 uid);
-	std::unordered_map<Uint32, std::unordered_map<int, std::pair<int,int>>> entityAchievementsToProcess; // uid of entity, achievement int, <ticks remaining, optional counter>
+	DynamicMapI32T<DynamicMapI32IntPair> entityAchievementsToProcess; // uid of entity, achievement int, <ticks remaining, optional counter>
 	
 	bool addEntityAchievementTimer(Entity* entity, int achievement, int ticks, bool resetTimerIfActive, int optionalIncrement);
 

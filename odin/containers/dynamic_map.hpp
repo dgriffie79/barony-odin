@@ -420,6 +420,13 @@ struct DynamicStringPair_t {
     DynamicString second;
 };
 
+// IntPair_t — 8B POD mirror of std::pair<int,int>. Value for
+// AchievementObserver::entityAchievementsToProcess inner map.
+struct IntPair_t {
+    int32_t first = 0;
+    int32_t second = 0;
+};
+
 // ChunkDither_t — same 8B layout, but its map value kind (MK_ChunkDither)
 // defaults `value` to 10 on insert (Chunk::Dither { value = MAX; }), matching
 // the std::unordered_map value-initialization for chunk dithering.
@@ -493,6 +500,8 @@ enum MapValueKind {
     MK_I32MapModelOffset = 58,   // nested map<int,map<int,ModelOffset_t>> (owning)
     MK_StrMapStr = 59,           // nested map<string,map<string,string>> (owning)
     MK_StrI32Map = 60,           // nested map<int,map<string,map<int,i32>>> (owning)
+    MK_IntPair = 61,             // pair<int,int> (8B POD)
+    MK_I32MapIntPair = 62,       // nested map<Uint32,map<int,pair<int,int>>> (owning)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -1049,6 +1058,8 @@ using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,str
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
 using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
 template <> struct MapValueKindOf<DynamicMapStrI32Map> { static constexpr int value = MK_StrI32Map; };
+using DynamicMapI32IntPair = DynamicMapI32T<IntPair_t>;            // map<int, pair<int,int>>
+template <> struct MapValueKindOf<DynamicMapI32IntPair> { static constexpr int value = MK_I32MapIntPair; };
 
 struct IconEntry_tMirror {
     DynamicString name;
