@@ -3382,7 +3382,7 @@ struct EditorEntityData_t
 		DynamicSetI32 pathableMonsters;
 		int colliderJumpLangEntry = 6234;
 		DynamicMapI32 overrideProperties;
-		bool hasOverride(std::string key)
+		bool hasOverride(std::string key) const
 		{
 			auto find = overrideProperties.find(key);
 			if ( find != overrideProperties.end() )
@@ -3394,7 +3394,7 @@ struct EditorEntityData_t
 				return false;
 			}
 		}
-		int getOverride(std::string key)
+		int getOverride(std::string key) const
 		{
 			auto find = overrideProperties.find(key);
 			if ( find != overrideProperties.end() )
@@ -3408,7 +3408,7 @@ struct EditorEntityData_t
 	static const int COLLIDER_COLLISION_FLAG_MINO = 2;
 	static const int COLLIDER_COLLISION_FLAG_NPC = 4;
 	static DynamicMapColliderDmg colliderDmgTypes;
-	static std::map<int, EntityColliderData_t> colliderData;
+	static DynamicMapI32T<EntityColliderData_t> colliderData;
 	static DynamicMapStrI32Map colliderRandomGenPool;
 	static DynamicMapI32 colliderNameIndexes;
 	static int getColliderIndexFromName(std::string name)
@@ -3423,6 +3423,7 @@ struct EditorEntityData_t
 	static void readFromFile();
 };
 extern EditorEntityData_t editorEntityData;
+template <> struct MapValueKindOf<EditorEntityData_t::EntityColliderData_t> { static constexpr int value = MK_EntityColliderData; };
 
 struct Mods
 {

@@ -10263,7 +10263,7 @@ void GameplayPreferences_t::serverProcessGameConfig()
 #endif // !EDITOR
 
 EditorEntityData_t editorEntityData;
-std::map<int, EditorEntityData_t::EntityColliderData_t> EditorEntityData_t::colliderData;
+DynamicMapI32T<EditorEntityData_t::EntityColliderData_t> EditorEntityData_t::colliderData;
 DynamicMapColliderDmg EditorEntityData_t::colliderDmgTypes;
 DynamicMapStrI32Map EditorEntityData_t::colliderRandomGenPool;
 DynamicMapI32 EditorEntityData_t::colliderNameIndexes;

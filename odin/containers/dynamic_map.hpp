@@ -484,6 +484,7 @@ enum MapValueKind {
     MK_U32Map = 49,              // nested map<Uint32,Uint32> (32B Raw_Map, owning)
     MK_U32MapEmitterHit = 50,    // nested map<Uint32,map<Uint32,ParticleEmitterHit_t>> (8B POD inner)
     MK_StringPair = 51,          // pair<DynamicString,DynamicString> (32B, owning: 2 strings)
+    MK_EntityColliderData = 52,  // EditorEntityData_t::EntityColliderData_t (owning: strings+arrays+maps+sets)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
