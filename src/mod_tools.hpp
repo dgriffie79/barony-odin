@@ -3437,8 +3437,8 @@ struct Mods
 	static std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImagesToReload;
 	static std::vector<std::pair<std::string, std::string>> mountedFilepaths;
 	static std::vector<std::pair<std::string, std::string>> mountedFilepathsSaved; // saved from config file
-	static std::set<std::string> mods_loaded_local;
-	static std::set<std::string> mods_loaded_workshop;
+	static DynamicSetStr mods_loaded_local;
+	static DynamicSetStr mods_loaded_workshop;
 	static DynamicArrayStr localModFoldernames;
 	static int numCurrentModsLoaded;
 	static bool modelsListRequiresReloadUnmodded;
@@ -3622,7 +3622,7 @@ struct Compendium_t
 		typedef std::function<bool(std::pair<std::string, std::string>, std::pair<std::string, std::string>)> Comparator;
 		static std::set<std::pair<std::string, std::string>, Comparator> achievementNamesSorted;
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> achievementCategories;
-		static std::unordered_set<std::string> achievementUnlockedLookup;
+		static DynamicSetStr achievementUnlockedLookup;
 		static void onAchievementUnlock(const char* ach);
 		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
 		static DynamicMapStr contentsMap;
