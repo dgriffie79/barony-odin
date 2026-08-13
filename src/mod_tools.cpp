@@ -7182,12 +7182,11 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 		}
 		int version = d["version"].GetInt();
 		Uint32 statueId = d["statue_id"].GetUint();
-		auto findStatue = allStatues.find(statueId);
-		if ( findStatue != allStatues.end() )
+		if ( allStatues.contains(statueId) )
 		{
-			allStatues.erase(findStatue);
+			allStatues.erase(statueId);
 		}
-		allStatues.insert(std::make_pair(statueId, Statue_t()));
+		allStatues.put(statueId, Statue_t());
 		for ( rapidjson::Value::ConstMemberIterator limb_itr = d["limbs"].MemberBegin(); limb_itr != d["limbs"].MemberEnd(); ++limb_itr )
 		{
 			auto& statue = allStatues[statueId];

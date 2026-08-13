@@ -1447,6 +1447,76 @@ entry_copy :: proc(dst: rawptr, src: rawptr) {
 	dynamic_string_copy_elem(rawptr(&d.signVideoContent.bgPath), rawptr(&s.signVideoContent.bgPath))
 }
 
+// DropDown_t — owning mirror of Player::GUIDropdown_t::DropDown_t.
+DropDown_t :: struct {
+	title:         DynamicString,
+	internalName:  DynamicString,
+	alignRight:    bool,
+	module:        i32,
+	defaultOption: i32,
+	options:       Raw_Dynamic_Array, // of DropdownOption_t
+}
+
+drop_down_free :: proc(p: rawptr) {
+	v := (^DropDown_t)(p)
+	dynamic_string_free_elem(rawptr(&v.title))
+	dynamic_string_free_elem(rawptr(&v.internalName))
+	barony_dynamic_array_elem_destroy(&v.options, size_of(DropdownOption_t), Kind_Option)
+}
+
+drop_down_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^DropDown_t)(dst)
+	s := (^DropDown_t)(src)
+	d^ = DropDown_t{}
+	dynamic_string_copy_elem(rawptr(&d.title), rawptr(&s.title))
+	dynamic_string_copy_elem(rawptr(&d.internalName), rawptr(&s.internalName))
+	d.alignRight = s.alignRight
+	d.module = s.module
+	d.defaultOption = s.defaultOption
+	barony_dynamic_array_elem_copy(&d.options, &s.options, size_of(DropdownOption_t), Kind_Option)
+}
+
+// Statue_t — owning mirror of StatueManager_t::Statue_t. limbs is
+// map[string][dynamic]StatueLimb_t (StatueLimb_t is POD).
+Statue_t :: struct {
+	id:           u32,
+	limbs:        map[string]Raw_Dynamic_Array, // str -> [dynamic]StatueLimb_t
+	heightOffset: f64,
+}
+
+statue_free :: proc(p: rawptr) {
+	v := (^Statue_t)(p)
+	if v.limbs != nil {
+		for key in v.limbs {
+			_, vp, _, err := map_entry(&v.limbs, key)
+			if err == nil && vp != nil {
+				barony_dynamic_array_elem_destroy(vp, size_of(StatueLimb_t), Kind_POD)
+			}
+		}
+		delete(v.limbs)
+		v.limbs = nil
+	}
+}
+
+statue_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Statue_t)(dst)
+	s := (^Statue_t)(src)
+	d^ = Statue_t{}
+	d.id = s.id
+	d.heightOffset = s.heightOffset
+	if s.limbs != nil {
+		d.limbs = make(map[string]Raw_Dynamic_Array)
+		for key in s.limbs {
+			_, vp, _, err := map_entry(&s.limbs, key)
+			if err == nil && vp != nil {
+				new_val: Raw_Dynamic_Array
+				barony_dynamic_array_elem_copy(&new_val, vp, size_of(StatueLimb_t), Kind_POD)
+				d.limbs[key] = new_val
+			}
+		}
+	}
+}
+
 spell_item_free :: proc(p: rawptr) {
 	v := (^SpellItem_t)(p)
 	strings := [?]^DynamicString{
@@ -2010,6 +2080,7 @@ Dither_t :: struct {
 #assert(size_of(SpellItem_t) == 496)
 #assert(size_of(ItemTooltip_t) == 280)
 #assert(size_of(Entry_t) == 352)
+#assert(size_of(Statue_t) == 48)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -2399,6 +2470,8 @@ Value_Kind :: enum i32 {
 	MK_SpellItem             = 53,
 	MK_ItemTooltip           = 54,
 	MK_Entry                 = 55,
+	MK_DropDown              = 56,
+	MK_Statue                = 57,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2465,6 +2538,10 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = item_tooltip_free, copy = item_tooltip_copy }
 	case .MK_Entry:
 		return Value_Ops{ free = entry_free, copy = entry_copy }
+	case .MK_DropDown:
+		return Value_Ops{ free = drop_down_free, copy = drop_down_copy }
+	case .MK_Statue:
+		return Value_Ops{ free = statue_free, copy = statue_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2524,6 +2601,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_I32Map: str_map_put(m, key, value, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_put(m, key, value, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_put(m, key, value, Entry_t, ops)
+	case .MK_DropDown: str_map_put(m, key, value, DropDown_t, ops)
 	}
 }
 
@@ -2558,6 +2636,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_I32Map: return str_map_get(m, key, out, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_get(m, key, out, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_get(m, key, out, Entry_t, ops)
+	case .MK_DropDown: return str_map_get(m, key, out, DropDown_t, ops)
 	}
 	return false
 }
@@ -2592,6 +2671,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_I32Map: return str_map_len(m, map[[4]byte]i32)
 	case .MK_ItemTooltip: return str_map_len(m, ItemTooltip_t)
 	case .MK_Entry: return str_map_len(m, Entry_t)
+	case .MK_DropDown: return str_map_len(m, DropDown_t)
 	}
 	return 0
 }
@@ -2627,6 +2707,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_I32Map: str_map_clear(m, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_clear(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_clear(m, Entry_t, ops)
+	case .MK_DropDown: str_map_clear(m, DropDown_t, ops)
 	}
 }
 
@@ -2661,6 +2742,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_I32Map: str_map_destroy(m, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_destroy(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_destroy(m, Entry_t, ops)
+	case .MK_DropDown: str_map_destroy(m, DropDown_t, ops)
 	}
 }
 
@@ -2694,6 +2776,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_I32Map: return str_map_entry(m, key, map[[4]byte]i32)
 	case .MK_ItemTooltip: return str_map_entry(m, key, ItemTooltip_t)
 	case .MK_Entry: return str_map_entry(m, key, Entry_t)
+	case .MK_DropDown: return str_map_entry(m, key, DropDown_t)
 	}
 	return nil
 }
@@ -2729,6 +2812,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_I32Map: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Entry_t, ops)
+	case .MK_DropDown: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DropDown_t, ops)
 	}
 	return 0
 }
@@ -2764,6 +2848,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_I32Map: str_map_for_each(m, map[[4]byte]i32, f, userdata)
 	case .MK_ItemTooltip: str_map_for_each(m, ItemTooltip_t, f, userdata)
 	case .MK_Entry: str_map_for_each(m, Entry_t, f, userdata)
+	case .MK_DropDown: str_map_for_each(m, DropDown_t, f, userdata)
 	}
 }
 
@@ -2804,6 +2889,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_I32Map: return str_map_erase(m, key, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_erase(m, key, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_erase(m, key, Entry_t, ops)
+	case .MK_DropDown: return str_map_erase(m, key, DropDown_t, ops)
 	}
 	return false
 }
@@ -2852,6 +2938,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_U32MapEmitterHit: i32_map_put(m, key, value, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_put(m, key, value, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_put(m, key, value, SpellItem_t, ops)
+	case .MK_Statue: i32_map_put(m, key, value, Statue_t, ops)
 	case .MK_Lootbag: i32_map_put(m, key, value, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_put(m, key, value, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_put(m, key, value, GlyphData_t, ops)
@@ -2896,6 +2983,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_U32MapEmitterHit: return i32_map_get(m, key, out, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_get(m, key, out, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_get(m, key, out, SpellItem_t, ops)
+	case .MK_Statue: return i32_map_get(m, key, out, Statue_t, ops)
 	case .MK_Lootbag: return i32_map_get(m, key, out, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_get(m, key, out, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_get(m, key, out, GlyphData_t, ops)
@@ -2940,6 +3028,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_U32MapEmitterHit: return i32_map_len(m, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_len(m, EntityColliderData_t)
 	case .MK_SpellItem: return i32_map_len(m, SpellItem_t)
+	case .MK_Statue: return i32_map_len(m, Statue_t)
 	case .MK_Lootbag: return i32_map_len(m, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_len(m, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_len(m, GlyphData_t)
@@ -2985,6 +3074,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U32MapEmitterHit: i32_map_clear(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_clear(m, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_clear(m, SpellItem_t, ops)
+	case .MK_Statue: i32_map_clear(m, Statue_t, ops)
 	case .MK_Lootbag: i32_map_clear(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_clear(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_clear(m, GlyphData_t, ops)
@@ -3029,6 +3119,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U32MapEmitterHit: i32_map_destroy(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_destroy(m, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_destroy(m, SpellItem_t, ops)
+	case .MK_Statue: i32_map_destroy(m, Statue_t, ops)
 	case .MK_Lootbag: i32_map_destroy(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_destroy(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_destroy(m, GlyphData_t, ops)
@@ -3072,6 +3163,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U32MapEmitterHit: return i32_map_entry(m, key, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_entry(m, key, EntityColliderData_t)
 	case .MK_SpellItem: return i32_map_entry(m, key, SpellItem_t)
+	case .MK_Statue: return i32_map_entry(m, key, Statue_t)
 	case .MK_Lootbag: return i32_map_entry(m, key, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_entry(m, key, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_entry(m, key, GlyphData_t)
@@ -3117,6 +3209,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_U32MapEmitterHit: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_entries(m, key_ptrs, val_ptrs, count, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_entries(m, key_ptrs, val_ptrs, count, SpellItem_t, ops)
+	case .MK_Statue: return i32_map_entries(m, key_ptrs, val_ptrs, count, Statue_t, ops)
 	case .MK_Lootbag: return i32_map_entries(m, key_ptrs, val_ptrs, count, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_entries(m, key_ptrs, val_ptrs, count, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_entries(m, key_ptrs, val_ptrs, count, GlyphData_t, ops)
@@ -3162,6 +3255,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_U32MapEmitterHit: i32_map_for_each(m, map[[4]byte]ParticleEmitterHit_t, f, userdata)
 	case .MK_EntityColliderData: i32_map_for_each(m, EntityColliderData_t, f, userdata)
 	case .MK_SpellItem: i32_map_for_each(m, SpellItem_t, f, userdata)
+	case .MK_Statue: i32_map_for_each(m, Statue_t, f, userdata)
 	case .MK_Lootbag: i32_map_for_each(m, Lootbag_t, f, userdata)
 	case .MK_EnemyHPDetails: i32_map_for_each(m, EnemyHPDetails_t, f, userdata)
 	case .MK_GlyphData: i32_map_for_each(m, GlyphData_t, f, userdata)
@@ -3206,6 +3300,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U32MapEmitterHit: return i32_map_erase(m, key, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_erase(m, key, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_erase(m, key, SpellItem_t, ops)
+	case .MK_Statue: return i32_map_erase(m, key, Statue_t, ops)
 	case .MK_Lootbag: return i32_map_erase(m, key, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_erase(m, key, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_erase(m, key, GlyphData_t, ops)
@@ -3278,6 +3373,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_I32Map: return str_map_find(m, key, out_key, out_key_len, out_val, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_find(m, key, out_key, out_key_len, out_val, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_find(m, key, out_key, out_key_len, out_val, Entry_t, ops)
+	case .MK_DropDown: return str_map_find(m, key, out_key, out_key_len, out_val, DropDown_t, ops)
 	}
 	return false
 }
@@ -3324,6 +3420,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_U32MapEmitterHit: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_find(m, key, out_val, out_val_len, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_find(m, key, out_val, out_val_len, SpellItem_t, ops)
+	case .MK_Statue: return i32_map_find(m, key, out_val, out_val_len, Statue_t, ops)
 	case .MK_Lootbag: return i32_map_find(m, key, out_val, out_val_len, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_find(m, key, out_val, out_val_len, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_find(m, key, out_val, out_val_len, GlyphData_t, ops)

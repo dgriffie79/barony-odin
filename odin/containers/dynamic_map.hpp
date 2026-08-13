@@ -488,6 +488,8 @@ enum MapValueKind {
     MK_SpellItem = 53,           // ItemTooltips_t::spellItem_t (owning: strings+arrays+sets)
     MK_ItemTooltip = 54,         // ItemTooltips_t::ItemTooltip_t (owning: icons+strings+maps)
     MK_Entry = 55,               // ScriptTextParser_t::Entry_t (owning: strings+arrays)
+    MK_DropDown = 56,            // Player::GUIDropdown_t::DropDown_t (owning: strings+option array)
+    MK_Statue = 57,              // StatueManager_t::Statue_t (owning: limbs map)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

@@ -3015,8 +3015,9 @@ public:
 	};
 
 	const DynamicArrayStr directionKeys{ "east", "south", "west", "north" };
-	std::map<Uint32, Statue_t> allStatues;
+	DynamicMapI32T<Statue_t> allStatues;
 };  // StatueManager_t
+template <> struct MapValueKindOf<StatueManager_t::Statue_t> { static constexpr int value = MK_Statue; };
 
 // MapValueKindOf for StatueLimb_t POD arrays (kind 20 = MK_StatueLimbArray)
 template <> struct MapValueKindOf<DynamicArrayT<StatueManager_t::Statue_t::StatueLimb_t>> {
