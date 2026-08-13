@@ -4376,11 +4376,11 @@ extern Compendium_t CompendiumEntries;
 struct TreasureRoomGenerator
 {
 	BaronyRNG treasure_rng;
-	std::unordered_set<unsigned int> treasure_floors;
-	std::unordered_set<unsigned int> treasure_secret_floors;
-	std::map<unsigned int, std::string> orb_floors;
-	std::map<unsigned int, std::string> station_floors;
-	std::map<unsigned int, std::string> station_secret_floors;
+	DynamicSetI32 treasure_floors;
+	DynamicSetI32 treasure_secret_floors;
+	DynamicMapI32Str orb_floors;
+	DynamicMapI32Str station_floors;
+	DynamicMapI32Str station_secret_floors;
 	void init();
 	bool bForceSpawnForCurrentFloor(int secretlevelexit, bool minotaur, BaronyRNG& mapRNG);
 	bool bForceStationSpawnForCurrentFloor(int secretlevelexit);
