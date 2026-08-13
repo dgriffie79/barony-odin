@@ -2905,7 +2905,7 @@ public:
 	void readTooltipsFromFile(bool forceLoadBaseDirectory = false);
 	void readBookLocalizationsFromFile(bool forceLoadBaseDirectory = false);
 	DynamicArrayT<tmpItem_t> tmpItems;
-	std::map<Sint32, spellItem_t> spellItems;
+	DynamicMapI32T<spellItem_t> spellItems;
 	std::map<std::string, ItemTooltip_t> tooltips;
 	std::map<std::string, std::map<std::string, std::string>> adjectives;
 	DynamicMapStrArrStr templates;
@@ -2961,6 +2961,7 @@ public:
 		DynamicMapI32T<Uint32>& highlightIndexes, DynamicMapI32T<Uint32>& positiveIndexes, DynamicMapI32T<Uint32>& negativeIndexes, ItemTooltip_t& tooltip);
 };
 template <> struct DynamicArrayKindOf<ItemTooltips_t::tmpItem_t> { static constexpr int value = Kind_TmpItem; };
+template <> struct MapValueKindOf<ItemTooltips_t::spellItem_t> { static constexpr int value = MK_SpellItem; };
 
 extern ItemTooltips_t ItemTooltips;
 

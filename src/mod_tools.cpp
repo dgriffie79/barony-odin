@@ -881,12 +881,12 @@ void lowercaseString(DynamicString& str)
 #endif
 
 
-void hashSpellProp(Uint32& hash, Uint32& hashShift, int& toSet)
+void hashSpellProp(Uint32& hash, Uint32& hashShift, const int& toSet)
 {
 	hash += (Uint32)((Uint32)abs(toSet) << (hashShift % 32)); ++hashShift;
 }
 
-void hashSpellProp(Uint32& hash, Uint32& hashShift, real_t& toSet)
+void hashSpellProp(Uint32& hash, Uint32& hashShift, const real_t& toSet)
 {
 	hash += (Uint32)(static_cast<Uint32>(abs(toSet) * 100000) << (hashShift % 32)); ++hashShift;
 }
@@ -1404,7 +1404,7 @@ void ItemTooltips_t::readItemsFromFile()
 
 		spellNameStringToSpellID[t.internalName] = t.id;
 		assert(spellItems.find(t.id) == spellItems.end()); // check we haven't got duplicate key
-		spellItems.insert(std::make_pair(t.id, t));
+		spellItems.put(t.id, t);
 		++spellsRead;
 	}
 	printlog("[JSON]: Successfully read %d spells from '%s'", spellsRead, inputPath.c_str());
@@ -1414,7 +1414,7 @@ void ItemTooltips_t::readItemsFromFile()
 		auto find = spellItems.find(i);
 		if ( find != spellItems.end() )
 		{
-			spellItem_t& t = find->second;
+			const spellItem_t& t = find->second;
 			hash += djb2Hash(const_cast<char*>(t.internalName.c_str()));
 			hash += (Uint32)((Uint32)t.id << (shift % 32)); ++shift;
 			hash += djb2Hash(const_cast<char*>(t.spellTypeStr.c_str()));
@@ -1628,12 +1628,11 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 			items[item.itemId].setUnidentifiedName(itemNameLocalizations[item.internalName].name_unidentified.c_str());
 		}
 	}
-	for ( auto& spell : spellItems )
-	{
-		spell.second.name = spellNameLocalizations[spell.second.internalName].c_str();
-		spell.second.name_lowercase = spell.second.name;
-		lowercaseString(spell.second.name_lowercase);
-	}
+	spellItems.forEach([&](int id, spellItem_t& spell) {
+		spell.name = spellNameLocalizations[spell.internalName].c_str();
+		spell.name_lowercase = spell.name;
+		lowercaseString(spell.name_lowercase);
+	});
 
 	/*for ( auto i : itemValueTable )
 	{
@@ -2550,7 +2549,7 @@ std::string ItemTooltips_t::getSpellIconFormatText(const int player, Item& item,
 	for ( auto& formatTag : def->second.spellFormatTags )
 	{
 		if ( formatTag.size() == 0 ) { continue; }
-		if ( (formatTag.at(0) - '1') != iconIndex ) { continue; }
+		if ( (formatTag[0] - '1') != iconIndex ) { continue; }
 		std::vector<int> vals;
 		size_t index = 2;
 		std::string str;

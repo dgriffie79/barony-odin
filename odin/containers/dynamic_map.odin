@@ -1235,6 +1235,120 @@ entity_collider_data_free :: proc(p: rawptr) {
 	if v.overrideProperties != nil { delete(v.overrideProperties); v.overrideProperties = nil }
 }
 
+// spellItem_t — owning mirror of ItemTooltips_t::spellItem_t. real_t = f64 on
+// x64; SpellItemTypes = i32; owns 9 DynamicStrings, 2 DynamicArrayStr, 2
+// DynamicSetI32, 1 DynamicArrayS32.
+SpellItem_t :: struct {
+	id:                            i32,
+	internalName:                  DynamicString,
+	name:                          DynamicString,
+	name_lowercase:                DynamicString,
+	spellTypeStr:                  DynamicString,
+	spellType:                     i32,
+	spellbookInternalName:         DynamicString,
+	magicstaffInternalName:        DynamicString,
+	fociInternalName:              DynamicString,
+	spellbookId:                   i32,
+	magicstaffId:                  i32,
+	fociId:                        i32,
+	spellTagsStr:                  Raw_Dynamic_Array, // of DynamicString
+	spellTags:                     map[i32]struct{},
+	spellFormatTags:               Raw_Dynamic_Array, // of DynamicString
+	spellbookItemIconPaddingLines: Raw_Dynamic_Array, // of i32
+	spellLevelTags:                map[i32]struct{},
+	hasExpandedJSON:               bool,
+	damage:                        i32,
+	damage2:                       i32,
+	damage_mult:                   f64,
+	damage2_mult:                  f64,
+	duration:                      i32,
+	duration_mult:                 f64,
+	duration2:                     i32,
+	duration2_mult:                f64,
+	mana:                          i32,
+	distance:                      f64,
+	distance_mult:                 f64,
+	life_time:                     i32,
+	life_mult:                     f64,
+	cast_time:                     f64,
+	cast_time_mult:                f64,
+	skillID:                       i32,
+	difficulty:                    i32,
+	sustain_mana:                  i32,
+	sustain_duration:              i32,
+	sustain_mult:                  f64,
+	radius:                        f64,
+	radius_mult:                   f64,
+	drop_table:                    i32,
+}
+
+spell_item_free :: proc(p: rawptr) {
+	v := (^SpellItem_t)(p)
+	strings := [?]^DynamicString{
+		&v.internalName, &v.name, &v.name_lowercase, &v.spellTypeStr,
+		&v.spellbookInternalName, &v.magicstaffInternalName, &v.fociInternalName,
+	}
+	for s in strings {
+		dynamic_string_free_elem(rawptr(s))
+	}
+	barony_dynamic_array_elem_destroy(&v.spellTagsStr, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.spellFormatTags, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.spellbookItemIconPaddingLines, size_of(i32), Kind_POD)
+	if v.spellTags != nil { delete(v.spellTags); v.spellTags = nil }
+	if v.spellLevelTags != nil { delete(v.spellLevelTags); v.spellLevelTags = nil }
+}
+
+spell_item_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SpellItem_t)(dst)
+	s := (^SpellItem_t)(src)
+	d^ = SpellItem_t{}
+	d.id = s.id
+	d.spellType = s.spellType
+	d.spellbookId = s.spellbookId
+	d.magicstaffId = s.magicstaffId
+	d.fociId = s.fociId
+	d.hasExpandedJSON = s.hasExpandedJSON
+	d.damage = s.damage
+	d.damage2 = s.damage2
+	d.damage_mult = s.damage_mult
+	d.damage2_mult = s.damage2_mult
+	d.duration = s.duration
+	d.duration_mult = s.duration_mult
+	d.duration2 = s.duration2
+	d.duration2_mult = s.duration2_mult
+	d.mana = s.mana
+	d.distance = s.distance
+	d.distance_mult = s.distance_mult
+	d.life_time = s.life_time
+	d.life_mult = s.life_mult
+	d.cast_time = s.cast_time
+	d.cast_time_mult = s.cast_time_mult
+	d.skillID = s.skillID
+	d.difficulty = s.difficulty
+	d.sustain_mana = s.sustain_mana
+	d.sustain_duration = s.sustain_duration
+	d.sustain_mult = s.sustain_mult
+	d.radius = s.radius
+	d.radius_mult = s.radius_mult
+	d.drop_table = s.drop_table
+	srcs := [?]^DynamicString{ &s.internalName, &s.name, &s.name_lowercase, &s.spellTypeStr, &s.spellbookInternalName, &s.magicstaffInternalName, &s.fociInternalName }
+	dsts := [?]^DynamicString{ &d.internalName, &d.name, &d.name_lowercase, &d.spellTypeStr, &d.spellbookInternalName, &d.magicstaffInternalName, &d.fociInternalName }
+	for i in 0..<len(srcs) {
+		dynamic_string_copy_elem(rawptr(dsts[i]), rawptr(srcs[i]))
+	}
+	barony_dynamic_array_elem_copy(&d.spellTagsStr, &s.spellTagsStr, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.spellFormatTags, &s.spellFormatTags, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.spellbookItemIconPaddingLines, &s.spellbookItemIconPaddingLines, size_of(i32), Kind_POD)
+	if s.spellTags != nil {
+		d.spellTags = make(map[i32]struct{})
+		for key in s.spellTags { d.spellTags[key] = {} }
+	}
+	if s.spellLevelTags != nil {
+		d.spellLevelTags = make(map[i32]struct{})
+		for key in s.spellLevelTags { d.spellLevelTags[key] = {} }
+	}
+}
+
 entity_collider_data_copy :: proc(dst: rawptr, src: rawptr) {
 	d := (^EntityColliderData_t)(dst)
 	s := (^EntityColliderData_t)(src)
@@ -1728,6 +1842,7 @@ Dither_t :: struct {
 #assert(size_of(ParticleEmitterHit_t) == 8)
 #assert(size_of(DynamicStringPair_t) == 32)
 #assert(size_of(EntityColliderData_t) == 304)
+#assert(size_of(SpellItem_t) == 496)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -2114,6 +2229,7 @@ Value_Kind :: enum i32 {
 	MK_U32MapEmitterHit      = 50,
 	MK_StringPair            = 51,
 	MK_EntityColliderData    = 52,
+	MK_SpellItem             = 53,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2174,6 +2290,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = dynamic_string_pair_free, copy = dynamic_string_pair_copy }
 	case .MK_EntityColliderData:
 		return Value_Ops{ free = entity_collider_data_free, copy = entity_collider_data_copy }
+	case .MK_SpellItem:
+		return Value_Ops{ free = spell_item_free, copy = spell_item_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2542,6 +2660,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_U32Map: i32_map_put(m, key, value, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_put(m, key, value, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_put(m, key, value, EntityColliderData_t, ops)
+	case .MK_SpellItem: i32_map_put(m, key, value, SpellItem_t, ops)
 	case .MK_Lootbag: i32_map_put(m, key, value, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_put(m, key, value, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_put(m, key, value, GlyphData_t, ops)
@@ -2585,6 +2704,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_U32Map: return i32_map_get(m, key, out, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_get(m, key, out, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_get(m, key, out, EntityColliderData_t, ops)
+	case .MK_SpellItem: return i32_map_get(m, key, out, SpellItem_t, ops)
 	case .MK_Lootbag: return i32_map_get(m, key, out, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_get(m, key, out, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_get(m, key, out, GlyphData_t, ops)
@@ -2628,6 +2748,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_U32Map: return i32_map_len(m, map[[4]byte]u32)
 	case .MK_U32MapEmitterHit: return i32_map_len(m, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_len(m, EntityColliderData_t)
+	case .MK_SpellItem: return i32_map_len(m, SpellItem_t)
 	case .MK_Lootbag: return i32_map_len(m, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_len(m, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_len(m, GlyphData_t)
@@ -2672,6 +2793,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U32Map: i32_map_clear(m, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_clear(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_clear(m, EntityColliderData_t, ops)
+	case .MK_SpellItem: i32_map_clear(m, SpellItem_t, ops)
 	case .MK_Lootbag: i32_map_clear(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_clear(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_clear(m, GlyphData_t, ops)
@@ -2715,6 +2837,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U32Map: i32_map_destroy(m, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_destroy(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_destroy(m, EntityColliderData_t, ops)
+	case .MK_SpellItem: i32_map_destroy(m, SpellItem_t, ops)
 	case .MK_Lootbag: i32_map_destroy(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_destroy(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_destroy(m, GlyphData_t, ops)
@@ -2757,6 +2880,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U32Map: return i32_map_entry(m, key, map[[4]byte]u32)
 	case .MK_U32MapEmitterHit: return i32_map_entry(m, key, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_entry(m, key, EntityColliderData_t)
+	case .MK_SpellItem: return i32_map_entry(m, key, SpellItem_t)
 	case .MK_Lootbag: return i32_map_entry(m, key, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_entry(m, key, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_entry(m, key, GlyphData_t)
@@ -2801,6 +2925,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_U32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_entries(m, key_ptrs, val_ptrs, count, EntityColliderData_t, ops)
+	case .MK_SpellItem: return i32_map_entries(m, key_ptrs, val_ptrs, count, SpellItem_t, ops)
 	case .MK_Lootbag: return i32_map_entries(m, key_ptrs, val_ptrs, count, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_entries(m, key_ptrs, val_ptrs, count, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_entries(m, key_ptrs, val_ptrs, count, GlyphData_t, ops)
@@ -2845,6 +2970,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_U32Map: i32_map_for_each(m, map[[4]byte]u32, f, userdata)
 	case .MK_U32MapEmitterHit: i32_map_for_each(m, map[[4]byte]ParticleEmitterHit_t, f, userdata)
 	case .MK_EntityColliderData: i32_map_for_each(m, EntityColliderData_t, f, userdata)
+	case .MK_SpellItem: i32_map_for_each(m, SpellItem_t, f, userdata)
 	case .MK_Lootbag: i32_map_for_each(m, Lootbag_t, f, userdata)
 	case .MK_EnemyHPDetails: i32_map_for_each(m, EnemyHPDetails_t, f, userdata)
 	case .MK_GlyphData: i32_map_for_each(m, GlyphData_t, f, userdata)
@@ -2888,6 +3014,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U32Map: return i32_map_erase(m, key, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_erase(m, key, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_erase(m, key, EntityColliderData_t, ops)
+	case .MK_SpellItem: return i32_map_erase(m, key, SpellItem_t, ops)
 	case .MK_Lootbag: return i32_map_erase(m, key, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_erase(m, key, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_erase(m, key, GlyphData_t, ops)
@@ -3003,6 +3130,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_U32Map: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_find(m, key, out_val, out_val_len, EntityColliderData_t, ops)
+	case .MK_SpellItem: return i32_map_find(m, key, out_val, out_val_len, SpellItem_t, ops)
 	case .MK_Lootbag: return i32_map_find(m, key, out_val, out_val_len, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_find(m, key, out_val, out_val_len, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_find(m, key, out_val, out_val_len, GlyphData_t, ops)
