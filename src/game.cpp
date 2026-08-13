@@ -4985,7 +4985,7 @@ bool handleEvents(void)
 			    if (demo_mode == DemoMode::PLAYING) {
 			        break;
 			    }
-				if ( Input::joysticks.find(event.jdevice.which) != Input::joysticks.end() )
+				if ( Input::joysticks.contains(event.jdevice.which) )
 				{
 					char buf[32] = "";
 					snprintf(buf, sizeof(buf), "Joy%dButton%d", event.jbutton.which, event.jbutton.button);
@@ -4998,7 +4998,7 @@ bool handleEvents(void)
 			    if (demo_mode == DemoMode::PLAYING) {
 			        break;
 			    }
-				if ( Input::joysticks.find(event.jdevice.which) != Input::joysticks.end() )
+				if ( Input::joysticks.contains(event.jdevice.which) )
 				{
 					char buf[32] = "";
 					float rebindingDeadzone = Input::getJoystickRebindingDeadzone() * 32768.f;
@@ -5022,7 +5022,7 @@ bool handleEvents(void)
 			    if (demo_mode == DemoMode::PLAYING) {
 			        break;
 			    }
-				if ( Input::joysticks.find(event.jdevice.which) != Input::joysticks.end() )
+				if ( Input::joysticks.contains(event.jdevice.which) )
 				{
 					char buf[32] = "";
 					switch (event.jhat.value) {
@@ -5055,19 +5055,16 @@ bool handleEvents(void)
 					printlog("A joystick was removed, but I don't know which one!");
 				} else {
 					int index = -1;
-					for (auto& pair : Input::joysticks) {
-						SDL_Joystick* curr = pair.second;
-						if (joystick == curr) {
+					Input::joysticks.forEach([&](int key, SDL_Joystick*& curr) {
+						if (index < 0 && joystick == curr) {
 							SDL_JoystickClose(curr);
-							index = pair.first;
+							index = key;
 							printlog("Removed joystick with device index (%d), instance id (%d)", index, event.jdevice.which);
-							Input::joysticks.erase(index);
 							for ( int c = 0; c < 4; ++c ) {
 								Input::inputs[c].refresh();
 							}
-							break;
 						}
-					}
+					});
 					if (index >= 0) {
 						Input::joysticks.erase(index);
 					}

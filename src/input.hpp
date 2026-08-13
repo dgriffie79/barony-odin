@@ -145,8 +145,8 @@ public:
 	//! list of connected input devices
 	static std::string lastInputOfAnyKind;
 	static int waitingToBindControllerForPlayer;
-	static std::unordered_map<int, SDL_GameController*> gameControllers;
-	static std::unordered_map<int, SDL_Joystick*> joysticks;
+	static DynamicMapI32T<SDL_GameController*> gameControllers;
+	static DynamicMapI32T<SDL_Joystick*> joysticks;
     static std::unordered_map<SDL_Keycode, bool> keys;
 	static bool mouseButtons[18];
 	static const int MOUSE_WHEEL_UP;
