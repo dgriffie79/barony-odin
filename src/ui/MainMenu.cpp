@@ -26442,7 +26442,7 @@ failed:
 				int entryNum = -1;
 
 				int startOffsetId = -1;
-				if ( findEvent->second.attributes.find("skills") != findEvent->second.attributes.end() )
+				if ( findEvent->second.attributes.contains("skills") )
 				{
 					for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 					{
@@ -26457,7 +26457,7 @@ failed:
 				int minValue = 0;
 				int maxValue = 0;
 				int sum = 0;
-				bool useSum = findEvent->second.attributes.find("display_sum_classes") != findEvent->second.attributes.end();
+				bool useSum = findEvent->second.attributes.contains("display_sum_classes");
 				auto type = Compendium_t::Events_t::Type::MAX;
 				for ( auto& pair : Compendium_t::Events_t::eventClassIds[tag] )
 				{
@@ -26499,7 +26499,7 @@ failed:
 						firstValue = false;
 
 						DynamicString output = "";
-						if ( findEvent->second.attributes.find("stats") != findEvent->second.attributes.end()
+						if ( findEvent->second.attributes.contains("stats")
 							&& tag != Compendium_t::EventTags::CPDM_CLASS_STAT_STR_MAX
 							&& tag != Compendium_t::EventTags::CPDM_CLASS_STAT_DEX_MAX
 							&& tag != Compendium_t::EventTags::CPDM_CLASS_STAT_CON_MAX
@@ -26532,11 +26532,11 @@ failed:
 								output = Compendium_t::Events_t::formatEventRecordText(value, "stats", STAT_CHR, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 							}
 						}
-						else if ( findEvent->second.attributes.find("class") != findEvent->second.attributes.end() )
+						else if ( findEvent->second.attributes.contains("class") )
 						{
 							output = Compendium_t::Events_t::formatEventRecordText(value, "class", entryNum % Compendium_t::Events_t::kEventClassesMax, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 						}
-						else if ( findEvent->second.attributes.find("race") != findEvent->second.attributes.end() )
+						else if ( findEvent->second.attributes.contains("race") )
 						{
 							output = Compendium_t::Events_t::formatEventRecordText(value, "race", entryNum, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
 						}
@@ -27423,7 +27423,7 @@ failed:
 									val->setText("-");
 								}
 								else if ( findEvent != Compendium_t::Events_t::events.end() 
-									&& findEvent->second.attributes.find("stats") != findEvent->second.attributes.end() )
+									&& findEvent->second.attributes.contains("stats") )
 								{
 									if ( !strcmp(entryName, "str") )
 									{

@@ -4296,7 +4296,7 @@ struct Compendium_t
 			ClientUpdateType clienttype = CLIENT_ONLY;
 			DynamicString name = "";
 			int id = CPDM_EVENT_TAGS_MAX;
-			std::set<std::string> attributes;
+			DynamicSetStr attributes;
 		};
 		struct EventVal_t
 		{

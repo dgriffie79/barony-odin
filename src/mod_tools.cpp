@@ -15285,7 +15285,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 						if ( foundLookup )
 						{
 							auto& def = events[tag];
-							if ( def.attributes.find("stats") != def.attributes.end() && valueType != "max_class" )
+							if ( def.attributes.contains("stats") && valueType != "max_class" )
 							{
 								if ( cat == "str" ) { codexIDs.back().first = STAT_STR; }
 								if ( cat == "dex" ) { codexIDs.back().first = STAT_DEX; }
@@ -15294,7 +15294,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								if ( cat == "per" ) { codexIDs.back().first = STAT_PER; }
 								if ( cat == "chr" ) { codexIDs.back().first = STAT_CHR; }
 							}
-							else if ( def.attributes.find("class") != def.attributes.end() )
+							else if ( def.attributes.contains("class") )
 							{
 								codexIDs.clear();
 								auto findClassTag = eventClassIds.find(tag);
@@ -15302,7 +15302,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								{
 									// iterate through classes
 									int startOffsetId = -1;
-									if ( def.attributes.find("skills") != def.attributes.end() )
+									if ( def.attributes.contains("skills") )
 									{
 										if ( cat == "magic skill" )
 										{
@@ -15357,7 +15357,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 											}
 
 											codexIDs.push_back(classId);
-											if ( def.attributes.find("stats") != def.attributes.end() && valueType == "max_class" )
+											if ( def.attributes.contains("stats") && valueType == "max_class" )
 											{
 												// we want to store the stat names rather than the class
 												if ( cat == "str" ) { codexIDs.back().first = STAT_STR; }
@@ -15371,7 +15371,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 									}
 								}
 							}
-							else if ( def.attributes.find("race") != def.attributes.end() )
+							else if ( def.attributes.contains("race") )
 							{
 								codexIDs.clear();
 								auto findClassTag = eventClassIds.find(tag);
@@ -15482,15 +15482,15 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								{
 									output = formatEventRecordText(val, d["value"]["format"].GetString(), classnum, eventCustomLangEntries[key]);
 								}
-								else if ( def.attributes.find("stats") != def.attributes.end() )
+								else if ( def.attributes.contains("stats") )
 								{
 									output = formatEventRecordText(val, "stats", classnum, eventCustomLangEntries[key]);
 								}
-								else if ( def.attributes.find("class") != def.attributes.end() )
+								else if ( def.attributes.contains("class") )
 								{
 									output = formatEventRecordText(val, "class", classnum, eventCustomLangEntries[key]);
 								}
-								else if ( def.attributes.find("race") != def.attributes.end() )
+								else if ( def.attributes.contains("race") )
 								{
 									output = formatEventRecordText(val, "race", classnum, eventCustomLangEntries[key]);
 								}
@@ -15813,9 +15813,9 @@ void Compendium_t::Events_t::readEventsFromFile()
 					entry.attributes.insert(itr2->value["attributes"].GetString());
 				}
 			}
-			if ( entry.attributes.find("class") != entry.attributes.end() || entry.attributes.find("race") != entry.attributes.end() )
+			if ( entry.attributes.contains("class") || entry.attributes.contains("race") )
 			{
-				if ( entry.attributes.find("skills") != entry.attributes.end() )
+				if ( entry.attributes.contains("skills") )
 				{
 					for ( int skillnum = 0; skillnum < 16; ++skillnum )
 					{
@@ -17812,8 +17812,8 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 	{
 		codexID = entryID;
 		bool foundCategory = false;
-		if ( def.attributes.find("class") != def.attributes.end()
-			|| def.attributes.find("race") != def.attributes.end() )
+		if ( def.attributes.contains("class")
+			|| def.attributes.contains("race") )
 		{
 			auto findClassTag = eventClassIds.find(tag);
 			if ( findClassTag != eventClassIds.end() )
@@ -17860,14 +17860,14 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		{
 			codexID = find->second;
 			baseCodexID = codexID;
-			if ( def.attributes.find("class") != def.attributes.end() )
+			if ( def.attributes.contains("class") )
 			{
 				auto findClassTag = eventClassIds.find(tag);
 				if ( findClassTag != eventClassIds.end() )
 				{
 					// iterate through classes
 					int classId = client_classes[playernum];
-					if ( def.attributes.find("skills") != def.attributes.end() )
+					if ( def.attributes.contains("skills") )
 					{
 						for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 						{
@@ -17890,7 +17890,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 					}
 				}
 			}
-			else if ( def.attributes.find("race") != def.attributes.end() )
+			else if ( def.attributes.contains("race") )
 			{
 				auto findRaceTag = eventClassIds.find(tag);
 				if ( findRaceTag != eventClassIds.end() )
