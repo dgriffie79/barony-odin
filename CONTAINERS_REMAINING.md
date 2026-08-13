@@ -1,159 +1,134 @@
-# Remaining std:: containers in headers (117 total)
+# Remaining std:: containers in headers
 
+Regenerated 2026-08-13 (was stale at "117" — that count predated D3aw–D3c7 and
+counted local helpers/signatures too). This list is HEADER MEMBERS ONLY (the
+shared-struct + global state that must de-STL to cross the C++↔Odin boundary),
+plus flagged signatures that return/pass std containers.
 
-## src/draw.hpp (5)
-  164	std::unordered_map<BufferType, int>
-  181	std::vector<float>
-  397	std::vector<float>
-  403	std::vector<Sint32>
-  410	std::unordered_map<view_t*, Dither>
+## DONE since the old doc (D3aw … D3cc)
 
-## src/entity.hpp (2)
-  106	std::unordered_map<view_t*, Dither>
-  976	std::unordered_set<Entity*>
+- monster.hpp: `iconSpritesAndPaths`, `monsterDataEntries`, `units`
+- entity.hpp + draw.hpp: `dithering` (pointer-keyed → `DynamicMapPtrT`, new family)
+- input.hpp: `gameControllers`, `joysticks`
+- magic.hpp: `spellTomeAppearanceToID` (nested map kind), `spellTomeIDToAppearance`
+- plus the entire earlier D3aw–D3c7 batch (see git log)
 
-## src/files.hpp (2)
-  391	std::list<std::string>
-  400	std::list<std::string>
+## Value-kind families now available
 
-## src/game.hpp (1)
-  516	std::unordered_map<unsigned long, std::pair<std::string, int>
+- str-key: `DynamicMapStrT<V>` (`barony_dynamic_map_str_*`)
+- i32-key: `DynamicMapI32T<V>` (`barony_dynamic_map_i32_*`)
+- **ptr-key (new):** `DynamicMapPtrT<V>` (`barony_dynamic_map_ptr_*`) — `map[rawptr]V`
+- sets: `DynamicSetI32` / `DynamicSetStr`
+- arrays: `DynamicArrayT<V>` (`barony_dynamic_array_elem_*`), raw `DynamicArray`
+- string: `DynamicString`
 
-## src/input.hpp (3)
-  148	std::unordered_map<int, SDL_GameController*>
-  149	std::unordered_map<int, SDL_Joystick*>
-  150	std::unordered_map<SDL_Keycode, bool>
+## Remaining header members (by file)
 
-## src/interface/interface.hpp (3)
-  1174	std::unordered_map<std::string, std::pair<int, bool>
-  1175	std::vector<std::pair<std::string, std::pair<int, bool>
-  1604	std::vector<std::pair<SDL_Surface**, std::string>
+### src/draw.hpp (3)
+- `Mesh::ElementsPerVBO` — `unordered_map<BufferType,int>` (static const, enum key)
+- `Mesh::data` — `std::vector<float>[BufferType::Max]` (array of vectors)
+- `Chunk::tiles` — `std::vector<Sint32>`
 
-## src/light.hpp (2)
-  64	std::vector<void*>
-  98	std::vector<void*>
+### src/entity.hpp (1)
+- `alertAlliesOnBeingHit(..., std::unordered_set<Entity*>*)` — signature param
 
-## src/magic/magic.hpp (6)
-  481	std::map<Uint32, std::map<Uint32, ParticleEmitterHit_t>
-  873	std::map<int, spell_t*>
-  874	std::map<int, std::map<int, int>
-  875	std::map<int, int>
-  1300	std::map<int, std::map<std::tuple<Uint8, Uint8, Uint8, Uint8, real_t, real_t, int>
-  1302	std::map<Uint32, Indicator_t>
+### src/files.hpp (2)
+- `directoryContents(...)` → returns `std::list<std::string>`
+- `physfsGetFileNamesInDirectory(...)` → returns `std::list<std::string>`
 
-## src/main.hpp (1)
-  691	std::unordered_map<SDL_Keycode, bool>
+### src/game.hpp (1)
+- `DebugStatsClass::networkPackets` — `unordered_map<unsigned long, pair<string,int>>`
 
-## src/menu.hpp (3)
-  141	std::list<std::string>
-  156	std::vector<std::tuple<int, int, int, std::string>
-  250	std::list<resolution>
+### src/input.hpp (1)
+- `Input::keys` — `unordered_map<SDL_Keycode,bool>` **HAZARD**: demo files do
+  `write(&Input::keys, sizeof(...))` + `write(&keystatus, sizeof(...))` — raw
+  `sizeof` of the map changes format on conversion. Needs a demo-format decision.
 
-## src/mod_tools.hpp (53)
-  2907	std::map<Sint32, spellItem_t>
-  2908	std::map<std::string, ItemTooltip_t>
-  2909	std::map<std::string, std::map<std::string, std::string>
-  3015	std::map<Uint32, Statue_t>
-  3026	std::map<std::string, std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>
-  3143	std::map<std::string, Entry_t>
-  3409	std::map<int, EntityColliderData_t>
-  3410	std::map<std::string, std::map<int, int>
-  3429	std::vector<std::pair<SDL_Surface**, std::string>
-  3430	std::vector<std::pair<std::string, std::string>
-  3431	std::vector<std::pair<std::string, std::string>
-  3432	std::set<std::string>
-  3433	std::set<std::string>
-  3434	std::list<std::string>
-  3521	std::map<int, std::map<int, ModelOffset_t>
-  3574	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  3612	std::set<std::pair<std::string, std::string>
-  3613	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  3614	std::unordered_set<std::string>
-  3616	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  3629	std::map<std::string, CompendiumAchievementsDisplay>
-  4070	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4072	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4078	std::map<std::string, CompendiumMonsters_t::Monster_t>
-  4090	std::map<std::string, ObjectLimbs_t>
-  4098	std::map<std::string, std::pair<CompendiumMap_t, std::vector<int>
-  4116	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4123	std::map<std::string, CompendiumWorld_t::World_t>
-  4144	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4151	std::map<std::string, CompendiumCodex_t::Codex_t>
-  4175	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4183	std::map<std::string, CompendiumItems_t::Codex_t>
-  4189	std::map<std::string, std::vector<std::pair<std::string, std::string>
-  4195	std::map<std::string, CompendiumItems_t::Codex_t>
-  4288	std::set<std::string>
-  4307	std::map<EventTags, Event_t>
-  4309	std::map<int, std::set<EventTags>
-  4318	std::map<EventTags, std::set<int>
-  4319	std::map<EventTags, std::set<int>
-  4320	std::map<EventTags, std::set<std::string>
-  4321	std::map<EventTags, std::set<std::string>
-  4324	std::map<EventTags, std::map<int, int>
-  4326	std::map<EventTags, std::map<std::string, std::string>
-  4327	std::map<std::string, std::map<std::string, std::string>
-  4328	std::vector<std::pair<std::string, Sint32>
-  4329	std::map<std::string, std::string>
-  4339	std::map<EventTags, std::map<int, EventVal_t>
-  4340	std::map<EventTags, std::map<int, EventVal_t>
-  4368	std::unordered_set<unsigned int>
-  4369	std::unordered_set<unsigned int>
-  4370	std::map<unsigned int, std::string>
-  4371	std::map<unsigned int, std::string>
-  4372	std::map<unsigned int, std::string>
+### src/main.hpp (1)
+- `keystatus` — `unordered_map<SDL_Keycode,bool>` (same demo-file hazard as above)
 
-## src/monster.hpp (3)
-  1285	std::map<int, IconLookup_t>
-  1302	std::map<int, MonsterDataEntry_t>
-  1401	std::unordered_map<Uint32, MonsterAllies_t>
+### src/interface/interface.hpp (3)
+- `scrolls` — `unordered_map<string, pair<int,bool>>`
+- `sortedScrolls` — `vector<pair<string,pair<int,bool>>>`
+- `systemResourceImages` — `vector<pair<SDL_Surface**, string>>` (extern)
 
-## src/net.hpp (1)
-  117	std::queue<SteamPacketWrapper* >
+### src/interface/ui.hpp (1)
+- `allNotifications` — `std::list<UIToastNotification>`
 
-## src/player.hpp (10)
-  741	std::map<std::string, DropDown_t>
-  1303	std::map<std::string, std::pair<std::string, std::string>
-  1465	std::map<Monster, std::vector<std::pair<Monster, std::string>
-  1925	std::list<Message*>
-  2073	std::map<Uint32, Dialogue_t>
-  2096	std::map<Player::WorldUI_t::WorldTooltipDialogue_t::DialogueType_t, Setting_t>
-  2329	std::vector<std::pair<std::string, std::string>
-  2360	std::map<std::string, std::map<int, Sint32>
-  2361	std::map<int, std::map<std::string, std::map<int, Sint32>
-  2431	std::map<Uint32, std::map<Uint32, Uint32>
+### src/magic/magic.hpp (4)
+- `particleTimerEmitterHitEntities` — `map<Uint32, map<Uint32, ParticleEmitterHit_t>>`
+  (nested map, POD values)
+- `allGameSpells` — `map<int, spell_t*>` **PORT-WITH-FILE** (order-dependent global)
+- `surfaceCache` — `map<int, map<tuple<...>, SDL_Surface*>>` (static; port-with-file)
+- `indicators` — `map<Uint32, Indicator_t>` (owning; port-with-file)
 
-## src/scores.hpp (3)
-  776	std::vector<std::pair<std::string, std::string>
-  777	std::vector<std::pair<std::string, std::string>
-  837	std::unordered_map<Uint32, std::unordered_map<int, std::pair<int,int>
+### src/menu.hpp (3)
+- `currentDirectoryFiles` — `std::list<std::string>` (extern)
+- `savegamesList` — `vector<tuple<int,int,int,string>>` (extern)
+- `getResolutionList(int, std::list<resolution>&)` — out-param
 
-## src/ui/Field.hpp (6)
-  61	std::vector<const Widget*>
-  68	std::vector<const Widget*>
-  69	std::vector<const Widget*>
-  189	std::map<int, Uint32>
-  191	std::map<int, int>
-  194	std::vector<std::pair<std::string,Text*>
+### src/mod_tools.hpp (40+)
+- `spellItems` — `map<Sint32, spellItem_t>`
+- `tooltips` — `map<string, ItemTooltip_t>`
+- `adjectives` — `map<string, map<string,string>>`
+- `allStatues` — `map<Uint32, Statue_t>`
+- `timepoints` — `map<string, vector<pair<string, time_point>>>`
+- `allEntries` — `map<string, Entry_t>`
+- `colliderData` — `map<int, EntityColliderData_t>` (static)
+- `colliderRandomGenPool` — `map<string, map<int,int>>` (static)
+- `systemResourceImagesToReload` / `mountedFilepaths` / `mountedFilepathsSaved` — vectors
+- `mods_loaded_local` / `mods_loaded_workshop` — `set<string>`
+- `localModFoldernames` — `list<string>`
+- `monsterModelsMap` — `map<int, map<int, ModelOffset_t>>`
+- compendium block (`achievementCategories`, `contents`, `monsters`, `worldObjects`,
+  `codex`, `items`, `magic`, `achievementsBookDisplay`, etc.)
+- event block (`events`, `itemEventLookup`, `eventItemLookup`, `eventMonsterLookup`,
+  `eventWorldLookup`, `eventCodexLookup`, `eventClassIds`, `eventLangEntries`,
+  `eventCustomLangEntries`, `playerEvents`, `serverPlayerEvents`, floor maps)
 
-## src/ui/Frame.hpp (3)
-  465	std::vector<const Widget*>
-  472	std::vector<const Widget*>
-  473	std::vector<const Widget*>
+### src/net.hpp (1)
+- `game_packets` — `queue<SteamPacketWrapper*>` (port-with-file)
 
-## src/ui/MainMenu.hpp (3)
-  131	std::vector<std::tuple<int, std::string, Uint32>
-  138	std::unordered_map<int, DescData_t>
-  161	std::unordered_map<std::string, DescData_t>
+### src/player.hpp (10)
+- `allDropDowns` — `map<string, DropDown_t>`
+- `mapDisplayNamesDescriptions` — `map<string, pair<string,string>>`
+- `leadershipAllyTableSpecialRecruitment` — `map<Monster, vector<pair<Monster,string>>>`
+- `notification_messages` — `list<Message*>`
+- `sharedDialogues` — `map<Uint32, Dialogue_t>`
+- `settings` — `map<DialogueType_t, Setting_t>`
+- `mapDetails` — `vector<pair<string,string>>`
+- `itemEvents` — `map<string, map<int,Sint32>>`
+- `floorEvents` — `map<int, map<string, map<int,Sint32>>>`
+- `targetsCompelled` — `map<Uint32, map<Uint32,Uint32>>`
 
-## src/ui/Widget.hpp (7)
-  162	std::vector<Widget*>
-  166	std::vector<const Widget*>
-  190	std::list<Widget*>
-  216	std::unordered_map<std::string, std::string>
-  218	std::unordered_map<std::string, std::string>
-  223	std::vector<const Widget*>
-  224	std::vector<const Widget*>
+### src/scores.hpp (3)
+- `map_messages` / `additional_data` — `vector<pair<string,string>>` **KEEP** (JSON
+  serialization — reverted in D3aj; port with file)
+- `entityAchievementsToProcess` — `unordered_map<Uint32, unordered_map<int, pair<int,int>>>`
 
-TOTAL: 117
+### src/steam.hpp (1)
+- `workshopItemTags` — `list<string>`
+
+### src/ui/* (Field/Frame/Button/Slider/Widget/MainMenu) (~20)
+- `Field::linesToColor` (`map<int,Uint32>`), `individualLinePadding` (`map<int,int>`),
+  `cache` (`vector<pair<string,Text*>>`)
+- `Widget::widgets` — `list<Widget*>`
+- `findSelectedWidgets(std::vector<Widget*>&)` + `selectedWidgets`/`searchParents`
+  `vector<const Widget*>` params across Widget/Frame/Field/Button/Slider
+- `MainMenu::survivalComplexity` (`vector<tuple<int,string,Uint32>>`),
+  `data` (`unordered_map<int/string, DescData_t>`)
+
+## Hazards to keep in mind (from the current batch)
+
+1. **Pointer-keyed maps** need the new `map[rawptr]V` family (done in D3c9).
+2. **bool-valued maps + `sizeof()` demo serialization** — `Input::keys` and
+   `keystatus` are written raw to demo files; converting changes the format.
+   Decide: leave std::unordered_map (port-with-file), or fix demo format.
+3. **Non-zero struct defaults** — `Chunk::Dither.value = 10` vs `Entity::Dither = 0`;
+   the ptr-map entry path takes a per-kind `default_value`.
+4. **Nested maps** — each `map<K, map<K2,V>>` needs its own value kind
+   (MK_I32Map done for `map<int,map<int,int>>`; more needed for the others).
+5. **`find()` returns a copy** — write-through must use `operator[]`/`contains()`
+   on the live slot, never `find()->second = x`.
+6. **Port-with-file globals** — `allGameSpells`, console commands, `surfaceCache`,
+   `indicators`, `game_packets` (order-dependent or owning C++ resources).
