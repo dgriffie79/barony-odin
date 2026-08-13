@@ -789,6 +789,36 @@ static void demo_stop() {
     TimerExperiments::bUseTimerInterpolation = true;
 }
 
+// Demo files are dev-only (not shared/synced) — format is NOT version-stable.
+// The bool-key maps (Input::keys / keystatus) are DynamicMapI32T<bool> now; the
+// old raw `sizeof(map)` blob write is replaced with [count][(key,value)...].
+static void demoWriteBoolKeyMap(File* f, const DynamicMapI32T<bool>& m) {
+    int32_t n = (int32_t)m.size();
+    f->write(&n, sizeof(n), 1);
+    if (n <= 0) return;
+    // zero-copy iteration over live entries (avoids std::vector<bool> bitset)
+    m.forEach([&](int key, bool& v) {
+        int32_t k = key;
+        bool b = v;
+        f->write(&k, sizeof(k), 1);
+        f->write(&b, sizeof(b), 1);
+    });
+}
+
+static void demoReadBoolKeyMap(File* f, DynamicMapI32T<bool>& m) {
+    int32_t n = 0;
+    f->read(&n, sizeof(n), 1);
+    m.clear();
+    if (n <= 0) return;
+    for (int32_t i = 0; i < n; ++i) {
+        int32_t key = 0;
+        bool v = false;
+        f->read(&key, sizeof(key), 1);
+        f->read(&v, sizeof(v), 1);
+        m.put(key, v);
+    }
+}
+
 static void demo_record(const char* filename) {
     if (demo_mode != DemoMode::STOPPED) {
         messagePlayer(clientnum, MESSAGE_MISC, "Demo must be stopped first (/demo_stop)");
@@ -940,9 +970,9 @@ void gameLogic(void)
         if (demo_file) {
             // demo recording
             if (demo_mode == DemoMode::RECORDING) {
-                demo_file->write(&Input::inputs[clientnum].keys, sizeof(Input::keys), 1);
+                demoWriteBoolKeyMap(demo_file, Input::inputs[clientnum].keys);
                 demo_file->write(&Input::inputs[clientnum].mouseButtons, sizeof(Input::mouseButtons), 1);
-                demo_file->write(&keystatus, sizeof(keystatus), 1);
+                demoWriteBoolKeyMap(demo_file, keystatus);
                 demo_file->write(&mousex, sizeof(mousex), 1);
                 demo_file->write(&mousey, sizeof(mousey), 1);
                 demo_file->write(&mousestatus, sizeof(mousestatus), 1);
@@ -952,9 +982,9 @@ void gameLogic(void)
 
             // demo playback
             if (demo_mode == DemoMode::PLAYING) {
-                demo_file->read(&Input::inputs[clientnum].keys, sizeof(Input::keys), 1);
+                demoReadBoolKeyMap(demo_file, Input::inputs[clientnum].keys);
                 demo_file->read(&Input::inputs[clientnum].mouseButtons, sizeof(Input::mouseButtons), 1);
-                demo_file->read(&keystatus, sizeof(keystatus), 1);
+                demoReadBoolKeyMap(demo_file, keystatus);
                 demo_file->read(&mousex, sizeof(mousex), 1);
                 demo_file->read(&mousey, sizeof(mousey), 1);
                 demo_file->read(&mousestatus, sizeof(mousestatus), 1);

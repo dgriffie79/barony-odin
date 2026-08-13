@@ -471,6 +471,7 @@ enum MapValueKind {
     MK_Dither = 45,              // Dither_t (8B POD; pointer-keyed dithering maps)
     MK_ChunkDither = 46,         // ChunkDither_t (8B POD; default value=10)
     MK_I32Map = 47,              // nested map<int,int> (32B Raw_Map, owning)
+    MK_Bool = 48,                // bool (1B POD)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -496,6 +497,7 @@ template <> struct MapValueKindOf<ChunkDither_t> { static constexpr int value = 
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
+template <> struct MapValueKindOf<bool> { static constexpr int value = MK_Bool; };
 
 // 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.
 template <typename T> struct MapValueKindOf<T*> { static constexpr int value = MK_Ptr; };

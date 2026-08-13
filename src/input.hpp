@@ -147,7 +147,7 @@ public:
 	static int waitingToBindControllerForPlayer;
 	static DynamicMapI32T<SDL_GameController*> gameControllers;
 	static DynamicMapI32T<SDL_Joystick*> joysticks;
-    static std::unordered_map<SDL_Keycode, bool> keys;
+    static DynamicMapI32T<bool> keys;
 	static bool mouseButtons[18];
 	static const int MOUSE_WHEEL_UP;
 	static const int MOUSE_WHEEL_DOWN;

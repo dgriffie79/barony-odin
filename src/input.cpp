@@ -23,7 +23,7 @@ const Uint32 Input::BUTTON_ANALOG_REPEAT_TICKS = TICKS_PER_SECOND / 4;
 DynamicMapI32 Input::keycodeNames;
 DynamicMapI32T<SDL_GameController*> Input::gameControllers;
 DynamicMapI32T<SDL_Joystick*> Input::joysticks;
-std::unordered_map<SDL_Keycode, bool> Input::keys;
+DynamicMapI32T<bool> Input::keys;
 bool Input::mouseButtons[18] = { false };
 const int Input::MOUSE_WHEEL_UP = 16;
 const int Input::MOUSE_WHEEL_DOWN = 17;
