@@ -492,6 +492,7 @@ enum MapValueKind {
     MK_Statue = 57,              // StatueManager_t::Statue_t (owning: limbs map)
     MK_I32MapModelOffset = 58,   // nested map<int,map<int,ModelOffset_t>> (owning)
     MK_StrMapStr = 59,           // nested map<string,map<string,string>> (owning)
+    MK_StrI32Map = 60,           // nested map<int,map<string,map<int,i32>>> (owning)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -1047,6 +1048,7 @@ using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
 using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
+template <> struct MapValueKindOf<DynamicMapStrI32Map> { static constexpr int value = MK_StrI32Map; };
 
 struct IconEntry_tMirror {
     DynamicString name;

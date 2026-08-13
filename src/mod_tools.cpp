@@ -16829,26 +16829,20 @@ void Compendium_t::Events_t::onEndgameEvent(const int playernum, const bool tuto
 
 void Player::CompendiumProgress_t::updateFloorEvents()
 {
-	for ( auto& p1 : floorEvents )
-	{
-		if ( p1.first >= 0 && p1.first < Compendium_t::EventTags::CPDM_EVENT_TAGS_MAX )
+	floorEvents.forEach([&](int tagInt, DynamicMapStrI32Map& p1) {
+		if ( tagInt >= 0 && tagInt < Compendium_t::EventTags::CPDM_EVENT_TAGS_MAX )
 		{
-			Compendium_t::EventTags tag = (Compendium_t::EventTags)p1.first;
-			for ( auto& p2 : p1.second )
-			{
-				const char* category = p2.first.c_str();
-				for ( auto& p3 : p2.second )
-				{
-					int eventID = p3.first;
-					Sint32 value = p3.second;
+			Compendium_t::EventTags tag = (Compendium_t::EventTags)tagInt;
+			p1.forEach([&](std::string_view category, DynamicMapI32T<int>& p2) {
+				p2.forEach([&](int eventID, int& value) {
 					if ( eventID >= Compendium_t::Events_t::kEventCodexOffset && eventID <= Compendium_t::Events_t::kEventCodexOffsetMax )
 					{
-						Compendium_t::Events_t::eventUpdateCodex(player.playernum, tag, category, value, false);
+						Compendium_t::Events_t::eventUpdateCodex(player.playernum, tag, category.data(), value, false);
 					}
-				}
-			}
+				});
+			});
 		}
-	}
+	});
 
 	floorEvents.clear();
 }

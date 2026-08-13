@@ -2364,7 +2364,7 @@ public:
 		Player& player;
 	public:
 		DynamicMapStrI32Map itemEvents;
-		std::map<int, std::map<std::string, std::map<int, Sint32>>> floorEvents;
+		DynamicMapI32T<DynamicMapStrI32Map> floorEvents;
 		real_t playerDistAccum = 0.0;
 		Uint32 playerSneakTime = 0;
 		Uint32 playerAliveTimeMoving = 0;
