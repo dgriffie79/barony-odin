@@ -3143,9 +3143,10 @@ public:
 		};
 		AdditionalContentProperties_t signVideoContent;
 	};
-	std::map<std::string, Entry_t> allEntries;
+	DynamicMapStrT<Entry_t> allEntries;
 };
 extern ScriptTextParser_t ScriptTextParser;
+template <> struct MapValueKindOf<ScriptTextParser_t::Entry_t> { static constexpr int value = MK_Entry; };
 
 #ifndef EDITOR
 //#define USE_THEORA_VIDEO

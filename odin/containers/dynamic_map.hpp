@@ -487,6 +487,7 @@ enum MapValueKind {
     MK_EntityColliderData = 52,  // EditorEntityData_t::EntityColliderData_t (owning: strings+arrays+maps+sets)
     MK_SpellItem = 53,           // ItemTooltips_t::spellItem_t (owning: strings+arrays+sets)
     MK_ItemTooltip = 54,         // ItemTooltips_t::ItemTooltip_t (owning: icons+strings+maps)
+    MK_Entry = 55,               // ScriptTextParser_t::Entry_t (owning: strings+arrays)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

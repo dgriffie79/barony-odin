@@ -1368,6 +1368,85 @@ item_tooltip_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// Entry_t — owning mirror of ScriptTextParser_t::Entry_t (the C++ struct has
+// a nested AdditionalContentProperties_t with an SDL_Rect; the mirror holds
+// the same POD bytes). ObjectType_t = i32.
+SDL_Rect_t :: struct {
+	x: i32,
+	y: i32,
+	w: i32,
+	h: i32,
+}
+
+EntryAdditionalContent_t :: struct {
+	pos:       SDL_Rect_t,
+	path:      DynamicString,
+	bgPath:    DynamicString,
+	imgBorder: i32,
+}
+
+Entry_t :: struct {
+	name:                    DynamicString,
+	rawText:                 Raw_Dynamic_Array, // of DynamicString
+	variables:               Raw_Dynamic_Array, // of EntryVariable_t
+	formattedText:           DynamicString,
+	objectType:              i32,
+	hjustify:                i32,
+	vjustify:                i32,
+	padPerLine:              Raw_Dynamic_Array, // of i32
+	padTopY:                 i32,
+	font:                    DynamicString,
+	fontColor:               u32,
+	fontOutlineColor:        u32,
+	fontHighlightColor:      u32,
+	fontHighlight2Color:     u32,
+	wordHighlights:          Raw_Dynamic_Array, // of i32
+	wordHighlights2:         Raw_Dynamic_Array, // of i32
+	imageInlineTextAdjustX:  i32,
+	signVideoContent:        EntryAdditionalContent_t,
+}
+
+entry_free :: proc(p: rawptr) {
+	v := (^Entry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.name))
+	dynamic_string_free_elem(rawptr(&v.formattedText))
+	dynamic_string_free_elem(rawptr(&v.font))
+	barony_dynamic_array_elem_destroy(&v.rawText, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.variables, size_of(EntryVariable_t), Kind_EntryVar)
+	barony_dynamic_array_elem_destroy(&v.padPerLine, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.wordHighlights, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.wordHighlights2, size_of(i32), Kind_POD)
+	dynamic_string_free_elem(rawptr(&v.signVideoContent.path))
+	dynamic_string_free_elem(rawptr(&v.signVideoContent.bgPath))
+}
+
+entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Entry_t)(dst)
+	s := (^Entry_t)(src)
+	d^ = Entry_t{}
+	dynamic_string_copy_elem(rawptr(&d.name), rawptr(&s.name))
+	dynamic_string_copy_elem(rawptr(&d.formattedText), rawptr(&s.formattedText))
+	dynamic_string_copy_elem(rawptr(&d.font), rawptr(&s.font))
+	d.objectType = s.objectType
+	d.hjustify = s.hjustify
+	d.vjustify = s.vjustify
+	d.padTopY = s.padTopY
+	d.fontColor = s.fontColor
+	d.fontOutlineColor = s.fontOutlineColor
+	d.fontHighlightColor = s.fontHighlightColor
+	d.fontHighlight2Color = s.fontHighlight2Color
+	d.imageInlineTextAdjustX = s.imageInlineTextAdjustX
+	barony_dynamic_array_elem_copy(&d.rawText, &s.rawText, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.variables, &s.variables, size_of(EntryVariable_t), Kind_EntryVar)
+	barony_dynamic_array_elem_copy(&d.padPerLine, &s.padPerLine, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.wordHighlights, &s.wordHighlights, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.wordHighlights2, &s.wordHighlights2, size_of(i32), Kind_POD)
+	d.signVideoContent.pos = s.signVideoContent.pos
+	d.signVideoContent.imgBorder = s.signVideoContent.imgBorder
+	dynamic_string_copy_elem(rawptr(&d.signVideoContent.path), rawptr(&s.signVideoContent.path))
+	dynamic_string_copy_elem(rawptr(&d.signVideoContent.bgPath), rawptr(&s.signVideoContent.bgPath))
+}
+
 spell_item_free :: proc(p: rawptr) {
 	v := (^SpellItem_t)(p)
 	strings := [?]^DynamicString{
@@ -1930,6 +2009,7 @@ Dither_t :: struct {
 #assert(size_of(EntityColliderData_t) == 304)
 #assert(size_of(SpellItem_t) == 496)
 #assert(size_of(ItemTooltip_t) == 280)
+#assert(size_of(Entry_t) == 352)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -2318,6 +2398,7 @@ Value_Kind :: enum i32 {
 	MK_EntityColliderData    = 52,
 	MK_SpellItem             = 53,
 	MK_ItemTooltip           = 54,
+	MK_Entry                 = 55,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2382,6 +2463,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = spell_item_free, copy = spell_item_copy }
 	case .MK_ItemTooltip:
 		return Value_Ops{ free = item_tooltip_free, copy = item_tooltip_copy }
+	case .MK_Entry:
+		return Value_Ops{ free = entry_free, copy = entry_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2440,6 +2523,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_StringPair: str_map_put(m, key, value, DynamicStringPair_t, ops)
 	case .MK_I32Map: str_map_put(m, key, value, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_put(m, key, value, ItemTooltip_t, ops)
+	case .MK_Entry: str_map_put(m, key, value, Entry_t, ops)
 	}
 }
 
@@ -2473,6 +2557,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_StringPair: return str_map_get(m, key, out, DynamicStringPair_t, ops)
 	case .MK_I32Map: return str_map_get(m, key, out, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_get(m, key, out, ItemTooltip_t, ops)
+	case .MK_Entry: return str_map_get(m, key, out, Entry_t, ops)
 	}
 	return false
 }
@@ -2506,6 +2591,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_StringPair: return str_map_len(m, DynamicStringPair_t)
 	case .MK_I32Map: return str_map_len(m, map[[4]byte]i32)
 	case .MK_ItemTooltip: return str_map_len(m, ItemTooltip_t)
+	case .MK_Entry: return str_map_len(m, Entry_t)
 	}
 	return 0
 }
@@ -2540,6 +2626,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_StringPair: str_map_clear(m, DynamicStringPair_t, ops)
 	case .MK_I32Map: str_map_clear(m, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_clear(m, ItemTooltip_t, ops)
+	case .MK_Entry: str_map_clear(m, Entry_t, ops)
 	}
 }
 
@@ -2573,6 +2660,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_StringPair: str_map_destroy(m, DynamicStringPair_t, ops)
 	case .MK_I32Map: str_map_destroy(m, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: str_map_destroy(m, ItemTooltip_t, ops)
+	case .MK_Entry: str_map_destroy(m, Entry_t, ops)
 	}
 }
 
@@ -2605,6 +2693,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_StringPair: return str_map_entry(m, key, DynamicStringPair_t)
 	case .MK_I32Map: return str_map_entry(m, key, map[[4]byte]i32)
 	case .MK_ItemTooltip: return str_map_entry(m, key, ItemTooltip_t)
+	case .MK_Entry: return str_map_entry(m, key, Entry_t)
 	}
 	return nil
 }
@@ -2639,6 +2728,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_StringPair: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DynamicStringPair_t, ops)
 	case .MK_I32Map: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemTooltip_t, ops)
+	case .MK_Entry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Entry_t, ops)
 	}
 	return 0
 }
@@ -2673,6 +2763,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_StringPair: str_map_for_each(m, DynamicStringPair_t, f, userdata)
 	case .MK_I32Map: str_map_for_each(m, map[[4]byte]i32, f, userdata)
 	case .MK_ItemTooltip: str_map_for_each(m, ItemTooltip_t, f, userdata)
+	case .MK_Entry: str_map_for_each(m, Entry_t, f, userdata)
 	}
 }
 
@@ -2712,6 +2803,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_StringPair: return str_map_erase(m, key, DynamicStringPair_t, ops)
 	case .MK_I32Map: return str_map_erase(m, key, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_erase(m, key, ItemTooltip_t, ops)
+	case .MK_Entry: return str_map_erase(m, key, Entry_t, ops)
 	}
 	return false
 }
@@ -3185,6 +3277,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_StringPair: return str_map_find(m, key, out_key, out_key_len, out_val, DynamicStringPair_t, ops)
 	case .MK_I32Map: return str_map_find(m, key, out_key, out_key_len, out_val, map[[4]byte]i32, ops)
 	case .MK_ItemTooltip: return str_map_find(m, key, out_key, out_key_len, out_val, ItemTooltip_t, ops)
+	case .MK_Entry: return str_map_find(m, key, out_key, out_key_len, out_val, Entry_t, ops)
 	}
 	return false
 }
