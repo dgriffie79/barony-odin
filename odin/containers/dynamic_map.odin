@@ -1162,6 +1162,35 @@ i32_map_value_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// u32_map value = map[uint]uint (Raw_Map of u32). Same shape as i32_map_value_*;
+// separate kind because the inner value type differs.
+u32_map_value_free :: proc(p: rawptr) {
+	mm := transmute(^map[[4]byte]u32)(p)
+	if mm^ != nil {
+		delete(mm^)
+		mm^ = nil
+	}
+}
+
+u32_map_value_copy :: proc(dst: rawptr, src: rawptr) {
+	m := transmute(^map[[4]byte]u32)(dst)
+	s := transmute(^map[[4]byte]u32)(src)
+	if m^ != nil {
+		delete(m^)
+	}
+	m^ = nil
+	if s^ == nil {
+		return
+	}
+	m^ = make(map[[4]byte]u32)
+	for key in s^ {
+		_, vp, _, err := map_entry(s, key)
+		if err == nil && vp != nil {
+			m^[key] = vp^
+		}
+	}
+}
+
 // game Item — 56-byte POD (verified via static_assert(sizeof(Item)==56))
 Item_Game :: struct {
 	bytes: [56]u8,
@@ -1936,6 +1965,7 @@ Value_Kind :: enum i32 {
 	MK_ChunkDither           = 46,
 	MK_I32Map                = 47,
 	MK_Bool                  = 48,
+	MK_U32Map                = 49,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -1988,6 +2018,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = set_i32_value_free, copy = set_i32_value_copy }
 	case .MK_I32Map:
 		return Value_Ops{ free = i32_map_value_free, copy = i32_map_value_copy }
+	case .MK_U32Map:
+		return Value_Ops{ free = u32_map_value_free, copy = u32_map_value_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2335,6 +2367,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_MonsterTrapIgnore: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_put(m, key, value, map[i32]struct{}, ops)
 	case .MK_I32Map: i32_map_put(m, key, value, map[[4]byte]i32, ops)
+	case .MK_U32Map: i32_map_put(m, key, value, map[[4]byte]u32, ops)
 	case .MK_Lootbag: i32_map_put(m, key, value, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_put(m, key, value, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_put(m, key, value, GlyphData_t, ops)
@@ -2375,6 +2408,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_MonsterTrapIgnore: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_get(m, key, out, map[i32]struct{}, ops)
 	case .MK_I32Map: return i32_map_get(m, key, out, map[[4]byte]i32, ops)
+	case .MK_U32Map: return i32_map_get(m, key, out, map[[4]byte]u32, ops)
 	case .MK_Lootbag: return i32_map_get(m, key, out, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_get(m, key, out, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_get(m, key, out, GlyphData_t, ops)
@@ -2415,6 +2449,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_MonsterTrapIgnore: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case .MK_SetOfI32: return i32_map_len(m, map[i32]struct{})
 	case .MK_I32Map: return i32_map_len(m, map[[4]byte]i32)
+	case .MK_U32Map: return i32_map_len(m, map[[4]byte]u32)
 	case .MK_Lootbag: return i32_map_len(m, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_len(m, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_len(m, GlyphData_t)
@@ -2456,6 +2491,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_MonsterTrapIgnore: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_clear(m, map[i32]struct{}, ops)
 	case .MK_I32Map: i32_map_clear(m, map[[4]byte]i32, ops)
+	case .MK_U32Map: i32_map_clear(m, map[[4]byte]u32, ops)
 	case .MK_Lootbag: i32_map_clear(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_clear(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_clear(m, GlyphData_t, ops)
@@ -2496,6 +2532,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_MonsterTrapIgnore: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_destroy(m, map[i32]struct{}, ops)
 	case .MK_I32Map: i32_map_destroy(m, map[[4]byte]i32, ops)
+	case .MK_U32Map: i32_map_destroy(m, map[[4]byte]u32, ops)
 	case .MK_Lootbag: i32_map_destroy(m, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: i32_map_destroy(m, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: i32_map_destroy(m, GlyphData_t, ops)
@@ -2535,6 +2572,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_MonsterTrapIgnore: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case .MK_SetOfI32: return i32_map_entry(m, key, map[i32]struct{})
 	case .MK_I32Map: return i32_map_entry(m, key, map[[4]byte]i32)
+	case .MK_U32Map: return i32_map_entry(m, key, map[[4]byte]u32)
 	case .MK_Lootbag: return i32_map_entry(m, key, Lootbag_t)
 	case .MK_EnemyHPDetails: return i32_map_entry(m, key, EnemyHPDetails_t)
 	case .MK_GlyphData: return i32_map_entry(m, key, GlyphData_t)
@@ -2576,6 +2614,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_MonsterTrapIgnore: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[i32]struct{}, ops)
 	case .MK_I32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]i32, ops)
+	case .MK_U32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]u32, ops)
 	case .MK_Lootbag: return i32_map_entries(m, key_ptrs, val_ptrs, count, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_entries(m, key_ptrs, val_ptrs, count, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_entries(m, key_ptrs, val_ptrs, count, GlyphData_t, ops)
@@ -2617,6 +2656,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_MonsterTrapIgnore: i32_map_for_each(m, MonsterTrapIgnoreEntities_t, f, userdata)
 	case .MK_SetOfI32: i32_map_for_each(m, map[i32]struct{}, f, userdata)
 	case .MK_I32Map: i32_map_for_each(m, map[[4]byte]i32, f, userdata)
+	case .MK_U32Map: i32_map_for_each(m, map[[4]byte]u32, f, userdata)
 	case .MK_Lootbag: i32_map_for_each(m, Lootbag_t, f, userdata)
 	case .MK_EnemyHPDetails: i32_map_for_each(m, EnemyHPDetails_t, f, userdata)
 	case .MK_GlyphData: i32_map_for_each(m, GlyphData_t, f, userdata)
@@ -2657,6 +2697,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_MonsterTrapIgnore: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_erase(m, key, map[i32]struct{}, ops)
 	case .MK_I32Map: return i32_map_erase(m, key, map[[4]byte]i32, ops)
+	case .MK_U32Map: return i32_map_erase(m, key, map[[4]byte]u32, ops)
 	case .MK_Lootbag: return i32_map_erase(m, key, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_erase(m, key, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_erase(m, key, GlyphData_t, ops)
@@ -2767,6 +2808,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_MonsterTrapIgnore: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_find(m, key, out_val, out_val_len, map[i32]struct{}, ops)
 	case .MK_I32Map: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]i32, ops)
+	case .MK_U32Map: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]u32, ops)
 	case .MK_Lootbag: return i32_map_find(m, key, out_val, out_val_len, Lootbag_t, ops)
 	case .MK_EnemyHPDetails: return i32_map_find(m, key, out_val, out_val_len, EnemyHPDetails_t, ops)
 	case .MK_GlyphData: return i32_map_find(m, key, out_val, out_val_len, GlyphData_t, ops)

@@ -2434,7 +2434,7 @@ public:
 		bool previouslyLevitating = false;
 		Uint32 donationRevealedOnFloor = 0;
 		bool donationClaimed = false;
-		std::map<Uint32, std::map<Uint32, Uint32>> targetsCompelled;
+		DynamicMapU32Map targetsCompelled;
 		DynamicSetI32 targetsRefuseCompel;
 		static void ensembleMusicUpdateServer();
 		static void ensembleMusicUpdate();
