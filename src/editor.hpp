@@ -48,7 +48,7 @@ extern int slidery, slidersize;
 extern int menuDisappear;
 extern int selectedFile;
 extern DynamicArrayStr mapNames;
-extern std::list<std::string> modFolderNames;
+extern DynamicArrayStr modFolderNames;
 extern std::string physfs_saveDirectory;
 extern std::string physfs_openDirectory;
 extern char filename[128];

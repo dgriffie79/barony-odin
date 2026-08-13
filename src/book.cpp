@@ -87,19 +87,19 @@ DynamicString getBookLocalizedNameFromIndex(int index, bool censored)
 }
 
 //Local helper function to make getting the list of books cross-platform easier.
-std::list<std::string> getListOfBooks()
+DynamicArrayStr getListOfBooks()
 {
-	std::list<std::string> books;
+	DynamicArrayStr books;
 	books = physfsGetFileNamesInDirectory("books/");
-	for ( auto it = books.begin(); it != books.end(); )
+	for ( int64_t i = 0; i < (int64_t)books.size(); )
 	{
-		if ( (*it).find(".txt") == std::string::npos)
+		if ( books[i].find(".txt") == DynamicString::npos )
 		{
-			it = books.erase(it);
+			books.erase(i);
 		}
 		else
 		{
-			++it;
+			++i;
 		}
 	}
 	return books;
@@ -215,9 +215,9 @@ bool BookParser_t::booksRequireCompiling()
 	return false;
 }
 
-std::list<std::string> BookParser_t::getListOfBooksAfterFiltering()
+DynamicArrayStr BookParser_t::getListOfBooksAfterFiltering()
 {
-	std::list<std::string> discoveredbooks = getListOfBooks();
+	DynamicArrayStr discoveredbooks = getListOfBooks();
 
 	//TODO: We will need to enable this on NINTENDO if we want mod support. Realistically, that just means adding JSON support and making ignoreBooksPath a static const definition in a header somewhere. (2 headers, actually: define it once for PC, definite it differently for Switch) ...we'll probably also need to update thet PHYSFS_getRealDir() call as well, something akin to the getListOfBooks() function. I.e. NINTENDO ROM reading or whatever.
 	DynamicString ignoreBooksPath = "books/ignored_books.json";
@@ -265,12 +265,12 @@ std::list<std::string> BookParser_t::getListOfBooksAfterFiltering()
 		{
 			for ( auto& filename : discoveredbooks )
 			{
-				if ( filename.find(".txt") == std::string::npos )
+				if ( filename.find(".txt") == DynamicString::npos )
 				{
 					++numSkipBooks;
 					printlog("[Books]: Skipping book '%s' due to filename\n", filename.c_str());
 				}
-				else if ( ignoredBooks.find(filename) != ignoredBooks.end() )
+				else if ( ignoredBooks.find(filename.c_str()) != ignoredBooks.end() )
 				{
 					++numSkipBooks;
 					printlog("[Books]: Skipping book '%s' due to 'ignored_books.json'\n", filename.c_str());
@@ -280,11 +280,11 @@ std::list<std::string> BookParser_t::getListOfBooksAfterFiltering()
 		// sort books alphabetically
 		discoveredbooks.sort();
 
-		std::list<std::string> filteredBooks;
+		DynamicArrayStr filteredBooks;
 		// read books
 		for ( const auto& filename : discoveredbooks )
 		{
-			if ( ignoredBooks.find(filename) != ignoredBooks.end() )
+			if ( ignoredBooks.find(filename.c_str()) != ignoredBooks.end() )
 			{
 				continue;
 			}
@@ -299,7 +299,7 @@ void BookParser_t::readBooksIntoTemp()
 {
 	tempBookData.clear();
 
-	std::list<std::string> discoveredbooks = getListOfBooksAfterFiltering();
+	DynamicArrayStr discoveredbooks = getListOfBooksAfterFiltering();
 
 	if ( !discoveredbooks.empty() )
 	{
@@ -310,7 +310,7 @@ void BookParser_t::readBooksIntoTemp()
 			//printlog("reading book: \"%s\"\n", filename.c_str());
 			DynamicString filenameNoExtension = filename;
 			auto findExtension = filename.find(".txt");
-			if ( findExtension != std::string::npos )
+			if ( findExtension != DynamicString::npos )
 			{
 				filenameNoExtension = filename.substr(0, findExtension);
 			}
@@ -357,7 +357,7 @@ void BookParser_t::createBooks(bool forceCacheRebuild)
 		printlog("[Books]: Error - Failed to read pre-compiled books... recompiling.");
 	}
 
-	std::list<std::string> discoveredbooks = getListOfBooksAfterFiltering();
+	DynamicArrayStr discoveredbooks = getListOfBooksAfterFiltering();
 	// create books
 	for ( const auto& filename : discoveredbooks )
 	{
@@ -597,7 +597,7 @@ void BookParser_t::createBook(DynamicString filename)
 
 	newBook.default_name = filename.c_str();
 	auto findTxt = newBook.default_name.find(".txt");
-	if ( findTxt != std::string::npos )
+	if ( findTxt != DynamicString::npos )
 	{
 		newBook.default_name = newBook.default_name.substr(0, findTxt);
 	}
@@ -930,7 +930,7 @@ void BookParser_t::createBook(DynamicString filename)
 
 bool physfsSearchBooksToUpdate()
 {
-	std::list<std::string> booklist = getListOfBooks();
+	DynamicArrayStr booklist = getListOfBooks();
 	if ( !booklist.empty() )
 	{
 		for ( auto& bookTitle : booklist )
@@ -953,7 +953,7 @@ bool physfsSearchBooksToUpdate()
 
 void physfsReloadBooks()
 {
-	const std::list<std::string> booklist = getListOfBooks();
+	const DynamicArrayStr booklist = getListOfBooks();
 	if ( !booklist.empty() )
 	{
 		bookParser_t.createBooks(true);

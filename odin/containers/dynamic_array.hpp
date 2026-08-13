@@ -23,6 +23,7 @@ typedef unsigned int Uint32;
 #include <vector>
 #include <memory>
 #include <string>
+#include <algorithm>
 
 
 
@@ -308,6 +309,12 @@ public:
     }
     void pop_back() { if (size() > 0) erase(size() - 1); }
     void pop_front() { if (size() > 0) erase((int64_t)0); }
+    // sort (std::list::sort equivalent). Sorts in place using std::sort over
+    // the live element slots. For DynamicString elements operator< is defined
+    // (barony_dynamic_string_compare), so the default comparator works.
+    void sort() { std::sort((T*)raw.data, (T*)raw.data + size()); }
+    template <typename Cmp>
+    void sort(Cmp cmp) { std::sort((T*)raw.data, (T*)raw.data + size(), cmp); }
     // reverse iteration (std::deque/vector rbegin/rend)
     using reverse_iterator = std::reverse_iterator<T*>;
     using const_reverse_iterator = std::reverse_iterator<const T*>;

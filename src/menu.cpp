@@ -91,8 +91,8 @@ std::vector<std::tuple<int, int, int, std::string>> savegamesList; // tuple - la
 
 // gamemods window stuff.
 int gamemods_window = 0;
-std::list<std::string> currentDirectoryFiles;
-std::list<std::string> directoryFilesListToUpload;
+DynamicArrayStr currentDirectoryFiles;
+DynamicArrayStr directoryFilesListToUpload;
 DynamicString directoryToUpload;
 DynamicString directoryPath;
 int gamemods_window_scroll = 0;
@@ -109,7 +109,7 @@ int gamemods_newBlankDirectoryStatus = 0;
 //int gamemods_numCurrentModsLoaded = -1;
 const int gamemods_maxTags = 10;
 std::vector<std::pair<std::string, std::string>> gamemods_mountedFilepaths;
-std::list<std::string> gamemods_localModFoldernames;
+DynamicArrayStr gamemods_localModFoldernames;
 //bool gamemods_modelsListRequiresReload = false;
 //bool gamemods_soundListRequiresReload = false;
 bool gamemods_modelsListLastStartedUnmodded = false; // if starting regular game that had to reset model list, use this to reinit custom models.
@@ -5262,10 +5262,7 @@ static void handleMainMenu(bool mode)
 			{
 				filename_padx = subx1 + 16;
 
-				std::list<std::string>::iterator it = gamemods_localModFoldernames.begin();
-				std::advance(it, 2); // skip the "." and ".." directories.
-				std::advance(it, i);
-				DynamicString folderName = *it;
+				DynamicString folderName = gamemods_localModFoldernames[2 + i]; // skip the "." and ".." directories.
 
 				drawWindowFancy(filename_padx, filename_pady - 8, filename_padx2, filename_pady + filename_rowHeight);
 				SDL_Rect highlightEntry;
@@ -9742,9 +9739,7 @@ void buttonGamemodsOpenDirectory(button_t* my)
 {
 	if ( gamemods_window_fileSelect != 0 && !currentDirectoryFiles.empty() )
 	{
-		std::list<std::string>::const_iterator it = currentDirectoryFiles.begin();
-		std::advance(it, std::max(gamemods_window_scroll + gamemods_window_fileSelect - 1, 0));
-		DynamicString directoryName = *it;
+		DynamicString directoryName = currentDirectoryFiles[std::max(gamemods_window_scroll + gamemods_window_fileSelect - 1, 0)];
 
 		if ( directoryName.compare("..") == 0 || directoryName.compare(".") == 0 )
 		{

@@ -46,6 +46,8 @@ extern bool requestingLobbies;
 
 #include <string>
 
+#include "../odin/containers/dynamic_array.hpp"
+
 extern void* currentLobby; // CSteamID to the current game lobby
 extern std::string cmd_line; // for game join requests
 const char* getRoomCode();
@@ -292,7 +294,7 @@ public:
 				actionMsg("")
 			{}
 	} LastActionResult;
-	std::list<std::string> workshopItemTags;
+	DynamicArrayStr workshopItemTags;
 	Uint32 uploadSuccessTicks;
 
 	void StoreResultMessage(std::string message, EResult result);

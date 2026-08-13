@@ -24429,9 +24429,7 @@ failed:
 		else
 		{
 			DynamicString path = outputdir;
-			auto it = Mods::localModFoldernames.begin();
-			std::advance(it, index);
-			path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator()).append(*it);
+			path.append(PHYSFS_getDirSeparator()).append("mods").append(PHYSFS_getDirSeparator()).append(Mods::localModFoldernames[index]);
 			bool pathIsMounted = Mods::isPathInMountedFiles(path);
 			snprintf(fullpath, sizeof(fullpath), "%s", path.c_str());
 			if ( pathIsMounted )
@@ -24466,7 +24464,7 @@ failed:
 				}
 				else if ( PHYSFS_mount(fullpath, NULL, 0) )
 				{
-					Mods::mountedFilepaths.push_back(std::make_pair(fullpath, *it));
+					Mods::mountedFilepaths.push_back(std::make_pair(fullpath, Mods::localModFoldernames[index]));
 					modLoaded = true;
 					button.setText(Language::get(5854));
 					button.setBackground("*#images/ui/Main Menus/Mods/Unload_Button_00.png");

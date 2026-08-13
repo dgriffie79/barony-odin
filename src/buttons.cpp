@@ -129,10 +129,13 @@ static void updateModFolderNames()
 	modFolderNames = directoryContents(path.c_str(), true, false);
 	if ( !modFolderNames.empty() )
 	{
-		std::list<std::string>::iterator it = std::find(modFolderNames.begin(), modFolderNames.end(), "..");
-		if ( it != modFolderNames.end() )
+		for ( int64_t i = 0; i < (int64_t)modFolderNames.size(); ++i )
 		{
-			modFolderNames.erase(it);
+			if ( modFolderNames[i] == ".." )
+			{
+				modFolderNames.erase(i);
+				break;
+			}
 		}
 		{
 		std::vector<DynamicString> _sorted;

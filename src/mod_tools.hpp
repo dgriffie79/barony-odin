@@ -3439,7 +3439,7 @@ struct Mods
 	static std::vector<std::pair<std::string, std::string>> mountedFilepathsSaved; // saved from config file
 	static std::set<std::string> mods_loaded_local;
 	static std::set<std::string> mods_loaded_workshop;
-	static std::list<std::string> localModFoldernames;
+	static DynamicArrayStr localModFoldernames;
 	static int numCurrentModsLoaded;
 	static bool modelsListRequiresReloadUnmodded;
 	static bool soundListRequiresReloadUnmodded;

@@ -40,7 +40,7 @@ public:
 	void deleteBooks();
 	DynamicMapStr tempBookData;
 	void readBooksIntoTemp();
-	std::list<std::string> getListOfBooksAfterFiltering();
+	DynamicArrayStr getListOfBooksAfterFiltering();
 };
 extern BookParser_t bookParser_t;
 

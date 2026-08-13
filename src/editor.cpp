@@ -49,7 +49,7 @@ std::vector<Entity*> groupedEntities;
 bool moveSelectionNegativeX = false;
 bool moveSelectionNegativeY = false;
 DynamicArrayStr mapNames;
-std::list<std::string> modFolderNames;
+DynamicArrayStr modFolderNames;
 std::string physfs_saveDirectory = BASE_DATA_DIR;
 std::string physfs_openDirectory = BASE_DATA_DIR;
 float limbs[NUMMONSTERS][30][3]; // dummy variable for files.cpp limbs reloading in Barony.
@@ -2909,9 +2909,7 @@ extern "C" int barony_main(int argc, char** argv)
 							slidery = std::min(std::max(suby1 + 21, slidery), suby2 - 113 - slidersize);
 							y2 = ((real_t)(slidery - suby1 - 20) / ((suby2 - 112) - (suby1 + 20))) * modFolderNames.size();
 							selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(modFolderNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-							std::list<std::string>::iterator it = modFolderNames.begin();
-							std::advance(it, selectedFile);
-							strcpy(foldername, it->c_str());
+							strcpy(foldername, modFolderNames[selectedFile].c_str());
 							inputstr = foldername;
 							scroll = 0;
 						}
@@ -2922,9 +2920,7 @@ extern "C" int barony_main(int argc, char** argv)
 							y2 = ((real_t)(slidery - suby1 - 20) / ((suby2 - 112) - (suby1 + 20))) * modFolderNames.size();
 							mclick = 1;
 							selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(modFolderNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-							std::list<std::string>::iterator it = modFolderNames.begin();
-							std::advance(it, selectedFile);
-							strcpy(foldername, it->c_str());
+							strcpy(foldername, modFolderNames[selectedFile].c_str());
 							inputstr = foldername;
 						}
 						else
@@ -2939,9 +2935,7 @@ extern "C" int barony_main(int argc, char** argv)
 							{
 								selectedFile = y2 + ((omousey - suby1 - 24) >> 3);
 								selectedFile = std::min<long unsigned int>(std::max(y2, selectedFile), std::min<long unsigned int>(modFolderNames.size() - 1, y2 + 19)); //TODO: Why are long unsigned int and int being compared? TWICE. On the same line.
-								std::list<std::string>::iterator it = modFolderNames.begin();
-								std::advance(it, selectedFile);
-								strcpy(foldername, it->c_str());
+								strcpy(foldername, modFolderNames[selectedFile].c_str());
 								inputstr = foldername;
 							}
 						}
@@ -2957,9 +2951,7 @@ extern "C" int barony_main(int argc, char** argv)
 						c = std::min<long unsigned int>(modFolderNames.size(), 20 + y2); //TODO: Why are long unsigned int and int being compared?
 						for ( z = y2; z < c; z++ )
 						{
-							std::list<std::string>::iterator it = modFolderNames.begin();
-							std::advance(it, z);
-							printText(font8x8_bmp, x, y, it->c_str());
+							printText(font8x8_bmp, x, y, modFolderNames[z].c_str());
 							y += 8;
 						}
 					}

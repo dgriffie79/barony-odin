@@ -3630,9 +3630,9 @@ out_input_file:
 
 -------------------------------------------------------------------------------*/
 
-std::list<std::string> directoryContents(const char* directory, bool includeSubdirectory, bool includeFiles, const char* base)
+DynamicArrayStr directoryContents(const char* directory, bool includeSubdirectory, bool includeFiles, const char* base)
 {
-	std::list<std::string> list;
+	DynamicArrayStr list;
 	char fullPath[PATH_MAX];
 	completePath(fullPath, directory, base);
 	DIR* dir = opendir(fullPath);
@@ -3868,9 +3868,9 @@ int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int* check
 	return 0;
 }
 
-std::list<std::string> physfsGetFileNamesInDirectory(const char* dir)
+DynamicArrayStr physfsGetFileNamesInDirectory(const char* dir)
 {
-	std::list<std::string> filenames;
+	DynamicArrayStr filenames;
 	char **rc = PHYSFS_enumerateFiles(dir);
 	if ( rc == NULL )
 	{

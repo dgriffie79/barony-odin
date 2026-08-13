@@ -10568,7 +10568,7 @@ std::vector<std::pair<std::string, std::string>> Mods::mountedFilepaths;
 std::vector<std::pair<std::string, std::string>> Mods::mountedFilepathsSaved;
 std::set<std::string> Mods::mods_loaded_local;
 std::set<std::string> Mods::mods_loaded_workshop;
-std::list<std::string> Mods::localModFoldernames;
+DynamicArrayStr Mods::localModFoldernames;
 int Mods::numCurrentModsLoaded = -1;
 bool Mods::modelsListRequiresReloadUnmodded = false;
 bool Mods::soundListRequiresReloadUnmodded = false;
