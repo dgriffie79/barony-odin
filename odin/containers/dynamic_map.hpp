@@ -470,6 +470,7 @@ enum MapValueKind {
     MK_MonsterAllies = 44,       // MonsterAllyFormation_t::MonsterAllies_t (72B, owning: 2 i32 maps)
     MK_Dither = 45,              // Dither_t (8B POD; pointer-keyed dithering maps)
     MK_ChunkDither = 46,         // ChunkDither_t (8B POD; default value=10)
+    MK_I32Map = 47,              // nested map<int,int> (32B Raw_Map, owning)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -1049,3 +1050,13 @@ template <> struct MapValueKindOf<IconEntry_tMirror> { static constexpr int valu
 template <> struct MapValueKindOf<IconEntryCallout_tMirror> { static constexpr int value = MK_IconEntryCallout; };
 using DynamicMapIconEntryList = DynamicMapStrT<IconEntry_tMirror>;
 using DynamicMapIconEntryCallout = DynamicMapStrT<IconEntryCallout_tMirror>;
+
+// map<int, map<int,int>>: the nested inner map as a value kind. DynamicMapI32T<int>
+// serves as the inner-map value (Raw_Map 32B == Odin map[[4]byte]i32).
+// CRITICAL: MapValueKindOf<DynamicMapI32T<int>> = MK_I32Map is what makes the
+// OUTER map treat the 32B inner map as an owned nested map. The inner map's own
+// method calls dispatch on MapValueKindOf<int> (MK_I32), never on this
+// specialization, so a standalone int->int map (spellTomeIDToAppearance) is
+// unaffected.
+template <> struct MapValueKindOf<DynamicMapI32T<int>> { static constexpr int value = MK_I32Map; };
+using DynamicMapI32Map = DynamicMapI32T<DynamicMapI32T<int>>;

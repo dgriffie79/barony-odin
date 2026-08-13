@@ -875,7 +875,7 @@ typedef struct spell_t
 
 extern list_t channeledSpells[MAXPLAYERS]; //Spells the player is currently channeling. //TODO: Universalize it for all entities that can cast spells? //TODO: Cleanup and stuff.
 extern std::map<int, spell_t*> allGameSpells; // to iterate over for quickly finding attributes of all spells.
-extern std::map<int, std::map<int, int>> spellTomeAppearanceToID; // school, then appearance, then spell ID
+extern DynamicMapI32Map spellTomeAppearanceToID; // school, then appearance, then spell ID
 extern DynamicMapI32T<int> spellTomeIDToAppearance; // spell ID to appearance of school
 
 //TODO: Add stock spells.

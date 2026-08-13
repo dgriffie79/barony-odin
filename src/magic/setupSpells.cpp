@@ -16,7 +16,7 @@
 #include "../mod_tools.hpp"
 
 std::map<int, spell_t*> allGameSpells;
-std::map<int, std::map<int, int>> spellTomeAppearanceToID;
+DynamicMapI32Map spellTomeAppearanceToID;
 DynamicMapI32T<int> spellTomeIDToAppearance;
 
 spell_t* createSimpleSpell(int spellID, int difficulty, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name, int sustainedMP = 0);
