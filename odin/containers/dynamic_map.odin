@@ -1476,6 +1476,16 @@ MonsterAllies_t :: struct {
 	updatedOnTick: u32,
 }
 
+// Dither_t — 8B POD. Value for the pointer-keyed dithering maps:
+//   Entity::Dither { int value = 0; Uint32 lastUpdateTick = 0; }
+//   Chunk::Dither  { int value = MAX(10); Uint32 lastUpdateTick = 0; }
+// Both are {value, lastUpdateTick}; the difference is only the non-zero
+// default (handled by the ptr entry path, not the struct).
+Dither_t :: struct {
+	value:         i32,
+	lastUpdateTick: u32,
+}
+
 // Layout guards — each mirror must match its C++ struct sizeof exactly.
 #assert(size_of(LightDef) == 28)
 #assert(size_of(IconEntryTextMap_t) == 48)
@@ -1513,6 +1523,7 @@ MonsterAllies_t :: struct {
 #assert(size_of(IconLookup_t) == 32)
 #assert(size_of(MonsterDataEntry_t) == 200)
 #assert(size_of(MonsterAllies_t) == 72)
+#assert(size_of(Dither_t) == 8)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -1891,6 +1902,8 @@ Value_Kind :: enum i32 {
 	MK_IconLookup            = 42,
 	MK_MonsterDataEntry      = 43,
 	MK_MonsterAllies         = 44,
+	MK_Dither                = 45,
+	MK_ChunkDither           = 46,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -1955,6 +1968,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = monster_data_entry_free, copy = monster_data_entry_copy }
 	case .MK_MonsterAllies:
 		return Value_Ops{ free = monster_allies_free, copy = monster_allies_copy }
+	case .MK_Dither, .MK_ChunkDither:
+		return Value_Ops{}
 	}
 	return Value_Ops{}
 }
@@ -2758,4 +2773,238 @@ barony_dynamic_set_i32_copy :: proc "c" (dst: ^map[i32]struct{}, src: ^map[i32]s
 	for i in 0..<int(n) {
 		barony_dynamic_set_i32_insert(dst, values[i])
 	}
+}
+
+// ---------------------------------------------------------------------------
+// pointer-keyed maps: std::unordered_map<PtrType, V> -> map[rawptr]V.
+//
+// Keys are non-owning raw pointers (view_t*, SDL_GameController*, ...). Odin
+// hashes the pointer address (map[rawptr]V). C++ passes the key as rawptr.
+//
+// The value is a POD Dither_t { value: i32, lastUpdateTick: u32 } (8 bytes).
+// `put` is the only owned-path op and it writes the value by value (POD).
+// ---------------------------------------------------------------------------
+
+@(export)
+barony_dynamic_map_ptr_init :: proc "c" (m: rawptr, value_kind: i32) {
+	context = runtime.default_context()
+	(^[32]byte)(m)^ = 0
+}
+
+@(export)
+barony_dynamic_map_ptr_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, value_kind: i32) {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither, .MK_ChunkDither:
+		ptr_map_put(m, key, value, Dither_t, ops)
+	}
+}
+
+ptr_map_put :: proc(m: rawptr, key: rawptr, value: rawptr, $V: typeid, ops: Value_Ops) {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil {
+		mm^ = make(map[rawptr]V)
+	}
+	k := key
+	if old, had := mm[k]; had {
+		if ops.free != nil {
+			ops.free(&old)
+		}
+	}
+	new_val: V
+	if ops.copy != nil {
+		ops.copy(&new_val, value)
+	} else {
+		new_val = (^V)(value)^
+	}
+	mm[k] = new_val
+}
+
+@(export)
+barony_dynamic_map_ptr_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, value_kind: i32) -> bool {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither, .MK_ChunkDither:
+		return ptr_map_get(m, key, out, Dither_t, ops)
+	}
+	return false
+}
+
+ptr_map_get :: proc(m: rawptr, key: rawptr, out: rawptr, $V: typeid, ops: Value_Ops) -> bool {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil {
+		return false
+	}
+	v, ok := mm[key]
+	if ok {
+		if ops.copy != nil {
+			ops.copy(out, &v)
+		} else {
+			(^V)(out)^ = v
+		}
+	}
+	return ok
+}
+
+@(export)
+barony_dynamic_map_ptr_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
+	context = runtime.default_context()
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither, .MK_ChunkDither:
+		return ptr_map_len(m, Dither_t)
+	}
+	return 0
+}
+
+ptr_map_len :: proc(m: rawptr, $V: typeid) -> i32 {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil {
+		return 0
+	}
+	return i32(len(mm^))
+}
+
+@(export)
+barony_dynamic_map_ptr_clear :: proc "c" (m: rawptr, value_kind: i32) {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither, .MK_ChunkDither:
+		ptr_map_clear(m, Dither_t, ops)
+	}
+}
+
+ptr_map_clear :: proc(m: rawptr, $V: typeid, ops: Value_Ops) {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ != nil {
+		if ops.free != nil {
+			for k in mm^ {
+				_, vp, _, err := map_entry(mm, k)
+				if err == nil && vp != nil {
+					ops.free(vp)
+				}
+			}
+		}
+		clear(&mm^)
+	}
+}
+
+@(export)
+barony_dynamic_map_ptr_destroy :: proc "c" (m: rawptr, value_kind: i32) {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither, .MK_ChunkDither:
+		ptr_map_destroy(m, Dither_t, ops)
+	}
+}
+
+ptr_map_destroy :: proc(m: rawptr, $V: typeid, ops: Value_Ops) {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ != nil {
+		if ops.free != nil {
+			for k in mm^ {
+				_, vp, _, err := map_entry(mm, k)
+				if err == nil && vp != nil {
+					ops.free(vp)
+				}
+			}
+		}
+		delete(mm^)
+		mm^ = nil
+	}
+}
+
+@(export)
+barony_dynamic_map_ptr_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i32) -> rawptr {
+	context = runtime.default_context()
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither:
+		return ptr_map_entry(m, key, Dither_t, 0)
+	case .MK_ChunkDither:
+		return ptr_map_entry(m, key, Dither_t, 10)
+	}
+	return nil
+}
+
+// ptr_map_entry: get-or-insert, returning the live slot. `default_value` sets
+// the initial `value` field for a freshly-inserted slot so the two dithering
+// defaults match their std::unordered_map origins:
+//   Entity::Dither -> 0 (fade in)
+//   Chunk::Dither  -> 10 (opaque immediately, fades out)
+ptr_map_entry :: proc(m: rawptr, key: rawptr, $V: typeid, default_value: i32) -> rawptr {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil {
+		mm^ = make(map[rawptr]V)
+	}
+	k := key
+	_, vp, just_inserted, err := map_entry(mm, k)
+	if err != nil {
+		return nil
+	}
+	if just_inserted && default_value != 0 {
+		(^Dither_t)(vp).value = default_value
+	}
+	return vp
+}
+
+@(export)
+barony_dynamic_map_ptr_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, val_ptrs: rawptr, count: i32, value_kind: i32) -> i32 {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither:
+		return ptr_map_entries(m, key_ptrs, val_ptrs, count, Dither_t, ops)
+	}
+	return 0
+}
+
+ptr_map_entries :: proc(m: rawptr, key_ptrs: [^]rawptr, val_ptrs: rawptr, count: i32, $V: typeid, ops: Value_Ops) -> i32 {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil || count <= 0 {
+		return 0
+	}
+	n := i32(0)
+	for key, &value in mm^ {
+		if n >= count {
+			break
+		}
+		key_ptrs[n] = key
+		if ops.copy != nil {
+			ops.copy(([^]u8)(uintptr(val_ptrs) + uintptr(n) * uintptr(size_of(V))), &value)
+		} else {
+			(^V)(([^]u8)(uintptr(val_ptrs) + uintptr(n) * uintptr(size_of(V))))^ = value
+		}
+		n += 1
+	}
+	return n
+}
+
+@(export)
+barony_dynamic_map_ptr_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i32) -> bool {
+	context = runtime.default_context()
+	ops := value_ops_for(value_kind)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_Dither:
+		return ptr_map_erase(m, key, Dither_t, ops)
+	}
+	return false
+}
+
+ptr_map_erase :: proc(m: rawptr, key: rawptr, $V: typeid, ops: Value_Ops) -> bool {
+	mm := transmute(^map[rawptr]V)(m)
+	if mm^ == nil {
+		return false
+	}
+	k := key
+	if v, had := mm[k]; had {
+		if ops.free != nil {
+			ops.free(&v)
+		}
+		runtime.delete_key(mm, k)
+		return true
+	}
+	return false
 }

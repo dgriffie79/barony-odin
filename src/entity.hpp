@@ -103,7 +103,7 @@ public:
         Uint32 lastUpdateTick = 0;
         static constexpr int MAX = 10;
     };
-    std::unordered_map<view_t*, Dither> dithering;
+    DynamicMapPtrT<Dither_t> dithering;
 	vec4_t lightBonus;
 
 #ifdef USE_FMOD

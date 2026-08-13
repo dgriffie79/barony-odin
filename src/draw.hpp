@@ -407,7 +407,7 @@ struct Chunk {
         int value = MAX;
         Uint32 lastUpdateTick = 0;
     };
-    std::unordered_map<view_t*, Dither> dithering;
+    DynamicMapPtrT<ChunkDither_t> dithering;
 };
 void clearChunks();
 void createChunks();

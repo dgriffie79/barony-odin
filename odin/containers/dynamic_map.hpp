@@ -53,6 +53,17 @@ extern "C" {
 
     void      barony_dynamic_map_str_for_each(DynamicMapRaw*, int32_t value_kind, void* cb, void* userdata);
 
+    // ---- generic ptr-key family (rawptr keys; value_kind selects V) ----
+    void      barony_dynamic_map_ptr_init(DynamicMapRaw*, int32_t value_kind);
+    void      barony_dynamic_map_ptr_put(DynamicMapRaw*, const void* key, const void* value, int32_t value_kind);
+    bool      barony_dynamic_map_ptr_get(DynamicMapRaw*, const void* key, void* out, int32_t value_kind);
+    int32_t   barony_dynamic_map_ptr_len(DynamicMapRaw*, int32_t value_kind);
+    void      barony_dynamic_map_ptr_clear(DynamicMapRaw*, int32_t value_kind);
+    void      barony_dynamic_map_ptr_destroy(DynamicMapRaw*, int32_t value_kind);
+    void*     barony_dynamic_map_ptr_entry(DynamicMapRaw*, const void* key, int32_t value_kind);
+    int32_t   barony_dynamic_map_ptr_entries(DynamicMapRaw*, void** key_ptrs, void* val_ptrs, int32_t count, int32_t value_kind);
+    bool      barony_dynamic_map_ptr_erase(DynamicMapRaw*, const void* key, int32_t value_kind);
+
     // DynamicSet shims (std::set replacement; map[T]struct{} on the Odin side)
     void      barony_dynamic_set_i32_init(DynamicMapRaw*);
     bool      barony_dynamic_set_i32_insert(DynamicMapRaw*, int);
@@ -392,6 +403,24 @@ struct Class_tMirror {
     const char* image_locked = nullptr;
 };
 
+// Dither_t — 8B POD mirror of Entity::Dither / Chunk::Dither (both
+// {int value; Uint32 lastUpdateTick;}). Value for the pointer-keyed
+// dithering maps. The non-zero Chunk::Dither default (value=10) is handled at
+// the call site (chunk dithering always writes value before first read), so
+// the mirror is POD and value-initializes to zero like Entity::Dither.
+struct Dither_t {
+    int32_t value = 0;
+    uint32_t lastUpdateTick = 0;
+};
+
+// ChunkDither_t — same 8B layout, but its map value kind (MK_ChunkDither)
+// defaults `value` to 10 on insert (Chunk::Dither { value = MAX; }), matching
+// the std::unordered_map value-initialization for chunk dithering.
+struct ChunkDither_t {
+    int32_t value = 10;
+    uint32_t lastUpdateTick = 0;
+};
+
 // ---- value kinds (must match value_kind mapping in dynamic_map.odin) ----
 enum MapValueKind {
     MK_I32 = 0,
@@ -439,6 +468,8 @@ enum MapValueKind {
     MK_IconLookup = 42,          // MonsterData_t::MonsterDataEntry_t::IconLookup_t (32B, owning: 2 DynamicStrings)
     MK_MonsterDataEntry = 43,    // MonsterData_t::MonsterDataEntry_t (200B, owning: strings+maps+sets)
     MK_MonsterAllies = 44,       // MonsterAllyFormation_t::MonsterAllies_t (72B, owning: 2 i32 maps)
+    MK_Dither = 45,              // Dither_t (8B POD; pointer-keyed dithering maps)
+    MK_ChunkDither = 46,         // ChunkDither_t (8B POD; default value=10)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -459,6 +490,8 @@ template <> struct MapValueKindOf<Achievement_tMirror> { static constexpr int va
 template <> struct MapValueKindOf<AchievementData_tMirror> { static constexpr int value = MK_AchievementData; };
 template <> struct MapValueKindOf<binding_tMirror> { static constexpr int value = MK_Binding; };
 template <> struct MapValueKindOf<Class_tMirror> { static constexpr int value = MK_Class; };
+template <> struct MapValueKindOf<Dither_t> { static constexpr int value = MK_Dither; };
+template <> struct MapValueKindOf<ChunkDither_t> { static constexpr int value = MK_ChunkDither; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
@@ -844,6 +877,129 @@ private:
         std::vector<int> kp(n);
         std::vector<V> vv(n);
         int32_t got = barony_dynamic_map_i32_entries(const_cast<DynamicMapRaw*>(&other.raw), (void**)kp.data(), vv.data(), n, MapValueKindOf<V>::value);
+        for (int32_t i = 0; i < got; ++i) put(kp[i], vv[i]);
+    }
+};
+
+// ---------------------------------------------------------------------------
+// DynamicMapPtrT<V> — std::unordered_map<KeyT, V> replacement with rawptr keys
+// (pointer-keyed maps: unordered_map<view_t*, Dither>, etc.). The key type is
+// the pointer itself (non-owning); Odin hashes the address. C++ passes the key
+// by value as a rawptr (8 bytes on x64, matches a pointer).
+// ---------------------------------------------------------------------------
+template <typename V>
+class DynamicMapPtrT {
+public:
+    DynamicMapRaw raw{};
+
+    DynamicMapPtrT() { barony_dynamic_map_ptr_init(&raw, MapValueKindOf<V>::value); }
+    ~DynamicMapPtrT() { barony_dynamic_map_ptr_destroy(&raw, MapValueKindOf<V>::value); }
+    DynamicMapPtrT(const DynamicMapPtrT& other) : raw{} {
+        barony_dynamic_map_ptr_init(&raw, MapValueKindOf<V>::value);
+        copyFrom(other);
+    }
+    DynamicMapPtrT& operator=(const DynamicMapPtrT& other) {
+        if (this != &other) { barony_dynamic_map_ptr_clear(&raw, MapValueKindOf<V>::value); copyFrom(other); }
+        return *this;
+    }
+    DynamicMapPtrT(DynamicMapPtrT&& other) noexcept : raw(other.raw) {
+        other.raw = DynamicMapRaw{};
+    }
+    DynamicMapPtrT& operator=(DynamicMapPtrT&& other) noexcept {
+        if (this != &other) {
+            barony_dynamic_map_ptr_destroy(&raw, MapValueKindOf<V>::value);
+            raw = other.raw;
+            other.raw = DynamicMapRaw{};
+        }
+        return *this;
+    }
+
+    template <typename K>
+    V& operator[](K key) {
+        return *reinterpret_cast<V*>(barony_dynamic_map_ptr_entry(&raw, (const void*)key, MapValueKindOf<V>::value));
+    }
+    template <typename K>
+    bool contains(K key) const {
+        V v{};
+        return barony_dynamic_map_ptr_get(const_cast<DynamicMapRaw*>(&raw), (const void*)key, &v, MapValueKindOf<V>::value);
+    }
+    template <typename K>
+    bool get(K key, V& out) const {
+        return barony_dynamic_map_ptr_get(const_cast<DynamicMapRaw*>(&raw), (const void*)key, &out, MapValueKindOf<V>::value);
+    }
+    template <typename K>
+    void put(K key, const V& v) {
+        barony_dynamic_map_ptr_put(&raw, (const void*)key, const_cast<V*>(&v), MapValueKindOf<V>::value);
+    }
+    int64_t size() const { return barony_dynamic_map_ptr_len(const_cast<DynamicMapRaw*>(&raw), MapValueKindOf<V>::value); }
+    bool empty() const { return size() == 0; }
+    void clear() { barony_dynamic_map_ptr_clear(&raw, MapValueKindOf<V>::value); }
+    template <typename K>
+    bool erase(K key) { return barony_dynamic_map_ptr_erase(&raw, (const void*)key, MapValueKindOf<V>::value); }
+
+    // swap (used by Chunk move ctor/assign: `dithering.swap(rhs.dithering)`)
+    void swap(DynamicMapPtrT& other) noexcept {
+        DynamicMapRaw tmp = raw;
+        raw = other.raw;
+        other.raw = tmp;
+    }
+
+    // find-family (snapshot iterator, std::unordered_map-like)
+    struct KV { const void* first; V second; };
+    struct Iterator {
+        std::shared_ptr<std::vector<KV>> snap;   // snapshot for begin(); null for find()
+        KV kv{};                                  // single result for find()
+        bool valid = false;
+        size_t idx = 0;
+        static constexpr size_t END = SIZE_MAX;
+        const KV* operator->() const { return snap ? &(*snap)[idx] : &kv; }
+        const KV& operator*() const { return snap ? (*snap)[idx] : kv; }
+        Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
+        bool operator!=(const Iterator& o) const {
+            if (!o.snap) return snap ? idx < snap->size() : valid;
+            if (!snap) return o.snap ? o.idx < o.snap->size() : false;
+            if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
+            return idx != o.idx;
+        }
+        bool operator==(const Iterator& o) const { return !(*this != o); }
+    };
+    template <typename K>
+    Iterator find(K key) const {
+        Iterator it;
+        V v{};
+        if (barony_dynamic_map_ptr_get(const_cast<DynamicMapRaw*>(&raw), (const void*)key, &v, MapValueKindOf<V>::value)) {
+            it.kv.first = (const void*)key;
+            it.kv.second = v;
+            it.valid = true;
+        }
+        return it;
+    }
+    Iterator end() const { Iterator it; it.valid = false; it.idx = Iterator::END; return it; }
+
+    Iterator begin() const {
+        Iterator it;
+        int32_t n = (int32_t)size();
+        if (n > 0) {
+            it.snap = std::make_shared<std::vector<KV>>();
+            it.snap->resize((size_t)n);
+            std::vector<void*> kp(n);
+            std::vector<V> vv(n);
+            int32_t got = barony_dynamic_map_ptr_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), vv.data(), n, MapValueKindOf<V>::value);
+            for (int32_t i = 0; i < got; ++i) {
+                (*it.snap)[i].first = kp[i];
+                (*it.snap)[i].second = vv[i];
+            }
+        }
+        return it;
+    }
+
+private:
+    void copyFrom(const DynamicMapPtrT& other) {
+        int32_t n = (int32_t)other.size();
+        if (n <= 0) return;
+        std::vector<void*> kp(n);
+        std::vector<V> vv(n);
+        int32_t got = barony_dynamic_map_ptr_entries(const_cast<DynamicMapRaw*>(&other.raw), kp.data(), vv.data(), n, MapValueKindOf<V>::value);
         for (int32_t i = 0; i < got; ++i) put(kp[i], vv[i]);
     }
 };
