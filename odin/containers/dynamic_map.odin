@@ -1007,6 +1007,33 @@ i32_map_entries :: proc(m: rawptr, key_ptrs: [^][4]byte, val_ptrs: rawptr, count
 	return n
 }
 
+// Zero-copy iteration: the callback receives (key, key_len, value_ptr, userdata)
+// where value_ptr points at the LIVE map slot. No value copy/free happens here,
+// so this is the iteration path to use for hot/large maps. The value pointer is
+// only valid for the duration of the callback (no insert/erase while iterating).
+MapForeachCb :: #type proc "c" (key: rawptr, key_len: i32, value: rawptr, userdata: rawptr)
+
+i32_map_for_each :: proc(m: rawptr, $V: typeid, cb: MapForeachCb, userdata: rawptr) {
+	mm := transmute(^map[[4]byte]V)(m)
+	if mm^ == nil {
+		return
+	}
+	for key, &value in mm^ {
+		k := key
+		cb(rawptr(&k), 4, rawptr(&value), userdata)
+	}
+}
+
+str_map_for_each :: proc(m: rawptr, $V: typeid, cb: MapForeachCb, userdata: rawptr) {
+	mm := transmute(^map[string]V)(m)
+	if mm^ == nil {
+		return
+	}
+	for key, &value in mm^ {
+		cb(rawptr(raw_data(key)), i32(len(key)), rawptr(&value), userdata)
+	}
+}
+
 // ---- element ops per value kind (must match value_kind_of<V> on the C++ side) ----
 // POD kinds (no free/copy): 0=i32 1=f32 2=u32 4=LightDef 17=Class_t
 // string (3) and the struct kinds get deep free/copy. string values are OWNED
@@ -1053,17 +1080,17 @@ dynarrs32_value_copy :: proc(dst: rawptr, src: rawptr) {
 }
 
 StatueLimb_t :: struct {
-	x:      f32,
-	y:      f32,
-	z:      f32,
-	pitch:  f32,
-	roll:   f32,
-	yaw:    f32,
-	focalx: f32,
-	focaly: f32,
-	focalz: f32,
+	x:      f64,
+	y:      f64,
+	z:      f64,
+	pitch:  f64,
+	roll:   f64,
+	yaw:    f64,
+	focalx: f64,
+	focaly: f64,
+	focalz: f64,
 	sprite: i32,
-	visible: b32,
+	visible: bool,
 }
 
 dynarr_statuelimb_value_free :: proc(p: rawptr) {
@@ -1135,21 +1162,21 @@ lootbag_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.items, &s.items, size_of(Item_Game), Kind_POD)
 }
 
-// EnemyHPDamageBarHandler::EnemyHPDetails — POD fields + one DynamicString
+// EnemyHPDamageBarHandler::EnemyHPDetails — real_t fields (f64) + one DynamicString + owning C++ pointers.
 BarAnimator_t :: struct {
-	foregroundValue: f32,
-	backgroundValue: f32,
-	previousSetpoint: f32,
+	foregroundValue: f64,
+	backgroundValue: f64,
+	previousSetpoint: f64,
 	setpoint: i32,
 	animateTicks: u32,
 	damageTaken: i32,
-	widthMultiplier: f32,
-	maxValue: f32,
-	currentOpacity: f32,
-	fadeOut: f32,
-	fadeIn: f32,
-	skullOpacities: [4]f32,
-	damageFrameOpacity: f32,
+	widthMultiplier: f64,
+	maxValue: f64,
+	currentOpacity: f64,
+	fadeOut: f64,
+	fadeIn: f64,
+	skullOpacities: [4]f64,
+	damageFrameOpacity: f64,
 }
 
 EnemyHPDetails_t :: struct {
@@ -1177,8 +1204,18 @@ EnemyHPDetails_t :: struct {
 	displayOnHUD: bool,
 	expired: bool,
 	detectMonsterCheckStatus: bool,
-	depletionAnimationPercent: f32,
+	depletionAnimationPercent: f64,
+	worldX: f64,
+	worldY: f64,
+	worldZ: f64,
+	screenDistance: f64,
+	worldTexture: rawptr,
+	worldSurfaceSprite: rawptr,
+	worldSurfaceSpriteStatusEffects: rawptr,
 }
+
+#assert(size_of(BarAnimator_t) == 120)
+#assert(size_of(EnemyHPDetails_t) == 280)
 
 enemy_hp_details_free :: proc(p: rawptr) {
 	v := (^EnemyHPDetails_t)(p)
@@ -1191,6 +1228,13 @@ enemy_hp_details_copy :: proc(dst: rawptr, src: rawptr) {
 	d^ = s^
 	d.enemy_name = DynamicString{}
 	dynamic_string_copy_elem(rawptr(&d.enemy_name), rawptr(&s.enemy_name))
+	// C++-owned transient caches (TempTexture / SDL_Surface). They are only ever
+	// read/written through operator[] (the live map slot), never through copied
+	// values; nulling them here stops snapshot/entry copies from double-freeing
+	// the slot's textures/surfaces via the C++ destructor.
+	d.worldTexture = nil
+	d.worldSurfaceSprite = nil
+	d.worldSurfaceSpriteStatusEffects = nil
 }
 
 // GlyphRenderer_t::GlyphData_t — 8 DynamicStrings + 3 ints (owning)
@@ -1245,6 +1289,292 @@ statistic_copy :: proc(dst: rawptr, src: rawptr) {
 	s := (^Statistic_t)(src)
 	d^ = s^
 	dynamic_string_copy_elem(rawptr(&d.name), rawptr(&s.name))
+}
+
+// ---------------------------------------------------------------------------
+// Case-2 value kinds (29-41): POD mirrors + owning mirrors (nested maps).
+// POD kinds use nil free/copy; owning kinds deep-free/deep-copy.
+// ---------------------------------------------------------------------------
+
+// FormationInfo_t — 20B POD (MSVC x64)
+FormationInfo_t :: struct {
+	x:             i32,
+	y:             i32,
+	pathingDelay:  i32,
+	tryExtendPath: i32,
+	init:          bool,
+	expired:       bool,
+}
+
+// AnimatedTile — 32B POD
+AnimatedTile :: struct {
+	indices: [8]i32,
+}
+
+// AdditionalOffset_t — 48B POD (6 x f64)
+AdditionalOffset_t :: struct {
+	focalx: f64,
+	focaly: f64,
+	focalz: f64,
+	scalex: f64,
+	scaley: f64,
+	scalez: f64,
+}
+
+// PlayerRaceHostility_t — 40B POD
+PlayerRaceHostility_t :: struct {
+	numAggressions:     i32,
+	numKills:           i32,
+	numAccessories:     i32,
+	playerRace:         i32,
+	sex:                i32,
+	equipment:          u8,
+	type_:              i32, // C++ field `type` (Odin keyword -> type_)
+	wantedLevel:        i32,
+	player:             i32,
+	bRequiresNetUpdate: bool,
+}
+
+// spellElement_t — 168B POD. `list_t` (two ptrs) inlined; `node` is a rawptr.
+spellElement_t :: struct {
+	damage:                 i32,
+	damage2:                i32,
+	duration2:              i32,
+	damage_mult:            f64,
+	damage2_mult:           f64,
+	channeledMana_mult:     f64,
+	duration_mult:          f64,
+	duration2_mult:         f64,
+	channeledMana_duration: i32,
+	duration:               i32,
+	element_internal_name:  [64]u8,
+	elementID:              i32,
+	can_be_learned:         bool,
+	channeledMana:          i32,
+	fociSpell:              bool,
+	elements: struct {
+		first: rawptr,
+		last:  rawptr,
+	},
+	node: rawptr,
+}
+
+// ParticleTimerEffect_t::Effect_t — 40B POD
+Effect_t :: struct {
+	x:          f64,
+	y:          f64,
+	effectType: i32,
+	yaw:        f64,
+	sfx:        i32,
+	firstEffect: bool,
+}
+
+// ParticleTimerEffect_t::EffectLocations_t — 40B POD
+EffectLocations_t :: struct {
+	yawOffset: f64,
+	xOffset:   f64,
+	seconds:   f64,
+	dist:      f64,
+	sfx:       i32,
+}
+
+// CalloutParticle_t — 160B POD
+CalloutParticle_t :: struct {
+	x:                        f64,
+	y:                        f64,
+	z:                        f64,
+	entityUid:                u32,
+	ticks:                    u32,
+	lifetime:                 u32,
+	creationTick:             u32,
+	cmd:                      i32,
+	type_:                    i32, // C++ field `type`
+	expired:                  bool,
+	lockOnScreen:             [4]bool,
+	playerColor:              i32,
+	tagID:                    i32,
+	tagSmallID:               i32,
+	animateState:             i32,
+	animateStateInit:         i32,
+	scale:                    f64,
+	animateX:                 f64,
+	animateScaleForPlayerView: [4]f64,
+	animateBounce:            f64,
+	animateY:                 f64,
+	noUpdate:                 bool,
+	selfCallout:              bool,
+	doMessage:                bool,
+	messageSentTick:          u32,
+	big:                      [4]bool,
+}
+
+// ModelOffset_t — 160B owning (2 nested i32-keyed maps of AdditionalOffset_t / kind 33)
+ModelOffset_t :: struct {
+	focalx: f64,
+	focaly: f64,
+	focalz: f64,
+	scalex: f64,
+	scaley: f64,
+	scalez: f64,
+	rotation: f64,
+	pitch:    f64,
+	x:        f64,
+	y:        f64,
+	z:        f64,
+	limbsIndex:  i32,
+	oversizedMask: bool,
+	expandToFitMask: bool,
+	adjustToOversizeMask:  map[[4]byte]AdditionalOffset_t,
+	adjustToExpandedHelm:  map[[4]byte]AdditionalOffset_t,
+}
+
+// StatusEffectQueue_t::EffectDefinitionEntry_t — 248B owning
+EffectDefinitionEntry_t :: struct {
+	effect_id: i32,
+	spell_id:  i32,
+	internal_name: DynamicString,
+	name:          DynamicString,
+	desc:          DynamicString,
+	imgPath:       DynamicString,
+	nameVariations:           Raw_Dynamic_Array, // of DynamicString
+	descVariations:           Raw_Dynamic_Array, // of DynamicString
+	useSpellIDForImgVariations: Raw_Dynamic_Array, // of i32
+	imgPathVariations:        Raw_Dynamic_Array, // of DynamicString
+	useSpellIDForImg: i32,
+	neverDisplay:    bool,
+	sustainedSpellID: i32,
+	tooltipWidth:    i32,
+}
+
+// ParticleTimerEffect_t — 32B owning (nested i32-keyed map of Effect_t / kind 36)
+ParticleTimerEffect_t :: struct {
+	effectMap: map[[4]byte]Effect_t,
+}
+
+// Layout guards — each mirror must match its C++ struct sizeof exactly.
+#assert(size_of(LightDef) == 28)
+#assert(size_of(IconEntryTextMap_t) == 48)
+#assert(size_of(IconEntryText_t) == 160)
+#assert(size_of(WorldIconEntry_t) == 104)
+#assert(size_of(DiscoveryAnim_t) == 24)
+#assert(size_of(SpecialNPCEntry_t) == 104)
+#assert(size_of(ColliderDmgProperties_t) == 72)
+#assert(size_of(ItemLocalization_t) == 32)
+#assert(size_of(Achievement_t) == 32)
+#assert(size_of(AchievementData_t) == 96)
+#assert(size_of(IconEntry_t) == 128)
+#assert(size_of(IconEntryCallout_t) == 128)
+#assert(size_of(binding_t) == 104)
+#assert(size_of(Class_t) == 32)
+#assert(size_of(StatueLimb_t) == 80)
+#assert(size_of(MonsterTrapIgnoreEntities_t) == 40)
+#assert(size_of(Item_Game) == 56)
+#assert(size_of(Lootbag_t) == 56)
+#assert(size_of(BarAnimator_t) == 120)
+#assert(size_of(EnemyHPDetails_t) == 280)
+#assert(size_of(GlyphData_t) == 144)
+#assert(size_of(Statistic_t) == 24)
+#assert(size_of(FormationInfo_t) == 20)
+#assert(size_of(AnimatedTile) == 32)
+#assert(size_of(AdditionalOffset_t) == 48)
+#assert(size_of(PlayerRaceHostility_t) == 40)
+#assert(size_of(spellElement_t) == 168)
+#assert(size_of(Effect_t) == 40)
+#assert(size_of(EffectLocations_t) == 40)
+#assert(size_of(CalloutParticle_t) == 160)
+#assert(size_of(ModelOffset_t) == 160)
+#assert(size_of(EffectDefinitionEntry_t) == 248)
+#assert(size_of(ParticleTimerEffect_t) == 32)
+
+model_offset_free :: proc(p: rawptr) {
+	v := (^ModelOffset_t)(p)
+	if v.adjustToOversizeMask != nil { delete(v.adjustToOversizeMask); v.adjustToOversizeMask = nil }
+	if v.adjustToExpandedHelm != nil { delete(v.adjustToExpandedHelm); v.adjustToExpandedHelm = nil }
+}
+
+copy_i32_map_additionaloffset :: proc(dst: ^map[[4]byte]AdditionalOffset_t, src: ^map[[4]byte]AdditionalOffset_t) {
+	if dst^ != nil { delete(dst^) }
+	dst^ = nil
+	if src^ == nil { return }
+	dst^ = make(map[[4]byte]AdditionalOffset_t)
+	for key in src^ {
+		_, vp, _, err := map_entry(src, key)
+		if err == nil && vp != nil {
+			// AdditionalOffset_t is POD (bytes); byte-copy the value.
+			dst^[key] = vp^
+		}
+	}
+}
+
+model_offset_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^ModelOffset_t)(dst)
+	s := (^ModelOffset_t)(src)
+	d.focalx = s.focalx; d.focaly = s.focaly; d.focalz = s.focalz
+	d.scalex = s.scalex; d.scaley = s.scaley; d.scalez = s.scalez
+	d.rotation = s.rotation; d.pitch = s.pitch
+	d.x = s.x; d.y = s.y; d.z = s.z
+	d.limbsIndex = s.limbsIndex
+	d.oversizedMask = s.oversizedMask
+	d.expandToFitMask = s.expandToFitMask
+	copy_i32_map_additionaloffset(&d.adjustToOversizeMask, &s.adjustToOversizeMask)
+	copy_i32_map_additionaloffset(&d.adjustToExpandedHelm, &s.adjustToExpandedHelm)
+}
+
+copy_i32_map_effect :: proc(dst: ^map[[4]byte]Effect_t, src: ^map[[4]byte]Effect_t) {
+	if dst^ != nil { delete(dst^) }
+	dst^ = nil
+	if src^ == nil { return }
+	dst^ = make(map[[4]byte]Effect_t)
+	for key in src^ {
+		_, vp, _, err := map_entry(src, key)
+		if err == nil && vp != nil {
+			dst^[key] = vp^ // Effect_t is POD; byte-copy.
+		}
+	}
+}
+
+particle_timer_effect_free :: proc(p: rawptr) {
+	v := (^ParticleTimerEffect_t)(p)
+	if v.effectMap != nil { delete(v.effectMap); v.effectMap = nil }
+}
+
+particle_timer_effect_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^ParticleTimerEffect_t)(dst)
+	s := (^ParticleTimerEffect_t)(src)
+	copy_i32_map_effect(&d.effectMap, &s.effectMap)
+}
+
+effect_definition_entry_free :: proc(p: rawptr) {
+	v := (^EffectDefinitionEntry_t)(p)
+	strings := [?]^DynamicString{ &v.internal_name, &v.name, &v.desc, &v.imgPath }
+	for s in strings {
+		if s.data != nil { mem.free(s.data); s.data = nil }
+		s.len = 0
+	}
+	barony_dynamic_array_elem_destroy(&v.nameVariations, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.descVariations, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.useSpellIDForImgVariations, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.imgPathVariations, size_of(DynamicString), Kind_DynamicString)
+}
+
+effect_definition_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^EffectDefinitionEntry_t)(dst)
+	s := (^EffectDefinitionEntry_t)(src)
+	d.effect_id = s.effect_id
+	d.spell_id = s.spell_id
+	d.useSpellIDForImg = s.useSpellIDForImg
+	d.neverDisplay = s.neverDisplay
+	d.sustainedSpellID = s.sustainedSpellID
+	d.tooltipWidth = s.tooltipWidth
+	srcs := [?]^DynamicString{ &s.internal_name, &s.name, &s.desc, &s.imgPath }
+	dsts := [?]^DynamicString{ &d.internal_name, &d.name, &d.desc, &d.imgPath }
+	for i in 0..<len(srcs) {
+		dynamic_string_copy_elem(rawptr(dsts[i]), rawptr(srcs[i]))
+	}
+	barony_dynamic_array_elem_copy(&d.nameVariations, &s.nameVariations, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.descVariations, &s.descVariations, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.useSpellIDForImgVariations, &s.useSpellIDForImgVariations, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.imgPathVariations, &s.imgPathVariations, size_of(DynamicString), Kind_DynamicString)
 }
 
 // kind -> ops lookup. POD kinds use {nil, nil} (raw byte copy, no free).
@@ -1345,55 +1675,111 @@ binding_t_copy_raw :: proc(dst: rawptr, src: rawptr) {
 	binding_t_copy((^binding_t)(dst), (^binding_t)(src))
 }
 
+// Value kinds — MUST match `enum MapValueKind` in dynamic_map.hpp.
+// i32-backed on purpose: Odin's default `int` is 8 bytes on x64, but these
+// cross the C ABI as int32_t. Keeping them named here makes the dispatchers
+// self-documenting so `case 26`-style magic numbers (and the u32/u64 drift)
+// can't happen again.
+Value_Kind :: enum i32 {
+	MK_I32                   = 0,
+	MK_F32                   = 1,
+	MK_U32                   = 2,
+	MK_String                = 3,
+	MK_LightDef              = 4,
+	MK_IconEntryTextMap      = 5,
+	MK_IconEntryText         = 6,
+	MK_WorldIconEntry        = 7,
+	MK_DiscoveryAnim         = 8,
+	MK_SpecialNPC            = 9,
+	MK_ColliderDmg           = 10,
+	MK_ItemLoc               = 11,
+	MK_Achievement           = 12,
+	MK_AchievementData       = 13,
+	MK_IconEntry             = 14,
+	MK_IconEntryCallout      = 15,
+	MK_Binding               = 16,
+	MK_Class                 = 17,
+	MK_DynArrayStr           = 18,
+	MK_DynArrayS32           = 19,
+	MK_StatueLimbArray       = 20,
+	MK_StoreSlotsArray       = 21,
+	MK_MonsterTrapIgnore     = 22,
+	MK_SetOfI32              = 23,
+	MK_Lootbag               = 24,
+	MK_EnemyHPDetails        = 25,
+	MK_U64                   = 26,
+	MK_GlyphData             = 27,
+	MK_Statistic             = 28,
+	MK_Ptr                   = 29,
+	MK_F64                   = 30,
+	MK_FormationInfo         = 31,
+	MK_AnimatedTile          = 32,
+	MK_AdditionalOffset      = 33,
+	MK_PlayerRaceHostility   = 34,
+	MK_SpellElement          = 35,
+	MK_Effect                = 36,
+	MK_EffectLocations       = 37,
+	MK_CalloutParticle       = 38,
+	MK_ModelOffset           = 39,
+	MK_EffectDefinitionEntry = 40,
+	MK_ParticleTimerEffect   = 41,
+}
+
 value_ops_for :: proc(kind: i32) -> Value_Ops {
-	switch kind {
-	case 0, 1, 2, 4, 17, 26:
+	switch Value_Kind(kind) {
+	case .MK_I32, .MK_F32, .MK_U32, .MK_LightDef, .MK_Class, .MK_U64, .MK_Ptr, .MK_F64, .MK_FormationInfo, .MK_AnimatedTile, .MK_AdditionalOffset, .MK_PlayerRaceHostility, .MK_SpellElement, .MK_Effect, .MK_EffectLocations, .MK_CalloutParticle:
 		return Value_Ops{}
-	case 3:
+	case .MK_ModelOffset:
+		return Value_Ops{ free = model_offset_free, copy = model_offset_copy }
+	case .MK_EffectDefinitionEntry:
+		return Value_Ops{ free = effect_definition_entry_free, copy = effect_definition_entry_copy }
+	case .MK_ParticleTimerEffect:
+		return Value_Ops{ free = particle_timer_effect_free, copy = particle_timer_effect_copy }
+	case .MK_String:
 		return Value_Ops{ free = string_value_free, copy = string_value_copy }
-	case 5:
+	case .MK_IconEntryTextMap:
 		return Value_Ops{ free = icon_entry_text_map_free_raw, copy = icon_entry_text_map_copy_raw }
-	case 6:
+	case .MK_IconEntryText:
 		return Value_Ops{ free = icon_entry_text_free_raw, copy = icon_entry_text_copy_raw }
-	case 7:
+	case .MK_WorldIconEntry:
 		return Value_Ops{ free = world_icon_entry_free_raw, copy = world_icon_entry_copy_raw }
-	case 8:
+	case .MK_DiscoveryAnim:
 		return Value_Ops{ free = discovery_anim_free_raw, copy = discovery_anim_copy_raw }
-	case 9:
+	case .MK_SpecialNPC:
 		return Value_Ops{ free = special_npc_free_raw, copy = special_npc_copy_raw }
-	case 10:
+	case .MK_ColliderDmg:
 		return Value_Ops{ free = collider_dmg_free_raw, copy = collider_dmg_copy_raw }
-	case 11:
+	case .MK_ItemLoc:
 		return Value_Ops{ free = item_localization_free_raw, copy = item_localization_copy_raw }
-	case 12:
+	case .MK_Achievement:
 		return Value_Ops{ free = achievement_t_free_raw, copy = achievement_t_copy_raw }
-	case 13:
+	case .MK_AchievementData:
 		return Value_Ops{ free = achievement_data_free_raw, copy = achievement_data_copy_raw }
-	case 14:
+	case .MK_IconEntry:
 		return Value_Ops{ free = icon_entry_free_raw, copy = icon_entry_copy_raw }
-	case 15:
+	case .MK_IconEntryCallout:
 		return Value_Ops{ free = icon_entry_callout_free_raw, copy = icon_entry_callout_copy_raw }
-	case 16:
+	case .MK_Binding:
 		return Value_Ops{ free = binding_t_free_raw, copy = binding_t_copy_raw }
-	case 18:
+	case .MK_DynArrayStr:
 		return Value_Ops{ free = dynarrstr_value_free, copy = dynarrstr_value_copy }
-	case 19:
+	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
-	case 20:
+	case .MK_StatueLimbArray:
 		return Value_Ops{ free = dynarr_statuelimb_value_free, copy = dynarr_statuelimb_value_copy }
-	case 21:
+	case .MK_StoreSlotsArray:
 		return Value_Ops{ free = dynarr_storeslots_value_free, copy = dynarr_storeslots_value_copy }
-	case 22:
+	case .MK_MonsterTrapIgnore:
 		return Value_Ops{ free = monster_trap_ignore_free, copy = monster_trap_ignore_copy }
-	case 23:
+	case .MK_SetOfI32:
 		return Value_Ops{ free = set_i32_value_free, copy = set_i32_value_copy }
-	case 24:
+	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
-	case 25:
+	case .MK_EnemyHPDetails:
 		return Value_Ops{ free = enemy_hp_details_free, copy = enemy_hp_details_copy }
-	case 27:
+	case .MK_GlyphData:
 		return Value_Ops{ free = glyph_data_free, copy = glyph_data_copy }
-	case 28:
+	case .MK_Statistic:
 		return Value_Ops{ free = statistic_free, copy = statistic_copy }
 	}
 	return Value_Ops{}
@@ -1411,29 +1797,29 @@ barony_dynamic_map_str_init :: proc "c" (m: rawptr, value_kind: i32) {
 barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  str_map_put(m, key, value, i32, ops)
-	case 1:  str_map_put(m, key, value, f32, ops)
-	case 2:  str_map_put(m, key, value, u32, ops)
-	case 3:  str_map_put(m, key, value, string, ops)
-	case 4:  str_map_put(m, key, value, LightDef, ops)
-	case 5:  str_map_put(m, key, value, IconEntryTextMap_t, ops)
-	case 6:  str_map_put(m, key, value, IconEntryText_t, ops)
-	case 7:  str_map_put(m, key, value, WorldIconEntry_t, ops)
-	case 8:  str_map_put(m, key, value, DiscoveryAnim_t, ops)
-	case 9:  str_map_put(m, key, value, SpecialNPCEntry_t, ops)
-	case 10: str_map_put(m, key, value, ColliderDmgProperties_t, ops)
-	case 11: str_map_put(m, key, value, ItemLocalization_t, ops)
-	case 12: str_map_put(m, key, value, Achievement_t, ops)
-	case 13: str_map_put(m, key, value, AchievementData_t, ops)
-	case 14: str_map_put(m, key, value, IconEntry_t, ops)
-	case 15: str_map_put(m, key, value, IconEntryCallout_t, ops)
-	case 16: str_map_put(m, key, value, binding_t, ops)
-	case 17: str_map_put(m, key, value, Class_t, ops)
-	case 18: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 19: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 20: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 21: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  str_map_put(m, key, value, i32, ops)
+	case .MK_F32:  str_map_put(m, key, value, f32, ops)
+	case .MK_U32:  str_map_put(m, key, value, u32, ops)
+	case .MK_String:  str_map_put(m, key, value, string, ops)
+	case .MK_LightDef:  str_map_put(m, key, value, LightDef, ops)
+	case .MK_IconEntryTextMap:  str_map_put(m, key, value, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  str_map_put(m, key, value, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  str_map_put(m, key, value, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  str_map_put(m, key, value, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  str_map_put(m, key, value, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: str_map_put(m, key, value, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: str_map_put(m, key, value, ItemLocalization_t, ops)
+	case .MK_Achievement: str_map_put(m, key, value, Achievement_t, ops)
+	case .MK_AchievementData: str_map_put(m, key, value, AchievementData_t, ops)
+	case .MK_IconEntry: str_map_put(m, key, value, IconEntry_t, ops)
+	case .MK_IconEntryCallout: str_map_put(m, key, value, IconEntryCallout_t, ops)
+	case .MK_Binding: str_map_put(m, key, value, binding_t, ops)
+	case .MK_Class: str_map_put(m, key, value, Class_t, ops)
+	case .MK_DynArrayStr: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1441,29 +1827,29 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, value_kind: i32) -> bool {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return str_map_get(m, key, out, i32, ops)
-	case 1:  return str_map_get(m, key, out, f32, ops)
-	case 2:  return str_map_get(m, key, out, u32, ops)
-	case 3:  return str_map_get(m, key, out, string, ops)
-	case 4:  return str_map_get(m, key, out, LightDef, ops)
-	case 5:  return str_map_get(m, key, out, IconEntryTextMap_t, ops)
-	case 6:  return str_map_get(m, key, out, IconEntryText_t, ops)
-	case 7:  return str_map_get(m, key, out, WorldIconEntry_t, ops)
-	case 8:  return str_map_get(m, key, out, DiscoveryAnim_t, ops)
-	case 9:  return str_map_get(m, key, out, SpecialNPCEntry_t, ops)
-	case 10: return str_map_get(m, key, out, ColliderDmgProperties_t, ops)
-	case 11: return str_map_get(m, key, out, ItemLocalization_t, ops)
-	case 12: return str_map_get(m, key, out, Achievement_t, ops)
-	case 13: return str_map_get(m, key, out, AchievementData_t, ops)
-	case 14: return str_map_get(m, key, out, IconEntry_t, ops)
-	case 15: return str_map_get(m, key, out, IconEntryCallout_t, ops)
-	case 16: return str_map_get(m, key, out, binding_t, ops)
-	case 17: return str_map_get(m, key, out, Class_t, ops)
-	case 18: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 19: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 20: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 21: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_get(m, key, out, i32, ops)
+	case .MK_F32:  return str_map_get(m, key, out, f32, ops)
+	case .MK_U32:  return str_map_get(m, key, out, u32, ops)
+	case .MK_String:  return str_map_get(m, key, out, string, ops)
+	case .MK_LightDef:  return str_map_get(m, key, out, LightDef, ops)
+	case .MK_IconEntryTextMap:  return str_map_get(m, key, out, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  return str_map_get(m, key, out, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  return str_map_get(m, key, out, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  return str_map_get(m, key, out, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  return str_map_get(m, key, out, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: return str_map_get(m, key, out, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: return str_map_get(m, key, out, ItemLocalization_t, ops)
+	case .MK_Achievement: return str_map_get(m, key, out, Achievement_t, ops)
+	case .MK_AchievementData: return str_map_get(m, key, out, AchievementData_t, ops)
+	case .MK_IconEntry: return str_map_get(m, key, out, IconEntry_t, ops)
+	case .MK_IconEntryCallout: return str_map_get(m, key, out, IconEntryCallout_t, ops)
+	case .MK_Binding: return str_map_get(m, key, out, binding_t, ops)
+	case .MK_Class: return str_map_get(m, key, out, Class_t, ops)
+	case .MK_DynArrayStr: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1471,29 +1857,29 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 @(export)
 barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	context = runtime.default_context()
-	switch value_kind {
-	case 0:  return str_map_len(m, i32)
-	case 1:  return str_map_len(m, f32)
-	case 2:  return str_map_len(m, u32)
-	case 3:  return str_map_len(m, string)
-	case 4:  return str_map_len(m, LightDef)
-	case 5:  return str_map_len(m, IconEntryTextMap_t)
-	case 6:  return str_map_len(m, IconEntryText_t)
-	case 7:  return str_map_len(m, WorldIconEntry_t)
-	case 8:  return str_map_len(m, DiscoveryAnim_t)
-	case 9:  return str_map_len(m, SpecialNPCEntry_t)
-	case 10: return str_map_len(m, ColliderDmgProperties_t)
-	case 11: return str_map_len(m, ItemLocalization_t)
-	case 12: return str_map_len(m, Achievement_t)
-	case 13: return str_map_len(m, AchievementData_t)
-	case 14: return str_map_len(m, IconEntry_t)
-	case 15: return str_map_len(m, IconEntryCallout_t)
-	case 16: return str_map_len(m, binding_t)
-	case 17: return str_map_len(m, Class_t)
-	case 18: return str_map_len(m, Raw_Dynamic_Array)
-	case 19: return str_map_len(m, Raw_Dynamic_Array)
-	case 20: return str_map_len(m, Raw_Dynamic_Array)
-	case 21: return str_map_len(m, Raw_Dynamic_Array)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_len(m, i32)
+	case .MK_F32:  return str_map_len(m, f32)
+	case .MK_U32:  return str_map_len(m, u32)
+	case .MK_String:  return str_map_len(m, string)
+	case .MK_LightDef:  return str_map_len(m, LightDef)
+	case .MK_IconEntryTextMap:  return str_map_len(m, IconEntryTextMap_t)
+	case .MK_IconEntryText:  return str_map_len(m, IconEntryText_t)
+	case .MK_WorldIconEntry:  return str_map_len(m, WorldIconEntry_t)
+	case .MK_DiscoveryAnim:  return str_map_len(m, DiscoveryAnim_t)
+	case .MK_SpecialNPC:  return str_map_len(m, SpecialNPCEntry_t)
+	case .MK_ColliderDmg: return str_map_len(m, ColliderDmgProperties_t)
+	case .MK_ItemLoc: return str_map_len(m, ItemLocalization_t)
+	case .MK_Achievement: return str_map_len(m, Achievement_t)
+	case .MK_AchievementData: return str_map_len(m, AchievementData_t)
+	case .MK_IconEntry: return str_map_len(m, IconEntry_t)
+	case .MK_IconEntryCallout: return str_map_len(m, IconEntryCallout_t)
+	case .MK_Binding: return str_map_len(m, binding_t)
+	case .MK_Class: return str_map_len(m, Class_t)
+	case .MK_DynArrayStr: return str_map_len(m, Raw_Dynamic_Array)
+	case .MK_DynArrayS32: return str_map_len(m, Raw_Dynamic_Array)
+	case .MK_StatueLimbArray: return str_map_len(m, Raw_Dynamic_Array)
+	case .MK_StoreSlotsArray: return str_map_len(m, Raw_Dynamic_Array)
 	}
 	return 0
 }
@@ -1502,29 +1888,29 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  str_map_clear(m, i32, ops)
-	case 1:  str_map_clear(m, f32, ops)
-	case 2:  str_map_clear(m, u32, ops)
-	case 3:  str_map_clear(m, string, ops)
-	case 4:  str_map_clear(m, LightDef, ops)
-	case 5:  str_map_clear(m, IconEntryTextMap_t, ops)
-	case 6:  str_map_clear(m, IconEntryText_t, ops)
-	case 7:  str_map_clear(m, WorldIconEntry_t, ops)
-	case 8:  str_map_clear(m, DiscoveryAnim_t, ops)
-	case 9:  str_map_clear(m, SpecialNPCEntry_t, ops)
-	case 10: str_map_clear(m, ColliderDmgProperties_t, ops)
-	case 11: str_map_clear(m, ItemLocalization_t, ops)
-	case 12: str_map_clear(m, Achievement_t, ops)
-	case 13: str_map_clear(m, AchievementData_t, ops)
-	case 14: str_map_clear(m, IconEntry_t, ops)
-	case 15: str_map_clear(m, IconEntryCallout_t, ops)
-	case 16: str_map_clear(m, binding_t, ops)
-	case 17: str_map_clear(m, Class_t, ops)
-	case 18: str_map_clear(m, Raw_Dynamic_Array, ops)
-	case 19: str_map_clear(m, Raw_Dynamic_Array, ops)
-	case 20: str_map_clear(m, Raw_Dynamic_Array, ops)
-	case 21: str_map_clear(m, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  str_map_clear(m, i32, ops)
+	case .MK_F32:  str_map_clear(m, f32, ops)
+	case .MK_U32:  str_map_clear(m, u32, ops)
+	case .MK_String:  str_map_clear(m, string, ops)
+	case .MK_LightDef:  str_map_clear(m, LightDef, ops)
+	case .MK_IconEntryTextMap:  str_map_clear(m, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  str_map_clear(m, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  str_map_clear(m, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  str_map_clear(m, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  str_map_clear(m, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: str_map_clear(m, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: str_map_clear(m, ItemLocalization_t, ops)
+	case .MK_Achievement: str_map_clear(m, Achievement_t, ops)
+	case .MK_AchievementData: str_map_clear(m, AchievementData_t, ops)
+	case .MK_IconEntry: str_map_clear(m, IconEntry_t, ops)
+	case .MK_IconEntryCallout: str_map_clear(m, IconEntryCallout_t, ops)
+	case .MK_Binding: str_map_clear(m, binding_t, ops)
+	case .MK_Class: str_map_clear(m, Class_t, ops)
+	case .MK_DynArrayStr: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: str_map_clear(m, Raw_Dynamic_Array, ops)
 	}
 }
 
@@ -1532,58 +1918,58 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  str_map_destroy(m, i32, ops)
-	case 1:  str_map_destroy(m, f32, ops)
-	case 2:  str_map_destroy(m, u32, ops)
-	case 3:  str_map_destroy(m, string, ops)
-	case 4:  str_map_destroy(m, LightDef, ops)
-	case 5:  str_map_destroy(m, IconEntryTextMap_t, ops)
-	case 6:  str_map_destroy(m, IconEntryText_t, ops)
-	case 7:  str_map_destroy(m, WorldIconEntry_t, ops)
-	case 8:  str_map_destroy(m, DiscoveryAnim_t, ops)
-	case 9:  str_map_destroy(m, SpecialNPCEntry_t, ops)
-	case 10: str_map_destroy(m, ColliderDmgProperties_t, ops)
-	case 11: str_map_destroy(m, ItemLocalization_t, ops)
-	case 12: str_map_destroy(m, Achievement_t, ops)
-	case 13: str_map_destroy(m, AchievementData_t, ops)
-	case 14: str_map_destroy(m, IconEntry_t, ops)
-	case 15: str_map_destroy(m, IconEntryCallout_t, ops)
-	case 16: str_map_destroy(m, binding_t, ops)
-	case 17: str_map_destroy(m, Class_t, ops)
-	case 18: str_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 19: str_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 20: str_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 21: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  str_map_destroy(m, i32, ops)
+	case .MK_F32:  str_map_destroy(m, f32, ops)
+	case .MK_U32:  str_map_destroy(m, u32, ops)
+	case .MK_String:  str_map_destroy(m, string, ops)
+	case .MK_LightDef:  str_map_destroy(m, LightDef, ops)
+	case .MK_IconEntryTextMap:  str_map_destroy(m, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  str_map_destroy(m, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  str_map_destroy(m, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  str_map_destroy(m, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  str_map_destroy(m, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: str_map_destroy(m, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: str_map_destroy(m, ItemLocalization_t, ops)
+	case .MK_Achievement: str_map_destroy(m, Achievement_t, ops)
+	case .MK_AchievementData: str_map_destroy(m, AchievementData_t, ops)
+	case .MK_IconEntry: str_map_destroy(m, IconEntry_t, ops)
+	case .MK_IconEntryCallout: str_map_destroy(m, IconEntryCallout_t, ops)
+	case .MK_Binding: str_map_destroy(m, binding_t, ops)
+	case .MK_Class: str_map_destroy(m, Class_t, ops)
+	case .MK_DynArrayStr: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	}
 }
 
 @(export)
 barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i32) -> rawptr {
 	context = runtime.default_context()
-	switch value_kind {
-	case 0:  return str_map_entry(m, key, i32)
-	case 1:  return str_map_entry(m, key, f32)
-	case 2:  return str_map_entry(m, key, u32)
-	case 3:  return str_map_entry(m, key, string)
-	case 4:  return str_map_entry(m, key, LightDef)
-	case 5:  return str_map_entry(m, key, IconEntryTextMap_t)
-	case 6:  return str_map_entry(m, key, IconEntryText_t)
-	case 7:  return str_map_entry(m, key, WorldIconEntry_t)
-	case 8:  return str_map_entry(m, key, DiscoveryAnim_t)
-	case 9:  return str_map_entry(m, key, SpecialNPCEntry_t)
-	case 10: return str_map_entry(m, key, ColliderDmgProperties_t)
-	case 11: return str_map_entry(m, key, ItemLocalization_t)
-	case 12: return str_map_entry(m, key, Achievement_t)
-	case 13: return str_map_entry(m, key, AchievementData_t)
-	case 14: return str_map_entry(m, key, IconEntry_t)
-	case 15: return str_map_entry(m, key, IconEntryCallout_t)
-	case 16: return str_map_entry(m, key, binding_t)
-	case 17: return str_map_entry(m, key, Class_t)
-	case 18: return str_map_entry(m, key, Raw_Dynamic_Array)
-	case 19: return str_map_entry(m, key, Raw_Dynamic_Array)
-	case 20: return str_map_entry(m, key, Raw_Dynamic_Array)
-	case 21: return str_map_entry(m, key, Raw_Dynamic_Array)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_entry(m, key, i32)
+	case .MK_F32:  return str_map_entry(m, key, f32)
+	case .MK_U32:  return str_map_entry(m, key, u32)
+	case .MK_String:  return str_map_entry(m, key, string)
+	case .MK_LightDef:  return str_map_entry(m, key, LightDef)
+	case .MK_IconEntryTextMap:  return str_map_entry(m, key, IconEntryTextMap_t)
+	case .MK_IconEntryText:  return str_map_entry(m, key, IconEntryText_t)
+	case .MK_WorldIconEntry:  return str_map_entry(m, key, WorldIconEntry_t)
+	case .MK_DiscoveryAnim:  return str_map_entry(m, key, DiscoveryAnim_t)
+	case .MK_SpecialNPC:  return str_map_entry(m, key, SpecialNPCEntry_t)
+	case .MK_ColliderDmg: return str_map_entry(m, key, ColliderDmgProperties_t)
+	case .MK_ItemLoc: return str_map_entry(m, key, ItemLocalization_t)
+	case .MK_Achievement: return str_map_entry(m, key, Achievement_t)
+	case .MK_AchievementData: return str_map_entry(m, key, AchievementData_t)
+	case .MK_IconEntry: return str_map_entry(m, key, IconEntry_t)
+	case .MK_IconEntryCallout: return str_map_entry(m, key, IconEntryCallout_t)
+	case .MK_Binding: return str_map_entry(m, key, binding_t)
+	case .MK_Class: return str_map_entry(m, key, Class_t)
+	case .MK_DynArrayStr: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_DynArrayS32: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_StatueLimbArray: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_StoreSlotsArray: return str_map_entry(m, key, Raw_Dynamic_Array)
 	}
 	return nil
 }
@@ -1592,31 +1978,61 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_lens: [^]i32, val_ptrs: rawptr, count: i32, value_kind: i32) -> i32 {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, i32, ops)
-	case 1:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, f32, ops)
-	case 2:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, u32, ops)
-	case 3:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, string, ops)
-	case 4:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, LightDef, ops)
-	case 5:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryTextMap_t, ops)
-	case 6:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryText_t, ops)
-	case 7:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, WorldIconEntry_t, ops)
-	case 8:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DiscoveryAnim_t, ops)
-	case 9:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, SpecialNPCEntry_t, ops)
-	case 10: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ColliderDmgProperties_t, ops)
-	case 11: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemLocalization_t, ops)
-	case 12: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Achievement_t, ops)
-	case 13: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, AchievementData_t, ops)
-	case 14: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntry_t, ops)
-	case 15: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryCallout_t, ops)
-	case 16: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, binding_t, ops)
-	case 17: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Class_t, ops)
-	case 18: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 19: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 20: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 21: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, i32, ops)
+	case .MK_F32:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, f32, ops)
+	case .MK_U32:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, u32, ops)
+	case .MK_String:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, string, ops)
+	case .MK_LightDef:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, LightDef, ops)
+	case .MK_IconEntryTextMap:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemLocalization_t, ops)
+	case .MK_Achievement: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Achievement_t, ops)
+	case .MK_AchievementData: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, AchievementData_t, ops)
+	case .MK_IconEntry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntry_t, ops)
+	case .MK_IconEntryCallout: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, IconEntryCallout_t, ops)
+	case .MK_Binding: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, binding_t, ops)
+	case .MK_Class: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Class_t, ops)
+	case .MK_DynArrayStr: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	}
 	return 0
+}
+
+@(export)
+barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: rawptr, userdata: rawptr) {
+	context = runtime.default_context()
+	f := transmute(MapForeachCb)(cb)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  str_map_for_each(m, i32, f, userdata)
+	case .MK_F32:  str_map_for_each(m, f32, f, userdata)
+	case .MK_U32:  str_map_for_each(m, u32, f, userdata)
+	case .MK_String:  str_map_for_each(m, string, f, userdata)
+	case .MK_LightDef:  str_map_for_each(m, LightDef, f, userdata)
+	case .MK_IconEntryTextMap:  str_map_for_each(m, IconEntryTextMap_t, f, userdata)
+	case .MK_IconEntryText:  str_map_for_each(m, IconEntryText_t, f, userdata)
+	case .MK_WorldIconEntry:  str_map_for_each(m, WorldIconEntry_t, f, userdata)
+	case .MK_DiscoveryAnim:  str_map_for_each(m, DiscoveryAnim_t, f, userdata)
+	case .MK_SpecialNPC:  str_map_for_each(m, SpecialNPCEntry_t, f, userdata)
+	case .MK_ColliderDmg: str_map_for_each(m, ColliderDmgProperties_t, f, userdata)
+	case .MK_ItemLoc: str_map_for_each(m, ItemLocalization_t, f, userdata)
+	case .MK_Achievement: str_map_for_each(m, Achievement_t, f, userdata)
+	case .MK_AchievementData: str_map_for_each(m, AchievementData_t, f, userdata)
+	case .MK_IconEntry: str_map_for_each(m, IconEntry_t, f, userdata)
+	case .MK_IconEntryCallout: str_map_for_each(m, IconEntryCallout_t, f, userdata)
+	case .MK_Binding: str_map_for_each(m, binding_t, f, userdata)
+	case .MK_Class: str_map_for_each(m, Class_t, f, userdata)
+	case .MK_DynArrayStr: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_DynArrayS32: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_StatueLimbArray: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_StoreSlotsArray: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	}
 }
 
 // erase: free the value at key (if owned), then delete the key
@@ -1629,29 +2045,29 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 		return false
 	}
 	// polymorphic delete via the core (free first, then delete key)
-	switch value_kind {
-	case 0:  return str_map_erase(m, key, i32, ops)
-	case 1:  return str_map_erase(m, key, f32, ops)
-	case 2:  return str_map_erase(m, key, u32, ops)
-	case 3:  return str_map_erase(m, key, string, ops)
-	case 4:  return str_map_erase(m, key, LightDef, ops)
-	case 5:  return str_map_erase(m, key, IconEntryTextMap_t, ops)
-	case 6:  return str_map_erase(m, key, IconEntryText_t, ops)
-	case 7:  return str_map_erase(m, key, WorldIconEntry_t, ops)
-	case 8:  return str_map_erase(m, key, DiscoveryAnim_t, ops)
-	case 9:  return str_map_erase(m, key, SpecialNPCEntry_t, ops)
-	case 10: return str_map_erase(m, key, ColliderDmgProperties_t, ops)
-	case 11: return str_map_erase(m, key, ItemLocalization_t, ops)
-	case 12: return str_map_erase(m, key, Achievement_t, ops)
-	case 13: return str_map_erase(m, key, AchievementData_t, ops)
-	case 14: return str_map_erase(m, key, IconEntry_t, ops)
-	case 15: return str_map_erase(m, key, IconEntryCallout_t, ops)
-	case 16: return str_map_erase(m, key, binding_t, ops)
-	case 17: return str_map_erase(m, key, Class_t, ops)
-	case 18: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 19: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 20: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 21: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_erase(m, key, i32, ops)
+	case .MK_F32:  return str_map_erase(m, key, f32, ops)
+	case .MK_U32:  return str_map_erase(m, key, u32, ops)
+	case .MK_String:  return str_map_erase(m, key, string, ops)
+	case .MK_LightDef:  return str_map_erase(m, key, LightDef, ops)
+	case .MK_IconEntryTextMap:  return str_map_erase(m, key, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  return str_map_erase(m, key, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  return str_map_erase(m, key, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  return str_map_erase(m, key, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  return str_map_erase(m, key, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: return str_map_erase(m, key, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: return str_map_erase(m, key, ItemLocalization_t, ops)
+	case .MK_Achievement: return str_map_erase(m, key, Achievement_t, ops)
+	case .MK_AchievementData: return str_map_erase(m, key, AchievementData_t, ops)
+	case .MK_IconEntry: return str_map_erase(m, key, IconEntry_t, ops)
+	case .MK_IconEntryCallout: return str_map_erase(m, key, IconEntryCallout_t, ops)
+	case .MK_Binding: return str_map_erase(m, key, binding_t, ops)
+	case .MK_Class: return str_map_erase(m, key, Class_t, ops)
+	case .MK_DynArrayStr: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1683,21 +2099,34 @@ barony_dynamic_map_i32_init :: proc "c" (m: rawptr, value_kind: i32) {
 barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  i32_map_put(m, key, value, i32, ops)
-	case 2:  i32_map_put(m, key, value, u32, ops)
-	case 26: i32_map_put(m, key, value, u64, ops)
-	case 3:  i32_map_put(m, key, value, string, ops)
-	case 18: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 19: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 20: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 21: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
-	case 22: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
-	case 23: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
-	case 24: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
-	case 25: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
-	case 27: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
-	case 28: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  i32_map_put(m, key, value, i32, ops)
+	case .MK_U32:  i32_map_put(m, key, value, u32, ops)
+	case .MK_U64: i32_map_put(m, key, value, u64, ops)
+	case .MK_String:  i32_map_put(m, key, value, string, ops)
+	case .MK_DynArrayStr: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: i32_map_put(m, key, value, map[i32]struct{}, ops)
+	case .MK_Lootbag: i32_map_put(m, key, value, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: i32_map_put(m, key, value, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: i32_map_put(m, key, value, GlyphData_t, ops)
+	case .MK_Statistic: i32_map_put(m, key, value, Statistic_t, ops)
+	case .MK_Ptr: i32_map_put(m, key, value, u64, ops)
+	case .MK_F64: i32_map_put(m, key, value, f64, ops)
+	case .MK_FormationInfo: i32_map_put(m, key, value, FormationInfo_t, ops)
+	case .MK_AnimatedTile: i32_map_put(m, key, value, AnimatedTile, ops)
+	case .MK_AdditionalOffset: i32_map_put(m, key, value, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: i32_map_put(m, key, value, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: i32_map_put(m, key, value, spellElement_t, ops)
+	case .MK_Effect: i32_map_put(m, key, value, Effect_t, ops)
+	case .MK_EffectLocations: i32_map_put(m, key, value, EffectLocations_t, ops)
+	case .MK_CalloutParticle: i32_map_put(m, key, value, CalloutParticle_t, ops)
+	case .MK_ModelOffset: i32_map_put(m, key, value, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: i32_map_put(m, key, value, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: i32_map_put(m, key, value, ParticleTimerEffect_t, ops)
 	}
 }
 
@@ -1705,21 +2134,34 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, value_kind: i32) -> bool {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return i32_map_get(m, key, out, i32, ops)
-	case 2:  return i32_map_get(m, key, out, u32, ops)
-	case 26: return i32_map_get(m, key, out, u64, ops)
-	case 3:  return i32_map_get(m, key, out, string, ops)
-	case 18: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 19: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 20: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 21: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
-	case 22: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
-	case 23: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
-	case 24: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
-	case 25: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
-	case 27: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
-	case 28: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_get(m, key, out, i32, ops)
+	case .MK_U32:  return i32_map_get(m, key, out, u32, ops)
+	case .MK_U64: return i32_map_get(m, key, out, u64, ops)
+	case .MK_String:  return i32_map_get(m, key, out, string, ops)
+	case .MK_DynArrayStr: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: return i32_map_get(m, key, out, map[i32]struct{}, ops)
+	case .MK_Lootbag: return i32_map_get(m, key, out, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: return i32_map_get(m, key, out, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: return i32_map_get(m, key, out, GlyphData_t, ops)
+	case .MK_Statistic: return i32_map_get(m, key, out, Statistic_t, ops)
+	case .MK_Ptr: return i32_map_get(m, key, out, u64, ops)
+	case .MK_F64: return i32_map_get(m, key, out, f64, ops)
+	case .MK_FormationInfo: return i32_map_get(m, key, out, FormationInfo_t, ops)
+	case .MK_AnimatedTile: return i32_map_get(m, key, out, AnimatedTile, ops)
+	case .MK_AdditionalOffset: return i32_map_get(m, key, out, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: return i32_map_get(m, key, out, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: return i32_map_get(m, key, out, spellElement_t, ops)
+	case .MK_Effect: return i32_map_get(m, key, out, Effect_t, ops)
+	case .MK_EffectLocations: return i32_map_get(m, key, out, EffectLocations_t, ops)
+	case .MK_CalloutParticle: return i32_map_get(m, key, out, CalloutParticle_t, ops)
+	case .MK_ModelOffset: return i32_map_get(m, key, out, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: return i32_map_get(m, key, out, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: return i32_map_get(m, key, out, ParticleTimerEffect_t, ops)
 	}
 	return false
 }
@@ -1727,21 +2169,34 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 @(export)
 barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	context = runtime.default_context()
-	switch value_kind {
-	case 0:  return i32_map_len(m, i32)
-	case 2:  return i32_map_len(m, u32)
-	case 26: return i32_map_len(m, u32)
-	case 3:  return i32_map_len(m, string)
-	case 18: return i32_map_len(m, Raw_Dynamic_Array)
-	case 19: return i32_map_len(m, Raw_Dynamic_Array)
-	case 20: return i32_map_len(m, Raw_Dynamic_Array)
-	case 21: return i32_map_len(m, Raw_Dynamic_Array)
-	case 22: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
-	case 23: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
-	case 24: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
-	case 25: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
-	case 27: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
-	case 28: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_len(m, i32)
+	case .MK_U32:  return i32_map_len(m, u32)
+	case .MK_U64: return i32_map_len(m, u64)
+	case .MK_String:  return i32_map_len(m, string)
+	case .MK_DynArrayStr: return i32_map_len(m, Raw_Dynamic_Array)
+	case .MK_DynArrayS32: return i32_map_len(m, Raw_Dynamic_Array)
+	case .MK_StatueLimbArray: return i32_map_len(m, Raw_Dynamic_Array)
+	case .MK_StoreSlotsArray: return i32_map_len(m, Raw_Dynamic_Array)
+	case .MK_MonsterTrapIgnore: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
+	case .MK_SetOfI32: return i32_map_len(m, map[i32]struct{})
+	case .MK_Lootbag: return i32_map_len(m, Lootbag_t)
+	case .MK_EnemyHPDetails: return i32_map_len(m, EnemyHPDetails_t)
+	case .MK_GlyphData: return i32_map_len(m, GlyphData_t)
+	case .MK_Statistic: return i32_map_len(m, Statistic_t)
+	case .MK_Ptr: return i32_map_len(m, u64)
+	case .MK_F64: return i32_map_len(m, f64)
+	case .MK_FormationInfo: return i32_map_len(m, FormationInfo_t)
+	case .MK_AnimatedTile: return i32_map_len(m, AnimatedTile)
+	case .MK_AdditionalOffset: return i32_map_len(m, AdditionalOffset_t)
+	case .MK_PlayerRaceHostility: return i32_map_len(m, PlayerRaceHostility_t)
+	case .MK_SpellElement: return i32_map_len(m, spellElement_t)
+	case .MK_Effect: return i32_map_len(m, Effect_t)
+	case .MK_EffectLocations: return i32_map_len(m, EffectLocations_t)
+	case .MK_CalloutParticle: return i32_map_len(m, CalloutParticle_t)
+	case .MK_ModelOffset: return i32_map_len(m, ModelOffset_t)
+	case .MK_EffectDefinitionEntry: return i32_map_len(m, EffectDefinitionEntry_t)
+	case .MK_ParticleTimerEffect: return i32_map_len(m, ParticleTimerEffect_t)
 	}
 	return 0
 }
@@ -1750,21 +2205,34 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  i32_map_clear(m, i32, ops)
-	case 2:  i32_map_clear(m, u32, ops)
-	case 26: i32_map_clear(m, u64, ops)
-	case 3:  i32_map_clear(m, string, ops)
-	case 18: i32_map_clear(m, Raw_Dynamic_Array, ops)
-	case 19: i32_map_clear(m, Raw_Dynamic_Array, ops)
-	case 20: i32_map_clear(m, Raw_Dynamic_Array, ops)
-	case 21: i32_map_clear(m, Raw_Dynamic_Array, ops)
-	case 22: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
-	case 23: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
-	case 24: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
-	case 25: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
-	case 27: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
-	case 28: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  i32_map_clear(m, i32, ops)
+	case .MK_U32:  i32_map_clear(m, u32, ops)
+	case .MK_U64: i32_map_clear(m, u64, ops)
+	case .MK_String:  i32_map_clear(m, string, ops)
+	case .MK_DynArrayStr: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: i32_map_clear(m, map[i32]struct{}, ops)
+	case .MK_Lootbag: i32_map_clear(m, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: i32_map_clear(m, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: i32_map_clear(m, GlyphData_t, ops)
+	case .MK_Statistic: i32_map_clear(m, Statistic_t, ops)
+	case .MK_Ptr: i32_map_clear(m, u64, ops)
+	case .MK_F64: i32_map_clear(m, f64, ops)
+	case .MK_FormationInfo: i32_map_clear(m, FormationInfo_t, ops)
+	case .MK_AnimatedTile: i32_map_clear(m, AnimatedTile, ops)
+	case .MK_AdditionalOffset: i32_map_clear(m, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: i32_map_clear(m, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: i32_map_clear(m, spellElement_t, ops)
+	case .MK_Effect: i32_map_clear(m, Effect_t, ops)
+	case .MK_EffectLocations: i32_map_clear(m, EffectLocations_t, ops)
+	case .MK_CalloutParticle: i32_map_clear(m, CalloutParticle_t, ops)
+	case .MK_ModelOffset: i32_map_clear(m, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: i32_map_clear(m, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: i32_map_clear(m, ParticleTimerEffect_t, ops)
 	}
 }
 
@@ -1772,42 +2240,68 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  i32_map_destroy(m, i32, ops)
-	case 2:  i32_map_destroy(m, u32, ops)
-	case 26: i32_map_destroy(m, u64, ops)
-	case 3:  i32_map_destroy(m, string, ops)
-	case 18: i32_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 19: i32_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 20: i32_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 21: i32_map_destroy(m, Raw_Dynamic_Array, ops)
-	case 22: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
-	case 23: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
-	case 24: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
-	case 25: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
-	case 27: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
-	case 28: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  i32_map_destroy(m, i32, ops)
+	case .MK_U32:  i32_map_destroy(m, u32, ops)
+	case .MK_U64: i32_map_destroy(m, u64, ops)
+	case .MK_String:  i32_map_destroy(m, string, ops)
+	case .MK_DynArrayStr: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: i32_map_destroy(m, map[i32]struct{}, ops)
+	case .MK_Lootbag: i32_map_destroy(m, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: i32_map_destroy(m, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: i32_map_destroy(m, GlyphData_t, ops)
+	case .MK_Statistic: i32_map_destroy(m, Statistic_t, ops)
+	case .MK_Ptr: i32_map_destroy(m, u64, ops)
+	case .MK_F64: i32_map_destroy(m, f64, ops)
+	case .MK_FormationInfo: i32_map_destroy(m, FormationInfo_t, ops)
+	case .MK_AnimatedTile: i32_map_destroy(m, AnimatedTile, ops)
+	case .MK_AdditionalOffset: i32_map_destroy(m, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: i32_map_destroy(m, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: i32_map_destroy(m, spellElement_t, ops)
+	case .MK_Effect: i32_map_destroy(m, Effect_t, ops)
+	case .MK_EffectLocations: i32_map_destroy(m, EffectLocations_t, ops)
+	case .MK_CalloutParticle: i32_map_destroy(m, CalloutParticle_t, ops)
+	case .MK_ModelOffset: i32_map_destroy(m, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: i32_map_destroy(m, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: i32_map_destroy(m, ParticleTimerEffect_t, ops)
 	}
 }
 
 @(export)
 barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i32) -> rawptr {
 	context = runtime.default_context()
-	switch value_kind {
-	case 0:  return i32_map_entry(m, key, i32)
-	case 2:  return i32_map_entry(m, key, u32)
-	case 26: return i32_map_entry(m, key, u32)
-	case 3:  return i32_map_entry(m, key, string)
-	case 18: return i32_map_entry(m, key, Raw_Dynamic_Array)
-	case 19: return i32_map_entry(m, key, Raw_Dynamic_Array)
-	case 20: return i32_map_entry(m, key, Raw_Dynamic_Array)
-	case 21: return i32_map_entry(m, key, Raw_Dynamic_Array)
-	case 22: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
-	case 23: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
-	case 24: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
-	case 25: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
-	case 27: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
-	case 28: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_entry(m, key, i32)
+	case .MK_U32:  return i32_map_entry(m, key, u32)
+	case .MK_U64: return i32_map_entry(m, key, u64)
+	case .MK_String:  return i32_map_entry(m, key, string)
+	case .MK_DynArrayStr: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_DynArrayS32: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_StatueLimbArray: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_StoreSlotsArray: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_MonsterTrapIgnore: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
+	case .MK_SetOfI32: return i32_map_entry(m, key, map[i32]struct{})
+	case .MK_Lootbag: return i32_map_entry(m, key, Lootbag_t)
+	case .MK_EnemyHPDetails: return i32_map_entry(m, key, EnemyHPDetails_t)
+	case .MK_GlyphData: return i32_map_entry(m, key, GlyphData_t)
+	case .MK_Statistic: return i32_map_entry(m, key, Statistic_t)
+	case .MK_Ptr: return i32_map_entry(m, key, u64)
+	case .MK_F64: return i32_map_entry(m, key, f64)
+	case .MK_FormationInfo: return i32_map_entry(m, key, FormationInfo_t)
+	case .MK_AnimatedTile: return i32_map_entry(m, key, AnimatedTile)
+	case .MK_AdditionalOffset: return i32_map_entry(m, key, AdditionalOffset_t)
+	case .MK_PlayerRaceHostility: return i32_map_entry(m, key, PlayerRaceHostility_t)
+	case .MK_SpellElement: return i32_map_entry(m, key, spellElement_t)
+	case .MK_Effect: return i32_map_entry(m, key, Effect_t)
+	case .MK_EffectLocations: return i32_map_entry(m, key, EffectLocations_t)
+	case .MK_CalloutParticle: return i32_map_entry(m, key, CalloutParticle_t)
+	case .MK_ModelOffset: return i32_map_entry(m, key, ModelOffset_t)
+	case .MK_EffectDefinitionEntry: return i32_map_entry(m, key, EffectDefinitionEntry_t)
+	case .MK_ParticleTimerEffect: return i32_map_entry(m, key, ParticleTimerEffect_t)
 	}
 	return nil
 }
@@ -1816,44 +2310,105 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val_ptrs: rawptr, count: i32, value_kind: i32) -> i32 {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return i32_map_entries(m, key_ptrs, val_ptrs, count, i32, ops)
-	case 2:  return i32_map_entries(m, key_ptrs, val_ptrs, count, u32, ops)
-	case 26: return i32_map_entries(m, key_ptrs, val_ptrs, count, u64, ops)
-	case 3:  return i32_map_entries(m, key_ptrs, val_ptrs, count, string, ops)
-	case 18: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 19: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 20: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 21: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
-	case 22: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
-	case 23: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
-	case 24: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
-	case 25: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
-	case 27: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
-	case 28: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_entries(m, key_ptrs, val_ptrs, count, i32, ops)
+	case .MK_U32:  return i32_map_entries(m, key_ptrs, val_ptrs, count, u32, ops)
+	case .MK_U64: return i32_map_entries(m, key_ptrs, val_ptrs, count, u64, ops)
+	case .MK_String:  return i32_map_entries(m, key_ptrs, val_ptrs, count, string, ops)
+	case .MK_DynArrayStr: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[i32]struct{}, ops)
+	case .MK_Lootbag: return i32_map_entries(m, key_ptrs, val_ptrs, count, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: return i32_map_entries(m, key_ptrs, val_ptrs, count, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: return i32_map_entries(m, key_ptrs, val_ptrs, count, GlyphData_t, ops)
+	case .MK_Statistic: return i32_map_entries(m, key_ptrs, val_ptrs, count, Statistic_t, ops)
+	case .MK_Ptr: return i32_map_entries(m, key_ptrs, val_ptrs, count, u64, ops)
+	case .MK_F64: return i32_map_entries(m, key_ptrs, val_ptrs, count, f64, ops)
+	case .MK_FormationInfo: return i32_map_entries(m, key_ptrs, val_ptrs, count, FormationInfo_t, ops)
+	case .MK_AnimatedTile: return i32_map_entries(m, key_ptrs, val_ptrs, count, AnimatedTile, ops)
+	case .MK_AdditionalOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: return i32_map_entries(m, key_ptrs, val_ptrs, count, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: return i32_map_entries(m, key_ptrs, val_ptrs, count, spellElement_t, ops)
+	case .MK_Effect: return i32_map_entries(m, key_ptrs, val_ptrs, count, Effect_t, ops)
+	case .MK_EffectLocations: return i32_map_entries(m, key_ptrs, val_ptrs, count, EffectLocations_t, ops)
+	case .MK_CalloutParticle: return i32_map_entries(m, key_ptrs, val_ptrs, count, CalloutParticle_t, ops)
+	case .MK_ModelOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: return i32_map_entries(m, key_ptrs, val_ptrs, count, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: return i32_map_entries(m, key_ptrs, val_ptrs, count, ParticleTimerEffect_t, ops)
 	}
 	return 0
+}
+
+@(export)
+barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: rawptr, userdata: rawptr) {
+	context = runtime.default_context()
+	f := transmute(MapForeachCb)(cb)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  i32_map_for_each(m, i32, f, userdata)
+	case .MK_U32:  i32_map_for_each(m, u32, f, userdata)
+	case .MK_U64: i32_map_for_each(m, u64, f, userdata)
+	case .MK_String:  i32_map_for_each(m, string, f, userdata)
+	case .MK_DynArrayStr: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_DynArrayS32: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_StatueLimbArray: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_StoreSlotsArray: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_MonsterTrapIgnore: i32_map_for_each(m, MonsterTrapIgnoreEntities_t, f, userdata)
+	case .MK_SetOfI32: i32_map_for_each(m, map[i32]struct{}, f, userdata)
+	case .MK_Lootbag: i32_map_for_each(m, Lootbag_t, f, userdata)
+	case .MK_EnemyHPDetails: i32_map_for_each(m, EnemyHPDetails_t, f, userdata)
+	case .MK_GlyphData: i32_map_for_each(m, GlyphData_t, f, userdata)
+	case .MK_Statistic: i32_map_for_each(m, Statistic_t, f, userdata)
+	case .MK_Ptr: i32_map_for_each(m, u64, f, userdata)
+	case .MK_F64: i32_map_for_each(m, f64, f, userdata)
+	case .MK_FormationInfo: i32_map_for_each(m, FormationInfo_t, f, userdata)
+	case .MK_AnimatedTile: i32_map_for_each(m, AnimatedTile, f, userdata)
+	case .MK_AdditionalOffset: i32_map_for_each(m, AdditionalOffset_t, f, userdata)
+	case .MK_PlayerRaceHostility: i32_map_for_each(m, PlayerRaceHostility_t, f, userdata)
+	case .MK_SpellElement: i32_map_for_each(m, spellElement_t, f, userdata)
+	case .MK_Effect: i32_map_for_each(m, Effect_t, f, userdata)
+	case .MK_EffectLocations: i32_map_for_each(m, EffectLocations_t, f, userdata)
+	case .MK_CalloutParticle: i32_map_for_each(m, CalloutParticle_t, f, userdata)
+	case .MK_ModelOffset: i32_map_for_each(m, ModelOffset_t, f, userdata)
+	case .MK_EffectDefinitionEntry: i32_map_for_each(m, EffectDefinitionEntry_t, f, userdata)
+	case .MK_ParticleTimerEffect: i32_map_for_each(m, ParticleTimerEffect_t, f, userdata)
+	}
 }
 
 @(export)
 barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i32) -> bool {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return i32_map_erase(m, key, i32, ops)
-	case 2:  return i32_map_erase(m, key, u32, ops)
-	case 26: return i32_map_erase(m, key, u64, ops)
-	case 3:  return i32_map_erase(m, key, string, ops)
-	case 18: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 19: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 20: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 21: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
-	case 22: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
-	case 23: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
-	case 24: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
-	case 25: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
-	case 27: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
-	case 28: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_erase(m, key, i32, ops)
+	case .MK_U32:  return i32_map_erase(m, key, u32, ops)
+	case .MK_U64: return i32_map_erase(m, key, u64, ops)
+	case .MK_String:  return i32_map_erase(m, key, string, ops)
+	case .MK_DynArrayStr: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: return i32_map_erase(m, key, map[i32]struct{}, ops)
+	case .MK_Lootbag: return i32_map_erase(m, key, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: return i32_map_erase(m, key, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: return i32_map_erase(m, key, GlyphData_t, ops)
+	case .MK_Statistic: return i32_map_erase(m, key, Statistic_t, ops)
+	case .MK_Ptr: return i32_map_erase(m, key, u64, ops)
+	case .MK_F64: return i32_map_erase(m, key, f64, ops)
+	case .MK_FormationInfo: return i32_map_erase(m, key, FormationInfo_t, ops)
+	case .MK_AnimatedTile: return i32_map_erase(m, key, AnimatedTile, ops)
+	case .MK_AdditionalOffset: return i32_map_erase(m, key, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: return i32_map_erase(m, key, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: return i32_map_erase(m, key, spellElement_t, ops)
+	case .MK_Effect: return i32_map_erase(m, key, Effect_t, ops)
+	case .MK_EffectLocations: return i32_map_erase(m, key, EffectLocations_t, ops)
+	case .MK_CalloutParticle: return i32_map_erase(m, key, CalloutParticle_t, ops)
+	case .MK_ModelOffset: return i32_map_erase(m, key, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: return i32_map_erase(m, key, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: return i32_map_erase(m, key, ParticleTimerEffect_t, ops)
 	}
 	return false
 }
@@ -1879,29 +2434,29 @@ i32_map_erase :: proc(m: rawptr, key: rawptr, $V: typeid, ops: Value_Ops) -> boo
 barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawptr, out_key_len: ^i32, out_val: rawptr, value_kind: i32) -> bool {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return str_map_find(m, key, out_key, out_key_len, out_val, i32, ops)
-	case 1:  return str_map_find(m, key, out_key, out_key_len, out_val, f32, ops)
-	case 2:  return str_map_find(m, key, out_key, out_key_len, out_val, u32, ops)
-	case 3:  return str_map_find(m, key, out_key, out_key_len, out_val, string, ops)
-	case 4:  return str_map_find(m, key, out_key, out_key_len, out_val, LightDef, ops)
-	case 5:  return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryTextMap_t, ops)
-	case 6:  return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryText_t, ops)
-	case 7:  return str_map_find(m, key, out_key, out_key_len, out_val, WorldIconEntry_t, ops)
-	case 8:  return str_map_find(m, key, out_key, out_key_len, out_val, DiscoveryAnim_t, ops)
-	case 9:  return str_map_find(m, key, out_key, out_key_len, out_val, SpecialNPCEntry_t, ops)
-	case 10: return str_map_find(m, key, out_key, out_key_len, out_val, ColliderDmgProperties_t, ops)
-	case 11: return str_map_find(m, key, out_key, out_key_len, out_val, ItemLocalization_t, ops)
-	case 12: return str_map_find(m, key, out_key, out_key_len, out_val, Achievement_t, ops)
-	case 13: return str_map_find(m, key, out_key, out_key_len, out_val, AchievementData_t, ops)
-	case 14: return str_map_find(m, key, out_key, out_key_len, out_val, IconEntry_t, ops)
-	case 15: return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryCallout_t, ops)
-	case 16: return str_map_find(m, key, out_key, out_key_len, out_val, binding_t, ops)
-	case 17: return str_map_find(m, key, out_key, out_key_len, out_val, Class_t, ops)
-	case 18: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
-	case 19: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
-	case 20: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
-	case 21: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return str_map_find(m, key, out_key, out_key_len, out_val, i32, ops)
+	case .MK_F32:  return str_map_find(m, key, out_key, out_key_len, out_val, f32, ops)
+	case .MK_U32:  return str_map_find(m, key, out_key, out_key_len, out_val, u32, ops)
+	case .MK_String:  return str_map_find(m, key, out_key, out_key_len, out_val, string, ops)
+	case .MK_LightDef:  return str_map_find(m, key, out_key, out_key_len, out_val, LightDef, ops)
+	case .MK_IconEntryTextMap:  return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryTextMap_t, ops)
+	case .MK_IconEntryText:  return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryText_t, ops)
+	case .MK_WorldIconEntry:  return str_map_find(m, key, out_key, out_key_len, out_val, WorldIconEntry_t, ops)
+	case .MK_DiscoveryAnim:  return str_map_find(m, key, out_key, out_key_len, out_val, DiscoveryAnim_t, ops)
+	case .MK_SpecialNPC:  return str_map_find(m, key, out_key, out_key_len, out_val, SpecialNPCEntry_t, ops)
+	case .MK_ColliderDmg: return str_map_find(m, key, out_key, out_key_len, out_val, ColliderDmgProperties_t, ops)
+	case .MK_ItemLoc: return str_map_find(m, key, out_key, out_key_len, out_val, ItemLocalization_t, ops)
+	case .MK_Achievement: return str_map_find(m, key, out_key, out_key_len, out_val, Achievement_t, ops)
+	case .MK_AchievementData: return str_map_find(m, key, out_key, out_key_len, out_val, AchievementData_t, ops)
+	case .MK_IconEntry: return str_map_find(m, key, out_key, out_key_len, out_val, IconEntry_t, ops)
+	case .MK_IconEntryCallout: return str_map_find(m, key, out_key, out_key_len, out_val, IconEntryCallout_t, ops)
+	case .MK_Binding: return str_map_find(m, key, out_key, out_key_len, out_val, binding_t, ops)
+	case .MK_Class: return str_map_find(m, key, out_key, out_key_len, out_val, Class_t, ops)
+	case .MK_DynArrayStr: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	}
 	return false
 }
@@ -1931,21 +2486,34 @@ str_map_find :: proc(m: rawptr, key: string, out_key: ^rawptr, out_key_len: ^i32
 barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr, out_val_len: ^i32, value_kind: i32) -> bool {
 	context = runtime.default_context()
 	ops := value_ops_for(value_kind)
-	switch value_kind {
-	case 0:  return i32_map_find(m, key, out_val, out_val_len, i32, ops)
-	case 2:  return i32_map_find(m, key, out_val, out_val_len, u32, ops)
-	case 26: return i32_map_find(m, key, out_val, out_val_len, u64, ops)
-	case 3:  return i32_map_find(m, key, out_val, out_val_len, string, ops)
-	case 18: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
-	case 19: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
-	case 20: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
-	case 21: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
-	case 22: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
-	case 23: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
-	case 24: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
-	case 25: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
-	case 27: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
-	case 28: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
+	#partial switch Value_Kind(value_kind) {
+	case .MK_I32:  return i32_map_find(m, key, out_val, out_val_len, i32, ops)
+	case .MK_U32:  return i32_map_find(m, key, out_val, out_val_len, u32, ops)
+	case .MK_U64: return i32_map_find(m, key, out_val, out_val_len, u64, ops)
+	case .MK_String:  return i32_map_find(m, key, out_val, out_val_len, string, ops)
+	case .MK_DynArrayStr: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case .MK_DynArrayS32: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case .MK_StatueLimbArray: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case .MK_StoreSlotsArray: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case .MK_MonsterTrapIgnore: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
+	case .MK_SetOfI32: return i32_map_find(m, key, out_val, out_val_len, map[i32]struct{}, ops)
+	case .MK_Lootbag: return i32_map_find(m, key, out_val, out_val_len, Lootbag_t, ops)
+	case .MK_EnemyHPDetails: return i32_map_find(m, key, out_val, out_val_len, EnemyHPDetails_t, ops)
+	case .MK_GlyphData: return i32_map_find(m, key, out_val, out_val_len, GlyphData_t, ops)
+	case .MK_Statistic: return i32_map_find(m, key, out_val, out_val_len, Statistic_t, ops)
+	case .MK_Ptr: return i32_map_find(m, key, out_val, out_val_len, u64, ops)
+	case .MK_F64: return i32_map_find(m, key, out_val, out_val_len, f64, ops)
+	case .MK_FormationInfo: return i32_map_find(m, key, out_val, out_val_len, FormationInfo_t, ops)
+	case .MK_AnimatedTile: return i32_map_find(m, key, out_val, out_val_len, AnimatedTile, ops)
+	case .MK_AdditionalOffset: return i32_map_find(m, key, out_val, out_val_len, AdditionalOffset_t, ops)
+	case .MK_PlayerRaceHostility: return i32_map_find(m, key, out_val, out_val_len, PlayerRaceHostility_t, ops)
+	case .MK_SpellElement: return i32_map_find(m, key, out_val, out_val_len, spellElement_t, ops)
+	case .MK_Effect: return i32_map_find(m, key, out_val, out_val_len, Effect_t, ops)
+	case .MK_EffectLocations: return i32_map_find(m, key, out_val, out_val_len, EffectLocations_t, ops)
+	case .MK_CalloutParticle: return i32_map_find(m, key, out_val, out_val_len, CalloutParticle_t, ops)
+	case .MK_ModelOffset: return i32_map_find(m, key, out_val, out_val_len, ModelOffset_t, ops)
+	case .MK_EffectDefinitionEntry: return i32_map_find(m, key, out_val, out_val_len, EffectDefinitionEntry_t, ops)
+	case .MK_ParticleTimerEffect: return i32_map_find(m, key, out_val, out_val_len, ParticleTimerEffect_t, ops)
 	}
 	return false
 }

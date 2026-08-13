@@ -2235,7 +2235,7 @@ void gameLogic(void)
 							FollowerMenu[i].closeFollowerMenuGUI(true);
 							CalloutMenu[i].closeCalloutMenuGUI();
 						}
-						barony_dynamic_array_clear(&players[i]->hud.followerBars);
+						barony_dynamic_array_elem_clear(&players[i]->hud.followerBars, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 						spellcastingAnimationManager_deactivate(&cast_animation[i]);
 					}
 					EnemyHPDamageBarHandler::dumpCache();
@@ -7646,10 +7646,10 @@ extern "C" int barony_main(int argc, char** argv)
 					camera.ang += mult * cvars.shakex2;
 					camera.vang += mult * cvars.shakey2 / 200.0;
 
-					for ( auto& HPBar : enemyHPDamageBarHandler[c].HPBars )
-					{
-						enemyHPDamageBarHandler[c].HPBars[HPBar.first].updateWorldCoordinates(); // update enemy bar world coordinates before drawEntities3D called
-					}
+					enemyHPDamageBarHandler[c].HPBars.forEach([&](int uid, EnemyHPDamageBarHandler::EnemyHPDetails& bar) {
+						(void)uid;
+						bar.updateWorldCoordinates(); // update enemy bar world coordinates before drawEntities3D called
+					});
 					players[c]->worldUI.worldTooltipDialogue.playerDialogue.updateWorldCoordinates(); // update dialogue world coordinates before drawEntities3D called
 					for ( auto& worldTooltipDialogue : players[c]->worldUI.worldTooltipDialogue.sharedDialogues )
 					{

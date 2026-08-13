@@ -209,6 +209,13 @@ Kind_HiscoreLootbag  :: 24
 Kind_HiscorePlayer  :: 25
 Kind_Book            :: 26
 Kind_StoreSlots      :: 27
+Kind_StatusEffectQueueEntry :: 28
+Kind_HiscoreAttributesPair   :: 29
+Kind_HiscorePlayerEquipPair  :: 30
+Kind_HiscoreNpcEquipPair     :: 31
+Kind_HiscoreLootbagPair      :: 32
+Kind_HiscoreCompendiumPair   :: 33
+Kind_FollowerBarPair         :: 34
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -247,6 +254,62 @@ store_slots_copy :: proc(dst: rawptr, src: rawptr) {
 	s := (^StoreSlots_t)(src)
 	d.slotTradingReq = s.slotTradingReq
 	barony_dynamic_array_elem_copy(&d.itemEntries, &s.itemEntries, size_of(ShopkeeperItemEntry_t), Kind_ShopkeeperItem)
+}
+
+// SDL_Rect mirror (16 bytes = 4 x i32)
+SDL_Rect :: struct {
+	x: i32,
+	y: i32,
+	w: i32,
+	h: i32,
+}
+
+// StatusEffectQueueEntry_t — 160B owning (navigation map; rest POD)
+StatusEffectQueueEntry_t :: struct {
+	animateX: f64,
+	animateY: f64,
+	animateW: f64,
+	animateH: f64,
+	animateSetpointX: i32,
+	animateSetpointY: i32,
+	animateSetpointW: i32,
+	animateSetpointH: i32,
+	animateStartX: i32,
+	animateStartY: i32,
+	animateStartW: i32,
+	animateStartH: i32,
+	pos: SDL_Rect,
+	notificationTargetPosition: SDL_Rect,
+	lastUpdateTick: u32,
+	effect: i32,
+	customVariable: u32,
+	lowDuration: bool,
+	notificationState: i32,
+	notificationStateInit: i32,
+	navigation: map[[4]byte]u64,
+	index: u64,
+}
+
+status_effect_queue_entry_free :: proc(p: rawptr) {
+	v := (^StatusEffectQueueEntry_t)(p)
+	if v.navigation != nil {
+		delete(v.navigation)
+		v.navigation = nil
+	}
+}
+
+status_effect_queue_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^StatusEffectQueueEntry_t)(dst)
+	s := (^StatusEffectQueueEntry_t)(src)
+	if d.navigation != nil { delete(d.navigation) }
+	d^ = s^
+	d.navigation = nil
+	if s.navigation != nil {
+		d.navigation = make(map[[4]byte]u64)
+		for key, value in s.navigation {
+			d.navigation[key] = value
+		}
+	}
 }
 
 // element free/copy procs, rawptr-based so the generic walkers can use them
@@ -836,7 +899,7 @@ MAXPLAYERS :: 4
 NUM_CONDUCT_CHALLENGES :: 32
 NUM_GAMEPLAY_STATISTICS :: 64
 NUM_HOTBAR_SLOTS :: 10
-NUM_HOTBAR_ALTERNATES :: 2
+NUM_HOTBAR_ALTERNATES :: 5
 
 // ---------------------------------------------------------------------------
 // SkillEffect_t + SkillEntry_t (player skill sheet) — recursive owns
@@ -1204,6 +1267,29 @@ HiscoreLootbag_t :: struct {
 	items:           Raw_Dynamic_Array,   // HiscoreItem_t
 }
 
+// Owning hiscore pair element mirrors (deep free/copy). Layouts match the
+// C++ std::pair<...> members exactly on MSVC x64.
+HiscoreAttributesPair_t :: struct {
+	first:  DynamicString,
+	second: DynamicString,
+}
+HiscorePlayerEquipPair_t :: struct {
+	first:  DynamicString,
+	second: u32,
+}
+HiscoreNpcEquipPair_t :: struct {
+	first:  DynamicString,
+	second: HiscoreItem_t,
+}
+HiscoreLootbagPair_t :: struct {
+	first:  u32,
+	second: HiscoreLootbag_t,
+}
+HiscoreCompendiumEventPair_t :: struct {
+	first:  DynamicString,
+	second: Raw_Dynamic_Array,   // i32
+}
+
 HiscoreStat_t :: struct {
 	name:                DynamicString,
 	type:                u32,
@@ -1250,12 +1336,12 @@ hiscore_stat_free :: proc(p: rawptr) {
 	barony_dynamic_array_elem_destroy(&v.EFFECTS_TIMERS, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.EFFECTS_ACCRETION_TIME, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.MISC_FLAGS, size_of(i32), Kind_POD)
-	barony_dynamic_array_elem_destroy(&v.attributes, size_of(DynamicString), Kind_DynamicString)
-	barony_dynamic_array_elem_destroy(&v.player_equipment, size_of(DynamicString), Kind_DynamicString)
-	barony_dynamic_array_elem_destroy(&v.npc_equipment, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.attributes, size_of(HiscoreAttributesPair_t), Kind_HiscoreAttributesPair)
+	barony_dynamic_array_elem_destroy(&v.player_equipment, size_of(HiscorePlayerEquipPair_t), Kind_HiscorePlayerEquipPair)
+	barony_dynamic_array_elem_destroy(&v.npc_equipment, size_of(HiscoreNpcEquipPair_t), Kind_HiscoreNpcEquipPair)
 	barony_dynamic_array_elem_destroy(&v.inventory, size_of(HiscoreItem_t), Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.void_chest_inventory, size_of(HiscoreItem_t), Kind_POD)
-	barony_dynamic_array_elem_destroy(&v.player_lootbags, size_of(HiscoreLootbag_t), Kind_HiscoreLootbag)
+	barony_dynamic_array_elem_destroy(&v.player_lootbags, size_of(HiscoreLootbagPair_t), Kind_HiscoreLootbagPair)
 }
 
 hiscore_stat_copy :: proc(dst: rawptr, src: rawptr) {
@@ -1293,12 +1379,12 @@ hiscore_stat_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.EFFECTS_TIMERS, &s.EFFECTS_TIMERS, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_copy(&d.EFFECTS_ACCRETION_TIME, &s.EFFECTS_ACCRETION_TIME, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_copy(&d.MISC_FLAGS, &s.MISC_FLAGS, size_of(i32), Kind_POD)
-	barony_dynamic_array_elem_copy(&d.attributes, &s.attributes, size_of(DynamicString), Kind_DynamicString)
-	barony_dynamic_array_elem_copy(&d.player_equipment, &s.player_equipment, size_of(DynamicString), Kind_DynamicString)
-	barony_dynamic_array_elem_copy(&d.npc_equipment, &s.npc_equipment, size_of(HiscoreItem_t), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.attributes, &s.attributes, size_of(HiscoreAttributesPair_t), Kind_HiscoreAttributesPair)
+	barony_dynamic_array_elem_copy(&d.player_equipment, &s.player_equipment, size_of(HiscorePlayerEquipPair_t), Kind_HiscorePlayerEquipPair)
+	barony_dynamic_array_elem_copy(&d.npc_equipment, &s.npc_equipment, size_of(HiscoreNpcEquipPair_t), Kind_HiscoreNpcEquipPair)
 	barony_dynamic_array_elem_copy(&d.inventory, &s.inventory, size_of(HiscoreItem_t), Kind_POD)
 	barony_dynamic_array_elem_copy(&d.void_chest_inventory, &s.void_chest_inventory, size_of(HiscoreItem_t), Kind_POD)
-	barony_dynamic_array_elem_copy(&d.player_lootbags, &s.player_lootbags, size_of(HiscoreLootbag_t), Kind_HiscoreLootbag)
+	barony_dynamic_array_elem_copy(&d.player_lootbags, &s.player_lootbags, size_of(HiscoreLootbagPair_t), Kind_HiscoreLootbagPair)
 }
 
 // HiscoreLootbag element ops (owns items array)
@@ -1314,6 +1400,64 @@ hiscore_lootbag_copy :: proc(dst: rawptr, src: rawptr) {
 	d.spawnedOnGround = s.spawnedOnGround
 	d.looted = s.looted
 	barony_dynamic_array_elem_copy(&d.items, &s.items, size_of(HiscoreItem_t), Kind_POD)
+}
+
+// ---- owning hiscore pair free/copy procs ----
+hiscore_attributes_pair_free :: proc(p: rawptr) {
+	v := (^HiscoreAttributesPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+	dynamic_string_free_elem(rawptr(&v.second))
+}
+hiscore_attributes_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreAttributesPair_t)(dst)
+	s := (^HiscoreAttributesPair_t)(src)
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+	dynamic_string_copy_elem(rawptr(&d.second), rawptr(&s.second))
+}
+
+hiscore_player_equip_pair_free :: proc(p: rawptr) {
+	v := (^HiscorePlayerEquipPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+}
+hiscore_player_equip_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscorePlayerEquipPair_t)(dst)
+	s := (^HiscorePlayerEquipPair_t)(src)
+	d.second = s.second
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+}
+
+hiscore_npc_equip_pair_free :: proc(p: rawptr) {
+	v := (^HiscoreNpcEquipPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+}
+hiscore_npc_equip_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreNpcEquipPair_t)(dst)
+	s := (^HiscoreNpcEquipPair_t)(src)
+	d.second = s.second
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+}
+
+hiscore_lootbag_pair_free :: proc(p: rawptr) {
+	v := (^HiscoreLootbagPair_t)(p)
+	hiscore_lootbag_free(rawptr(&v.second))
+}
+hiscore_lootbag_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreLootbagPair_t)(dst)
+	s := (^HiscoreLootbagPair_t)(src)
+	d.first = s.first
+	hiscore_lootbag_copy(rawptr(&d.second), rawptr(&s.second))
+}
+
+hiscore_compendium_pair_free :: proc(p: rawptr) {
+	v := (^HiscoreCompendiumEventPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+	barony_dynamic_array_elem_destroy(&v.second, size_of(i32), Kind_POD)
+}
+hiscore_compendium_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^HiscoreCompendiumEventPair_t)(dst)
+	s := (^HiscoreCompendiumEventPair_t)(src)
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+	barony_dynamic_array_elem_copy(&d.second, &s.second, size_of(i32), Kind_POD)
 }
 
 // ---------------------------------------------------------------------------
@@ -1344,9 +1488,124 @@ HiscorePlayer_t :: struct {
 	escalatingSpellRngRolls: Raw_Dynamic_Array,
 	appraisal_item_progress: Raw_Dynamic_Array,
 	learnedSpells:         Raw_Dynamic_Array,   // i32
+	sustainedSpellIDCounter: Raw_Dynamic_Array,  // pair<int,int> (POD)
+	ducksInARow:             Raw_Dynamic_Array,  // pair<int,int> (POD)
+	favoriteBooksAchievement: Raw_Dynamic_Array, // pair<int,int> (POD)
+	sustainedSpellMPUsedSorcery:  i32,
+	sustainedSpellMPUsedMysticism: i32,
+	sustainedSpellMPUsedThaumaturgy: i32,
+	baseSpellMPUsedSorcery:  i32,
+	baseSpellMPUsedMysticism: i32,
+	baseSpellMPUsedThaumaturgy: i32,
 	stats:                 HiscoreStat_t,
 	followers:             Raw_Dynamic_Array,   // HiscoreStat_t
 }
+
+// Player::HUD_t::Bar_t — all POD (real_t=f64). 88 bytes.
+HudBar_t :: struct {
+	animateValue: f64,
+	animateValue2: f64,
+	animatePreviousSetpoint: f64,
+	animateSetpoint: i32,
+	animateTicks: u32,
+	animateState: i32,
+	xpLevelups: u32,
+	maxValue: f64,
+	fadeIn: f64,
+	fadeOut: f64,
+	widthMultiplier: f64,
+	flashTicks: u32,
+	flashProcessedOnTick: u32,
+	flashAnimState: i32,
+	flashType: i32,
+}
+
+// Player::HUD_t::FollowerBar_t — POD + two owned DynamicStrings. 280 bytes.
+FollowerBar_t :: struct {
+	hpBar: HudBar_t,
+	mpBar: HudBar_t,
+	animx: f64,
+	animy: f64,
+	expired: bool,
+	expiredTicks: u32,
+	animFade: f64,
+	animFadeScroll: f64,
+	animFadeScrollDummy: f64,
+	bInit: bool,
+	name: DynamicString,
+	customPortraitPath: DynamicString,
+	level: i32,
+	model: i32,
+	monsterType: i32,
+	selected: bool,
+	dummy: bool,
+}
+
+// std::pair<Uint32, FollowerBar_t> — 4-byte key + 4 padding + value. 288 bytes.
+FollowerBarPair_t :: struct {
+	first: u32,
+	_pad: u32,
+	second: FollowerBar_t,
+}
+
+#assert(size_of(HudBar_t) == 88)
+#assert(size_of(FollowerBar_t) == 280)
+#assert(size_of(FollowerBarPair_t) == 288)
+
+follower_bar_pair_free :: proc(p: rawptr) {
+	v := (^FollowerBarPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.second.name))
+	dynamic_string_free_elem(rawptr(&v.second.customPortraitPath))
+}
+
+follower_bar_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^FollowerBarPair_t)(dst)
+	s := (^FollowerBarPair_t)(src)
+	d^ = s^
+	d.second.name = DynamicString{}
+	d.second.customPortraitPath = DynamicString{}
+	dynamic_string_copy_elem(rawptr(&d.second.name), rawptr(&s.second.name))
+	dynamic_string_copy_elem(rawptr(&d.second.customPortraitPath), rawptr(&s.second.customPortraitPath))
+}
+
+// Layout guards — must match the C++ SaveGameInfo::Player / stat_t sizeof
+// exactly (MSVC x64, real_t=double). Catch any field drift at compile time.
+#assert(size_of(HiscoreItem_t) == 32)
+#assert(size_of(HiscoreLootbag_t) == 56)
+#assert(size_of(HiscoreStat_t) == 528)
+#assert(size_of(HiscorePlayer_t) == 1816)
+#assert(size_of(HiscoreAttributesPair_t) == 32)
+#assert(size_of(HiscorePlayerEquipPair_t) == 24)
+#assert(size_of(HiscoreNpcEquipPair_t) == 48)
+#assert(size_of(HiscoreLootbagPair_t) == 64)
+#assert(size_of(HiscoreCompendiumEventPair_t) == 56)
+
+// Non-hiscore array-element mirrors — lock to C++ sizeof.
+#assert(size_of(Book_t) == 72)
+#assert(size_of(StoreSlots_t) == 48)
+#assert(size_of(SDL_Rect) == 16)
+#assert(size_of(StatusEffectQueueEntry_t) == 160)
+#assert(size_of(ItemTooltipIcons_t) == 56)
+#assert(size_of(DropdownOption_t) == 64)
+#assert(size_of(EntryVariable_t) == 40)
+#assert(size_of(FollowerGenerateDetails_t) == 40)
+#assert(size_of(Level_t) == 56)
+#assert(size_of(CodexItem_t) == 32)
+#assert(size_of(ShopkeeperItemEntry_t) == 256)
+#assert(size_of(VariantPair_t) == 24)
+#assert(size_of(MonsterCurveEntry_t) == 64)
+#assert(size_of(LevelCurve_t) == 96)
+#assert(size_of(TmpItem_t) == 184)
+#assert(size_of(MapGeneration_t) == 208)
+#assert(size_of(HotbarEntry_t) == 88)
+#assert(size_of(SkillEffect_t) == 160)
+#assert(size_of(SkillEntry_t) == 208)
+#assert(size_of(PanelEntry_t) == 80)
+#assert(size_of(AssistNotification_t) == 72)
+#assert(size_of(AssistNotificationPair_t) == 80)
+#assert(size_of(AlchNotification_t) == 64)
+#assert(size_of(AlchNotificationPair_t) == 72)
+#assert(size_of(CalloutPanelEntry_t) == 48)
 
 hiscore_player_free :: proc(p: rawptr) {
 	v := (^HiscorePlayer_t)(p)
@@ -1355,12 +1614,15 @@ hiscore_player_free :: proc(p: rawptr) {
 	barony_dynamic_array_elem_destroy(&v.known_recipes, 12, Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.known_scrolls, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.shopkeeperHostility, size_of(i32)*2, Kind_POD)
-	barony_dynamic_array_elem_destroy(&v.compendium_item_events, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.compendium_item_events, size_of(HiscoreCompendiumEventPair_t), Kind_HiscoreCompendiumPair)
 	barony_dynamic_array_elem_destroy(&v.itemDegradeRNG, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.escalatingRngRolls, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.escalatingSpellRngRolls, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.appraisal_item_progress, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_destroy(&v.learnedSpells, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.sustainedSpellIDCounter, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.ducksInARow, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.favoriteBooksAchievement, size_of(i32)*2, Kind_POD)
 	hiscore_stat_free(&v.stats)
 	barony_dynamic_array_elem_destroy(&v.followers, size_of(HiscoreStat_t), Kind_HiscoreStat)
 }
@@ -1386,12 +1648,21 @@ hiscore_player_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.known_recipes, &s.known_recipes, 12, Kind_POD)
 	barony_dynamic_array_elem_copy(&d.known_scrolls, &s.known_scrolls, size_of(i32), Kind_POD)
 	barony_dynamic_array_elem_copy(&d.shopkeeperHostility, &s.shopkeeperHostility, size_of(i32)*2, Kind_POD)
-	barony_dynamic_array_elem_copy(&d.compendium_item_events, &s.compendium_item_events, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.compendium_item_events, &s.compendium_item_events, size_of(HiscoreCompendiumEventPair_t), Kind_HiscoreCompendiumPair)
 	barony_dynamic_array_elem_copy(&d.itemDegradeRNG, &s.itemDegradeRNG, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_copy(&d.escalatingRngRolls, &s.escalatingRngRolls, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_copy(&d.escalatingSpellRngRolls, &s.escalatingSpellRngRolls, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_copy(&d.appraisal_item_progress, &s.appraisal_item_progress, size_of(i32)*2, Kind_POD)
 	barony_dynamic_array_elem_copy(&d.learnedSpells, &s.learnedSpells, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.sustainedSpellIDCounter, &s.sustainedSpellIDCounter, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.ducksInARow, &s.ducksInARow, size_of(i32)*2, Kind_POD)
+	barony_dynamic_array_elem_copy(&d.favoriteBooksAchievement, &s.favoriteBooksAchievement, size_of(i32)*2, Kind_POD)
+	d.sustainedSpellMPUsedSorcery = s.sustainedSpellMPUsedSorcery
+	d.sustainedSpellMPUsedMysticism = s.sustainedSpellMPUsedMysticism
+	d.sustainedSpellMPUsedThaumaturgy = s.sustainedSpellMPUsedThaumaturgy
+	d.baseSpellMPUsedSorcery = s.baseSpellMPUsedSorcery
+	d.baseSpellMPUsedMysticism = s.baseSpellMPUsedMysticism
+	d.baseSpellMPUsedThaumaturgy = s.baseSpellMPUsedThaumaturgy
 	hiscore_stat_copy(&d.stats, &s.stats)
 	barony_dynamic_array_elem_copy(&d.followers, &s.followers, size_of(HiscoreStat_t), Kind_HiscoreStat)
 }
@@ -1402,7 +1673,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [28]Element_Ops{
+element_ops := [35]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1431,6 +1702,13 @@ element_ops := [28]Element_Ops{
 	25 = { free = hiscore_player_free,  copy = hiscore_player_copy },
 	26 = { free = book_free,            copy = book_copy },
 	27 = { free = store_slots_free,    copy = store_slots_copy },
+	28 = { free = status_effect_queue_entry_free, copy = status_effect_queue_entry_copy },
+	29 = { free = hiscore_attributes_pair_free, copy = hiscore_attributes_pair_copy },
+	30 = { free = hiscore_player_equip_pair_free, copy = hiscore_player_equip_pair_copy },
+	31 = { free = hiscore_npc_equip_pair_free, copy = hiscore_npc_equip_pair_copy },
+	32 = { free = hiscore_lootbag_pair_free, copy = hiscore_lootbag_pair_copy },
+	33 = { free = hiscore_compendium_pair_free, copy = hiscore_compendium_pair_copy },
+	34 = { free = follower_bar_pair_free, copy = follower_bar_pair_copy },
 }
 
 @(export)

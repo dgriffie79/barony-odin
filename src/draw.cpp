@@ -2333,13 +2333,12 @@ void drawEntities3D(view_t* camera, int mode)
 #ifndef EDITOR
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		for ( auto& enemybar : enemyHPDamageBarHandler[i].HPBars )
-		{
-			EnemyHPDamageBarHandler::EnemyHPDetails& enemybarRef = enemyHPDamageBarHandler[i].HPBars[enemybar.first];
-			real_t camDist = (pow(camera->x * 16.0 - enemybarRef.worldX, 2)
-				+ pow(camera->y * 16.0 - enemybarRef.worldY, 2));
-			spritesToDraw.push_back(std::make_tuple(camDist, &enemybarRef, SPRITE_HPBAR));
-		}
+		enemyHPDamageBarHandler[i].HPBars.forEach([&](int uid, EnemyHPDamageBarHandler::EnemyHPDetails& bar) {
+			(void)uid;
+			real_t camDist = (pow(camera->x * 16.0 - bar.worldX, 2)
+				+ pow(camera->y * 16.0 - bar.worldY, 2));
+			spritesToDraw.push_back(std::make_tuple(camDist, &bar, SPRITE_HPBAR));
+		});
 		if ( players[i]->worldUI.worldTooltipDialogue.playerDialogue.init && players[i]->worldUI.worldTooltipDialogue.playerDialogue.draw )
 		{
 			if ( i == currentPlayerViewport )
@@ -2546,8 +2545,8 @@ void drawEntities3D(view_t* camera, int mode)
 		{
 #ifndef EDITOR
 			if ( intro ) { continue; } // don't draw on main menu
-			auto enemybar = (std::pair<Uint32, EnemyHPDamageBarHandler::EnemyHPDetails>*)std::get<1>(distSpriteType);
-			glDrawEnemyBarSprite(camera, mode, currentPlayerViewport, &enemybar->second);
+			auto enemybar = (EnemyHPDamageBarHandler::EnemyHPDetails*)std::get<1>(distSpriteType);
+			glDrawEnemyBarSprite(camera, mode, currentPlayerViewport, enemybar);
 #endif
 		}
 		else if ( std::get<2>(distSpriteType) == SpriteTypes::SPRITE_DIALOGUE )

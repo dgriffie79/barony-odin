@@ -832,6 +832,8 @@ struct AnimatedTile {
 };
 extern DynamicMapI32T<AnimatedTile> tileAnimations;
 
+template <> struct MapValueKindOf<AnimatedTile> { static constexpr int value = MK_AnimatedTile; };
+
 // function prototypes for main.c:
 int sgn(real_t x);
 int numdigits_sint16(Sint16 x);

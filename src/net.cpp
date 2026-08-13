@@ -2345,7 +2345,7 @@ static void changeLevel() {
         auto& camera = players[i]->camera();
         camera.globalLightModifierActive = GLOBAL_LIGHT_MODIFIER_STOPPED;
         camera.luminance = defaultLuminance;
-		barony_dynamic_array_clear(&players[i]->hud.followerBars);
+		barony_dynamic_array_elem_clear(&players[i]->hud.followerBars, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 		spellcastingAnimationManager_deactivate(&cast_animation[i]);
 	}
 	EnemyHPDamageBarHandler::dumpCache();

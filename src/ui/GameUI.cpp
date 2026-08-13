@@ -1978,6 +1978,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 	int barIndex = -1;
 	for ( auto f : baseFrame->getFrames() )
 	{
+		if ( !f ) { continue; } // defensive: skip null child frame (see followerBars note)
 		if ( strcmp(f->getName(), "entry") || f->isToBeDeleted() )
 		{
 			continue;
@@ -3773,7 +3774,7 @@ void updateAllyFollowerFrame(const int player)
 			}
 			if ( foundIdx < 0 )
 			{
-				dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, std::make_pair(uid, Player::HUD_t::FollowerBar_t()));
+				dynarray_push_owned<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, std::make_pair(uid, Player::HUD_t::FollowerBar_t()));
 				auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) - 1);
 				bar.second.animFadeScroll = 1.0;
 				bar.second.animFadeScrollDummy = 1.0;
@@ -3789,17 +3790,11 @@ void updateAllyFollowerFrame(const int player)
 		auto& it = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _fi);
 		if ( it.second.dummy )
 		{
-			auto& _fb = hud_t.followerBars;
-			for ( int64_t _k = _fi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb) - 1; ++_k )
-				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k + 1));
-			_fb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
+			barony_dynamic_array_elem_erase(&hud_t.followerBars, (int32_t)_fi, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 		}
 		else if ( it.second.expired && it.second.animy >= 0.999 )
 		{
-			auto& _fb = hud_t.followerBars;
-			for ( int64_t _k = _fi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb) - 1; ++_k )
-				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_fb, _k + 1));
-			_fb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
+			barony_dynamic_array_elem_erase(&hud_t.followerBars, (int32_t)_fi, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 			erasedEntry = true;
 		}
 		else
@@ -3987,7 +3982,8 @@ void updateAllyFollowerFrame(const int player)
 				}
 				if ( barIndex < (followerDisplay.scrollSetpoint - 1) )
 				{
-					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, vecIndex));
+					auto fbCopy = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, vecIndex);
+					dynarray_push_owned<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, fbCopy);
 					dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars) - 1)->second.dummy = true;
 					//messagePlayer(0, MESSAGE_DEBUG, "%.2f", hud_t.followerBars[hud_t.followerBars.size() - 1].second.animFadeScrollDummy);
 					//hud_t.followerBars[hud_t.followerBars.size() - 1].second.animFadeScroll = 0.0;
@@ -4118,6 +4114,7 @@ void updateAllyFollowerFrame(const int player)
 
 					for ( auto f : baseFrame->getFrames() )
 					{
+						if ( !f ) { continue; } // defensive
 						if ( strcmp(f->getName(), "entry") || f->isToBeDeleted() )
 						{
 							continue;
@@ -4177,6 +4174,7 @@ void updateAllyFollowerFrame(const int player)
 		bool scrollingCompleted = false;
 		for ( auto f : baseFrame->getFrames() )
 		{
+			if ( !f ) { continue; } // defensive: skip null child frame
 			if ( strcmp(f->getName(), "entry") || f->isToBeDeleted() )
 			{
 				continue;
@@ -4268,12 +4266,12 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 			{
 				while ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) < *cvar_playerbars_debug )
 				{
-					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(0, Player::HUD_t::FollowerBar_t()));
+					dynarray_push_owned<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(0, Player::HUD_t::FollowerBar_t()));
 				}
 			}
 			else if ( dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) > *cvar_playerbars_debug )
 			{
-				barony_dynamic_array_clear(&hud_t.playerBars);
+				barony_dynamic_array_elem_clear(&hud_t.playerBars, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 			}
 		}
 		/*if ( enableDebugKeys && keystatus[SDLK_H] )
@@ -4308,7 +4306,7 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 				}
 				if ( foundPB < 0 )
 				{
-					dynarray_pair_push<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(i, Player::HUD_t::FollowerBar_t()));
+					dynarray_push_owned<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, std::make_pair(i, Player::HUD_t::FollowerBar_t()));
 					auto& bar = *dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) - 1);
 					bar.second.animFadeScroll = 1.0;
 					bar.second.animFadeScrollDummy = 1.0;
@@ -4325,17 +4323,11 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 		if ( playernum >= 0 && playernum < MAXPLAYERS
 			&& client_disconnected[playernum] )
 		{
-			auto& _pb = hud_t.playerBars;
-			for ( int64_t _k = _pi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb) - 1; ++_k )
-				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k + 1));
-			_pb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
+			barony_dynamic_array_elem_erase(&hud_t.playerBars, (int32_t)_pi, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 		}
 		else if ( it.second.expired && it.second.animy >= 0.999 )
 		{
-			auto& _pb = hud_t.playerBars;
-			for ( int64_t _k = _pi; _k < dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb) - 1; ++_k )
-				(*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k)) = (*dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(_pb, _k + 1));
-			_pb.len -= (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>);
+			barony_dynamic_array_elem_erase(&hud_t.playerBars, (int32_t)_pi, (int64_t)sizeof(std::pair<Uint32, Player::HUD_t::FollowerBar_t>), Kind_FollowerBarPair);
 		}
 		else
 		{
@@ -12805,10 +12797,10 @@ void Player::HUD_t::processHUD()
 	enemyHPDamageBarHandler[player.playernum].cullExpiredHPBars();
 	enemyBarFrame->setDisabled(true);
 	enemyBarFrameHUD->setDisabled(true);
-	for ( auto& HPBar : enemyHPDamageBarHandler[player.playernum].HPBars )
-	{
-		updateEnemyBar2(enemyBarFrame, &enemyHPDamageBarHandler[player.playernum].HPBars[HPBar.first]);
-	}
+	enemyHPDamageBarHandler[player.playernum].HPBars.forEach([&](int uid, EnemyHPDamageBarHandler::EnemyHPDetails& bar) {
+		(void)uid;
+		updateEnemyBar2(enemyBarFrame, &bar);
+	});
 	updateStatusEffectQueue(player.playernum);
 }
 
@@ -32618,6 +32610,11 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 
 EnemyHPDamageBarHandler::EnemyHPDetails::~EnemyHPDetails()
 {
+	freeWorldTextures();
+}
+
+void EnemyHPDamageBarHandler::EnemyHPDetails::freeWorldTextures()
+{
 	if ( worldTexture )
 	{
 		delete worldTexture;
@@ -33163,6 +33160,10 @@ void EnemyHPDamageBarHandler::dumpCache()
 	enemyBarMap.m.clear();
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
+		enemyHPDamageBarHandler[i].HPBars.forEach([&](int uid, EnemyHPDamageBarHandler::EnemyHPDetails& bar) {
+			(void)uid;
+			bar.freeWorldTextures();
+		});
 		enemyHPDamageBarHandler[i].HPBars.clear();
 	}
 }

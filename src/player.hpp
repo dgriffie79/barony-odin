@@ -1626,8 +1626,12 @@ public:
 			real_t animFadeScroll = 0.0;
 			real_t animFadeScrollDummy = 0.0;
 			bool bInit = false;
-			DynamicString name = "";
-			DynamicString customPortraitPath = "";
+			// Default to null (not a 1-byte "" buffer): followerBars is a raw
+			// DynamicArray whose push is a shallow memcpy. A non-null empty buffer
+			// would be freed by the source temporary's destructor, leaving a
+			// dangling pointer in the array slot (double-free on next assignment).
+			DynamicString name{};
+			DynamicString customPortraitPath{};
 			int level = 0;
 			int model = 0;
 			int monsterType = 0;
@@ -2101,7 +2105,9 @@ public:
 			player(p),
 			worldTooltipItem(p),
 			worldTooltipDialogue(p)
-		{};
+		{
+			barony_dynamic_array_init(&tooltipsInRange);
+		};
 		~WorldUI_t() {};
 		TooltipView tooltipView = TOOLTIP_VIEW_FREE;
 		DynamicArray tooltipsInRange;  // vector<pair<Entity*,real_t>>
@@ -2460,6 +2466,7 @@ public:
 };
 template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::SkillEffect_t> { static constexpr int value = Kind_SkillEffect; };
 template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t> { static constexpr int value = Kind_SkillEntry; };
+template <> struct DynamicArrayKindOf<std::pair<Uint32, Player::HUD_t::FollowerBar_t>> { static constexpr int value = Kind_FollowerBarPair; };
 
 
 extern Player* players[MAXPLAYERS];

@@ -2075,7 +2075,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
-const DynamicString& ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status status)
+DynamicString ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status status)
 {
 	if ( itemType >= ARTIFACT_ORB_BLUE && itemType <= ARTIFACT_ORB_GREEN )
 	{
@@ -2280,7 +2280,7 @@ const DynamicString& ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Sta
 	return defaultString;
 }
 
-const DynamicString& ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
+DynamicString ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 {
 	if ( adjectives.find("beatitude_status") == adjectives.end() )
 	{
@@ -2301,7 +2301,7 @@ const DynamicString& ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 	}
 }
 
-const DynamicString& ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
+DynamicString ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
 {
 	if ( adjectives.find("proficiency_levels") == adjectives.end() )
 	{
@@ -2919,7 +2919,7 @@ real_t ItemTooltips_t::getSpellSustainCostPerSecond(int spellID)
 	return cost;
 }
 
-const DynamicString& ItemTooltips_t::getSpellTypeString(const int player, Item& item)
+DynamicString ItemTooltips_t::getSpellTypeString(const int player, Item& item)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3177,7 +3177,7 @@ std::string ItemTooltips_t::getSpellIconPath(const int player, Item& item, int s
 #endif
 }
 
-const DynamicString& ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uint32 itemType)
+DynamicString ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uint32 itemType)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3205,7 +3205,7 @@ const DynamicString& ItemTooltips_t::getItemPotionAlchemyAdjective(const int pla
 #endif
 }
 
-const DynamicString& ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
+DynamicString ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 {
 #ifdef EDITOR
 	return defaultString;
@@ -3227,7 +3227,7 @@ const DynamicString& ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 #endif
 }
 
-const DynamicString& ItemTooltips_t::getItemProficiencyName(int proficiency)
+DynamicString ItemTooltips_t::getItemProficiencyName(int proficiency)
 {
 	if ( adjectives.find("proficiency_types") == adjectives.end() )
 	{
@@ -3257,7 +3257,7 @@ const DynamicString& ItemTooltips_t::getItemProficiencyName(int proficiency)
 	}
 }
 
-const DynamicString& ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
+DynamicString ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
 {
 	switch ( slotname )
 	{
@@ -3287,7 +3287,7 @@ const DynamicString& ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname
 	return adjectives["equipment_slot_types"]["unknown"];
 }
 
-const DynamicString& ItemTooltips_t::getItemStatShortName(const char* attr)
+DynamicString ItemTooltips_t::getItemStatShortName(const char* attr)
 {
     const std::string attribute = attr;
 	if ( attribute == "STR" )
@@ -3321,7 +3321,7 @@ const DynamicString& ItemTooltips_t::getItemStatShortName(const char* attr)
 	return defaultString;
 }
 
-const DynamicString& ItemTooltips_t::getItemStatFullName(const char* attr)
+DynamicString ItemTooltips_t::getItemStatFullName(const char* attr)
 {
     const std::string attribute = attr;
 	if ( attribute == "STR" )
@@ -3355,7 +3355,7 @@ const DynamicString& ItemTooltips_t::getItemStatFullName(const char* attr)
 	return defaultString;
 }
 
-const DynamicString& ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& attribute)
+DynamicString ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_icon_text"].find(attribute) != adjectives["equipment_effects_icon_text"].end() )
 	{
@@ -3364,7 +3364,7 @@ const DynamicString& ItemTooltips_t::getItemEquipmentEffectsForIconText(std::str
 	return defaultString;
 }
 
-const DynamicString& ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::string& attribute)
+DynamicString ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_attributes_text"].find(attribute) != adjectives["equipment_effects_attributes_text"].end() )
 	{

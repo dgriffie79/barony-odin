@@ -19,6 +19,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <string_view>
 #include "dynamic_string.hpp"
 
 struct DynamicMapRaw;  // forward decl for the shim signatures
@@ -48,6 +49,9 @@ extern "C" {
     void*     barony_dynamic_map_i32_entry(DynamicMapRaw*, const void* key, int32_t value_kind);
     int32_t   barony_dynamic_map_i32_entries(DynamicMapRaw*, void** key_ptrs, void* val_ptrs, int32_t count, int32_t value_kind);
     bool      barony_dynamic_map_i32_find(DynamicMapRaw*, const void* key, void* out_val, int32_t* out_val_len, int32_t value_kind);
+    void      barony_dynamic_map_i32_for_each(DynamicMapRaw*, int32_t value_kind, void* cb, void* userdata);
+
+    void      barony_dynamic_map_str_for_each(DynamicMapRaw*, int32_t value_kind, void* cb, void* userdata);
 
     // DynamicSet shims (std::set replacement; map[T]struct{} on the Odin side)
     void      barony_dynamic_set_i32_init(DynamicMapRaw*);
@@ -117,7 +121,7 @@ public:
         int operator*() const { return snap ? (*snap)[idx] : value; }
         Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
         bool operator!=(const Iterator& o) const {
-            if (!o.snap) return valid;
+            if (!o.snap) return snap ? idx < snap->size() : valid;
             if (!snap) return o.snap ? o.idx < o.snap->size() : false;
             if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
             return idx != o.idx;
@@ -419,6 +423,19 @@ enum MapValueKind {
     MK_U64 = 26,
     MK_GlyphData = 27,
     MK_Statistic = 28,
+    MK_Ptr = 29,                 // 8-byte pointer values (Frame*, node_t*, etc.)
+    MK_F64 = 30,                 // double / real_t (x64)
+    MK_FormationInfo = 31,       // FormationInfo_t (20B POD)
+    MK_AnimatedTile = 32,        // AnimatedTile (32B POD)
+    MK_AdditionalOffset = 33,    // AdditionalOffset_t (48B POD)
+    MK_PlayerRaceHostility = 34, // PlayerRaceHostility_t (40B POD)
+    MK_SpellElement = 35,        // spellElement_t (168B POD)
+    MK_Effect = 36,              // ParticleTimerEffect_t::Effect_t (40B POD)
+    MK_EffectLocations = 37,     // ParticleTimerEffect_t::EffectLocations_t (40B POD)
+    MK_CalloutParticle = 38,     // CalloutParticle_t (160B POD)
+    MK_ModelOffset = 39,         // ModelOffset_t (160B, owning: 2 nested maps)
+    MK_EffectDefinitionEntry = 40, // StatusEffectQueue_t::EffectDefinitionEntry_t (248B owning)
+    MK_ParticleTimerEffect = 41, // ParticleTimerEffect_t (32B, owning: effectMap)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -443,10 +460,27 @@ template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value 
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
 
+// 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.
+template <typename T> struct MapValueKindOf<T*> { static constexpr int value = MK_Ptr; };
+template <> struct MapValueKindOf<double> { static constexpr int value = MK_F64; };
+
 // Entry value type: string maps expose const char* (view into map storage);
 // other maps expose V by value.
 template <typename V> struct MapEntryValue { using type = V; };
-template <> struct MapEntryValue<DynamicString> { using type = const char*; };
+template <> struct MapEntryValue<DynamicString> { using type = DynamicString; };
+
+// Zero-copy iteration trampoline. The Odin for_each shims walk live map
+// entries and call a C-ABI callback with (key, key_len, live value ptr,
+// userdata). The trampoline forwards to a typed std::function-style sink.
+namespace barony_map_detail {
+struct ForeachSink {
+    virtual ~ForeachSink() = default;
+    virtual void call(const void* key, int32_t key_len, void* value) = 0;
+};
+inline void foreachTrampoline(const void* key, int32_t key_len, void* value, void* userdata) {
+    static_cast<ForeachSink*>(userdata)->call(key, key_len, value);
+}
+}
 
 // ---------------------------------------------------------------------------
 // DynamicMapStrT<V> — std::map<string,V> replacement (string keys).
@@ -527,7 +561,7 @@ public:
         const KV& operator*() const { return snap ? (*snap)[idx] : kv; }
         Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
         bool operator!=(const Iterator& o) const {
-            if (!o.snap) return valid;                       // o is find-end
+            if (!o.snap) return snap ? idx < snap->size() : valid;      // o is find-end / end()
             if (!snap) return o.snap ? o.idx < o.snap->size() : false;
             if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
             return idx != o.idx;
@@ -590,11 +624,10 @@ public:
         for (int32_t i = 0; i < got; ++i) {
             out[i].key = (const char*)kp[i];
             out[i].key_len = kl[i];
+            out[i].value = std::move(vv[i]);
             if constexpr (std::is_same_v<V, DynamicString>) {
-                out[i].value = vv[i].c_str();
-                out[i].value_len = vv[i].len;
+                out[i].value_len = out[i].value.len;
             } else {
-                out[i].value = std::move(vv[i]);
                 out[i].value_len = 0;
             }
         }
@@ -611,6 +644,22 @@ public:
         std::vector<V> vv(n);
         int32_t got = barony_dynamic_map_str_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), n, MapValueKindOf<V>::value);
         for (int32_t i = 0; i < got; ++i) out.push_back((const char*)kp[i]);
+    }
+
+    // Zero-copy iteration over live entries. The callback receives
+    // (std::string_view key, V& value) where value is the LIVE map slot.
+    // Do not insert/erase entries during the callback (mutating the value is fine).
+    template <typename F>
+    void forEach(F&& f) const {
+        struct Sink : barony_map_detail::ForeachSink {
+            F& f;
+            explicit Sink(F& f_) : f(f_) {}
+            void call(const void* key, int32_t key_len, void* value) override {
+                f(std::string_view((const char*)key, (size_t)key_len), *reinterpret_cast<V*>(value));
+            }
+        } sink{ f };
+        barony_dynamic_map_str_for_each(const_cast<DynamicMapRaw*>(&raw), MapValueKindOf<V>::value,
+            (void*)&barony_map_detail::foreachTrampoline, &sink);
     }
 
     Iterator begin() const {
@@ -712,7 +761,7 @@ public:
         const KV& operator*() const { return snap ? (*snap)[idx] : kv; }
         Iterator& operator++() { if (snap && idx < snap->size()) ++idx; return *this; }
         bool operator!=(const Iterator& o) const {
-            if (!o.snap) return valid;
+            if (!o.snap) return snap ? idx < snap->size() : valid;
             if (!snap) return o.snap ? o.idx < o.snap->size() : false;
             if (snap.get() != o.snap.get()) return !(idx >= snap->size() && o.idx == END);
             return idx != o.idx;
@@ -725,11 +774,11 @@ public:
         if (n > 0) {
             it.snap = std::make_shared<std::vector<KV>>();
             it.snap->resize((size_t)n);
-            std::vector<void*> kp(n);
+            std::vector<int> kp(n);
             std::vector<V> vv(n);
-            int32_t got = barony_dynamic_map_i32_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), vv.data(), n, MapValueKindOf<V>::value);
+            int32_t got = barony_dynamic_map_i32_entries(const_cast<DynamicMapRaw*>(&raw), (void**)kp.data(), vv.data(), n, MapValueKindOf<V>::value);
             for (int32_t i = 0; i < got; ++i) {
-                (*it.snap)[i].first = *(int*)kp[i];
+                (*it.snap)[i].first = kp[i];
                 (*it.snap)[i].first_len = 4;
                 (*it.snap)[i].second = vv[i];
             }
@@ -759,15 +808,30 @@ public:
         for (int32_t i = 0; i < got; ++i) {
             out[i].key = kp[i];
             out[i].key_len = 4;
+            out[i].value = std::move(vv[i]);
             if constexpr (std::is_same_v<V, DynamicString>) {
-                out[i].value = vv[i].c_str();
-                out[i].value_len = vv[i].len;
+                out[i].value_len = out[i].value.len;
             } else {
-                out[i].value = std::move(vv[i]);
                 out[i].value_len = 0;
             }
         }
         return got;
+    }
+
+    // Zero-copy iteration over live entries. The callback receives
+    // (int key, V& value) where value is the LIVE map slot.
+    // Do not insert/erase entries during the callback (mutating the value is fine).
+    template <typename F>
+    void forEach(F&& f) const {
+        struct Sink : barony_map_detail::ForeachSink {
+            F& f;
+            explicit Sink(F& f_) : f(f_) {}
+            void call(const void* key, int32_t, void* value) override {
+                f(*(const int*)key, *reinterpret_cast<V*>(value));
+            }
+        } sink{ f };
+        barony_dynamic_map_i32_for_each(const_cast<DynamicMapRaw*>(&raw), MapValueKindOf<V>::value,
+            (void*)&barony_map_detail::foreachTrampoline, &sink);
     }
 
 private:

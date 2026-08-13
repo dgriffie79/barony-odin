@@ -2729,6 +2729,7 @@ public:
 	} Tutorial;
 };
 extern GameModeManager_t gameModeManager;
+template <> struct DynamicArrayKindOf<GameModeManager_t::Tutorial_t::Level_t> { static constexpr int value = Kind_LevelT; };
 
 class IRCHandler_t
 {
@@ -2920,24 +2921,24 @@ public:
 	char buf[2048];
 	bool autoReload = false;
 	bool itemDebug = false;
-	const DynamicString& getItemStatusAdjective(Uint32 itemType, Status status);
-	const DynamicString& getItemBeatitudeAdjective(Sint16 beatitude);
-	const DynamicString& getItemPotionAlchemyAdjective(const int player, Uint32 itemType);
-	const DynamicString& getItemPotionHarmAllyAdjective(Item& item);
-	const DynamicString& getItemProficiencyName(int proficiency);
-	const DynamicString& getItemSlotName(ItemEquippableSlot slotname);
-	const DynamicString& getItemStatShortName(const char* attribute);
-	const DynamicString& getItemStatFullName(const char* attribute);
-	const DynamicString& getItemEquipmentEffectsForIconText(std::string& attribute);
-	const DynamicString& getItemEquipmentEffectsForAttributesText(std::string& attribute);
-	const DynamicString& getProficiencyLevelName(Sint32 proficiencyLevel);
+	DynamicString getItemStatusAdjective(Uint32 itemType, Status status);
+	DynamicString getItemBeatitudeAdjective(Sint16 beatitude);
+	DynamicString getItemPotionAlchemyAdjective(const int player, Uint32 itemType);
+	DynamicString getItemPotionHarmAllyAdjective(Item& item);
+	DynamicString getItemProficiencyName(int proficiency);
+	DynamicString getItemSlotName(ItemEquippableSlot slotname);
+	DynamicString getItemStatShortName(const char* attribute);
+	DynamicString getItemStatFullName(const char* attribute);
+	DynamicString getItemEquipmentEffectsForIconText(std::string& attribute);
+	DynamicString getItemEquipmentEffectsForAttributesText(std::string& attribute);
+	DynamicString getProficiencyLevelName(Sint32 proficiencyLevel);
 	const char* getIconLabel(Item& item);
 	std::string getSpellIconText(const int player, Item& item, const bool excludePlayerStats);
 	std::string getSpellIconFormatText(const int player, Item& item, std::string& format, const spell_t* spell, const int iconIndex, const bool compendiumTooltipIntro);
 	std::string getSpellDescriptionText(const int player, Item& item);
 	std::string getSpellIconPath(const int player, Item& item, int spellID);
 	std::string getCostOfSpellString(const int player, Item& item);
-	const DynamicString& getSpellTypeString(const int player, Item& item);
+	DynamicString getSpellTypeString(const int player, Item& item);
 	node_t* getSpellNodeFromSpellID(int spellID);
 	real_t getSpellSustainCostPerSecond(int spellID);
 	int getSpellDamageOrHealAmount(const int player, spell_t* spell, Item* spellbook, const bool excludePlayerStats);
@@ -3227,6 +3228,7 @@ struct ShopkeeperConsumables_t
 	static void readFromFile();
 };
 template <> struct DynamicArrayKindOf<ShopkeeperConsumables_t::ItemEntry> { static constexpr int value = Kind_ShopkeeperItem; };
+template <> struct DynamicArrayKindOf<ShopkeeperConsumables_t::StoreSlots_t> { static constexpr int value = Kind_StoreSlots; };
 template <> struct MapValueKindOf<DynamicArrayT<ShopkeeperConsumables_t::StoreSlots_t>> { static constexpr int value = MK_StoreSlotsArray; };
 
 
@@ -3530,6 +3532,8 @@ struct EquipmentModelOffsets_t
 	ModelOffset_t& getModelOffset(int monster, int sprite);
 };
 extern EquipmentModelOffsets_t EquipmentModelOffsets;
+template <> struct MapValueKindOf<EquipmentModelOffsets_t::ModelOffset_t> { static constexpr int value = MK_ModelOffset; };
+template <> struct MapValueKindOf<EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t> { static constexpr int value = MK_AdditionalOffset; };
 
 struct Compendium_t
 {

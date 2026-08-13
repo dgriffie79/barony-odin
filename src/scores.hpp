@@ -642,7 +642,7 @@ struct SaveGameInfo {
 					fp->property("spawn_y", spawn_y);
 					fp->property("looted", looted);
 					fp->property("spawned", spawnedOnGround);
-					fp->property("items", items);
+					fp->propertyName("items"); fp->valueArray<item_t>(items);
 					return true;
 				}
 			};
@@ -701,12 +701,12 @@ struct SaveGameInfo {
 				fp->property("EFFECTS_TIMERS", EFFECTS_TIMERS);
 				fp->property("EFFECTS_ACCRETION_TIME", EFFECTS_ACCRETION_TIME);
 				fp->property("MISC_FLAGS", MISC_FLAGS);
-				fp->property("player_equipment", player_equipment);
-				fp->property("npc_equipment", npc_equipment);
-				fp->property("inventory", inventory);
-				fp->property("void_chest_inventory", void_chest_inventory);
-				fp->property("attributes", attributes);
-				fp->property("lootbags", player_lootbags);
+				fp->propertyName("player_equipment"); fp->valueArray<std::pair<DynamicString, Uint32>>(player_equipment);
+				fp->propertyName("npc_equipment");     fp->valueArray<std::pair<DynamicString, item_t>>(npc_equipment);
+				fp->propertyName("inventory");         fp->valueArray<item_t>(inventory);
+				fp->propertyName("void_chest_inventory"); fp->valueArray<item_t>(void_chest_inventory);
+				fp->propertyName("attributes");        fp->valueArray<std::pair<DynamicString, DynamicString>>(attributes);
+				fp->propertyName("lootbags");          fp->valueArray<std::pair<Uint32, lootbag_t>>(player_lootbags);
 				return true;
 			}
 		};
@@ -751,9 +751,9 @@ struct SaveGameInfo {
 			fp->property("stats", stats);
 			fp->property("followers", followers);
 			fp->property("game_statistics", gameStatistics);
-			fp->property("shopkeeper_hostility", shopkeeperHostility);
-			fp->property("compendium_item_events", compendium_item_events);
-			fp->property("item_degrade_rng", itemDegradeRNG);
+			fp->propertyName("shopkeeper_hostility"); fp->valueArray<std::pair<int, PlayerRaceHostility_t>>(shopkeeperHostility);
+			fp->propertyName("compendium_item_events"); fp->valueArray<std::pair<DynamicString, DynamicArrayS32>>(compendium_item_events);
+			fp->propertyName("item_degrade_rng"); fp->valueArray<std::pair<int, int>>(itemDegradeRNG);
 			fp->property("sustained_mp_used_sorcery", sustainedSpellMPUsedSorcery);
 			fp->property("sustained_mp_used_mysticism", sustainedSpellMPUsedMysticism);
 			fp->property("sustained_mp_used_thaumaturgy", sustainedSpellMPUsedThaumaturgy);
@@ -761,12 +761,12 @@ struct SaveGameInfo {
 			fp->property("base_mp_used_mysticism", baseSpellMPUsedMysticism);
 			fp->property("base_mp_used_thaumaturgy", baseSpellMPUsedThaumaturgy);
 			fp->property("learned_spells", learnedSpells);
-			fp->property("ducks_in_a_row", ducksInARow);
-			fp->property("favorite_books_achievement", favoriteBooksAchievement);
-			fp->property("sustained_spell_id_counters", sustainedSpellIDCounter);
-			fp->property("escalating_rng_rolls", escalatingRngRolls);
-			fp->property("escalating_spell_rng_rolls", escalatingSpellRngRolls);
-			fp->property("appraisal_time_progress", appraisal_item_progress);
+			fp->propertyName("ducks_in_a_row"); fp->valueArray<std::pair<int, int>>(ducksInARow);
+			fp->propertyName("favorite_books_achievement"); fp->valueArray<std::pair<int, int>>(favoriteBooksAchievement);
+			fp->propertyName("sustained_spell_id_counters"); fp->valueArray<std::pair<int, int>>(sustainedSpellIDCounter);
+			fp->propertyName("escalating_rng_rolls"); fp->valueArray<std::pair<int, int>>(escalatingRngRolls);
+			fp->propertyName("escalating_spell_rng_rolls"); fp->valueArray<std::pair<int, int>>(escalatingSpellRngRolls);
+			fp->propertyName("appraisal_time_progress"); fp->valueArray<std::pair<int, int>>(appraisal_item_progress);
 			return true;
 		}
 
@@ -1020,6 +1020,11 @@ public:
 };
 template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t> { static constexpr int value = Kind_HiscoreStat; };
 template <> struct DynamicArrayKindOf<SaveGameInfo::Player::stat_t::lootbag_t> { static constexpr int value = Kind_HiscoreLootbag; };
+template <> struct DynamicArrayKindOf<std::pair<DynamicString, DynamicString>> { static constexpr int value = Kind_HiscoreAttributesPair; };
+template <> struct DynamicArrayKindOf<std::pair<DynamicString, Uint32>> { static constexpr int value = Kind_HiscorePlayerEquipPair; };
+template <> struct DynamicArrayKindOf<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>> { static constexpr int value = Kind_HiscoreNpcEquipPair; };
+template <> struct DynamicArrayKindOf<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>> { static constexpr int value = Kind_HiscoreLootbagPair; };
+template <> struct DynamicArrayKindOf<std::pair<DynamicString, DynamicArrayS32>> { static constexpr int value = Kind_HiscoreCompendiumPair; };
 template <> struct DynamicArrayKindOf<SaveGameInfo::Player> { static constexpr int value = Kind_HiscorePlayer; };
 
 

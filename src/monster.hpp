@@ -1375,6 +1375,7 @@ public:
 	DynamicMapI32T<PlayerRaceHostility_t> playerHostility[MAXPLAYERS];
 };
 extern ShopkeeperPlayerHostility_t ShopkeeperPlayerHostility;
+template <> struct MapValueKindOf<ShopkeeperPlayerHostility_t::PlayerRaceHostility_t> { static constexpr int value = MK_PlayerRaceHostility; };
 
 struct MonsterAllyFormation_t
 {
@@ -1425,6 +1426,7 @@ struct MonsterAllyFormation_t
 	int getFollowerTryExtendedPathSearch(Entity& my, Stat& myStats);
 };
 extern MonsterAllyFormation_t monsterAllyFormations;
+template <> struct MapValueKindOf<MonsterAllyFormation_t::MonsterAllies_t::FormationInfo_t> { static constexpr int value = MK_FormationInfo; };
 
 struct MimicGenerator
 {

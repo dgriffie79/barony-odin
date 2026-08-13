@@ -6727,7 +6727,7 @@ bind_failed:
                     DynamicMapStr::Entry gpEntries[128];
                     int32_t gpCount = allSettings.bindings.gamepad_bindings[player].entryList(gpEntries, 128);
                     for ( int32_t gi = 0; gi < gpCount; ++gi ) {
-                        if (strcmp(gpEntries[gi].value, b.name) == 0) {
+                        if (strcmp(gpEntries[gi].value.c_str(), b.name) == 0) {
                             bindings.emplace_back(translateBinding(gpEntries[gi].key));
                         }
                     }

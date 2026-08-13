@@ -30,15 +30,11 @@ typedef unsigned int Uint32;
 
 struct DynamicArray {
 
-    void*   data;          // element bytes
-
-    int64_t len;           // bytes (not elements!)
-
-    int64_t cap;           // bytes
-
-    void*   alloc_proc;    // Odin Allocator.procedure
-
-    void*   alloc_data;    // Odin Allocator.data
+    void*   data = nullptr;   // element bytes
+    int64_t len = 0;          // bytes (not elements!)
+    int64_t cap = 0;          // bytes
+    void*   alloc_proc = nullptr; // Odin Allocator.procedure
+    void*   alloc_data = nullptr; // Odin Allocator.data
 
 };
 
@@ -218,6 +214,13 @@ enum DynamicArrayKind {
     Kind_HiscorePlayer = 25,
     Kind_Book = 26,
     Kind_StoreSlots = 27,
+    Kind_StatusEffectQueueEntry = 28,
+    Kind_HiscoreAttributesPair = 29,
+    Kind_HiscorePlayerEquipPair = 30,
+    Kind_HiscoreNpcEquipPair = 31,
+    Kind_HiscoreLootbagPair = 32,
+    Kind_HiscoreCompendiumPair = 33,
+    Kind_FollowerBarPair = 34,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };
@@ -363,6 +366,14 @@ template <typename P>
 inline int64_t dynarray_pair_size(const DynamicArray& a) { return a.len / (int64_t)sizeof(P); }
 template <typename P>
 inline void dynarray_pair_push(DynamicArray& a, const P& v) { barony_dynamic_array_append(&a, &v, (int64_t)sizeof(P)); }
+
+// Deep-copy append for owning element types (pairs with DynamicString/nested
+// array members). Uses the element kind's copy proc so the array owns
+// independent memory and the source temporary can be destroyed safely.
+template <typename T>
+inline void dynarray_push_owned(DynamicArray& a, const T& v) {
+    barony_dynamic_array_elem_append(&a, &v, (int64_t)sizeof(T), DynamicArrayKindOf<T>::value);
+}
 
 // pair<int,int> element helpers (8-byte POD pairs)
 typedef std::pair<int, int> int_pair_t;

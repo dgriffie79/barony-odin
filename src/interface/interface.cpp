@@ -13474,25 +13474,24 @@ void EnemyHPDamageBarHandler::cullExpiredHPBars()
 {
 	{
 		std::vector<int> expiredKeys;
-		for ( auto it = HPBars.begin(); it != HPBars.end(); ++it )
-		{
+		HPBars.forEach([&](int uid, EnemyHPDetails& bar) {
 			int tickLifetime = EnemyHPDamageBarHandler::maxTickLifetime;
-			if ( it->second.barType == BAR_TYPE_FURNITURE )
+			if ( bar.barType == BAR_TYPE_FURNITURE )
 			{
 				tickLifetime = EnemyHPDamageBarHandler::maxTickFurnitureLifetime;
 			}
-			if ( ticks - it->second.enemy_timer >= tickLifetime )
+			if ( ticks - bar.enemy_timer >= tickLifetime )
 			{
 				bool expire = true;
-				if ( it->second.detectMonsterCheckStatus )
+				if ( bar.detectMonsterCheckStatus )
 				{
-					if ( Entity* parent = uidToEntity(it->first) )
+					if ( Entity* parent = uidToEntity(uid) )
 					{
 						if ( Stat* stats = parent->getStats() )
 						{
 							if ( stats->getEffectActive(EFF_DETECT_ENEMY) )
 							{
-								HPBars[it->first].enemy_timer += tickLifetime / 2; // extend lifetime of bar while effect active
+								bar.enemy_timer += tickLifetime / 2; // extend lifetime of bar while effect active
 								expire = false;
 							}
 						}
@@ -13501,16 +13500,19 @@ void EnemyHPDamageBarHandler::cullExpiredHPBars()
 
 				if ( expire )
 				{
-					HPBars[it->first].expired = true;
-					if ( HPBars[it->first].animator.fadeOut <= 0.01 )
+					bar.expired = true;
+					if ( bar.animator.fadeOut <= 0.01 )
 					{
-						expiredKeys.push_back(it->first); // no need to show this bar, delete it
+						expiredKeys.push_back(uid); // no need to show this bar, delete it
 					}
 				}
 			}
-		}
+		});
 		for ( int ek : expiredKeys )
 		{
+			// The Odin map free op only releases the DynamicString; free the C++-owned
+			// GL texture/surfaces here before the value is erased.
+			HPBars[ek].freeWorldTextures();
 			HPBars.erase(ek);
 		}
 	}
@@ -13527,32 +13529,33 @@ EnemyHPDamageBarHandler::EnemyHPDetails* EnemyHPDamageBarHandler::getMostRecentH
 	int mostRecentEntry = -1;
 	int highPriorityMostRecentEntry = -1;
 	bool foundHighPriorityEntry = false;
-	for ( auto it = HPBars.begin(); it != HPBars.end(); ++it )
-	{
-		if ( false /*ticks - it->second.enemy_timer >= k_maxTickLifetime * 120*/ )
+	EnemyHPDetails* mostRecentBar = nullptr;
+	HPBars.forEach([&](int uid, EnemyHPDetails& bar) {
+		if ( false /*ticks - bar.enemy_timer >= k_maxTickLifetime * 120*/ )
 		{
-			continue;
+			return;
 		}
-		if ( it->second.enemy_timer > mostRecentTicks && it->second.shouldDisplay )
+		if ( bar.enemy_timer > mostRecentTicks && bar.shouldDisplay )
 		{
-			if ( mostRecentEntry != -1 )
+			if ( mostRecentBar )
 			{
 				// previous most recent tick should not display until updated by high priority.
 				// since we've found a new one to display.
-				HPBars[mostRecentEntry].shouldDisplay = false;
+				mostRecentBar->shouldDisplay = false;
 			}
-			if ( !it->second.lowPriorityTick )
+			if ( !bar.lowPriorityTick )
 			{
 				// this is a normal priority damage update (not burn/poison etc)
 				// if a newer tick is low priority, then defer to this one.
-				highPriorityMostRecentEntry = it->first;
+				highPriorityMostRecentEntry = uid;
 				foundHighPriorityEntry = true;
 			}
-			mostRecentEntry = it->first;
-			mostRecentTicks = it->second.enemy_timer;
+			mostRecentEntry = uid;
+			mostRecentBar = &bar;
+			mostRecentTicks = bar.enemy_timer;
 			//queuedBars.push(std::make_pair(mostRecentTicks, mostRecentEntry));
 		}
-	}
+	});
 
 	if ( mostRecentTicks > 0 )
 	{

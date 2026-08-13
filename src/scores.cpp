@@ -5308,7 +5308,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 
 			for ( auto& pair : ::players[c]->compendiumProgress.itemEvents )
 			{
-				dynarray_pair_push<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events, std::make_pair(pair.first, DynamicArrayS32()));
+				dynarray_push_owned<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events, std::make_pair(pair.first, DynamicArrayS32()));
 				auto& vec_entry = *dynarray_pair_at<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events, dynarray_pair_size<std::pair<DynamicString, DynamicArrayS32>>(player.compendium_item_events) - 1);
 				for ( auto& itemValue : pair.second )
 				{
@@ -5319,7 +5319,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 
 			for ( auto& loot : stats[c]->player_lootbags )
 			{
-				dynarray_pair_push<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(player.stats.player_lootbags, std::make_pair(loot.first,
+				dynarray_push_owned<std::pair<Uint32, SaveGameInfo::Player::stat_t::lootbag_t>>(player.stats.player_lootbags, std::make_pair(loot.first,
 					SaveGameInfo::Player::stat_t::lootbag_t(
 						loot.second.spawn_x,
 						loot.second.spawn_y,
@@ -5358,7 +5358,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				// if this is a local player, we have their inventory, and can store
 				// item indexes in the player_equipment table
 				for ( auto& slot : player_slots ) {
-					dynarray_pair_push<std::pair<DynamicString, Uint32>>(player.stats.player_equipment, std::make_pair(DynamicString(slot.first.c_str()),
+					dynarray_push_owned<std::pair<DynamicString, Uint32>>(player.stats.player_equipment, std::make_pair(DynamicString(slot.first.c_str()),
 						slot.second ? list_Index(slot.second->node) : UINT32_MAX));
 				}
 			}
@@ -5368,7 +5368,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 				// restore later
 				for ( auto& slot : player_slots ) {
 					if ( slot.second ) {
-						dynarray_pair_push<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(player.stats.npc_equipment, std::make_pair(
+						dynarray_push_owned<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(player.stats.npc_equipment, std::make_pair(
 							slot.first, SaveGameInfo::Player::stat_t::item_t{
 								(Uint32)slot.second->type,
 								(Uint32)slot.second->status,
@@ -5467,7 +5467,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					DynamicMapStr::Entry attrEntries[64];
 					int32_t attrCount = follower->attributes.entryList(attrEntries, 64);
 					for ( int32_t ai = 0; ai < attrCount; ++ai ) {
-						dynarray_pair_push<std::pair<DynamicString, DynamicString>>(stats.attributes, std::make_pair(DynamicString((const char*)attrEntries[ai].key, attrEntries[ai].key_len), DynamicString((const char*)attrEntries[ai].value, attrEntries[ai].value_len)));
+						dynarray_push_owned<std::pair<DynamicString, DynamicString>>(stats.attributes, std::make_pair(DynamicString((const char*)attrEntries[ai].key, attrEntries[ai].key_len), attrEntries[ai].value));
 					}
 
 					// equipment slots
@@ -5485,7 +5485,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 					};
 					for ( auto& slot : npc_slots ) {
 						if ( slot.second ) {
-							dynarray_pair_push<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(stats.npc_equipment, std::make_pair(
+							dynarray_push_owned<std::pair<DynamicString, SaveGameInfo::Player::stat_t::item_t>>(stats.npc_equipment, std::make_pair(
 								slot.first, SaveGameInfo::Player::stat_t::item_t{
 									(Uint32)slot.second->type,
 									(Uint32)slot.second->status,

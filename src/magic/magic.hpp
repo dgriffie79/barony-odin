@@ -481,6 +481,8 @@ struct ParticleTimerEffect_t
 extern std::map<Uint32, std::map<Uint32, ParticleEmitterHit_t>> particleTimerEmitterHitEntities;
 extern DynamicMapI32T<ParticleTimerEffect_t> particleTimerEffects;
 ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hitentity);
+template <> struct MapValueKindOf<ParticleTimerEffect_t::Effect_t> { static constexpr int value = MK_Effect; };
+template <> struct MapValueKindOf<ParticleTimerEffect_t::EffectLocations_t> { static constexpr int value = MK_EffectLocations; };
 
 bool addSpell(int spell, int player, bool ignoreSkill = false); //Adds a spell to the client's spell list. Note: Do not use this to add custom spells.
 
@@ -757,6 +759,8 @@ extern spellElement_t spellElement_slimeTar;
 extern spellElement_t spellElement_slimeMetal;
 extern spellElement_t spellElement_slime_spray;
 extern DynamicMapI32T<spellElement_t> spellElementMap;
+template <> struct MapValueKindOf<spellElement_t> { static constexpr int value = MK_SpellElement; };
+template <> struct MapValueKindOf<ParticleTimerEffect_t> { static constexpr int value = MK_ParticleTimerEffect; };
 
 enum SpellElementIDs_t
 {

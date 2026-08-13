@@ -116,12 +116,18 @@ public:
 	bool value(DynamicArrayS32& v, Uint32 maxLength = 0) {
 		Uint32 size = (Uint32)v.size();
 		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    v.clear();
 		    bool result = true;
-		    for (Uint32 index = 0; index < size; ++index) {
-			    int32_t elem = 0;
-			    result = value(elem) ? result : false;
-			    v.push_back(elem);
+		    if (isReading()) {
+		        v.clear();
+		        for (Uint32 index = 0; index < size; ++index) {
+			        int32_t elem = 0;
+			        result = value(elem) ? result : false;
+			        v.push_back(elem);
+		        }
+		    } else {
+		        for (Uint32 index = 0; index < size; ++index) {
+			        result = value(v[index]) ? result : false;
+		        }
 		    }
 		    endArray();
 		    return result;
@@ -136,12 +142,18 @@ public:
 	bool value(DynamicArrayT<T>& v, Uint32 maxLength = 0) {
 		Uint32 size = (Uint32)v.size();
 		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    v.clear();
 		    bool result = true;
-		    for (Uint32 index = 0; index < size; ++index) {
-			    T elem{};
-			    result = value(elem) ? result : false;
-			    v.push_back(elem);
+		    if (isReading()) {
+		        v.clear();
+		        for (Uint32 index = 0; index < size; ++index) {
+			        T elem{};
+			        result = value(elem) ? result : false;
+			        v.push_back(elem);
+		        }
+		    } else {
+		        for (Uint32 index = 0; index < size; ++index) {
+			        result = value(v[index]) ? result : false;
+		        }
 		    }
 		    endArray();
 		    return result;
@@ -154,12 +166,18 @@ public:
 	bool value(DynamicArrayU32& v, Uint32 maxLength = 0) {
 		Uint32 size = (Uint32)v.size();
 		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    v.clear();
 		    bool result = true;
-		    for (Uint32 index = 0; index < size; ++index) {
-			    uint32_t elem = 0;
-			    result = value(elem) ? result : false;
-			    v.push_back(elem);
+		    if (isReading()) {
+		        v.clear();
+		        for (Uint32 index = 0; index < size; ++index) {
+			        uint32_t elem = 0;
+			        result = value(elem) ? result : false;
+			        v.push_back(elem);
+		        }
+		    } else {
+		        for (Uint32 index = 0; index < size; ++index) {
+			        result = value(v[index]) ? result : false;
+		        }
 		    }
 		    endArray();
 		    return result;
@@ -207,21 +225,56 @@ public:
 		typedef std::pair<int, std::pair<int, int>> recipe_t;
 		Uint32 size = (Uint32)dynarray_size<recipe_t>(v);
 		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    v.len = 0;
 		    bool result = true;
-		    for (Uint32 index = 0; index < size; ++index) {
-			    int a = 0, b = 0, c2 = 0;
-			    result = value(a) ? result : false;
-			    result = value(b) ? result : false;
-			    result = value(c2) ? result : false;
-			    recipe_t r = std::make_pair(a, std::make_pair(b, c2));
-			    dynarray_push<recipe_t>(v, r);
+		    if (isReading()) {
+		        v.len = 0;
+		        for (Uint32 index = 0; index < size; ++index) {
+			        int a = 0, b = 0, c2 = 0;
+			        result = value(a) ? result : false;
+			        result = value(b) ? result : false;
+			        result = value(c2) ? result : false;
+			        recipe_t r = std::make_pair(a, std::make_pair(b, c2));
+			        dynarray_push<recipe_t>(v, r);
+		        }
+		    } else {
+		        for (Uint32 index = 0; index < size; ++index) {
+			        recipe_t* r = dynarray_at<recipe_t>(v, index);
+			        result = value(r->first) ? result : false;
+			        result = value(r->second.first) ? result : false;
+			        result = value(r->second.second) ? result : false;
+		        }
 		    }
 		    endArray();
 		    return result;
 		} else {
 		    return false;
 		}
+	}
+
+	// Serialize a raw DynamicArray as an array of T. The raw DynamicArray lost
+	// its element type in the vector<...> -> DynamicArray de-STL conversion, so
+	// this reinterprets the 40-byte layout as DynamicArrayT<T> and serializes
+	// each element via value(T&). Deserializes DIRECTLY into the array slot
+	// (no temporary), so owning elements (DynamicString etc.) aren't double-freed.
+	template <typename T>
+	bool valueArray(DynamicArray& v, Uint32 maxLength = 0) {
+		Uint32 size = (Uint32)dynarray_size<T>(v);
+		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
+			if (isReading()) {
+				v.len = 0;
+				for (Uint32 i = 0; i < size; ++i) {
+					dynarray_push<T>(v, T{});
+					value(*dynarray_at<T>(v, i));
+				}
+			} else {
+				for (Uint32 i = 0; i < size; ++i) {
+					value(*dynarray_at<T>(v, i));
+				}
+			}
+			endArray();
+			return true;
+		}
+		return false;
 	}
 
 // Serializes a class or struct to the file using it's ::serialize(FileInterface*) function

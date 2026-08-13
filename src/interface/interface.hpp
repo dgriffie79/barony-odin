@@ -177,6 +177,7 @@ public:
 			enemy_name = name;
 		}
 		~EnemyHPDetails();
+		void freeWorldTextures();
 
 		real_t worldX = 0.0;
 		real_t worldY = 0.0;
@@ -1954,6 +1955,10 @@ struct CalloutRadialMenu
 	void update();
 };
 extern CalloutRadialMenu CalloutMenu[MAXPLAYERS];
+template <> struct MapValueKindOf<CalloutRadialMenu::CalloutParticle_t> { static constexpr int value = MK_CalloutParticle; };
+template <> struct DynamicArrayKindOf<CalloutRadialMenu::PanelEntry> { static constexpr int value = Kind_CalloutPanel; };
+template <> struct DynamicArrayKindOf<std::pair<Uint32, GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t>> { static constexpr int value = Kind_AssistNotifPair; };
+template <> struct DynamicArrayKindOf<std::pair<Uint32, GenericGUIMenu::AlchemyGUI_t::AlchNotification_t>> { static constexpr int value = Kind_AlchNotifPair; };
 
 std::string getItemSpritePath(const int player, Item& item);
 

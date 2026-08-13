@@ -288,6 +288,8 @@ struct StatusEffectQueue_t
 	};
 };
 extern StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS];
+template <> struct DynamicArrayKindOf<StatusEffectQueueEntry_t> { static constexpr int value = Kind_StatusEffectQueueEntry; };
+template <> struct MapValueKindOf<StatusEffectQueue_t::EffectDefinitionEntry_t> { static constexpr int value = MK_EffectDefinitionEntry; };
 
 struct SkillSheetFrames_t
 {

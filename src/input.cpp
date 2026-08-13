@@ -267,7 +267,7 @@ void Input::refresh() {
 	int32_t kbCount = kb_system_bindings.entryList(kbEntries, 128);
 	for ( int32_t bi = 0; bi < kbCount; ++bi )
 	{
-		bind(kbEntries[bi].key, kbEntries[bi].value);
+		bind(kbEntries[bi].key, kbEntries[bi].value.c_str());
 	}
 	if ( getPlayerControlType() == playerControlType_t::PLAYER_CONTROLLED_BY_KEYBOARD )
 	{
@@ -276,7 +276,7 @@ void Input::refresh() {
 	    int32_t kbUserCount = getKeyboardBindings().entryList(kbUserEntries, 128);
 	    for ( int32_t bi = 0; bi < kbUserCount; ++bi )
 	    {
-		    bind(kbUserEntries[bi].key, kbUserEntries[bi].value);
+		    bind(kbUserEntries[bi].key, kbUserEntries[bi].value.c_str());
 	    }
 	}
 	if ( getPlayerControlType() == playerControlType_t::PLAYER_CONTROLLED_BY_CONTROLLER )
@@ -286,7 +286,7 @@ void Input::refresh() {
 		int32_t gamepadCount = gamepad_system_bindings.entryList(gamepadEntries, 128);
 		for ( int32_t bi = 0; bi < gamepadCount; ++bi )
 		{
-			bind(gamepadEntries[bi].key, gamepadEntries[bi].value);
+			bind(gamepadEntries[bi].key, gamepadEntries[bi].value.c_str());
 		}
 
 		DynamicString prefix;
@@ -295,7 +295,7 @@ void Input::refresh() {
 		DynamicMapStr::Entry gamepadUserEntries[128];
 		int32_t gamepadUserCount = getGamepadBindings().entryList(gamepadUserEntries, 128);
 		for ( int32_t bi = 0; bi < gamepadUserCount; ++bi ) {
-			if ( strcmp(gamepadUserEntries[bi].value, MainMenu::hiddenBinding) == 0 )
+			if ( strcmp(gamepadUserEntries[bi].value.c_str(), MainMenu::hiddenBinding) == 0 )
 			{
 				if ( bindings.contains(gamepadUserEntries[bi].key) && bindings[gamepadUserEntries[bi].key].isBindingUsingGamepad() )
 				{
@@ -304,13 +304,13 @@ void Input::refresh() {
 				}
 			}
 
-			bind(gamepadUserEntries[bi].key, (prefix + gamepadUserEntries[bi].value).c_str());
+			bind(gamepadUserEntries[bi].key, (prefix + gamepadUserEntries[bi].value.c_str()).c_str());
 			if ( strcmp(gamepadUserEntries[bi].key, "Voice Chat") == 0 ) // special binding can be on gamepad or keyboard
 			{
 				if ( bindings[gamepadUserEntries[bi].key].type == binding_t::INVALID )
 				{
 					// try bind to keyboard as fallback
-					bind(gamepadUserEntries[bi].key, gamepadUserEntries[bi].value);
+					bind(gamepadUserEntries[bi].key, gamepadUserEntries[bi].value.c_str());
 				}
 			}
 		}
@@ -322,7 +322,7 @@ void Input::refresh() {
 		int32_t joystickCount = joystick_system_bindings.entryList(joystickEntries, 128);
 		for ( int32_t bi = 0; bi < joystickCount; ++bi )
 		{
-			bind(joystickEntries[bi].key, joystickEntries[bi].value);
+			bind(joystickEntries[bi].key, joystickEntries[bi].value.c_str());
 		}
 
 		DynamicString prefix;
@@ -331,7 +331,7 @@ void Input::refresh() {
 		DynamicMapStr::Entry joystickUserEntries[128];
 		int32_t joystickUserCount = getJoystickBindings().entryList(joystickUserEntries, 128);
 		for ( int32_t bi = 0; bi < joystickUserCount; ++bi ) {
-		    bind(joystickUserEntries[bi].key, (prefix + joystickUserEntries[bi].value).c_str());
+		    bind(joystickUserEntries[bi].key, (prefix + joystickUserEntries[bi].value.c_str()).c_str());
 		}
 	}
 #endif // !EDITOR
