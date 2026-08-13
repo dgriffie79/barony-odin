@@ -18439,11 +18439,10 @@ void actParticleDemesneDoor(Entity* my)
 				}
 			}
 
-			for ( auto& hitProp : particleTimerEmitterHitEntities[my->getUID()] )
-			{
-				if ( hitProp.second.hits == 1 )
+			particleTimerEmitterHitEntities[my->getUID()].forEach([&](Uint32 uid, ParticleEmitterHit_t& hitProp) {
+				if ( hitProp.hits == 1 )
 				{
-					if ( Entity* entity = uidToEntity(hitProp.first) )
+					if ( Entity* entity = uidToEntity(uid) )
 					{
 						if ( Stat* stats = entity->getStats() )
 						{
@@ -18451,8 +18450,8 @@ void actParticleDemesneDoor(Entity* my)
 							{
 								if ( !entityInsideEntity(my, entity) )
 								{
-									hitProp.second.hits++;
-									hitProp.second.tick = ticks;
+									hitProp.hits++;
+									hitProp.tick = ticks;
 									Entity* caster = uidToEntity(my->parent);
 									if ( caster && (caster == entity || caster->checkFriend(entity)) )
 									{
@@ -18470,7 +18469,7 @@ void actParticleDemesneDoor(Entity* my)
 						}
 					}
 				}
-			}
+			});
 		}
 
 		if ( interrupted )

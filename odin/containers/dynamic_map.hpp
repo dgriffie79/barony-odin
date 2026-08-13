@@ -421,6 +421,8 @@ struct ChunkDither_t {
     uint32_t lastUpdateTick = 0;
 };
 
+
+
 // ---- value kinds (must match value_kind mapping in dynamic_map.odin) ----
 enum MapValueKind {
     MK_I32 = 0,
@@ -473,6 +475,7 @@ enum MapValueKind {
     MK_I32Map = 47,              // nested map<int,int> (32B Raw_Map, owning)
     MK_Bool = 48,                // bool (1B POD)
     MK_U32Map = 49,              // nested map<Uint32,Uint32> (32B Raw_Map, owning)
+    MK_U32MapEmitterHit = 50,    // nested map<Uint32,map<Uint32,ParticleEmitterHit_t>> (8B POD inner)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -1067,3 +1070,5 @@ using DynamicMapI32Map = DynamicMapI32T<DynamicMapI32T<int>>;
 // map<Uint32, map<Uint32, Uint32>>: nested u32->u32 inner map as a value kind.
 template <> struct MapValueKindOf<DynamicMapI32T<uint32_t>> { static constexpr int value = MK_U32Map; };
 using DynamicMapU32Map = DynamicMapI32T<DynamicMapI32T<uint32_t>>;
+
+

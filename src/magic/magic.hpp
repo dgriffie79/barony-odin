@@ -478,7 +478,10 @@ struct ParticleTimerEffect_t
 	};
 	DynamicMapI32T<Effect_t> effectMap;
 };
-extern std::map<Uint32, std::map<Uint32, ParticleEmitterHit_t>> particleTimerEmitterHitEntities;
+// map<Uint32, map<Uint32, ParticleEmitterHit_t>>: the inner map as a nested value kind.
+template <> struct MapValueKindOf<DynamicMapI32T<ParticleEmitterHit_t>> { static constexpr int value = MK_U32MapEmitterHit; };
+using DynamicMapU32MapEmitterHit = DynamicMapI32T<DynamicMapI32T<ParticleEmitterHit_t>>;
+extern DynamicMapU32MapEmitterHit particleTimerEmitterHitEntities;
 extern DynamicMapI32T<ParticleTimerEffect_t> particleTimerEffects;
 ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hitentity);
 template <> struct MapValueKindOf<ParticleTimerEffect_t::Effect_t> { static constexpr int value = MK_Effect; };

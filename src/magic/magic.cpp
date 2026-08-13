@@ -25,7 +25,7 @@
 #include "../prng.hpp"
 #include "../mod_tools.hpp"
 
-std::map<Uint32, std::map<Uint32, ParticleEmitterHit_t>> particleTimerEmitterHitEntities;
+DynamicMapU32MapEmitterHit particleTimerEmitterHitEntities;
 DynamicMapI32T<ParticleTimerEffect_t> particleTimerEffects;
 ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hitentity)
 {
@@ -33,17 +33,10 @@ ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hite
 
 	if ( (Sint32)(hitentity->getUID()) >= 0 )
 	{
-		auto& emitterHit = particleTimerEmitterHitEntities[emitterUid];
-		auto find = emitterHit.find(hitentity->getUID());
-		if ( find != emitterHit.end() )
-		{
-			return &find->second;
-		}
-		else
-		{
-			auto& entry = emitterHit[hitentity->getUID()];
-			return &entry;
-		}
+		// operator[] gives the LIVE slot (std::map::operator[] semantics);
+		// the returned pointer is valid until the map mutates.
+		auto& entry = particleTimerEmitterHitEntities[emitterUid][hitentity->getUID()];
+		return &entry;
 	}
 	return nullptr;
 }
