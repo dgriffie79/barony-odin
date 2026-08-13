@@ -1282,7 +1282,7 @@ struct MonsterData_t
 			DynamicString key = "";
 			DynamicString iconPath = "";
 		};
-		std::map<int, IconLookup_t> iconSpritesAndPaths;
+		DynamicMapI32T<IconLookup_t> iconSpritesAndPaths;
 		DynamicMapStrT<DynamicArrayS32> keyToSpriteLookup;
 		DynamicSetI32 modelIndexes;
 		DynamicSetI32 playerModelIndexes;
@@ -1299,9 +1299,9 @@ struct MonsterData_t
 	};
 	static DynamicString iconDefaultString;
 	static DynamicString keyDefaultString;
-	static std::map<int, MonsterDataEntry_t> monsterDataEntries;
-	static DynamicString& getAllyIconFromSprite(int sprite, int type = -1);
-	static DynamicString& getKeyFromSprite(int sprite, int type = -1);
+	static DynamicMapI32T<MonsterDataEntry_t> monsterDataEntries;
+	static DynamicString getAllyIconFromSprite(int sprite, int type = -1);
+	static DynamicString getKeyFromSprite(int sprite, int type = -1);
 	static int getSpriteFromKey(int sprite, DynamicString key, int type = -1);
 	static int getSpecialNPCBaseModel(Stat& myStats);
 	static DynamicString getSpecialNPCName(Stat& myStats);
@@ -1309,6 +1309,8 @@ struct MonsterData_t
 	static void loadMonsterDataJSON();
 };
 extern MonsterData_t monsterData;
+template <> struct MapValueKindOf<MonsterData_t::MonsterDataEntry_t::IconLookup_t> { static constexpr int value = MK_IconLookup; };
+template <> struct MapValueKindOf<MonsterData_t::MonsterDataEntry_t> { static constexpr int value = MK_MonsterDataEntry; };
 
 class ShopkeeperPlayerHostility_t
 {
@@ -1399,7 +1401,7 @@ struct MonsterAllyFormation_t
 	void updateOnPathFail(Uint32 uid, Entity* entity);
 	void updateOnPathSucceed(Uint32 uid, Entity* entity);
 	void updateOnFollowCommand(Uint32 uid, Entity* entity);
-	std::unordered_map<Uint32, MonsterAllies_t> units;
+	DynamicMapI32T<MonsterAllies_t> units;
 	DynamicArrayT<std::pair<int, int>> formationShape;
 	MonsterAllyFormation_t()
 	{
@@ -1427,6 +1429,7 @@ struct MonsterAllyFormation_t
 };
 extern MonsterAllyFormation_t monsterAllyFormations;
 template <> struct MapValueKindOf<MonsterAllyFormation_t::MonsterAllies_t::FormationInfo_t> { static constexpr int value = MK_FormationInfo; };
+template <> struct MapValueKindOf<MonsterAllyFormation_t::MonsterAllies_t> { static constexpr int value = MK_MonsterAllies; };
 
 struct MimicGenerator
 {

@@ -834,25 +834,24 @@ bool MonsterAllyFormation_t::getFollowLocation(Uint32 uid, Uint32 leaderUid, std
 	if ( leader->behavior != &actPlayer && leader->behavior != &actMonster ) { return false; }
 
 	auto& leaderUnits = units[leaderUid];
-	auto findMelee = leaderUnits.meleeUnits.find(uid);
-	auto findRanged = leaderUnits.rangedUnits.find(uid);
-
 	bool found = false;
-	if ( findMelee != leaderUnits.meleeUnits.end() )
+	if ( leaderUnits.meleeUnits.contains(uid) )
 	{
-		if ( findMelee->second.init )
+		auto& ux = leaderUnits.meleeUnits[uid];
+		if ( ux.init )
 		{
-			outPos.first = findMelee->second.x;
-			outPos.second = findMelee->second.y;
+			outPos.first = ux.x;
+			outPos.second = ux.y;
 			found = true;
 		}
 	}
-	if ( findRanged != leaderUnits.rangedUnits.end() )
+	if ( leaderUnits.rangedUnits.contains(uid) )
 	{
-		if ( findRanged->second.init )
+		auto& ux = leaderUnits.rangedUnits[uid];
+		if ( ux.init )
 		{
-			outPos.first = findRanged->second.x;
-			outPos.second = findRanged->second.y;
+			outPos.first = ux.x;
+			outPos.second = ux.y;
 			found = true;
 		}
 	}
@@ -876,13 +875,12 @@ void MonsterAllyFormation_t::updateOnPathFail(Uint32 uid, Entity* entity)
 	{
 		if ( myStats->leader_uid != 0 )
 		{
-			auto find = units.find(myStats->leader_uid);
-			if ( find != units.end() )
+			if ( units.contains(myStats->leader_uid) )
 			{
-				auto find2 = find->second.meleeUnits.find(uid);
-				if ( find2 != find->second.meleeUnits.end() )
+				auto& leaderUnits = units[myStats->leader_uid];
+				if ( leaderUnits.meleeUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					MonsterAllies_t::FormationInfo_t& mo = leaderUnits.meleeUnits[uid];
 					mo.pathingDelay = std::min(10, mo.pathingDelay + 1);
 					mo.tryExtendPath = std::max(0, mo.tryExtendPath - 2);
 					if ( mo.pathingDelay == 5 )
@@ -892,10 +890,9 @@ void MonsterAllyFormation_t::updateOnPathFail(Uint32 uid, Entity* entity)
 					}
 					return;
 				}
-				auto find3 = find->second.rangedUnits.find(uid);
-				if ( find3 != find->second.rangedUnits.end() )
+				if ( leaderUnits.rangedUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					MonsterAllies_t::FormationInfo_t& ro = leaderUnits.rangedUnits[uid];
 					ro.pathingDelay = std::min(10, ro.pathingDelay + 1);
 					ro.tryExtendPath = std::max(0, ro.tryExtendPath - 2);
 					if ( ro.pathingDelay == 5 )
@@ -926,21 +923,19 @@ void MonsterAllyFormation_t::updateOnPathSucceed(Uint32 uid, Entity* entity)
 	{
 		if ( myStats->leader_uid != 0 )
 		{
-			auto find = units.find(myStats->leader_uid);
-			if ( find != units.end() )
+			if ( units.contains(myStats->leader_uid) )
 			{
-				auto find2 = find->second.meleeUnits.find(uid);
-				if ( find2 != find->second.meleeUnits.end() )
+				auto& leaderUnits = units[myStats->leader_uid];
+				if ( leaderUnits.meleeUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					MonsterAllies_t::FormationInfo_t& mo = leaderUnits.meleeUnits[uid];
 					mo.pathingDelay = std::max(0, mo.pathingDelay - 2);
 					mo.tryExtendPath = std::max(0, mo.tryExtendPath - 1);
 					return;
 				}
-				auto find3 = find->second.rangedUnits.find(uid);
-				if ( find3 != find->second.rangedUnits.end() )
+				if ( leaderUnits.rangedUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					MonsterAllies_t::FormationInfo_t& ro = leaderUnits.rangedUnits[uid];
 					ro.pathingDelay = std::max(0, ro.pathingDelay - 2);
 					ro.tryExtendPath = std::max(0, ro.tryExtendPath - 1);
 					return;
@@ -966,21 +961,19 @@ void MonsterAllyFormation_t::updateOnFollowCommand(Uint32 uid, Entity* entity)
 	{
 		if ( myStats->leader_uid != 0 )
 		{
-			auto find = units.find(myStats->leader_uid);
-			if ( find != units.end() )
+			if ( units.contains(myStats->leader_uid) )
 			{
-				auto find2 = find->second.meleeUnits.find(uid);
-				if ( find2 != find->second.meleeUnits.end() )
+				auto& leaderUnits = units[myStats->leader_uid];
+				if ( leaderUnits.meleeUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& mo = find->second.meleeUnits[find2->first];
+					MonsterAllies_t::FormationInfo_t& mo = leaderUnits.meleeUnits[uid];
 					mo.pathingDelay = 0;
 					mo.tryExtendPath = 10;
 					return;
 				}
-				auto find3 = find->second.rangedUnits.find(uid);
-				if ( find3 != find->second.rangedUnits.end() )
+				if ( leaderUnits.rangedUnits.contains(uid) )
 				{
-					MonsterAllies_t::FormationInfo_t& ro = find->second.rangedUnits[find3->first];
+					MonsterAllies_t::FormationInfo_t& ro = leaderUnits.rangedUnits[uid];
 					ro.pathingDelay = 0;
 					ro.tryExtendPath = 10;
 					return;
@@ -994,18 +987,16 @@ int MonsterAllyFormation_t::getFollowerChaseLeaderInterval(Entity& my, Stat& myS
 {
 	if ( myStats.leader_uid != 0 )
 	{
-		auto find = units.find(myStats.leader_uid);
-		if ( find != units.end() )
+		if ( units.contains(myStats.leader_uid) )
 		{
-			auto find2 = find->second.meleeUnits.find(my.getUID());
-			if ( find2 != find->second.meleeUnits.end() )
+			auto& leaderUnits = units[myStats.leader_uid];
+			if ( leaderUnits.meleeUnits.contains(my.getUID()) )
 			{
-				return find->second.meleeUnits[find2->first].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
+				return leaderUnits.meleeUnits[my.getUID()].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
 			}
-			auto find3 = find->second.rangedUnits.find(my.getUID());
-			if ( find3 != find->second.rangedUnits.end() )
+			if ( leaderUnits.rangedUnits.contains(my.getUID()) )
 			{
-				return find->second.rangedUnits[find3->first].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
+				return leaderUnits.rangedUnits[my.getUID()].pathingDelay * TICKS_PER_SECOND + TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -1016,18 +1007,16 @@ int MonsterAllyFormation_t::getFollowerPathingDelay(Entity& my, Stat& myStats)
 {
 	if ( myStats.leader_uid != 0 )
 	{
-		auto find = units.find(myStats.leader_uid);
-		if ( find != units.end() )
+		if ( units.contains(myStats.leader_uid) )
 		{
-			auto find2 = find->second.meleeUnits.find(my.getUID());
-			if ( find2 != find->second.meleeUnits.end() )
+			auto& leaderUnits = units[myStats.leader_uid];
+			if ( leaderUnits.meleeUnits.contains(my.getUID()) )
 			{
-				return find2->second.pathingDelay;
+				return leaderUnits.meleeUnits[my.getUID()].pathingDelay;
 			}
-			auto find3 = find->second.rangedUnits.find(my.getUID());
-			if ( find3 != find->second.rangedUnits.end() )
+			if ( leaderUnits.rangedUnits.contains(my.getUID()) )
 			{
-				return find3->second.pathingDelay;
+				return leaderUnits.rangedUnits[my.getUID()].pathingDelay;
 			}
 		}
 	}
@@ -1038,18 +1027,16 @@ int MonsterAllyFormation_t::getFollowerTryExtendedPathSearch(Entity& my, Stat& m
 {
 	if ( myStats.leader_uid != 0 )
 	{
-		auto find = units.find(myStats.leader_uid);
-		if ( find != units.end() )
+		if ( units.contains(myStats.leader_uid) )
 		{
-			auto find2 = find->second.meleeUnits.find(my.getUID());
-			if ( find2 != find->second.meleeUnits.end() )
+			auto& leaderUnits = units[myStats.leader_uid];
+			if ( leaderUnits.meleeUnits.contains(my.getUID()) )
 			{
-				return find2->second.tryExtendPath;
+				return leaderUnits.meleeUnits[my.getUID()].tryExtendPath;
 			}
-			auto find3 = find->second.rangedUnits.find(my.getUID());
-			if ( find3 != find->second.rangedUnits.end() )
+			if ( leaderUnits.rangedUnits.contains(my.getUID()) )
 			{
-				return find3->second.tryExtendPath;
+				return leaderUnits.rangedUnits[my.getUID()].tryExtendPath;
 			}
 		}
 	}
@@ -1073,7 +1060,7 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 	}
 	else if ( monsterUpdateUid != 0 ) // monster updated on behalf of leader
 	{
-		if ( leaderUnits.meleeUnits.find(monsterUpdateUid) == leaderUnits.meleeUnits.end() )
+		if ( !leaderUnits.meleeUnits.contains(monsterUpdateUid) )
 		{
 			leaderUnits.meleeUnits[monsterUpdateUid] = MonsterAllies_t::FormationInfo_t(); // insert myself
 		}
@@ -1101,22 +1088,22 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 				bool isRanged = ally->hasRangedWeapon();
 				if ( isRanged )
 				{
-					if ( leaderUnits.rangedUnits.find(allyUid) == leaderUnits.rangedUnits.end() )
+					if ( !leaderUnits.rangedUnits.contains(allyUid) )
 					{
 						leaderUnits.rangedUnits[allyUid] = MonsterAllies_t::FormationInfo_t();
 					}
-					if ( leaderUnits.meleeUnits.find(allyUid) != leaderUnits.meleeUnits.end() )
+					if ( leaderUnits.meleeUnits.contains(allyUid) )
 					{
 						leaderUnits.meleeUnits.erase(allyUid);
 					}
 				}
 				else
 				{
-					if ( leaderUnits.meleeUnits.find(allyUid) == leaderUnits.meleeUnits.end() )
+					if ( !leaderUnits.meleeUnits.contains(allyUid) )
 					{
 						leaderUnits.meleeUnits[allyUid] = MonsterAllies_t::FormationInfo_t();
 					}
-					if ( leaderUnits.rangedUnits.find(allyUid) != leaderUnits.rangedUnits.end() )
+					if ( leaderUnits.rangedUnits.contains(allyUid) )
 					{
 						leaderUnits.rangedUnits.erase(allyUid);
 					}

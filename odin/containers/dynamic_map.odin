@@ -1451,6 +1451,31 @@ ParticleTimerEffect_t :: struct {
 	effectMap: map[[4]byte]Effect_t,
 }
 
+// MonsterData_t::MonsterDataEntry_t::IconLookup_t — 32B owning (2 DynamicStrings)
+IconLookup_t :: struct {
+	key:      DynamicString,
+	iconPath: DynamicString,
+}
+
+// MonsterData_t::MonsterDataEntry_t — owning (strings + i32 maps + str-keyed map + sets)
+MonsterDataEntry_t :: struct {
+	monsterType:           i32,
+	defaultIconPath:       DynamicString,
+	iconSpritesAndPaths:   map[[4]byte]IconLookup_t,
+	keyToSpriteLookup:     map[string]Raw_Dynamic_Array,
+	modelIndexes:          map[i32]struct{},
+	playerModelIndexes:    map[i32]struct{},
+	defaultShortDisplayName: DynamicString,
+	specialNPCs:           map[string]SpecialNPCEntry_t,
+}
+
+// MonsterAllyFormation_t::MonsterAllies_t — owning (2 i32-keyed maps of FormationInfo_t)
+MonsterAllies_t :: struct {
+	meleeUnits:   map[[4]byte]FormationInfo_t,
+	rangedUnits:  map[[4]byte]FormationInfo_t,
+	updatedOnTick: u32,
+}
+
 // Layout guards — each mirror must match its C++ struct sizeof exactly.
 #assert(size_of(LightDef) == 28)
 #assert(size_of(IconEntryTextMap_t) == 48)
@@ -1485,6 +1510,9 @@ ParticleTimerEffect_t :: struct {
 #assert(size_of(ModelOffset_t) == 160)
 #assert(size_of(EffectDefinitionEntry_t) == 248)
 #assert(size_of(ParticleTimerEffect_t) == 32)
+#assert(size_of(IconLookup_t) == 32)
+#assert(size_of(MonsterDataEntry_t) == 200)
+#assert(size_of(MonsterAllies_t) == 72)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -1542,6 +1570,143 @@ particle_timer_effect_copy :: proc(dst: rawptr, src: rawptr) {
 	d := (^ParticleTimerEffect_t)(dst)
 	s := (^ParticleTimerEffect_t)(src)
 	copy_i32_map_effect(&d.effectMap, &s.effectMap)
+}
+
+icon_lookup_free :: proc(p: rawptr) {
+	v := (^IconLookup_t)(p)
+	dynamic_string_free_elem(rawptr(&v.key))
+	dynamic_string_free_elem(rawptr(&v.iconPath))
+}
+
+icon_lookup_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^IconLookup_t)(dst)
+	s := (^IconLookup_t)(src)
+	d^ = IconLookup_t{}
+	dynamic_string_copy_elem(rawptr(&d.key), rawptr(&s.key))
+	dynamic_string_copy_elem(rawptr(&d.iconPath), rawptr(&s.iconPath))
+}
+
+monster_data_entry_free :: proc(p: rawptr) {
+	v := (^MonsterDataEntry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.defaultIconPath))
+	dynamic_string_free_elem(rawptr(&v.defaultShortDisplayName))
+	if v.iconSpritesAndPaths != nil {
+		for key in v.iconSpritesAndPaths {
+			_, vp, _, err := map_entry(&v.iconSpritesAndPaths, key)
+			if err == nil && vp != nil {
+				icon_lookup_free(vp)
+			}
+		}
+		delete(v.iconSpritesAndPaths)
+		v.iconSpritesAndPaths = nil
+	}
+	if v.keyToSpriteLookup != nil {
+		for key in v.keyToSpriteLookup {
+			_, vp, _, err := map_entry(&v.keyToSpriteLookup, key)
+			if err == nil && vp != nil {
+				barony_dynamic_array_elem_destroy(vp, size_of(i32), Kind_POD)
+			}
+		}
+		delete(v.keyToSpriteLookup)
+		v.keyToSpriteLookup = nil
+	}
+	if v.modelIndexes != nil { delete(v.modelIndexes); v.modelIndexes = nil }
+	if v.playerModelIndexes != nil { delete(v.playerModelIndexes); v.playerModelIndexes = nil }
+	if v.specialNPCs != nil {
+		for key in v.specialNPCs {
+			_, vp, _, err := map_entry(&v.specialNPCs, key)
+			if err == nil && vp != nil {
+				special_npc_free(vp)
+			}
+		}
+		delete(v.specialNPCs)
+		v.specialNPCs = nil
+	}
+}
+
+monster_data_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^MonsterDataEntry_t)(dst)
+	s := (^MonsterDataEntry_t)(src)
+	d^ = MonsterDataEntry_t{}
+	d.monsterType = s.monsterType
+	dynamic_string_copy_elem(rawptr(&d.defaultIconPath), rawptr(&s.defaultIconPath))
+	dynamic_string_copy_elem(rawptr(&d.defaultShortDisplayName), rawptr(&s.defaultShortDisplayName))
+	if s.iconSpritesAndPaths != nil {
+		d.iconSpritesAndPaths = make(map[[4]byte]IconLookup_t)
+		for key in s.iconSpritesAndPaths {
+			_, vp, _, err := map_entry(&s.iconSpritesAndPaths, key)
+			if err == nil && vp != nil {
+				new_val: IconLookup_t
+				icon_lookup_copy(&new_val, vp)
+				d.iconSpritesAndPaths[key] = new_val
+			}
+		}
+	}
+	if s.keyToSpriteLookup != nil {
+		d.keyToSpriteLookup = make(map[string]Raw_Dynamic_Array)
+		for key in s.keyToSpriteLookup {
+			_, vp, _, err := map_entry(&s.keyToSpriteLookup, key)
+			if err == nil && vp != nil {
+				new_val: Raw_Dynamic_Array
+				barony_dynamic_array_elem_copy(&new_val, vp, size_of(i32), Kind_POD)
+				d.keyToSpriteLookup[key] = new_val
+			}
+		}
+	}
+	if s.modelIndexes != nil {
+		d.modelIndexes = make(map[i32]struct{})
+		for key in s.modelIndexes {
+			d.modelIndexes[key] = {}
+		}
+	}
+	if s.playerModelIndexes != nil {
+		d.playerModelIndexes = make(map[i32]struct{})
+		for key in s.playerModelIndexes {
+			d.playerModelIndexes[key] = {}
+		}
+	}
+	if s.specialNPCs != nil {
+		d.specialNPCs = make(map[string]SpecialNPCEntry_t)
+		for key in s.specialNPCs {
+			_, vp, _, err := map_entry(&s.specialNPCs, key)
+			if err == nil && vp != nil {
+				new_val: SpecialNPCEntry_t
+				special_npc_copy(&new_val, vp)
+				d.specialNPCs[key] = new_val
+			}
+		}
+	}
+}
+
+monster_allies_free :: proc(p: rawptr) {
+	v := (^MonsterAllies_t)(p)
+	if v.meleeUnits != nil { delete(v.meleeUnits); v.meleeUnits = nil }
+	if v.rangedUnits != nil { delete(v.rangedUnits); v.rangedUnits = nil }
+}
+
+monster_allies_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^MonsterAllies_t)(dst)
+	s := (^MonsterAllies_t)(src)
+	d^ = MonsterAllies_t{}
+	d.updatedOnTick = s.updatedOnTick
+	if s.meleeUnits != nil {
+		d.meleeUnits = make(map[[4]byte]FormationInfo_t)
+		for key in s.meleeUnits {
+			_, vp, _, err := map_entry(&s.meleeUnits, key)
+			if err == nil && vp != nil {
+				d.meleeUnits[key] = vp^
+			}
+		}
+	}
+	if s.rangedUnits != nil {
+		d.rangedUnits = make(map[[4]byte]FormationInfo_t)
+		for key in s.rangedUnits {
+			_, vp, _, err := map_entry(&s.rangedUnits, key)
+			if err == nil && vp != nil {
+				d.rangedUnits[key] = vp^
+			}
+		}
+	}
 }
 
 effect_definition_entry_free :: proc(p: rawptr) {
@@ -1723,6 +1888,9 @@ Value_Kind :: enum i32 {
 	MK_ModelOffset           = 39,
 	MK_EffectDefinitionEntry = 40,
 	MK_ParticleTimerEffect   = 41,
+	MK_IconLookup            = 42,
+	MK_MonsterDataEntry      = 43,
+	MK_MonsterAllies         = 44,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -1781,6 +1949,12 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = glyph_data_free, copy = glyph_data_copy }
 	case .MK_Statistic:
 		return Value_Ops{ free = statistic_free, copy = statistic_copy }
+	case .MK_IconLookup:
+		return Value_Ops{ free = icon_lookup_free, copy = icon_lookup_copy }
+	case .MK_MonsterDataEntry:
+		return Value_Ops{ free = monster_data_entry_free, copy = monster_data_entry_copy }
+	case .MK_MonsterAllies:
+		return Value_Ops{ free = monster_allies_free, copy = monster_allies_copy }
 	}
 	return Value_Ops{}
 }
@@ -2127,6 +2301,9 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_ModelOffset: i32_map_put(m, key, value, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: i32_map_put(m, key, value, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: i32_map_put(m, key, value, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: i32_map_put(m, key, value, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: i32_map_put(m, key, value, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: i32_map_put(m, key, value, MonsterAllies_t, ops)
 	}
 }
 
@@ -2162,6 +2339,9 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_ModelOffset: return i32_map_get(m, key, out, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: return i32_map_get(m, key, out, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: return i32_map_get(m, key, out, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: return i32_map_get(m, key, out, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: return i32_map_get(m, key, out, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: return i32_map_get(m, key, out, MonsterAllies_t, ops)
 	}
 	return false
 }
@@ -2197,6 +2377,9 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_ModelOffset: return i32_map_len(m, ModelOffset_t)
 	case .MK_EffectDefinitionEntry: return i32_map_len(m, EffectDefinitionEntry_t)
 	case .MK_ParticleTimerEffect: return i32_map_len(m, ParticleTimerEffect_t)
+	case .MK_IconLookup: return i32_map_len(m, IconLookup_t)
+	case .MK_MonsterDataEntry: return i32_map_len(m, MonsterDataEntry_t)
+	case .MK_MonsterAllies: return i32_map_len(m, MonsterAllies_t)
 	}
 	return 0
 }
@@ -2233,6 +2416,9 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ModelOffset: i32_map_clear(m, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: i32_map_clear(m, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: i32_map_clear(m, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: i32_map_clear(m, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: i32_map_clear(m, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: i32_map_clear(m, MonsterAllies_t, ops)
 	}
 }
 
@@ -2268,6 +2454,9 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ModelOffset: i32_map_destroy(m, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: i32_map_destroy(m, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: i32_map_destroy(m, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: i32_map_destroy(m, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: i32_map_destroy(m, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: i32_map_destroy(m, MonsterAllies_t, ops)
 	}
 }
 
@@ -2302,6 +2491,9 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_ModelOffset: return i32_map_entry(m, key, ModelOffset_t)
 	case .MK_EffectDefinitionEntry: return i32_map_entry(m, key, EffectDefinitionEntry_t)
 	case .MK_ParticleTimerEffect: return i32_map_entry(m, key, ParticleTimerEffect_t)
+	case .MK_IconLookup: return i32_map_entry(m, key, IconLookup_t)
+	case .MK_MonsterDataEntry: return i32_map_entry(m, key, MonsterDataEntry_t)
+	case .MK_MonsterAllies: return i32_map_entry(m, key, MonsterAllies_t)
 	}
 	return nil
 }
@@ -2338,6 +2530,9 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_ModelOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: return i32_map_entries(m, key_ptrs, val_ptrs, count, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: return i32_map_entries(m, key_ptrs, val_ptrs, count, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: return i32_map_entries(m, key_ptrs, val_ptrs, count, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterAllies_t, ops)
 	}
 	return 0
 }
@@ -2374,6 +2569,9 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_ModelOffset: i32_map_for_each(m, ModelOffset_t, f, userdata)
 	case .MK_EffectDefinitionEntry: i32_map_for_each(m, EffectDefinitionEntry_t, f, userdata)
 	case .MK_ParticleTimerEffect: i32_map_for_each(m, ParticleTimerEffect_t, f, userdata)
+	case .MK_IconLookup: i32_map_for_each(m, IconLookup_t, f, userdata)
+	case .MK_MonsterDataEntry: i32_map_for_each(m, MonsterDataEntry_t, f, userdata)
+	case .MK_MonsterAllies: i32_map_for_each(m, MonsterAllies_t, f, userdata)
 	}
 }
 
@@ -2409,6 +2607,9 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_ModelOffset: return i32_map_erase(m, key, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: return i32_map_erase(m, key, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: return i32_map_erase(m, key, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: return i32_map_erase(m, key, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: return i32_map_erase(m, key, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: return i32_map_erase(m, key, MonsterAllies_t, ops)
 	}
 	return false
 }
@@ -2514,6 +2715,9 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_ModelOffset: return i32_map_find(m, key, out_val, out_val_len, ModelOffset_t, ops)
 	case .MK_EffectDefinitionEntry: return i32_map_find(m, key, out_val, out_val_len, EffectDefinitionEntry_t, ops)
 	case .MK_ParticleTimerEffect: return i32_map_find(m, key, out_val, out_val_len, ParticleTimerEffect_t, ops)
+	case .MK_IconLookup: return i32_map_find(m, key, out_val, out_val_len, IconLookup_t, ops)
+	case .MK_MonsterDataEntry: return i32_map_find(m, key, out_val, out_val_len, MonsterDataEntry_t, ops)
+	case .MK_MonsterAllies: return i32_map_find(m, key, out_val, out_val_len, MonsterAllies_t, ops)
 	}
 	return false
 }

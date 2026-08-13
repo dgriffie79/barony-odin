@@ -467,7 +467,7 @@ void Entity::spawnBlood(int bloodSprite)
 
 
 MonsterData_t monsterData;
-std::map<int, MonsterData_t::MonsterDataEntry_t> MonsterData_t::monsterDataEntries;
+DynamicMapI32T<MonsterData_t::MonsterDataEntry_t> MonsterData_t::monsterDataEntries;
 DynamicString MonsterData_t::iconDefaultString = "#*images/ui/HUD/allies/icons/Icon_HeadDefaultM_00.png";
 DynamicString MonsterData_t::keyDefaultString;
 
@@ -498,7 +498,7 @@ int MonsterData_t::getSpriteFromKey(int sprite, DynamicString key, int type)
 	}
 }
 
-DynamicString& MonsterData_t::getKeyFromSprite(int sprite, int type)
+DynamicString MonsterData_t::getKeyFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
 	{
@@ -520,7 +520,7 @@ DynamicString& MonsterData_t::getKeyFromSprite(int sprite, int type)
 		return find->second.key;
 	}
 }
-DynamicString& MonsterData_t::getAllyIconFromSprite(int sprite, int type)
+DynamicString MonsterData_t::getAllyIconFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
 	{

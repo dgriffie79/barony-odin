@@ -436,6 +436,9 @@ enum MapValueKind {
     MK_ModelOffset = 39,         // ModelOffset_t (160B, owning: 2 nested maps)
     MK_EffectDefinitionEntry = 40, // StatusEffectQueue_t::EffectDefinitionEntry_t (248B owning)
     MK_ParticleTimerEffect = 41, // ParticleTimerEffect_t (32B, owning: effectMap)
+    MK_IconLookup = 42,          // MonsterData_t::MonsterDataEntry_t::IconLookup_t (32B, owning: 2 DynamicStrings)
+    MK_MonsterDataEntry = 43,    // MonsterData_t::MonsterDataEntry_t (200B, owning: strings+maps+sets)
+    MK_MonsterAllies = 44,       // MonsterAllyFormation_t::MonsterAllies_t (72B, owning: 2 i32 maps)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
