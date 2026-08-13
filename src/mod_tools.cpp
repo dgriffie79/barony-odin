@@ -12091,9 +12091,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 					baseFocalZ_rot1 = (*itr)["focalz_rot1"].GetDouble();
 				}
 
-				for ( auto& model : monsterModelsMap[customSprite] )
-				{
-					auto& entry = model.second;
+				monsterModelsMap[customSprite].forEach([&](int sprite, ModelOffset_t& entry) {
 					if ( static_cast<int>(entry.rotation) == 1 && version >= 2 )
 					{
 						entry.focalx += baseFocalX_rot1;
@@ -12106,7 +12104,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 						entry.focaly += baseFocalY;
 						entry.focalz += baseFocalZ;
 					}
-				}
+				});
 			}
 		}
 	}

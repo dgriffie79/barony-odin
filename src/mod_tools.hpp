@@ -3525,7 +3525,7 @@ struct EquipmentModelOffsets_t
 		DynamicMapI32T<AdditionalOffset_t> adjustToOversizeMask;
 		DynamicMapI32T<AdditionalOffset_t> adjustToExpandedHelm;
 	};
-	std::map<int, std::map<int, ModelOffset_t>> monsterModelsMap;
+	DynamicMapI32T<DynamicMapI32T<ModelOffset_t>> monsterModelsMap;
 	DynamicMapI32T<ModelOffset_t> miscItemsBaseOffsets;
 	void readBaseItemsFromFile();
 	void readFromFile(std::string monsterName, int monsterType = NOTHING);
@@ -3539,6 +3539,7 @@ struct EquipmentModelOffsets_t
 extern EquipmentModelOffsets_t EquipmentModelOffsets;
 template <> struct MapValueKindOf<EquipmentModelOffsets_t::ModelOffset_t> { static constexpr int value = MK_ModelOffset; };
 template <> struct MapValueKindOf<EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t> { static constexpr int value = MK_AdditionalOffset; };
+template <> struct MapValueKindOf<DynamicMapI32T<EquipmentModelOffsets_t::ModelOffset_t>> { static constexpr int value = MK_I32MapModelOffset; };
 
 struct Compendium_t
 {
