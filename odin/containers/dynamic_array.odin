@@ -216,6 +216,7 @@ Kind_HiscoreNpcEquipPair     :: 31
 Kind_HiscoreLootbagPair      :: 32
 Kind_HiscoreCompendiumPair   :: 33
 Kind_FollowerBarPair         :: 34
+Kind_StringPair               :: 35
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -1673,7 +1674,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [35]Element_Ops{
+element_ops := [36]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1709,6 +1710,7 @@ element_ops := [35]Element_Ops{
 	32 = { free = hiscore_lootbag_pair_free, copy = hiscore_lootbag_pair_copy },
 	33 = { free = hiscore_compendium_pair_free, copy = hiscore_compendium_pair_copy },
 	34 = { free = follower_bar_pair_free, copy = follower_bar_pair_copy },
+	35 = { free = dynamic_string_pair_free, copy = dynamic_string_pair_copy },
 }
 
 @(export)

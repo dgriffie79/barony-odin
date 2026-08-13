@@ -186,6 +186,18 @@ public:
 		}
 	}
 
+// Serialize a DynamicStringPair_t (pair<DynamicString,DynamicString> mirror)
+	bool value(DynamicStringPair_t& v) {
+	    bool result = false;
+	    if (beginObject()) {
+	        result = true;
+	        result = property("first", v.first) ? result : false;
+	        result = property("second", v.second) ? result : false;
+	        endObject();
+	    }
+	    return result;
+	}
+
 // Serialize a pair
 	// @param v the pair to serialize
 	template<typename T1, typename T2>

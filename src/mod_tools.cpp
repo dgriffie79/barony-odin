@@ -10564,8 +10564,8 @@ void EditorEntityData_t::readFromFile()
 DynamicArrayS32 Mods::modelsListModifiedIndexes;
 DynamicArrayS32 Mods::soundsListModifiedIndexes;
 std::vector<std::pair<SDL_Surface**, std::string>> Mods::systemResourceImagesToReload;
-std::vector<std::pair<std::string, std::string>> Mods::mountedFilepaths;
-std::vector<std::pair<std::string, std::string>> Mods::mountedFilepathsSaved;
+DynamicArrayStringPair Mods::mountedFilepaths;
+DynamicArrayStringPair Mods::mountedFilepathsSaved;
 DynamicSetStr Mods::mods_loaded_local;
 DynamicSetStr Mods::mods_loaded_workshop;
 DynamicArrayStr Mods::localModFoldernames;
@@ -10590,11 +10590,11 @@ void Mods::updateModCounts()
 	for ( auto& mod : mountedFilepaths )
 	{
 		bool found = false;
-		if ( mod.first.find("371970") != std::string::npos )
+		if ( mod.first.find("371970") != DynamicString::npos )
 		{
-			if ( mod.first.find("workshop") != std::string::npos )
+			if ( mod.first.find("workshop") != DynamicString::npos )
 			{
-				if ( mod.first.find("content") != std::string::npos )
+				if ( mod.first.find("content") != DynamicString::npos )
 				{
 					found = true;
 					Mods::mods_loaded_workshop.insert(mod.first);
@@ -10804,12 +10804,9 @@ void Mods::verifyAchievements(const char* fullpath, bool ignoreBaseFolder)
 
 bool Mods::isPathInMountedFiles(std::string findStr)
 {
-	std::vector<std::pair<std::string, std::string>>::iterator it;
-	std::pair<std::string, std::string> line;
-	for ( it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
+	for ( auto it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
 	{
-		line = *it;
-		if ( line.first.compare(findStr) == 0 )
+		if ( it->first == findStr )
 		{
 			// found entry
 			return true;
@@ -10820,12 +10817,9 @@ bool Mods::isPathInMountedFiles(std::string findStr)
 
 bool Mods::removePathFromMountedFiles(std::string findStr)
 {
-	std::vector<std::pair<std::string, std::string>>::iterator it;
-	std::pair<std::string, std::string> line;
-	for ( it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
+	for ( auto it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
 	{
-		line = *it;
-		if ( line.first.compare(findStr) == 0 )
+		if ( it->first == findStr )
 		{
 			// found entry, remove from list.
 			Mods::mountedFilepaths.erase(it);
@@ -10870,17 +10864,15 @@ bool Mods::clearAllMountedPaths()
 bool Mods::mountAllExistingPaths()
 {
 	bool success = true;
-	std::vector<std::pair<std::string, std::string>>::iterator it;
-	for ( it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
+	for ( auto it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
 	{
-		std::pair<std::string, std::string> itpair = *it;
-		if ( PHYSFS_mount(itpair.first.c_str(), NULL, 0) )
+		if ( PHYSFS_mount(it->first.c_str(), NULL, 0) )
 		{
-			printlog("[%s] is in the search path.\n", itpair.first.c_str());
+			printlog("[%s] is in the search path.\n", it->first.c_str());
 		}
 		else
 		{
-			printlog("[%s] unsuccessfully added to search path.\n", itpair.first.c_str());
+			printlog("[%s] unsuccessfully added to search path.\n", it->first.c_str());
 			success = false;
 		}
 	}

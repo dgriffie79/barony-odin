@@ -529,7 +529,7 @@ namespace MainMenu {
 
     // All menu options combined
 	struct AllSettings {
-	    std::vector<std::pair<std::string, std::string>> mods = Mods::mountedFilepathsSaved;
+	    DynamicArrayStringPair mods = Mods::mountedFilepathsSaved;
 	    bool crossplay_enabled = LobbyHandler.crossplayEnabled;
 	    bool fast_restart = false;
 		float world_tooltip_scale = 100.f;
@@ -24464,7 +24464,7 @@ failed:
 				}
 				else if ( PHYSFS_mount(fullpath, NULL, 0) )
 				{
-					Mods::mountedFilepaths.push_back(std::make_pair(fullpath, Mods::localModFoldernames[index]));
+					Mods::mountedFilepaths.push_back(DynamicStringPair_t{fullpath, Mods::localModFoldernames[index]});
 					modLoaded = true;
 					button.setText(Language::get(5854));
 					button.setBackground("*#images/ui/Main Menus/Mods/Unload_Button_00.png");
@@ -25299,11 +25299,11 @@ failed:
 			}
 			else
 			{
-				if ( it->first.find("371970") != std::string::npos )
+				if ( it->first.find("371970") != DynamicString::npos )
 				{
-					if ( it->first.find("workshop") != std::string::npos )
+					if ( it->first.find("workshop") != DynamicString::npos )
 					{
-						if ( it->first.find("content") != std::string::npos )
+						if ( it->first.find("content") != DynamicString::npos )
 						{
 							// steamworks mod, ignore this
 							it = Mods::mountedFilepathsSaved.erase(it);

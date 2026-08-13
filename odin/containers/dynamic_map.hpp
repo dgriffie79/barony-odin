@@ -525,6 +525,8 @@ template <> struct MapValueKindOf<Class_tMirror> { static constexpr int value = 
 template <> struct MapValueKindOf<Dither_t> { static constexpr int value = MK_Dither; };
 template <> struct MapValueKindOf<ChunkDither_t> { static constexpr int value = MK_ChunkDither; };
 template <> struct MapValueKindOf<DynamicStringPair_t> { static constexpr int value = MK_StringPair; };
+// Array elem kind for vector<pair<string,string>> (mountedFilepaths etc.).
+template <> struct DynamicArrayKindOf<DynamicStringPair_t> { static constexpr int value = Kind_StringPair; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
@@ -1056,6 +1058,7 @@ using DynamicMapClass = DynamicMapStrT<Class_tMirror>;
 using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string, vector<string>>
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
+using DynamicArrayStringPair = DynamicArrayT<DynamicStringPair_t>;  // vector<pair<string,string>>
 using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
 template <> struct MapValueKindOf<DynamicMapStrI32Map> { static constexpr int value = MK_StrI32Map; };
 using DynamicMapI32IntPair = DynamicMapI32T<IntPair_t>;            // map<int, pair<int,int>>

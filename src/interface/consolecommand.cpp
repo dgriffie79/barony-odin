@@ -2776,7 +2776,7 @@ namespace ConsoleCommands {
 				//TODO is this still necessary?
 				//modname = modname.substr(0, modname.length() - 1);
 				printlog("[Mods]: Adding mod \"%s\" in path \"%s\"", directory.c_str(), modname.c_str());
-				Mods::mountedFilepaths.push_back(std::make_pair(directory, modname));
+				Mods::mountedFilepaths.push_back(DynamicStringPair_t{directory, modname});
 			}
 		}
 		});
