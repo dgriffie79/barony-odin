@@ -1521,6 +1521,43 @@ i32_map_modeloffset_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// nested map<string, map<string, string>> value: the inner map owns its
+// DynamicString values (interned keys). Deep-free/copy.
+str_map_str_value_free :: proc(p: rawptr) {
+	mm := transmute(^map[string]string)(p)
+	if mm^ != nil {
+		for key in mm^ {
+			_, vp, _, err := map_entry(mm, key)
+			if err == nil && vp != nil {
+				string_value_free(vp)
+			}
+		}
+		delete(mm^)
+		mm^ = nil
+	}
+}
+
+str_map_str_value_copy :: proc(dst: rawptr, src: rawptr) {
+	m := transmute(^map[string]string)(dst)
+	s := transmute(^map[string]string)(src)
+	if m^ != nil {
+		str_map_str_value_free(m)
+	}
+	m^ = nil
+	if s^ == nil {
+		return
+	}
+	m^ = make(map[string]string)
+	for key in s^ {
+		_, vp, _, err := map_entry(s, key)
+		if err == nil && vp != nil {
+			new_val: string
+			string_value_copy(&new_val, vp)
+			m^[key] = new_val
+		}
+	}
+}
+
 statue_free :: proc(p: rawptr) {
 	v := (^Statue_t)(p)
 	if v.limbs != nil {
@@ -2510,6 +2547,7 @@ Value_Kind :: enum i32 {
 	MK_DropDown              = 56,
 	MK_Statue                = 57,
 	MK_I32MapModelOffset     = 58,
+	MK_StrMapStr             = 59,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2582,6 +2620,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = statue_free, copy = statue_copy }
 	case .MK_I32MapModelOffset:
 		return Value_Ops{ free = i32_map_modeloffset_free, copy = i32_map_modeloffset_copy }
+	case .MK_StrMapStr:
+		return Value_Ops{ free = str_map_str_value_free, copy = str_map_str_value_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2642,6 +2682,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_ItemTooltip: str_map_put(m, key, value, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_put(m, key, value, Entry_t, ops)
 	case .MK_DropDown: str_map_put(m, key, value, DropDown_t, ops)
+	case .MK_StrMapStr: str_map_put(m, key, value, map[string]string, ops)
 	}
 }
 
@@ -2677,6 +2718,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_ItemTooltip: return str_map_get(m, key, out, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_get(m, key, out, Entry_t, ops)
 	case .MK_DropDown: return str_map_get(m, key, out, DropDown_t, ops)
+	case .MK_StrMapStr: return str_map_get(m, key, out, map[string]string, ops)
 	}
 	return false
 }
@@ -2712,6 +2754,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_ItemTooltip: return str_map_len(m, ItemTooltip_t)
 	case .MK_Entry: return str_map_len(m, Entry_t)
 	case .MK_DropDown: return str_map_len(m, DropDown_t)
+	case .MK_StrMapStr: return str_map_len(m, map[string]string)
 	}
 	return 0
 }
@@ -2748,6 +2791,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ItemTooltip: str_map_clear(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_clear(m, Entry_t, ops)
 	case .MK_DropDown: str_map_clear(m, DropDown_t, ops)
+	case .MK_StrMapStr: str_map_clear(m, map[string]string, ops)
 	}
 }
 
@@ -2783,6 +2827,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ItemTooltip: str_map_destroy(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_destroy(m, Entry_t, ops)
 	case .MK_DropDown: str_map_destroy(m, DropDown_t, ops)
+	case .MK_StrMapStr: str_map_destroy(m, map[string]string, ops)
 	}
 }
 
@@ -2817,6 +2862,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_ItemTooltip: return str_map_entry(m, key, ItemTooltip_t)
 	case .MK_Entry: return str_map_entry(m, key, Entry_t)
 	case .MK_DropDown: return str_map_entry(m, key, DropDown_t)
+	case .MK_StrMapStr: return str_map_entry(m, key, map[string]string)
 	}
 	return nil
 }
@@ -2853,6 +2899,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_ItemTooltip: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Entry_t, ops)
 	case .MK_DropDown: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DropDown_t, ops)
+	case .MK_StrMapStr: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, map[string]string, ops)
 	}
 	return 0
 }
@@ -2889,6 +2936,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_ItemTooltip: str_map_for_each(m, ItemTooltip_t, f, userdata)
 	case .MK_Entry: str_map_for_each(m, Entry_t, f, userdata)
 	case .MK_DropDown: str_map_for_each(m, DropDown_t, f, userdata)
+	case .MK_StrMapStr: str_map_for_each(m, map[string]string, f, userdata)
 	}
 }
 
@@ -2930,6 +2978,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_ItemTooltip: return str_map_erase(m, key, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_erase(m, key, Entry_t, ops)
 	case .MK_DropDown: return str_map_erase(m, key, DropDown_t, ops)
+	case .MK_StrMapStr: return str_map_erase(m, key, map[string]string, ops)
 	}
 	return false
 }
@@ -3423,6 +3472,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_ItemTooltip: return str_map_find(m, key, out_key, out_key_len, out_val, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_find(m, key, out_key, out_key_len, out_val, Entry_t, ops)
 	case .MK_DropDown: return str_map_find(m, key, out_key, out_key_len, out_val, DropDown_t, ops)
+	case .MK_StrMapStr: return str_map_find(m, key, out_key, out_key_len, out_val, map[string]string, ops)
 	}
 	return false
 }

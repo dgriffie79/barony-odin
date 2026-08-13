@@ -2907,7 +2907,7 @@ public:
 	DynamicArrayT<tmpItem_t> tmpItems;
 	DynamicMapI32T<spellItem_t> spellItems;
 	DynamicMapStrT<ItemTooltip_t> tooltips;
-	std::map<std::string, std::map<std::string, std::string>> adjectives;
+	DynamicMapStrT<DynamicMapStr> adjectives;
 	DynamicMapStrArrStr templates;
 	//std::vector<std::pair<int, Sint32>> itemValueTable;
 	//std::map<int, std::vector<std::pair<int, Sint32>>> itemValueTableByCategory;
@@ -2963,6 +2963,7 @@ public:
 template <> struct DynamicArrayKindOf<ItemTooltips_t::tmpItem_t> { static constexpr int value = Kind_TmpItem; };
 template <> struct MapValueKindOf<ItemTooltips_t::spellItem_t> { static constexpr int value = MK_SpellItem; };
 template <> struct MapValueKindOf<ItemTooltips_t::ItemTooltip_t> { static constexpr int value = MK_ItemTooltip; };
+template <> struct MapValueKindOf<DynamicMapStr> { static constexpr int value = MK_StrMapStr; };
 
 extern ItemTooltips_t ItemTooltips;
 

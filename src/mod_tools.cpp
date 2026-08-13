@@ -1804,7 +1804,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 		for ( rapidjson::Value::ConstMemberIterator adj_itr = d["adjectives"].MemberBegin();
 			adj_itr != d["adjectives"].MemberEnd(); ++adj_itr )
 		{
-			std::map<std::string, std::string> m;
+			DynamicMapStr m;
 			for ( rapidjson::Value::ConstMemberIterator inner_itr = adj_itr->value.MemberBegin();
 				inner_itr != adj_itr->value.MemberEnd(); ++inner_itr )
 			{

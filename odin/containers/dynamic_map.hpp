@@ -491,6 +491,7 @@ enum MapValueKind {
     MK_DropDown = 56,            // Player::GUIDropdown_t::DropDown_t (owning: strings+option array)
     MK_Statue = 57,              // StatueManager_t::Statue_t (owning: limbs map)
     MK_I32MapModelOffset = 58,   // nested map<int,map<int,ModelOffset_t>> (owning)
+    MK_StrMapStr = 59,           // nested map<string,map<string,string>> (owning)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
