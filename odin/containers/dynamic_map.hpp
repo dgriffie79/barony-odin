@@ -1038,6 +1038,7 @@ using DynamicMapClass = DynamicMapStrT<Class_tMirror>;
 using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string, vector<string>>
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
+using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
 
 struct IconEntry_tMirror {
     DynamicString name;

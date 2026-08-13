@@ -3409,7 +3409,7 @@ struct EditorEntityData_t
 	static const int COLLIDER_COLLISION_FLAG_NPC = 4;
 	static DynamicMapColliderDmg colliderDmgTypes;
 	static std::map<int, EntityColliderData_t> colliderData;
-	static std::map<std::string, std::map<int, int>> colliderRandomGenPool;
+	static DynamicMapStrI32Map colliderRandomGenPool;
 	static DynamicMapI32 colliderNameIndexes;
 	static int getColliderIndexFromName(std::string name)
 	{
