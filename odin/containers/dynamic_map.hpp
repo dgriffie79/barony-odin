@@ -413,6 +413,13 @@ struct Dither_t {
     uint32_t lastUpdateTick = 0;
 };
 
+// DynamicStringPair_t — 32B owning mirror of std::pair<DynamicString,DynamicString>.
+// Value for map<string, pair<string,string>> (mapDisplayNamesDescriptions).
+struct DynamicStringPair_t {
+    DynamicString first;
+    DynamicString second;
+};
+
 // ChunkDither_t — same 8B layout, but its map value kind (MK_ChunkDither)
 // defaults `value` to 10 on insert (Chunk::Dither { value = MAX; }), matching
 // the std::unordered_map value-initialization for chunk dithering.
@@ -476,6 +483,7 @@ enum MapValueKind {
     MK_Bool = 48,                // bool (1B POD)
     MK_U32Map = 49,              // nested map<Uint32,Uint32> (32B Raw_Map, owning)
     MK_U32MapEmitterHit = 50,    // nested map<Uint32,map<Uint32,ParticleEmitterHit_t>> (8B POD inner)
+    MK_StringPair = 51,          // pair<DynamicString,DynamicString> (32B, owning: 2 strings)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -498,6 +506,7 @@ template <> struct MapValueKindOf<binding_tMirror> { static constexpr int value 
 template <> struct MapValueKindOf<Class_tMirror> { static constexpr int value = MK_Class; };
 template <> struct MapValueKindOf<Dither_t> { static constexpr int value = MK_Dither; };
 template <> struct MapValueKindOf<ChunkDither_t> { static constexpr int value = MK_ChunkDither; };
+template <> struct MapValueKindOf<DynamicStringPair_t> { static constexpr int value = MK_StringPair; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
@@ -1028,6 +1037,7 @@ using DynamicMapBinding = DynamicMapStrT<binding_tMirror>;
 using DynamicMapClass = DynamicMapStrT<Class_tMirror>;
 using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string, vector<string>>
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
+using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
 
 struct IconEntry_tMirror {
     DynamicString name;

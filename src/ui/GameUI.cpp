@@ -14408,7 +14408,7 @@ void openLogWindow(int player) {
 		"images/system/white.png", "LogScrollDown");
 }
 
-std::map<std::string, std::pair<std::string, std::string>> Player::CharacterSheet_t::mapDisplayNamesDescriptions;
+DynamicMapStringPair Player::CharacterSheet_t::mapDisplayNamesDescriptions;
 DynamicString Player::CharacterSheet_t::defaultString;
 DynamicMapStr Player::CharacterSheet_t::hoverTextStrings;
 void Player::CharacterSheet_t::loadCharacterSheetJSON()
@@ -14458,7 +14458,7 @@ void Player::CharacterSheet_t::loadCharacterSheetJSON()
 						{
 							desc = itr->value["description"].GetString();
 						}
-						mapDisplayNamesDescriptions[itr->name.GetString()] = std::make_pair(name, desc);
+						mapDisplayNamesDescriptions[itr->name.GetString()] = DynamicStringPair_t{ name, desc };
 					}
 				}
 				if ( d.HasMember("hover_text") )

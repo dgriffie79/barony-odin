@@ -1170,6 +1170,27 @@ ParticleEmitterHit_t :: struct {
 	hits: i32,
 }
 
+// DynamicStringPair_t — 32B owning (2 DynamicStrings). Value for
+// map<string, pair<string,string>> (mapDisplayNamesDescriptions etc.).
+DynamicStringPair_t :: struct {
+	first:  DynamicString,
+	second: DynamicString,
+}
+
+dynamic_string_pair_free :: proc(p: rawptr) {
+	v := (^DynamicStringPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+	dynamic_string_free_elem(rawptr(&v.second))
+}
+
+dynamic_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^DynamicStringPair_t)(dst)
+	s := (^DynamicStringPair_t)(src)
+	d^ = DynamicStringPair_t{}
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+	dynamic_string_copy_elem(rawptr(&d.second), rawptr(&s.second))
+}
+
 emitter_hit_map_value_free :: proc(p: rawptr) {
 	mm := transmute(^map[[4]byte]ParticleEmitterHit_t)(p)
 	if mm^ != nil {
@@ -1617,6 +1638,7 @@ Dither_t :: struct {
 #assert(size_of(MonsterAllies_t) == 72)
 #assert(size_of(Dither_t) == 8)
 #assert(size_of(ParticleEmitterHit_t) == 8)
+#assert(size_of(DynamicStringPair_t) == 32)
 
 model_offset_free :: proc(p: rawptr) {
 	v := (^ModelOffset_t)(p)
@@ -2001,6 +2023,7 @@ Value_Kind :: enum i32 {
 	MK_Bool                  = 48,
 	MK_U32Map                = 49,
 	MK_U32MapEmitterHit      = 50,
+	MK_StringPair            = 51,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2057,6 +2080,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = u32_map_value_free, copy = u32_map_value_copy }
 	case .MK_U32MapEmitterHit:
 		return Value_Ops{ free = emitter_hit_map_value_free, copy = emitter_hit_map_value_copy }
+	case .MK_StringPair:
+		return Value_Ops{ free = dynamic_string_pair_free, copy = dynamic_string_pair_copy }
 	case .MK_Lootbag:
 		return Value_Ops{ free = lootbag_free, copy = lootbag_copy }
 	case .MK_EnemyHPDetails:
@@ -2112,6 +2137,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_DynArrayS32: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: str_map_put(m, key, value, DynamicStringPair_t, ops)
 	}
 }
 
@@ -2142,6 +2168,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_DynArrayS32: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: return str_map_get(m, key, out, DynamicStringPair_t, ops)
 	}
 	return false
 }
@@ -2172,6 +2199,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_DynArrayS32: return str_map_len(m, Raw_Dynamic_Array)
 	case .MK_StatueLimbArray: return str_map_len(m, Raw_Dynamic_Array)
 	case .MK_StoreSlotsArray: return str_map_len(m, Raw_Dynamic_Array)
+	case .MK_StringPair: return str_map_len(m, DynamicStringPair_t)
 	}
 	return 0
 }
@@ -2203,6 +2231,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_DynArrayS32: str_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: str_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: str_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: str_map_clear(m, DynamicStringPair_t, ops)
 	}
 }
 
@@ -2233,6 +2262,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_DynArrayS32: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: str_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: str_map_destroy(m, DynamicStringPair_t, ops)
 	}
 }
 
@@ -2262,6 +2292,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_DynArrayS32: return str_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_StatueLimbArray: return str_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_StoreSlotsArray: return str_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_StringPair: return str_map_entry(m, key, DynamicStringPair_t)
 	}
 	return nil
 }
@@ -2293,6 +2324,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_DynArrayS32: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DynamicStringPair_t, ops)
 	}
 	return 0
 }
@@ -2324,6 +2356,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_DynArrayS32: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_StatueLimbArray: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_StoreSlotsArray: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_StringPair: str_map_for_each(m, DynamicStringPair_t, f, userdata)
 	}
 }
 
@@ -2360,6 +2393,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_DynArrayS32: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: return str_map_erase(m, key, DynamicStringPair_t, ops)
 	}
 	return false
 }
@@ -2812,6 +2846,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_DynArrayS32: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	case .MK_StoreSlotsArray: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
+	case .MK_StringPair: return str_map_find(m, key, out_key, out_key_len, out_val, DynamicStringPair_t, ops)
 	}
 	return false
 }

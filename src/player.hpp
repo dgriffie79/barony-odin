@@ -1300,7 +1300,7 @@ public:
 		real_t tooltipOpacityAnimate = 1.0;
 		Uint32 tooltipDeselectedTick = 0;
 
-		static std::map<std::string, std::pair<std::string, std::string>> mapDisplayNamesDescriptions;
+		static DynamicMapStringPair mapDisplayNamesDescriptions;
 		static DynamicMapStr hoverTextStrings;
 		enum SheetElements
 		{
