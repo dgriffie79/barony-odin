@@ -26021,12 +26021,12 @@ failed:
 	static void populateRecordsSectionItems(Frame* page_right, int entryType, const char* entryName = "", int specificClass = -1);
 	static void refreshCompendiumCamera(const DynamicString& modelsPath)
 	{
-		auto find = CompendiumEntries.compendiumObjectLimbs.find(modelsPath.c_str());
-		if ( find != CompendiumEntries.compendiumObjectLimbs.end() )
+		if ( CompendiumEntries.compendiumObjectLimbs.contains(modelsPath.c_str()) )
 		{
-			if ( find->second.baseCamera.inUse )
+			auto& entry = CompendiumEntries.compendiumObjectLimbs[modelsPath.c_str()];
+			if ( entry.baseCamera.inUse )
 			{
-				find->second.currentCamera = find->second.baseCamera;
+				entry.currentCamera = entry.baseCamera;
 			}
 		}
 		CompendiumEntries.defaultCamera = Compendium_t::CompendiumView_t();

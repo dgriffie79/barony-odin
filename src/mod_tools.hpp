@@ -4098,7 +4098,7 @@ struct Compendium_t
 		CompendiumView_t currentCamera;
 		DynamicArray entities;  // vector<Entity> (byte moves)
 	};
-	std::map<std::string, ObjectLimbs_t> compendiumObjectLimbs;
+	DynamicMapStrT<ObjectLimbs_t> compendiumObjectLimbs;
 	CompendiumView_t currentView;
 	struct CompendiumMap_t
 	{
@@ -4377,6 +4377,7 @@ template <> struct DynamicArrayKindOf<Compendium_t::CompendiumItems_t::Codex_t::
 // MapValueKindOf for Compendium_t::AchievementData_t::CompendiumAchievementsDisplay (owns 1 nested array + 2 ints)
 template <> struct MapValueKindOf<Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> { static constexpr int value = MK_CompendiumAchievementsDisplay; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumMapTiles_t> { static constexpr int value = MK_CompendiumMapTiles; };
+template <> struct MapValueKindOf<Compendium_t::ObjectLimbs_t> { static constexpr int value = MK_ObjectLimbs; };
 
 
 extern Compendium_t CompendiumEntries;
