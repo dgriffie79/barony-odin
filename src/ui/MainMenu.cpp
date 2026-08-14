@@ -20201,15 +20201,15 @@ failed:
 			
 			if ( pair.first == "game_scenario" )
 			{
-				if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != std::string::npos )
+				if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != DynamicString::npos )
 				{
 					challengeEventSave = 1;
 				}
-				else if ( pair.second.find("\"lid\":\"lid_victory_seed_unlimited\"") != std::string::npos )
+				else if ( pair.second.find("\"lid\":\"lid_victory_seed_unlimited\"") != DynamicString::npos )
 				{
 					challengeEventSave = 2;
 				}
-				else if ( pair.second.find("\"lid\":\"lid_victory_seed_challenge\"") != std::string::npos )
+				else if ( pair.second.find("\"lid\":\"lid_victory_seed_challenge\"") != DynamicString::npos )
 				{
 					challengeEventSave = 3;
 				}
@@ -20589,15 +20589,15 @@ failed:
 					
 					if ( pair.first == "game_scenario" )
 					{
-						if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != std::string::npos )
+						if ( pair.second.find("\"lid\":\"lid_victory_seed_oneshot\"") != DynamicString::npos )
 						{
 							challengeEventSave = 1;
 						}
-						else if ( pair.second.find("\"lid\":\"lid_victory_seed_unlimited\"") != std::string::npos )
+						else if ( pair.second.find("\"lid\":\"lid_victory_seed_unlimited\"") != DynamicString::npos )
 						{
 							challengeEventSave = 2;
 						}
-						else if ( pair.second.find("\"lid\":\"lid_victory_seed_challenge\"") != std::string::npos )
+						else if ( pair.second.find("\"lid\":\"lid_victory_seed_challenge\"") != DynamicString::npos )
 						{
 							challengeEventSave = 3;
 						}

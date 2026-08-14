@@ -773,8 +773,8 @@ struct SaveGameInfo {
 		int isCharacterValidFromDLC();
 	};
 	DynamicArrayT<Player> players;
-	std::vector<std::pair<std::string, std::string>> map_messages; // map modifiers "sound of pickaxes striking rock" "walls are fortified" etc
-	std::vector<std::pair<std::string, std::string>> additional_data;
+	DynamicArrayStringPair map_messages; // map modifiers "sound of pickaxes striking rock" "walls are fortified" etc
+	DynamicArrayStringPair additional_data;
 	
 	bool serialize(FileInterface* fp) {
 		fp->property("magic_cookie", magic_cookie);
