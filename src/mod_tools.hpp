@@ -4320,9 +4320,9 @@ struct Compendium_t
 				firstValue = true;
 			}
 		};
-		static std::map<EventTags, Event_t> events;
+		static DynamicMapI32T<Event_t> events;
 		static DynamicMapI32 eventIdLookup;
-		static std::map<int, std::set<EventTags>> itemEventLookup;
+		static DynamicMapI32T<DynamicSetI32> itemEventLookup;
 		static DynamicMapI32 monsterUniqueIDLookup;
 		static DynamicMapI32Str itemIDToString;
 		static DynamicMapI32Str monsterIDToString;
@@ -4331,18 +4331,18 @@ struct Compendium_t
 		static DynamicMapI32T<DynamicArrayS32> itemDisplayedEventsList;
 		static DynamicMapI32T<DynamicArrayStr> itemDisplayedCustomEventsList;
 		static DynamicMapStr customEventsValues;
-		static std::map<EventTags, std::set<int>> eventItemLookup;
-		static std::map<EventTags, std::set<int>> eventMonsterLookup;
-		static std::map<EventTags, std::set<std::string>> eventWorldLookup;
-		static std::map<EventTags, std::set<std::string>> eventCodexLookup;
+		static DynamicMapI32T<DynamicSetI32> eventItemLookup;
+		static DynamicMapI32T<DynamicSetI32> eventMonsterLookup;
+		static DynamicMapI32T<DynamicSetStr> eventWorldLookup;
+		static DynamicMapI32T<DynamicSetStr> eventCodexLookup;
 		static DynamicMapI32 eventWorldIDLookup;
 		static DynamicMapI32 eventCodexIDLookup;
-		static std::map<EventTags, std::map<int, int>> eventClassIds;
+		static DynamicMapI32Map eventClassIds;
 		static const int kEventClassesMax = 40;
-		static std::map<EventTags, std::map<std::string, std::string>> eventLangEntries;
-		static std::map<std::string, std::map<std::string, std::string>> eventCustomLangEntries;
+		static DynamicMapI32T<DynamicMapStr> eventLangEntries;
+		static DynamicMapStrT<DynamicMapStr> eventCustomLangEntries;
 		static std::vector<std::pair<std::string, Sint32>> getCustomEventValue(std::string key, std::string compendiumSection, std::string compendiumContentsSelected, int specificClass = -1);
-		static std::string formatEventRecordText(Sint32 value, const char* formatType, int formatVal, std::map<std::string, std::string>& langMap);
+		static std::string formatEventRecordText(Sint32 value, const char* formatType, int formatVal, DynamicMapStr& langMap);
 		static void readEventsFromFile();
 		static void writeItemsSaveData();
 		static void loadItemsSaveData();
@@ -4352,8 +4352,8 @@ struct Compendium_t
 		static void eventUpdateMonster(int playernum, const EventTags tag, const Entity* entity, Sint32 value, const bool loadingValue = false, const int entryID = -1);
 		static void eventUpdateWorld(int playernum, const EventTags tag, const char* category, Sint32 value, const bool loadingValue = false, const int entryID = -1, const bool commitUniqueValue = true);
 		static void eventUpdateCodex(int playernum, const EventTags tag, const char* category, Sint32 value, const bool loadingValue = false, const int entryID = -1, const bool floorEvent = false);
-		static std::map<EventTags, std::map<int, EventVal_t>> playerEvents;
-		static std::map<EventTags, std::map<int, EventVal_t>> serverPlayerEvents[MAXPLAYERS];
+		static DynamicMapI32T<DynamicMapI32T<EventVal_t>> playerEvents;
+		static DynamicMapI32T<DynamicMapI32T<EventVal_t>> serverPlayerEvents[MAXPLAYERS];
 		static void onLevelChangeEvent(const int playernum, const int prevlevel, const bool prevsecretfloor, const std::string prevmapname, const bool died);
 		static void onEndgameEvent(const int playernum, const bool tutorialend, const bool saveHighscore, const bool died);
 		static void sendClientDataOverNet(const int playernum);
@@ -4382,6 +4382,9 @@ template <> struct MapValueKindOf<Compendium_t::CompendiumWorld_t::World_t> { st
 template <> struct MapValueKindOf<Compendium_t::CompendiumCodex_t::Codex_t> { static constexpr int value = MK_Codex; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumItems_t::Codex_t> { static constexpr int value = MK_ItemsCodex; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumMonsters_t::Monster_t> { static constexpr int value = MK_Monster; };
+template <> struct MapValueKindOf<Compendium_t::Events_t::Event_t> { static constexpr int value = MK_Event; };
+template <> struct MapValueKindOf<Compendium_t::Events_t::EventVal_t> { static constexpr int value = MK_EventVal; };
+template <> struct MapValueKindOf<DynamicMapI32T<Compendium_t::Events_t::EventVal_t>> { static constexpr int value = MK_I32MapEventVal; };
 
 
 extern Compendium_t CompendiumEntries;

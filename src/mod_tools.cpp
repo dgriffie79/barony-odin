@@ -14380,7 +14380,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 }
 
 DynamicMapI32 Compendium_t::Events_t::monsterUniqueIDLookup;
-std::map<Compendium_t::EventTags, std::set<int>> Compendium_t::Events_t::eventMonsterLookup;
+DynamicMapI32T<DynamicSetI32> Compendium_t::Events_t::eventMonsterLookup;
 void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 {
 	const std::string filename = "lang/compendium_lang/lang_monsters.json";
@@ -14741,22 +14741,22 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 }
 
 Uint32 Compendium_t::lastTickUpdate = 0;
-std::map<Compendium_t::EventTags, Compendium_t::Events_t::Event_t> Compendium_t::Events_t::events;
+DynamicMapI32T<Compendium_t::Events_t::Event_t> Compendium_t::Events_t::events;
 DynamicMapI32 Compendium_t::Events_t::eventIdLookup;
-std::map<int, std::set<Compendium_t::EventTags>> Compendium_t::Events_t::itemEventLookup;
-std::map<Compendium_t::EventTags, std::set<int>> Compendium_t::Events_t::eventItemLookup;
-std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t::eventWorldLookup;
-std::map<Compendium_t::EventTags, std::set<std::string>> Compendium_t::Events_t::eventCodexLookup;
+DynamicMapI32T<DynamicSetI32> Compendium_t::Events_t::itemEventLookup;
+DynamicMapI32T<DynamicSetI32> Compendium_t::Events_t::eventItemLookup;
+DynamicMapI32T<DynamicSetStr> Compendium_t::Events_t::eventWorldLookup;
+DynamicMapI32T<DynamicSetStr> Compendium_t::Events_t::eventCodexLookup;
 DynamicMapI32 Compendium_t::Events_t::eventWorldIDLookup;
 DynamicMapI32 Compendium_t::Events_t::eventCodexIDLookup;
-std::map<Compendium_t::EventTags, std::map<int, int>> Compendium_t::Events_t::eventClassIds;
+DynamicMapI32Map Compendium_t::Events_t::eventClassIds;
 DynamicMapI32T<DynamicArrayS32> Compendium_t::Events_t::itemDisplayedEventsList;
 DynamicMapI32T<DynamicArrayStr> Compendium_t::Events_t::itemDisplayedCustomEventsList;
 DynamicMapStr Compendium_t::Events_t::customEventsValues;
-std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::playerEvents;
-std::map<Compendium_t::EventTags, std::map<int, Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::serverPlayerEvents[MAXPLAYERS];
-std::map<Compendium_t::EventTags, std::map<std::string, std::string>> Compendium_t::Events_t::eventLangEntries;
-std::map<std::string, std::map<std::string, std::string>> Compendium_t::Events_t::eventCustomLangEntries;
+DynamicMapI32T<DynamicMapI32T<Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::playerEvents;
+DynamicMapI32T<DynamicMapI32T<Compendium_t::Events_t::EventVal_t>> Compendium_t::Events_t::serverPlayerEvents[MAXPLAYERS];
+DynamicMapI32T<DynamicMapStr> Compendium_t::Events_t::eventLangEntries;
+DynamicMapStrT<DynamicMapStr> Compendium_t::Events_t::eventCustomLangEntries;
 
 void Compendium_t::Events_t::readEventsTranslations()
 {
@@ -14822,7 +14822,7 @@ void Compendium_t::Events_t::readEventsTranslations()
 	}
 }
 
-std::string Compendium_t::Events_t::formatEventRecordText(Sint32 value, const char* formatType, int formatVal, std::map<std::string, std::string>& langMap)
+std::string Compendium_t::Events_t::formatEventRecordText(Sint32 value, const char* formatType, int formatVal, DynamicMapStr& langMap)
 {
 	std::string resultsFormatting = "%d";
 	if ( formatType && !strcmp(formatType, "cycle") )
@@ -15289,24 +15289,24 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 							else if ( def.attributes.contains("class") )
 							{
 								codexIDs.clear();
-								auto findClassTag = eventClassIds.find(tag);
-								if ( findClassTag != eventClassIds.end() )
+								if ( eventClassIds.contains(tag) )
 								{
+									auto& classTagMap = eventClassIds[tag];
 									// iterate through classes
 									int startOffsetId = -1;
 									if ( def.attributes.contains("skills") )
 									{
 										if ( cat == "magic skill" )
 										{
-											startOffsetId = findClassTag->second[0] + PRO_SORCERY * kEventClassesMax;
+											startOffsetId = classTagMap[0] + PRO_SORCERY * kEventClassesMax;
 										}
 										else if ( cat == "casting skill" )
 										{
-											startOffsetId = findClassTag->second[0] + PRO_MYSTICISM * kEventClassesMax;
+											startOffsetId = classTagMap[0] + PRO_MYSTICISM * kEventClassesMax;
 										}
 										else if ( cat == "swimming skill" )
 										{
-											startOffsetId = findClassTag->second[0] + PRO_THAUMATURGY * kEventClassesMax;
+											startOffsetId = classTagMap[0] + PRO_THAUMATURGY * kEventClassesMax;
 										}
 										else
 										{
@@ -15314,14 +15314,14 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 											{
 												if ( cat == getSkillStringForCompendium(i) )
 												{
-													startOffsetId = findClassTag->second[0] + i * kEventClassesMax;
+													startOffsetId = classTagMap[0] + i * kEventClassesMax;
 													break;
 												}
 											}
 										}
 									}
 
-									for ( auto& classId : findClassTag->second )
+									for ( auto& classId : classTagMap )
 									{
 										if ( startOffsetId >= 0 )
 										{
@@ -15334,7 +15334,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 														continue;
 													}
 												}
-												codexIDs.push_back(classId);
+												codexIDs.push_back(std::make_pair(classId.first, classId.second));
 												codexIDs.back().first = codexIDs.back().first % kEventClassesMax;
 											}
 										}
@@ -15348,7 +15348,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 												}
 											}
 
-											codexIDs.push_back(classId);
+											codexIDs.push_back(std::make_pair(classId.first, classId.second));
 											if ( def.attributes.contains("stats") && valueType == "max_class" )
 											{
 												// we want to store the stat names rather than the class
@@ -15366,13 +15366,13 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 							else if ( def.attributes.contains("race") )
 							{
 								codexIDs.clear();
-								auto findClassTag = eventClassIds.find(tag);
-								if ( findClassTag != eventClassIds.end() )
+								if ( eventClassIds.contains(tag) )
 								{
+									auto& classTagMap = eventClassIds[tag];
 									// iterate through classes
-									for ( auto& classId : findClassTag->second )
+									for ( auto& classId : classTagMap )
 									{
-										codexIDs.push_back(classId);
+										codexIDs.push_back(std::make_pair(classId.first, classId.second));
 									}
 								}
 							}
@@ -15977,52 +15977,52 @@ void Compendium_t::Events_t::createDummyClientData(const int playernum)
 	if ( playernum < 0 || playernum >= MAXPLAYERS ) { return; }
 	for ( int i = 0; i < NUMITEMS; ++i )
 	{
-		for ( auto& tag : itemEventLookup[i] )
+		for ( auto tag : itemEventLookup[i] )
 		{
-			eventUpdate(playernum, tag, (ItemType)i, 1);
+			eventUpdate(playernum, (EventTags)tag, (ItemType)i, 1);
 		}
 	}
 	for ( int i = 0; i < NUM_SPELLS; ++i )
 	{
-		for ( auto& tag : itemEventLookup[i + kEventSpellOffset] )
+		for ( auto tag : itemEventLookup[i + kEventSpellOffset] )
 		{
-			eventUpdate(playernum, tag, SPELL_ITEM, 1, false, i);
+			eventUpdate(playernum, (EventTags)tag, SPELL_ITEM, 1, false, i);
 		}
 	}
 	for ( auto& pair : eventMonsterLookup  )
 	{
 		for ( auto monster : pair.second )
 		{
-			eventUpdateMonster(playernum, pair.first, nullptr, 1, false, monster);
+			eventUpdateMonster(playernum, (EventTags)pair.first, nullptr, 1, false, monster);
 		}
 	}
 	for ( auto& pair : eventWorldLookup )
 	{
-		for ( auto& world : pair.second )
+		for ( auto world : pair.second )
 		{
-			eventUpdateWorld(playernum, pair.first, world.c_str(), 1);
+			eventUpdateWorld(playernum, (EventTags)pair.first, world, 1);
 		}
 	}
 	for ( auto& pair : eventCodexLookup )
 	{
-		if ( eventClassIds.find(pair.first) != eventClassIds.end() )
+		if ( eventClassIds.contains(pair.first) )
 		{
 			int oldclass = client_classes[playernum];
 			for ( int c = 0; c < NUMCLASSES; ++c )
 			{
 				client_classes[playernum] = c;
-				for ( auto& world : pair.second )
+				for ( auto world : pair.second )
 				{
-					eventUpdateCodex(playernum, pair.first, world.c_str(), 1);
+					eventUpdateCodex(playernum, (EventTags)pair.first, world, 1);
 				}
 			}
 			client_classes[playernum] = oldclass;
 		}
 		else
 		{
-			for ( auto& world : pair.second )
+			for ( auto world : pair.second )
 			{
-				eventUpdateCodex(playernum, pair.first, world.c_str(), 1);
+				eventUpdateCodex(playernum, (EventTags)pair.first, world, 1);
 			}
 		}
 	}
@@ -17489,7 +17489,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 	{
 		worldID = entryID;
 		bool foundCategory = false;
-		for ( auto& cat : eventWorldLookup[tag] )
+		for ( auto cat : eventWorldLookup[tag] )
 		{
 			auto find = eventWorldIDLookup.find(cat);
 			if ( find != eventWorldIDLookup.end() )
@@ -17807,10 +17807,10 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		if ( def.attributes.contains("class")
 			|| def.attributes.contains("race") )
 		{
-			auto findClassTag = eventClassIds.find(tag);
-			if ( findClassTag != eventClassIds.end() )
+			if ( eventClassIds.contains(tag) )
 			{
-				for ( auto& pair : findClassTag->second )
+				auto& classTagMap = eventClassIds[tag];
+				for ( auto& pair : classTagMap )
 				{
 					if ( pair.second == ((codexID < kEventCodexOffset) ? (codexID + kEventCodexOffset) : codexID) )
 					{
@@ -17822,7 +17822,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		}
 		else
 		{
-			for ( auto& cat : eventCodexLookup[tag] )
+			for ( auto cat : eventCodexLookup[tag] )
 			{
 				auto find = eventCodexIDLookup.find(cat);
 				if ( find != eventCodexIDLookup.end() )
@@ -17854,9 +17854,9 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 			baseCodexID = codexID;
 			if ( def.attributes.contains("class") )
 			{
-				auto findClassTag = eventClassIds.find(tag);
-				if ( findClassTag != eventClassIds.end() )
+				if ( eventClassIds.contains(tag) )
 				{
+					auto& classTagMap = eventClassIds[tag];
 					// iterate through classes
 					int classId = client_classes[playernum];
 					if ( def.attributes.contains("skills") )
@@ -17871,8 +17871,8 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 						}
 					}
 
-					auto findClassId = findClassTag->second.find(classId);
-					if ( findClassId != findClassTag->second.end() )
+					auto findClassId = classTagMap.find(classId);
+					if ( findClassId != classTagMap.end() )
 					{
 						codexID = findClassId->second;
 					}

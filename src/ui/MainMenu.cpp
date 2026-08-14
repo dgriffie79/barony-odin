@@ -27022,14 +27022,14 @@ failed:
 								if ( index < find->second.size() )
 								{
 									customTagKey = find->second[index];
-									auto find2 = Compendium_t::Events_t::eventCustomLangEntries.find(customTagKey);
-									if ( find2 != Compendium_t::Events_t::eventCustomLangEntries.end() )
+									if ( Compendium_t::Events_t::eventCustomLangEntries.contains(customTagKey) )
 									{
-										if ( find2->second.find(entryName) != find2->second.end() )
+										auto& langMap = Compendium_t::Events_t::eventCustomLangEntries[customTagKey];
+										if ( langMap.find(entryName) != langMap.end() )
 										{
 											itemname = entryName;
 										}
-										str = find2->second[itemname];
+										str = langMap[itemname];
 									}
 								}
 							}
@@ -27456,18 +27456,18 @@ failed:
 									if ( tag == Compendium_t::CPDM_RUNS_COLLECTED )
 									{
 										output = Compendium_t::Events_t::formatEventRecordText(value, nullptr, 0, Compendium_t::Events_t::eventLangEntries[(Compendium_t::EventTags)tag]);
-										auto findTag = Compendium_t::Events_t::playerEvents.find(Compendium_t::CPDM_MINEHEAD_ENTER);
-										if ( findTag != Compendium_t::Events_t::playerEvents.end() )
+										if ( Compendium_t::Events_t::playerEvents.contains(Compendium_t::CPDM_MINEHEAD_ENTER) )
 										{
+											auto& eventMap = Compendium_t::Events_t::playerEvents[Compendium_t::CPDM_MINEHEAD_ENTER];
 											auto findCat = Compendium_t::Events_t::eventWorldIDLookup.find("minehead");
 											if ( findCat != Compendium_t::Events_t::eventWorldIDLookup.end() )
 											{
 												int worldId = findCat->second + Compendium_t::Events_t::kEventWorldOffset;
-												if ( findTag->second.find(worldId) != findTag->second.end()
-													&& findTag->second[worldId].value > 0 )
+												if ( eventMap.find(worldId) != eventMap.end()
+													&& eventMap[worldId].value > 0 )
 												{
 													char buf[32];
-													snprintf(buf, sizeof(buf), " (%.2f%%)", std::min(100.0, 100.0 * value / (real_t)findTag->second[worldId].value));
+													snprintf(buf, sizeof(buf), " (%.2f%%)", std::min(100.0, 100.0 * value / (real_t)eventMap[worldId].value));
 													output += buf;
 												}
 											}
@@ -29130,7 +29130,7 @@ failed:
 						auto findLang = Compendium_t::Events_t::eventCustomLangEntries.find("CUSTOM_CLASS_PLAYTIME");
 						if ( findLang != Compendium_t::Events_t::eventCustomLangEntries.end() )
 						{
-							name += findLang->second["default"];
+							name += Compendium_t::Events_t::eventCustomLangEntries["CUSTOM_CLASS_PLAYTIME"]["default"];
 							name += ' ';
 						}
 						auto results = Compendium_t::Events_t::getCustomEventValue("CUSTOM_CLASS_PLAYTIME", "codex", "", classnum);
@@ -29154,7 +29154,7 @@ failed:
 								DynamicString txt = "\n";
 								if ( findLang != Compendium_t::Events_t::eventCustomLangEntries.end() )
 								{
-									txt += findLang->second["format"];
+									txt += Compendium_t::Events_t::eventCustomLangEntries["CUSTOM_CLASS_PLAYTIME"]["format"];
 								}
 								txt += std::to_string(*cvar_compendium_class_sort_playtime ? rankedScores[i].first : classRank[i]);
 								itemNameRight->setText(txt.c_str());

@@ -1778,6 +1778,77 @@ monster_t_copy :: proc(dst: rawptr, src: rawptr) {
 	}
 }
 
+// map[int]Event_t (events). 72B: 3 i32 + string + i32 + set.
+Event_t :: struct {
+	type:              i32,
+	eventTrackingType: i32,
+	clienttype:        i32,
+	name:              string,
+	id:                i32,
+	attributes:        map[string]struct{},
+}
+#assert(size_of(Event_t) == 72)
+
+// map[int]EventVal_t (playerEvents inner map). 16B POD.
+EventVal_t :: struct {
+	type:       i32,
+	id:         i32,
+	value:      i32,
+	firstValue: bool,
+}
+#assert(size_of(EventVal_t) == 16)
+
+set_str_value_free :: proc(p: rawptr) {
+	s := transmute(^map[string]struct{})(p)
+	if s^ != nil { delete(s^); s^ = nil }
+}
+set_str_value_copy :: proc(dst: rawptr, src: rawptr) {
+	d := transmute(^map[string]struct{})(dst)
+	s := transmute(^map[string]struct{})(src)
+	d^ = nil
+	if s^ != nil {
+		d^ = make(map[string]struct{})
+		for key in s^ { d^[key] = {} }
+	}
+}
+
+event_t_free :: proc(p: rawptr) {
+	v := (^Event_t)(p)
+	dynamic_string_free_elem(rawptr(&v.name))
+	if v.attributes != nil { delete(v.attributes); v.attributes = nil }
+}
+event_t_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Event_t)(dst)
+	s := (^Event_t)(src)
+	d^ = Event_t{}
+	d.type = s.type
+	d.eventTrackingType = s.eventTrackingType
+	d.clienttype = s.clienttype
+	d.id = s.id
+	dynamic_string_copy_elem(rawptr(&d.name), rawptr(&s.name))
+	if s.attributes != nil {
+		d.attributes = make(map[string]struct{})
+		for key in s.attributes { d.attributes[key] = {} }
+	}
+}
+
+i32_map_eventval_free :: proc(p: rawptr) {
+	mm := transmute(^map[[4]byte]EventVal_t)(p)
+	if mm^ != nil { delete(mm^); mm^ = nil }
+}
+i32_map_eventval_copy :: proc(dst: rawptr, src: rawptr) {
+	d := transmute(^map[[4]byte]EventVal_t)(dst)
+	s := transmute(^map[[4]byte]EventVal_t)(src)
+	d^ = nil
+	if s^ != nil {
+		d^ = make(map[[4]byte]EventVal_t)
+		for key in s^ {
+			_, vp, _, err := map_entry(s, key)
+			if err == nil && vp != nil { d^[key] = vp^ }
+		}
+	}
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -2925,6 +2996,10 @@ Value_Kind :: enum i32 {
 	MK_Codex = 68,
 	MK_ItemsCodex = 69,
 	MK_Monster = 70,
+	MK_SetOfStr = 71,
+	MK_Event = 72,
+	MK_EventVal = 73,
+	MK_I32MapEventVal = 74,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2981,6 +3056,14 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = items_codex_free, copy = items_codex_copy }
 	case .MK_Monster:
 		return Value_Ops{ free = monster_t_free, copy = monster_t_copy }
+	case .MK_SetOfStr:
+		return Value_Ops{ free = set_str_value_free, copy = set_str_value_copy }
+	case .MK_Event:
+		return Value_Ops{ free = event_t_free, copy = event_t_copy }
+	case .MK_EventVal:
+		return Value_Ops{}
+	case .MK_I32MapEventVal:
+		return Value_Ops{ free = i32_map_eventval_free, copy = i32_map_eventval_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -3494,12 +3577,17 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_StoreSlotsArray: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: i32_map_put(m, key, value, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_put(m, key, value, map[i32]struct{}, ops)
+	case .MK_SetOfStr: i32_map_put(m, key, value, map[string]struct{}, ops)
+	case .MK_StrMapStr: i32_map_put(m, key, value, map[string]string, ops)
 	case .MK_I32Map: i32_map_put(m, key, value, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: i32_map_put(m, key, value, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: i32_map_put(m, key, value, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_put(m, key, value, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_put(m, key, value, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_put(m, key, value, SpellItem_t, ops)
 	case .MK_Statue: i32_map_put(m, key, value, Statue_t, ops)
+	case .MK_Event: i32_map_put(m, key, value, Event_t, ops)
+	case .MK_EventVal: i32_map_put(m, key, value, EventVal_t, ops)
 	case .MK_I32MapModelOffset: i32_map_put(m, key, value, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_put(m, key, value, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_put(m, key, value, map[[4]byte]IntPair_t, ops)
@@ -3543,12 +3631,17 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_StoreSlotsArray: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: return i32_map_get(m, key, out, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_get(m, key, out, map[i32]struct{}, ops)
+	case .MK_SetOfStr: return i32_map_get(m, key, out, map[string]struct{}, ops)
+	case .MK_StrMapStr: return i32_map_get(m, key, out, map[string]string, ops)
 	case .MK_I32Map: return i32_map_get(m, key, out, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: return i32_map_get(m, key, out, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: return i32_map_get(m, key, out, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_get(m, key, out, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_get(m, key, out, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_get(m, key, out, SpellItem_t, ops)
 	case .MK_Statue: return i32_map_get(m, key, out, Statue_t, ops)
+	case .MK_Event: return i32_map_get(m, key, out, Event_t, ops)
+	case .MK_EventVal: return i32_map_get(m, key, out, EventVal_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_get(m, key, out, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_get(m, key, out, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_get(m, key, out, map[[4]byte]IntPair_t, ops)
@@ -3592,12 +3685,17 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_StoreSlotsArray: return i32_map_len(m, Raw_Dynamic_Array)
 	case .MK_MonsterTrapIgnore: return i32_map_len(m, MonsterTrapIgnoreEntities_t)
 	case .MK_SetOfI32: return i32_map_len(m, map[i32]struct{})
+	case .MK_SetOfStr: return i32_map_len(m, map[string]struct{})
+	case .MK_StrMapStr: return i32_map_len(m, map[string]string)
 	case .MK_I32Map: return i32_map_len(m, map[[4]byte]i32)
+	case .MK_I32MapEventVal: return i32_map_len(m, map[[4]byte]EventVal_t)
 	case .MK_U32Map: return i32_map_len(m, map[[4]byte]u32)
 	case .MK_U32MapEmitterHit: return i32_map_len(m, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_len(m, EntityColliderData_t)
 	case .MK_SpellItem: return i32_map_len(m, SpellItem_t)
 	case .MK_Statue: return i32_map_len(m, Statue_t)
+	case .MK_Event: return i32_map_len(m, Event_t)
+	case .MK_EventVal: return i32_map_len(m, EventVal_t)
 	case .MK_I32MapModelOffset: return i32_map_len(m, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_len(m, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_len(m, map[[4]byte]IntPair_t)
@@ -3642,12 +3740,17 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_StoreSlotsArray: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: i32_map_clear(m, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_clear(m, map[i32]struct{}, ops)
+	case .MK_SetOfStr: i32_map_clear(m, map[string]struct{}, ops)
+	case .MK_StrMapStr: i32_map_clear(m, map[string]string, ops)
 	case .MK_I32Map: i32_map_clear(m, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: i32_map_clear(m, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: i32_map_clear(m, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_clear(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_clear(m, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_clear(m, SpellItem_t, ops)
 	case .MK_Statue: i32_map_clear(m, Statue_t, ops)
+	case .MK_Event: i32_map_clear(m, Event_t, ops)
+	case .MK_EventVal: i32_map_clear(m, EventVal_t, ops)
 	case .MK_I32MapModelOffset: i32_map_clear(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_clear(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_clear(m, map[[4]byte]IntPair_t, ops)
@@ -3691,12 +3794,17 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_StoreSlotsArray: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: i32_map_destroy(m, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: i32_map_destroy(m, map[i32]struct{}, ops)
+	case .MK_SetOfStr: i32_map_destroy(m, map[string]struct{}, ops)
+	case .MK_StrMapStr: i32_map_destroy(m, map[string]string, ops)
 	case .MK_I32Map: i32_map_destroy(m, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: i32_map_destroy(m, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: i32_map_destroy(m, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: i32_map_destroy(m, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: i32_map_destroy(m, EntityColliderData_t, ops)
 	case .MK_SpellItem: i32_map_destroy(m, SpellItem_t, ops)
 	case .MK_Statue: i32_map_destroy(m, Statue_t, ops)
+	case .MK_Event: i32_map_destroy(m, Event_t, ops)
+	case .MK_EventVal: i32_map_destroy(m, EventVal_t, ops)
 	case .MK_I32MapModelOffset: i32_map_destroy(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_destroy(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_destroy(m, map[[4]byte]IntPair_t, ops)
@@ -3739,12 +3847,17 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_StoreSlotsArray: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_MonsterTrapIgnore: return i32_map_entry(m, key, MonsterTrapIgnoreEntities_t)
 	case .MK_SetOfI32: return i32_map_entry(m, key, map[i32]struct{})
+	case .MK_SetOfStr: return i32_map_entry(m, key, map[string]struct{})
+	case .MK_StrMapStr: return i32_map_entry(m, key, map[string]string)
 	case .MK_I32Map: return i32_map_entry(m, key, map[[4]byte]i32)
+	case .MK_I32MapEventVal: return i32_map_entry(m, key, map[[4]byte]EventVal_t)
 	case .MK_U32Map: return i32_map_entry(m, key, map[[4]byte]u32)
 	case .MK_U32MapEmitterHit: return i32_map_entry(m, key, map[[4]byte]ParticleEmitterHit_t)
 	case .MK_EntityColliderData: return i32_map_entry(m, key, EntityColliderData_t)
 	case .MK_SpellItem: return i32_map_entry(m, key, SpellItem_t)
 	case .MK_Statue: return i32_map_entry(m, key, Statue_t)
+	case .MK_Event: return i32_map_entry(m, key, Event_t)
+	case .MK_EventVal: return i32_map_entry(m, key, EventVal_t)
 	case .MK_I32MapModelOffset: return i32_map_entry(m, key, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_entry(m, key, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_entry(m, key, map[[4]byte]IntPair_t)
@@ -3789,12 +3902,17 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_StoreSlotsArray: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: return i32_map_entries(m, key_ptrs, val_ptrs, count, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[i32]struct{}, ops)
+	case .MK_SetOfStr: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[string]struct{}, ops)
+	case .MK_StrMapStr: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[string]string, ops)
 	case .MK_I32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_entries(m, key_ptrs, val_ptrs, count, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_entries(m, key_ptrs, val_ptrs, count, SpellItem_t, ops)
 	case .MK_Statue: return i32_map_entries(m, key_ptrs, val_ptrs, count, Statue_t, ops)
+	case .MK_Event: return i32_map_entries(m, key_ptrs, val_ptrs, count, Event_t, ops)
+	case .MK_EventVal: return i32_map_entries(m, key_ptrs, val_ptrs, count, EventVal_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]IntPair_t, ops)
@@ -3839,12 +3957,17 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_StoreSlotsArray: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_MonsterTrapIgnore: i32_map_for_each(m, MonsterTrapIgnoreEntities_t, f, userdata)
 	case .MK_SetOfI32: i32_map_for_each(m, map[i32]struct{}, f, userdata)
+	case .MK_SetOfStr: i32_map_for_each(m, map[string]struct{}, f, userdata)
+	case .MK_StrMapStr: i32_map_for_each(m, map[string]string, f, userdata)
 	case .MK_I32Map: i32_map_for_each(m, map[[4]byte]i32, f, userdata)
+	case .MK_I32MapEventVal: i32_map_for_each(m, map[[4]byte]EventVal_t, f, userdata)
 	case .MK_U32Map: i32_map_for_each(m, map[[4]byte]u32, f, userdata)
 	case .MK_U32MapEmitterHit: i32_map_for_each(m, map[[4]byte]ParticleEmitterHit_t, f, userdata)
 	case .MK_EntityColliderData: i32_map_for_each(m, EntityColliderData_t, f, userdata)
 	case .MK_SpellItem: i32_map_for_each(m, SpellItem_t, f, userdata)
 	case .MK_Statue: i32_map_for_each(m, Statue_t, f, userdata)
+	case .MK_Event: i32_map_for_each(m, Event_t, f, userdata)
+	case .MK_EventVal: i32_map_for_each(m, EventVal_t, f, userdata)
 	case .MK_I32MapModelOffset: i32_map_for_each(m, map[[4]byte]ModelOffset_t, f, userdata)
 	case .MK_StrI32Map: i32_map_for_each(m, map[string]map[[4]byte]i32, f, userdata)
 	case .MK_I32MapIntPair: i32_map_for_each(m, map[[4]byte]IntPair_t, f, userdata)
@@ -3888,12 +4011,17 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_StoreSlotsArray: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: return i32_map_erase(m, key, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_erase(m, key, map[i32]struct{}, ops)
+	case .MK_SetOfStr: return i32_map_erase(m, key, map[string]struct{}, ops)
+	case .MK_StrMapStr: return i32_map_erase(m, key, map[string]string, ops)
 	case .MK_I32Map: return i32_map_erase(m, key, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: return i32_map_erase(m, key, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: return i32_map_erase(m, key, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_erase(m, key, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_erase(m, key, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_erase(m, key, SpellItem_t, ops)
 	case .MK_Statue: return i32_map_erase(m, key, Statue_t, ops)
+	case .MK_Event: return i32_map_erase(m, key, Event_t, ops)
+	case .MK_EventVal: return i32_map_erase(m, key, EventVal_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_erase(m, key, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_erase(m, key, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_erase(m, key, map[[4]byte]IntPair_t, ops)
@@ -4021,12 +4149,17 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_StoreSlotsArray: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	case .MK_MonsterTrapIgnore: return i32_map_find(m, key, out_val, out_val_len, MonsterTrapIgnoreEntities_t, ops)
 	case .MK_SetOfI32: return i32_map_find(m, key, out_val, out_val_len, map[i32]struct{}, ops)
+	case .MK_SetOfStr: return i32_map_find(m, key, out_val, out_val_len, map[string]struct{}, ops)
+	case .MK_StrMapStr: return i32_map_find(m, key, out_val, out_val_len, map[string]string, ops)
 	case .MK_I32Map: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]i32, ops)
+	case .MK_I32MapEventVal: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]EventVal_t, ops)
 	case .MK_U32Map: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]u32, ops)
 	case .MK_U32MapEmitterHit: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ParticleEmitterHit_t, ops)
 	case .MK_EntityColliderData: return i32_map_find(m, key, out_val, out_val_len, EntityColliderData_t, ops)
 	case .MK_SpellItem: return i32_map_find(m, key, out_val, out_val_len, SpellItem_t, ops)
 	case .MK_Statue: return i32_map_find(m, key, out_val, out_val_len, Statue_t, ops)
+	case .MK_Event: return i32_map_find(m, key, out_val, out_val_len, Event_t, ops)
+	case .MK_EventVal: return i32_map_find(m, key, out_val, out_val_len, EventVal_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_find(m, key, out_val, out_val_len, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]IntPair_t, ops)
