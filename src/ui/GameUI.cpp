@@ -2045,7 +2045,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 
 	bool audioSliderBars = bPlayerBars && !strcmp(baseFrame->getName(), "pause player status audio");
 
-	for ( int64_t _bi = 0; _bi < (bPlayerBars ? dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) : dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars)); ++_bi )
+	for ( int64_t _bi = 0; _bi < (bPlayerBars ? dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars) : dynarray_pair_size<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars)); )
 	{
 		++barIndex;
 		auto& followerBar = (bPlayerBars ? dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.playerBars, _bi) : dynarray_pair_at<std::pair<Uint32, Player::HUD_t::FollowerBar_t>>(hud_t.followerBars, _bi))->second;
