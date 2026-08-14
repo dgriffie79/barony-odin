@@ -100,7 +100,7 @@ Keep (order-dependent):
   `sharedDialogues` → `DynamicMapI32T` (new `MK_Setting`, `MK_Dialogue`),
   `leadershipAllyTableSpecialRecruitment` → `DynamicMapI32T<DynamicArrayT<…>>`
   (new `Kind_MonsterStringPair` + `MK_ArrayMonsterStringPair`)
-- Only `std::array` members remain (see bottom section)
+- `std::array` members → C arrays (D3dl)
 
 ### src/scores.hpp (2 — KEEP)
 - `map_messages` / `additional_data` — `vector<pair<string,string>>` **KEEP**
@@ -121,12 +121,7 @@ Voice-chat subsystem (port-with-file candidate; listed so it isn't missed):
 - `draw(... const vector<const Widget*>& selectedWidgets/searchParents)` params
   across Widget/Frame/Field/Button/Slider
 
-## std::array members (fixed-size — trivial `[N]T` port, do last)
-
-- player.hpp: `game_controllers`, `dollSlots`, `hotbar`, `hotbar_alternate`,
-  `hotbarSlotFrames`, `faceButtonPositions`
-- mod_tools.hpp: `Monster_t::resistances` (`std::array<int,7>`)
-- steam.hpp: `m_subscribedItemPreviewURL` (`std::array<std::string,50>`)
+## std::array members — DONE (D3dl, `[N]T` C arrays)
 
 ## Hazards to keep in mind
 
