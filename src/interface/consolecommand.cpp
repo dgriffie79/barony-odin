@@ -4140,45 +4140,7 @@ namespace ConsoleCommands {
 			return;
 		}
 
-		/*rapidjson::Document d;
-		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "item_names", rapidjson::Value(rapidjson::kObjectType));*/
-
-		for ( int i = SPELL_NONE + 50; i < NUM_SPELLS; ++i )
-		{
-			if ( allGameSpells.find(i) != allGameSpells.end() )
-			{
-				if ( spell_t* spell = allGameSpells[i] )
-				{
-					bool oldIntro = intro;
-					intro = true;
-					bool learned = addSpell(spell->ID, clientnum, true);
-					intro = oldIntro;
-
-					/*int spellbookId = getSpellbookFromSpellID(spell->ID);
-					if ( items[spellbookId].category == SPELLBOOK )
-					{
-						d["item_names"].AddMember(rapidjson::Value(ItemTooltips.tmpItems[spellbookId].internalName.c_str(), d.GetAllocator()), rapidjson::Value(rapidjson::kObjectType),
-							d.GetAllocator());
-						DynamicString str = "spellbook of ";
-						str += spell->getSpellName(true);
-						d["item_names"][ItemTooltips.tmpItems[spellbookId].internalName.c_str()].AddMember("name_identified", rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
-						d["item_names"][ItemTooltips.tmpItems[spellbookId].internalName.c_str()].AddMember("name_unidentified", rapidjson::Value("spellbook", d.GetAllocator()), d.GetAllocator());
-					}*/
-				}
-			}
-		}
-
-		/*File* fp = FileIO::open("lang/stuff.json", "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
-		FileIO::close(fp);*/
+		
 
 		return;
 		});
@@ -5342,55 +5304,13 @@ namespace ConsoleCommands {
 
 	static ConsoleCommand ccmd_exportitemlang("/exportitemlang", "", []CCMD{
 #ifndef EDITOR
-		/*rapidjson::Document d;
-		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(d, "items", rapidjson::Value(rapidjson::kObjectType));
-		for ( int i = 0; i < NUMITEMS; ++i )
-		{
-			d["item_names"].AddMember(rapidjson::Value(ItemTooltips.tmpItems[i].itemName.c_str(), d.GetAllocator()), rapidjson::Value(rapidjson::kObjectType),
-				d.GetAllocator());
-			d["item_names"][ItemTooltips.tmpItems[i].itemName.c_str()].AddMember("name_identified", rapidjson::Value(items[i].name_identified, d.GetAllocator()), d.GetAllocator());
-			d["item_names"][ItemTooltips.tmpItems[i].itemName.c_str()].AddMember("name_unidentified", rapidjson::Value(items[i].name_unidentified, d.GetAllocator()), d.GetAllocator());
-		}
-		File* fp = FileIO::open("lang/item_names.json", "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
-		FileIO::close(fp);*/
+		
 #endif
 	});
 
 	static ConsoleCommand ccmd_exportspelllang("/exportspelllang", "", []CCMD{
 #ifndef EDITOR
-		/*rapidjson::Document d;
-		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(d, "spells", rapidjson::Value(rapidjson::kObjectType));
-		for ( int i = 0; i < NUM_SPELLS; ++i )
-		{
-			if ( spell_t* spell = getSpellFromID(i) )
-			{
-				d["spell_names"].AddMember(rapidjson::Value(ItemTooltips.spellItems[i].internalName.c_str(), d.GetAllocator()), rapidjson::Value(rapidjson::kObjectType),
-					d.GetAllocator());
-				d["spell_names"][ItemTooltips.spellItems[i].internalName.c_str()].AddMember("name", rapidjson::Value(spell->getSpellName(), d.GetAllocator()), d.GetAllocator());
-			}
-		}
-		File* fp = FileIO::open("lang/spell_names.json", "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
-		FileIO::close(fp);*/
+		
 #endif
 	});
 

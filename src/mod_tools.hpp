@@ -17,10 +17,7 @@ See LICENSE for details.
 #include "files.hpp"
 #include "prng.hpp"
 #include "items.hpp"
-#include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/filewritestream.h"
-#include "rapidjson/prettywriter.h"
+#include "../odin/json_shim/json_shim.hpp"
 #include "net.hpp"
 #include "scores.hpp"
 #include "entity.hpp"
@@ -33,22 +30,17 @@ See LICENSE for details.
 class CustomHelpers
 {
 public:
-	static void addMemberToSubkey(rapidjson::Document& d, std::string subkey, std::string name, const rapidjson::Value& value)
+	static void addMemberToSubkey(JsonNode d, std::string subkey, std::string name, JsonNode value)
 	{
-		rapidjson::Value key(name.c_str(), d.GetAllocator()); // copy string name
-		rapidjson::Value val(value, d.GetAllocator());
-		d[subkey.c_str()].AddMember(key, val, d.GetAllocator());
+		d[subkey.c_str()].AddMember(name.c_str(), value);
 	}
-	static void addMemberToRoot(rapidjson::Document& d, std::string name, const rapidjson::Value& value)
+	static void addMemberToRoot(JsonNode d, std::string name, JsonNode value)
 	{
-		rapidjson::Value key(name.c_str(), d.GetAllocator()); // copy string name
-		rapidjson::Value val(value, d.GetAllocator());
-		d.AddMember(key, val, d.GetAllocator());
+		d.AddMember(name.c_str(), value);
 	}
-	static void addArrayMemberToSubkey(rapidjson::Document& d, std::string subkey, const rapidjson::Value& value)
+	static void addArrayMemberToSubkey(JsonNode d, std::string subkey, JsonNode value)
 	{
-		rapidjson::Value val(value, d.GetAllocator());        // some value
-		d[subkey.c_str()].PushBack(val, d.GetAllocator());
+		d[subkey.c_str()].PushBack(value);
 	}
 	static bool isLevelPartOfSet(int level, bool secret, std::pair<DynamicSetI32, DynamicSetI32>& pairOfSets)
 	{
@@ -155,43 +147,43 @@ public:
 				dropItemOnDeath = false;
 			}
 		}
-		void setValueFromAttributes(rapidjson::Document& d, rapidjson::Value& outObject)
+		void setValueFromAttributes(JsonNode d, JsonNode outObject)
 		{
-			rapidjson::Value key1("type", d.GetAllocator());
-			rapidjson::Value val1(itemNameStrings[type + 2], d.GetAllocator());
-			outObject.AddMember(key1, val1, d.GetAllocator());
+			JsonNode key1("type");
+			JsonNode val1(itemNameStrings[type + 2]);
+			outObject.AddMember(key1, val1);
 
-			rapidjson::Value key2("status", d.GetAllocator());
-			rapidjson::Value val2(itemStatusStrings.at(status).c_str(), d.GetAllocator());
-			outObject.AddMember(key2, val2, d.GetAllocator());
+			JsonNode key2("status");
+			JsonNode val2(itemStatusStrings.at(status).c_str());
+			outObject.AddMember(key2, val2);
 
-			outObject.AddMember("beatitude", rapidjson::Value(beatitude), d.GetAllocator());
-			outObject.AddMember("count", rapidjson::Value(count), d.GetAllocator());
-			outObject.AddMember("appearance", rapidjson::Value(appearance), d.GetAllocator());
-			outObject.AddMember("identified", rapidjson::Value(identified), d.GetAllocator());
-			outObject.AddMember("spawn_percent_chance", rapidjson::Value(100), d.GetAllocator());
-			outObject.AddMember("drop_percent_chance", rapidjson::Value(dropItemOnDeath ? 100 : 0), d.GetAllocator());
-			outObject.AddMember("slot_weighted_chance", rapidjson::Value(1), d.GetAllocator());
+			outObject.AddMember("beatitude", JsonNode(beatitude));
+			outObject.AddMember("count", JsonNode(count));
+			outObject.AddMember("appearance", JsonNode(appearance));
+			outObject.AddMember("identified", JsonNode(identified));
+			outObject.AddMember("spawn_percent_chance", JsonNode(100));
+			outObject.AddMember("drop_percent_chance", JsonNode(dropItemOnDeath ? 100 : 0));
+			outObject.AddMember("slot_weighted_chance", JsonNode(1));
 		}
 
-		const char* getRandomArrayStr(const rapidjson::GenericArray<true, rapidjson::GenericValue<rapidjson::UTF8<>>>& arr, const char* invalidEntry)
-		{
-			if ( arr.Size() == 0 )
-			{
-				return invalidEntry;
-			}
-			return (arr[rapidjson::SizeType(monster_stat_rng.rand() % arr.Size())].GetString());
-		}
-		int getRandomArrayInt(const rapidjson::GenericArray<true, rapidjson::GenericValue<rapidjson::UTF8<>>>& arr, int invalidEntry)
+		const char* getRandomArrayStr(const JsonNode arr, const char* invalidEntry)
 		{
 			if ( arr.Size() == 0 )
 			{
 				return invalidEntry;
 			}
-			return (arr[rapidjson::SizeType(monster_stat_rng.rand() % arr.Size())].GetInt());
+			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetString());
+		}
+		int getRandomArrayInt(const JsonNode arr, int invalidEntry)
+		{
+			if ( arr.Size() == 0 )
+			{
+				return invalidEntry;
+			}
+			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetInt());
 		}
 
-		bool readKeyToItemEntry(rapidjson::Value::ConstMemberIterator& itr)
+		bool readKeyToItemEntry(JsonMemberIt itr)
 		{
 			DynamicString name = itr->name.GetString();
 			if ( name.compare("type") == 0 )
@@ -730,72 +722,72 @@ public:
 
 	void writeAllFromStats(Stat* myStats)
 	{
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
-		rapidjson::Value version;
+		JsonNode version;
 		version.SetInt(1);
 		CustomHelpers::addMemberToRoot(d, "version", version);
 		readAttributesFromStats(myStats, d);
 		readItemsFromStats(myStats, d);
 		
 		// misc properties
-		rapidjson::Value propsObject;
+		JsonNode propsObject;
 		propsObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "properties", propsObject);
-		CustomHelpers::addMemberToSubkey(d, "properties", "monster_name_always_display_as_generic_species", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "populate_empty_equipped_items_with_default", rapidjson::Value(true));
-		CustomHelpers::addMemberToSubkey(d, "properties", "populate_default_inventory", rapidjson::Value(true));
-		CustomHelpers::addMemberToSubkey(d, "properties", "disable_miniboss_chance", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_recruitable", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_friendly", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_enemy", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "disable_item_drops", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "xp_award_percent", rapidjson::Value(100));
-		CustomHelpers::addMemberToSubkey(d, "properties", "enable_casting_inventory_spellbooks", rapidjson::Value(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "spellbook_cast_cooldown", rapidjson::Value(250));
+		CustomHelpers::addMemberToSubkey(d, "properties", "monster_name_always_display_as_generic_species", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "populate_empty_equipped_items_with_default", JsonNode(true));
+		CustomHelpers::addMemberToSubkey(d, "properties", "populate_default_inventory", JsonNode(true));
+		CustomHelpers::addMemberToSubkey(d, "properties", "disable_miniboss_chance", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_recruitable", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_friendly", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_enemy", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "disable_item_drops", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "xp_award_percent", JsonNode(100));
+		CustomHelpers::addMemberToSubkey(d, "properties", "enable_casting_inventory_spellbooks", JsonNode(false));
+		CustomHelpers::addMemberToSubkey(d, "properties", "spellbook_cast_cooldown", JsonNode(250));
 
 		if ( myStats->type == SHOPKEEPER )
 		{
 			// shop properties
 			CustomHelpers::addMemberToRoot(d, "shopkeeper_properties", propsObject);
 
-			rapidjson::Value shopObject(rapidjson::kObjectType);
+			JsonNode shopObject(ObjectTypeTag);
 			shopObject.SetObject();
 
-			rapidjson::Value storeTypesObject(rapidjson::kObjectType);
-			storeTypesObject.AddMember("equipment", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("hats", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("jewelry", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("books", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("apothecary", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("staffs", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("food", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("hardware", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("hunting", rapidjson::Value(1), d.GetAllocator());
-			storeTypesObject.AddMember("general", rapidjson::Value(1), d.GetAllocator());
+			JsonNode storeTypesObject(ObjectTypeTag);
+			storeTypesObject.AddMember("equipment", JsonNode(1));
+			storeTypesObject.AddMember("hats", JsonNode(1));
+			storeTypesObject.AddMember("jewelry", JsonNode(1));
+			storeTypesObject.AddMember("books", JsonNode(1));
+			storeTypesObject.AddMember("apothecary", JsonNode(1));
+			storeTypesObject.AddMember("staffs", JsonNode(1));
+			storeTypesObject.AddMember("food", JsonNode(1));
+			storeTypesObject.AddMember("hardware", JsonNode(1));
+			storeTypesObject.AddMember("hunting", JsonNode(1));
+			storeTypesObject.AddMember("general", JsonNode(1));
 
 			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "store_type_chances", storeTypesObject);
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generate_default_shop_items", rapidjson::Value(true));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_min", rapidjson::Value(10));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_max", rapidjson::Value(15));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generated_item_blessing_max", rapidjson::Value(0));
+			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generate_default_shop_items", JsonNode(true));
+			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_min", JsonNode(10));
+			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_max", JsonNode(15));
+			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generated_item_blessing_max", JsonNode(0));
 		}
 
 		// follower details
-		rapidjson::Value followersObject;
+		JsonNode followersObject;
 		followersObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "followers", followersObject);
-		CustomHelpers::addMemberToSubkey(d, "followers", "num_followers", rapidjson::Value(0));
-		rapidjson::Value followerVariantsObject;
+		CustomHelpers::addMemberToSubkey(d, "followers", "num_followers", JsonNode(0));
+		JsonNode followerVariantsObject;
 		followerVariantsObject.SetObject();
 		CustomHelpers::addMemberToSubkey(d, "followers", "follower_variants", followerVariantsObject);
 
 		writeToFile(d, monstertypename[myStats->type]);
 	}
 
-	void readItemsFromStats(Stat* myStats, rapidjson::Document& d)
+	void readItemsFromStats(Stat* myStats, JsonNode d)
 	{
-		rapidjson::Value equippedItemsObject;
+		JsonNode equippedItemsObject;
 		equippedItemsObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "equipped_items", equippedItemsObject);
 		addMemberFromItem(d, "equipped_items", "weapon", myStats->weapon);
@@ -809,7 +801,7 @@ public:
 		addMemberFromItem(d, "equipped_items", "amulet", myStats->amulet);
 		addMemberFromItem(d, "equipped_items", "mask", myStats->mask);
 
-		rapidjson::Value invItemsArray;
+		JsonNode invItemsArray;
 		invItemsArray.SetArray();
 		CustomHelpers::addMemberToRoot(d, "inventory_items", invItemsArray);
 		for ( node_t* node = myStats->inventory.first; node; node = node->next )
@@ -822,59 +814,59 @@ public:
 		}
 	}
 
-	void readAttributesFromStats(Stat* myStats, rapidjson::Document& d)
+	void readAttributesFromStats(Stat* myStats, JsonNode d)
 	{
-		rapidjson::Value statsObject;
+		JsonNode statsObject;
 		statsObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "stats", statsObject);
 
 		StatEntry statEntry(myStats);
-		CustomHelpers::addMemberToSubkey(d, "stats", "name", rapidjson::Value(statEntry.name, d.GetAllocator()));
-		CustomHelpers::addMemberToSubkey(d, "stats", "type", rapidjson::Value(monstertypename[statEntry.type], d.GetAllocator()));
-		CustomHelpers::addMemberToSubkey(d, "stats", "sex", rapidjson::Value(statEntry.sex));
-		CustomHelpers::addMemberToSubkey(d, "stats", "appearance", rapidjson::Value(statEntry.appearance));
-		CustomHelpers::addMemberToSubkey(d, "stats", "HP", rapidjson::Value(statEntry.HP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MAXHP", rapidjson::Value(statEntry.MAXHP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MP", rapidjson::Value(statEntry.MP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MAXMP", rapidjson::Value(statEntry.MAXMP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "STR", rapidjson::Value(statEntry.STR));
-		CustomHelpers::addMemberToSubkey(d, "stats", "DEX", rapidjson::Value(statEntry.DEX));
-		CustomHelpers::addMemberToSubkey(d, "stats", "CON", rapidjson::Value(statEntry.CON));
-		CustomHelpers::addMemberToSubkey(d, "stats", "INT", rapidjson::Value(statEntry.INT));
-		CustomHelpers::addMemberToSubkey(d, "stats", "PER", rapidjson::Value(statEntry.PER));
-		CustomHelpers::addMemberToSubkey(d, "stats", "CHR", rapidjson::Value(statEntry.CHR));
-		CustomHelpers::addMemberToSubkey(d, "stats", "EXP", rapidjson::Value(statEntry.EXP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "LVL", rapidjson::Value(statEntry.LVL));
-		CustomHelpers::addMemberToSubkey(d, "stats", "GOLD", rapidjson::Value(statEntry.GOLD));
+		CustomHelpers::addMemberToSubkey(d, "stats", "name", JsonNode(statEntry.name));
+		CustomHelpers::addMemberToSubkey(d, "stats", "type", JsonNode(monstertypename[statEntry.type]));
+		CustomHelpers::addMemberToSubkey(d, "stats", "sex", JsonNode(statEntry.sex));
+		CustomHelpers::addMemberToSubkey(d, "stats", "appearance", JsonNode(statEntry.appearance));
+		CustomHelpers::addMemberToSubkey(d, "stats", "HP", JsonNode(statEntry.HP));
+		CustomHelpers::addMemberToSubkey(d, "stats", "MAXHP", JsonNode(statEntry.MAXHP));
+		CustomHelpers::addMemberToSubkey(d, "stats", "MP", JsonNode(statEntry.MP));
+		CustomHelpers::addMemberToSubkey(d, "stats", "MAXMP", JsonNode(statEntry.MAXMP));
+		CustomHelpers::addMemberToSubkey(d, "stats", "STR", JsonNode(statEntry.STR));
+		CustomHelpers::addMemberToSubkey(d, "stats", "DEX", JsonNode(statEntry.DEX));
+		CustomHelpers::addMemberToSubkey(d, "stats", "CON", JsonNode(statEntry.CON));
+		CustomHelpers::addMemberToSubkey(d, "stats", "INT", JsonNode(statEntry.INT));
+		CustomHelpers::addMemberToSubkey(d, "stats", "PER", JsonNode(statEntry.PER));
+		CustomHelpers::addMemberToSubkey(d, "stats", "CHR", JsonNode(statEntry.CHR));
+		CustomHelpers::addMemberToSubkey(d, "stats", "EXP", JsonNode(statEntry.EXP));
+		CustomHelpers::addMemberToSubkey(d, "stats", "LVL", JsonNode(statEntry.LVL));
+		CustomHelpers::addMemberToSubkey(d, "stats", "GOLD", JsonNode(statEntry.GOLD));
 
-		rapidjson::Value miscStatsObject;
+		JsonNode miscStatsObject;
 		miscStatsObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "misc_stats", miscStatsObject);
 
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_STR", rapidjson::Value(statEntry.RANDOM_STR));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_DEX", rapidjson::Value(statEntry.RANDOM_DEX));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CON", rapidjson::Value(statEntry.RANDOM_CON));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_INT", rapidjson::Value(statEntry.RANDOM_INT));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_PER", rapidjson::Value(statEntry.RANDOM_PER));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CHR", rapidjson::Value(statEntry.RANDOM_CHR));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXHP", rapidjson::Value(statEntry.RANDOM_MAXHP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_HP", rapidjson::Value(statEntry.RANDOM_HP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXMP", rapidjson::Value(statEntry.RANDOM_MAXMP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MP", rapidjson::Value(statEntry.RANDOM_MP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_LVL", rapidjson::Value(statEntry.RANDOM_LVL));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_GOLD", rapidjson::Value(statEntry.RANDOM_GOLD));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_STR", JsonNode(statEntry.RANDOM_STR));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_DEX", JsonNode(statEntry.RANDOM_DEX));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CON", JsonNode(statEntry.RANDOM_CON));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_INT", JsonNode(statEntry.RANDOM_INT));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_PER", JsonNode(statEntry.RANDOM_PER));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CHR", JsonNode(statEntry.RANDOM_CHR));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXHP", JsonNode(statEntry.RANDOM_MAXHP));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_HP", JsonNode(statEntry.RANDOM_HP));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXMP", JsonNode(statEntry.RANDOM_MAXMP));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MP", JsonNode(statEntry.RANDOM_MP));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_LVL", JsonNode(statEntry.RANDOM_LVL));
+		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_GOLD", JsonNode(statEntry.RANDOM_GOLD));
 
-		rapidjson::Value profObject;
+		JsonNode profObject;
 		profObject.SetObject();
 		CustomHelpers::addMemberToRoot(d, "proficiencies", profObject);
 
 		for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 		{
-			CustomHelpers::addMemberToSubkey(d, "proficiencies", getSkillLangEntry(i), rapidjson::Value(statEntry.PROFICIENCIES[i]));
+			CustomHelpers::addMemberToSubkey(d, "proficiencies", getSkillLangEntry(i), JsonNode(statEntry.PROFICIENCIES[i]));
 		}
 	}
 
-	bool readKeyToStatEntry(StatEntry& statEntry, rapidjson::Value::ConstMemberIterator& itr)
+	bool readKeyToStatEntry(StatEntry& statEntry, JsonMemberIt itr)
 	{
 		DynamicString name = itr->name.GetString();
 		if ( name.compare("name") == 0 )
@@ -1044,28 +1036,28 @@ public:
 		return false;
 	}
 
-	void addArrayMemberFromItem(rapidjson::Document& d, std::string rootKey, Item* item)
+	void addArrayMemberFromItem(JsonNode d, std::string rootKey, Item* item)
 	{
 		if ( item )
 		{
-			rapidjson::Value itemObject(rapidjson::kObjectType);
+			JsonNode itemObject(ObjectTypeTag);
 			ItemEntry itemEntry(*item);
 			itemEntry.setValueFromAttributes(d, itemObject);
 			CustomHelpers::addArrayMemberToSubkey(d, rootKey, itemObject);
 		}
 	}
-	void addMemberFromItem(rapidjson::Document& d, std::string rootKey, std::string key, Item* item)
+	void addMemberFromItem(JsonNode d, std::string rootKey, std::string key, Item* item)
 	{
 		if ( item )
 		{
-			rapidjson::Value itemObject(rapidjson::kObjectType);
+			JsonNode itemObject(ObjectTypeTag);
 			ItemEntry itemEntry(*item);
 			itemEntry.setValueFromAttributes(d, itemObject);
 			CustomHelpers::addMemberToSubkey(d, rootKey, key.c_str(), itemObject);
 		}
 	}
 
-	void writeToFile(rapidjson::Document& d, std::string monsterFileName)
+	void writeToFile(JsonNode d, std::string monsterFileName)
 	{
 		int filenum = 0;
 		DynamicString testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
@@ -1085,10 +1077,9 @@ public:
 		{
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 		FileIO::close(fp);
 	}
 
@@ -1114,12 +1105,11 @@ public:
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
-
+			JsonDoc jd(buf);
+			if ( !jd.ok() ) { return nullptr; }
+			JsonNode d = jd.root;
 
 			if ( !d.HasMember("version") )
 			{
@@ -1128,33 +1118,33 @@ public:
 			}
 			StatEntry* statEntry = new StatEntry();
 			int version = d["version"].GetInt();
-			const rapidjson::Value& stats = d["stats"];
-			for ( rapidjson::Value::ConstMemberIterator stat_itr = stats.MemberBegin(); stat_itr != stats.MemberEnd(); ++stat_itr )
+			const JsonNode stats = d["stats"];
+			for ( JsonMemberIt stat_itr = stats.MemberBegin(); stat_itr != stats.MemberEnd(); ++stat_itr )
 			{
 				readKeyToStatEntry(*statEntry, stat_itr);
 			}
-			const rapidjson::Value& miscStats = d["misc_stats"];
-			for ( rapidjson::Value::ConstMemberIterator stat_itr = miscStats.MemberBegin(); stat_itr != miscStats.MemberEnd(); ++stat_itr )
+			const JsonNode miscStats = d["misc_stats"];
+			for ( JsonMemberIt stat_itr = miscStats.MemberBegin(); stat_itr != miscStats.MemberEnd(); ++stat_itr )
 			{
 				readKeyToStatEntry(*statEntry, stat_itr);
 			}
-			const rapidjson::Value& proficiencies = d["proficiencies"];
-			for ( rapidjson::Value::ConstMemberIterator stat_itr = proficiencies.MemberBegin(); stat_itr != proficiencies.MemberEnd(); ++stat_itr )
+			const JsonNode proficiencies = d["proficiencies"];
+			for ( JsonMemberIt stat_itr = proficiencies.MemberBegin(); stat_itr != proficiencies.MemberEnd(); ++stat_itr )
 			{
 				readKeyToStatEntry(*statEntry, stat_itr);
 			}
-			const rapidjson::Value& equipped_items = d["equipped_items"];
-			for ( rapidjson::Value::ConstMemberIterator itemSlot_itr = equipped_items.MemberBegin(); itemSlot_itr != equipped_items.MemberEnd(); ++itemSlot_itr )
+			const JsonNode equipped_items = d["equipped_items"];
+			for ( JsonMemberIt itemSlot_itr = equipped_items.MemberBegin(); itemSlot_itr != equipped_items.MemberEnd(); ++itemSlot_itr )
 			{
 				DynamicString slotName = itemSlot_itr->name.GetString();
 				if ( itemSlot_itr->value.IsArray() )
 				{
 					DynamicArray itemsToChoose;  // vector<pair<ItemEntry,int>>
 					// a selection of items in the slot. need to choose 1.
-					for ( rapidjson::Value::ConstValueIterator itemArray_itr = itemSlot_itr->value.Begin(); itemArray_itr != itemSlot_itr->value.End(); ++itemArray_itr )
+					for ( JsonValueIt itemArray_itr = itemSlot_itr->value.Begin(); itemArray_itr != itemSlot_itr->value.End(); ++itemArray_itr )
 					{
 						ItemEntry item;
-						for ( rapidjson::Value::ConstMemberIterator item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
+						for ( JsonMemberIt item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
 						{
 							item.readKeyToItemEntry(item_itr);
 						}
@@ -1177,24 +1167,24 @@ public:
 				else if ( itemSlot_itr->value.MemberCount() > 0 )
 				{
 					ItemEntry item;
-					for ( rapidjson::Value::ConstMemberIterator item_itr = itemSlot_itr->value.MemberBegin(); item_itr != itemSlot_itr->value.MemberEnd(); ++item_itr )
+					for ( JsonMemberIt item_itr = itemSlot_itr->value.MemberBegin(); item_itr != itemSlot_itr->value.MemberEnd(); ++item_itr )
 					{
 						item.readKeyToItemEntry(item_itr);
 					}
 					dynarray_pair_push<std::pair<ItemEntry, int>>(statEntry->equipped_items, std::make_pair(item, getSlotFromKeyName(slotName)));
 				}
 			}
-			const rapidjson::Value& inventory_items = d["inventory_items"];
-			for ( rapidjson::Value::ConstValueIterator itemSlot_itr = inventory_items.Begin(); itemSlot_itr != inventory_items.End(); ++itemSlot_itr )
+			const JsonNode inventory_items = d["inventory_items"];
+			for ( JsonValueIt itemSlot_itr = inventory_items.Begin(); itemSlot_itr != inventory_items.End(); ++itemSlot_itr )
 			{
 				if ( itemSlot_itr->IsArray() )
 				{
 					DynamicArray itemsToChoose;  // vector<ItemEntry>
 					// a selection of items in the slot. need to choose 1.
-					for ( rapidjson::Value::ConstValueIterator itemArray_itr = itemSlot_itr->Begin(); itemArray_itr != itemSlot_itr->End(); ++itemArray_itr )
+					for ( JsonValueIt itemArray_itr = itemSlot_itr->Begin(); itemArray_itr != itemSlot_itr->End(); ++itemArray_itr )
 					{
 						ItemEntry item;
-						for ( rapidjson::Value::ConstMemberIterator item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
+						for ( JsonMemberIt item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
 						{
 							item.readKeyToItemEntry(item_itr);
 						}
@@ -1217,7 +1207,7 @@ public:
 				else
 				{
 					ItemEntry item;
-					for ( rapidjson::Value::ConstMemberIterator item_itr = itemSlot_itr->MemberBegin(); item_itr != itemSlot_itr->MemberEnd(); ++item_itr )
+					for ( JsonMemberIt item_itr = itemSlot_itr->MemberBegin(); item_itr != itemSlot_itr->MemberEnd(); ++item_itr )
 					{
 						item.readKeyToItemEntry(item_itr);
 					}
@@ -1226,12 +1216,12 @@ public:
 			}
 			if ( d.HasMember("followers") )
 			{
-				const rapidjson::Value& numFollowersVal = d["followers"]["num_followers"];
+				const JsonNode numFollowersVal = d["followers"]["num_followers"];
 				statEntry->numFollowers = numFollowersVal.GetInt();
-				const rapidjson::Value& followers = d["followers"]["follower_variants"];
+				const JsonNode followers = d["followers"]["follower_variants"];
 
 				statEntry->followerVariants.clear();
-				for ( rapidjson::Value::ConstMemberIterator follower_itr = followers.MemberBegin(); follower_itr != followers.MemberEnd(); ++follower_itr )
+				for ( JsonMemberIt follower_itr = followers.MemberBegin(); follower_itr != followers.MemberEnd(); ++follower_itr )
 				{
 										MonsterStatCustomManager::StatEntry::VariantPair_t vp;
 					vp.name = follower_itr->name.GetString();
@@ -1290,7 +1280,7 @@ public:
 			{
 				if ( d["shopkeeper_properties"].HasMember("store_type_chances") )
 				{
-					for ( rapidjson::Value::ConstMemberIterator types_itr = d["shopkeeper_properties"]["store_type_chances"].MemberBegin(); 
+					for ( JsonMemberIt types_itr = d["shopkeeper_properties"]["store_type_chances"].MemberBegin(); 
 						types_itr != d["shopkeeper_properties"]["store_type_chances"].MemberEnd(); ++types_itr )
 					{
 											MonsterStatCustomManager::StatEntry::VariantPair_t vp2;
@@ -1430,11 +1420,11 @@ public:
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
+			JsonDoc jd(buf);
+			if ( !jd.ok() ) { return; }
+			JsonNode d = jd.root;
 			if ( !d.HasMember("version") )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -1445,17 +1435,17 @@ public:
 			if ( d.HasMember("levels") )
 			{
 				usingCustomManager = true;
-				const rapidjson::Value& levels = d["levels"];
-				for ( rapidjson::Value::ConstMemberIterator map_itr = levels.MemberBegin(); map_itr != levels.MemberEnd(); ++map_itr )
+				const JsonNode levels = d["levels"];
+				for ( JsonMemberIt map_itr = levels.MemberBegin(); map_itr != levels.MemberEnd(); ++map_itr )
 				{
 					LevelCurve newCurve;
 					newCurve.mapName = map_itr->name.GetString();
 					if ( map_itr->value.HasMember("random_generation_monsters") )
 					{
-						const rapidjson::Value& randomGeneration = map_itr->value["random_generation_monsters"];
-						for ( rapidjson::Value::ConstValueIterator monsters_itr = randomGeneration.Begin(); monsters_itr != randomGeneration.End(); ++monsters_itr )
+						const JsonNode randomGeneration = map_itr->value["random_generation_monsters"];
+						for ( JsonValueIt monsters_itr = randomGeneration.Begin(); monsters_itr != randomGeneration.End(); ++monsters_itr )
 						{
-							const rapidjson::Value& monster = *monsters_itr;
+							const JsonNode monster = *monsters_itr;
 							MonsterCurveEntry newMonster(monster["name"].GetString(),
 								monster["dungeon_depth_minimum"].GetInt(),
 								monster["dungeon_depth_maximum"].GetInt(),
@@ -1464,7 +1454,7 @@ public:
 
 							if ( monster.HasMember("variants") )
 							{
-								for ( rapidjson::Value::ConstMemberIterator var_itr = monster["variants"].MemberBegin();
+								for ( JsonMemberIt var_itr = monster["variants"].MemberBegin();
 									var_itr != monster["variants"].MemberEnd(); ++var_itr )
 								{
 									newMonster.addVariant(var_itr->name.GetString(), var_itr->value.GetInt());
@@ -1476,15 +1466,15 @@ public:
 
 					if ( map_itr->value.HasMember("fixed_monsters") )
 					{
-						const rapidjson::Value& fixedGeneration = map_itr->value["fixed_monsters"];
-						for ( rapidjson::Value::ConstValueIterator monsters_itr = fixedGeneration.Begin(); monsters_itr != fixedGeneration.End(); ++monsters_itr )
+						const JsonNode fixedGeneration = map_itr->value["fixed_monsters"];
+						for ( JsonValueIt monsters_itr = fixedGeneration.Begin(); monsters_itr != fixedGeneration.End(); ++monsters_itr )
 						{
-							const rapidjson::Value& monster = *monsters_itr;
+							const JsonNode monster = *monsters_itr;
 							MonsterCurveEntry newMonster(monster["name"].GetString(), 0, 255, 1, "");
 
 							if ( monster.HasMember("variants") )
 							{
-								for ( rapidjson::Value::ConstMemberIterator var_itr = monster["variants"].MemberBegin();
+								for ( JsonMemberIt var_itr = monster["variants"].MemberBegin();
 									var_itr != monster["variants"].MemberEnd(); ++var_itr )
 								{
 									newMonster.addVariant(var_itr->name.GetString(), var_itr->value.GetInt());
@@ -1716,124 +1706,124 @@ public:
 
 	void writeSampleToDocument()
 	{
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		rapidjson::Value levelObj(rapidjson::kObjectType);
-		levelObj.AddMember("The Mines", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		levelObj["The Mines"].AddMember("fixed_monsters", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
+		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
+		JsonNode levelObj(ObjectTypeTag);
+		levelObj.AddMember("The Mines", JsonNode(ObjectTypeTag));
+		levelObj["The Mines"].AddMember("fixed_monsters", JsonNode(ArrayTypeTag));
 
-		auto& fm = levelObj["The Mines"]["fixed_monsters"];
-		fm.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(0)].AddMember("name", "rat", d.GetAllocator());
-		fm[rapidjson::SizeType(0)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(0)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		JsonNode fm = levelObj["The Mines"]["fixed_monsters"];
+		fm.PushBack(JsonNode(ObjectTypeTag));
+		fm[uint32_t(0)].AddMember("name", "rat");
+		fm[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
+		fm[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
 
-		fm.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(1)].AddMember("name", "skeleton", d.GetAllocator());
-		fm[rapidjson::SizeType(1)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(1)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		fm.PushBack(JsonNode(ObjectTypeTag));
+		fm[uint32_t(1)].AddMember("name", "skeleton");
+		fm[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
+		fm[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
 		
-		fm.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(2)].AddMember("name", "spider", d.GetAllocator());
-		fm[rapidjson::SizeType(2)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(2)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		fm.PushBack(JsonNode(ObjectTypeTag));
+		fm[uint32_t(2)].AddMember("name", "spider");
+		fm[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
+		fm[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
 
-		fm.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(3)].AddMember("name", "troll", d.GetAllocator());
-		fm[rapidjson::SizeType(3)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		fm[rapidjson::SizeType(3)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		fm.PushBack(JsonNode(ObjectTypeTag));
+		fm[uint32_t(3)].AddMember("name", "troll");
+		fm[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
+		fm[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
 
-		levelObj["The Mines"].AddMember("random_generation_monsters", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
+		levelObj["The Mines"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
 
-		auto& mines = levelObj["The Mines"]["random_generation_monsters"];
-		mines.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(0)].AddMember("name", "rat", d.GetAllocator());
-		mines[rapidjson::SizeType(0)].AddMember("weighted_chance", rapidjson::Value(4), d.GetAllocator());
-		mines[rapidjson::SizeType(0)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		mines[rapidjson::SizeType(0)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		mines[rapidjson::SizeType(0)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(0)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		JsonNode mines = levelObj["The Mines"]["random_generation_monsters"];
+		mines.PushBack(JsonNode(ObjectTypeTag));
+		mines[uint32_t(0)].AddMember("name", "rat");
+		mines[uint32_t(0)].AddMember("weighted_chance", JsonNode(4));
+		mines[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		mines[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		mines[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
+		mines[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
 
-		mines.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(1)].AddMember("name", "skeleton", d.GetAllocator());
-		mines[rapidjson::SizeType(1)].AddMember("weighted_chance", rapidjson::Value(4), d.GetAllocator());
-		mines[rapidjson::SizeType(1)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		mines[rapidjson::SizeType(1)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		mines[rapidjson::SizeType(1)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(1)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		mines.PushBack(JsonNode(ObjectTypeTag));
+		mines[uint32_t(1)].AddMember("name", "skeleton");
+		mines[uint32_t(1)].AddMember("weighted_chance", JsonNode(4));
+		mines[uint32_t(1)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		mines[uint32_t(1)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		mines[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
+		mines[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
 
-		mines.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(2)].AddMember("name", "spider", d.GetAllocator());
-		mines[rapidjson::SizeType(2)].AddMember("weighted_chance", rapidjson::Value(1), d.GetAllocator());
-		mines[rapidjson::SizeType(2)].AddMember("dungeon_depth_minimum", rapidjson::Value(2), d.GetAllocator());
-		mines[rapidjson::SizeType(2)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		mines[rapidjson::SizeType(2)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(2)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		mines.PushBack(JsonNode(ObjectTypeTag));
+		mines[uint32_t(2)].AddMember("name", "spider");
+		mines[uint32_t(2)].AddMember("weighted_chance", JsonNode(1));
+		mines[uint32_t(2)].AddMember("dungeon_depth_minimum", JsonNode(2));
+		mines[uint32_t(2)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		mines[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
+		mines[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
 
-		mines.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(3)].AddMember("name", "troll", d.GetAllocator());
-		mines[rapidjson::SizeType(3)].AddMember("weighted_chance", rapidjson::Value(1), d.GetAllocator());
-		mines[rapidjson::SizeType(3)].AddMember("dungeon_depth_minimum", rapidjson::Value(2), d.GetAllocator());
-		mines[rapidjson::SizeType(3)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		mines[rapidjson::SizeType(3)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		mines[rapidjson::SizeType(3)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		mines.PushBack(JsonNode(ObjectTypeTag));
+		mines[uint32_t(3)].AddMember("name", "troll");
+		mines[uint32_t(3)].AddMember("weighted_chance", JsonNode(1));
+		mines[uint32_t(3)].AddMember("dungeon_depth_minimum", JsonNode(2));
+		mines[uint32_t(3)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		mines[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
+		mines[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
 
-		levelObj.AddMember("The Swamp", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		levelObj["The Swamp"].AddMember("random_generation_monsters", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		levelObj["The Swamp"]["random_generation_monsters"].PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
+		levelObj.AddMember("The Swamp", JsonNode(ObjectTypeTag));
+		levelObj["The Swamp"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
+		levelObj["The Swamp"]["random_generation_monsters"].PushBack(JsonNode(ObjectTypeTag));
 
-		auto& swamp = levelObj["The Swamp"]["random_generation_monsters"];
-		swamp[rapidjson::SizeType(0)].AddMember("name", "spider", d.GetAllocator());
-		swamp[rapidjson::SizeType(0)].AddMember("weighted_chance", rapidjson::Value(2), d.GetAllocator());
-		swamp[rapidjson::SizeType(0)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		swamp[rapidjson::SizeType(0)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		swamp[rapidjson::SizeType(0)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(0)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		JsonNode swamp = levelObj["The Swamp"]["random_generation_monsters"];
+		swamp[uint32_t(0)].AddMember("name", "spider");
+		swamp[uint32_t(0)].AddMember("weighted_chance", JsonNode(2));
+		swamp[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		swamp[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		swamp[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
+		swamp[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
 
-		swamp.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(1)].AddMember("name", "goblin", d.GetAllocator());
-		swamp[rapidjson::SizeType(1)].AddMember("weighted_chance", rapidjson::Value(3), d.GetAllocator());
-		swamp[rapidjson::SizeType(1)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		swamp[rapidjson::SizeType(1)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		swamp[rapidjson::SizeType(1)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(1)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		swamp.PushBack(JsonNode(ObjectTypeTag));
+		swamp[uint32_t(1)].AddMember("name", "goblin");
+		swamp[uint32_t(1)].AddMember("weighted_chance", JsonNode(3));
+		swamp[uint32_t(1)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		swamp[uint32_t(1)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		swamp[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
+		swamp[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
 
-		swamp.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(2)].AddMember("name", "slime", d.GetAllocator());
-		swamp[rapidjson::SizeType(2)].AddMember("weighted_chance", rapidjson::Value(3), d.GetAllocator());
-		swamp[rapidjson::SizeType(2)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		swamp[rapidjson::SizeType(2)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		swamp[rapidjson::SizeType(2)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(2)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		swamp.PushBack(JsonNode(ObjectTypeTag));
+		swamp[uint32_t(2)].AddMember("name", "slime");
+		swamp[uint32_t(2)].AddMember("weighted_chance", JsonNode(3));
+		swamp[uint32_t(2)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		swamp[uint32_t(2)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		swamp[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
+		swamp[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
 
-		swamp.PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(3)].AddMember("name", "ghoul", d.GetAllocator());
-		swamp[rapidjson::SizeType(3)].AddMember("weighted_chance", rapidjson::Value(2), d.GetAllocator());
-		swamp[rapidjson::SizeType(3)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		swamp[rapidjson::SizeType(3)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		swamp[rapidjson::SizeType(3)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		swamp[rapidjson::SizeType(3)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		swamp.PushBack(JsonNode(ObjectTypeTag));
+		swamp[uint32_t(3)].AddMember("name", "ghoul");
+		swamp[uint32_t(3)].AddMember("weighted_chance", JsonNode(2));
+		swamp[uint32_t(3)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		swamp[uint32_t(3)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		swamp[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
+		swamp[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
 
-		levelObj.AddMember("My level", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
+		levelObj.AddMember("My level", JsonNode(ObjectTypeTag));
 
-		levelObj["My level"].AddMember("random_generation_monsters", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		levelObj["My level"]["random_generation_monsters"].PushBack(rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		auto& customLevel = levelObj["My level"]["random_generation_monsters"];
-		customLevel[rapidjson::SizeType(0)].AddMember("name", "demon", d.GetAllocator());
-		customLevel[rapidjson::SizeType(0)].AddMember("weighted_chance", rapidjson::Value(1), d.GetAllocator());
-		customLevel[rapidjson::SizeType(0)].AddMember("dungeon_depth_minimum", rapidjson::Value(0), d.GetAllocator());
-		customLevel[rapidjson::SizeType(0)].AddMember("dungeon_depth_maximum", rapidjson::Value(99), d.GetAllocator());
-		customLevel[rapidjson::SizeType(0)].AddMember("variants", rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-		customLevel[rapidjson::SizeType(0)]["variants"].AddMember("default", rapidjson::Value(1), d.GetAllocator());
+		levelObj["My level"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
+		levelObj["My level"]["random_generation_monsters"].PushBack(JsonNode(ObjectTypeTag));
+		JsonNode customLevel = levelObj["My level"]["random_generation_monsters"];
+		customLevel[uint32_t(0)].AddMember("name", "demon");
+		customLevel[uint32_t(0)].AddMember("weighted_chance", JsonNode(1));
+		customLevel[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
+		customLevel[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
+		customLevel[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
+		customLevel[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
 
 		CustomHelpers::addMemberToRoot(d, "levels", levelObj);
 
 		writeToFile(d);
 	}
 
-	void writeToFile(rapidjson::Document& d)
+	void writeToFile(JsonNode d)
 	{
 		int filenum = 0;
 		DynamicString testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
@@ -1852,10 +1842,9 @@ public:
 		{
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 
 		FileIO::close(fp);
 	}
@@ -1944,19 +1933,19 @@ public:
 
 	void writeAllToDocument()
 	{
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(d, "xp_share_range", rapidjson::Value(xpShareRange));
-		CustomHelpers::addMemberToRoot(d, "global_xp_award_percent", rapidjson::Value(globalXPPercent));
-		CustomHelpers::addMemberToRoot(d, "global_gold_drop_scale_percent", rapidjson::Value(globalGoldPercent));
-		CustomHelpers::addMemberToRoot(d, "player_share_minimap_progress", rapidjson::Value(minimapShareProgress));
-		CustomHelpers::addMemberToRoot(d, "player_speed_weight_impact_percent", rapidjson::Value(playerWeightPercent));
-		CustomHelpers::addMemberToRoot(d, "player_speed_max", rapidjson::Value(playerSpeedMax));
+		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
+		CustomHelpers::addMemberToRoot(d, "xp_share_range", JsonNode(xpShareRange));
+		CustomHelpers::addMemberToRoot(d, "global_xp_award_percent", JsonNode(globalXPPercent));
+		CustomHelpers::addMemberToRoot(d, "global_gold_drop_scale_percent", JsonNode(globalGoldPercent));
+		CustomHelpers::addMemberToRoot(d, "player_share_minimap_progress", JsonNode(minimapShareProgress));
+		CustomHelpers::addMemberToRoot(d, "player_speed_weight_impact_percent", JsonNode(playerWeightPercent));
+		CustomHelpers::addMemberToRoot(d, "player_speed_max", JsonNode(playerSpeedMax));
 
-		rapidjson::Value obj(rapidjson::kObjectType);
-		rapidjson::Value arr(rapidjson::kArrayType);
+		JsonNode obj(ObjectTypeTag);
+		JsonNode arr(ArrayTypeTag);
 		CustomHelpers::addMemberToRoot(d, "minotaur_force_disable_on_floors", obj);
 		CustomHelpers::addMemberToSubkey(d, "minotaur_force_disable_on_floors", "normal_floors", arr);
 		CustomHelpers::addMemberToSubkey(d, "minotaur_force_disable_on_floors", "secret_floors", arr);
@@ -1970,80 +1959,80 @@ public:
 		CustomHelpers::addMemberToSubkey(d, "disable_minimap_on_floors", "normal_floors", arr);
 		CustomHelpers::addMemberToSubkey(d, "disable_minimap_on_floors", "secret_floors", arr);
 
-		rapidjson::Value mapGenObj;
+		JsonNode mapGenObj;
 		mapGenObj.SetObject();
 		CustomHelpers::addMemberToRoot(d, "map_generation", mapGenObj);
-		rapidjson::Value key1("The Mines", d.GetAllocator());
-		rapidjson::Value minesObj(rapidjson::kObjectType);
+		JsonNode key1("The Mines");
+		JsonNode minesObj(ObjectTypeTag);
 
-		rapidjson::Value trapArray1(rapidjson::kArrayType);
-		trapArray1.PushBack("boulders", d.GetAllocator());
-		minesObj.AddMember("trap_generation_types", trapArray1, d.GetAllocator());
-		minesObj.AddMember("minotaur_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		minesObj["minotaur_floors"].PushBack(2, d.GetAllocator());
-		minesObj["minotaur_floors"].PushBack(3, d.GetAllocator());
-		minesObj.AddMember("minotaur_floor_percent", rapidjson::Value(50), d.GetAllocator());
+		JsonNode trapArray1(ArrayTypeTag);
+		trapArray1.PushBack("boulders");
+		minesObj.AddMember("trap_generation_types", trapArray1);
+		minesObj.AddMember("minotaur_floors", JsonNode(ArrayTypeTag));
+		minesObj["minotaur_floors"].PushBack(2);
+		minesObj["minotaur_floors"].PushBack(3);
+		minesObj.AddMember("minotaur_floor_percent", JsonNode(50));
 
-		minesObj.AddMember("dark_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		minesObj["dark_floors"].PushBack(1, d.GetAllocator());
-		minesObj["dark_floors"].PushBack(2, d.GetAllocator());
-		minesObj["dark_floors"].PushBack(3, d.GetAllocator());
-		minesObj["dark_floors"].PushBack(4, d.GetAllocator());
-		minesObj.AddMember("dark_floor_percent", rapidjson::Value(25), d.GetAllocator());
+		minesObj.AddMember("dark_floors", JsonNode(ArrayTypeTag));
+		minesObj["dark_floors"].PushBack(1);
+		minesObj["dark_floors"].PushBack(2);
+		minesObj["dark_floors"].PushBack(3);
+		minesObj["dark_floors"].PushBack(4);
+		minesObj.AddMember("dark_floor_percent", JsonNode(25));
 
-		minesObj.AddMember("shop_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		minesObj["shop_floors"].PushBack(2, d.GetAllocator());
-		minesObj["shop_floors"].PushBack(3, d.GetAllocator());
-		minesObj["shop_floors"].PushBack(4, d.GetAllocator());
-		minesObj.AddMember("shop_floor_percent", rapidjson::Value(50), d.GetAllocator());
+		minesObj.AddMember("shop_floors", JsonNode(ArrayTypeTag));
+		minesObj["shop_floors"].PushBack(2);
+		minesObj["shop_floors"].PushBack(3);
+		minesObj["shop_floors"].PushBack(4);
+		minesObj.AddMember("shop_floor_percent", JsonNode(50));
 
-		minesObj.AddMember("npc_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		minesObj["npc_floors"].PushBack(2, d.GetAllocator());
-		minesObj["npc_floors"].PushBack(3, d.GetAllocator());
-		minesObj["npc_floors"].PushBack(4, d.GetAllocator());
-		minesObj.AddMember("npc_spawn_chance", rapidjson::Value(10), d.GetAllocator());
+		minesObj.AddMember("npc_floors", JsonNode(ArrayTypeTag));
+		minesObj["npc_floors"].PushBack(2);
+		minesObj["npc_floors"].PushBack(3);
+		minesObj["npc_floors"].PushBack(4);
+		minesObj.AddMember("npc_spawn_chance", JsonNode(10));
 
-		d["map_generation"].AddMember(key1, minesObj, d.GetAllocator());
+		d["map_generation"].AddMember(key1, minesObj);
 		
-		rapidjson::Value key2("The Swamp", d.GetAllocator());
-		rapidjson::Value swampObj(rapidjson::kObjectType);
+		JsonNode key2("The Swamp");
+		JsonNode swampObj(ObjectTypeTag);
 
-		rapidjson::Value trapArray2(rapidjson::kArrayType);
-		trapArray2.PushBack("boulders", d.GetAllocator());
-		trapArray2.PushBack("arrows", d.GetAllocator());
-		swampObj.AddMember("trap_generation_types", trapArray2, d.GetAllocator());
-		swampObj.AddMember("minotaur_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		swampObj["minotaur_floors"].PushBack(7, d.GetAllocator());
-		swampObj["minotaur_floors"].PushBack(8, d.GetAllocator());
-		swampObj.AddMember("minotaur_floor_percent", rapidjson::Value(50), d.GetAllocator());
+		JsonNode trapArray2(ArrayTypeTag);
+		trapArray2.PushBack("boulders");
+		trapArray2.PushBack("arrows");
+		swampObj.AddMember("trap_generation_types", trapArray2);
+		swampObj.AddMember("minotaur_floors", JsonNode(ArrayTypeTag));
+		swampObj["minotaur_floors"].PushBack(7);
+		swampObj["minotaur_floors"].PushBack(8);
+		swampObj.AddMember("minotaur_floor_percent", JsonNode(50));
 
-		swampObj.AddMember("dark_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		swampObj["dark_floors"].PushBack(6, d.GetAllocator());
-		swampObj["dark_floors"].PushBack(7, d.GetAllocator());
-		swampObj["dark_floors"].PushBack(8, d.GetAllocator());
-		swampObj["dark_floors"].PushBack(9, d.GetAllocator());
-		swampObj.AddMember("dark_floor_percent", rapidjson::Value(25), d.GetAllocator());
+		swampObj.AddMember("dark_floors", JsonNode(ArrayTypeTag));
+		swampObj["dark_floors"].PushBack(6);
+		swampObj["dark_floors"].PushBack(7);
+		swampObj["dark_floors"].PushBack(8);
+		swampObj["dark_floors"].PushBack(9);
+		swampObj.AddMember("dark_floor_percent", JsonNode(25));
 
-		swampObj.AddMember("shop_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		swampObj["shop_floors"].PushBack(6, d.GetAllocator());
-		swampObj["shop_floors"].PushBack(7, d.GetAllocator());
-		swampObj["shop_floors"].PushBack(8, d.GetAllocator());
-		swampObj["shop_floors"].PushBack(9, d.GetAllocator());
-		swampObj.AddMember("shop_floor_percent", rapidjson::Value(50), d.GetAllocator());
+		swampObj.AddMember("shop_floors", JsonNode(ArrayTypeTag));
+		swampObj["shop_floors"].PushBack(6);
+		swampObj["shop_floors"].PushBack(7);
+		swampObj["shop_floors"].PushBack(8);
+		swampObj["shop_floors"].PushBack(9);
+		swampObj.AddMember("shop_floor_percent", JsonNode(50));
 
-		swampObj.AddMember("npc_floors", rapidjson::Value(rapidjson::kArrayType), d.GetAllocator());
-		swampObj["npc_floors"].PushBack(6, d.GetAllocator());
-		swampObj["npc_floors"].PushBack(7, d.GetAllocator());
-		swampObj["npc_floors"].PushBack(8, d.GetAllocator());
-		swampObj["npc_floors"].PushBack(9, d.GetAllocator());
-		swampObj.AddMember("npc_spawn_chance", rapidjson::Value(10), d.GetAllocator());
+		swampObj.AddMember("npc_floors", JsonNode(ArrayTypeTag));
+		swampObj["npc_floors"].PushBack(6);
+		swampObj["npc_floors"].PushBack(7);
+		swampObj["npc_floors"].PushBack(8);
+		swampObj["npc_floors"].PushBack(9);
+		swampObj.AddMember("npc_spawn_chance", JsonNode(10));
 
-		d["map_generation"].AddMember(key2, swampObj, d.GetAllocator());
+		d["map_generation"].AddMember(key2, swampObj);
 
 		writeToFile(d);
 	}
 
-	void writeToFile(rapidjson::Document& d)
+	void writeToFile(JsonNode d)
 	{
 		int filenum = 0;
 		DynamicString testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
@@ -2062,10 +2051,9 @@ public:
 		{
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 
 		FileIO::close(fp);
 	}
@@ -2087,11 +2075,11 @@ public:
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
+			JsonDoc jd(buf);
+			if ( !jd.ok() ) { return; }
+			JsonNode d = jd.root;
 			if ( !d.HasMember("version") )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -2099,7 +2087,7 @@ public:
 			}
 			int version = d["version"].GetInt();
 
-			for ( rapidjson::Value::ConstMemberIterator prop_itr = d.MemberBegin(); prop_itr != d.MemberEnd(); ++prop_itr )
+			for ( JsonMemberIt prop_itr = d.MemberBegin(); prop_itr != d.MemberEnd(); ++prop_itr )
 			{
 				if ( readKeyToGameplayProperty(prop_itr) )
 				{
@@ -2111,7 +2099,7 @@ public:
 		}
 	}
 
-	bool readKeyToGameplayProperty(rapidjson::Value::ConstMemberIterator& itr)
+	bool readKeyToGameplayProperty(JsonMemberIt itr)
 	{
 		DynamicString name = itr->name.GetString();
 		if ( name.compare("version") == 0 )
@@ -2150,11 +2138,11 @@ public:
 		}
 		else if ( name.compare("minotaur_force_disable_on_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
 			{
 				minotaurForceDisableFloors.first.insert(arr_itr->GetInt());
 			}
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
 			{
 				minotaurForceDisableFloors.second.insert(arr_itr->GetInt());
 			}
@@ -2162,11 +2150,11 @@ public:
 		}
 		else if ( name.compare("minotaur_force_enable_on_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
 			{
 				minotaurForceEnableFloors.first.insert(arr_itr->GetInt());
 			}
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
 			{
 				minotaurForceEnableFloors.second.insert(arr_itr->GetInt());
 			}
@@ -2174,11 +2162,11 @@ public:
 		}
 		else if ( name.compare("disable_hunger_on_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
 			{
 				hungerDisableFloors.first.insert(arr_itr->GetInt());
 			}
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
 			{
 				hungerDisableFloors.second.insert(arr_itr->GetInt());
 			}
@@ -2186,11 +2174,11 @@ public:
 		}
 		else if ( name.compare("disable_herx_messages_on_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
 			{
 				herxChatterDisableFloors.first.insert(arr_itr->GetInt());
 			}
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
 			{
 				herxChatterDisableFloors.second.insert(arr_itr->GetInt());
 			}
@@ -2198,11 +2186,11 @@ public:
 		}
 		else if ( name.compare("disable_minimap_on_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
 			{
 				minimapDisableFloors.first.insert(arr_itr->GetInt());
 			}
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
 			{
 				minimapDisableFloors.second.insert(arr_itr->GetInt());
 			}
@@ -2210,11 +2198,11 @@ public:
 		}
 		else if ( name.compare("map_generation") == 0 )
 		{
-			for ( rapidjson::Value::ConstMemberIterator map_itr = itr->value.MemberBegin(); map_itr != itr->value.MemberEnd(); ++map_itr )
+			for ( JsonMemberIt map_itr = itr->value.MemberBegin(); map_itr != itr->value.MemberEnd(); ++map_itr )
 			{
 				DynamicString mapName = map_itr->name.GetString();
 				MapGeneration m(mapName);
-				for ( rapidjson::Value::ConstMemberIterator obj_itr = map_itr->value.MemberBegin(); obj_itr != map_itr->value.MemberEnd(); ++obj_itr )
+				for ( JsonMemberIt obj_itr = map_itr->value.MemberBegin(); obj_itr != map_itr->value.MemberEnd(); ++obj_itr )
 				{
 					readKeyToMapGenerationProperty(m, obj_itr);
 				}
@@ -2226,13 +2214,13 @@ public:
 		return false;
 	}
 
-	bool readKeyToMapGenerationProperty(MapGeneration& m, rapidjson::Value::ConstMemberIterator& itr)
+	bool readKeyToMapGenerationProperty(MapGeneration& m, JsonMemberIt itr)
 	{
 		DynamicString name = itr->name.GetString();
 		if ( name.compare("trap_generation_types") == 0 )
 		{
 			m.usingTrapTypes = true;
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
 			{
 				m.trapTypes.push_back(arr_itr->GetString());
 			}
@@ -2240,7 +2228,7 @@ public:
 		}
 		else if ( name.compare("minotaur_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
 			{
 				m.minoFloors.insert(arr_itr->GetInt());
 			}
@@ -2248,7 +2236,7 @@ public:
 		}
 		else if ( name.compare("dark_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
 			{
 				m.darkFloors.insert(arr_itr->GetInt());
 			}
@@ -2256,7 +2244,7 @@ public:
 		}
 		else if ( name.compare("shop_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
 			{
 				m.shopFloors.insert(arr_itr->GetInt());
 			}
@@ -2264,7 +2252,7 @@ public:
 		}
 		else if ( name.compare("npc_floors") == 0 )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
+			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
 			{
 				m.npcSpawnFloors.insert(arr_itr->GetInt());
 			}
@@ -2708,7 +2696,7 @@ public:
 #else
 		const DynamicString tutorialScoresFilename = "/savegames/tutorial_scores.json";
 #endif
-		void writeToFile(rapidjson::Document& d)
+		void writeToFile(JsonNode d)
 		{
 			DynamicString outputPath = outputdir;
 			outputPath.append(tutorialScoresFilename.c_str());
@@ -2718,10 +2706,9 @@ public:
 			{
 				return;
 			}
-			rapidjson::StringBuffer os;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-			d.Accept(writer);
-			fp->write(os.GetString(), sizeof(char), os.GetSize());
+			const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 			fp->write("", sizeof(char), 1);
 
 			FileIO::close(fp);
@@ -2896,8 +2883,8 @@ public:
 		void setColorStatus(Uint32 color) { statusEffectTextColor = color; }
 		void setColorFaintText(Uint32 color) { faintTextColor = color; }
 	};
-	void setSpellValueIfKeyPresent(spellItem_t& t, rapidjson::Value::ConstMemberIterator item_itr, Uint32& hash, Uint32& hashShift, const char* key, int& toSet);
-	void setSpellValueIfKeyPresent(spellItem_t& t, rapidjson::Value::ConstMemberIterator item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet);
+	void setSpellValueIfKeyPresent(spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, int& toSet);
+	void setSpellValueIfKeyPresent(spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet);
 	void readItemsFromFile();
 	static const Uint32 kItemsJsonHash;
 	static Uint32 itemsJsonHashRead;
@@ -2987,7 +2974,7 @@ public:
 	DynamicString exportFileName = "";
 	int exportRotations = 0;
 	bool exportActive = false;
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 
 	class Statue_t
 	{

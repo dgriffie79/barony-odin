@@ -10,6 +10,7 @@ See LICENSE for details.
 -------------------------------------------------------------------------------*/
 #include "items.hpp"
 #include "mod_tools.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "menu.hpp"
 #include "classdescriptions.hpp"
 #include "draw.hpp"
@@ -165,11 +166,11 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") || !d.HasMember("levels") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -177,7 +178,7 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 		}
 		int version = d["version"].GetInt();
 
-		for ( rapidjson::Value::ConstMemberIterator level_itr = d["levels"].MemberBegin(); level_itr != d["levels"].MemberEnd(); ++level_itr )
+		for ( JsonMemberIt level_itr = d["levels"].MemberBegin(); level_itr != d["levels"].MemberEnd(); ++level_itr )
 		{
 			Tutorial_t::Level_t level;
 			level.filename = level_itr->name.GetString();
@@ -208,11 +209,11 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") || !d.HasMember("levels") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -221,16 +222,16 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 			printlog("[JSON]: File %s corrupt, recreating...", inputPath.c_str());
 			d.Clear();
 			d.SetObject();
-			CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-			CustomHelpers::addMemberToRoot(d, "first_time_prompt", rapidjson::Value(FirstTimePrompt.showFirstTimePrompt));
-			CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", rapidjson::Value(firstTutorialCompleted));
+			CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
+			CustomHelpers::addMemberToRoot(d, "first_time_prompt", JsonNode(FirstTimePrompt.showFirstTimePrompt));
+			CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", JsonNode(firstTutorialCompleted));
 
-			rapidjson::Value levelsObj(rapidjson::kObjectType);
+			JsonNode levelsObj(ObjectTypeTag);
 			CustomHelpers::addMemberToRoot(d, "levels", levelsObj);
 			for ( auto it = levels.begin(); it != levels.end(); ++it )
 			{
-				rapidjson::Value level(rapidjson::kObjectType);
-				level.AddMember("completion_time", rapidjson::Value(it->completionTime), d.GetAllocator());
+				JsonNode level(ObjectTypeTag);
+				level.AddMember("completion_time", JsonNode(it->completionTime));
 				CustomHelpers::addMemberToSubkey(d, "levels", it->filename, level);
 			}
 			writeToFile(d);
@@ -257,21 +258,21 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 	{
 		printlog("[JSON]: File %s does not exist, creating...", tutorialScoresFilename.c_str());
 
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(d, "first_time_prompt", rapidjson::Value(true));
-		CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", rapidjson::Value(false));
+		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
+		CustomHelpers::addMemberToRoot(d, "first_time_prompt", JsonNode(true));
+		CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", JsonNode(false));
 
 		this->FirstTimePrompt.showFirstTimePrompt = true;
 		this->firstTutorialCompleted = false;
 
-		rapidjson::Value levelsObj(rapidjson::kObjectType);
+		JsonNode levelsObj(ObjectTypeTag);
 		CustomHelpers::addMemberToRoot(d, "levels", levelsObj);
 		for ( auto it = levels.begin(); it != levels.end(); ++it )
 		{
-			rapidjson::Value level(rapidjson::kObjectType);
-			level.AddMember("completion_time", rapidjson::Value(it->completionTime), d.GetAllocator());
+			JsonNode level(ObjectTypeTag);
+			level.AddMember("completion_time", JsonNode(it->completionTime));
 			CustomHelpers::addMemberToSubkey(d, "levels", it->filename, level);
 		}
 		writeToFile(d);
@@ -304,27 +305,27 @@ void GameModeManager_t::Tutorial_t::writeToDocument()
 	char buf[65536];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 
 	if ( !d.HasMember("version") || !d.HasMember("levels") )
 	{
 		printlog("[JSON]: File %s corrupt, recreating...", inputPath.c_str());
 		d.Clear();
 		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(d, "first_time_prompt", rapidjson::Value(FirstTimePrompt.showFirstTimePrompt));
-		CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", rapidjson::Value(firstTutorialCompleted));
+		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
+		CustomHelpers::addMemberToRoot(d, "first_time_prompt", JsonNode(FirstTimePrompt.showFirstTimePrompt));
+		CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", JsonNode(firstTutorialCompleted));
 
-		rapidjson::Value levelsObj(rapidjson::kObjectType);
+		JsonNode levelsObj(ObjectTypeTag);
 		CustomHelpers::addMemberToRoot(d, "levels", levelsObj);
 		for ( auto it = levels.begin(); it != levels.end(); ++it )
 		{
-			rapidjson::Value level(rapidjson::kObjectType);
-			level.AddMember("completion_time", rapidjson::Value(it->completionTime), d.GetAllocator());
+			JsonNode level(ObjectTypeTag);
+			level.AddMember("completion_time", JsonNode(it->completionTime));
 			CustomHelpers::addMemberToSubkey(d, "levels", it->filename, level);
 		}
 	}
@@ -333,7 +334,7 @@ void GameModeManager_t::Tutorial_t::writeToDocument()
 		d["first_time_prompt"].SetBool(this->FirstTimePrompt.showFirstTimePrompt);
 		if ( !d.HasMember("first_tutorial_complete") )
 		{
-			CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", rapidjson::Value(false));
+			CustomHelpers::addMemberToRoot(d, "first_tutorial_complete", JsonNode(false));
 		}
 		d["first_tutorial_complete"].SetBool(this->firstTutorialCompleted);
 
@@ -623,11 +624,11 @@ void GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile()
 	char buf[10000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.HasMember("version") || !d.HasMember("prefixes") || !d.HasMember("suffixes") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -662,11 +663,11 @@ bool IRCHandler_t::readFromFile()
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -836,7 +837,7 @@ void IRCHandler_t::handleMessage(std::string& msg)
 Uint32 ItemTooltips_t::itemsJsonHashRead = 0;
 const Uint32 ItemTooltips_t::kItemsJsonHash = 2516917045;
 
-void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, rapidjson::Value::ConstMemberIterator item_itr, Uint32& hash, Uint32& hashShift, const char* key, int& toSet)
+void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, int& toSet)
 {
 	if ( item_itr->value.HasMember(key) )
 	{
@@ -845,7 +846,7 @@ void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, r
 		//hash += (Uint32)((Uint32)toSet << (hashShift % 32)); ++hashShift;
 	}
 }
-void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, rapidjson::Value::ConstMemberIterator item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet)
+void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet)
 {
 	if ( item_itr->value.HasMember(key) )
 	{
@@ -915,10 +916,9 @@ void ItemTooltips_t::readItemsFromFile()
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
 	//rapidjson::FileReadStream is(fp, buf, sizeof(buf)); - use this for large chunks.
-	rapidjson::StringStream is(buf);
-
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	FileIO::close(fp);
 	if ( !d.HasMember("version") || !d.HasMember("items") )
 	{
@@ -931,7 +931,7 @@ void ItemTooltips_t::readItemsFromFile()
 
 	tmpItems.clear();
 
-	for ( rapidjson::Value::ConstMemberIterator item_itr = d["items"].MemberBegin(); 
+	for ( JsonMemberIt item_itr = d["items"].MemberBegin(); 
 		item_itr != d["items"].MemberEnd(); ++item_itr )
 	{
 		tmpItem_t t;
@@ -949,7 +949,7 @@ void ItemTooltips_t::readItemsFromFile()
 		t.category = item_itr->value["item_category"].GetString();
 		t.equipSlot = item_itr->value["equip_slot"].GetString();
 
-		for ( rapidjson::Value::ConstValueIterator pathArray_itr = item_itr->value["item_images"].Begin();
+		for ( JsonValueIt pathArray_itr = item_itr->value["item_images"].Begin();
 			pathArray_itr != item_itr->value["item_images"].End(); 
 			++pathArray_itr )
 		{
@@ -958,7 +958,7 @@ void ItemTooltips_t::readItemsFromFile()
 
 		if ( item_itr->value.HasMember("stats") )
 		{
-			for ( rapidjson::Value::ConstMemberIterator stat_itr = item_itr->value["stats"].MemberBegin(); 
+			for ( JsonMemberIt stat_itr = item_itr->value["stats"].MemberBegin(); 
 				stat_itr != item_itr->value["stats"].MemberEnd(); ++stat_itr )
 			{
 				t.attributes[stat_itr->name.GetString()] = stat_itr->value.GetInt();
@@ -1158,7 +1158,7 @@ void ItemTooltips_t::readItemsFromFile()
 	spellItems.clear();
 
 	int spellsRead = 0;
-	for ( rapidjson::Value::ConstMemberIterator spell_itr = d["spells"].MemberBegin();
+	for ( JsonMemberIt spell_itr = d["spells"].MemberBegin();
 		spell_itr != d["spells"].MemberEnd(); ++spell_itr )
 	{
 		spellItem_t t;
@@ -1220,7 +1220,7 @@ void ItemTooltips_t::readItemsFromFile()
 
 		if ( spell_itr->value.HasMember("format_tags") )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = spell_itr->value["format_tags"].Begin();
+			for ( JsonValueIt arr_itr = spell_itr->value["format_tags"].Begin();
 				arr_itr != spell_itr->value["format_tags"].End(); ++arr_itr )
 			{
 				t.spellFormatTags.push_back(arr_itr->GetString());
@@ -1229,14 +1229,14 @@ void ItemTooltips_t::readItemsFromFile()
 
 		if ( spell_itr->value.HasMember("spellbook_item_icon_padding") )
 		{
-			for ( rapidjson::Value::ConstValueIterator arr_itr = spell_itr->value["spellbook_item_icon_padding"].Begin();
+			for ( JsonValueIt arr_itr = spell_itr->value["spellbook_item_icon_padding"].Begin();
 				arr_itr != spell_itr->value["spellbook_item_icon_padding"].End(); ++arr_itr )
 			{
 				t.spellbookItemIconPaddingLines.push_back(arr_itr->GetInt());
 			}
 		}
 
-		for ( rapidjson::Value::ConstValueIterator arr_itr = spell_itr->value["effect_tags"].Begin();
+		for ( JsonValueIt arr_itr = spell_itr->value["effect_tags"].Begin();
 			arr_itr != spell_itr->value["effect_tags"].End(); ++arr_itr )
 		{
 			t.spellTagsStr.push_back(arr_itr->GetString());
@@ -1541,10 +1541,9 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 	const int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
 	//rapidjson::FileReadStream is(fp, buf, sizeof(buf)); - use this for large chunks.
-	rapidjson::StringStream is(buf);
-
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	FileIO::close(fp);
 
 	if ( !d.IsObject() )
@@ -1566,7 +1565,7 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 		{
 			itemNameLocalizations.clear();
 		}
-		for ( rapidjson::Value::ConstMemberIterator items_itr = d["items"].MemberBegin();
+		for ( JsonMemberIt items_itr = d["items"].MemberBegin();
 			items_itr != d["items"].MemberEnd(); ++items_itr )
 		{
 			if ( items_itr->value.HasMember("name_identified") )
@@ -1594,7 +1593,7 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 		{
 			spellNameLocalizations.clear();
 		}
-		for ( rapidjson::Value::ConstMemberIterator spell_itr = d["spell_names"].MemberBegin();
+		for ( JsonMemberIt spell_itr = d["spell_names"].MemberBegin();
 			spell_itr != d["spell_names"].MemberEnd(); ++spell_itr )
 		{
 			if ( spell_itr->value.HasMember("name") )
@@ -1694,10 +1693,9 @@ void ItemTooltips_t::readBookLocalizationsFromFile(bool forceLoadBaseDirectory)
 	const int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
 	//rapidjson::FileReadStream is(fp, buf, sizeof(buf)); - use this for large chunks.
-	rapidjson::StringStream is(buf);
-
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	FileIO::close(fp);
 
 	if ( !d.IsObject() )
@@ -1719,7 +1717,7 @@ void ItemTooltips_t::readBookLocalizationsFromFile(bool forceLoadBaseDirectory)
 		{
 			bookNameLocalizations.clear();
 		}
-		for ( rapidjson::Value::ConstMemberIterator books_itr = d["book_names"].MemberBegin();
+		for ( JsonMemberIt books_itr = d["book_names"].MemberBegin();
 			books_itr != d["book_names"].MemberEnd(); ++books_itr )
 		{
 			bookNameLocalizations[books_itr->name.GetString()] = books_itr->value.GetString();
@@ -1776,10 +1774,9 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	const int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
 	//rapidjson::FileReadStream is(fp, buf, sizeof(buf)); - use this for large chunks.
-	rapidjson::StringStream is(buf);
-
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	FileIO::close(fp);
 
 	if ( !d.IsObject() )
@@ -1801,11 +1798,11 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	}
 	if ( d.HasMember("adjectives") )
 	{
-		for ( rapidjson::Value::ConstMemberIterator adj_itr = d["adjectives"].MemberBegin();
+		for ( JsonMemberIt adj_itr = d["adjectives"].MemberBegin();
 			adj_itr != d["adjectives"].MemberEnd(); ++adj_itr )
 		{
 			DynamicMapStr m;
-			for ( rapidjson::Value::ConstMemberIterator inner_itr = adj_itr->value.MemberBegin();
+			for ( JsonMemberIt inner_itr = adj_itr->value.MemberBegin();
 				inner_itr != adj_itr->value.MemberEnd(); ++inner_itr )
 			{
 				m[inner_itr->name.GetString()] = inner_itr->value.GetString();
@@ -1864,7 +1861,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	}
 	if ( d.HasMember("templates") )
 	{
-		for ( rapidjson::Value::ConstMemberIterator template_itr = d["templates"].MemberBegin();
+		for ( JsonMemberIt template_itr = d["templates"].MemberBegin();
 			template_itr != d["templates"].MemberEnd(); ++template_itr )
 		{
 			if ( !template_itr->value.IsArray() )
@@ -1895,7 +1892,7 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 
 	if ( d.HasMember("tooltips") )
 	{
-		for ( rapidjson::Value::ConstMemberIterator tooltipType_itr = d["tooltips"].MemberBegin();
+		for ( JsonMemberIt tooltipType_itr = d["tooltips"].MemberBegin();
 			tooltipType_itr != d["tooltips"].MemberEnd(); ++tooltipType_itr )
 		{
 			ItemTooltip_t tooltip;
@@ -2355,7 +2352,7 @@ bool ItemTooltips_t::bSpellHasBasicHitMessage(const int spellID)
 {
 	if ( spellItems.find(spellID) != spellItems.end() )
 	{
-		auto& entry = spellItems[spellID];
+		auto entry = spellItems[spellID];
 		if ( entry.spellTags.find(SPELL_TAG_BASIC_HIT_MESSAGE) != entry.spellTags.end() )
 		{
 			return true;
@@ -6987,10 +6984,9 @@ int StatueManager_t::processStatueExport()
 			{
 				return 0;
 			}
-			rapidjson::StringBuffer os;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-			exportDocument.Accept(writer);
-			fp->write(os.GetString(), sizeof(char), os.GetSize());
+			const char* json = json_node_serialize(exportDocument.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 			FileIO::close(fp);
 			return 2; // success
 		}
@@ -7025,14 +7021,14 @@ int StatueManager_t::processStatueExport()
 			exportDocument.RemoveAllMembers();
 		}
 		exportDocument.SetObject();
-		CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(1));
-		CustomHelpers::addMemberToRoot(exportDocument, "statue_id", rapidjson::Value(local_rng.rand()));
-		CustomHelpers::addMemberToRoot(exportDocument, "height_offset", rapidjson::Value(0));
-		rapidjson::Value limbsObject(rapidjson::kObjectType);
+		CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(1));
+		CustomHelpers::addMemberToRoot(exportDocument, "statue_id", JsonNode(local_rng.rand()));
+		CustomHelpers::addMemberToRoot(exportDocument, "height_offset", JsonNode(0));
+		JsonNode limbsObject(ObjectTypeTag);
 		CustomHelpers::addMemberToRoot(exportDocument, "limbs", limbsObject);
 	}
 
-	rapidjson::Value limbsArray(rapidjson::kArrayType);
+	JsonNode limbsArray(ArrayTypeTag);
 
 	std::vector<Entity*> allLimbs;
 	allLimbs.push_back(player);
@@ -7050,28 +7046,28 @@ int StatueManager_t::processStatueExport()
 		{
 			continue;
 		}
-		rapidjson::Value limbsObj(rapidjson::kObjectType);
+		JsonNode limbsObj(ObjectTypeTag);
 
 		if ( index != 0 )
 		{
-			limbsObj.AddMember("x", rapidjson::Value(player->x - limb->x), exportDocument.GetAllocator());
-			limbsObj.AddMember("y", rapidjson::Value(player->y - limb->y), exportDocument.GetAllocator());
-			limbsObj.AddMember("z", rapidjson::Value(limb->z), exportDocument.GetAllocator());
+			limbsObj.AddMember("x", JsonNode(player->x - limb->x));
+			limbsObj.AddMember("y", JsonNode(player->y - limb->y));
+			limbsObj.AddMember("z", JsonNode(limb->z));
 		}
 		else
 		{
-			limbsObj.AddMember("x", rapidjson::Value(0), exportDocument.GetAllocator());
-			limbsObj.AddMember("y", rapidjson::Value(0), exportDocument.GetAllocator());
-			limbsObj.AddMember("z", rapidjson::Value(limb->z), exportDocument.GetAllocator());
+			limbsObj.AddMember("x", JsonNode(0));
+			limbsObj.AddMember("y", JsonNode(0));
+			limbsObj.AddMember("z", JsonNode(limb->z));
 		}
-		limbsObj.AddMember("pitch", rapidjson::Value(limb->pitch), exportDocument.GetAllocator());
-		limbsObj.AddMember("roll", rapidjson::Value(limb->roll), exportDocument.GetAllocator());
-		limbsObj.AddMember("yaw", rapidjson::Value(limb->yaw), exportDocument.GetAllocator());
-		limbsObj.AddMember("focalx", rapidjson::Value(limb->focalx), exportDocument.GetAllocator());
-		limbsObj.AddMember("focaly", rapidjson::Value(limb->focaly), exportDocument.GetAllocator());
-		limbsObj.AddMember("focalz", rapidjson::Value(limb->focalz), exportDocument.GetAllocator());
-		limbsObj.AddMember("sprite", rapidjson::Value(limb->sprite), exportDocument.GetAllocator());
-		limbsArray.PushBack(limbsObj, exportDocument.GetAllocator());
+		limbsObj.AddMember("pitch", JsonNode(limb->pitch));
+		limbsObj.AddMember("roll", JsonNode(limb->roll));
+		limbsObj.AddMember("yaw", JsonNode(limb->yaw));
+		limbsObj.AddMember("focalx", JsonNode(limb->focalx));
+		limbsObj.AddMember("focaly", JsonNode(limb->focaly));
+		limbsObj.AddMember("focalz", JsonNode(limb->focalz));
+		limbsObj.AddMember("sprite", JsonNode(limb->sprite));
+		limbsArray.PushBack(limbsObj);
 
 		++index;
 	}
@@ -7170,11 +7166,11 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") || !d.HasMember("limbs") || !d.HasMember("statue_id") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -7187,20 +7183,20 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 			allStatues.erase(statueId);
 		}
 		allStatues.put(statueId, Statue_t());
-		for ( rapidjson::Value::ConstMemberIterator limb_itr = d["limbs"].MemberBegin(); limb_itr != d["limbs"].MemberEnd(); ++limb_itr )
+		for ( JsonMemberIt limb_itr = d["limbs"].MemberBegin(); limb_itr != d["limbs"].MemberEnd(); ++limb_itr )
 		{
-			auto& statue = allStatues[statueId];
+			auto statue = allStatues[statueId];
 			if ( d.HasMember("height_offset") )
 			{
 				statue.heightOffset = d["height_offset"].GetDouble();
 			}
-			for ( rapidjson::Value::ConstValueIterator dir_itr = limb_itr->value.Begin(); dir_itr != limb_itr->value.End(); ++dir_itr )
+			for ( JsonValueIt dir_itr = limb_itr->value.Begin(); dir_itr != limb_itr->value.End(); ++dir_itr )
 			{
-				const rapidjson::Value& attributes = *dir_itr;
+				const JsonNode attributes = *dir_itr;
 				std::string direction = limb_itr->name.GetString();
-				auto& limbVector = statue.limbs[direction];
+				auto limbVector = statue.limbs[direction];
 				limbVector.push_back(Statue_t::StatueLimb_t());
-				auto& limb = limbVector[limbVector.size() - 1];
+				auto limb = limbVector[limbVector.size() - 1];
 				limb.x = attributes["x"].GetDouble();
 				limb.y = attributes["y"].GetDouble();
 				limb.z = attributes["z"].GetDouble();
@@ -7233,7 +7229,7 @@ void DebugTimers_t::printTimepoints(std::string key, int& posy)
 	if ( !font8x8_bmp || intro ) {
 		return;
 	}
-	auto& points = timepoints[key];
+	auto points = timepoints[key];
 	if ( points.empty() ) { return; }
 	int starty = posy;
 	int index = 0;
@@ -7271,11 +7267,11 @@ bool GlyphRenderer_t::readFromFile()
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -7321,9 +7317,9 @@ bool GlyphRenderer_t::readFromFile()
 		baseRenderedPath += renderedGlyphFolder;
 		baseRenderedPath += '/';
 
-		for ( rapidjson::Value::ConstValueIterator glyph_itr = d["glyphs"].Begin(); glyph_itr != d["glyphs"].End(); ++glyph_itr )
+		for ( JsonValueIt glyph_itr = d["glyphs"].Begin(); glyph_itr != d["glyphs"].End(); ++glyph_itr )
 		{
-			const rapidjson::Value& attributes = *glyph_itr;
+			const JsonNode attributes = *glyph_itr;
 			if ( !attributes.HasMember("keyname") )
 			{
 				printlog("[JSON]: Glyph entry does not have keyname, skipping...");
@@ -7337,7 +7333,7 @@ bool GlyphRenderer_t::readFromFile()
 				continue;
 			}
 			allGlyphs[keycode] = GlyphData_t();
-			auto& glyphData = allGlyphs[keycode];
+			auto glyphData = allGlyphs[keycode];
 			glyphData.keycode = keycode;
 			glyphData.keyname = keyname;
 			if ( !attributes.HasMember("folder") )
@@ -7642,11 +7638,11 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") || !d.HasMember("script_entries") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -7693,11 +7689,11 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			}
 		}
 
-		for ( rapidjson::Value::ConstMemberIterator entry_itr = d["script_entries"].MemberBegin(); entry_itr != d["script_entries"].MemberEnd(); ++entry_itr )
+		for ( JsonMemberIt entry_itr = d["script_entries"].MemberBegin(); entry_itr != d["script_entries"].MemberEnd(); ++entry_itr )
 		{
 			std::string key = entry_itr->name.GetString();
 			allEntries[key] = Entry_t();
-			auto& entry = allEntries[key];
+			auto entry = allEntries[key];
 			entry.name = key;
 			entry.fontColor = defaultFontColor;
 			entry.fontOutlineColor = defaultFontOutlineColor;
@@ -7706,13 +7702,13 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			if ( entry_itr->value.HasMember("sign") )
 			{
 				entry.objectType = OBJ_SIGN;
-				for ( rapidjson::Value::ConstValueIterator text_itr = entry_itr->value["sign"].Begin(); text_itr != entry_itr->value["sign"].End(); ++text_itr )
+				for ( JsonValueIt text_itr = entry_itr->value["sign"].Begin(); text_itr != entry_itr->value["sign"].End(); ++text_itr )
 				{
 					entry.rawText.push_back(text_itr->GetString());
 				}
 				if ( entry_itr->value.HasMember("variables") )
 				{
-					for ( rapidjson::Value::ConstValueIterator var_itr = entry_itr->value["variables"].Begin();
+					for ( JsonValueIt var_itr = entry_itr->value["variables"].Begin();
 						var_itr != entry_itr->value["variables"].End(); ++var_itr )
 					{
 						Entry_t::Variable_t variable;
@@ -7927,7 +7923,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			else if ( entry_itr->value.HasMember("bubble_sign") )
 			{
 				entry.objectType = OBJ_BUBBLE_SIGN;
-				for ( rapidjson::Value::ConstValueIterator text_itr = entry_itr->value["bubble_sign"].Begin(); text_itr != entry_itr->value["bubble_sign"].End(); ++text_itr )
+				for ( JsonValueIt text_itr = entry_itr->value["bubble_sign"].Begin(); text_itr != entry_itr->value["bubble_sign"].End(); ++text_itr )
 				{
 					entry.rawText.push_back(text_itr->GetString());
 				}
@@ -7944,7 +7940,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			else if ( entry_itr->value.HasMember("bubble_grave") )
 			{
 				entry.objectType = OBJ_BUBBLE_GRAVE;
-				for ( rapidjson::Value::ConstValueIterator text_itr = entry_itr->value["bubble_grave"].Begin(); text_itr != entry_itr->value["bubble_grave"].End(); ++text_itr )
+				for ( JsonValueIt text_itr = entry_itr->value["bubble_grave"].Begin(); text_itr != entry_itr->value["bubble_grave"].End(); ++text_itr )
 				{
 					entry.rawText.push_back(text_itr->GetString());
 				}
@@ -7961,7 +7957,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			else if ( entry_itr->value.HasMember("bubble_dialogue") )
 			{
 				entry.objectType = OBJ_BUBBLE_DIALOGUE;
-				for ( rapidjson::Value::ConstValueIterator text_itr = entry_itr->value["bubble_dialogue"].Begin(); text_itr != entry_itr->value["bubble_dialogue"].End(); ++text_itr )
+				for ( JsonValueIt text_itr = entry_itr->value["bubble_dialogue"].Begin(); text_itr != entry_itr->value["bubble_dialogue"].End(); ++text_itr )
 				{
 					entry.rawText.push_back(text_itr->GetString());
 				}
@@ -7978,7 +7974,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 			else if ( entry_itr->value.HasMember("message") )
 			{
 				entry.objectType = OBJ_MESSAGE;
-				for ( rapidjson::Value::ConstValueIterator text_itr = entry_itr->value["message"].Begin(); text_itr != entry_itr->value["message"].End(); ++text_itr )
+				for ( JsonValueIt text_itr = entry_itr->value["message"].Begin(); text_itr != entry_itr->value["message"].End(); ++text_itr )
 				{
 					entry.rawText.push_back(text_itr->GetString());
 				}
@@ -7993,7 +7989,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 				}
 				if ( entry_itr->value.HasMember("variables") )
 				{
-					for ( rapidjson::Value::ConstValueIterator var_itr = entry_itr->value["variables"].Begin();
+					for ( JsonValueIt var_itr = entry_itr->value["variables"].Begin();
 						var_itr != entry_itr->value["variables"].End(); ++var_itr )
 					{
 						Entry_t::Variable_t variable;
@@ -8041,10 +8037,10 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 void ScriptTextParser_t::writeWorldSignsToFile()
 {
 #ifndef EDITOR
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	exportDocument.SetObject();
-	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(1));
-	rapidjson::Value objScriptEntries(rapidjson::kObjectType);
+	CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(1));
+	JsonNode objScriptEntries(ObjectTypeTag);
 
 	char suffix = 'a';
 	char suffix2 = 'a';
@@ -8054,36 +8050,36 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 	SDL_Color fontOutline{ 29, 16, 11, 255 };
 	SDL_Color fontHighlight{ 255, 0, 255, 255 };
 
-	rapidjson::Value objDefaultAttributes(rapidjson::kObjectType);
+	JsonNode objDefaultAttributes(ObjectTypeTag);
 	{
-		rapidjson::Value objFontColor(rapidjson::kObjectType);
-		objFontColor.AddMember("r", rapidjson::Value(fontColor.r), exportDocument.GetAllocator());
-		objFontColor.AddMember("g", rapidjson::Value(fontColor.g), exportDocument.GetAllocator());
-		objFontColor.AddMember("b", rapidjson::Value(fontColor.b), exportDocument.GetAllocator());
-		objFontColor.AddMember("a", rapidjson::Value(fontColor.a), exportDocument.GetAllocator());
+		JsonNode objFontColor(ObjectTypeTag);
+		objFontColor.AddMember("r", JsonNode(fontColor.r));
+		objFontColor.AddMember("g", JsonNode(fontColor.g));
+		objFontColor.AddMember("b", JsonNode(fontColor.b));
+		objFontColor.AddMember("a", JsonNode(fontColor.a));
 
-		rapidjson::Value objFontOutlineColor(rapidjson::kObjectType);
-		objFontOutlineColor.AddMember("r", rapidjson::Value(fontOutline.r), exportDocument.GetAllocator());
-		objFontOutlineColor.AddMember("g", rapidjson::Value(fontOutline.g), exportDocument.GetAllocator());
-		objFontOutlineColor.AddMember("b", rapidjson::Value(fontOutline.b), exportDocument.GetAllocator());
-		objFontOutlineColor.AddMember("a", rapidjson::Value(fontOutline.a), exportDocument.GetAllocator());
+		JsonNode objFontOutlineColor(ObjectTypeTag);
+		objFontOutlineColor.AddMember("r", JsonNode(fontOutline.r));
+		objFontOutlineColor.AddMember("g", JsonNode(fontOutline.g));
+		objFontOutlineColor.AddMember("b", JsonNode(fontOutline.b));
+		objFontOutlineColor.AddMember("a", JsonNode(fontOutline.a));
 
-		rapidjson::Value objFontHighlightColor(rapidjson::kObjectType);
-		objFontHighlightColor.AddMember("r", rapidjson::Value(fontHighlight.r), exportDocument.GetAllocator());
-		objFontHighlightColor.AddMember("g", rapidjson::Value(fontHighlight.g), exportDocument.GetAllocator());
-		objFontHighlightColor.AddMember("b", rapidjson::Value(fontHighlight.b), exportDocument.GetAllocator());
-		objFontHighlightColor.AddMember("a", rapidjson::Value(fontHighlight.a), exportDocument.GetAllocator());
+		JsonNode objFontHighlightColor(ObjectTypeTag);
+		objFontHighlightColor.AddMember("r", JsonNode(fontHighlight.r));
+		objFontHighlightColor.AddMember("g", JsonNode(fontHighlight.g));
+		objFontHighlightColor.AddMember("b", JsonNode(fontHighlight.b));
+		objFontHighlightColor.AddMember("a", JsonNode(fontHighlight.a));
 
-		rapidjson::Value objFontHighlight2Color(rapidjson::kObjectType);
-		objFontHighlight2Color.AddMember("r", rapidjson::Value(fontHighlight.r), exportDocument.GetAllocator());
-		objFontHighlight2Color.AddMember("g", rapidjson::Value(fontHighlight.g), exportDocument.GetAllocator());
-		objFontHighlight2Color.AddMember("b", rapidjson::Value(fontHighlight.b), exportDocument.GetAllocator());
-		objFontHighlight2Color.AddMember("a", rapidjson::Value(fontHighlight.a), exportDocument.GetAllocator());
+		JsonNode objFontHighlight2Color(ObjectTypeTag);
+		objFontHighlight2Color.AddMember("r", JsonNode(fontHighlight.r));
+		objFontHighlight2Color.AddMember("g", JsonNode(fontHighlight.g));
+		objFontHighlight2Color.AddMember("b", JsonNode(fontHighlight.b));
+		objFontHighlight2Color.AddMember("a", JsonNode(fontHighlight.a));
 
-		objDefaultAttributes.AddMember("font_color", objFontColor, exportDocument.GetAllocator());
-		objDefaultAttributes.AddMember("font_outline_color", objFontOutlineColor, exportDocument.GetAllocator());
-		objDefaultAttributes.AddMember("font_highlight_color", objFontHighlightColor, exportDocument.GetAllocator());
-		objDefaultAttributes.AddMember("font_highlight2_color", objFontHighlight2Color, exportDocument.GetAllocator());
+		objDefaultAttributes.AddMember("font_color", objFontColor);
+		objDefaultAttributes.AddMember("font_outline_color", objFontOutlineColor);
+		objDefaultAttributes.AddMember("font_highlight_color", objFontHighlightColor);
+		objDefaultAttributes.AddMember("font_highlight2_color", objFontHighlight2Color);
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "default_attributes", objDefaultAttributes);
 
@@ -8106,8 +8102,8 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 			
 			printlog("Sign '%s': x: %d y: %d", key.c_str(), static_cast<int>(entity->x) >> 4, static_cast<int>(entity->y) >> 4);
 
-			rapidjson::Value objEntry(rapidjson::kObjectType);
-			rapidjson::Value arrSignText(rapidjson::kArrayType);
+			JsonNode objEntry(ObjectTypeTag);
+			JsonNode arrSignText(ArrayTypeTag);
 
 			// assemble the string.
 			char buf[256] = "";
@@ -8159,31 +8155,31 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 
 			for ( auto& line : signText )
 			{
-				rapidjson::Value lineString(line.c_str(), exportDocument.GetAllocator());
-				arrSignText.PushBack(lineString, exportDocument.GetAllocator());
+				JsonNode lineString(line.c_str());
+				arrSignText.PushBack(lineString);
 			}
-			objEntry.AddMember("sign", arrSignText, exportDocument.GetAllocator());
+			objEntry.AddMember("sign", arrSignText);
 
-			rapidjson::Value objAttributes(rapidjson::kObjectType);
+			JsonNode objAttributes(ObjectTypeTag);
 			{
-				objAttributes.AddMember("font", rapidjson::StringRef("fonts/pixel_maz_multiline.ttf#16#2"), exportDocument.GetAllocator());
-				objAttributes.AddMember("horizontal_justify", rapidjson::StringRef("center"), exportDocument.GetAllocator());
-				objAttributes.AddMember("vertical_justify", rapidjson::StringRef("center"), exportDocument.GetAllocator());
-				objAttributes.AddMember("line_padding", rapidjson::Value(0), exportDocument.GetAllocator());
-				objAttributes.AddMember("top_padding", rapidjson::Value(0), exportDocument.GetAllocator());
-				objAttributes.AddMember("inline_img_adjust_x", rapidjson::Value(0), exportDocument.GetAllocator());
-				rapidjson::Value objWordHighlights(rapidjson::kArrayType);
-				objAttributes.AddMember("word_highlights", objWordHighlights, exportDocument.GetAllocator());
-				rapidjson::Value objWordHighlights2(rapidjson::kArrayType);
-				objAttributes.AddMember("word_highlights2", objWordHighlights2, exportDocument.GetAllocator());
+				objAttributes.AddMember("font", JsonNode("fonts/pixel_maz_multiline.ttf#16#2"));
+				objAttributes.AddMember("horizontal_justify", JsonNode("center"));
+				objAttributes.AddMember("vertical_justify", JsonNode("center"));
+				objAttributes.AddMember("line_padding", JsonNode(0));
+				objAttributes.AddMember("top_padding", JsonNode(0));
+				objAttributes.AddMember("inline_img_adjust_x", JsonNode(0));
+				JsonNode objWordHighlights(ArrayTypeTag);
+				objAttributes.AddMember("word_highlights", objWordHighlights);
+				JsonNode objWordHighlights2(ArrayTypeTag);
+				objAttributes.AddMember("word_highlights2", objWordHighlights2);
 			}
-			objEntry.AddMember("attributes", objAttributes, exportDocument.GetAllocator());
+			objEntry.AddMember("attributes", objAttributes);
 
-			rapidjson::Value objVariables(rapidjson::kArrayType);
-			objEntry.AddMember("variables", objVariables, exportDocument.GetAllocator());
+			JsonNode objVariables(ArrayTypeTag);
+			objEntry.AddMember("variables", objVariables);
 
-			rapidjson::Value entryName(key.c_str(), exportDocument.GetAllocator());
-			objScriptEntries.AddMember(entryName, objEntry, exportDocument.GetAllocator());
+			JsonNode entryName(key.c_str());
+			objScriptEntries.AddMember(entryName, objEntry);
 		}
 	}
 
@@ -8199,10 +8195,9 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 	{
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 #endif
 }
@@ -8537,11 +8532,11 @@ void MonsterData_t::loadMonsterDataJSON()
 		char buf[65536];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+	JsonNode d = jd.root;
+		
 		if ( !d.HasMember("version") || !d.HasMember("monsters") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -8566,7 +8561,7 @@ void MonsterData_t::loadMonsterDataJSON()
 			}
 
 			monsterDataEntries[monsterType] = MonsterDataEntry_t(monsterType);
-			auto& entry = monsterDataEntries[monsterType];
+			auto entry = monsterDataEntries[monsterType];
 
 			for ( auto entry_itr = itr->value.MemberBegin(); entry_itr != itr->value.MemberEnd(); ++entry_itr )
 			{
@@ -8613,7 +8608,7 @@ void MonsterData_t::loadMonsterDataJSON()
 								noOverrideIcon = special_itr->value["no_override_icon"].GetBool();
 							}
 							entry.specialNPCs[special_itr->name.GetString()] = MonsterDataEntry_t::SpecialNPCEntry_t();
-							auto& specialNPC = entry.specialNPCs[special_itr->name.GetString()];
+							auto specialNPC = entry.specialNPCs[special_itr->name.GetString()];
 							specialNPC.internalName = special_itr->name.GetString();
 							specialNPC.name = special_itr->value["localized_name"].GetString();
 							specialNPC.baseModel = baseModel;
@@ -8747,11 +8742,11 @@ void ShopkeeperConsumables_t::readFromFile()
 	char buf[65536];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.HasMember("version") || !d.HasMember("store_types") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -8824,7 +8819,7 @@ void ShopkeeperConsumables_t::readFromFile()
 			auto& slot = slots->value;
 			int tradeRequirement = slot["trading_req"].GetInt();
 
-			auto& slotItems = slot["items"];
+			auto slotItems = slot["items"];
 
 			entries[shoptype].push_back(StoreSlots_t());
 			auto& storeSlotData = entries[shoptype].at(entries[shoptype].size() - 1);
@@ -8836,7 +8831,7 @@ void ShopkeeperConsumables_t::readFromFile()
 				auto& itemEntry = storeSlotData.itemEntries.at(storeSlotData.itemEntries.size() - 1);
 
 				{
-					auto& member = (*slot_itr)["type"];
+					auto member = (*slot_itr)["type"];
 					bool isArr = member.IsArray();
 					std::vector<DynamicString> strings;
 					if ( !isArr )
@@ -8875,7 +8870,7 @@ void ShopkeeperConsumables_t::readFromFile()
 					itemEntry.emptyItemEntry = true;
 				}
 				{
-					auto& member = (*slot_itr)["status"];
+					auto member = (*slot_itr)["status"];
 					bool isArr = member.IsArray();
 					std::vector<DynamicString> strings;
 					if ( !isArr )
@@ -8914,7 +8909,7 @@ void ShopkeeperConsumables_t::readFromFile()
 					}
 				}
 				{
-					auto& member = (*slot_itr)["beatitude"];
+					auto member = (*slot_itr)["beatitude"];
 					bool isArr = member.IsArray();
 					std::vector<int> ints;
 					if ( !isArr )
@@ -8934,7 +8929,7 @@ void ShopkeeperConsumables_t::readFromFile()
 					}
 				}
 				{
-					auto& member = (*slot_itr)["count"];
+					auto member = (*slot_itr)["count"];
 					bool isArr = member.IsArray();
 					std::vector<int> ints;
 					if ( !isArr )
@@ -8954,7 +8949,7 @@ void ShopkeeperConsumables_t::readFromFile()
 					}
 				}
 				{
-					auto& member = (*slot_itr)["appearance"];
+					auto member = (*slot_itr)["appearance"];
 					bool isArr = member.IsArray();
 					std::vector<Uint32> ints;
 					if ( !member.IsString() )
@@ -8977,7 +8972,7 @@ void ShopkeeperConsumables_t::readFromFile()
 					}
 				}
 				{
-					auto& member = (*slot_itr)["identified"];
+					auto member = (*slot_itr)["identified"];
 					bool isArr = member.IsArray();
 					std::vector<bool> bools;
 					if ( !isArr )
@@ -9032,7 +9027,7 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 	}
 	outputPath.append(fileName.c_str());
 
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	bool writeNewFile = true;
 	if ( fileWriteType == HOTBAR_LAYOUT_CUSTOM_CONFIG )
 	{
@@ -9061,10 +9056,9 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 			char buf[80000];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			exportDocument.ParseStream(is);
+			exportDocument.Parse(buf);
 			printlog("[JSON]: Loaded existing file %s", outputPath.c_str());
 			writeNewFile = false;
 		}
@@ -9081,8 +9075,8 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 		std::string classname = playerClassInternalNames.at(client_classes[clientnum]);
 		if ( writeNewFile )
 		{
-			CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
-			rapidjson::Value allClassesObject(rapidjson::kObjectType);
+			CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(VERSION));
+			JsonNode allClassesObject(ObjectTypeTag);
 			CustomHelpers::addMemberToRoot(exportDocument, "classes", allClassesObject);
 		}
 		else
@@ -9097,8 +9091,8 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 				printlog("[JSON]: Custom layout not found for class '%s', skipping deletion...", classname.c_str());
 				return;
 			}
-			exportDocument["classes"].AddMember(rapidjson::Value(classname.c_str(), exportDocument.GetAllocator()),
-				rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
+			exportDocument["classes"].AddMember(JsonNode(classname.c_str()),
+				JsonNode(ObjectTypeTag));
 		}
 
 		if ( writeMode == HOTBAR_CONFIG_DELETE )
@@ -9116,30 +9110,30 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 			}
 			if ( !exportDocument["classes"][classname.c_str()].HasMember(layoutname.c_str()) )
 			{
-				exportDocument["classes"][classname.c_str()].AddMember(rapidjson::Value(layoutname.c_str(), exportDocument.GetAllocator()),
-					rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
+				exportDocument["classes"][classname.c_str()].AddMember(JsonNode(layoutname.c_str()),
+					JsonNode(ObjectTypeTag));
 			}
 
-			auto& layoutObj = exportDocument["classes"][classname.c_str()][layoutname.c_str()];
+			auto layoutObj = exportDocument["classes"][classname.c_str()][layoutname.c_str()];
 			for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
 			{
 				std::string slotnum = std::to_string(i);
 				if ( !layoutObj.HasMember(slotnum.c_str()) )
 				{
-					layoutObj.AddMember(rapidjson::Value(slotnum.c_str(), exportDocument.GetAllocator()),
-						rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
+					layoutObj.AddMember(JsonNode(slotnum.c_str()),
+						JsonNode(ObjectTypeTag));
 				}
 
-				auto& slot = layoutObj[slotnum.c_str()];
+				auto slot = layoutObj[slotnum.c_str()];
 				if ( !slot.HasMember("items") )
 				{
-					slot.AddMember("items", rapidjson::Value(rapidjson::kArrayType), exportDocument.GetAllocator());
+					slot.AddMember("items", JsonNode(ArrayTypeTag));
 				}
 				else
 				{
 					slot["items"].Clear(); // overwrite new values in array
 				}
-				//slot.AddMember("categories", rapidjson::Value(rapidjson::kArrayType), exportDocument.GetAllocator());
+				//slot.AddMember("categories", JsonNode(ArrayTypeTag));
 				if ( hotbar_t.slots()[i].item != 0 )
 				{
 					if ( Item* item = uidToItem(hotbar_t.slots()[i].item) )
@@ -9158,8 +9152,8 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 									continue;
 								}
 							}
-							rapidjson::Value itemnamekey(itemstr.c_str(), exportDocument.GetAllocator());
-							slot["items"].PushBack(itemnamekey, exportDocument.GetAllocator());
+							JsonNode itemnamekey(itemstr.c_str());
+							slot["items"].PushBack(itemnamekey);
 						}
 					}
 				}
@@ -9168,17 +9162,17 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 	}
 	else if ( fileWriteType == HOTBAR_LAYOUT_DEFAULT_CONFIG )
 	{
-		CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
-		rapidjson::Value allClassesObject(rapidjson::kObjectType);
+		CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(VERSION));
+		JsonNode allClassesObject(ObjectTypeTag);
 		CustomHelpers::addMemberToRoot(exportDocument, "classes", allClassesObject);
 
 		int classIndex = -1;
 		for ( auto& classname : playerClassInternalNames )
 		{
 			++classIndex;
-			rapidjson::Value classObj(rapidjson::kObjectType);
-			classObj.AddMember("classic", rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
-			classObj.AddMember("modern", rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
+			JsonNode classObj(ObjectTypeTag);
+			classObj.AddMember("classic", JsonNode(ObjectTypeTag));
+			classObj.AddMember("modern", JsonNode(ObjectTypeTag));
 
 			auto& hotbar_t = players[clientnum]->hotbar;
 
@@ -9200,12 +9194,12 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 				for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
 				{
 					std::string slotnum = std::to_string(i);
-					classObj[layout.c_str()].AddMember(rapidjson::Value(slotnum.c_str(), exportDocument.GetAllocator()),
-						rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
+					classObj[layout.c_str()].AddMember(JsonNode(slotnum.c_str()),
+						JsonNode(ObjectTypeTag));
 
-					auto& slot = classObj[layout.c_str()][slotnum.c_str()];
-					slot.AddMember("items", rapidjson::Value(rapidjson::kArrayType), exportDocument.GetAllocator());
-					//slot.AddMember("categories", rapidjson::Value(rapidjson::kArrayType), exportDocument.GetAllocator());
+					auto slot = classObj[layout.c_str()][slotnum.c_str()];
+					slot.AddMember("items", JsonNode(ArrayTypeTag));
+					//slot.AddMember("categories", JsonNode(ArrayTypeTag));
 					if ( hotbar_t.slots()[i].item != 0 )
 					{
 						if ( Item* item = uidToItem(hotbar_t.slots()[i].item) )
@@ -9224,8 +9218,8 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 										continue;
 									}
 								}
-								rapidjson::Value itemnamekey(itemstr.c_str(), exportDocument.GetAllocator());
-								slot["items"].PushBack(itemnamekey, exportDocument.GetAllocator());
+								JsonNode itemnamekey(itemstr.c_str());
+								slot["items"].PushBack(itemnamekey);
 							}
 						}
 					}
@@ -9245,10 +9239,9 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 		printlog("[JSON]: Error opening json file %s for write!", outputPath.c_str());
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 
 	printlog("[JSON]: Successfully wrote json file %s", outputPath.c_str());
@@ -9289,11 +9282,11 @@ void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fil
 	static char buf[140000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.HasMember("version") || !d.HasMember("classes") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -9328,7 +9321,7 @@ void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fil
 				facebarLayout = true;
 			}
 
-			auto& customOrDefaultHotbar = (fileReadType == HOTBAR_LAYOUT_DEFAULT_CONFIG) ? ClassHotbarsDefault[classIndex] : ClassHotbars[classIndex];
+			auto customOrDefaultHotbar = (fileReadType == HOTBAR_LAYOUT_DEFAULT_CONFIG) ? ClassHotbarsDefault[classIndex] : ClassHotbars[classIndex];
 			auto& classHotbar = facebarLayout ? customOrDefaultHotbar.layoutModern : customOrDefaultHotbar.layoutClassic;
 			classHotbar.hasData = true;
 			for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
@@ -9338,7 +9331,7 @@ void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fil
 				{
 					continue;
 				}
-				auto& slot = layout->value[slotnum.c_str()];
+				auto slot = layout->value[slotnum.c_str()];
 				if ( slot.HasMember("items") )
 				{
 					if ( slot["items"].IsArray() )
@@ -9421,8 +9414,8 @@ void ClassHotbarConfig_t::init()
 {
 	for ( int c = 0; c < NUMCLASSES; ++c )
 	{
-		auto& classHotbar = ClassHotbars[c];
-		auto& classHotbarDefault = ClassHotbarsDefault[c];
+		auto classHotbar = ClassHotbars[c];
+		auto classHotbarDefault = ClassHotbarsDefault[c];
 		classHotbar.layoutClassic.init();
 		classHotbar.layoutModern.init();
 		classHotbarDefault.layoutClassic.init();
@@ -9570,11 +9563,11 @@ void LocalAchievements_t::readFromFile()
 	static char buf[65536 * 2];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.HasMember("version") || !d.HasMember("achievements") || !d.HasMember("statistics") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", path);
@@ -9583,13 +9576,13 @@ void LocalAchievements_t::readFromFile()
 
 	for ( auto achievement = d["achievements"].MemberBegin(); achievement != d["achievements"].MemberEnd(); ++achievement )
 	{
-		auto& ach = LocalAchievements.achievements[achievement->name.GetString()];
+		auto ach = LocalAchievements.achievements[achievement->name.GetString()];
 		ach.name = achievement->name.GetString();
 		ach.unlocked = achievement->value["unlocked"].GetBool();
 		ach.unlockTime = achievement->value["unlock_time"].GetInt64();
 
 		{
-			auto& achData = Compendium_t::achievements[achievement->name.GetString()];
+			auto achData = Compendium_t::achievements[achievement->name.GetString()];
 			achData.unlocked = ach.unlocked;
 			achData.unlockTime = ach.unlockTime;
 			if ( ach.unlocked )
@@ -9603,7 +9596,7 @@ void LocalAchievements_t::readFromFile()
 	{
 		std::string statStr = statistic->name.GetString();
 		const int statNum = stoi(statStr);
-		auto& stat = LocalAchievements.statistics[statNum];
+		auto stat = LocalAchievements.statistics[statNum];
 		stat.value = statistic->value["progress"].GetInt();
 	}
 
@@ -9619,43 +9612,43 @@ void LocalAchievements_t::writeToFile()
 	char path[PATH_MAX] = "";
 	completePath(path, "savegames/achievements.json", outputdir);
 
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	exportDocument.SetObject();
 
 	const int VERSION = 1;
 
-	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
-	rapidjson::Value allAchObj(rapidjson::kObjectType);
+	CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(VERSION));
+	JsonNode allAchObj(ObjectTypeTag);
 	for ( auto& ach : Compendium_t::achievements )
 	{
 		if ( !LocalAchievements.achievements.contains(ach.first) )
 		{
 			continue;
 		}
-		auto& achData = LocalAchievements.achievements[ach.first];
+		auto achData = LocalAchievements.achievements[ach.first];
 
-		rapidjson::Value namekey(ach.first, exportDocument.GetAllocator());
-		allAchObj.AddMember(namekey, rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
-		auto& obj = allAchObj[ach.first];
-		obj.AddMember("unlocked", achData.unlocked, exportDocument.GetAllocator());
-		obj.AddMember("unlock_time", achData.unlockTime, exportDocument.GetAllocator());
+		JsonNode namekey(ach.first);
+		allAchObj.AddMember(namekey, JsonNode(ObjectTypeTag));
+		auto obj = allAchObj[ach.first];
+		obj.AddMember("unlocked", achData.unlocked);
+		obj.AddMember("unlock_time", achData.unlockTime);
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "achievements", allAchObj);
 
-	rapidjson::Value allStatObj(rapidjson::kObjectType);
+	JsonNode allStatObj(ObjectTypeTag);
 	for ( int i = 0; i < NUM_STEAM_STATISTICS; ++i )
 	{
 		if ( LocalAchievements.statistics.find(i) == LocalAchievements.statistics.end() )
 		{
 			continue;
 		}
-		auto& statData = LocalAchievements.statistics[i];
+		auto statData = LocalAchievements.statistics[i];
 
 		std::string statNum = std::to_string(i);
-		rapidjson::Value namekey(statNum.c_str(), exportDocument.GetAllocator());
-		allStatObj.AddMember(namekey, rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
-		auto& obj = allStatObj[statNum.c_str()];
-		obj.AddMember("progress", statData.value, exportDocument.GetAllocator());
+		JsonNode namekey(statNum.c_str());
+		allStatObj.AddMember(namekey, JsonNode(ObjectTypeTag));
+		auto obj = allStatObj[statNum.c_str()];
+		obj.AddMember("progress", statData.value);
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "statistics", allStatObj);
 
@@ -9665,10 +9658,9 @@ void LocalAchievements_t::writeToFile()
 		printlog("[JSON]: Error opening json file %s for write!", path);
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 
 	printlog("[JSON]: Successfully wrote json file %s", path);
@@ -9695,7 +9687,7 @@ void LocalAchievements_t::updateAchievement(const char* name, const bool unlocke
 {
 	if ( achievements.contains(name) )
 	{
-		auto& ach = achievements[name];
+		auto ach = achievements[name];
 		bool oldUnlocked = ach.unlocked;
 		ach.unlocked = unlocked;
 		if ( ach.unlocked && !oldUnlocked )
@@ -9712,7 +9704,7 @@ void LocalAchievements_t::updateStatistic(const int stat_num, const int value)
 {
 	if ( statistics.find(stat_num) != statistics.end() )
 	{
-		auto& stat = statistics[stat_num];
+		auto stat = statistics[stat_num];
 		stat.value = value;
 	}
 }
@@ -9779,7 +9771,7 @@ void GameplayPreferences_t::receivePacket()
 	int player = (Uint8)net_packet->data[4];
 	if ( player >= 0 && player < MAXPLAYERS )
 	{
-		auto& playerPrefs = gameplayPreferences[player];
+		auto playerPrefs = gameplayPreferences[player];
 		const int numPrefs = (Uint8)net_packet->data[5];
 		for ( int i = 0; i < numPrefs && i < GPREF_ENUM_END; ++i )
 		{
@@ -10288,11 +10280,11 @@ void EditorEntityData_t::readFromFile()
 	char buf[65536];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.HasMember("version") || !d.HasMember("entities") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -10303,13 +10295,13 @@ void EditorEntityData_t::readFromFile()
 	colliderDmgTypes.clear();
 	colliderRandomGenPool.clear();
 	colliderNameIndexes.clear();
-	auto& entityTypes = d["entities"];
+	auto entityTypes = d["entities"];
 	if ( entityTypes.HasMember("collider_dmg_calcs") )
 	{
 		for ( auto itr = entityTypes["collider_dmg_calcs"].MemberBegin(); itr != entityTypes["collider_dmg_calcs"].MemberEnd();
 			++itr )
 		{
-			auto& colliderDmg = colliderDmgTypes[itr->name.GetString()];
+			auto colliderDmg = colliderDmgTypes[itr->name.GetString()];
 			colliderDmg.burnable = itr->value["burnable"].GetBool();
 			colliderDmg.minotaurPathThroughAndBreak = itr->value["minotaur_path_and_break"].GetBool();
 			colliderDmg.meleeAffects = itr->value["melee"].GetBool();
@@ -10404,7 +10396,7 @@ void EditorEntityData_t::readFromFile()
 		{
 			auto indexStr = itr->name.GetString();
 			int index = std::stoi(indexStr);
-			auto& collider = colliderData[index];
+			auto collider = colliderData[index];
 			collider.name = itr->value["name"].GetString();
 			assert(colliderNameIndexes.find(collider.name) == colliderNameIndexes.end());
 			colliderNameIndexes[collider.name] = index;
@@ -10519,7 +10511,7 @@ void EditorEntityData_t::readFromFile()
 					{
 						if ( !strcmp(itr3->name.GetString(), "summon") )
 						{
-							auto& data = collider.hideMonsters[mapname];
+							auto data = collider.hideMonsters[mapname];
 							if ( itr3->value.IsArray() )
 							{
 								for ( auto val = itr3->value.Begin(); val != itr3->value.End(); ++val )
@@ -11671,11 +11663,11 @@ void EquipmentModelOffsets_t::readBaseItemsFromFile()
 	static char buf[32000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		return;
@@ -11690,7 +11682,7 @@ void EquipmentModelOffsets_t::readBaseItemsFromFile()
 
 	miscItemsBaseOffsets.clear();
 
-	auto& itemsArr = d["items"];
+	auto itemsArr = d["items"];
 	for ( auto it = itemsArr.Begin(); it != itemsArr.End(); ++it )
 	{
 		for ( auto it2 = it->MemberBegin(); it2 != it->MemberEnd(); ++it2 )
@@ -11746,7 +11738,7 @@ void EquipmentModelOffsets_t::readBaseItemsFromFile()
 			}
 			for ( auto index : models )
 			{
-				auto& entry = miscItemsBaseOffsets[index];
+				auto entry = miscItemsBaseOffsets[index];
 				entry.focalx = focalx;
 				entry.focaly = focaly;
 				entry.focalz = focalz;
@@ -11801,11 +11793,11 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 	static char buf[32000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		return;
@@ -11853,7 +11845,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 		}
 	}
 
-	auto& itemsArr = d["items"];
+	auto itemsArr = d["items"];
 	for ( auto it = itemsArr.Begin(); it != itemsArr.End(); ++it )
 	{
 		for ( auto it2 = it->MemberBegin(); it2 != it->MemberEnd(); ++it2 )
@@ -11918,7 +11910,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 
 			for ( auto index : models )
 			{
-				auto& entry = monsterModelsMap[monsterType][index];
+				auto entry = monsterModelsMap[monsterType][index];
 				entry.rotation = rotation * (PI / 2);
 				entry.focalx = focalx;
 				entry.focaly = focaly;
@@ -11948,7 +11940,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 
 				if ( it2->value.HasMember("adjust_on_oversize_mask") )
 				{
-					auto& itr = it2->value["adjust_on_oversize_mask"];
+					auto itr = it2->value["adjust_on_oversize_mask"];
 					for ( auto adjItr = itr.Begin(); adjItr != itr.End(); ++adjItr )
 					{
 						std::vector<int> models;
@@ -11995,7 +11987,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 
 				if ( it2->value.HasMember("adjust_on_expand_helm") )
 				{
-					auto& itr = it2->value["adjust_on_expand_helm"];
+					auto itr = it2->value["adjust_on_expand_helm"];
 					for ( auto adjItr = itr.Begin(); adjItr != itr.End(); ++adjItr )
 					{
 						std::vector<int> models;
@@ -12131,7 +12123,7 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::updateKillEvent(Entity
 		return;
 	}
 
-	auto& killTotal = gameStatistics[STATISTICS_TOTAL_KILLS];
+	auto killTotal = gameStatistics[STATISTICS_TOTAL_KILLS];
 	killTotal++;
 
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -12252,7 +12244,7 @@ static ConsoleVariable<int> cvar_challengeevent("/challengeevent", -1);
 
 bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 {
-	rapidjson::Document d;
+	JsonNode d;
 	const char* json = scenarioStr.c_str();
 	d.Parse(json);
 
@@ -12272,7 +12264,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 
 	if ( d.HasMember("base_stats") )
 	{
-		const rapidjson::Value& stats = d["base_stats"];
+		const JsonNode stats = d["base_stats"];
 		for ( auto itr = stats.MemberBegin(); itr != stats.MemberEnd(); ++itr )
 		{
 			std::string name = itr->name.GetString();
@@ -12350,7 +12342,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 
 	if ( d.HasMember("add_stats") )
 	{
-		const rapidjson::Value& stats = d["add_stats"];
+		const JsonNode stats = d["add_stats"];
 		for ( auto itr = stats.MemberBegin(); itr != stats.MemberEnd(); ++itr )
 		{
 			std::string name = itr->name.GetString();
@@ -12428,7 +12420,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 
 	if ( d.HasMember("character") )
 	{
-		const rapidjson::Value& stats = d["character"];
+		const JsonNode stats = d["character"];
 		for ( auto itr = stats.MemberBegin(); itr != stats.MemberEnd(); ++itr )
 		{
 			std::string name = itr->name.GetString();
@@ -12445,7 +12437,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 
 	if ( d.HasMember("gameplay") )
 	{
-		const rapidjson::Value& stats = d["gameplay"];
+		const JsonNode stats = d["gameplay"];
 		for ( auto itr = stats.MemberBegin(); itr != stats.MemberEnd(); ++itr )
 		{
 			std::string name = itr->name.GetString();
@@ -12534,7 +12526,7 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 }
 #endif
 
-void jsonVecToVec(rapidjson::Value& val, DynamicArrayStr& vec)
+void jsonVecToVec(JsonNode val, DynamicArrayStr& vec)
 {
 	for ( auto itr = val.Begin(); itr != val.End(); ++itr )
 	{
@@ -12545,7 +12537,7 @@ void jsonVecToVec(rapidjson::Value& val, DynamicArrayStr& vec)
 	}
 }
 
-void jsonVecToVec(rapidjson::Value& val, DynamicArrayS32& vec)
+void jsonVecToVec(JsonNode val, DynamicArrayS32& vec)
 {
 	for ( auto itr = val.Begin(); itr != val.End(); ++itr )
 	{
@@ -12630,11 +12622,11 @@ void Compendium_t::readContentsLang(std::string name, DynamicMapStrArrayStringPa
 	char buf[65536];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("contents") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -12796,11 +12788,11 @@ void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -12812,7 +12804,7 @@ void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( items.contains(key) )
 		{
-			auto& entry = items[key];
+			auto entry = items[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -12861,11 +12853,11 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("items") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -12878,12 +12870,12 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 	Compendium_t::Events_t::itemIDToString.clear();
 	Compendium_t::CompendiumItems_t::readContentsLang();
 
-	auto& entries = d["items"];
+	auto entries = d["items"];
 	for ( auto itr = entries.MemberBegin(); itr != entries.MemberEnd(); ++itr )
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto& obj = items[name];
+		auto obj = items[name];
 
 		if ( w.HasMember("blurb") )
 		{
@@ -12995,7 +12987,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 							const int itemType = ItemTooltips.itemNameStringToItemID[item.name];
 							if ( itemType >= WOODEN_SHIELD && itemType < NUMITEMS )
 							{
-								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
+								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13019,12 +13011,12 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 
 			for ( auto item : itemsInList )
 			{
-				auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
+				auto vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
 				int index = -1;
 				for ( auto& v : vec )
 				{
 					++index;
-					auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
+					auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
 					if ( v == EventTags::CPDM_CUSTOM_TAG )
 					{
 						if ( index < customEvents.size() )
@@ -13048,22 +13040,22 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 	/*if ( keystatus[SDLK_g] )
 	{
 		keystatus[SDLK_g] = 0;
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 		for ( auto& obj : items )
 		{
-			rapidjson::Value entry(rapidjson::kObjectType);
+			JsonNode entry(ObjectTypeTag);
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.blurb )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("blurb", arr, d.GetAllocator());
+				entry.AddMember("blurb", arr);
 			}
 
-			d.AddMember(rapidjson::Value(obj.first.c_str(), d.GetAllocator()), entry, d.GetAllocator());
+			d.AddMember(JsonNode(obj.first.c_str()), entry);
 		}
 
 		char path[PATH_MAX] = "";
@@ -13075,10 +13067,9 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 			printlog("[JSON]: Error opening json file %s for write!", path);
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 		FileIO::close(fp);
 	}*/
 }
@@ -13122,11 +13113,11 @@ void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -13138,7 +13129,7 @@ void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( magic.contains(key) )
 		{
-			auto& entry = magic[key];
+			auto entry = magic[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -13187,11 +13178,11 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("items") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -13203,7 +13194,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	//Compendium_t::Events_t::eventItemLookup.clear();
 	Compendium_t::CompendiumMagic_t::readContentsLang();
 
-	auto& entries = d["items"];
+	auto entries = d["items"];
 	std::unordered_set<std::string> ignoredSpells;
 	std::unordered_set<std::string> ignoredSpellbooks;
 
@@ -13226,7 +13217,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto& obj = magic[name];
+		auto obj = magic[name];
 
 		if ( w.HasMember("blurb") )
 		{
@@ -13495,7 +13486,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 							const int itemType = isSpell ? SPELL_ITEM : ItemTooltips.itemNameStringToItemID[item.name];
 							if ( itemType == SPELL_ITEM )
 							{
-								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventSpellOffset + item.spellID];
+								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventSpellOffset + item.spellID];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13505,7 +13496,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 							}
 							else if ( itemType >= WOODEN_SHIELD && itemType < NUMITEMS )
 							{
-								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
+								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13529,12 +13520,12 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 
 			for ( auto item : itemsInList )
 			{
-				auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
+				auto vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
 				int index = -1;
 				for ( auto& v : vec )
 				{
 					++index;
-					auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
+					auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
 					if ( v == EventTags::CPDM_CUSTOM_TAG )
 					{
 						if ( index < customEvents.size() )
@@ -13558,22 +13549,22 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	/*if ( keystatus[SDLK_g] )
 	{
 		keystatus[SDLK_g] = 0;
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 		for ( auto& obj : magic )
 		{
-			rapidjson::Value entry(rapidjson::kObjectType);
+			JsonNode entry(ObjectTypeTag);
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.blurb )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("blurb", arr, d.GetAllocator());
+				entry.AddMember("blurb", arr);
 			}
 
-			d.AddMember(rapidjson::Value(obj.first.c_str(), d.GetAllocator()), entry, d.GetAllocator());
+			d.AddMember(JsonNode(obj.first.c_str()), entry);
 		}
 
 		char path[PATH_MAX] = "";
@@ -13585,10 +13576,9 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 			printlog("[JSON]: Error opening json file %s for write!", path);
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 		FileIO::close(fp);
 	}*/
 }
@@ -13632,11 +13622,11 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -13648,7 +13638,7 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( codex.contains(key) )
 		{
-			auto& entry = codex[key];
+			auto entry = codex[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -13664,7 +13654,7 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 				entry.details.snapshot(_lines);
 				for ( size_t _li = 0; _li < _lines.size(); ++_li )
 				{
-					auto& line = _lines[_li];
+					auto line = _lines[_li];
 					if ( line.size() > 0 )
 					{
 						if ( line[0] == '-' )
@@ -13763,11 +13753,11 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("codex") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -13781,12 +13771,12 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 	Compendium_t::Events_t::codexIDToString.clear();
 	Compendium_t::CompendiumCodex_t::readContentsLang();
 
-	auto& entries = d["codex"];
+	auto entries = d["codex"];
 	for ( auto itr = entries.MemberBegin(); itr != entries.MemberEnd(); ++itr )
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto& obj = codex[name];
+		auto obj = codex[name];
 
 		obj.id = w["event_lookup"].GetInt();
 		if ( w.HasMember("blurb") )
@@ -13820,7 +13810,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 			obj.details.snapshot(_lines);
 			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				auto& line = _lines[_li];
+				auto line = _lines[_li];
 				if ( line.size() > 0 )
 				{
 					if ( line[0] == '-' )
@@ -13911,7 +13901,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
-						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+						auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 						if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 							== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 						{
@@ -13929,12 +13919,12 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 				customEvents.push_back(itr->GetString());
 			}
 
-			auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+			auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 			int index = -1;
 			for ( auto& v : vec )
 			{
 				++index;
-				auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+				auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 				if ( v == EventTags::CPDM_CUSTOM_TAG )
 				{
 					if ( index < customEvents.size() )
@@ -13994,11 +13984,11 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -14010,7 +14000,7 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( worldObjects.contains(key) )
 		{
-			auto& entry = worldObjects[key];
+			auto entry = worldObjects[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -14026,7 +14016,7 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 				entry.details.snapshot(_lines);
 				for ( size_t _li = 0; _li < _lines.size(); ++_li )
 				{
-					auto& line = _lines[_li];
+					auto line = _lines[_li];
 					if ( line.size() > 0 )
 					{
 						if ( line[0] == '-' )
@@ -14125,11 +14115,11 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("world") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -14142,12 +14132,12 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	Compendium_t::Events_t::worldIDToString.clear();
 	Compendium_t::CompendiumWorld_t::readContentsLang();
 
-	auto& entries = d["world"];
+	auto entries = d["world"];
 	for ( auto itr = entries.MemberBegin(); itr != entries.MemberEnd(); ++itr )
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto& obj = worldObjects[name];
+		auto obj = worldObjects[name];
 
 		obj.id = w["event_lookup"].GetInt();
 		if ( w.HasMember("blurb") )
@@ -14177,7 +14167,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 			obj.details.snapshot(_lines);
 			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				auto& line = _lines[_li];
+				auto line = _lines[_li];
 				if ( line.size() > 0 )
 				{
 					if ( line[0] == '-' )
@@ -14263,7 +14253,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
-						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+						auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 						if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 							== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 						{
@@ -14281,12 +14271,12 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 				customEvents.push_back(itr->GetString());
 			}
 
-			auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+			auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 			int index = -1;
 			for ( auto& v : vec )
 			{
 				++index;
-				auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+				auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 				if ( v == EventTags::CPDM_CUSTOM_TAG )
 				{
 					if ( index < customEvents.size() )
@@ -14309,35 +14299,35 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	/*if ( keystatus[SDLK_g] )
 	{
 		keystatus[SDLK_g] = 0;
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 		for ( auto& obj : worldObjects )
 		{
-			rapidjson::Value entry(rapidjson::kObjectType);
+			JsonNode entry(ObjectTypeTag);
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.blurb )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("blurb", arr, d.GetAllocator());
+				entry.AddMember("blurb", arr);
 			}
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.details )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("details", arr, d.GetAllocator());
+				entry.AddMember("details", arr);
 			}
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& color : obj.second.linesToHighlight )
 				{
-					rapidjson::Value val(rapidjson::kObjectType);
+					JsonNode val(ObjectTypeTag);
 					if ( color == 0 )
 					{
 					}
@@ -14346,20 +14336,20 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 						Uint8 r, g, b, a;
 						getColor(color, &r, &g, &b, &a);
 
-						rapidjson::Value colorVal(rapidjson::kObjectType);
-						colorVal.AddMember("r", r, d.GetAllocator());
-						colorVal.AddMember("g", g, d.GetAllocator());
-						colorVal.AddMember("b", b, d.GetAllocator());
-						colorVal.AddMember("a", a, d.GetAllocator());
+						JsonNode colorVal(ObjectTypeTag);
+						colorVal.AddMember("r", r);
+						colorVal.AddMember("g", g);
+						colorVal.AddMember("b", b);
+						colorVal.AddMember("a", a);
 
-						val.AddMember("color", colorVal, d.GetAllocator());
+						val.AddMember("color", colorVal);
 					}
-					arr.PushBack(val, d.GetAllocator());
+					arr.PushBack(val);
 				}
-				entry.AddMember("details_line_highlights", arr, d.GetAllocator());
+				entry.AddMember("details_line_highlights", arr);
 			}
 
-			d.AddMember(rapidjson::Value(obj.first.c_str(), d.GetAllocator()), entry, d.GetAllocator());
+			d.AddMember(JsonNode(obj.first.c_str()), entry);
 		}
 
 		char path[PATH_MAX] = "";
@@ -14371,10 +14361,9 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 			printlog("[JSON]: Error opening json file %s for write!", path);
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 		FileIO::close(fp);
 	}*/
 }
@@ -14420,11 +14409,11 @@ void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -14436,7 +14425,7 @@ void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( monsters.contains(key) )
 		{
-			auto& entry = monsters[key];
+			auto entry = monsters[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -14495,11 +14484,11 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("monsters") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -14569,7 +14558,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 
-	auto& entries = d["monsters"];
+	auto entries = d["monsters"];
 	for ( auto itr = entries.MemberBegin(); itr != entries.MemberEnd(); ++itr )
 	{
 		std::string name = itr->name.GetString();
@@ -14590,7 +14579,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 		if ( monsterType == NOTHING && name != "ghost" ) { continue; }
 
 		auto& m = itr->value;
-		auto& monster = monsters[itr->name.GetString()];
+		auto monster = monsters[itr->name.GetString()];
 		monster.monsterType = monsterType;
 		monster.unique_npc = m.HasMember("unique_npc") ? m["unique_npc"].GetString() : "";
 		if ( m.HasMember("blurb") )
@@ -14605,7 +14594,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 		{
 			monster.lorePoints = m["lore_points"].GetInt();
 		}
-		auto& stats = m["stats"];
+		auto stats = m["stats"];
 		jsonVecToVec(stats["hp"], monster.hp);
 		jsonVecToVec(stats["ac"], monster.ac);
 		jsonVecToVec(stats["spd"], monster.spd);
@@ -14687,40 +14676,40 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 	/*if ( keystatus[SDLK_g] )
 	{
 		keystatus[SDLK_g] = 0;
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
 		for ( auto& obj : monsters )
 		{
-			rapidjson::Value entry(rapidjson::kObjectType);
+			JsonNode entry(ObjectTypeTag);
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.blurb )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("blurb", arr, d.GetAllocator());
+				entry.AddMember("blurb", arr);
 			}
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.abilities )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("abilities", arr, d.GetAllocator());
+				entry.AddMember("abilities", arr);
 			}
 
 			{
-				rapidjson::Value arr(rapidjson::kArrayType);
+				JsonNode arr(ArrayTypeTag);
 				for ( auto& str : obj.second.inventory )
 				{
-					arr.PushBack(rapidjson::Value(str.c_str(), d.GetAllocator()), d.GetAllocator());
+					arr.PushBack(JsonNode(str.c_str()));
 				}
-				entry.AddMember("inventory", arr, d.GetAllocator());
+				entry.AddMember("inventory", arr);
 			}
 
-			d.AddMember(rapidjson::Value(obj.first.c_str(), d.GetAllocator()), entry, d.GetAllocator());
+			d.AddMember(JsonNode(obj.first.c_str()), entry);
 		}
 
 		char path[PATH_MAX] = "";
@@ -14732,10 +14721,9 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 			printlog("[JSON]: Error opening json file %s for write!", path);
 			return;
 		}
-		rapidjson::StringBuffer os;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		fp->write(os.GetString(), sizeof(char), os.GetSize());
+		const char* json = json_node_serialize(d.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 		FileIO::close(fp);
 	}*/
 }
@@ -14781,11 +14769,11 @@ void Compendium_t::Events_t::readEventsTranslations()
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("tags") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -14802,7 +14790,7 @@ void Compendium_t::Events_t::readEventsTranslations()
 			if ( find != eventIdLookup.end())
 			{
 				EventTags tag = (Compendium_t::EventTags)eventIdLookup[find->first];
-				auto& entry = eventLangEntries[tag];
+				auto entry = eventLangEntries[tag];
 				for ( auto itr3 = itr2->value.MemberBegin(); itr3 != itr2->value.MemberEnd(); ++itr3 )
 				{
 					entry[itr3->name.GetString()] = itr3->value.GetString();
@@ -15058,7 +15046,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 		return results;
 	}
 
-	rapidjson::Document d;
+	JsonNode d;
 	d.Parse(customEventsValues[key].c_str());
 	if ( !d.IsObject() )
 	{
@@ -15143,7 +15131,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 					auto findTag = eventIdLookup.find(name);
 					if ( findTag != eventIdLookup.end() )
 					{
-						auto& playerTags = playerEvents[(Compendium_t::EventTags)findTag->second];
+						auto playerTags = playerEvents[(Compendium_t::EventTags)findTag->second];
 						for ( auto itemId : eventItemLookup[(Compendium_t::EventTags)findTag->second] )
 						{
 							if ( cat == "spells" )
@@ -15253,7 +15241,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 							++cycleResults;
 							continue;
 						}
-						auto& playerTags = playerEvents[tag];
+						auto playerTags = playerEvents[tag];
 						std::vector<std::pair<int, int>> codexIDs;
 						codexIDs.push_back(std::make_pair(-1, foundId));
 
@@ -15276,7 +15264,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 
 						if ( foundLookup )
 						{
-							auto& def = events[tag];
+							auto def = events[tag];
 							if ( def.attributes.contains("stats") && valueType != "max_class" )
 							{
 								if ( cat == "str" ) { codexIDs.back().first = STAT_STR; }
@@ -15291,7 +15279,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								codexIDs.clear();
 								if ( eventClassIds.contains(tag) )
 								{
-									auto& classTagMap = eventClassIds[tag];
+									auto classTagMap = eventClassIds[tag];
 									// iterate through classes
 									int startOffsetId = -1;
 									if ( def.attributes.contains("skills") )
@@ -15368,7 +15356,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								codexIDs.clear();
 								if ( eventClassIds.contains(tag) )
 								{
-									auto& classTagMap = eventClassIds[tag];
+									auto classTagMap = eventClassIds[tag];
 									// iterate through classes
 									for ( auto& classId : classTagMap )
 									{
@@ -15720,11 +15708,11 @@ void Compendium_t::Events_t::readEventsFromFile()
 	char buf[120000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("tags") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -15742,7 +15730,7 @@ void Compendium_t::Events_t::readEventsFromFile()
 		for ( auto itr2 = itr->MemberBegin(); itr2 != itr->MemberEnd(); ++itr2 )
 		{
 			const EventTags id = (EventTags)std::min(index, (int)CPDM_EVENT_TAGS_MAX);
-			auto& entry = events[id];
+			auto entry = events[id];
 			entry.id = id;
 			entry.name = itr2->name.GetString();
 			eventIdLookup[entry.name] = id;
@@ -15837,12 +15825,9 @@ void Compendium_t::Events_t::readEventsFromFile()
 		{
 			eventIdLookup[itr->name.GetString()] = EventTags::CPDM_CUSTOM_TAG;
 
-			rapidjson::StringBuffer os;
-			os.Clear();
-			rapidjson::Writer<rapidjson::StringBuffer> writer(os);
-			itr->value.Accept(writer);
-
-			customEventsValues[itr->name.GetString()] = os.GetString();
+			const char* json = json_node_serialize(itr->value.h, true);
+			customEventsValues[itr->name.GetString()] = json;
+			json_string_free(json);
 		}
 	}
 }
@@ -15871,11 +15856,11 @@ void Compendium_t::Events_t::loadItemsSaveData()
 	char buf[bufSize];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("items") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -16151,11 +16136,11 @@ void Compendium_t::readUnlocksSaveData()
 	char buf[bufSize];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
+	JsonDoc jd(buf);
+	JsonNode d = jd.root;
+	
 	if ( !d.IsObject() || !d.HasMember("version") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -16254,28 +16239,28 @@ void Compendium_t::writeUnlocksSaveData()
 	char path[PATH_MAX] = "";
 	completePath(path, "savegames/compendium_progress.json", outputdir);
 
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	exportDocument.SetObject();
 
 	const int VERSION = 1;
 
-	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
-	rapidjson::Value obj(rapidjson::kObjectType);
+	CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(VERSION));
+	JsonNode obj(ObjectTypeTag);
 	obj.RemoveAllMembers();
 	DynamicMapI32::Entry unlocksEntries_u0[512];
 	int32_t unlocksCount_u0 = CompendiumItems_t::unlocks.entryList(unlocksEntries_u0, 512);
 	for ( int32_t ui = 0; ui < unlocksCount_u0; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(unlocksEntries_u0[ui].key, exportDocument.GetAllocator()),
-			rapidjson::Value((int)unlocksEntries_u0[ui].value), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(unlocksEntries_u0[ui].key),
+			JsonNode((int)unlocksEntries_u0[ui].value));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "items", obj);
 
 	obj.RemoveAllMembers();
 	for ( auto& pair : CompendiumItems_t::itemUnlocks )
 	{
-		obj.AddMember(rapidjson::Value(std::to_string(pair.first).c_str(), exportDocument.GetAllocator()),
-			rapidjson::Value((int)pair.second), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(std::to_string(pair.first).c_str()),
+			JsonNode((int)pair.second));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "items_status", obj);
 
@@ -16284,8 +16269,8 @@ void Compendium_t::writeUnlocksSaveData()
 	int32_t unlocksCount_u1 = AchievementData_t::unlocks.entryList(unlocksEntries_u1, 512);
 	for ( int32_t ui = 0; ui < unlocksCount_u1; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(unlocksEntries_u1[ui].key, exportDocument.GetAllocator()),
-			rapidjson::Value((int)unlocksEntries_u1[ui].value), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(unlocksEntries_u1[ui].key),
+			JsonNode((int)unlocksEntries_u1[ui].value));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "achievements", obj);
 
@@ -16294,8 +16279,8 @@ void Compendium_t::writeUnlocksSaveData()
 	int32_t unlocksCount_u2 = CompendiumWorld_t::unlocks.entryList(unlocksEntries_u2, 512);
 	for ( int32_t ui = 0; ui < unlocksCount_u2; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(unlocksEntries_u2[ui].key, exportDocument.GetAllocator()),
-			rapidjson::Value((int)unlocksEntries_u2[ui].value), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(unlocksEntries_u2[ui].key),
+			JsonNode((int)unlocksEntries_u2[ui].value));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "world", obj);
 
@@ -16304,8 +16289,8 @@ void Compendium_t::writeUnlocksSaveData()
 	int32_t unlocksCount_u3 = CompendiumCodex_t::unlocks.entryList(unlocksEntries_u3, 512);
 	for ( int32_t ui = 0; ui < unlocksCount_u3; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(unlocksEntries_u3[ui].key, exportDocument.GetAllocator()),
-			rapidjson::Value((int)unlocksEntries_u3[ui].value), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(unlocksEntries_u3[ui].key),
+			JsonNode((int)unlocksEntries_u3[ui].value));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "codex", obj);
 
@@ -16314,8 +16299,8 @@ void Compendium_t::writeUnlocksSaveData()
 	int32_t unlocksCount = CompendiumMonsters_t::unlocks.entryList(unlocksEntries, 512);
 	for ( int32_t ui = 0; ui < unlocksCount; ++ui )
 	{
-		obj.AddMember(rapidjson::Value(unlocksEntries[ui].key, exportDocument.GetAllocator()),
-			rapidjson::Value((int)unlocksEntries[ui].value), exportDocument.GetAllocator());
+		obj.AddMember(JsonNode(unlocksEntries[ui].key),
+			JsonNode((int)unlocksEntries[ui].value));
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "monsters", obj);
 
@@ -16325,10 +16310,9 @@ void Compendium_t::writeUnlocksSaveData()
 		printlog("[JSON]: Error opening json file %s for write!", path);
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, true);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 
 	printlog("[JSON]: Successfully wrote json file %s", path);
@@ -16347,23 +16331,23 @@ void Compendium_t::Events_t::writeItemsSaveData()
 		completePath(path, "savegames/compendium_items.json", outputdir);
 	}
 
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	exportDocument.SetObject();
 
 	const int VERSION = 2;
 
-	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(VERSION));
-	rapidjson::Value itemsObj(rapidjson::kObjectType);
+	CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(VERSION));
+	JsonNode itemsObj(ObjectTypeTag);
 	for ( auto& pair : playerEvents )
 	{
 		const std::string& key = events[pair.first].name;
-		rapidjson::Value namekey(key.c_str(), exportDocument.GetAllocator());
-		itemsObj.AddMember(namekey, rapidjson::Value(rapidjson::kObjectType), exportDocument.GetAllocator());
-		auto& obj = itemsObj[key.c_str()];
+		JsonNode namekey(key.c_str());
+		itemsObj.AddMember(namekey, JsonNode(ObjectTypeTag));
+		auto obj = itemsObj[key.c_str()];
 		for ( auto& itemsData : pair.second )
 		{
-			rapidjson::Value itemKey(std::to_string(itemsData.first).c_str(), exportDocument.GetAllocator());
-			obj.AddMember(itemKey, itemsData.second.value, exportDocument.GetAllocator());
+			JsonNode itemKey(std::to_string(itemsData.first).c_str());
+			obj.AddMember(itemKey, itemsData.second.value);
 		}
 	}
 	CustomHelpers::addMemberToRoot(exportDocument, "items", itemsObj);
@@ -16374,10 +16358,9 @@ void Compendium_t::Events_t::writeItemsSaveData()
 		printlog("[JSON]: Error opening json file %s for write!", path);
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, true);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 
 	printlog("[JSON]: Successfully wrote json file %s", path);
@@ -17128,7 +17111,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 		return;
 	}
 
-	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 
 	if ( def.eventTrackingType == EventTrackingType::ONCE_PER_RUN && !loadingValue )
 	{
@@ -17147,7 +17130,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 		{
 			e[itemType] = EventVal_t(tag);
 		}
-		auto& val = e[itemType];
+		auto val = e[itemType];
 		val.value = value; // reading from savefile
 		val.firstValue = false;
 	}
@@ -17177,7 +17160,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 			{
 				e[itemType] = EventVal_t(tag);
 			}
-			auto& val = e[itemType];
+			auto val = e[itemType];
 			if ( val.applyValue(value) )
 			{
 				if ( *cvar_compendiumDebugSave )
@@ -17219,7 +17202,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 					auto find = Compendium_t::Events_t::monsterIDToString.find(monsterId);
 					if ( find != Compendium_t::Events_t::monsterIDToString.end() )
 					{
-						auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+						auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 						if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 						{
 							unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17230,7 +17213,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 
 			bool itemUnlocked = false;
 			{
-				auto& unlockStatus = Compendium_t::CompendiumItems_t::itemUnlocks[itemType];
+				auto unlockStatus = Compendium_t::CompendiumItems_t::itemUnlocks[itemType];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17240,7 +17223,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 			auto find = itemIDToString.find(itemType);
 			if ( find != itemIDToString.end() )
 			{
-				auto& unlockStatus = Compendium_t::CompendiumItems_t::unlocks[find->second];
+				auto unlockStatus = Compendium_t::CompendiumItems_t::unlocks[find->second];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17368,7 +17351,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		return;
 	}
 
-	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 	if ( e.find(monsterType) == e.end() )
 	{
 		e[monsterType] = EventVal_t(tag);
@@ -17385,7 +17368,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		players[playernum]->compendiumProgress.itemEvents[def.name][monsterType] += value;
 	}
 
-	auto& val = e[monsterType];
+	auto val = e[monsterType];
 	if ( loadingValue )
 	{
 		val.value = value; // reading from savefile
@@ -17424,7 +17407,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		auto find = monsterIDToString.find(monsterType);
 		if ( find != monsterIDToString.end() )
 		{
-			auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+			auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 			if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 			{
 				unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17531,7 +17514,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 	}
 
 
-	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 
 	if ( def.eventTrackingType == EventTrackingType::ONCE_PER_RUN && !loadingValue )
 	{
@@ -17550,7 +17533,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		{
 			e[worldID] = EventVal_t(tag);
 		}
-		auto& val = e[worldID];
+		auto val = e[worldID];
 		val.value = value; // reading from savefile
 		val.firstValue = false;
 	}
@@ -17580,7 +17563,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		{
 			e[worldID] = EventVal_t(tag);
 		}
-		auto& val = e[worldID];
+		auto val = e[worldID];
 		if ( val.applyValue(value) )
 		{
 			if ( *cvar_compendiumDebugSave )
@@ -17598,7 +17581,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		auto find = worldIDToString.find(worldID);
 		if ( find != worldIDToString.end() )
 		{
-			auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks[find->second];
+			auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks[find->second];
 			if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 			{
 				if ( find->second == "merchants guild"
@@ -17620,7 +17603,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + SHOPKEEPER);
 				if ( find != monsterIDToString.end() )
 				{
-					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17632,7 +17615,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH);
 				if ( find != monsterIDToString.end() )
 				{
-					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17642,35 +17625,35 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 			else if ( find->second == "hamlet" )
 			{
 				{
-					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["merchants guild"];
+					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["merchants guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["magicians guild"];
+					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["magicians guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["hunters guild"];
+					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["hunters guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["the church"];
+					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["the church"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["masons guild"];
+					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["masons guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17682,14 +17665,14 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + DEVIL);
 				if ( find != monsterIDToString.end() )
 				{
-					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 
-				auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["brimstone boulder"];
+				auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["brimstone boulder"];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17700,7 +17683,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH_FIRE);
 				if ( find != monsterIDToString.end() )
 				{
-					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17709,7 +17692,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH_ICE);
 				if ( find != monsterIDToString.end() )
 				{
-					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17809,7 +17792,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		{
 			if ( eventClassIds.contains(tag) )
 			{
-				auto& classTagMap = eventClassIds[tag];
+				auto classTagMap = eventClassIds[tag];
 				for ( auto& pair : classTagMap )
 				{
 					if ( pair.second == ((codexID < kEventCodexOffset) ? (codexID + kEventCodexOffset) : codexID) )
@@ -17856,7 +17839,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 			{
 				if ( eventClassIds.contains(tag) )
 				{
-					auto& classTagMap = eventClassIds[tag];
+					auto classTagMap = eventClassIds[tag];
 					// iterate through classes
 					int classId = client_classes[playernum];
 					if ( def.attributes.contains("skills") )
@@ -17924,7 +17907,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 	}
 
 
-	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 	if ( e.find(codexID) == e.end() )
 	{
 		e[codexID] = EventVal_t(tag);
@@ -17941,7 +17924,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		players[playernum]->compendiumProgress.itemEvents[def.name][codexID] += value;
 	}
 
-	auto& val = e[codexID];
+	auto val = e[codexID];
 	if ( loadingValue )
 	{
 		val.value = value; // reading from savefile
@@ -17987,7 +17970,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 			auto find = codexIDToString.find(baseCodexID);
 			if ( find != codexIDToString.end() )
 			{
-				auto& unlockStatus = Compendium_t::CompendiumCodex_t::unlocks[find->second];
+				auto unlockStatus = Compendium_t::CompendiumCodex_t::unlocks[find->second];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -18014,29 +17997,28 @@ void Compendium_t::Events_t::sendClientDataOverNet(const int playernum)
 			return;
 		}
 
-		rapidjson::Document d;
+		JsonNode d;
 		d.SetObject();
-		CustomHelpers::addMemberToRoot(d, "seq", rapidjson::Value(clientSequence));
-		rapidjson::Value data(rapidjson::kObjectType);
+		CustomHelpers::addMemberToRoot(d, "seq", JsonNode(clientSequence));
+		JsonNode data(ObjectTypeTag);
 		for ( auto& p1 : serverPlayerEvents[playernum] )
 		{
 			std::string key = std::to_string(p1.first);
-			rapidjson::Value namekey(key.c_str(), d.GetAllocator());
-			data.AddMember(namekey, rapidjson::Value(rapidjson::kObjectType), d.GetAllocator());
-			auto& obj = data[key.c_str()];
+			JsonNode namekey(key.c_str());
+			data.AddMember(namekey, JsonNode(ObjectTypeTag));
+			auto obj = data[key.c_str()];
 			for ( auto& itemsData : p1.second )
 			{
-				rapidjson::Value itemKey(std::to_string(itemsData.first).c_str(), d.GetAllocator());
-				obj.AddMember(itemKey, itemsData.second.value, d.GetAllocator());
+				JsonNode itemKey(std::to_string(itemsData.first).c_str());
+				obj.AddMember(itemKey, itemsData.second.value);
 			}
 		}
 		CustomHelpers::addMemberToRoot(d, "item", data);
 
-		rapidjson::StringBuffer os;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(os);
-		d.Accept(writer);
-		clientDataStrings[playernum][clientSequence] = os.GetString();
-		auto& dataStr = clientDataStrings[playernum][clientSequence];
+		const char* json = json_node_serialize(d.h, true);
+		clientDataStrings[playernum][clientSequence] = json;
+		json_string_free(json);
+		auto dataStr = clientDataStrings[playernum][clientSequence];
 
 		const size_t len = dataStr.size();
 		if ( len == 0 )
@@ -18124,11 +18106,11 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			static char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
+			JsonDoc jd(buf);
+	JsonNode d = jd.root;
+			
 			if ( !d.IsObject() || !d.HasMember("version") || !d.HasMember("limbs") )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -18137,7 +18119,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			int version = d["version"].GetInt();
 
 			std::string filename = f.substr(0, f.find(".json"));
-			auto& entry = compendiumObjectLimbs[filename];
+			auto entry = compendiumObjectLimbs[filename];
 			barony_dynamic_array_clear(&entry.entities);
 			entry.baseCamera = CompendiumView_t();
 
@@ -18147,7 +18129,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			int index = 0;
 			if ( d.HasMember("map_tiles") )
 			{
-				auto& m = compendiumObjectMapTiles[filename];
+				auto m = compendiumObjectMapTiles[filename];
 				if ( d["map_tiles"].HasMember("floor") 
 					&& d["map_tiles"].HasMember("mid") 
 					&& d["map_tiles"].HasMember("top")
@@ -18218,7 +18200,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			if ( d.HasMember("camera") )
 			{
 				entry.baseCamera.inUse = true;
-				auto& c = d["camera"];
+				auto c = d["camera"];
 				if ( c.HasMember("ang_degrees") )
 				{
 					entry.baseCamera.ang = PI * c["ang_degrees"].GetInt() / 180.0;
@@ -18358,23 +18340,23 @@ void Compendium_t::exportCurrentMonster(Entity* monster)
 
 	std::string exportFileName = monsterName + std::to_string(filenum) + ".json";
 
-	rapidjson::Document exportDocument;
+	JsonNode exportDocument;
 	exportDocument.SetObject();
-	CustomHelpers::addMemberToRoot(exportDocument, "version", rapidjson::Value(1));
+	CustomHelpers::addMemberToRoot(exportDocument, "version", JsonNode(1));
 
-	rapidjson::Value cameraObject(rapidjson::kObjectType);
-	cameraObject.AddMember("ang_degrees", 0, exportDocument.GetAllocator());
-	cameraObject.AddMember("vang_degrees", 0, exportDocument.GetAllocator());
-	cameraObject.AddMember("zoom", 0.0, exportDocument.GetAllocator());
-	cameraObject.AddMember("height", 0.0, exportDocument.GetAllocator());
-	cameraObject.AddMember("rotate_limit_degrees_min", 0, exportDocument.GetAllocator());
-	cameraObject.AddMember("rotate_limit_degrees_max", 0, exportDocument.GetAllocator());
-	cameraObject.AddMember("rotate_speed", 0.0, exportDocument.GetAllocator());
+	JsonNode cameraObject(ObjectTypeTag);
+	cameraObject.AddMember("ang_degrees", 0);
+	cameraObject.AddMember("vang_degrees", 0);
+	cameraObject.AddMember("zoom", 0.0);
+	cameraObject.AddMember("height", 0.0);
+	cameraObject.AddMember("rotate_limit_degrees_min", 0);
+	cameraObject.AddMember("rotate_limit_degrees_max", 0);
+	cameraObject.AddMember("rotate_speed", 0.0);
 	CustomHelpers::addMemberToRoot(exportDocument, "camera", cameraObject);
 
-	rapidjson::Value limbsObject(rapidjson::kObjectType);
+	JsonNode limbsObject(ObjectTypeTag);
 
-	rapidjson::Value limbsArray(rapidjson::kArrayType);
+	JsonNode limbsArray(ArrayTypeTag);
 
 	std::vector<Entity*> allLimbs;
 	allLimbs.push_back(monster);
@@ -18392,31 +18374,31 @@ void Compendium_t::exportCurrentMonster(Entity* monster)
 		{
 			continue;
 		}
-		rapidjson::Value limbsObj(rapidjson::kObjectType);
+		JsonNode limbsObj(ObjectTypeTag);
 
 		if ( index != 0 )
 		{
-			limbsObj.AddMember("x", rapidjson::Value(monster->x - limb->x), exportDocument.GetAllocator());
-			limbsObj.AddMember("y", rapidjson::Value(monster->y - limb->y), exportDocument.GetAllocator());
-			limbsObj.AddMember("z", rapidjson::Value(limb->z), exportDocument.GetAllocator());
+			limbsObj.AddMember("x", JsonNode(monster->x - limb->x));
+			limbsObj.AddMember("y", JsonNode(monster->y - limb->y));
+			limbsObj.AddMember("z", JsonNode(limb->z));
 		}
 		else
 		{
-			limbsObj.AddMember("x", rapidjson::Value(0), exportDocument.GetAllocator());
-			limbsObj.AddMember("y", rapidjson::Value(0), exportDocument.GetAllocator());
-			limbsObj.AddMember("z", rapidjson::Value(limb->z), exportDocument.GetAllocator());
+			limbsObj.AddMember("x", JsonNode(0));
+			limbsObj.AddMember("y", JsonNode(0));
+			limbsObj.AddMember("z", JsonNode(limb->z));
 		}
-		limbsObj.AddMember("pitch", rapidjson::Value(limb->pitch), exportDocument.GetAllocator());
-		limbsObj.AddMember("roll", rapidjson::Value(limb->roll), exportDocument.GetAllocator());
-		limbsObj.AddMember("yaw", rapidjson::Value(limb->yaw), exportDocument.GetAllocator());
-		limbsObj.AddMember("focalx", rapidjson::Value(limb->focalx), exportDocument.GetAllocator());
-		limbsObj.AddMember("focaly", rapidjson::Value(limb->focaly), exportDocument.GetAllocator());
-		limbsObj.AddMember("focalz", rapidjson::Value(limb->focalz), exportDocument.GetAllocator());
-		limbsObj.AddMember("sprite", rapidjson::Value(limb->sprite), exportDocument.GetAllocator());
-		limbsObj.AddMember("scalex", rapidjson::Value(limb->scalex), exportDocument.GetAllocator());
-		limbsObj.AddMember("scaley", rapidjson::Value(limb->scaley), exportDocument.GetAllocator());
-		limbsObj.AddMember("scalez", rapidjson::Value(limb->scalez), exportDocument.GetAllocator());
-		limbsArray.PushBack(limbsObj, exportDocument.GetAllocator());
+		limbsObj.AddMember("pitch", JsonNode(limb->pitch));
+		limbsObj.AddMember("roll", JsonNode(limb->roll));
+		limbsObj.AddMember("yaw", JsonNode(limb->yaw));
+		limbsObj.AddMember("focalx", JsonNode(limb->focalx));
+		limbsObj.AddMember("focaly", JsonNode(limb->focaly));
+		limbsObj.AddMember("focalz", JsonNode(limb->focalz));
+		limbsObj.AddMember("sprite", JsonNode(limb->sprite));
+		limbsObj.AddMember("scalex", JsonNode(limb->scalex));
+		limbsObj.AddMember("scaley", JsonNode(limb->scaley));
+		limbsObj.AddMember("scalez", JsonNode(limb->scalez));
+		limbsArray.PushBack(limbsObj);
 
 		++index;
 	}
@@ -18433,10 +18415,9 @@ void Compendium_t::exportCurrentMonster(Entity* monster)
 	{
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	exportDocument.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(exportDocument.h, false);
+		fp->write(json, sizeof(char), strlen(json));
+		json_string_free(json);
 	FileIO::close(fp);
 
 	return;

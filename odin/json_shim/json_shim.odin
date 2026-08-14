@@ -1183,6 +1183,27 @@ json_node_clear_array :: proc "c" (arr: rawptr) {
 }
 
 @(export)
+json_node_remove_all_members :: proc "c" (obj: rawptr) {
+	context = runtime.default_context()
+	n := cast(^Node)obj
+	if n.kind != .Object { return }
+	for m in n.members {
+		delete(m.name)
+		destroy_node(m.value)
+		free(m.value)
+	}
+	clear(&n.members)
+}
+
+@(export)
+json_node_parse_document :: proc "c" (data: cstring) -> rawptr {
+	context = runtime.default_context()
+	n, ok := parse_document(string(data))
+	if !ok { return nil }
+	return n
+}
+
+@(export)
 json_node_set_string :: proc "c" (node: rawptr, s: cstring) {
 	context = runtime.default_context()
 	n := cast(^Node)node

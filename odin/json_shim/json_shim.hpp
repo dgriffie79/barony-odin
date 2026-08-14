@@ -89,6 +89,8 @@ extern "C" {
     // --- serializer ---
     const char* json_node_serialize(void* node, bool compact);
     void        json_string_free(const char* s);
+    void*       json_node_parse_document(const char* data);
+    void        json_node_remove_all_members(void* obj);
 }
 
 // Convenience helpers for the ad-hoc parser sites (rapidjson-style value reads).
@@ -124,10 +126,24 @@ struct JsonValueIt;
 // JsonNode — a lightweight non-owning view over a json_shim DOM node, mirroring
 // the rapidjson read API (operator[], HasMember, GetInt/GetString/..., Member/
 // Value iteration). Lets large parser sites convert ~1:1 from rapidjson.
+// Tags mirroring rapidjson's kObjectType/kArrayType used with Value(...).
+enum JsonTypeTag { ObjectTypeTag, ArrayTypeTag };
+
 struct JsonNode {
     void* h = nullptr;
     JsonNode() = default;
     explicit JsonNode(void* _h) : h(_h) {}
+    JsonNode(JsonTypeTag t) : h(t == ObjectTypeTag ? json_node_create_object() : json_node_create_array()) {}
+    // rapidjson::Value(v) — primitive-typed construction
+    JsonNode(int32_t v)  : h(json_node_create_int(v)) {}
+    JsonNode(uint32_t v) : h(json_node_create_uint(v)) {}
+    JsonNode(int64_t v)  : h(json_node_create_int64(v)) {}
+    JsonNode(uint64_t v) : h(json_node_create_uint64(v)) {}
+    JsonNode(double v)   : h(json_node_create_double(v)) {}
+    JsonNode(bool v)     : h(json_node_create_bool(v)) {}
+    JsonNode(const char* v) : h(json_node_create_string(v)) {}
+    // rapidjson::Value(str, allocator) — copy-string form
+    JsonNode(const char* v, void*) : h(json_node_create_string(v)) {}
 
     bool IsNull()    const { return json_node_is_null(h); }
     bool IsObject()  const { return json_node_is_object(h); }
@@ -143,6 +159,59 @@ struct JsonNode {
 
     bool HasMember(const char* k) const { return json_node_has_member(h, k); }
     JsonNode operator[](const char* k) const { return JsonNode(json_node_get_member(h, k)); }
+    JsonNode operator[](uint32_t i) const { return JsonNode(json_node_element_at(h, i)); }
+
+    // rapidjson::GetArray()/GetObject() equivalents — return *this (the node IS
+    // the array/object). Only valid if IsArray()/IsObject().
+    JsonNode GetArray()  const { return *this; }
+    JsonNode GetObject() const { return *this; }
+
+    // write-side (rapidjson::Value mutation, mirrored from JsonValue)
+    static JsonNode Object()            { return JsonNode(json_node_create_object()); }
+    static JsonNode Array()             { return JsonNode(json_node_create_array()); }
+    static JsonNode Int(int32_t v)      { return JsonNode(json_node_create_int(v)); }
+    static JsonNode Uint(uint32_t v)    { return JsonNode(json_node_create_uint(v)); }
+    static JsonNode Int64(int64_t v)    { return JsonNode(json_node_create_int64(v)); }
+    static JsonNode Uint64(uint64_t v)  { return JsonNode(json_node_create_uint64(v)); }
+    static JsonNode Double(double v)    { return JsonNode(json_node_create_double(v)); }
+    static JsonNode Bool(bool v)        { return JsonNode(json_node_create_bool(v)); }
+    static JsonNode Str(const char* s)  { return JsonNode(json_node_create_string(s)); }
+    static JsonNode Null()              { return JsonNode(json_node_create_null()); }
+
+    // rapidjson Value Set* — replace this node's payload (mutate in place)
+    void SetObject() { *this = Object(); }
+    void SetArray()  { *this = Array(); }
+    // rapidjson Document::Parse / Accept / RemoveAllMembers
+    void ParseStream(void*) { /* handled by callers via JsonDoc; no-op */ }
+    void Parse(const char* s) { *this = JsonNode(json_node_parse_document(s)); }
+    void RemoveAllMembers() { json_node_remove_all_members(h); }
+    void Clear() { json_node_remove_all_members(h); }
+    void EraseMember(const char* k) { json_node_erase_member(h, k); }
+    void Accept(void*) {}  // serialization is done via json_node_serialize
+    void SetInt(int32_t v)     { *this = Int(v); }
+    void SetUint(uint32_t v)   { *this = Uint(v); }
+    void SetInt64(int64_t v)   { *this = Int64(v); }
+    void SetUint64(uint64_t v) { *this = Uint64(v); }
+    void SetDouble(double v)   { *this = Double(v); }
+    void SetBool(bool v)       { *this = Bool(v); }
+    void SetString(const char* s, void*) { *this = Str(s); }
+    void AddMember(const char* k, JsonNode v) { json_node_add_member(h, k, v.h); }
+    void AddMember(JsonNode k, JsonNode v) { json_node_add_member(h, k.GetString(), v.h); }
+    void AddMember(const char* k, int32_t v)     { AddMember(k, Int(v)); }
+    void AddMember(const char* k, uint32_t v)    { AddMember(k, Uint(v)); }
+    void AddMember(const char* k, int64_t v)     { AddMember(k, Int64(v)); }
+    void AddMember(const char* k, uint64_t v)    { AddMember(k, Uint64(v)); }
+    void AddMember(const char* k, double v)      { AddMember(k, Double(v)); }
+    void AddMember(const char* k, bool v)        { AddMember(k, Bool(v)); }
+    void AddMember(const char* k, const char* v) { AddMember(k, Str(v)); }
+    void PushBack(JsonNode v)                    { json_node_push_back(h, v.h); }
+    void PushBack(int32_t v)     { PushBack(Int(v)); }
+    void PushBack(uint32_t v)    { PushBack(Uint(v)); }
+    void PushBack(int64_t v)     { PushBack(Int64(v)); }
+    void PushBack(uint64_t v)    { PushBack(Uint64(v)); }
+    void PushBack(double v)      { PushBack(Double(v)); }
+    void PushBack(bool v)        { PushBack(Bool(v)); }
+    void PushBack(const char* v) { PushBack(Str(v)); }
 
     int32_t  GetInt()    const { int32_t v = 0;    json_node_get_int(h, &v);    return v; }
     uint32_t GetUint()   const { uint32_t v = 0;   json_node_get_uint(h, &v);   return v; }
@@ -165,7 +234,7 @@ struct JsonNode {
 
 // object-member iterator (mirrors rapidjson ConstMemberIterator)
 struct JsonMemberRef {
-    struct Name { const char* s = nullptr; const char* GetString() const { return s; } };
+    struct Name { const char* s = nullptr; const char* GetString() const { return s; } bool IsString() const { return s != nullptr; } };
     Name name;
     JsonNode value;
 };
