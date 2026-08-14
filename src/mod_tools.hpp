@@ -4164,7 +4164,7 @@ struct Compendium_t
 		static int completionPercent;
 		static int numUnread;
 	};
-	std::map<std::string, CompendiumCodex_t::Codex_t> codex;
+	DynamicMapStrT<CompendiumCodex_t::Codex_t> codex;
 	bool migrateOldSkillIndexes = false;
 	void readCodexFromFile(bool forceLoadBaseDirectory = false);
 	void readCodexTranslationsFromFile(bool forceLoadBaseDirectory = false);
@@ -4379,6 +4379,7 @@ template <> struct MapValueKindOf<Compendium_t::AchievementData_t::CompendiumAch
 template <> struct MapValueKindOf<Compendium_t::CompendiumMapTiles_t> { static constexpr int value = MK_CompendiumMapTiles; };
 template <> struct MapValueKindOf<Compendium_t::ObjectLimbs_t> { static constexpr int value = MK_ObjectLimbs; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumWorld_t::World_t> { static constexpr int value = MK_World; };
+template <> struct MapValueKindOf<Compendium_t::CompendiumCodex_t::Codex_t> { static constexpr int value = MK_Codex; };
 
 
 extern Compendium_t CompendiumEntries;

@@ -24457,10 +24457,9 @@ void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, 
 
 	bool sprite = false;
 	Compendium_t::CompendiumCodex_t::Codex_t* codexEntry = nullptr;
-	auto find = CompendiumEntries.codex.find(name);
-	if ( find != CompendiumEntries.codex.end() )
+	if ( CompendiumEntries.codex.contains(name) )
 	{
-		codexEntry = &find->second;
+		codexEntry = &CompendiumEntries.codex[name];
 		sprite = codexEntry->renderedImagePaths.size() > 0;
 	}
 
