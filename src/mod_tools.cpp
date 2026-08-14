@@ -1137,7 +1137,7 @@ void ItemTooltips_t::readItemsFromFile()
 		hash += (Uint32)((Uint32)items[i].gold_value << (shift % 32)); ++shift;
 		hash += (Uint32)((Uint32)items[i].level << (shift % 32)); ++shift;
 		/*{
-			auto pair = std::make_pair(items[i].value, i);
+			auto& pair = std::make_pair(items[i].value, i);
 			auto lower = std::lower_bound(itemValueTable.begin(), itemValueTable.end(), pair,
 				[](const auto& lhs, const auto& rhs) {
 					return lhs < rhs;
@@ -1145,8 +1145,8 @@ void ItemTooltips_t::readItemsFromFile()
 			itemValueTable.insert(lower, pair);
 		}
 		{
-			auto pair = std::make_pair(items[i].value, i);
-			auto lower = std::lower_bound(itemValueTableByCategory[items[i].category].begin(), 
+			auto& pair = std::make_pair(items[i].value, i);
+			auto& lower = std::lower_bound(itemValueTableByCategory[items[i].category].begin(), 
 				itemValueTableByCategory[items[i].category].end(), pair,
 				[](const auto& lhs, const auto& rhs) {
 					return lhs < rhs;
@@ -1487,7 +1487,7 @@ void ItemTooltips_t::readItemsFromFile()
 		}
 		for ( int j = 0; j < items[i].variations; ++j )
 		{
-			auto s = static_cast<string_t*>(list_Node(&items[i].images, j)->element);
+			auto& s = static_cast<string_t*>(list_Node(&items[i].images, j)->element);
 			assert(!strcmp(s->data, tmpItems[i].imagePaths[j].c_str()));
 		}
 		assert(items[i].index == tmpItems[i].tpIndex);
@@ -2352,7 +2352,7 @@ bool ItemTooltips_t::bSpellHasBasicHitMessage(const int spellID)
 {
 	if ( spellItems.find(spellID) != spellItems.end() )
 	{
-		auto entry = spellItems[spellID];
+		auto& entry = spellItems[spellID];
 		if ( entry.spellTags.find(SPELL_TAG_BASIC_HIT_MESSAGE) != entry.spellTags.end() )
 		{
 			return true;
@@ -7185,7 +7185,7 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 		allStatues.put(statueId, Statue_t());
 		for ( JsonMemberIt limb_itr = d["limbs"].MemberBegin(); limb_itr != d["limbs"].MemberEnd(); ++limb_itr )
 		{
-			auto statue = allStatues[statueId];
+			auto& statue = allStatues[statueId];
 			if ( d.HasMember("height_offset") )
 			{
 				statue.heightOffset = d["height_offset"].GetDouble();
@@ -7194,9 +7194,9 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 			{
 				const JsonNode attributes = *dir_itr;
 				std::string direction = limb_itr->name.GetString();
-				auto limbVector = statue.limbs[direction];
+				auto& limbVector = statue.limbs[direction];
 				limbVector.push_back(Statue_t::StatueLimb_t());
-				auto limb = limbVector[limbVector.size() - 1];
+				auto& limb = limbVector[limbVector.size() - 1];
 				limb.x = attributes["x"].GetDouble();
 				limb.y = attributes["y"].GetDouble();
 				limb.z = attributes["z"].GetDouble();
@@ -7229,12 +7229,12 @@ void DebugTimers_t::printTimepoints(std::string key, int& posy)
 	if ( !font8x8_bmp || intro ) {
 		return;
 	}
-	auto points = timepoints[key];
+	auto& points = timepoints[key];
 	if ( points.empty() ) { return; }
 	int starty = posy;
 	int index = 0;
 	std::string output = "";
-	auto previousPoint = points[0];
+	auto& previousPoint = points[0];
 	for ( auto& point : points )
 	{
 		double timediff = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(point.second - previousPoint.second).count();
@@ -7333,7 +7333,7 @@ bool GlyphRenderer_t::readFromFile()
 				continue;
 			}
 			allGlyphs[keycode] = GlyphData_t();
-			auto glyphData = allGlyphs[keycode];
+			auto& glyphData = allGlyphs[keycode];
 			glyphData.keycode = keycode;
 			glyphData.keyname = keyname;
 			if ( !attributes.HasMember("folder") )
@@ -7693,7 +7693,7 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 		{
 			std::string key = entry_itr->name.GetString();
 			allEntries[key] = Entry_t();
-			auto entry = allEntries[key];
+			auto& entry = allEntries[key];
 			entry.name = key;
 			entry.fontColor = defaultFontColor;
 			entry.fontOutlineColor = defaultFontOutlineColor;
@@ -8561,7 +8561,7 @@ void MonsterData_t::loadMonsterDataJSON()
 			}
 
 			monsterDataEntries[monsterType] = MonsterDataEntry_t(monsterType);
-			auto entry = monsterDataEntries[monsterType];
+			auto& entry = monsterDataEntries[monsterType];
 
 			for ( auto entry_itr = itr->value.MemberBegin(); entry_itr != itr->value.MemberEnd(); ++entry_itr )
 			{
@@ -8608,7 +8608,7 @@ void MonsterData_t::loadMonsterDataJSON()
 								noOverrideIcon = special_itr->value["no_override_icon"].GetBool();
 							}
 							entry.specialNPCs[special_itr->name.GetString()] = MonsterDataEntry_t::SpecialNPCEntry_t();
-							auto specialNPC = entry.specialNPCs[special_itr->name.GetString()];
+							auto& specialNPC = entry.specialNPCs[special_itr->name.GetString()];
 							specialNPC.internalName = special_itr->name.GetString();
 							specialNPC.name = special_itr->value["localized_name"].GetString();
 							specialNPC.baseModel = baseModel;
@@ -9321,7 +9321,7 @@ void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fil
 				facebarLayout = true;
 			}
 
-			auto customOrDefaultHotbar = (fileReadType == HOTBAR_LAYOUT_DEFAULT_CONFIG) ? ClassHotbarsDefault[classIndex] : ClassHotbars[classIndex];
+			auto& customOrDefaultHotbar = (fileReadType == HOTBAR_LAYOUT_DEFAULT_CONFIG) ? ClassHotbarsDefault[classIndex] : ClassHotbars[classIndex];
 			auto& classHotbar = facebarLayout ? customOrDefaultHotbar.layoutModern : customOrDefaultHotbar.layoutClassic;
 			classHotbar.hasData = true;
 			for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
@@ -9414,8 +9414,8 @@ void ClassHotbarConfig_t::init()
 {
 	for ( int c = 0; c < NUMCLASSES; ++c )
 	{
-		auto classHotbar = ClassHotbars[c];
-		auto classHotbarDefault = ClassHotbarsDefault[c];
+		auto& classHotbar = ClassHotbars[c];
+		auto& classHotbarDefault = ClassHotbarsDefault[c];
 		classHotbar.layoutClassic.init();
 		classHotbar.layoutModern.init();
 		classHotbarDefault.layoutClassic.init();
@@ -9576,13 +9576,13 @@ void LocalAchievements_t::readFromFile()
 
 	for ( auto achievement = d["achievements"].MemberBegin(); achievement != d["achievements"].MemberEnd(); ++achievement )
 	{
-		auto ach = LocalAchievements.achievements[achievement->name.GetString()];
+		auto& ach = LocalAchievements.achievements[achievement->name.GetString()];
 		ach.name = achievement->name.GetString();
 		ach.unlocked = achievement->value["unlocked"].GetBool();
 		ach.unlockTime = achievement->value["unlock_time"].GetInt64();
 
 		{
-			auto achData = Compendium_t::achievements[achievement->name.GetString()];
+			auto& achData = Compendium_t::achievements[achievement->name.GetString()];
 			achData.unlocked = ach.unlocked;
 			achData.unlockTime = ach.unlockTime;
 			if ( ach.unlocked )
@@ -9596,7 +9596,7 @@ void LocalAchievements_t::readFromFile()
 	{
 		std::string statStr = statistic->name.GetString();
 		const int statNum = stoi(statStr);
-		auto stat = LocalAchievements.statistics[statNum];
+		auto& stat = LocalAchievements.statistics[statNum];
 		stat.value = statistic->value["progress"].GetInt();
 	}
 
@@ -9625,7 +9625,7 @@ void LocalAchievements_t::writeToFile()
 		{
 			continue;
 		}
-		auto achData = LocalAchievements.achievements[ach.first];
+		auto& achData = LocalAchievements.achievements[ach.first];
 
 		JsonNode namekey(ach.first);
 		allAchObj.AddMember(namekey, JsonNode(ObjectTypeTag));
@@ -9642,7 +9642,7 @@ void LocalAchievements_t::writeToFile()
 		{
 			continue;
 		}
-		auto statData = LocalAchievements.statistics[i];
+		auto& statData = LocalAchievements.statistics[i];
 
 		std::string statNum = std::to_string(i);
 		JsonNode namekey(statNum.c_str());
@@ -9687,7 +9687,7 @@ void LocalAchievements_t::updateAchievement(const char* name, const bool unlocke
 {
 	if ( achievements.contains(name) )
 	{
-		auto ach = achievements[name];
+		auto& ach = achievements[name];
 		bool oldUnlocked = ach.unlocked;
 		ach.unlocked = unlocked;
 		if ( ach.unlocked && !oldUnlocked )
@@ -9704,7 +9704,7 @@ void LocalAchievements_t::updateStatistic(const int stat_num, const int value)
 {
 	if ( statistics.find(stat_num) != statistics.end() )
 	{
-		auto stat = statistics[stat_num];
+		auto& stat = statistics[stat_num];
 		stat.value = value;
 	}
 }
@@ -9771,7 +9771,7 @@ void GameplayPreferences_t::receivePacket()
 	int player = (Uint8)net_packet->data[4];
 	if ( player >= 0 && player < MAXPLAYERS )
 	{
-		auto playerPrefs = gameplayPreferences[player];
+		auto& playerPrefs = gameplayPreferences[player];
 		const int numPrefs = (Uint8)net_packet->data[5];
 		for ( int i = 0; i < numPrefs && i < GPREF_ENUM_END; ++i )
 		{
@@ -10301,7 +10301,7 @@ void EditorEntityData_t::readFromFile()
 		for ( auto itr = entityTypes["collider_dmg_calcs"].MemberBegin(); itr != entityTypes["collider_dmg_calcs"].MemberEnd();
 			++itr )
 		{
-			auto colliderDmg = colliderDmgTypes[itr->name.GetString()];
+			auto& colliderDmg = colliderDmgTypes[itr->name.GetString()];
 			colliderDmg.burnable = itr->value["burnable"].GetBool();
 			colliderDmg.minotaurPathThroughAndBreak = itr->value["minotaur_path_and_break"].GetBool();
 			colliderDmg.meleeAffects = itr->value["melee"].GetBool();
@@ -10396,7 +10396,7 @@ void EditorEntityData_t::readFromFile()
 		{
 			auto indexStr = itr->name.GetString();
 			int index = std::stoi(indexStr);
-			auto collider = colliderData[index];
+			auto& collider = colliderData[index];
 			collider.name = itr->value["name"].GetString();
 			assert(colliderNameIndexes.find(collider.name) == colliderNameIndexes.end());
 			colliderNameIndexes[collider.name] = index;
@@ -10511,7 +10511,7 @@ void EditorEntityData_t::readFromFile()
 					{
 						if ( !strcmp(itr3->name.GetString(), "summon") )
 						{
-							auto data = collider.hideMonsters[mapname];
+							auto& data = collider.hideMonsters[mapname];
 							if ( itr3->value.IsArray() )
 							{
 								for ( auto val = itr3->value.Begin(); val != itr3->value.End(); ++val )
@@ -11738,7 +11738,7 @@ void EquipmentModelOffsets_t::readBaseItemsFromFile()
 			}
 			for ( auto index : models )
 			{
-				auto entry = miscItemsBaseOffsets[index];
+				auto& entry = miscItemsBaseOffsets[index];
 				entry.focalx = focalx;
 				entry.focaly = focaly;
 				entry.focalz = focalz;
@@ -11910,7 +11910,7 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 
 			for ( auto index : models )
 			{
-				auto entry = monsterModelsMap[monsterType][index];
+				auto& entry = monsterModelsMap[monsterType][index];
 				entry.rotation = rotation * (PI / 2);
 				entry.focalx = focalx;
 				entry.focaly = focaly;
@@ -12123,7 +12123,7 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::updateKillEvent(Entity
 		return;
 	}
 
-	auto killTotal = gameStatistics[STATISTICS_TOTAL_KILLS];
+	auto& killTotal = gameStatistics[STATISTICS_TOTAL_KILLS];
 	killTotal++;
 
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -12804,7 +12804,7 @@ void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( items.contains(key) )
 		{
-			auto entry = items[key];
+			auto& entry = items[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -12875,7 +12875,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto obj = items[name];
+		auto& obj = items[name];
 
 		if ( w.HasMember("blurb") )
 		{
@@ -12987,7 +12987,7 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 							const int itemType = ItemTooltips.itemNameStringToItemID[item.name];
 							if ( itemType >= WOODEN_SHIELD && itemType < NUMITEMS )
 							{
-								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
+								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13011,12 +13011,12 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 
 			for ( auto item : itemsInList )
 			{
-				auto vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
+				auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
 				int index = -1;
 				for ( auto& v : vec )
 				{
 					++index;
-					auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
+					auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
 					if ( v == EventTags::CPDM_CUSTOM_TAG )
 					{
 						if ( index < customEvents.size() )
@@ -13129,7 +13129,7 @@ void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( magic.contains(key) )
 		{
-			auto entry = magic[key];
+			auto& entry = magic[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -13217,7 +13217,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto obj = magic[name];
+		auto& obj = magic[name];
 
 		if ( w.HasMember("blurb") )
 		{
@@ -13486,7 +13486,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 							const int itemType = isSpell ? SPELL_ITEM : ItemTooltips.itemNameStringToItemID[item.name];
 							if ( itemType == SPELL_ITEM )
 							{
-								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventSpellOffset + item.spellID];
+								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventSpellOffset + item.spellID];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13496,7 +13496,7 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 							}
 							else if ( itemType >= WOODEN_SHIELD && itemType < NUMITEMS )
 							{
-								auto vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
+								auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[itemType];
 								if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 									== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 								{
@@ -13520,12 +13520,12 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 
 			for ( auto item : itemsInList )
 			{
-				auto vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
+				auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[item];
 				int index = -1;
 				for ( auto& v : vec )
 				{
 					++index;
-					auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
+					auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[item];
 					if ( v == EventTags::CPDM_CUSTOM_TAG )
 					{
 						if ( index < customEvents.size() )
@@ -13638,7 +13638,7 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( codex.contains(key) )
 		{
-			auto entry = codex[key];
+			auto& entry = codex[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -13654,7 +13654,7 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 				entry.details.snapshot(_lines);
 				for ( size_t _li = 0; _li < _lines.size(); ++_li )
 				{
-					auto line = _lines[_li];
+					auto& line = _lines[_li];
 					if ( line.size() > 0 )
 					{
 						if ( line[0] == '-' )
@@ -13776,7 +13776,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto obj = codex[name];
+		auto& obj = codex[name];
 
 		obj.id = w["event_lookup"].GetInt();
 		if ( w.HasMember("blurb") )
@@ -13810,7 +13810,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 			obj.details.snapshot(_lines);
 			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				auto line = _lines[_li];
+				auto& line = _lines[_li];
 				if ( line.size() > 0 )
 				{
 					if ( line[0] == '-' )
@@ -13901,7 +13901,7 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
-						auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 						if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 							== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 						{
@@ -13919,12 +13919,12 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 				customEvents.push_back(itr->GetString());
 			}
 
-			auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+			auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 			int index = -1;
 			for ( auto& v : vec )
 			{
 				++index;
-				auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
+				auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventCodexOffset + obj.id];
 				if ( v == EventTags::CPDM_CUSTOM_TAG )
 				{
 					if ( index < customEvents.size() )
@@ -14000,7 +14000,7 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( worldObjects.contains(key) )
 		{
-			auto entry = worldObjects[key];
+			auto& entry = worldObjects[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -14016,7 +14016,7 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 				entry.details.snapshot(_lines);
 				for ( size_t _li = 0; _li < _lines.size(); ++_li )
 				{
-					auto line = _lines[_li];
+					auto& line = _lines[_li];
 					if ( line.size() > 0 )
 					{
 						if ( line[0] == '-' )
@@ -14137,7 +14137,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	{
 		std::string name = itr->name.GetString();
 		auto& w = itr->value;
-		auto obj = worldObjects[name];
+		auto& obj = worldObjects[name];
 
 		obj.id = w["event_lookup"].GetInt();
 		if ( w.HasMember("blurb") )
@@ -14167,7 +14167,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 			obj.details.snapshot(_lines);
 			for ( size_t _li = 0; _li < _lines.size(); ++_li )
 			{
-				auto line = _lines[_li];
+				auto& line = _lines[_li];
 				if ( line.size() > 0 )
 				{
 					if ( line[0] == '-' )
@@ -14253,7 +14253,7 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 					auto find2 = Compendium_t::Events_t::events.find((Compendium_t::EventTags)find->second);
 					if ( find2 != Compendium_t::Events_t::events.end() )
 					{
-						auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+						auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 						if ( std::find(vec.begin(), vec.end(), (Compendium_t::EventTags)find2->second.id)
 							== vec.end() || find2->second.id == EventTags::CPDM_CUSTOM_TAG )
 						{
@@ -14271,12 +14271,12 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 				customEvents.push_back(itr->GetString());
 			}
 
-			auto vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+			auto& vec = Compendium_t::Events_t::itemDisplayedEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 			int index = -1;
 			for ( auto& v : vec )
 			{
 				++index;
-				auto vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
+				auto& vec2 = Compendium_t::Events_t::itemDisplayedCustomEventsList[Compendium_t::Events_t::kEventWorldOffset + obj.id];
 				if ( v == EventTags::CPDM_CUSTOM_TAG )
 				{
 					if ( index < customEvents.size() )
@@ -14425,7 +14425,7 @@ void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 		std::string key = itr->name.GetString();
 		if ( monsters.contains(key) )
 		{
-			auto entry = monsters[key];
+			auto& entry = monsters[key];
 			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
@@ -14579,7 +14579,7 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 		if ( monsterType == NOTHING && name != "ghost" ) { continue; }
 
 		auto& m = itr->value;
-		auto monster = monsters[itr->name.GetString()];
+		auto& monster = monsters[itr->name.GetString()];
 		monster.monsterType = monsterType;
 		monster.unique_npc = m.HasMember("unique_npc") ? m["unique_npc"].GetString() : "";
 		if ( m.HasMember("blurb") )
@@ -14790,7 +14790,7 @@ void Compendium_t::Events_t::readEventsTranslations()
 			if ( find != eventIdLookup.end())
 			{
 				EventTags tag = (Compendium_t::EventTags)eventIdLookup[find->first];
-				auto entry = eventLangEntries[tag];
+				auto& entry = eventLangEntries[tag];
 				for ( auto itr3 = itr2->value.MemberBegin(); itr3 != itr2->value.MemberEnd(); ++itr3 )
 				{
 					entry[itr3->name.GetString()] = itr3->value.GetString();
@@ -15131,7 +15131,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 					auto findTag = eventIdLookup.find(name);
 					if ( findTag != eventIdLookup.end() )
 					{
-						auto playerTags = playerEvents[(Compendium_t::EventTags)findTag->second];
+						auto& playerTags = playerEvents[(Compendium_t::EventTags)findTag->second];
 						for ( auto itemId : eventItemLookup[(Compendium_t::EventTags)findTag->second] )
 						{
 							if ( cat == "spells" )
@@ -15241,7 +15241,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 							++cycleResults;
 							continue;
 						}
-						auto playerTags = playerEvents[tag];
+						auto& playerTags = playerEvents[tag];
 						std::vector<std::pair<int, int>> codexIDs;
 						codexIDs.push_back(std::make_pair(-1, foundId));
 
@@ -15264,7 +15264,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 
 						if ( foundLookup )
 						{
-							auto def = events[tag];
+							auto& def = events[tag];
 							if ( def.attributes.contains("stats") && valueType != "max_class" )
 							{
 								if ( cat == "str" ) { codexIDs.back().first = STAT_STR; }
@@ -15279,7 +15279,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								codexIDs.clear();
 								if ( eventClassIds.contains(tag) )
 								{
-									auto classTagMap = eventClassIds[tag];
+									auto& classTagMap = eventClassIds[tag];
 									// iterate through classes
 									int startOffsetId = -1;
 									if ( def.attributes.contains("skills") )
@@ -15356,7 +15356,7 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 								codexIDs.clear();
 								if ( eventClassIds.contains(tag) )
 								{
-									auto classTagMap = eventClassIds[tag];
+									auto& classTagMap = eventClassIds[tag];
 									// iterate through classes
 									for ( auto& classId : classTagMap )
 									{
@@ -15730,7 +15730,7 @@ void Compendium_t::Events_t::readEventsFromFile()
 		for ( auto itr2 = itr->MemberBegin(); itr2 != itr->MemberEnd(); ++itr2 )
 		{
 			const EventTags id = (EventTags)std::min(index, (int)CPDM_EVENT_TAGS_MAX);
-			auto entry = events[id];
+			auto& entry = events[id];
 			entry.id = id;
 			entry.name = itr2->name.GetString();
 			eventIdLookup[entry.name] = id;
@@ -16465,8 +16465,8 @@ void Compendium_t::Events_t::updateEventsInMainLoop(const int playernum)
 
 	if ( ticks % TICKS_PER_SECOND == 25 )
 	{
-		auto entity = players[playernum]->entity;
-		auto myStats = stats[playernum];
+		auto& entity = players[playernum]->entity;
+		auto& myStats = stats[playernum];
 		{
 			real_t resistance = 100.0 * Entity::getDamageTableMultiplier(entity, *myStats, DAMAGE_TABLE_MAGIC);
 			resistance = -(resistance - 100.0);
@@ -17111,7 +17111,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 		return;
 	}
 
-	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 
 	if ( def.eventTrackingType == EventTrackingType::ONCE_PER_RUN && !loadingValue )
 	{
@@ -17130,7 +17130,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 		{
 			e[itemType] = EventVal_t(tag);
 		}
-		auto val = e[itemType];
+		auto& val = e[itemType];
 		val.value = value; // reading from savefile
 		val.firstValue = false;
 	}
@@ -17160,7 +17160,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 			{
 				e[itemType] = EventVal_t(tag);
 			}
-			auto val = e[itemType];
+			auto& val = e[itemType];
 			if ( val.applyValue(value) )
 			{
 				if ( *cvar_compendiumDebugSave )
@@ -17202,7 +17202,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 					auto find = Compendium_t::Events_t::monsterIDToString.find(monsterId);
 					if ( find != Compendium_t::Events_t::monsterIDToString.end() )
 					{
-						auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+						auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 						if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 						{
 							unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17213,7 +17213,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 
 			bool itemUnlocked = false;
 			{
-				auto unlockStatus = Compendium_t::CompendiumItems_t::itemUnlocks[itemType];
+				auto& unlockStatus = Compendium_t::CompendiumItems_t::itemUnlocks[itemType];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17223,7 +17223,7 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 			auto find = itemIDToString.find(itemType);
 			if ( find != itemIDToString.end() )
 			{
-				auto unlockStatus = Compendium_t::CompendiumItems_t::unlocks[find->second];
+				auto& unlockStatus = Compendium_t::CompendiumItems_t::unlocks[find->second];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17351,7 +17351,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		return;
 	}
 
-	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 	if ( e.find(monsterType) == e.end() )
 	{
 		e[monsterType] = EventVal_t(tag);
@@ -17368,7 +17368,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		players[playernum]->compendiumProgress.itemEvents[def.name][monsterType] += value;
 	}
 
-	auto val = e[monsterType];
+	auto& val = e[monsterType];
 	if ( loadingValue )
 	{
 		val.value = value; // reading from savefile
@@ -17407,7 +17407,7 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		auto find = monsterIDToString.find(monsterType);
 		if ( find != monsterIDToString.end() )
 		{
-			auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+			auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 			if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 			{
 				unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17514,7 +17514,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 	}
 
 
-	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 
 	if ( def.eventTrackingType == EventTrackingType::ONCE_PER_RUN && !loadingValue )
 	{
@@ -17533,7 +17533,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		{
 			e[worldID] = EventVal_t(tag);
 		}
-		auto val = e[worldID];
+		auto& val = e[worldID];
 		val.value = value; // reading from savefile
 		val.firstValue = false;
 	}
@@ -17563,7 +17563,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		{
 			e[worldID] = EventVal_t(tag);
 		}
-		auto val = e[worldID];
+		auto& val = e[worldID];
 		if ( val.applyValue(value) )
 		{
 			if ( *cvar_compendiumDebugSave )
@@ -17581,7 +17581,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 		auto find = worldIDToString.find(worldID);
 		if ( find != worldIDToString.end() )
 		{
-			auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks[find->second];
+			auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks[find->second];
 			if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 			{
 				if ( find->second == "merchants guild"
@@ -17603,7 +17603,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + SHOPKEEPER);
 				if ( find != monsterIDToString.end() )
 				{
-					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17615,7 +17615,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH);
 				if ( find != monsterIDToString.end() )
 				{
-					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17625,35 +17625,35 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 			else if ( find->second == "hamlet" )
 			{
 				{
-					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["merchants guild"];
+					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["merchants guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["magicians guild"];
+					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["magicians guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["hunters guild"];
+					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["hunters guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["the church"];
+					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["the church"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 				{
-					auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["masons guild"];
+					auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["masons guild"];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17665,14 +17665,14 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + DEVIL);
 				if ( find != monsterIDToString.end() )
 				{
-					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
 					}
 				}
 
-				auto unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["brimstone boulder"];
+				auto& unlockStatus = Compendium_t::CompendiumWorld_t::unlocks["brimstone boulder"];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17683,7 +17683,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				auto find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH_FIRE);
 				if ( find != monsterIDToString.end() )
 				{
-					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17692,7 +17692,7 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 				find = monsterIDToString.find(Compendium_t::Events_t::kEventMonsterOffset + LICH_ICE);
 				if ( find != monsterIDToString.end() )
 				{
-					auto unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
+					auto& unlockStatus = Compendium_t::CompendiumMonsters_t::unlocks[find->second];
 					if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 					{
 						unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -17792,7 +17792,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		{
 			if ( eventClassIds.contains(tag) )
 			{
-				auto classTagMap = eventClassIds[tag];
+				auto& classTagMap = eventClassIds[tag];
 				for ( auto& pair : classTagMap )
 				{
 					if ( pair.second == ((codexID < kEventCodexOffset) ? (codexID + kEventCodexOffset) : codexID) )
@@ -17839,7 +17839,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 			{
 				if ( eventClassIds.contains(tag) )
 				{
-					auto classTagMap = eventClassIds[tag];
+					auto& classTagMap = eventClassIds[tag];
 					// iterate through classes
 					int classId = client_classes[playernum];
 					if ( def.attributes.contains("skills") )
@@ -17907,7 +17907,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 	}
 
 
-	auto e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
+	auto& e = (multiplayer == SERVER && playernum != 0 && !loadingValue) ? serverPlayerEvents[playernum][tag] : playerEvents[tag];
 	if ( e.find(codexID) == e.end() )
 	{
 		e[codexID] = EventVal_t(tag);
@@ -17924,7 +17924,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 		players[playernum]->compendiumProgress.itemEvents[def.name][codexID] += value;
 	}
 
-	auto val = e[codexID];
+	auto& val = e[codexID];
 	if ( loadingValue )
 	{
 		val.value = value; // reading from savefile
@@ -17970,7 +17970,7 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 			auto find = codexIDToString.find(baseCodexID);
 			if ( find != codexIDToString.end() )
 			{
-				auto unlockStatus = Compendium_t::CompendiumCodex_t::unlocks[find->second];
+				auto& unlockStatus = Compendium_t::CompendiumCodex_t::unlocks[find->second];
 				if ( unlockStatus == Compendium_t::CompendiumUnlockStatus::LOCKED_UNKNOWN )
 				{
 					unlockStatus = Compendium_t::CompendiumUnlockStatus::LOCKED_REVEALED_UNVISITED;
@@ -18018,7 +18018,7 @@ void Compendium_t::Events_t::sendClientDataOverNet(const int playernum)
 		const char* json = json_node_serialize(d.h, true);
 		clientDataStrings[playernum][clientSequence] = json;
 		json_string_free(json);
-		auto dataStr = clientDataStrings[playernum][clientSequence];
+		auto& dataStr = clientDataStrings[playernum][clientSequence];
 
 		const size_t len = dataStr.size();
 		if ( len == 0 )
@@ -18119,7 +18119,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			int version = d["version"].GetInt();
 
 			std::string filename = f.substr(0, f.find(".json"));
-			auto entry = compendiumObjectLimbs[filename];
+			auto& entry = compendiumObjectLimbs[filename];
 			barony_dynamic_array_clear(&entry.entities);
 			entry.baseCamera = CompendiumView_t();
 
@@ -18129,7 +18129,7 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 			int index = 0;
 			if ( d.HasMember("map_tiles") )
 			{
-				auto m = compendiumObjectMapTiles[filename];
+				auto& m = compendiumObjectMapTiles[filename];
 				if ( d["map_tiles"].HasMember("floor") 
 					&& d["map_tiles"].HasMember("mid") 
 					&& d["map_tiles"].HasMember("top")
