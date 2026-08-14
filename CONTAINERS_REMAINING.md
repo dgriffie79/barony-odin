@@ -102,9 +102,9 @@ Keep (order-dependent):
   (new `Kind_MonsterStringPair` + `MK_ArrayMonsterStringPair`)
 - `std::array` members → C arrays (D3dl)
 
-### src/scores.hpp (2 — KEEP)
-- `map_messages` / `additional_data` — `vector<pair<string,string>>` **KEEP**
-  (JSON serialization — reverted in D3aj; port with file)
+### src/scores.hpp (done — D3dn)
+- `map_messages` / `additional_data` → `DynamicArrayStringPair` (D3aj revert
+  blocker removed by D3cy `value(DynamicStringPair_t&)`; save format preserved)
 
 ### src/engine/audio/sound.hpp (3 — previously untracked)
 Voice-chat subsystem (port-with-file candidate; listed so it isn't missed):
