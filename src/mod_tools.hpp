@@ -4104,9 +4104,14 @@ struct Compendium_t
 	{
 		Uint32 width = 0;
 		Uint32 height = 0;
-		Uint32 ceiling = -1;
+		Uint32 ceiling = (Uint32)-1;
 	};
-	std::map<std::string, std::pair<CompendiumMap_t, std::vector<int>>> compendiumObjectMapTiles;
+	struct CompendiumMapTiles_t
+	{
+		CompendiumMap_t first;
+		DynamicArrayS32 second;
+	};
+	DynamicMapStrT<CompendiumMapTiles_t> compendiumObjectMapTiles;
 	map_t compendiumMap;
 	struct CompendiumWorld_t
 	{
@@ -4371,6 +4376,7 @@ template <> struct DynamicArrayKindOf<DynamicArrayT<DynamicArrayStr>> { static c
 template <> struct DynamicArrayKindOf<Compendium_t::CompendiumItems_t::Codex_t::CodexItem_t> { static constexpr int value = Kind_CodexItem; };
 // MapValueKindOf for Compendium_t::AchievementData_t::CompendiumAchievementsDisplay (owns 1 nested array + 2 ints)
 template <> struct MapValueKindOf<Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> { static constexpr int value = MK_CompendiumAchievementsDisplay; };
+template <> struct MapValueKindOf<Compendium_t::CompendiumMapTiles_t> { static constexpr int value = MK_CompendiumMapTiles; };
 
 
 extern Compendium_t CompendiumEntries;

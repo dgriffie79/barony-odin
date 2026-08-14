@@ -1513,6 +1513,32 @@ compendium_achievements_display_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.pages, &s.pages, size_of(Raw_Dynamic_Array), Kind_DynArrayStrArray)
 }
 
+// map[string]CompendiumMapTiles_t (compendiumObjectMapTiles).
+// 56B: POD CompendiumMap_t + Raw_Dynamic_Array of i32.
+CompendiumMap_t :: struct {
+	width:   u32,
+	height:  u32,
+	ceiling: u32,
+}
+#assert(size_of(CompendiumMap_t) == 12)
+CompendiumMapTiles_t :: struct {
+	first:  CompendiumMap_t,
+	second: Raw_Dynamic_Array, // of i32
+}
+#assert(size_of(CompendiumMapTiles_t) == 56)
+
+compendium_map_tiles_free :: proc(p: rawptr) {
+	v := (^CompendiumMapTiles_t)(p)
+	barony_dynamic_array_elem_destroy(&v.second, size_of(i32), Kind_POD)
+}
+compendium_map_tiles_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^CompendiumMapTiles_t)(dst)
+	s := (^CompendiumMapTiles_t)(src)
+	d^ = CompendiumMapTiles_t{}
+	d.first = s.first
+	barony_dynamic_array_elem_copy(&d.second, &s.second, size_of(i32), Kind_POD)
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -2654,6 +2680,7 @@ Value_Kind :: enum i32 {
 	MK_I32MapIntPair         = 62,
 	MK_ArrayStringPair        = 63,
 	MK_CompendiumAchievementsDisplay = 64,
+	MK_CompendiumMapTiles = 65,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2698,6 +2725,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = dynarrstrpair_value_free, copy = dynarrstrpair_value_copy }
 	case .MK_CompendiumAchievementsDisplay:
 		return Value_Ops{ free = compendium_achievements_display_free, copy = compendium_achievements_display_copy }
+	case .MK_CompendiumMapTiles:
+		return Value_Ops{ free = compendium_map_tiles_free, copy = compendium_map_tiles_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -2799,6 +2828,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_ItemTooltip: str_map_put(m, key, value, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_put(m, key, value, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: str_map_put(m, key, value, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: str_map_put(m, key, value, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: str_map_put(m, key, value, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_put(m, key, value, map[string]string, ops)
 	}
@@ -2837,6 +2867,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_ItemTooltip: return str_map_get(m, key, out, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_get(m, key, out, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: return str_map_get(m, key, out, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: return str_map_get(m, key, out, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: return str_map_get(m, key, out, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_get(m, key, out, map[string]string, ops)
 	}
@@ -2875,6 +2906,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_ItemTooltip: return str_map_len(m, ItemTooltip_t)
 	case .MK_Entry: return str_map_len(m, Entry_t)
 	case .MK_CompendiumAchievementsDisplay: return str_map_len(m, CompendiumAchievementsDisplay_t)
+	case .MK_CompendiumMapTiles: return str_map_len(m, CompendiumMapTiles_t)
 	case .MK_DropDown: return str_map_len(m, DropDown_t)
 	case .MK_StrMapStr: return str_map_len(m, map[string]string)
 	}
@@ -2914,6 +2946,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ItemTooltip: str_map_clear(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_clear(m, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: str_map_clear(m, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: str_map_clear(m, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: str_map_clear(m, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_clear(m, map[string]string, ops)
 	}
@@ -2952,6 +2985,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_ItemTooltip: str_map_destroy(m, ItemTooltip_t, ops)
 	case .MK_Entry: str_map_destroy(m, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: str_map_destroy(m, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: str_map_destroy(m, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: str_map_destroy(m, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_destroy(m, map[string]string, ops)
 	}
@@ -2989,6 +3023,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_ItemTooltip: return str_map_entry(m, key, ItemTooltip_t)
 	case .MK_Entry: return str_map_entry(m, key, Entry_t)
 	case .MK_CompendiumAchievementsDisplay: return str_map_entry(m, key, CompendiumAchievementsDisplay_t)
+	case .MK_CompendiumMapTiles: return str_map_entry(m, key, CompendiumMapTiles_t)
 	case .MK_DropDown: return str_map_entry(m, key, DropDown_t)
 	case .MK_StrMapStr: return str_map_entry(m, key, map[string]string)
 	}
@@ -3028,6 +3063,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_ItemTooltip: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, map[string]string, ops)
 	}
@@ -3067,6 +3103,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_ItemTooltip: str_map_for_each(m, ItemTooltip_t, f, userdata)
 	case .MK_Entry: str_map_for_each(m, Entry_t, f, userdata)
 	case .MK_CompendiumAchievementsDisplay: str_map_for_each(m, CompendiumAchievementsDisplay_t, f, userdata)
+	case .MK_CompendiumMapTiles: str_map_for_each(m, CompendiumMapTiles_t, f, userdata)
 	case .MK_DropDown: str_map_for_each(m, DropDown_t, f, userdata)
 	case .MK_StrMapStr: str_map_for_each(m, map[string]string, f, userdata)
 	}
@@ -3111,6 +3148,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_ItemTooltip: return str_map_erase(m, key, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_erase(m, key, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: return str_map_erase(m, key, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: return str_map_erase(m, key, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: return str_map_erase(m, key, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_erase(m, key, map[string]string, ops)
 	}
@@ -3634,6 +3672,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_ItemTooltip: return str_map_find(m, key, out_key, out_key_len, out_val, ItemTooltip_t, ops)
 	case .MK_Entry: return str_map_find(m, key, out_key, out_key_len, out_val, Entry_t, ops)
 	case .MK_CompendiumAchievementsDisplay: return str_map_find(m, key, out_key, out_key_len, out_val, CompendiumAchievementsDisplay_t, ops)
+	case .MK_CompendiumMapTiles: return str_map_find(m, key, out_key, out_key_len, out_val, CompendiumMapTiles_t, ops)
 	case .MK_DropDown: return str_map_find(m, key, out_key, out_key_len, out_val, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_find(m, key, out_key, out_key_len, out_val, map[string]string, ops)
 	}
