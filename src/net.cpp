@@ -2440,35 +2440,35 @@ static void changeLevel() {
 		{
 			case 2:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(712));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(712)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(712)});
 				break;
 			case 3:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(713));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(713)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(713)});
 				break;
 			case 7:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(714));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(714)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(714)});
 				break;
 			case 8:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(715));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(715)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(715)});
 				break;
 			case 11:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(716));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(716)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(716)});
 				break;
 			case 13:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(717));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(717)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(717)});
 				break;
 			case 16:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(718));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(718)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(718)});
 				break;
 			case 18:
 				messagePlayer(clientnum, MESSAGE_HINT, Language::get(719));
-				Player::Minimap_t::mapDetails.push_back(std::make_pair("secret_exit_description", Language::get(719)));
+				Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"secret_exit_description", Language::get(719)});
 				break;
 			default:
 				break;
@@ -2476,11 +2476,11 @@ static void changeLevel() {
 	}
 	if ( MFLAG_DISABLETELEPORT )
 	{
-		Player::Minimap_t::mapDetails.push_back(std::make_pair("map_flag_disable_teleport", Language::get(2382)));
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"map_flag_disable_teleport", Language::get(2382)});
 	}
 	if ( MFLAG_DISABLEOPENING )
 	{
-		Player::Minimap_t::mapDetails.push_back(std::make_pair("map_flag_disable_opening", Language::get(2382)));
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"map_flag_disable_opening", Language::get(2382)});
 	}
 	if ( MFLAG_DISABLETELEPORT || MFLAG_DISABLEOPENING )
 	{
@@ -2489,16 +2489,16 @@ static void changeLevel() {
 	if ( MFLAG_DISABLELEVITATION )
 	{
 		messagePlayer(clientnum, MESSAGE_HINT, Language::get(2383));
-		Player::Minimap_t::mapDetails.push_back(std::make_pair("map_flag_disable_levitation", Language::get(2383)));
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"map_flag_disable_levitation", Language::get(2383)});
 	}
 	if ( MFLAG_DISABLEDIGGING )
 	{
 		messagePlayer(clientnum, MESSAGE_HINT, Language::get(2450));
-		Player::Minimap_t::mapDetails.push_back(std::make_pair("map_flag_disable_digging", Language::get(2450)));
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"map_flag_disable_digging", Language::get(2450)});
 	}
 	if ( MFLAG_DISABLEHUNGER )
 	{
-		Player::Minimap_t::mapDetails.push_back(std::make_pair("map_flag_disable_hunger", ""));
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{"map_flag_disable_hunger", ""});
 	}
 
 	if ( !died )

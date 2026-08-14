@@ -16104,7 +16104,7 @@ void Player::CharacterSheet_t::processCharacterSheet()
 	updateCharacterInfo();
 }
 
-std::map<std::string, Player::GUIDropdown_t::DropDown_t> Player::GUIDropdown_t::allDropDowns;
+DynamicMapStrT<Player::GUIDropdown_t::DropDown_t> Player::GUIDropdown_t::allDropDowns;
 
 bool Player::GUIDropdown_t::set(const DynamicString name)
 {

@@ -5882,7 +5882,7 @@ const bool Player::bAlignGUINextToInventoryCompact() const
 	return false;
 }
 
-std::vector<std::pair<std::string, std::string>> Player::Minimap_t::mapDetails;
+DynamicArrayStringPair Player::Minimap_t::mapDetails;
 
 void Inputs::setMouse(const int player, MouseInputs input, Sint32 value)
 {

@@ -738,7 +738,7 @@ public:
 		void process();
 		bool getDropDownAlignRight(const DynamicString& name);
 		void activateSelection(const DynamicString& name, int option);
-		static std::map<std::string, DropDown_t> allDropDowns;
+		static DynamicMapStrT<DropDown_t> allDropDowns;
 		GUIDropdown_t(Player& p) :
 			player(p) {}
 	};
@@ -1926,7 +1926,7 @@ public:
 		static const int ADD_MESSAGE_BUFFER_LENGTH = 256;
 		MessageZone_t(Player& p) : player(p) {};
 		~MessageZone_t() {};
-		std::list<Message*> notification_messages;
+		DynamicArrayT<Message*> notification_messages;
 		//Init old_sdl_ticks to determine when to fade messages
 		static void startMessages();
 		//Adds a message to the list of messages.
@@ -2332,7 +2332,7 @@ public:
 	{
 		Player& player;
 	public:
-		static std::vector<std::pair<std::string, std::string>> mapDetails;
+		static DynamicArrayStringPair mapDetails;
 		Minimap_t(Player& p) : player(p)
 		{};
 		~Minimap_t() {};
@@ -2467,6 +2467,7 @@ public:
 template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::SkillEffect_t> { static constexpr int value = Kind_SkillEffect; };
 template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t> { static constexpr int value = Kind_SkillEntry; };
 template <> struct DynamicArrayKindOf<std::pair<Uint32, Player::HUD_t::FollowerBar_t>> { static constexpr int value = Kind_FollowerBarPair; };
+template <> struct MapValueKindOf<Player::GUIDropdown_t::DropDown_t> { static constexpr int value = MK_DropDown; };
 
 
 extern Player* players[MAXPLAYERS];

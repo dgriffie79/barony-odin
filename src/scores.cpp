@@ -5515,7 +5515,11 @@ int SaveGameInfo::populateFromSession(const int playernum)
 		}
 	}
 
-	info->map_messages = ::Player::Minimap_t::mapDetails;
+	info->map_messages.clear();
+	for ( auto& detail : ::Player::Minimap_t::mapDetails )
+	{
+		info->map_messages.push_back(std::make_pair(std::string(detail.first), std::string(detail.second)));
+	}
 	if ( gameModeManager.currentSession.challengeRun.isActive() )
 	{
 		info->additional_data.push_back(std::make_pair(std::string("game_scenario"), gameModeManager.currentSession.challengeRun.scenarioStr));
@@ -6346,7 +6350,11 @@ int loadGame(int player, const SaveGameInfo& info) {
 		mechanics.baseSpellMPUsedThaumaturgy = info.players[player].baseSpellMPUsedThaumaturgy;
 	}
 
-	Player::Minimap_t::mapDetails = info.map_messages;
+	Player::Minimap_t::mapDetails.clear();
+	for ( auto& msg : info.map_messages )
+	{
+		Player::Minimap_t::mapDetails.push_back(DynamicStringPair_t{msg.first, msg.second});
+	}
 
 	if ( !info.hiscore_dummy_loading )
 	{

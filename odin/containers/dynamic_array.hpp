@@ -284,6 +284,7 @@ public:
     }
 
     void push_back(const T& v) { barony_dynamic_array_elem_append(&raw, &v, sizeof(T), DynamicArrayKindOf<T>::value); }
+    void push_front(const T& v) { insert((T*)raw.data, v); }
     // insert at position (std::vector::insert single-element semantics)
     T* insert(T* pos, const T& v) {
         int64_t i = (int64_t)(pos - (T*)raw.data);
