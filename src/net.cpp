@@ -9655,7 +9655,7 @@ NetHandler::~NetHandler()
 	{
 		SteamPacketWrapper* packet = game_packets.front();
 		delete packet;
-		game_packets.pop();
+		game_packets.pop_front();
 	}
 }
 
@@ -9713,12 +9713,12 @@ void NetHandler::addGamePacket(SteamPacketWrapper* packet)
 	if ( !disableMultithreadedSteamNetworking )
 	{
 		SDL_LockMutex(game_packets_lock);
-		game_packets.push(packet);
+		game_packets.push_back(packet);
 		SDL_UnlockMutex(game_packets_lock);
 	}
 	else
 	{
-		game_packets.push(packet);
+		game_packets.push_back(packet);
 	}
 }
 
@@ -9731,7 +9731,7 @@ SteamPacketWrapper* NetHandler::getGamePacket()
 		if (!game_packets.empty())
 		{
 			packet = game_packets.front();
-			game_packets.pop();
+			game_packets.pop_front();
 		}
 		SDL_UnlockMutex(game_packets_lock);
 	}
@@ -9740,7 +9740,7 @@ SteamPacketWrapper* NetHandler::getGamePacket()
 		if ( !game_packets.empty() )
 		{
 			packet = game_packets.front();
-			game_packets.pop();
+			game_packets.pop_front();
 		}
 	}
 	return packet;

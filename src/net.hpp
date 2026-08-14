@@ -114,7 +114,7 @@ class NetHandler
 public:
 	NetHandler();
 	~NetHandler();
-	std::queue<SteamPacketWrapper* > game_packets;
+	DynamicArrayT<SteamPacketWrapper*> game_packets;
 
 	void initializeMultithreadedPacketHandling();
 	void stopMultithreadedPacketHandling();
