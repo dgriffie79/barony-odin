@@ -515,6 +515,7 @@ enum MapValueKind {
     MK_CompendiumAchievementsDisplay = 64, // CompendiumAchievementsDisplay (owns 1 nested array + 2 ints)
     MK_CompendiumMapTiles = 65,      // CompendiumMapTiles_t (POD map + owning i32 array)
     MK_ObjectLimbs = 66,             // ObjectLimbs_t (2 POD cameras + raw Entity array)
+    MK_World = 67,                   // CompendiumWorld_t::World_t (owning strings+arrays+sets)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

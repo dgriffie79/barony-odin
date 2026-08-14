@@ -14008,22 +14008,22 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 	for ( auto itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr )
 	{
 		std::string key = itr->name.GetString();
-		auto find = worldObjects.find(key);
-		if ( find != worldObjects.end() )
+		if ( worldObjects.contains(key) )
 		{
-			find->second.blurb.clear();
+			auto& entry = worldObjects[key];
+			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
-				jsonVecToVec(itr->value["blurb"], find->second.blurb);
+				jsonVecToVec(itr->value["blurb"], entry.blurb);
 			}
-			find->second.details.clear();
+			entry.details.clear();
 			if ( itr->value.HasMember("details") )
 			{
-				jsonVecToVec(itr->value["details"], find->second.details);
+				jsonVecToVec(itr->value["details"], entry.details);
 			}
 						{
 				std::vector<DynamicString> _lines;
-				find->second.details.snapshot(_lines);
+				entry.details.snapshot(_lines);
 				for ( size_t _li = 0; _li < _lines.size(); ++_li )
 				{
 					auto& line = _lines[_li];
@@ -14049,11 +14049,11 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 							}
 						}
 					}
-					find->second.details.set((int64_t)_li, line);
+					entry.details.set((int64_t)_li, line);
 				}
 			}
 
-			find->second.linesToHighlight.clear();
+			entry.linesToHighlight.clear();
 			if ( itr->value.HasMember("details_line_highlights") )
 			{
 				for ( auto itr2 = itr->value["details_line_highlights"].Begin(); itr2 != itr->value["details_line_highlights"].End(); ++itr2 )
@@ -14074,11 +14074,11 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 							b = (*itr2)["color"]["b"].GetInt();
 						}
 
-						find->second.linesToHighlight.push_back(makeColorRGB(r, g, b));
+						entry.linesToHighlight.push_back(makeColorRGB(r, g, b));
 					}
 					else
 					{
-						find->second.linesToHighlight.push_back(0);
+						entry.linesToHighlight.push_back(0);
 					}
 				}
 			}
