@@ -153,7 +153,15 @@ bool gamemodsMountAllExistingPaths();
 //extern bool gamemods_modPreload;
 bool drawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor);
 extern bool scoreDisplayMultiplayer;
-extern std::vector<std::tuple<int, int, int, std::string>> savegamesList; // tuple - last modified, multiplayer type, file entry, and description of save game.
+struct SaveGameListEntry_t {
+	int lastModified = 0;
+	int multiplayerType = 0;
+	int fileEntry = 0;
+	DynamicString description;
+};
+template <> struct DynamicArrayKindOf<SaveGameListEntry_t> { static constexpr int value = Kind_SaveGameListEntry; };
+using DynamicArraySaveGameList = DynamicArrayT<SaveGameListEntry_t>;
+extern DynamicArraySaveGameList savegamesList; // last modified, multiplayer type, file entry, description
 
 extern Sint32 slidery, slidersize, oslidery;
 
@@ -247,7 +255,7 @@ struct resolution {
 		return x == rhs.x && y == rhs.y && hz == rhs.hz;
 	}
 };
-void getResolutionList(int device_id, std::list<resolution>&);
+void getResolutionList(int device_id, DynamicArrayT<resolution>&);
 void applySettings();
 void openConfirmResolutionWindow();
 void buttonAcceptResolution(button_t* my);

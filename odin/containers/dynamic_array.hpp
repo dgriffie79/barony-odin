@@ -225,6 +225,7 @@ enum DynamicArrayKind {
     Kind_StringPair = 35,
     Kind_SurfacePtrStringPair = 36,
     Kind_MonsterStringPair = 37,
+    Kind_SaveGameListEntry = 38,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };
@@ -332,6 +333,20 @@ public:
     void sort() { std::sort((T*)raw.data, (T*)raw.data + size()); }
     template <typename Cmp>
     void sort(Cmp cmp) { std::sort((T*)raw.data, (T*)raw.data + size(), cmp); }
+    // remove consecutive duplicates (std::list::unique semantics)
+    void unique() {
+        int64_t n = size();
+        if (n <= 1) return;
+        T* base = (T*)raw.data;
+        int64_t write = 1;
+        for (int64_t i = 1; i < n; ++i) {
+            if (!(base[i] == base[write - 1])) {
+                if (write != i) base[write] = base[i];
+                ++write;
+            }
+        }
+        while (size() > write) pop_back();
+    }
     // reverse iteration (std::deque/vector rbegin/rend)
     using reverse_iterator = std::reverse_iterator<T*>;
     using const_reverse_iterator = std::reverse_iterator<const T*>;

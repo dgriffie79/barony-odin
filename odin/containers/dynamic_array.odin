@@ -219,6 +219,7 @@ Kind_FollowerBarPair         :: 34
 Kind_StringPair               :: 35
 Kind_SurfacePtrStringPair      :: 36
 Kind_MonsterStringPair          :: 37
+Kind_SaveGameListEntry           :: 38
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -1456,6 +1457,29 @@ monster_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
 	dynamic_string_copy_elem(rawptr(&d.second), rawptr(&s.second))
 }
 
+// SaveGameListEntry_t — 32B (3 ints + DynamicString). Value for savegamesList.
+SaveGameListEntry_t :: struct {
+	lastModified:    i32,
+	multiplayerType: i32,
+	fileEntry:       i32,
+	description:     string,
+}
+#assert(size_of(SaveGameListEntry_t) == 32)
+
+save_game_list_entry_free :: proc(p: rawptr) {
+	v := (^SaveGameListEntry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.description))
+}
+save_game_list_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SaveGameListEntry_t)(dst)
+	s := (^SaveGameListEntry_t)(src)
+	d.lastModified = s.lastModified
+	d.multiplayerType = s.multiplayerType
+	d.fileEntry = s.fileEntry
+	d.description = {}
+	dynamic_string_copy_elem(rawptr(&d.description), rawptr(&s.description))
+}
+
 hiscore_player_equip_pair_free :: proc(p: rawptr) {
 	v := (^HiscorePlayerEquipPair_t)(p)
 	dynamic_string_free_elem(rawptr(&v.first))
@@ -1714,7 +1738,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [38]Element_Ops{
+element_ops := [39]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1753,6 +1777,7 @@ element_ops := [38]Element_Ops{
 	35 = { free = dynamic_string_pair_free, copy = dynamic_string_pair_copy },
 	36 = { free = surface_ptr_string_pair_free, copy = surface_ptr_string_pair_copy },
 	37 = { free = monster_string_pair_free, copy = monster_string_pair_copy },
+	38 = { free = save_game_list_entry_free, copy = save_game_list_entry_copy },
 }
 
 @(export)

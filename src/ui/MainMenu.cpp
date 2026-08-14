@@ -4309,13 +4309,13 @@ namespace MainMenu {
 			dropdown->removeSelf();
 			button->select();
 
-		    std::list<resolution> resolutions;
+		    DynamicArrayT<resolution> resolutions;
 		    getResolutionList(allSettings.video.display_id, resolutions);
 		    std::vector<DynamicString> resolutions_formatted;
 		    resolutions_formatted.reserve(resolutions.size());
 
 		    int index;
-		    std::list<resolution>::iterator it;
+		    resolution* it;
 		    for (index = 0, it = resolutions.begin(); it != resolutions.end(); ++it, ++index) {
 			    auto& res = *it;
 			    char buf[32];
@@ -6077,7 +6077,7 @@ bind_failed:
 		int y = 0;
 
 		int selected_res = -1;
-		std::list<resolution> resolutions;
+		DynamicArrayT<resolution> resolutions;
 		getResolutionList(allSettings.video.display_id, resolutions);
 		std::vector<DynamicString> resolutions_formatted;
 		std::vector<const char*> resolutions_formatted_ptrs;
@@ -6085,7 +6085,7 @@ bind_failed:
 		resolutions_formatted_ptrs.reserve(resolutions.size());
 
 		int index;
-		std::list<resolution>::iterator it;
+		resolution* it;
 		for (index = 0, it = resolutions.begin(); it != resolutions.end(); ++it, ++index) {
 			auto& res = *it;
 			char buf[32];

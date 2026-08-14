@@ -87,7 +87,7 @@ int score_leaderboard_window = 0;
 
 int savegames_window = 0;
 int savegames_window_scroll = 0;
-std::vector<std::tuple<int, int, int, std::string>> savegamesList; // tuple - last modified, multiplayer type, file entry, and description of save game.
+DynamicArraySaveGameList savegamesList; // last modified, multiplayer type, file entry, description
 
 // gamemods window stuff.
 int gamemods_window = 0;
@@ -4997,11 +4997,11 @@ static void handleMainMenu(bool mode)
 		{
 			filename_padx = subx1 + 16;
 
-			std::vector<std::tuple<int, int, int, std::string>>::iterator it = savegamesList.begin();
+			auto it = savegamesList.begin();
 			std::advance(it, i);
-			std::tuple<int, int, int, std::string> entry = *it;
+			SaveGameListEntry_t entry = *it;
 
-			if ( std::get<1>(entry) != SINGLE )
+			if ( entry.multiplayerType != SINGLE )
 			{
 				++numMultiplayerSaves;
 			}
@@ -5020,7 +5020,7 @@ static void handleMainMenu(bool mode)
 				highlightEntry.h = filename_rowHeight + 8;
 				if ( gamemods_numCurrentModsLoaded >= 0 )
 				{
-					if ( std::get<1>(entry) == SINGLE ) // single player.
+					if ( entry.multiplayerType == SINGLE ) // single player.
 					{
 						drawRect(&highlightEntry, uint32ColorGreen, 64);
 					}
@@ -5031,7 +5031,7 @@ static void handleMainMenu(bool mode)
 				}
 				else
 				{
-					if ( std::get<1>(entry) == SINGLE ) // single player.
+					if ( entry.multiplayerType == SINGLE ) // single player.
 					{
 						drawRect(&highlightEntry, makeColorRGB(128, 128, 128), 48);
 						//drawRect(&highlightEntry, uint32ColorBaronyBlue, 16);
@@ -5042,21 +5042,21 @@ static void handleMainMenu(bool mode)
 					}
 				}
 
-				ttfPrintTextFormatted(ttf12, filename_padx + 8, filename_pady, "[%d]: %s", i + 1, std::get<3>(entry).c_str());
+				ttfPrintTextFormatted(ttf12, filename_padx + 8, filename_pady, "[%d]: %s", i + 1, entry.description.c_str());
 
 				filename_padx = filename_padx2 - (13 * TTF12_WIDTH + 16);
 				int text_x = filename_padx;
 				int text_y = filename_pady + 10;
 				if ( drawClickableButton(filename_padx, filename_pady, 10 * TTF12_WIDTH + 8, TTF12_HEIGHT * 2 + 4, 0) )
 				{
-					if ( std::get<1>(entry) == SINGLE )
+					if ( entry.multiplayerType == SINGLE )
 					{
-						savegameCurrentFileIndex = std::get<2>(entry);
+						savegameCurrentFileIndex = entry.fileEntry;
 						buttonLoadSingleplayerGame(nullptr);
 					}
 					else
 					{
-						savegameCurrentFileIndex = std::get<2>(entry);
+						savegameCurrentFileIndex = entry.fileEntry;
 						buttonLoadMultiplayerGame(nullptr);
 					}
 				}
@@ -5066,14 +5066,14 @@ static void handleMainMenu(bool mode)
 				text_x = filename_padx;
 				if ( drawClickableButton(filename_padx, filename_pady, 2 * TTF12_WIDTH + 8, TTF12_HEIGHT * 2 + 4, uint32ColorRed) )
 				{
-					if ( std::get<1>(entry) == SINGLE )
+					if ( entry.multiplayerType == SINGLE )
 					{
-						savegameCurrentFileIndex = std::get<2>(entry);
+						savegameCurrentFileIndex = entry.fileEntry;
 						buttonDeleteSavedSoloGame(nullptr);
 					}
 					else
 					{
-						savegameCurrentFileIndex = std::get<2>(entry);
+						savegameCurrentFileIndex = entry.fileEntry;
 						buttonDeleteSavedMultiplayerGame(nullptr);
 					}
 				}
@@ -8825,7 +8825,7 @@ int getNumDisplays()
 	return numdisplays;
 }
 
-void getResolutionList(int device_id, std::list<resolution>& resolutions)
+void getResolutionList(int device_id, DynamicArrayT<resolution>& resolutions)
 {
 	int nummodes = SDL_GetNumDisplayModes(device_id);
 	printlog("display mode count: %d.\n", nummodes);
