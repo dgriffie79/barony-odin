@@ -14434,23 +14434,23 @@ void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 	for ( auto itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr )
 	{
 		std::string key = itr->name.GetString();
-		auto find = monsters.find(key);
-		if ( find != monsters.end() )
+		if ( monsters.contains(key) )
 		{
-			find->second.blurb.clear();
+			auto& entry = monsters[key];
+			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
-				jsonVecToVec(itr->value["blurb"], find->second.blurb);
+				jsonVecToVec(itr->value["blurb"], entry.blurb);
 			}
-			find->second.abilities.clear();
+			entry.abilities.clear();
 			if ( itr->value.HasMember("abilities") )
 			{
-				jsonVecToVec(itr->value["abilities"], find->second.abilities);
+				jsonVecToVec(itr->value["abilities"], entry.abilities);
 			}
-			find->second.inventory.clear();
+			entry.inventory.clear();
 			if ( itr->value.HasMember("inventory") )
 			{
-				jsonVecToVec(itr->value["inventory"], find->second.inventory);
+				jsonVecToVec(itr->value["inventory"], entry.inventory);
 			}
 		}
 	}

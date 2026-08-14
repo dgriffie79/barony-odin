@@ -518,6 +518,7 @@ enum MapValueKind {
     MK_World = 67,                   // CompendiumWorld_t::World_t (owning strings+arrays+sets)
     MK_Codex = 68,                   // CompendiumCodex_t::Codex_t (owning strings+arrays+POD view)
     MK_ItemsCodex = 69,              // CompendiumItems_t::Codex_t (items + magic, owning string+arrays)
+    MK_Monster = 70,                 // CompendiumMonsters_t::Monster_t (owning strings+arrays+set)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

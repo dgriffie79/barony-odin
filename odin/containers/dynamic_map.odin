@@ -1701,6 +1701,83 @@ items_codex_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy(&d.items_in_category, &s.items_in_category, size_of(CodexItem_t), Kind_CodexItem)
 }
 
+// map[string]Monster_t (monsters).
+// 680B: 2 strings + 4 str arrays + 10 i32 arrays + set + [7]i32 + enum + ints.
+Monster_t :: struct {
+	monsterType:        i32,
+	unique_npc:         string,
+	blurb:              Raw_Dynamic_Array, // of string
+	hp:                 Raw_Dynamic_Array, // of i32
+	spd:                Raw_Dynamic_Array, // of i32
+	ac:                 Raw_Dynamic_Array, // of i32
+	atk:                Raw_Dynamic_Array, // of i32
+	rangeatk:           Raw_Dynamic_Array, // of i32
+	pwr:                Raw_Dynamic_Array, // of i32
+	str:                Raw_Dynamic_Array, // of i32
+	con:                Raw_Dynamic_Array, // of i32
+	dex:                Raw_Dynamic_Array, // of i32
+	species:            i32,
+	lvl:                Raw_Dynamic_Array, // of i32
+	resistances:        [7]i32,
+	abilities:          Raw_Dynamic_Array, // of string
+	inventory:          Raw_Dynamic_Array, // of string
+	imagePath:          string,
+	models:             Raw_Dynamic_Array, // of string
+	unlockAchievements: map[string]struct{},
+	lorePoints:         i32,
+}
+#assert(size_of(Monster_t) == 680)
+
+monster_t_free :: proc(p: rawptr) {
+	v := (^Monster_t)(p)
+	dynamic_string_free_elem(rawptr(&v.unique_npc))
+	dynamic_string_free_elem(rawptr(&v.imagePath))
+	barony_dynamic_array_elem_destroy(&v.blurb, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.abilities, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.inventory, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.models, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.hp, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.spd, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.ac, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.atk, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.rangeatk, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.pwr, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.str, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.con, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.dex, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.lvl, size_of(i32), Kind_POD)
+	if v.unlockAchievements != nil { delete(v.unlockAchievements); v.unlockAchievements = nil }
+}
+monster_t_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^Monster_t)(dst)
+	s := (^Monster_t)(src)
+	d^ = Monster_t{}
+	d.monsterType = s.monsterType
+	d.species = s.species
+	d.resistances = s.resistances
+	d.lorePoints = s.lorePoints
+	dynamic_string_copy_elem(rawptr(&d.unique_npc), rawptr(&s.unique_npc))
+	dynamic_string_copy_elem(rawptr(&d.imagePath), rawptr(&s.imagePath))
+	barony_dynamic_array_elem_copy(&d.blurb, &s.blurb, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.abilities, &s.abilities, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.inventory, &s.inventory, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.models, &s.models, size_of(DynamicString), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.hp, &s.hp, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.spd, &s.spd, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.ac, &s.ac, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.atk, &s.atk, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.rangeatk, &s.rangeatk, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.pwr, &s.pwr, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.str, &s.str, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.con, &s.con, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.dex, &s.dex, size_of(i32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.lvl, &s.lvl, size_of(i32), Kind_POD)
+	if s.unlockAchievements != nil {
+		d.unlockAchievements = make(map[string]struct{})
+		for key in s.unlockAchievements { d.unlockAchievements[key] = {} }
+	}
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -2847,6 +2924,7 @@ Value_Kind :: enum i32 {
 	MK_World = 67,
 	MK_Codex = 68,
 	MK_ItemsCodex = 69,
+	MK_Monster = 70,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -2901,6 +2979,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = codex_t_free, copy = codex_t_copy }
 	case .MK_ItemsCodex:
 		return Value_Ops{ free = items_codex_free, copy = items_codex_copy }
+	case .MK_Monster:
+		return Value_Ops{ free = monster_t_free, copy = monster_t_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -3007,6 +3087,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_World: str_map_put(m, key, value, World_t, ops)
 	case .MK_Codex: str_map_put(m, key, value, Codex_t, ops)
 	case .MK_ItemsCodex: str_map_put(m, key, value, ItemsCodex_t, ops)
+	case .MK_Monster: str_map_put(m, key, value, Monster_t, ops)
 	case .MK_DropDown: str_map_put(m, key, value, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_put(m, key, value, map[string]string, ops)
 	}
@@ -3050,6 +3131,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_World: return str_map_get(m, key, out, World_t, ops)
 	case .MK_Codex: return str_map_get(m, key, out, Codex_t, ops)
 	case .MK_ItemsCodex: return str_map_get(m, key, out, ItemsCodex_t, ops)
+	case .MK_Monster: return str_map_get(m, key, out, Monster_t, ops)
 	case .MK_DropDown: return str_map_get(m, key, out, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_get(m, key, out, map[string]string, ops)
 	}
@@ -3093,6 +3175,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_World: return str_map_len(m, World_t)
 	case .MK_Codex: return str_map_len(m, Codex_t)
 	case .MK_ItemsCodex: return str_map_len(m, ItemsCodex_t)
+	case .MK_Monster: return str_map_len(m, Monster_t)
 	case .MK_DropDown: return str_map_len(m, DropDown_t)
 	case .MK_StrMapStr: return str_map_len(m, map[string]string)
 	}
@@ -3137,6 +3220,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_World: str_map_clear(m, World_t, ops)
 	case .MK_Codex: str_map_clear(m, Codex_t, ops)
 	case .MK_ItemsCodex: str_map_clear(m, ItemsCodex_t, ops)
+	case .MK_Monster: str_map_clear(m, Monster_t, ops)
 	case .MK_DropDown: str_map_clear(m, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_clear(m, map[string]string, ops)
 	}
@@ -3180,6 +3264,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_World: str_map_destroy(m, World_t, ops)
 	case .MK_Codex: str_map_destroy(m, Codex_t, ops)
 	case .MK_ItemsCodex: str_map_destroy(m, ItemsCodex_t, ops)
+	case .MK_Monster: str_map_destroy(m, Monster_t, ops)
 	case .MK_DropDown: str_map_destroy(m, DropDown_t, ops)
 	case .MK_StrMapStr: str_map_destroy(m, map[string]string, ops)
 	}
@@ -3222,6 +3307,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_World: return str_map_entry(m, key, World_t)
 	case .MK_Codex: return str_map_entry(m, key, Codex_t)
 	case .MK_ItemsCodex: return str_map_entry(m, key, ItemsCodex_t)
+	case .MK_Monster: return str_map_entry(m, key, Monster_t)
 	case .MK_DropDown: return str_map_entry(m, key, DropDown_t)
 	case .MK_StrMapStr: return str_map_entry(m, key, map[string]string)
 	}
@@ -3266,6 +3352,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_World: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, World_t, ops)
 	case .MK_Codex: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Codex_t, ops)
 	case .MK_ItemsCodex: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ItemsCodex_t, ops)
+	case .MK_Monster: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Monster_t, ops)
 	case .MK_DropDown: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, map[string]string, ops)
 	}
@@ -3310,6 +3397,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_World: str_map_for_each(m, World_t, f, userdata)
 	case .MK_Codex: str_map_for_each(m, Codex_t, f, userdata)
 	case .MK_ItemsCodex: str_map_for_each(m, ItemsCodex_t, f, userdata)
+	case .MK_Monster: str_map_for_each(m, Monster_t, f, userdata)
 	case .MK_DropDown: str_map_for_each(m, DropDown_t, f, userdata)
 	case .MK_StrMapStr: str_map_for_each(m, map[string]string, f, userdata)
 	}
@@ -3359,6 +3447,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_World: return str_map_erase(m, key, World_t, ops)
 	case .MK_Codex: return str_map_erase(m, key, Codex_t, ops)
 	case .MK_ItemsCodex: return str_map_erase(m, key, ItemsCodex_t, ops)
+	case .MK_Monster: return str_map_erase(m, key, Monster_t, ops)
 	case .MK_DropDown: return str_map_erase(m, key, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_erase(m, key, map[string]string, ops)
 	}
@@ -3887,6 +3976,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_World: return str_map_find(m, key, out_key, out_key_len, out_val, World_t, ops)
 	case .MK_Codex: return str_map_find(m, key, out_key, out_key_len, out_val, Codex_t, ops)
 	case .MK_ItemsCodex: return str_map_find(m, key, out_key, out_key_len, out_val, ItemsCodex_t, ops)
+	case .MK_Monster: return str_map_find(m, key, out_key, out_key_len, out_val, Monster_t, ops)
 	case .MK_DropDown: return str_map_find(m, key, out_key, out_key_len, out_val, DropDown_t, ops)
 	case .MK_StrMapStr: return str_map_find(m, key, out_key, out_key_len, out_val, map[string]string, ops)
 	}
