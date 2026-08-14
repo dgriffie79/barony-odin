@@ -465,6 +465,13 @@ struct SurfacePtrStringPair_t {
     DynamicString second;
 };
 
+// NetworkPacket_t — 24B (DynamicString + int). Value for
+// DebugStatsClass::networkPackets.
+struct NetworkPacket_t {
+    DynamicString first;
+    int second = 0;
+};
+
 // IntPair_t — 8B POD mirror of std::pair<int,int>. Value for
 // AchievementObserver::entityAchievementsToProcess inner map.
 struct IntPair_t {
@@ -562,6 +569,7 @@ enum MapValueKind {
     MK_Setting = 75,                 // Player::WorldUI_t::...::Setting_t (56B POD)
     MK_Dialogue = 76,                // Player::WorldUI_t::...::Dialogue_t (owning 2 strings)
     MK_ArrayMonsterStringPair = 77,  // vector<pair<Monster,string>> (owning array of pair<int,string>)
+    MK_NetworkPacket = 78,           // DebugStatsClass::networkPackets value (DynamicString + int)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -592,6 +600,7 @@ template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value 
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
 template <> struct MapValueKindOf<DynamicSetStr> { static constexpr int value = MK_SetOfStr; };
+template <> struct MapValueKindOf<NetworkPacket_t> { static constexpr int value = MK_NetworkPacket; };
 template <> struct MapValueKindOf<bool> { static constexpr int value = MK_Bool; };
 
 // 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.

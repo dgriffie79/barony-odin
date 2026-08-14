@@ -6725,14 +6725,13 @@ void clientHandlePacket()
 
 		DynamicString tmp = packetHeader;
 		unsigned long hash = djb2Hash(packetHeader);
-		auto find = DebugStats.networkPackets.find(hash);
-		if ( find != DebugStats.networkPackets.end() )
+		if ( DebugStats.networkPackets.contains((int)hash) )
 		{
-			++DebugStats.networkPackets[hash].second;
+			++DebugStats.networkPackets[(int)hash].second;
 		}
 		else
 		{
-			DebugStats.networkPackets.insert(std::make_pair(hash, std::make_pair(tmp, 0)));
+			DebugStats.networkPackets.put((int)hash, NetworkPacket_t{tmp, 0});
 			messagePlayer(clientnum, MESSAGE_DEBUG, "%s", tmp.c_str());
 		}
 		if ( packetId == 'ENTU' )

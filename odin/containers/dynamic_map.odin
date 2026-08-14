@@ -1928,6 +1928,25 @@ array_monster_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
 	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(MonsterStringPair_t), Kind_MonsterStringPair)
 }
 
+// map[unsigned long]NetworkPacket_t (networkPackets). 24B owning (1 string).
+NetworkPacket_t :: struct {
+	first:  string,
+	second: i32,
+}
+#assert(size_of(NetworkPacket_t) == 24)
+
+network_packet_free :: proc(p: rawptr) {
+	v := (^NetworkPacket_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+}
+network_packet_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^NetworkPacket_t)(dst)
+	s := (^NetworkPacket_t)(src)
+	d.second = s.second
+	d.first = {}
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -3082,6 +3101,7 @@ Value_Kind :: enum i32 {
 	MK_Setting = 75,
 	MK_Dialogue = 76,
 	MK_ArrayMonsterStringPair = 77,
+	MK_NetworkPacket = 78,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -3152,6 +3172,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = dialogue_t_free, copy = dialogue_t_copy }
 	case .MK_ArrayMonsterStringPair:
 		return Value_Ops{ free = array_monster_string_pair_free, copy = array_monster_string_pair_copy }
+	case .MK_NetworkPacket:
+		return Value_Ops{ free = network_packet_free, copy = network_packet_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -3679,6 +3701,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_EventVal: i32_map_put(m, key, value, EventVal_t, ops)
 	case .MK_Setting: i32_map_put(m, key, value, Setting_t, ops)
 	case .MK_Dialogue: i32_map_put(m, key, value, Dialogue_t, ops)
+	case .MK_NetworkPacket: i32_map_put(m, key, value, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: i32_map_put(m, key, value, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_put(m, key, value, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_put(m, key, value, map[[4]byte]IntPair_t, ops)
@@ -3736,6 +3759,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_EventVal: return i32_map_get(m, key, out, EventVal_t, ops)
 	case .MK_Setting: return i32_map_get(m, key, out, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_get(m, key, out, Dialogue_t, ops)
+	case .MK_NetworkPacket: return i32_map_get(m, key, out, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_get(m, key, out, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_get(m, key, out, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_get(m, key, out, map[[4]byte]IntPair_t, ops)
@@ -3793,6 +3817,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_EventVal: return i32_map_len(m, EventVal_t)
 	case .MK_Setting: return i32_map_len(m, Setting_t)
 	case .MK_Dialogue: return i32_map_len(m, Dialogue_t)
+	case .MK_NetworkPacket: return i32_map_len(m, NetworkPacket_t)
 	case .MK_I32MapModelOffset: return i32_map_len(m, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_len(m, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_len(m, map[[4]byte]IntPair_t)
@@ -3851,6 +3876,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_EventVal: i32_map_clear(m, EventVal_t, ops)
 	case .MK_Setting: i32_map_clear(m, Setting_t, ops)
 	case .MK_Dialogue: i32_map_clear(m, Dialogue_t, ops)
+	case .MK_NetworkPacket: i32_map_clear(m, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: i32_map_clear(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_clear(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_clear(m, map[[4]byte]IntPair_t, ops)
@@ -3908,6 +3934,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_EventVal: i32_map_destroy(m, EventVal_t, ops)
 	case .MK_Setting: i32_map_destroy(m, Setting_t, ops)
 	case .MK_Dialogue: i32_map_destroy(m, Dialogue_t, ops)
+	case .MK_NetworkPacket: i32_map_destroy(m, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: i32_map_destroy(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_destroy(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_destroy(m, map[[4]byte]IntPair_t, ops)
@@ -3964,6 +3991,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_EventVal: return i32_map_entry(m, key, EventVal_t)
 	case .MK_Setting: return i32_map_entry(m, key, Setting_t)
 	case .MK_Dialogue: return i32_map_entry(m, key, Dialogue_t)
+	case .MK_NetworkPacket: return i32_map_entry(m, key, NetworkPacket_t)
 	case .MK_I32MapModelOffset: return i32_map_entry(m, key, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_entry(m, key, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_entry(m, key, map[[4]byte]IntPair_t)
@@ -4022,6 +4050,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_EventVal: return i32_map_entries(m, key_ptrs, val_ptrs, count, EventVal_t, ops)
 	case .MK_Setting: return i32_map_entries(m, key_ptrs, val_ptrs, count, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_entries(m, key_ptrs, val_ptrs, count, Dialogue_t, ops)
+	case .MK_NetworkPacket: return i32_map_entries(m, key_ptrs, val_ptrs, count, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]IntPair_t, ops)
@@ -4080,6 +4109,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_EventVal: i32_map_for_each(m, EventVal_t, f, userdata)
 	case .MK_Setting: i32_map_for_each(m, Setting_t, f, userdata)
 	case .MK_Dialogue: i32_map_for_each(m, Dialogue_t, f, userdata)
+	case .MK_NetworkPacket: i32_map_for_each(m, NetworkPacket_t, f, userdata)
 	case .MK_I32MapModelOffset: i32_map_for_each(m, map[[4]byte]ModelOffset_t, f, userdata)
 	case .MK_StrI32Map: i32_map_for_each(m, map[string]map[[4]byte]i32, f, userdata)
 	case .MK_I32MapIntPair: i32_map_for_each(m, map[[4]byte]IntPair_t, f, userdata)
@@ -4137,6 +4167,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_EventVal: return i32_map_erase(m, key, EventVal_t, ops)
 	case .MK_Setting: return i32_map_erase(m, key, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_erase(m, key, Dialogue_t, ops)
+	case .MK_NetworkPacket: return i32_map_erase(m, key, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_erase(m, key, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_erase(m, key, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_erase(m, key, map[[4]byte]IntPair_t, ops)
@@ -4278,6 +4309,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_EventVal: return i32_map_find(m, key, out_val, out_val_len, EventVal_t, ops)
 	case .MK_Setting: return i32_map_find(m, key, out_val, out_val_len, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_find(m, key, out_val, out_val_len, Dialogue_t, ops)
+	case .MK_NetworkPacket: return i32_map_find(m, key, out_val, out_val_len, NetworkPacket_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_find(m, key, out_val, out_val_len, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]IntPair_t, ops)

@@ -513,7 +513,7 @@ public:
 	std::chrono::high_resolution_clock::time_point messagesT2WhileLoop;
 	bool handlePacketStartLoop = false;
 
-	std::unordered_map<unsigned long, std::pair<std::string, int>> networkPackets;
+	DynamicMapI32T<NetworkPacket_t> networkPackets;
 	DynamicMapI32T<int> entityUpdatePackets;
 
 	bool displayStats = false;
