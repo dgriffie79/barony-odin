@@ -161,7 +161,7 @@ struct Mesh {
         Color,    // vec4 float
         Max
     };
-    static const std::unordered_map<BufferType, int> ElementsPerVBO;
+    static const int ElementsPerVBO[(int)BufferType::Max];
 
     Mesh() = default;
     Mesh(
@@ -178,7 +178,7 @@ struct Mesh {
         data{{positions}, {texcoords}, {colors}}
         {}
 
-    std::vector<float> data[(int)BufferType::Max];
+    DynamicArrayT<float> data[(int)BufferType::Max];
 
     void init();
     void destroy();
@@ -400,7 +400,7 @@ struct Chunk {
     bool isDirty(const map_t& map);
     
     int x = 0, y = 0, w = 0, h = 0;
-    std::vector<Sint32> tiles;
+    DynamicArrayS32 tiles;
     
     struct Dither {
         static constexpr int MAX = 10;

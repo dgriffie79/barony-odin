@@ -31,11 +31,7 @@
 
 #include "ui/Image.hpp"
 
-const std::unordered_map<Mesh::BufferType, int> Mesh::ElementsPerVBO = {
-	{Mesh::BufferType::Position, 3},
-	{Mesh::BufferType::TexCoord, 2},
-	{Mesh::BufferType::Color, 4},
-};
+const int Mesh::ElementsPerVBO[(int)Mesh::BufferType::Max] = {3, 2, 4};
 
 framebuffer main_framebuffer;
 
@@ -747,13 +743,11 @@ void Mesh::init() {
     GL_CHECK_ERR(glGenBuffers((GLsizei)BufferType::Max, vbo));
 	for (unsigned int c = 0; c < (unsigned int)BufferType::Max; ++c) {
         if (data[c].size()) {
-            const auto& find = ElementsPerVBO.find((BufferType)c);
-            assert(find != ElementsPerVBO.end());
-            numVertices = std::max(numVertices, (unsigned int)data[c].size() / find->second);
+            numVertices = std::max(numVertices, (unsigned int)data[c].size() / ElementsPerVBO[c]);
             GL_CHECK_ERR(glBindBuffer(GL_ARRAY_BUFFER, vbo[c]));
             GL_CHECK_ERR(glBufferData(GL_ARRAY_BUFFER, data[c].size() * sizeof(float), data[c].data(), GL_STATIC_DRAW));
 #ifdef VERTEX_ARRAYS_ENABLED
-            GL_CHECK_ERR(glVertexAttribPointer(c, find->second, GL_FLOAT, GL_FALSE, 0, nullptr));
+            GL_CHECK_ERR(glVertexAttribPointer(c, ElementsPerVBO[c], GL_FLOAT, GL_FALSE, 0, nullptr));
             GL_CHECK_ERR(glEnableVertexAttribArray(c));
 #endif
         }
@@ -792,10 +786,8 @@ void Mesh::draw(GLenum type, int numVertices) const {
 #ifndef VERTEX_ARRAYS_ENABLED
     for (unsigned int c = 0; c < (unsigned int)BufferType::Max; ++c) {
         if (data[c].size()) {
-            const auto& find = ElementsPerVBO.find((BufferType)c);
-            assert(find != ElementsPerVBO.end());
             GL_CHECK_ERR(glBindBuffer(GL_ARRAY_BUFFER, vbo[c]));
-            GL_CHECK_ERR(glVertexAttribPointer(c, find->second, GL_FLOAT, GL_FALSE, 0, nullptr));
+            GL_CHECK_ERR(glVertexAttribPointer(c, ElementsPerVBO[c], GL_FLOAT, GL_FALSE, 0, nullptr));
             GL_CHECK_ERR(glEnableVertexAttribArray(c));
         }
     }

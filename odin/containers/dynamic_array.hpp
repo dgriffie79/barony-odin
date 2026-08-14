@@ -268,6 +268,12 @@ public:
         return *this;
     }
 
+    void swap(DynamicArrayT& other) noexcept {
+        DynamicArray tmp = raw;
+        raw = other.raw;
+        other.raw = tmp;
+    }
+
     int64_t size() const { return barony_dynamic_array_elem_len(const_cast<DynamicArray*>(&raw), sizeof(T)); }
     bool empty() const { return size() == 0; }
     T* data() { return (T*)raw.data; }
@@ -298,6 +304,13 @@ public:
             base[i] = v;
         }
         return (T*)raw.data + i;
+    }
+    // insert an initializer_list at position (std::vector::insert(pos, ilist) semantics)
+    void insert(T* pos, std::initializer_list<T> ilist) {
+        T* p = pos;
+        for (const T& v : ilist) {
+            p = insert(p, v) + 1;
+        }
     }
     template <typename U = T, std::enable_if_t<std::is_same_v<U, DynamicString>, int> = 0>
     void push_back(const char* v) { T s(v); barony_dynamic_array_elem_append(&raw, &s, sizeof(T), DynamicArrayKindOf<T>::value); }
