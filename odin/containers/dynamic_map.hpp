@@ -512,6 +512,7 @@ enum MapValueKind {
     MK_IntPair = 61,             // pair<int,int> (8B POD)
     MK_I32MapIntPair = 62,       // nested map<Uint32,map<int,pair<int,int>>> (owning)
     MK_ArrayStringPair = 63,     // vector<pair<string,string>> (owning Raw_Dynamic_Array of string pairs)
+    MK_CompendiumAchievementsDisplay = 64, // CompendiumAchievementsDisplay (owns 1 nested array + 2 ints)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

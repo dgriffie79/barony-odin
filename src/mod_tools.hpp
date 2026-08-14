@@ -3637,7 +3637,7 @@ struct Compendium_t
 			int currentPage = 0;
 			int numHidden = 0;
 		};
-		static std::map<std::string, CompendiumAchievementsDisplay> achievementsBookDisplay;
+		static DynamicMapStrT<CompendiumAchievementsDisplay> achievementsBookDisplay;
 		static bool sortAlphabetical;
 	};
 	static DynamicMapAchievementData achievements;
@@ -4369,6 +4369,8 @@ struct Compendium_t
 
 template <> struct DynamicArrayKindOf<DynamicArrayT<DynamicArrayStr>> { static constexpr int value = Kind_DynArrayStrArray; };
 template <> struct DynamicArrayKindOf<Compendium_t::CompendiumItems_t::Codex_t::CodexItem_t> { static constexpr int value = Kind_CodexItem; };
+// MapValueKindOf for Compendium_t::AchievementData_t::CompendiumAchievementsDisplay (owns 1 nested array + 2 ints)
+template <> struct MapValueKindOf<Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> { static constexpr int value = MK_CompendiumAchievementsDisplay; };
 
 
 extern Compendium_t CompendiumEntries;

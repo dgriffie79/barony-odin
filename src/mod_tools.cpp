@@ -19173,7 +19173,7 @@ int Compendium_t::lorePointsAchievementsTotal = 0;
 int Compendium_t::lorePointsSpent = 0;
 std::set<std::pair<std::string, std::string>, Compendium_t::AchievementData_t::Comparator> Compendium_t::AchievementData_t::achievementNamesSorted;
 DynamicMapStrArrayStringPair Compendium_t::AchievementData_t::achievementCategories;
-std::map<std::string, Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> Compendium_t::AchievementData_t::achievementsBookDisplay;
+DynamicMapStrT<Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> Compendium_t::AchievementData_t::achievementsBookDisplay;
 DynamicSetStr Compendium_t::AchievementData_t::achievementUnlockedLookup;
 bool Compendium_t::AchievementData_t::sortAlphabetical = false;
 DynamicString Compendium_t::compendium_sorting = "default";
