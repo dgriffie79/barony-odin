@@ -1602,7 +1602,7 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 extern int minimapPingGimpTimer[MAXPLAYERS];
 extern SDL_Rect minimaps[MAXPLAYERS];
 
-extern std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImages;
+extern DynamicArraySurfacePtrStringPair systemResourceImages;
 
 class FollowerRadialMenu
 {

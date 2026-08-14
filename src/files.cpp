@@ -5993,9 +5993,9 @@ bool physfsSearchSystemImagesToUpdate()
 	bool requireReload = false;
 	Mods::systemResourceImagesToReload.clear();
 
-	for ( std::vector<std::pair<SDL_Surface**, std::string>>::const_iterator it = systemResourceImages.begin(); it != systemResourceImages.end(); ++it )
+	for ( auto it = systemResourceImages.begin(); it != systemResourceImages.end(); ++it )
 	{
-		std::pair<SDL_Surface**, std::string> line = *it;
+		const auto& line = *it;
 		DynamicString imgFile = line.second;
 		if ( PHYSFS_getRealDir(imgFile.c_str()) != NULL)
 		{
@@ -6015,9 +6015,9 @@ void physfsReloadSystemImages()
 {
 	if ( !Mods::systemResourceImagesToReload.empty() )
 	{
-		for ( std::vector<std::pair<SDL_Surface**, std::string>>::const_iterator it = Mods::systemResourceImagesToReload.begin(); it != Mods::systemResourceImagesToReload.end(); ++it )
+		for ( auto it = Mods::systemResourceImagesToReload.begin(); it != Mods::systemResourceImagesToReload.end(); ++it )
 		{
-			std::pair<SDL_Surface**, std::string> line = *it;
+			const auto& line = *it;
 			if ( *(line.first) ) // SDL_Surface* pointer exists
 			{
 				// load a new image, getting the VFS system location.

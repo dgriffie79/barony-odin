@@ -217,6 +217,7 @@ Kind_HiscoreLootbagPair      :: 32
 Kind_HiscoreCompendiumPair   :: 33
 Kind_FollowerBarPair         :: 34
 Kind_StringPair               :: 35
+Kind_SurfacePtrStringPair      :: 36
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -1416,6 +1417,25 @@ hiscore_attributes_pair_copy :: proc(dst: rawptr, src: rawptr) {
 	dynamic_string_copy_elem(rawptr(&d.second), rawptr(&s.second))
 }
 
+// SurfacePtrStringPair_t — 24B (SDL_Surface** + DynamicString). The pointer is
+// copied verbatim (points into global SDL_Surface* vars); the string is owned.
+SurfacePtrStringPair_t :: struct {
+	first:  rawptr,   // SDL_Surface** (8B, not owned)
+	second: string,   // owned filepath
+}
+#assert(size_of(SurfacePtrStringPair_t) == 24)
+
+surface_ptr_string_pair_free :: proc(p: rawptr) {
+	v := (^SurfacePtrStringPair_t)(p)
+	dynamic_string_free_elem(rawptr(&v.second))
+}
+surface_ptr_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SurfacePtrStringPair_t)(dst)
+	s := (^SurfacePtrStringPair_t)(src)
+	d.first = s.first
+	dynamic_string_copy_elem(rawptr(&d.second), rawptr(&s.second))
+}
+
 hiscore_player_equip_pair_free :: proc(p: rawptr) {
 	v := (^HiscorePlayerEquipPair_t)(p)
 	dynamic_string_free_elem(rawptr(&v.first))
@@ -1674,7 +1694,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [36]Element_Ops{
+element_ops := [37]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1711,6 +1731,7 @@ element_ops := [36]Element_Ops{
 	33 = { free = hiscore_compendium_pair_free, copy = hiscore_compendium_pair_copy },
 	34 = { free = follower_bar_pair_free, copy = follower_bar_pair_copy },
 	35 = { free = dynamic_string_pair_free, copy = dynamic_string_pair_copy },
+	36 = { free = surface_ptr_string_pair_free, copy = surface_ptr_string_pair_copy },
 }
 
 @(export)

@@ -214,11 +214,11 @@ real_t EnemyHPDamageBarHandler::shortDistanceHPBarFadeDistance = 1.0;
 DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters;  // vector<pair<real_t,int>>
 DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture;  // vector<pair<real_t,int>>
 
-std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImages =
+DynamicArraySurfacePtrStringPair systemResourceImages =
 {
-	std::make_pair(&font8x8_bmp, "images/system/font8x8.png"),
-	std::make_pair(&font12x12_bmp, "images/system/font12x12.png"),
-	std::make_pair(&font16x16_bmp, "images/system/font16x16.png"),
+	{&font8x8_bmp, "images/system/font8x8.png"},
+	{&font12x12_bmp, "images/system/font12x12.png"},
+	{&font16x16_bmp, "images/system/font16x16.png"},
 
 	//std::make_pair(&font12x12_small_bmp, "images/system/font12x12_small.png"),
 	//std::make_pair(&backdrop_blessed_bmp, "images/system/backdrop_blessed.png"),

@@ -3434,7 +3434,7 @@ struct Mods
 {
 	static DynamicArrayS32 modelsListModifiedIndexes;
 	static DynamicArrayS32 soundsListModifiedIndexes;
-	static std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImagesToReload;
+	static DynamicArraySurfacePtrStringPair systemResourceImagesToReload;
 	static DynamicArrayStringPair mountedFilepaths;
 	static DynamicArrayStringPair mountedFilepathsSaved; // saved from config file
 	static DynamicSetStr mods_loaded_local;

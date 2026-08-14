@@ -58,7 +58,7 @@ void steamStatisticUpdate(int statisticNum, ESteamStatTypes type, int value) {} 
 //AchievementObserver achievementObserver; // dummy function for mod_tools.cpp
 void initClass(int i) {} // dummy function for mod_tools.cpp
 //void AchievementObserver::updateGlobalStat(int index, int value) {}
-std::vector<std::pair<SDL_Surface**, std::string>> systemResourceImages; // dummy variable for files.cpp system resource reloading in Barony.
+DynamicArraySurfacePtrStringPair systemResourceImages; // dummy variable for files.cpp system resource reloading in Barony.
 void initMenuOptions() {} // dummy
 int textInsertCaratPosition = -1;
 GenericGUIMenu GenericGUI[MAXPLAYERS];

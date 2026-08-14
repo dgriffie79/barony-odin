@@ -10563,7 +10563,7 @@ void EditorEntityData_t::readFromFile()
 
 DynamicArrayS32 Mods::modelsListModifiedIndexes;
 DynamicArrayS32 Mods::soundsListModifiedIndexes;
-std::vector<std::pair<SDL_Surface**, std::string>> Mods::systemResourceImagesToReload;
+DynamicArraySurfacePtrStringPair Mods::systemResourceImagesToReload;
 DynamicArrayStringPair Mods::mountedFilepaths;
 DynamicArrayStringPair Mods::mountedFilepathsSaved;
 DynamicSetStr Mods::mods_loaded_local;

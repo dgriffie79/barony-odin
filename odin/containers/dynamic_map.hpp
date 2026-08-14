@@ -22,6 +22,7 @@
 #include <string_view>
 #include "dynamic_string.hpp"
 
+struct SDL_Surface;  // fwd decl: only used as SDL_Surface** (pointer) in mirrors
 struct DynamicMapRaw;  // forward decl for the shim signatures
 
 // Odin containers shims (declared before the class so methods can call them)
@@ -420,6 +421,14 @@ struct DynamicStringPair_t {
     DynamicString second;
 };
 
+// SurfacePtrStringPair_t — 24B (SDL_Surface** + DynamicString). The pointer is
+// copied verbatim (points into global SDL_Surface* vars); the string is owned.
+// Value for systemResourceImages / systemResourceImagesToReload.
+struct SurfacePtrStringPair_t {
+    SDL_Surface** first = nullptr;
+    DynamicString second;
+};
+
 // IntPair_t — 8B POD mirror of std::pair<int,int>. Value for
 // AchievementObserver::entityAchievementsToProcess inner map.
 struct IntPair_t {
@@ -527,6 +536,7 @@ template <> struct MapValueKindOf<ChunkDither_t> { static constexpr int value = 
 template <> struct MapValueKindOf<DynamicStringPair_t> { static constexpr int value = MK_StringPair; };
 // Array elem kind for vector<pair<string,string>> (mountedFilepaths etc.).
 template <> struct DynamicArrayKindOf<DynamicStringPair_t> { static constexpr int value = Kind_StringPair; };
+template <> struct DynamicArrayKindOf<SurfacePtrStringPair_t> { static constexpr int value = Kind_SurfacePtrStringPair; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
@@ -1059,6 +1069,7 @@ using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
 using DynamicArrayStringPair = DynamicArrayT<DynamicStringPair_t>;  // vector<pair<string,string>>
+using DynamicArraySurfacePtrStringPair = DynamicArrayT<SurfacePtrStringPair_t>;  // vector<pair<SDL_Surface**, string>>
 using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
 template <> struct MapValueKindOf<DynamicMapStrI32Map> { static constexpr int value = MK_StrI32Map; };
 using DynamicMapI32IntPair = DynamicMapI32T<IntPair_t>;            // map<int, pair<int,int>>
