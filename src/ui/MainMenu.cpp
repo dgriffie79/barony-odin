@@ -1,4 +1,5 @@
 #include "../main.hpp"
+#include "../../odin/json_shim/json_shim.hpp"
 #include "MainMenu.hpp"
 #include "Frame.hpp"
 #include "Image.hpp"
@@ -10825,11 +10826,15 @@ failed:
 		char buf[32000];
 		const int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+		if ( !jd.ok() )
+		{
+			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
+			return;
+		}
+		JsonNode& d = jd.root;
 		if ( !d.HasMember("version") || !d.HasMember("descriptions") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -10844,7 +10849,7 @@ failed:
 		static constexpr Uint32 poor = makeColorRGB(255, 64, 0);
 		static constexpr Uint32 bad = makeColorRGB(255, 64, 0);
 
-		auto& classes = d["descriptions"];
+		auto classes = d["descriptions"];
 		Stat tmpStats(0);
 		for ( auto it = classes.MemberBegin(); it != classes.MemberEnd(); ++it )
 		{
@@ -10973,11 +10978,15 @@ failed:
 		static char buf[32000];
 		const int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
+		JsonDoc jd(buf);
+		if ( !jd.ok() )
+		{
+			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
+			return;
+		}
+		JsonNode& d = jd.root;
 		if ( !d.HasMember("version") || !d.HasMember("descriptions") )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -10986,7 +10995,7 @@ failed:
 
 		data.clear();
 
-		auto& races = d["descriptions"];
+		auto races = d["descriptions"];
 		for ( auto it = races.MemberBegin(); it != races.MemberEnd(); ++it )
 		{
 			DynamicString key = it->name.GetString();
@@ -11047,7 +11056,7 @@ failed:
 				}
 			}
 
-			auto& highlights = it->value["text_line_highlights"];
+			auto highlights = it->value["text_line_highlights"];
 			int minProLine = 999;
 			int spellProLine = 999;
 			int maxProLine = 0;
@@ -22917,16 +22926,15 @@ failed:
 		char buf[2048];
 		int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 		buf[count] = '\0';
-		rapidjson::StringStream is(buf);
 		FileIO::close(fp);
 
-		rapidjson::Document d;
-		d.ParseStream(is);
-		if ( !d.HasMember("version") )
+		JsonDoc jd(buf);
+		if ( !jd.ok() )
 		{
 			printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			return;
 		}
+		JsonNode& d = jd.root;
 
 		updateBannerImg = "";
 		updateBannerImgHighlight = "";

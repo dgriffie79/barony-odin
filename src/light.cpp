@@ -176,8 +176,7 @@ light_t* lightSphere(int index, Sint32 x, Sint32 y, Sint32 radius, float r, floa
 	return light;
 }
 
-#include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
+#include "../odin/json_shim/json_shim.hpp"
 #include "files.hpp"
 
 DynamicMapLightDef lightDefs;
@@ -222,33 +221,37 @@ bool loadLights(bool forceLoadBaseDirectory) {
     char buf[65536];
     int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf));
     buf[count] = '\0';
-    rapidjson::StringStream is(buf);
     FileIO::close(fp);
 
-    rapidjson::Document d;
-    d.ParseStream(is);
-    
-    const auto& lights = d["lights"];
-    if (lights.IsObject()) {
-        for (const auto& it : lights.GetObject()) {
-            LightDef def;
-            const auto& name = it.name.GetString();
-            const auto& radius = it.value["radius"]; def.radius = radius.GetInt();
-            const auto& r = it.value["r"]; def.r = r.GetFloat();
-            const auto& g = it.value["g"]; def.g = g.GetFloat();
-            const auto& b = it.value["b"]; def.b = b.GetFloat();
-            if ( it.value.HasMember("a") )
-            {
-                def.a = it.value["a"].GetFloat();
+    void* jsonReader = json_reader_parse(buf);
+    if ( jsonReader )
+    {
+        void* root = json_node_root(jsonReader);
+        void* lights = json_node_get_member(root, "lights");
+        if ( lights && json_node_is_object(lights) ) {
+            uint32_t lightCount = json_node_member_count(lights);
+            for ( uint32_t i = 0; i < lightCount; ++i ) {
+                LightDef def;
+                const char* name = json_node_member_name_at(lights, i);
+                void* value = json_node_member_value_at(lights, i);
+                int32_t radius; json_node_get_int(json_node_get_member(value, "radius"), &radius); def.radius = radius;
+                float r; json_node_get_float(json_node_get_member(value, "r"), &r); def.r = r;
+                float g; json_node_get_float(json_node_get_member(value, "g"), &g); def.g = g;
+                float b; json_node_get_float(json_node_get_member(value, "b"), &b); def.b = b;
+                if ( json_node_has_member(value, "a") )
+                {
+                    float a; json_node_get_float(json_node_get_member(value, "a"), &a); def.a = a;
+                }
+                else
+                {
+                    def.a = 0.f;
+                }
+                float exp; json_node_get_float(json_node_get_member(value, "falloff_exp"), &exp); def.falloff_exp = exp;
+                bool shadows; json_node_get_bool(json_node_get_member(value, "shadows"), &shadows); def.shadows = shadows;
+                lightDefs[name] = def;
             }
-            else
-            {
-                def.a = 0.f;
-            }
-            const auto& exp = it.value["falloff_exp"]; def.falloff_exp = exp.GetFloat();
-            const auto& shadows = it.value["shadows"]; def.shadows = shadows.GetBool();
-            lightDefs[name] = def;
         }
+        json_reader_destroy(jsonReader);
     }
     
     return true;

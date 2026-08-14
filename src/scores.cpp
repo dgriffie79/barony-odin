@@ -10,6 +10,7 @@
 -------------------------------------------------------------------------------*/
 
 #include "main.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "files.hpp"
 #include "game.hpp"
 #include "stat.hpp"
@@ -643,10 +644,10 @@ void saveAllScoresJSON(const std::string& scoresfilename)
 	char path[PATH_MAX] = "";
 	completePath(path, scoresfilename.c_str(), outputdir);
 
-	rapidjson::Document d;
+	JsonBuilder d;
 	d.SetObject();
-	d.AddMember("version", rapidjson::Value(1), d.GetAllocator());
-	d.AddMember("game_version", rapidjson::Value(VERSION), d.GetAllocator());
+	d.AddMember("version", JsonValue::Int(1));
+	d.AddMember("game_version", JsonValue::Str(VERSION));
 
 	int versionNumber = 300;
 	char versionStr[4] = "000";
@@ -683,256 +684,256 @@ void saveAllScoresJSON(const std::string& scoresfilename)
 		return;
 	}
 
-	rapidjson::Value scores_list(rapidjson::kArrayType);
+	JsonValue scores_list = JsonValue::Array();
 	for ( ; node != NULL; node = node->next )
 	{
 		score_t* score = (score_t*)node->element;
-		rapidjson::Value entry(rapidjson::kObjectType);
+		JsonValue entry = JsonValue::Object();
 
-		entry.AddMember("name", rapidjson::Value(score->stats->name, d.GetAllocator()), d.GetAllocator());
-		entry.AddMember("type", score->stats->type, d.GetAllocator());
-		entry.AddMember("sex", score->stats->sex, d.GetAllocator());
-		entry.AddMember("race", score->stats->playerRace, d.GetAllocator());
-		entry.AddMember("appearance", score->stats->stat_appearance, d.GetAllocator());
+		entry.AddMember("name", JsonValue::Str(score->stats->name));
+		entry.AddMember("type", score->stats->type);
+		entry.AddMember("sex", score->stats->sex);
+		entry.AddMember("race", score->stats->playerRace);
+		entry.AddMember("appearance", score->stats->stat_appearance);
 
-		entry.AddMember("classnum", score->classnum, d.GetAllocator());
-		entry.AddMember("dungeonlevel", score->dungeonlevel, d.GetAllocator());
-		entry.AddMember("victory", score->victory, d.GetAllocator());
+		entry.AddMember("classnum", score->classnum);
+		entry.AddMember("dungeonlevel", score->dungeonlevel);
+		entry.AddMember("victory", score->victory);
 
-		entry.AddMember("completionTime", score->completionTime, d.GetAllocator());
-		entry.AddMember("conductPenniless", score->conductPenniless, d.GetAllocator());
-		entry.AddMember("conductFoodless", score->conductFoodless, d.GetAllocator());
-		entry.AddMember("conductVegetarian", score->conductVegetarian, d.GetAllocator());
-		entry.AddMember("conductIlliterate", score->conductIlliterate, d.GetAllocator());
+		entry.AddMember("completionTime", score->completionTime);
+		entry.AddMember("conductPenniless", score->conductPenniless);
+		entry.AddMember("conductFoodless", score->conductFoodless);
+		entry.AddMember("conductVegetarian", score->conductVegetarian);
+		entry.AddMember("conductIlliterate", score->conductIlliterate);
 
-		entry.AddMember("killer_monster", score->stats->killer_monster, d.GetAllocator());
-		entry.AddMember("killer_item", score->stats->killer_item, d.GetAllocator());
-		entry.AddMember("killer", score->stats->killer, d.GetAllocator());
-		entry.AddMember("killer_name", rapidjson::Value(score->stats->killer_name.c_str(), d.GetAllocator()), d.GetAllocator());
+		entry.AddMember("killer_monster", score->stats->killer_monster);
+		entry.AddMember("killer_item", score->stats->killer_item);
+		entry.AddMember("killer", score->stats->killer);
+		entry.AddMember("killer_name", JsonValue::Str(score->stats->killer_name.c_str()));
 
-		entry.AddMember("HP", score->stats->HP, d.GetAllocator());
-		entry.AddMember("MAXHP", score->stats->MAXHP, d.GetAllocator());
-		entry.AddMember("MP", score->stats->MP, d.GetAllocator());
-		entry.AddMember("MAXMP", score->stats->MAXMP, d.GetAllocator());
-		entry.AddMember("STR", score->stats->STR, d.GetAllocator());
-		entry.AddMember("DEX", score->stats->DEX, d.GetAllocator());
-		entry.AddMember("CON", score->stats->CON, d.GetAllocator());
-		entry.AddMember("INT", score->stats->INT, d.GetAllocator());
-		entry.AddMember("PER", score->stats->PER, d.GetAllocator());
-		entry.AddMember("CHR", score->stats->CHR, d.GetAllocator());
-		entry.AddMember("EXP", score->stats->EXP, d.GetAllocator());
-		entry.AddMember("LVL", score->stats->LVL, d.GetAllocator());
-		entry.AddMember("GOLD", score->stats->GOLD, d.GetAllocator());
-		entry.AddMember("HUNGER", score->stats->HUNGER, d.GetAllocator());
+		entry.AddMember("HP", score->stats->HP);
+		entry.AddMember("MAXHP", score->stats->MAXHP);
+		entry.AddMember("MP", score->stats->MP);
+		entry.AddMember("MAXMP", score->stats->MAXMP);
+		entry.AddMember("STR", score->stats->STR);
+		entry.AddMember("DEX", score->stats->DEX);
+		entry.AddMember("CON", score->stats->CON);
+		entry.AddMember("INT", score->stats->INT);
+		entry.AddMember("PER", score->stats->PER);
+		entry.AddMember("CHR", score->stats->CHR);
+		entry.AddMember("EXP", score->stats->EXP);
+		entry.AddMember("LVL", score->stats->LVL);
+		entry.AddMember("GOLD", score->stats->GOLD);
+		entry.AddMember("HUNGER", score->stats->HUNGER);
 		
 		{
-			rapidjson::Value kills_num(rapidjson::kArrayType);
+			JsonValue kills_num = JsonValue::Array();
 			for ( int c = 0; c < NUMMONSTERS; c++ )
 			{
-				kills_num.PushBack(score->kills[c], d.GetAllocator());
+				kills_num.PushBack(score->kills[c]);
 			}
-			entry.AddMember("kills", kills_num, d.GetAllocator());
+			entry.AddMember("kills", kills_num);
 		}
 
 		{
-			rapidjson::Value proficiencies(rapidjson::kArrayType);
+			JsonValue proficiencies = JsonValue::Array();
 			for ( int c = 0; c < NUMPROFICIENCIES; c++ )
 			{
-				proficiencies.PushBack(score->stats->getProficiency(c), d.GetAllocator());
+				proficiencies.PushBack(score->stats->getProficiency(c));
 			}
-			entry.AddMember("proficiencies", proficiencies, d.GetAllocator());
+			entry.AddMember("proficiencies", proficiencies);
 		}
 
 		{
-			rapidjson::Value effects(rapidjson::kArrayType);
+			JsonValue effects = JsonValue::Array();
 			for ( int c = 0; c < NUMEFFECTS; c++ )
 			{
-				effects.PushBack(score->stats->getEffectActive(c), d.GetAllocator());
+				effects.PushBack(score->stats->getEffectActive(c));
 			}
-			entry.AddMember("effects", effects, d.GetAllocator());
+			entry.AddMember("effects", effects);
 		}
 		{
-			rapidjson::Value effects_timers(rapidjson::kArrayType);
+			JsonValue effects_timers = JsonValue::Array();
 			for ( int c = 0; c < NUMEFFECTS; c++ )
 			{
-				effects_timers.PushBack(score->stats->EFFECTS_TIMERS[c], d.GetAllocator());
+				effects_timers.PushBack(score->stats->EFFECTS_TIMERS[c]);
 			}
-			entry.AddMember("effects_timers", effects_timers, d.GetAllocator());
+			entry.AddMember("effects_timers", effects_timers);
 		}
 		{
-			rapidjson::Value effects_accretion_time(rapidjson::kArrayType);
+			JsonValue effects_accretion_time = JsonValue::Array();
 			for ( int c = 0; c < NUMEFFECTS; c++ )
 			{
-				effects_accretion_time.PushBack(score->stats->EFFECTS_ACCRETION_TIME[c], d.GetAllocator());
+				effects_accretion_time.PushBack(score->stats->EFFECTS_ACCRETION_TIME[c]);
 			}
-			entry.AddMember("effects_accretion_time", effects_accretion_time, d.GetAllocator());
+			entry.AddMember("effects_accretion_time", effects_accretion_time);
 		}
 
 
 		{
-			rapidjson::Value conducts(rapidjson::kArrayType);
+			JsonValue conducts = JsonValue::Array();
 			for ( int c = 0; c < NUM_CONDUCT_CHALLENGES; c++ )
 			{
-				conducts.PushBack(score->conductGameChallenges[c], d.GetAllocator());
+				conducts.PushBack(score->conductGameChallenges[c]);
 			}
-			entry.AddMember("conducts", conducts, d.GetAllocator());
+			entry.AddMember("conducts", conducts);
 		}
 
 		{
-			rapidjson::Value statistics(rapidjson::kArrayType);
+			JsonValue statistics = JsonValue::Array();
 			for ( int c = 0; c < NUM_GAMEPLAY_STATISTICS; c++ )
 			{
-				statistics.PushBack(score->gameStatistics[c], d.GetAllocator());
+				statistics.PushBack(score->gameStatistics[c]);
 			}
-			entry.AddMember("statistics", statistics, d.GetAllocator());
+			entry.AddMember("statistics", statistics);
 		}
 
 		{
-			rapidjson::Value inventory(rapidjson::kArrayType);
+			JsonValue inventory = JsonValue::Array();
 			for ( node_t* node2 = score->stats->inventory.first; node2 != NULL; node2 = node2->next )
 			{
 				Item* item = (Item*)node2->element;
 
-				rapidjson::Value inv_item(rapidjson::kObjectType);
-				inv_item.AddMember("type", item->type, d.GetAllocator());
-				inv_item.AddMember("status", item->status, d.GetAllocator());
-				inv_item.AddMember("beatitude", item->beatitude, d.GetAllocator());
-				inv_item.AddMember("count", item->count, d.GetAllocator());
-				inv_item.AddMember("appearance", rapidjson::Value(item->appearance), d.GetAllocator());
-				inv_item.AddMember("identified", item->identified, d.GetAllocator());
+				JsonValue inv_item = JsonValue::Object();
+				inv_item.AddMember("type", item->type);
+				inv_item.AddMember("status", item->status);
+				inv_item.AddMember("beatitude", item->beatitude);
+				inv_item.AddMember("count", item->count);
+				inv_item.AddMember("appearance", JsonValue::Uint(item->appearance));
+				inv_item.AddMember("identified", item->identified);
 
-				inventory.PushBack(inv_item, d.GetAllocator());
+				inventory.PushBack(inv_item);
 			}
 
-			entry.AddMember("inventory", inventory, d.GetAllocator());
+			entry.AddMember("inventory", inventory);
 		}
 
 		{
-			rapidjson::Value equipped(rapidjson::kArrayType);
+			JsonValue equipped = JsonValue::Array();
 			if ( score->stats->helmet )
 			{
 				int c = list_Index(score->stats->helmet->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->breastplate )
 			{
 				int c = list_Index(score->stats->breastplate->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->gloves )
 			{
 				int c = list_Index(score->stats->gloves->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->shoes )
 			{
 				int c = list_Index(score->stats->shoes->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->shield )
 			{
 				int c = list_Index(score->stats->shield->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->weapon )
 			{
 				int c = list_Index(score->stats->weapon->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->cloak )
 			{
 				int c = list_Index(score->stats->cloak->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->amulet )
 			{
 				int c = list_Index(score->stats->amulet->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->ring )
 			{
 				int c = list_Index(score->stats->ring->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
 			if ( score->stats->mask )
 			{
 				int c = list_Index(score->stats->mask->node);
-				equipped.PushBack(c, d.GetAllocator());
+				equipped.PushBack(c);
 			}
 			else
 			{
-				equipped.PushBack(-1, d.GetAllocator());
+				equipped.PushBack(-1);
 			}
-			entry.AddMember("equipped", equipped, d.GetAllocator());
+			entry.AddMember("equipped", equipped);
 		}
 
-		scores_list.PushBack(entry, d.GetAllocator());
+		scores_list.PushBack(entry);
 	}
 
-	d.AddMember("scores_list", scores_list, d.GetAllocator());
+	d.AddMember("scores_list", scores_list);
 
 	{
-		rapidjson::Value books_read(rapidjson::kArrayType);
+		JsonValue books_read = JsonValue::Array();
 		for ( node_t* node = booksRead.first; node != NULL; node = node->next )
 		{
 			char* book = (char*)node->element;
-			books_read.PushBack(rapidjson::Value(book, d.GetAllocator()), d.GetAllocator());
+			books_read.PushBack(JsonValue::Str(book));
 		}
-		d.AddMember("books_read", books_read, d.GetAllocator());
+		d.AddMember("books_read", books_read);
 	}
 
 	{
-		rapidjson::Value used_class(rapidjson::kArrayType);
+		JsonValue used_class = JsonValue::Array();
 		for ( int c = 0; c < NUMCLASSES; c++ )
 		{
-			used_class.PushBack(rapidjson::Value(usedClass[c]), d.GetAllocator());
+			used_class.PushBack(JsonValue::Bool(usedClass[c]));
 		}
-		d.AddMember("used_class", used_class, d.GetAllocator());
+		d.AddMember("used_class", used_class);
 	}
 
 	{
-		rapidjson::Value used_race(rapidjson::kArrayType);
+		JsonValue used_race = JsonValue::Array();
 		for ( int c = 0; c < NUMRACES; c++ )
 		{
-			used_race.PushBack(rapidjson::Value(usedRace[c]), d.GetAllocator());
+			used_race.PushBack(JsonValue::Bool(usedRace[c]));
 		}
-		d.AddMember("used_race", used_race, d.GetAllocator());
+		d.AddMember("used_race", used_race);
 	}
 
 	// open file
@@ -943,12 +944,9 @@ void saveAllScoresJSON(const std::string& scoresfilename)
 		return;
 	}
 
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	writer.SetIndent(' ', 2);
-	writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
-	d.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = d.Serialize(true);
+	fp->write(json, sizeof(char), strlen(json));
+	json_string_free(json);
 	FileIO::close(fp);
 
 	printlog("[JSON]: Successfully wrote json file %s", path);
@@ -1249,7 +1247,7 @@ bool deleteScore(bool multiplayer, int index)
 	loads all highscores from the scores data file
 
 -------------------------------------------------------------------------------*/
-int jsonGetInt(rapidjson::Value& d, const char* key)
+int jsonGetInt(JsonNode& d, const char* key)
 {
 	if ( d.HasMember(key) && d[key].IsInt() )
 	{
@@ -1258,7 +1256,7 @@ int jsonGetInt(rapidjson::Value& d, const char* key)
 	return 0;
 }
 
-bool jsonGetBool(rapidjson::Value& d, const char* key)
+bool jsonGetBool(JsonNode& d, const char* key)
 {
 	if ( d.HasMember(key) && d[key].IsBool() )
 	{
@@ -1267,7 +1265,7 @@ bool jsonGetBool(rapidjson::Value& d, const char* key)
 	return false;
 }
 
-const char* jsonGetStr(rapidjson::Value& d, const char* key)
+const char* jsonGetStr(JsonNode& d, const char* key)
 {
 	if ( d.HasMember(key) && d[key].IsString() )
 	{
@@ -1435,65 +1433,6 @@ bool verifyScoreLoader()
 	return true;
 }
 
-class FileReadStreamCustomWrapper {
-public:
-	typedef char Ch;    //!< Character type (byte).
-
-	//! Constructor.
-	/*!
-		\param fp File pointer opened for read.
-		\param buffer user-supplied buffer.
-		\param bufferSize size of buffer in bytes. Must >=4 bytes.
-	*/
-	FileReadStreamCustomWrapper(File* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) {
-		RAPIDJSON_ASSERT(fp_ != 0);
-		RAPIDJSON_ASSERT(bufferSize >= 4);
-		Read();
-	}
-
-	Ch Peek() const { return *current_; }
-	Ch Take() { Ch c = *current_; Read(); return c; }
-	size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
-
-	// Not implemented
-	void Put(Ch) { RAPIDJSON_ASSERT(false); }
-	void Flush() { RAPIDJSON_ASSERT(false); }
-	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
-
-	// For encoding detection only.
-	const Ch* Peek4() const {
-		return (current_ + 4 <= bufferLast_) ? current_ : 0;
-	}
-
-private:
-	void Read() {
-		if ( current_ < bufferLast_ )
-			++current_;
-		else if ( !eof_ ) {
-			count_ += readCount_;
-			readCount_ = fp_->read(buffer_, 1, bufferSize_);
-			bufferLast_ = buffer_ + readCount_ - 1;
-			current_ = buffer_;
-
-			if ( readCount_ < bufferSize_ ) {
-				buffer_[readCount_] = '\0';
-				++bufferLast_;
-				eof_ = true;
-			}
-		}
-	}
-
-	File* fp_;
-	Ch* buffer_;
-	size_t bufferSize_;
-	Ch* bufferLast_;
-	Ch* current_;
-	size_t readCount_;
-	size_t count_;  //!< Number of characters read
-	bool eof_;
-};
-
 void loadAllScoresJSON(const std::string& scoresfilename)
 {
 	// clear top scores
@@ -1524,14 +1463,17 @@ void loadAllScoresJSON(const std::string& scoresfilename)
 
 	static char buf[65536];
 	memset(buf, 0, sizeof(buf));
-	//int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
-	//buf[count] = '\0';
-	FileReadStreamCustomWrapper is(fp, buf, sizeof(buf));
-
-	rapidjson::Document d;
-	d.ParseStream(is);
+	int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
+	buf[count] = '\0';
 	FileIO::close(fp);
 
+	JsonDoc jd(buf);
+	if ( !jd.ok() )
+	{
+		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", path);
+		return;
+	}
+	JsonNode& d = jd.root;
 	if ( !d.HasMember("version") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", path);
@@ -5657,10 +5599,10 @@ int SaveGameInfo::getTotalScore(const int playernum, const int victory)
 
 DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const int victory)
 {
-	rapidjson::Document d;
+	JsonBuilder d;
 	d.SetObject();
 
-	rapidjson::Value character(rapidjson::kObjectType);
+	JsonValue character = JsonValue::Object();
 
 	auto& player = players[playernum];
 	auto& myStats = players[playernum].stats;
@@ -5686,16 +5628,16 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 		}
 	}
 
-	character.AddMember("version", rapidjson::Value(1), d.GetAllocator());
-	character.AddMember("game_ver", rapidjson::Value(VERSION, d.GetAllocator()), d.GetAllocator());
-	character.AddMember("leaderboard", rapidjson::Value(lid.c_str(), d.GetAllocator()), d.GetAllocator());
-	character.AddMember("leaderboard_version", rapidjson::Value(lid_version), d.GetAllocator());
-	character.AddMember("time", rapidjson::Value(gametimer), d.GetAllocator());
-	character.AddMember("totalscore", rapidjson::Value(getTotalScore(playernum, victory)), d.GetAllocator());
-	character.AddMember("seed", rapidjson::Value(customseed), d.GetAllocator());
-	character.AddMember("seed_str", rapidjson::Value(customseed_string.c_str(), d.GetAllocator()), d.GetAllocator());
+	character.AddMember("version", JsonValue::Int(1));
+	character.AddMember("game_ver", JsonValue::Str(VERSION));
+	character.AddMember("leaderboard", JsonValue::Str(lid.c_str()));
+	character.AddMember("leaderboard_version", JsonValue::Int(lid_version));
+	character.AddMember("time", JsonValue::Uint(gametimer));
+	character.AddMember("totalscore", JsonValue::Int(getTotalScore(playernum, victory)));
+	character.AddMember("seed", JsonValue::Uint(customseed));
+	character.AddMember("seed_str", JsonValue::Str(customseed_string.c_str()));
 
-	character.AddMember("victory", rapidjson::Value(victory), d.GetAllocator());
+	character.AddMember("victory", JsonValue::Int(victory));
 	int multi = multiplayer;
 	if ( multi == 0 )
 	{
@@ -5704,100 +5646,100 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 			multi = CLIENT; // failsafe to set if session wrapped up prematurely
 		}
 	}
-	character.AddMember("multiplayer", rapidjson::Value(multi), d.GetAllocator());
-	character.AddMember("splitscreen", rapidjson::Value(splitscreen), d.GetAllocator());
-	character.AddMember("flags", rapidjson::Value(svflags), d.GetAllocator());
-	character.AddMember("lvl", rapidjson::Value(dungeon_lvl), d.GetAllocator());
-	character.AddMember("secret", rapidjson::Value(level_track), d.GetAllocator());
+	character.AddMember("multiplayer", JsonValue::Int(multi));
+	character.AddMember("splitscreen", JsonValue::Int(splitscreen));
+	character.AddMember("flags", JsonValue::Uint(svflags));
+	character.AddMember("lvl", JsonValue::Int(dungeon_lvl));
+	character.AddMember("secret", JsonValue::Int(level_track));
 
 	{
-		rapidjson::Value statsObj(rapidjson::kObjectType);
-		//statsObj.AddMember("name", rapidjson::Value(myStats.name.c_str(), d.GetAllocator()), d.GetAllocator());
-		statsObj.AddMember("MAXHP", myStats.maxHP, d.GetAllocator());
-		statsObj.AddMember("MAXMP", myStats.maxMP, d.GetAllocator());
-		statsObj.AddMember("STR", myStats.STR, d.GetAllocator());
-		statsObj.AddMember("DEX", myStats.DEX, d.GetAllocator());
-		statsObj.AddMember("CON", myStats.CON, d.GetAllocator());
-		statsObj.AddMember("INT", myStats.INT, d.GetAllocator());
-		statsObj.AddMember("PER", myStats.PER, d.GetAllocator());
-		statsObj.AddMember("CHR", myStats.CHR, d.GetAllocator());
+		JsonValue statsObj = JsonValue::Object();
+		//statsObj.AddMember("name", rapidjson::Value(myStats.name.c_str()));
+		statsObj.AddMember("MAXHP", myStats.maxHP);
+		statsObj.AddMember("MAXMP", myStats.maxMP);
+		statsObj.AddMember("STR", myStats.STR);
+		statsObj.AddMember("DEX", myStats.DEX);
+		statsObj.AddMember("CON", myStats.CON);
+		statsObj.AddMember("INT", myStats.INT);
+		statsObj.AddMember("PER", myStats.PER);
+		statsObj.AddMember("CHR", myStats.CHR);
 
-		statsObj.AddMember("LVL", myStats.LVL, d.GetAllocator());
-		statsObj.AddMember("EXP", myStats.EXP, d.GetAllocator());
-		statsObj.AddMember("race", player.race, d.GetAllocator());
-		statsObj.AddMember("appearance", myStats.statscore_appearance, d.GetAllocator());
-		statsObj.AddMember("sex", myStats.sex, d.GetAllocator());
-		statsObj.AddMember("class", player.char_class, d.GetAllocator());
+		statsObj.AddMember("LVL", myStats.LVL);
+		statsObj.AddMember("EXP", myStats.EXP);
+		statsObj.AddMember("race", player.race);
+		statsObj.AddMember("appearance", myStats.statscore_appearance);
+		statsObj.AddMember("sex", myStats.sex);
+		statsObj.AddMember("class", player.char_class);
 
-		statsObj.AddMember("GOLD", myStats.GOLD, d.GetAllocator());
-		statsObj.AddMember("kill_by", hiscore_killed_by, d.GetAllocator());
-		statsObj.AddMember("kill_mon", hiscore_killed_monster, d.GetAllocator());
-		statsObj.AddMember("kill_item", hiscore_killed_item, d.GetAllocator());
+		statsObj.AddMember("GOLD", myStats.GOLD);
+		statsObj.AddMember("kill_by", hiscore_killed_by);
+		statsObj.AddMember("kill_mon", hiscore_killed_monster);
+		statsObj.AddMember("kill_item", hiscore_killed_item);
 
-		character.AddMember("stats", statsObj, d.GetAllocator());
+		character.AddMember("stats", statsObj);
 
-		rapidjson::Value attrObj(rapidjson::kObjectType);
-		rapidjson::Value killsArr(rapidjson::kArrayType);
+		JsonValue attrObj = JsonValue::Object();
+		JsonValue killsArr = JsonValue::Array();
 		for ( int i = 0; i < NUMMONSTERS; ++i )
 		{
-			killsArr.PushBack(player.kills[i], d.GetAllocator());
+			killsArr.PushBack(player.kills[i]);
 		}
-		attrObj.AddMember("kills", killsArr, d.GetAllocator());
+		attrObj.AddMember("kills", killsArr);
 
-		rapidjson::Value profArr(rapidjson::kArrayType);
+		JsonValue profArr = JsonValue::Array();
 		for ( int i = 0; i < NUMPROFICIENCIES; ++i )
 		{
-			profArr.PushBack(myStats.PROFICIENCIES[i], d.GetAllocator());
+			profArr.PushBack(myStats.PROFICIENCIES[i]);
 		}
-		attrObj.AddMember("proficiencies", profArr, d.GetAllocator());
+		attrObj.AddMember("proficiencies", profArr);
 
-		rapidjson::Value conductsArr(rapidjson::kArrayType);
-		conductsArr.PushBack((int)player.conductPenniless, d.GetAllocator());
-		conductsArr.PushBack((int)player.conductFoodless, d.GetAllocator());
-		conductsArr.PushBack((int)player.conductVegetarian, d.GetAllocator());
-		conductsArr.PushBack((int)player.conductIlliterate, d.GetAllocator());
+		JsonValue conductsArr = JsonValue::Array();
+		conductsArr.PushBack((int)player.conductPenniless);
+		conductsArr.PushBack((int)player.conductFoodless);
+		conductsArr.PushBack((int)player.conductVegetarian);
+		conductsArr.PushBack((int)player.conductIlliterate);
 		for ( int i = 0; i < NUM_CONDUCT_CHALLENGES; ++i )
 		{
-			conductsArr.PushBack(player.additionalConducts[i], d.GetAllocator());
+			conductsArr.PushBack(player.additionalConducts[i]);
 		}
-		attrObj.AddMember("conducts", conductsArr, d.GetAllocator());
+		attrObj.AddMember("conducts", conductsArr);
 
-		rapidjson::Value statisticsArr(rapidjson::kArrayType);
+		JsonValue statisticsArr = JsonValue::Array();
 		for ( int i = 0; i < NUM_GAMEPLAY_STATISTICS; ++i )
 		{
-			statisticsArr.PushBack(player.gameStatistics[i], d.GetAllocator());
+			statisticsArr.PushBack(player.gameStatistics[i]);
 		}
-		attrObj.AddMember("statistics", statisticsArr, d.GetAllocator());
+		attrObj.AddMember("statistics", statisticsArr);
 
-		rapidjson::Value effectsObj(rapidjson::kObjectType);
+		JsonValue effectsObj = JsonValue::Object();
 		for ( int i = 0; i < NUMEFFECTS; ++i )
 		{
 			if ( myStats.EFFECTS[i] > 0 )
 			{
-				effectsObj.AddMember(rapidjson::Value(std::to_string(i).c_str(), d.GetAllocator()), rapidjson::Value(myStats.EFFECTS[i]), d.GetAllocator());
+				effectsObj.AddMember(std::to_string(i).c_str(), JsonValue::Int(myStats.EFFECTS[i]));
 			}
 		}
-		attrObj.AddMember("effects", effectsObj, d.GetAllocator());
+		attrObj.AddMember("effects", effectsObj);
 
-		character.AddMember("attributes", attrObj, d.GetAllocator());
+		character.AddMember("attributes", attrObj);
 	}
 
-	rapidjson::Value inventory(rapidjson::kArrayType);
+	JsonValue inventory = JsonValue::Array();
 	for ( int64_t _inv = 0; _inv < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(myStats.inventory); ++_inv )
 	{
 		auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(myStats.inventory, _inv);
-		rapidjson::Value itemArray(rapidjson::kArrayType);
-		itemArray.PushBack((int)item.type, d.GetAllocator());
-		itemArray.PushBack((int)item.status, d.GetAllocator());
-		itemArray.PushBack((int)item.beatitude, d.GetAllocator());
-		itemArray.PushBack((int)item.count, d.GetAllocator());
-		itemArray.PushBack((int)item.appearance, d.GetAllocator());
-		itemArray.PushBack((int)item.identified, d.GetAllocator());
-		itemArray.PushBack((int)0 /* blank uid */, d.GetAllocator());
-		itemArray.PushBack((int)item.x, d.GetAllocator());
-		itemArray.PushBack((int)item.y, d.GetAllocator());
+		JsonValue itemArray = JsonValue::Array();
+		itemArray.PushBack((int)item.type);
+		itemArray.PushBack((int)item.status);
+		itemArray.PushBack((int)item.beatitude);
+		itemArray.PushBack((int)item.count);
+		itemArray.PushBack((int)item.appearance);
+		itemArray.PushBack((int)item.identified);
+		itemArray.PushBack((int)0 /* blank uid */);
+		itemArray.PushBack((int)item.x);
+		itemArray.PushBack((int)item.y);
 
-		inventory.PushBack(itemArray, d.GetAllocator());
+		inventory.PushBack(itemArray);
 	}
 
 	{
@@ -5805,33 +5747,32 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 		for ( int64_t _pe = 0; _pe < dynarray_pair_size<std::pair<DynamicString, Uint32>>(player.stats.player_equipment); ++_pe )
 		{
 			auto& equipment = *dynarray_pair_at<std::pair<DynamicString, Uint32>>(player.stats.player_equipment, _pe);
-			rapidjson::Value itemArray(rapidjson::kArrayType);
+			JsonValue itemArray = JsonValue::Array();
 			if ( equipment.second != UINT32_MAX && equipment.second < dynarray_size<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory) )
 			{
 				auto& item = *dynarray_at<SaveGameInfo::Player::stat_t::item_t>(player.stats.inventory, equipment.second);
-				itemArray.PushBack((int)item.type, d.GetAllocator());
-				itemArray.PushBack((int)item.status, d.GetAllocator());
-				itemArray.PushBack((int)item.beatitude, d.GetAllocator());
-				itemArray.PushBack((int)item.count, d.GetAllocator());
-				itemArray.PushBack((int)item.appearance, d.GetAllocator());
-				itemArray.PushBack((int)item.identified, d.GetAllocator());
-				itemArray.PushBack((int)0 /* blank uid */, d.GetAllocator());
-				itemArray.PushBack((int)item.x, d.GetAllocator());
-				itemArray.PushBack((int)item.y, d.GetAllocator());
+				itemArray.PushBack((int)item.type);
+				itemArray.PushBack((int)item.status);
+				itemArray.PushBack((int)item.beatitude);
+				itemArray.PushBack((int)item.count);
+				itemArray.PushBack((int)item.appearance);
+				itemArray.PushBack((int)item.identified);
+				itemArray.PushBack((int)0 /* blank uid */);
+				itemArray.PushBack((int)item.x);
+				itemArray.PushBack((int)item.y);
 			}
-			rapidjson::Value key(equipment.first.c_str(), d.GetAllocator());
-			character.AddMember(key, itemArray, d.GetAllocator());
+			character.AddMember(equipment.first.c_str(), itemArray);
 		}
 	}
 
-	character.AddMember("inventory", inventory, d.GetAllocator());
+	character.AddMember("inventory", inventory);
 
-	d.AddMember("score", character, d.GetAllocator());
+	d.AddMember("score", character);
 
-	rapidjson::StringBuffer os;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(os);
-	d.Accept(writer);
-	return os.GetString();
+	const char* json = d.Serialize(false);
+	DynamicString result = json;
+	json_string_free(json);
+	return result;
 }
 
 int loadGame(int player, const SaveGameInfo& info) {

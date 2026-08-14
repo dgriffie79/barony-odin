@@ -1,6 +1,7 @@
 // GameUI.cpp
 
 #include "GameUI.hpp"
+#include "../../odin/json_shim/json_shim.hpp"
 #include "MainMenu.hpp"
 #include "Frame.hpp"
 #include "Image.hpp"
@@ -5906,87 +5907,82 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
+				void* root = json_node_root(jsonReader);
 				StatusEffectDefinitions_t::reset();
 				int defaultTooltipWidth = 200;
-				if ( d.HasMember("default_tooltip_width") )
+				if ( json_node_has_member(root, "default_tooltip_width") )
 				{
-					defaultTooltipWidth = d["default_tooltip_width"].GetInt();
+					defaultTooltipWidth = json_int(root, "default_tooltip_width");
 				}
-				if ( d.HasMember("colors") )
+				if ( json_node_has_member(root, "colors") )
 				{
-					if ( d["colors"].HasMember("notification_text") )
+					void* colors = json_node_get_member(root, "colors");
+					if ( json_node_has_member(colors, "notification_text") )
 					{
-						StatusEffectDefinitions_t::notificationTextColor = makeColor(
-							d["colors"]["notification_text"]["r"].GetInt(),
-							d["colors"]["notification_text"]["g"].GetInt(),
-							d["colors"]["notification_text"]["b"].GetInt(),
-							d["colors"]["notification_text"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "notification_text");
+						StatusEffectDefinitions_t::notificationTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("tooltip_desc_text") )
+					if ( json_node_has_member(colors, "tooltip_desc_text") )
 					{
-						StatusEffectDefinitions_t::tooltipDescColor = makeColor(
-							d["colors"]["tooltip_desc_text"]["r"].GetInt(),
-							d["colors"]["tooltip_desc_text"]["g"].GetInt(),
-							d["colors"]["tooltip_desc_text"]["b"].GetInt(),
-							d["colors"]["tooltip_desc_text"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "tooltip_desc_text");
+						StatusEffectDefinitions_t::tooltipDescColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("tooltip_heading_text") )
+					if ( json_node_has_member(colors, "tooltip_heading_text") )
 					{
-						StatusEffectDefinitions_t::tooltipHeadingColor = makeColor(
-							d["colors"]["tooltip_heading_text"]["r"].GetInt(),
-							d["colors"]["tooltip_heading_text"]["g"].GetInt(),
-							d["colors"]["tooltip_heading_text"]["b"].GetInt(),
-							d["colors"]["tooltip_heading_text"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "tooltip_heading_text");
+						StatusEffectDefinitions_t::tooltipHeadingColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
 				}
-				if ( d.HasMember("notification_font") )
+				if ( json_node_has_member(root, "notification_font") )
 				{
-					StatusEffectDefinitions_t::notificationFont = d["notification_font"].GetString();
+					StatusEffectDefinitions_t::notificationFont = json_str(root, "notification_font");
 				}
-				if ( d.HasMember("sustained_effects") )
+				if ( json_node_has_member(root, "sustained_effects") )
 				{
-					for ( rapidjson::Value::ConstMemberIterator itr = d["sustained_effects"].MemberBegin();
-						itr != d["sustained_effects"].MemberEnd(); ++itr )
+					void* sustained = json_node_get_member(root, "sustained_effects");
+					uint32_t sustainedCount = json_node_member_count(sustained);
+					for ( uint32_t i = 0; i < sustainedCount; ++i )
 					{
+						void* val = json_node_member_value_at(sustained, i);
 						int id = -1;
-						if ( itr->value.HasMember("id") )
+						if ( json_node_has_member(val, "id") )
 						{
-							id = itr->value["id"].GetInt();
+							id = json_int(val, "id");
 						}
 						int spellID = -1;
-						if ( itr->value.HasMember("spell_id") )
+						if ( json_node_has_member(val, "spell_id") )
 						{
-							spellID = itr->value["spell_id"].GetInt();
+							spellID = json_int(val, "spell_id");
 						}
 						StatusEffectDefinitions_t::allSustainedSpells.put(spellID, EffectDefinitionEntry_t());
 						auto& entry = StatusEffectDefinitions_t::allSustainedSpells[spellID];
 						entry.effect_id = id;
 						entry.spell_id = spellID;
-						entry.internal_name = itr->name.GetString();
-						if ( itr->value["name"].IsArray() )
+						entry.internal_name = json_node_member_name_at(sustained, i);
+						void* nameNode = json_node_get_member(val, "name");
+						if ( json_node_is_array(nameNode) )
 						{
-							for ( auto arr = itr->value["name"].Begin();
-								arr != itr->value["name"].End(); ++arr )
+							uint32_t nameCount = json_node_array_size(nameNode);
+							for ( uint32_t j = 0; j < nameCount; ++j )
 							{
-								entry.nameVariations.push_back(arr->GetString());
+								const char* s = nullptr; json_node_get_string(json_node_element_at(nameNode, j), &s);
+								entry.nameVariations.push_back(s);
 							}
 						}
 						else
 						{
-							entry.name = itr->value["name"].GetString();
+							entry.name = json_str(val, "name");
 						}
-						DynamicString buf = itr->value["desc"].GetString();
+						DynamicString buf = json_str(val, "desc");
 						entry.desc = "\x1E ";
 						int index = 0;
 						for ( auto s : buf )
@@ -6011,51 +6007,57 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 							}
 							++index;
 						}
-						entry.imgPath = itr->value["img_path"].GetString();
-						entry.useSpellIDForImg = itr->value["img_from_spell_id"].GetInt();
+						entry.imgPath = json_str(val, "img_path");
+						entry.useSpellIDForImg = json_int(val, "img_from_spell_id");
 						entry.neverDisplay = false;
-						if ( itr->value.HasMember("never_display") )
+						if ( json_node_has_member(val, "never_display") )
 						{
-							entry.neverDisplay = itr->value["never_display"].GetBool();
+							entry.neverDisplay = json_bool(val, "never_display");
 						}
 						entry.tooltipWidth = defaultTooltipWidth;
-						if ( itr->value.HasMember("tooltip_width") )
+						if ( json_node_has_member(val, "tooltip_width") )
 						{
-							entry.tooltipWidth = itr->value["tooltip_width"].GetInt();
+							entry.tooltipWidth = json_int(val, "tooltip_width");
 						}
 					}
 				}
-				if ( d.HasMember("effects") )
+				if ( json_node_has_member(root, "effects") )
 				{
-					for ( rapidjson::Value::ConstMemberIterator itr = d["effects"].MemberBegin();
-						itr != d["effects"].MemberEnd(); ++itr )
+					void* effects = json_node_get_member(root, "effects");
+					uint32_t effectCount = json_node_member_count(effects);
+					for ( uint32_t i = 0; i < effectCount; ++i )
 					{
+						void* val = json_node_member_value_at(effects, i);
 						int id = -1;
-						if ( itr->value.HasMember("id") )
+						if ( json_node_has_member(val, "id") )
 						{
-							id = itr->value["id"].GetInt();
+							id = json_int(val, "id");
 						}
 						StatusEffectDefinitions_t::allEffects.put(id, EffectDefinitionEntry_t());
 						auto& entry = StatusEffectDefinitions_t::allEffects[id];
 						entry.effect_id = id;
-						if ( itr->value["name"].IsArray() )
+						void* nameNode = json_node_get_member(val, "name");
+						if ( json_node_is_array(nameNode) )
 						{
-							for ( auto arr = itr->value["name"].Begin();
-								arr != itr->value["name"].End(); ++arr )
+							uint32_t nameCount = json_node_array_size(nameNode);
+							for ( uint32_t j = 0; j < nameCount; ++j )
 							{
-								entry.nameVariations.push_back(arr->GetString());
+								const char* s = nullptr; json_node_get_string(json_node_element_at(nameNode, j), &s);
+								entry.nameVariations.push_back(s);
 							}
 						}
 						else
 						{
-							entry.name = itr->value["name"].GetString();
+							entry.name = json_str(val, "name");
 						}
-						if ( itr->value["desc"].IsArray() )
+						void* descNode = json_node_get_member(val, "desc");
+						if ( json_node_is_array(descNode) )
 						{
-							for ( auto arr = itr->value["desc"].Begin();
-								arr != itr->value["desc"].End(); ++arr )
+							uint32_t descCount = json_node_array_size(descNode);
+							for ( uint32_t j = 0; j < descCount; ++j )
 							{
-								DynamicString buf = arr->GetString();
+								const char* descCstr = nullptr; json_node_get_string(json_node_element_at(descNode, j), &descCstr);
+								DynamicString buf = descCstr;
 								int index = 0;
 								DynamicString formattedStr = "\x1E ";
 								for ( auto s : buf )
@@ -6071,7 +6073,6 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 										{
 											if ( buf[index + 1] == '+' || buf[index + 1] == '-' )
 											{
-												// skip adding dot
 												++index;
 												continue;
 											}
@@ -6085,7 +6086,7 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 						}
 						else
 						{
-							DynamicString buf = itr->value["desc"].GetString();
+							DynamicString buf = json_str(val, "desc");
 							entry.desc = "\x1E ";
 							int index = 0;
 							for ( auto s : buf )
@@ -6101,7 +6102,6 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 									{
 										if ( buf[index + 1] == '+' || buf[index + 1] == '-' )
 										{
-											// skip adding dot
 											++index;
 											continue;
 										}
@@ -6111,49 +6111,54 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 								++index;
 							}
 						}
-						entry.internal_name = itr->name.GetString();
-						if ( itr->value["img_path"].IsArray() )
+						entry.internal_name = json_node_member_name_at(effects, i);
+						void* imgNode = json_node_get_member(val, "img_path");
+						if ( json_node_is_array(imgNode) )
 						{
-							for ( auto arr = itr->value["img_path"].Begin();
-								arr != itr->value["img_path"].End(); ++arr )
+							uint32_t imgCount = json_node_array_size(imgNode);
+							for ( uint32_t j = 0; j < imgCount; ++j )
 							{
-								entry.imgPathVariations.push_back(arr->GetString());
+								const char* s = nullptr; json_node_get_string(json_node_element_at(imgNode, j), &s);
+								entry.imgPathVariations.push_back(s);
 							}
 						}
 						else
 						{
-							entry.imgPath = itr->value["img_path"].GetString();
+							entry.imgPath = json_str(val, "img_path");
 						}
-						if ( itr->value["img_from_spell_id"].IsArray() )
+						void* spellIdNode = json_node_get_member(val, "img_from_spell_id");
+						if ( json_node_is_array(spellIdNode) )
 						{
-							for ( auto arr = itr->value["img_from_spell_id"].Begin();
-								arr != itr->value["img_from_spell_id"].End(); ++arr )
+							uint32_t sidCount = json_node_array_size(spellIdNode);
+							for ( uint32_t j = 0; j < sidCount; ++j )
 							{
-								entry.useSpellIDForImgVariations.push_back(arr->GetInt());
+								int32_t sid = 0; json_node_get_int(json_node_element_at(spellIdNode, j), &sid);
+								entry.useSpellIDForImgVariations.push_back(sid);
 							}
 						}
 						else
 						{
-							entry.useSpellIDForImg = itr->value["img_from_spell_id"].GetInt();
+							entry.useSpellIDForImg = json_int(val, "img_from_spell_id");
 						}
 						entry.sustainedSpellID = -1;
-						if ( itr->value.HasMember("use_entry_for_sustained_spell") )
+						if ( json_node_has_member(val, "use_entry_for_sustained_spell") )
 						{
-							entry.sustainedSpellID = itr->value["use_entry_for_sustained_spell"].GetInt();
+							entry.sustainedSpellID = json_int(val, "use_entry_for_sustained_spell");
 						}
 						entry.neverDisplay = false;
-						if ( itr->value.HasMember("never_display") )
+						if ( json_node_has_member(val, "never_display") )
 						{
-							entry.neverDisplay = itr->value["never_display"].GetBool();
+							entry.neverDisplay = json_bool(val, "never_display");
 						}
 						entry.tooltipWidth = defaultTooltipWidth;
-						if ( itr->value.HasMember("tooltip_width") )
+						if ( json_node_has_member(val, "tooltip_width") )
 						{
-							entry.tooltipWidth = itr->value["tooltip_width"].GetInt();
+							entry.tooltipWidth = json_int(val, "tooltip_width");
 						}
 					}
 				}
 				printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
+				json_reader_destroy(jsonReader);
 			}
 		}
 	}
@@ -14431,55 +14436,61 @@ void Player::CharacterSheet_t::loadCharacterSheetJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
-				if ( d.HasMember("level_strings") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "level_strings") )
 				{
 					mapDisplayNamesDescriptions.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["level_strings"].MemberBegin();
-						itr != d["level_strings"].MemberEnd(); ++itr )
+					void* levelStrings = json_node_get_member(root, "level_strings");
+					uint32_t lsCount = json_node_member_count(levelStrings);
+					for ( uint32_t i = 0; i < lsCount; ++i )
 					{
+						void* val = json_node_member_value_at(levelStrings, i);
 						DynamicString name = "";
 						DynamicString desc = "";
-						if ( itr->value.HasMember("display_name") )
+						if ( json_node_has_member(val, "display_name") )
 						{
-							name = itr->value["display_name"].GetString();
+							name = json_str(val, "display_name");
 						}
-						if ( itr->value.HasMember("description") )
+						if ( json_node_has_member(val, "description") )
 						{
-							desc = itr->value["description"].GetString();
+							desc = json_str(val, "description");
 						}
-						mapDisplayNamesDescriptions[itr->name.GetString()] = DynamicStringPair_t{ name, desc };
+						mapDisplayNamesDescriptions[json_node_member_name_at(levelStrings, i)] = DynamicStringPair_t{ name, desc };
 					}
 				}
-				if ( d.HasMember("hover_text") )
+				if ( json_node_has_member(root, "hover_text") )
 				{
 					hoverTextStrings.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["hover_text"].MemberBegin();
-						itr != d["hover_text"].MemberEnd(); ++itr )
+					void* hoverText = json_node_get_member(root, "hover_text");
+					uint32_t htCount = json_node_member_count(hoverText);
+					for ( uint32_t i = 0; i < htCount; ++i )
 					{
-						if ( itr->value.IsObject() )
+						void* val = json_node_member_value_at(hoverText, i);
+						if ( json_node_is_object(val) )
 						{
-							for ( rapidjson::Value::ConstMemberIterator inner_itr = itr->value.MemberBegin();
-								inner_itr != itr->value.MemberEnd(); ++inner_itr )
+							uint32_t innerCount = json_node_member_count(val);
+							for ( uint32_t j = 0; j < innerCount; ++j )
 							{
-								hoverTextStrings[inner_itr->name.GetString()] = inner_itr->value.GetString();
+								const char* s = nullptr; json_node_get_string(json_node_member_value_at(val, j), &s);
+								hoverTextStrings[json_node_member_name_at(val, j)] = s;
 							}
 						}
 						else
 						{
-							hoverTextStrings[itr->name.GetString()] = itr->value.GetString();
+							const char* s = nullptr; json_node_get_string(val, &s);
+							hoverTextStrings[json_node_member_name_at(hoverText, i)] = s;
 						}
 					}
 				}
+				json_reader_destroy(jsonReader);
 			}
 		}
 	}
@@ -25662,254 +25673,141 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
-				if ( d.HasMember("skills") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "skills") )
 				{
 					auto& allEntries = skillSheetData.skillEntries;
 					allEntries.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["skills"].Begin();
-						itr != d["skills"].End(); ++itr )
+					void* skills = json_node_get_member(root, "skills");
+					uint32_t skillCount = json_node_array_size(skills);
+					for ( uint32_t i = 0; i < skillCount; ++i )
 					{
+						void* elem = json_node_element_at(skills, i);
 						allEntries.push_back(SkillSheetData_t::SkillEntry_t());
 						auto& entry = allEntries[allEntries.size() - 1];
 						entry.setSkillName("");
 						entry.setSkillShortName("");
-						if ( (*itr).HasMember("name") )
+						if ( json_node_has_member(elem, "name") ) { entry.setSkillName(json_str(elem, "name")); }
+						if ( json_node_has_member(elem, "shortname") ) { entry.setSkillShortName(json_str(elem, "shortname")); }
+						if ( json_node_has_member(elem, "id") ) { entry.skillId = json_int(elem, "id"); }
+						if ( json_node_has_member(elem, "sfx") ) { entry.skillSfx = json_int(elem, "sfx"); }
+						if ( json_node_has_member(elem, "icon_base_path") ) { entry.skillIconPath = json_str(elem, "icon_base_path"); }
+						if ( json_node_has_member(elem, "icon_legend_path") ) { entry.skillIconPathLegend = json_str(elem, "icon_legend_path"); }
+						if ( json_node_has_member(elem, "icon_base_path_32px") ) { entry.skillIconPath32px = json_str(elem, "icon_base_path_32px"); }
+						if ( json_node_has_member(elem, "icon_legend_path_32px") ) { entry.skillIconPathLegend32px = json_str(elem, "icon_legend_path_32px"); }
+						if ( json_node_has_member(elem, "icon_stat_path") ) { entry.statIconPath = json_str(elem, "icon_stat_path"); }
+						if ( json_node_has_member(elem, "description") ) { entry.description = json_str(elem, "description"); }
+						if ( json_node_has_member(elem, "legend_text") ) { entry.legendaryDescription = json_str(elem, "legend_text"); }
+						if ( json_node_has_member(elem, "effects") )
 						{
-							entry.setSkillName((*itr)["name"].GetString());
-						}
-						if ( (*itr).HasMember("shortname") )
-						{
-							entry.setSkillShortName((*itr)["shortname"].GetString());
-						}
-						if ( (*itr).HasMember("id") )
-						{
-							entry.skillId = (*itr)["id"].GetInt();
-						}
-						if ( (*itr).HasMember("sfx") )
-						{
-							entry.skillSfx = (*itr)["sfx"].GetInt();
-						}
-						if ( (*itr).HasMember("icon_base_path") )
-						{
-							entry.skillIconPath = (*itr)["icon_base_path"].GetString();
-						}
-						if ( (*itr).HasMember("icon_legend_path") )
-						{
-							entry.skillIconPathLegend = (*itr)["icon_legend_path"].GetString();
-						}
-						if ( (*itr).HasMember("icon_base_path_32px") )
-						{
-							entry.skillIconPath32px = (*itr)["icon_base_path_32px"].GetString();
-						}
-						if ( (*itr).HasMember("icon_legend_path_32px") )
-						{
-							entry.skillIconPathLegend32px = (*itr)["icon_legend_path_32px"].GetString();
-						}
-						if ( (*itr).HasMember("icon_stat_path") )
-						{
-							entry.statIconPath = (*itr)["icon_stat_path"].GetString();
-						}
-						if ( (*itr).HasMember("description") )
-						{
-							entry.description = (*itr)["description"].GetString();
-						}
-						if ( (*itr).HasMember("legend_text") )
-						{
-							entry.legendaryDescription = (*itr)["legend_text"].GetString();
-						}
-						if ( (*itr).HasMember("effects") )
-						{
-							for ( rapidjson::Value::ConstValueIterator eff_itr = (*itr)["effects"].Begin(); eff_itr != (*itr)["effects"].End(); ++eff_itr )
+							void* effects = json_node_get_member(elem, "effects");
+							uint32_t effectCount = json_node_array_size(effects);
+							for ( uint32_t j = 0; j < effectCount; ++j )
 							{
+								void* eff = json_node_element_at(effects, j);
 								entry.effects.push_back(SkillSheetData_t::SkillEntry_t::SkillEffect_t());
 								auto& effect = entry.effects[entry.effects.size() - 1];
-								effect.tag = (*eff_itr)["tag"].GetString();
-								effect.title = (*eff_itr)["title"].GetString();
-								if ( (*eff_itr).HasMember("title_short") )
-								{
-									effect.titleShort = (*eff_itr)["title_short"].GetString();
-								}
-								effect.rawValue = (*eff_itr)["value"].GetString();
+								effect.tag = json_str(eff, "tag");
+								effect.title = json_str(eff, "title");
+								if ( json_node_has_member(eff, "title_short") ) { effect.titleShort = json_str(eff, "title_short"); }
+								effect.rawValue = json_str(eff, "value");
 								effect.valueCustomWidthOffset = 0;
-								if ( (*eff_itr).HasMember("custom_value_width_offset") )
-								{
-									effect.valueCustomWidthOffset = (*eff_itr)["custom_value_width_offset"].GetInt();
-								}
-								if ( (*eff_itr).HasMember("auto_resize_value") )
-								{
-									effect.bAllowAutoResizeValue = (*eff_itr)["auto_resize_value"].GetBool();
-								}
-								else
-								{
-									effect.bAllowAutoResizeValue = false;
-								}
-								if ( (*eff_itr).HasMember("realtime_update") )
-								{
-									effect.bAllowRealtimeUpdate = (*eff_itr)["realtime_update"].GetBool();
-								}
-								else
-								{
-									effect.bAllowRealtimeUpdate = false;
-								}
+								if ( json_node_has_member(eff, "custom_value_width_offset") ) { effect.valueCustomWidthOffset = json_int(eff, "custom_value_width_offset"); }
+								if ( json_node_has_member(eff, "auto_resize_value") ) { effect.bAllowAutoResizeValue = json_bool(eff, "auto_resize_value"); }
+								else { effect.bAllowAutoResizeValue = false; }
+								if ( json_node_has_member(eff, "realtime_update") ) { effect.bAllowRealtimeUpdate = json_bool(eff, "realtime_update"); }
+								else { effect.bAllowRealtimeUpdate = false; }
 							}
 						}
-						if ( (*itr).HasMember("effects_position") )
+						if ( json_node_has_member(elem, "effects_position") )
 						{
-							for ( rapidjson::Value::ConstMemberIterator effPos_itr = (*itr)["effects_position"].MemberBegin(); 
-								effPos_itr != (*itr)["effects_position"].MemberEnd(); ++effPos_itr )
+							void* effPos = json_node_get_member(elem, "effects_position");
+							uint32_t effPosCount = json_node_member_count(effPos);
+							for ( uint32_t j = 0; j < effPosCount; ++j )
 							{
-								DynamicString memberName = effPos_itr->name.GetString();
-								if ( memberName == "effect_start_offset_x" )
+								const char* memberName = json_node_member_name_at(effPos, j);
+								int32_t v = 0; json_node_get_int(json_node_member_value_at(effPos, j), &v);
+								if ( strcmp(memberName, "effect_start_offset_x") == 0 )
 								{
-									entry.effectStartOffsetX = effPos_itr->value.GetInt();
+									entry.effectStartOffsetX = v;
 								}
-								else if ( memberName == "effect_background_offset_x" )
+								else if ( strcmp(memberName, "effect_background_offset_x") == 0 )
 								{
-									entry.effectBackgroundOffsetX = effPos_itr->value.GetInt();
+									entry.effectBackgroundOffsetX = v;
 								}
-								else if ( memberName == "effect_background_width" )
+								else if ( strcmp(memberName, "effect_background_width") == 0 )
 								{
-									entry.effectBackgroundWidth = effPos_itr->value.GetInt();
+									entry.effectBackgroundWidth = v;
 								}
 							}
 						}
 					}
 				}
-				if ( d.HasMember("window_scaling") )
+				if ( json_node_has_member(root, "window_scaling") )
 				{
-					if ( d["window_scaling"].HasMember("standard_scale_modifier_x") )
-					{
-						windowHeightScaleX = d["window_scaling"]["standard_scale_modifier_x"].GetDouble();
-					}
-					if ( d["window_scaling"].HasMember("standard_scale_modifier_y") )
-					{
-						windowHeightScaleY = d["window_scaling"]["standard_scale_modifier_y"].GetDouble();
-					}
-					if ( d["window_scaling"].HasMember("compact_scale_modifier_x") )
-					{
-						windowCompactHeightScaleX = d["window_scaling"]["compact_scale_modifier_x"].GetDouble();
-					}
-					if ( d["window_scaling"].HasMember("compact_scale_modifier_y") )
-					{
-						windowCompactHeightScaleY = d["window_scaling"]["compact_scale_modifier_y"].GetDouble();
-					}
+					void* ws = json_node_get_member(root, "window_scaling");
+					if ( json_node_has_member(ws, "standard_scale_modifier_x") ) { windowHeightScaleX = json_double(ws, "standard_scale_modifier_x"); }
+					if ( json_node_has_member(ws, "standard_scale_modifier_y") ) { windowHeightScaleY = json_double(ws, "standard_scale_modifier_y"); }
+					if ( json_node_has_member(ws, "compact_scale_modifier_x") ) { windowCompactHeightScaleX = json_double(ws, "compact_scale_modifier_x"); }
+					if ( json_node_has_member(ws, "compact_scale_modifier_y") ) { windowCompactHeightScaleY = json_double(ws, "compact_scale_modifier_y"); }
 				}
-				if ( d.HasMember("skill_select_images") )
+				if ( json_node_has_member(root, "skill_select_images") )
 				{
-					if ( d["skill_select_images"].HasMember("highlight_left") )
-					{
-						skillSheetData.highlightSkillImg = d["skill_select_images"]["highlight_left"].GetString();
-					}
-					if ( d["skill_select_images"].HasMember("selected_left") )
-					{
-						skillSheetData.selectSkillImg = d["skill_select_images"]["selected_left"].GetString();
-					}
-					if ( d["skill_select_images"].HasMember("highlight_right") )
-					{
-						skillSheetData.highlightSkillImg_Right = d["skill_select_images"]["highlight_right"].GetString();
-					}
-					if ( d["skill_select_images"].HasMember("selected_right") )
-					{
-						skillSheetData.selectSkillImg_Right = d["skill_select_images"]["selected_right"].GetString();
-					}
+					void* ssi = json_node_get_member(root, "skill_select_images");
+					if ( json_node_has_member(ssi, "highlight_left") ) { skillSheetData.highlightSkillImg = json_str(ssi, "highlight_left"); }
+					if ( json_node_has_member(ssi, "selected_left") ) { skillSheetData.selectSkillImg = json_str(ssi, "selected_left"); }
+					if ( json_node_has_member(ssi, "highlight_right") ) { skillSheetData.highlightSkillImg_Right = json_str(ssi, "highlight_right"); }
+					if ( json_node_has_member(ssi, "selected_right") ) { skillSheetData.selectSkillImg_Right = json_str(ssi, "selected_right"); }
 				}
-				if ( d.HasMember("skill_background_icons") )
+				if ( json_node_has_member(root, "skill_background_icons") )
 				{
-					if ( d["skill_background_icons"].HasMember("default") )
-					{
-						skillSheetData.iconBgPathDefault = d["skill_background_icons"]["default"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("default_selected") )
-					{
-						skillSheetData.iconBgSelectedPathDefault = d["skill_background_icons"]["default_selected"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("novice") )
-					{
-						skillSheetData.iconBgPathNovice = d["skill_background_icons"]["novice"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("novice_selected") )
-					{
-						skillSheetData.iconBgSelectedPathNovice = d["skill_background_icons"]["novice_selected"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("expert") )
-					{
-						skillSheetData.iconBgPathExpert = d["skill_background_icons"]["expert"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("expert_selected") )
-					{
-						skillSheetData.iconBgSelectedPathExpert = d["skill_background_icons"]["expert_selected"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("legend") )
-					{
-						skillSheetData.iconBgPathLegend = d["skill_background_icons"]["legend"].GetString();
-					}
-					if ( d["skill_background_icons"].HasMember("legend_selected") )
-					{
-						skillSheetData.iconBgSelectedPathLegend = d["skill_background_icons"]["legend_selected"].GetString();
-					}
+					void* sbi = json_node_get_member(root, "skill_background_icons");
+					if ( json_node_has_member(sbi, "default") ) { skillSheetData.iconBgPathDefault = json_str(sbi, "default"); }
+					if ( json_node_has_member(sbi, "default_selected") ) { skillSheetData.iconBgSelectedPathDefault = json_str(sbi, "default_selected"); }
+					if ( json_node_has_member(sbi, "novice") ) { skillSheetData.iconBgPathNovice = json_str(sbi, "novice"); }
+					if ( json_node_has_member(sbi, "novice_selected") ) { skillSheetData.iconBgSelectedPathNovice = json_str(sbi, "novice_selected"); }
+					if ( json_node_has_member(sbi, "expert") ) { skillSheetData.iconBgPathExpert = json_str(sbi, "expert"); }
+					if ( json_node_has_member(sbi, "expert_selected") ) { skillSheetData.iconBgSelectedPathExpert = json_str(sbi, "expert_selected"); }
+					if ( json_node_has_member(sbi, "legend") ) { skillSheetData.iconBgPathLegend = json_str(sbi, "legend"); }
+					if ( json_node_has_member(sbi, "legend_selected") ) { skillSheetData.iconBgSelectedPathLegend = json_str(sbi, "legend_selected"); }
 				}
-				if ( d.HasMember("alchemy_potion_names_to_filter") )
+				if ( json_node_has_member(root, "alchemy_potion_names_to_filter") )
 				{
 					skillSheetData.potionNamesToFilter.clear();
-					if ( d["alchemy_potion_names_to_filter"].IsString() )
+					void* pot = json_node_get_member(root, "alchemy_potion_names_to_filter");
+					if ( json_node_is_string(pot) )
 					{
-						skillSheetData.potionNamesToFilter.push_back(d["alchemy_potion_names_to_filter"].GetString());
+						const char* s = nullptr; json_node_get_string(pot, &s);
+						skillSheetData.potionNamesToFilter.push_back(s);
 					}
-					else if ( d["alchemy_potion_names_to_filter"].IsArray() )
+					else if ( json_node_is_array(pot) )
 					{
-						for ( rapidjson::Value::ConstValueIterator pot_itr = d["alchemy_potion_names_to_filter"].Begin(); 
-							pot_itr != d["alchemy_potion_names_to_filter"].End(); ++pot_itr )
+						uint32_t potCount = json_node_array_size(pot);
+						for ( uint32_t j = 0; j < potCount; ++j )
 						{
-							skillSheetData.potionNamesToFilter.push_back(pot_itr->GetString());
+							const char* s = nullptr; json_node_get_string(json_node_element_at(pot, j), &s);
+							skillSheetData.potionNamesToFilter.push_back(s);
 						}
 					}
 				}
-				if ( d.HasMember("colors") )
+				if ( json_node_has_member(root, "colors") )
 				{
-					if ( d["colors"].HasMember("default") )
-					{
-						skillSheetData.defaultTextColor = makeColor(
-							d["colors"]["default"]["r"].GetInt(),
-							d["colors"]["default"]["g"].GetInt(),
-							d["colors"]["default"]["b"].GetInt(),
-							d["colors"]["default"]["a"].GetInt());
-					}
-					if ( d["colors"].HasMember("novice") )
-					{
-						skillSheetData.noviceTextColor = makeColor(
-							d["colors"]["novice"]["r"].GetInt(),
-							d["colors"]["novice"]["g"].GetInt(),
-							d["colors"]["novice"]["b"].GetInt(),
-							d["colors"]["novice"]["a"].GetInt());
-					}
-					if ( d["colors"].HasMember("expert") )
-					{
-						skillSheetData.expertTextColor = makeColor(
-							d["colors"]["expert"]["r"].GetInt(),
-							d["colors"]["expert"]["g"].GetInt(),
-							d["colors"]["expert"]["b"].GetInt(),
-							d["colors"]["expert"]["a"].GetInt());
-					}
-					if ( d["colors"].HasMember("legend") )
-					{
-						skillSheetData.legendTextColor = makeColor(
-							d["colors"]["legend"]["r"].GetInt(),
-							d["colors"]["legend"]["g"].GetInt(),
-							d["colors"]["legend"]["b"].GetInt(),
-							d["colors"]["legend"]["a"].GetInt());
-					}
+					void* colors = json_node_get_member(root, "colors");
+					if ( json_node_has_member(colors, "default") ) { void* c = json_node_get_member(colors, "default"); skillSheetData.defaultTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a")); }
+					if ( json_node_has_member(colors, "novice") ) { void* c = json_node_get_member(colors, "novice"); skillSheetData.noviceTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a")); }
+					if ( json_node_has_member(colors, "expert") ) { void* c = json_node_get_member(colors, "expert"); skillSheetData.expertTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a")); }
+					if ( json_node_has_member(colors, "legend") ) { void* c = json_node_get_member(colors, "legend"); skillSheetData.legendTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a")); }
 				}
 				printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
+				json_reader_destroy(jsonReader);
 			}
 		}
 	}
@@ -25933,138 +25831,117 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
-				if ( d.HasMember("leadership_allies_base") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "leadership_allies_base") )
 				{
 					auto& allyTable = skillSheetData.leadershipAllyTableBase;
 					allyTable.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_base"].MemberBegin();
-						itr != d["leadership_allies_base"].MemberEnd(); ++itr )
+					void* lab = json_node_get_member(root, "leadership_allies_base");
+					uint32_t labCount = json_node_member_count(lab);
+					for ( uint32_t i = 0; i < labCount; ++i )
 					{
-						DynamicString monsterName = itr->name.GetString();
+						DynamicString monsterName = json_node_member_name_at(lab, i);
 						int monsterType = -1;
-						for ( int i = 0; i < NUMMONSTERS; ++i )
+						for ( int m = 0; m < NUMMONSTERS; ++m )
 						{
-							if ( monsterName.compare(monstertypename[i]) == 0 )
-							{
-								monsterType = i;
-								break;
-							}
+							if ( monsterName.compare(monstertypename[m]) == 0 ) { monsterType = m; break; }
 						}
 						if ( monsterType < 0 ) { continue; }
-						if ( itr->value.IsArray() )
+						void* val = json_node_member_value_at(lab, i);
+						if ( json_node_is_array(val) )
 						{
-							for ( rapidjson::Value::ConstValueIterator ally_itr = itr->value.Begin();
-								ally_itr != itr->value.End(); ++ally_itr )
+							uint32_t allyCount = json_node_array_size(val);
+							for ( uint32_t j = 0; j < allyCount; ++j )
 							{
-								DynamicString allyName = ally_itr->GetString();
+								const char* allyCstr = nullptr; json_node_get_string(json_node_element_at(val, j), &allyCstr);
+								DynamicString allyName = allyCstr;
 								int allyType = -1;
-								for ( int i = 0; i < NUMMONSTERS; ++i )
+								for ( int m = 0; m < NUMMONSTERS; ++m )
 								{
-									if ( allyName.compare(monstertypename[i]) == 0 )
-									{
-										allyType = i;
-										break;
-									}
+									if ( allyName.compare(monstertypename[m]) == 0 ) { allyType = m; break; }
 								}
-								if ( allyType >= 0 )
-								{
-									allyTable[(Monster)monsterType].push_back((Monster)allyType);
-								}
+								if ( allyType >= 0 ) { allyTable[(Monster)monsterType].push_back((Monster)allyType); }
 							}
 						}
 					}
 				}
-				if ( d.HasMember("leadership_allies_legendary") )
+				if ( json_node_has_member(root, "leadership_allies_legendary") )
 				{
 					auto& allyTable = skillSheetData.leadershipAllyTableLegendary;
 					allyTable.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_legendary"].MemberBegin();
-						itr != d["leadership_allies_legendary"].MemberEnd(); ++itr )
+					void* lal = json_node_get_member(root, "leadership_allies_legendary");
+					uint32_t lalCount = json_node_member_count(lal);
+					for ( uint32_t i = 0; i < lalCount; ++i )
 					{
-						DynamicString monsterName = itr->name.GetString();
+						DynamicString monsterName = json_node_member_name_at(lal, i);
 						int monsterType = -1;
-						for ( int i = 0; i < NUMMONSTERS; ++i )
+						for ( int m = 0; m < NUMMONSTERS; ++m )
 						{
-							if ( monsterName.compare(monstertypename[i]) == 0 )
-							{
-								monsterType = i;
-								break;
-							}
+							if ( monsterName.compare(monstertypename[m]) == 0 ) { monsterType = m; break; }
 						}
 						if ( monsterType < 0 ) { continue; }
-						if ( itr->value.IsArray() )
+						void* val = json_node_member_value_at(lal, i);
+						if ( json_node_is_array(val) )
 						{
-							for ( rapidjson::Value::ConstValueIterator ally_itr = itr->value.Begin();
-								ally_itr != itr->value.End(); ++ally_itr )
+							uint32_t allyCount = json_node_array_size(val);
+							for ( uint32_t j = 0; j < allyCount; ++j )
 							{
-								DynamicString allyName = ally_itr->GetString();
+								const char* allyCstr = nullptr; json_node_get_string(json_node_element_at(val, j), &allyCstr);
+								DynamicString allyName = allyCstr;
 								int allyType = -1;
-								for ( int i = 0; i < NUMMONSTERS; ++i )
+								for ( int m = 0; m < NUMMONSTERS; ++m )
 								{
-									if ( allyName.compare(monstertypename[i]) == 0 )
-									{
-										allyType = i;
-										break;
-									}
+									if ( allyName.compare(monstertypename[m]) == 0 ) { allyType = m; break; }
 								}
-								if ( allyType >= 0 )
-								{
-									allyTable[(Monster)monsterType].push_back((Monster)allyType);
-								}
+								if ( allyType >= 0 ) { allyTable[(Monster)monsterType].push_back((Monster)allyType); }
 							}
 						}
 					}
 				}
-				if ( d.HasMember("leadership_allies_unique_recruits") )
+				if ( json_node_has_member(root, "leadership_allies_unique_recruits") )
 				{
 					auto& allyTable = skillSheetData.leadershipAllyTableSpecialRecruitment;
 					allyTable.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["leadership_allies_unique_recruits"].MemberBegin();
-						itr != d["leadership_allies_unique_recruits"].MemberEnd(); ++itr )
+					void* laur = json_node_get_member(root, "leadership_allies_unique_recruits");
+					uint32_t laurCount = json_node_member_count(laur);
+					for ( uint32_t i = 0; i < laurCount; ++i )
 					{
-						DynamicString monsterName = itr->name.GetString();
+						DynamicString monsterName = json_node_member_name_at(laur, i);
 						int monsterType = -1;
-						for ( int i = 0; i < NUMMONSTERS; ++i )
+						for ( int m = 0; m < NUMMONSTERS; ++m )
 						{
-							if ( monsterName.compare(monstertypename[i]) == 0 )
-							{
-								monsterType = i;
-								break;
-							}
+							if ( monsterName.compare(monstertypename[m]) == 0 ) { monsterType = m; break; }
 						}
 						if ( monsterType < 0 ) { continue; }
-						if ( itr->value.IsArray() )
+						void* val = json_node_member_value_at(laur, i);
+						if ( json_node_is_array(val) )
 						{
-							for ( rapidjson::Value::ConstValueIterator ally_itr = itr->value.Begin();
-								ally_itr != itr->value.End(); ++ally_itr )
+							uint32_t allyCount = json_node_array_size(val);
+							for ( uint32_t j = 0; j < allyCount; ++j )
 							{
-								for ( rapidjson::Value::ConstMemberIterator entry_itr = ally_itr->MemberBegin();
-									entry_itr != ally_itr->MemberEnd(); ++entry_itr )
+								void* entryObj = json_node_element_at(val, j);
+								uint32_t entryCount = json_node_member_count(entryObj);
+								for ( uint32_t k = 0; k < entryCount; ++k )
 								{
-									DynamicString allyName = entry_itr->name.GetString();
+									DynamicString allyName = json_node_member_name_at(entryObj, k);
 									int allyType = -1;
-									for ( int i = 0; i < NUMMONSTERS; ++i )
+									for ( int m = 0; m < NUMMONSTERS; ++m )
 									{
-										if ( allyName.compare(monstertypename[i]) == 0 )
-										{
-											allyType = i;
-											break;
-										}
+										if ( allyName.compare(monstertypename[m]) == 0 ) { allyType = m; break; }
 									}
 									if ( allyType >= 0 )
 									{
-										allyTable[(Monster)monsterType].push_back(MonsterStringPair_t{(Monster)allyType, entry_itr->value.GetString()});
+										const char* s = nullptr; json_node_get_string(json_node_member_value_at(entryObj, k), &s);
+										allyTable[(Monster)monsterType].push_back(MonsterStringPair_t{(Monster)allyType, s});
 									}
 								}
 							}
@@ -26072,6 +25949,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 					}
 				}
 				printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
+				json_reader_destroy(jsonReader);
 			}
 		}
 	}
@@ -26098,17 +25976,16 @@ void loadHUDSettingsJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
 
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			JsonDoc jd(buf);
+			if ( !jd.ok() )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
+				JsonNode& d = jd.root;
 				if ( d.HasMember("selected_cursor_opacity") )
 				{
 					selectedCursorOpacity = d["selected_cursor_opacity"].GetInt();
@@ -26830,7 +26707,7 @@ void loadHUDSettingsJSON()
 					{
 						if ( d["messages"].HasMember(pair.first) )
 						{
-							for ( rapidjson::Value::ConstMemberIterator itr = d["messages"][pair.first].MemberBegin();
+							for ( auto itr = d["messages"][pair.first].MemberBegin();
 								itr != d["messages"][pair.first].MemberEnd(); ++itr )
 							{
 								DynamicString alignmentStr = itr->name.GetString();
@@ -26853,7 +26730,7 @@ void loadHUDSettingsJSON()
 								}
 
 								auto& setting = messageZoneSettings.addSetting(pair.second, alignment);
-								for ( rapidjson::Value::ConstMemberIterator itr2 = itr->value.MemberBegin();
+								for ( auto itr2 = itr->value.MemberBegin();
 									itr2 != itr->value.MemberEnd(); ++itr2 )
 								{
 									DynamicString layoutStr = itr2->name.GetString();
@@ -26882,7 +26759,7 @@ void loadHUDSettingsJSON()
 				{
 					if ( d["world_dialogue"].HasMember("types") )
 					{
-						for ( rapidjson::Value::ConstMemberIterator itr = d["world_dialogue"]["types"].MemberBegin();
+						for ( auto itr = d["world_dialogue"]["types"].MemberBegin();
 							itr != d["world_dialogue"]["types"].MemberEnd(); ++itr )
 						{
 							DynamicString type = itr->name.GetString();
@@ -26973,7 +26850,7 @@ void loadHUDSettingsJSON()
 					if ( d["enemy_hp_bars"].HasMember("world_height_offsets") )
 					{
 						enemyBarSettings.heightOffsets.clear();
-						for ( rapidjson::Value::ConstMemberIterator itr = d["enemy_hp_bars"]["world_height_offsets"].MemberBegin();
+						for ( auto itr = d["enemy_hp_bars"]["world_height_offsets"].MemberBegin();
 							itr != d["enemy_hp_bars"]["world_height_offsets"].MemberEnd(); ++itr )
 						{
 							enemyBarSettings.heightOffsets[itr->name.GetString()] = itr->value.GetFloat();
@@ -26982,7 +26859,7 @@ void loadHUDSettingsJSON()
 					if ( d["enemy_hp_bars"].HasMember("screen_depth_distance_offset") )
 					{
 						enemyBarSettings.screenDistanceOffsets.clear();
-						for ( rapidjson::Value::ConstMemberIterator itr = d["enemy_hp_bars"]["screen_depth_distance_offset"].MemberBegin();
+						for ( auto itr = d["enemy_hp_bars"]["screen_depth_distance_offset"].MemberBegin();
 							itr != d["enemy_hp_bars"]["screen_depth_distance_offset"].MemberEnd(); ++itr )
 						{
 							enemyBarSettings.screenDistanceOffsets[itr->name.GetString()] = itr->value.GetFloat();
@@ -26991,7 +26868,7 @@ void loadHUDSettingsJSON()
 					if ( d["enemy_hp_bars"].HasMember("monster_bar_width_to_hp_intervals") )
 					{
 						barony_dynamic_array_clear(&EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters);
-						for ( rapidjson::Value::ConstValueIterator itr = d["enemy_hp_bars"]["monster_bar_width_to_hp_intervals"].Begin();
+						for ( auto itr = d["enemy_hp_bars"]["monster_bar_width_to_hp_intervals"].Begin();
 							itr != d["enemy_hp_bars"]["monster_bar_width_to_hp_intervals"].End(); ++itr )
 						{
 							// you need to FindMember() if getting objects from an array...
@@ -27012,7 +26889,7 @@ void loadHUDSettingsJSON()
 					if ( d["enemy_hp_bars"].HasMember("furniture_bar_width_to_hp_intervals") )
 					{
 						barony_dynamic_array_clear(&EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture);
-						for ( rapidjson::Value::ConstValueIterator itr = d["enemy_hp_bars"]["furniture_bar_width_to_hp_intervals"].Begin();
+						for ( auto itr = d["enemy_hp_bars"]["furniture_bar_width_to_hp_intervals"].Begin();
 							itr != d["enemy_hp_bars"]["furniture_bar_width_to_hp_intervals"].End(); ++itr )
 						{
 							// you need to FindMember() if getting objects from an array...
@@ -27212,7 +27089,7 @@ void loadHUDSettingsJSON()
 				if ( d.HasMember("dropdowns") )
 				{
 					Player::GUIDropdown_t::allDropDowns.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["dropdowns"].MemberBegin();
+					for ( auto itr = d["dropdowns"].MemberBegin();
 						itr != d["dropdowns"].MemberEnd(); ++itr )
 					{
 						auto& dropdown = Player::GUIDropdown_t::allDropDowns[itr->name.GetString()];
@@ -27265,7 +27142,7 @@ void loadHUDSettingsJSON()
 						{
 							dropdown.defaultOption = 0;
 						}
-						for ( rapidjson::Value::ConstValueIterator options_itr = itr->value["options"].Begin();
+						for ( auto options_itr = itr->value["options"].Begin();
 							options_itr != itr->value["options"].End(); ++options_itr )
 						{
 							DynamicString text = "";
@@ -41718,14 +41595,14 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::update()
 		d.update();
 	});
 	std::vector<int> toErase;
-	for ( auto& d : sharedDialogues )
+	sharedDialogues.forEach([&](int key, auto& d)
 	{
-		if ( !d.second.active && d.second.alpha <= 0.0
-			&& (ticks - d.second.spawnTick >= d.second.expiryTicks) )
+		if ( !d.active && d.alpha <= 0.0
+			&& (ticks - d.spawnTick >= d.expiryTicks) )
 		{
-			toErase.push_back(d.first);
+			toErase.push_back(key);
 		}
-	}
+	});
 	for ( int key : toErase )
 	{
 		sharedDialogues.erase(key);

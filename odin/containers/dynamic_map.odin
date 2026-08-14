@@ -1913,10 +1913,13 @@ dialogue_t_copy :: proc(dst: rawptr, src: rawptr) {
 	d.spawnTick = s.spawnTick
 	d.updatedThisTick = s.updatedThisTick
 	d.expiryTicks = s.expiryTicks
-	d.dialogueField = s.dialogueField
+	// dialogueField / dialogueTooltipSurface are owned by C++ (Dialogue_t has a
+	// destructor that deletes them). Do NOT shallow-copy them into snapshot
+	// copies: a copy's ~Dialogue_t() would free the live entry's Field/Surface.
+	d.dialogueField = nil
 	d.dialogueStringLength = s.dialogueStringLength
 	d.dialogueType = s.dialogueType
-	d.dialogueTooltipSurface = s.dialogueTooltipSurface
+	d.dialogueTooltipSurface = nil
 	dynamic_string_copy_elem(rawptr(&d.dialogueStrFull), rawptr(&s.dialogueStrFull))
 	dynamic_string_copy_elem(rawptr(&d.dialogueStrCurrent), rawptr(&s.dialogueStrCurrent))
 }

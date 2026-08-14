@@ -754,7 +754,7 @@ tmp_item_free :: proc(p: rawptr) {
 		f.len = 0
 	}
 	barony_dynamic_array_elem_destroy(&v.imagePaths, size_of(DynamicString), Kind_DynamicString)
-	barony_dynamic_map_str_destroy(&v.attributes, Kind_I32Map)
+	barony_dynamic_map_str_destroy(&v.attributes, 0) // 0 = MK_I32 (map-value-kind for map[string]i32)
 }
 
 tmp_item_copy :: proc(dst: rawptr, src: rawptr) {

@@ -1,5 +1,6 @@
 #include "../main.hpp"
 #include "../files.hpp"
+#include "../../odin/json_shim/json_shim.hpp"
 #include "../game.hpp"
 #include "../stat.hpp"
 #include "../messages.hpp"
@@ -1700,169 +1701,115 @@ void FollowerRadialMenu::loadFollowerJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
-				if ( d.HasMember("panel_center_x_offset") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "panel_center_x_offset") )
 				{
-					FollowerRadialMenu::followerWheelFrameOffsetX = d["panel_center_x_offset"].GetInt();
+					FollowerRadialMenu::followerWheelFrameOffsetX = json_int(root, "panel_center_x_offset");
 				}
-				if ( d.HasMember("panel_center_y_offset") )
+				if ( json_node_has_member(root, "panel_center_y_offset") )
 				{
-					FollowerRadialMenu::followerWheelFrameOffsetY = d["panel_center_y_offset"].GetInt();
+					FollowerRadialMenu::followerWheelFrameOffsetY = json_int(root, "panel_center_y_offset");
 				}
-				if ( d.HasMember("panel_radius") )
+				if ( json_node_has_member(root, "panel_radius") )
 				{
-					FollowerRadialMenu::followerWheelRadius = d["panel_radius"].GetInt();
+					FollowerRadialMenu::followerWheelRadius = json_int(root, "panel_radius");
 				}
-				if ( d.HasMember("panel_button_thickness") )
+				if ( json_node_has_member(root, "panel_button_thickness") )
 				{
-					FollowerRadialMenu::followerWheelButtonThickness = d["panel_button_thickness"].GetInt();
+					FollowerRadialMenu::followerWheelButtonThickness = json_int(root, "panel_button_thickness");
 				}
-				if ( d.HasMember("panel_inner_circle_radius_offset") )
+				if ( json_node_has_member(root, "panel_inner_circle_radius_offset") )
 				{
-					FollowerRadialMenu::followerWheelInnerCircleRadiusOffset = d["panel_inner_circle_radius_offset"].GetInt();
+					FollowerRadialMenu::followerWheelInnerCircleRadiusOffset = json_int(root, "panel_inner_circle_radius_offset");
 				}
-				if ( d.HasMember("panel_inner_circle_radius_offset_alternate") )
+				if ( json_node_has_member(root, "panel_inner_circle_radius_offset_alternate") )
 				{
-					FollowerRadialMenu::followerWheelInnerCircleRadiusOffsetAlternate = d["panel_inner_circle_radius_offset_alternate"].GetInt();
+					FollowerRadialMenu::followerWheelInnerCircleRadiusOffsetAlternate = json_int(root, "panel_inner_circle_radius_offset_alternate");
 				}
-				if ( d.HasMember("colors") )
+				if ( json_node_has_member(root, "colors") )
 				{
-					if ( d["colors"].HasMember("banner_default") )
+					void* colors = json_node_get_member(root, "colors");
+					if ( json_node_has_member(colors, "banner_default") )
 					{
-						followerBannerTextColor = makeColor(
-							d["colors"]["banner_default"]["r"].GetInt(),
-							d["colors"]["banner_default"]["g"].GetInt(),
-							d["colors"]["banner_default"]["b"].GetInt(),
-							d["colors"]["banner_default"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "banner_default");
+						followerBannerTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("banner_highlight_default") )
+					if ( json_node_has_member(colors, "banner_highlight_default") )
 					{
-						followerBannerTextHighlightColor = makeColor(
-							d["colors"]["banner_highlight_default"]["r"].GetInt(),
-							d["colors"]["banner_highlight_default"]["g"].GetInt(),
-							d["colors"]["banner_highlight_default"]["b"].GetInt(),
-							d["colors"]["banner_highlight_default"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "banner_highlight_default");
+						followerBannerTextHighlightColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("title") )
+					if ( json_node_has_member(colors, "title") )
 					{
-						followerTitleColor = makeColor(
-							d["colors"]["title"]["r"].GetInt(),
-							d["colors"]["title"]["g"].GetInt(),
-							d["colors"]["title"]["b"].GetInt(),
-							d["colors"]["title"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "title");
+						followerTitleColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("title_creature_highlight") )
+					if ( json_node_has_member(colors, "title_creature_highlight") )
 					{
-						followerTitleHighlightColor = makeColor(
-							d["colors"]["title_creature_highlight"]["r"].GetInt(),
-							d["colors"]["title_creature_highlight"]["g"].GetInt(),
-							d["colors"]["title_creature_highlight"]["b"].GetInt(),
-							d["colors"]["title_creature_highlight"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "title_creature_highlight");
+						followerTitleHighlightColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
 				}
-				if ( d.HasMember("panels") )
+				if ( json_node_has_member(root, "panels") )
 				{
 					FollowerRadialMenu::panelEntries.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["panels"].Begin();
-						itr != d["panels"].End(); ++itr )
+					void* panels = json_node_get_member(root, "panels");
+					uint32_t panelCount = json_node_array_size(panels);
+					for ( uint32_t i = 0; i < panelCount; ++i )
 					{
+						void* elem = json_node_element_at(panels, i);
 						FollowerRadialMenu::panelEntries.push_back(FollowerRadialMenu::PanelEntry());
 						auto& entry = FollowerRadialMenu::panelEntries[FollowerRadialMenu::panelEntries.size() - 1];
-						if ( (*itr).HasMember("x") )
-						{
-							entry.x = (*itr)["x"].GetInt();
-						}
-						if ( (*itr).HasMember("y") )
-						{
-							entry.y = (*itr)["y"].GetInt();
-						}
-						if ( (*itr).HasMember("path") )
-						{
-							entry.path = (*itr)["path"].GetString();
-						}
-						if ( (*itr).HasMember("path_locked") )
-						{
-							entry.path_locked = (*itr)["path_locked"].GetString();
-						}
-						if ( (*itr).HasMember("path_hover") )
-						{
-							entry.path_hover = (*itr)["path_hover"].GetString();
-						}
-						if ( (*itr).HasMember("path_locked_hover") )
-						{
-							entry.path_locked_hover = (*itr)["path_locked_hover"].GetString();
-						}
-						if ( (*itr).HasMember("icon_offset_x") )
-						{
-							entry.icon_offsetx = (*itr)["icon_offset_x"].GetInt();
-						}
-						if ( (*itr).HasMember("icon_offset_y") )
-						{
-							entry.icon_offsety = (*itr)["icon_offset_y"].GetInt();
-						}
+						if ( json_node_has_member(elem, "x") ) { entry.x = json_int(elem, "x"); }
+						if ( json_node_has_member(elem, "y") ) { entry.y = json_int(elem, "y"); }
+						if ( json_node_has_member(elem, "path") ) { entry.path = json_str(elem, "path"); }
+						if ( json_node_has_member(elem, "path_locked") ) { entry.path_locked = json_str(elem, "path_locked"); }
+						if ( json_node_has_member(elem, "path_hover") ) { entry.path_hover = json_str(elem, "path_hover"); }
+						if ( json_node_has_member(elem, "path_locked_hover") ) { entry.path_locked_hover = json_str(elem, "path_locked_hover"); }
+						if ( json_node_has_member(elem, "icon_offset_x") ) { entry.icon_offsetx = json_int(elem, "icon_offset_x"); }
+						if ( json_node_has_member(elem, "icon_offset_y") ) { entry.icon_offsety = json_int(elem, "icon_offset_y"); }
 					}
 				}
-				if ( d.HasMember("panels_alternate") )
+				if ( json_node_has_member(root, "panels_alternate") )
 				{
 					FollowerRadialMenu::panelEntriesAlternate.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["panels_alternate"].Begin();
-						itr != d["panels_alternate"].End(); ++itr )
+					void* panels = json_node_get_member(root, "panels_alternate");
+					uint32_t panelCount = json_node_array_size(panels);
+					for ( uint32_t i = 0; i < panelCount; ++i )
 					{
+						void* elem = json_node_element_at(panels, i);
 						FollowerRadialMenu::panelEntriesAlternate.push_back(FollowerRadialMenu::PanelEntry());
 						auto& entry = FollowerRadialMenu::panelEntriesAlternate[FollowerRadialMenu::panelEntriesAlternate.size() - 1];
-						if ( (*itr).HasMember("x") )
-						{
-							entry.x = (*itr)["x"].GetInt();
-						}
-						if ( (*itr).HasMember("y") )
-						{
-							entry.y = (*itr)["y"].GetInt();
-						}
-						if ( (*itr).HasMember("path") )
-						{
-							entry.path = (*itr)["path"].GetString();
-						}
-						if ( (*itr).HasMember("path_locked") )
-						{
-							entry.path_locked = (*itr)["path_locked"].GetString();
-						}
-						if ( (*itr).HasMember("path_hover") )
-						{
-							entry.path_hover = (*itr)["path_hover"].GetString();
-						}
-						if ( (*itr).HasMember("path_locked_hover") )
-						{
-							entry.path_locked_hover = (*itr)["path_locked_hover"].GetString();
-						}
-						if ( (*itr).HasMember("icon_offset_x") )
-						{
-							entry.icon_offsetx = (*itr)["icon_offset_x"].GetInt();
-						}
-						if ( (*itr).HasMember("icon_offset_y") )
-						{
-							entry.icon_offsety = (*itr)["icon_offset_y"].GetInt();
-						}
+						if ( json_node_has_member(elem, "x") ) { entry.x = json_int(elem, "x"); }
+						if ( json_node_has_member(elem, "y") ) { entry.y = json_int(elem, "y"); }
+						if ( json_node_has_member(elem, "path") ) { entry.path = json_str(elem, "path"); }
+						if ( json_node_has_member(elem, "path_locked") ) { entry.path_locked = json_str(elem, "path_locked"); }
+						if ( json_node_has_member(elem, "path_hover") ) { entry.path_hover = json_str(elem, "path_hover"); }
+						if ( json_node_has_member(elem, "path_locked_hover") ) { entry.path_locked_hover = json_str(elem, "path_locked_hover"); }
+						if ( json_node_has_member(elem, "icon_offset_x") ) { entry.icon_offsetx = json_int(elem, "icon_offset_x"); }
+						if ( json_node_has_member(elem, "icon_offset_y") ) { entry.icon_offsety = json_int(elem, "icon_offset_y"); }
 					}
 				}
-				if ( d.HasMember("icons") )
+				if ( json_node_has_member(root, "icons") )
 				{
 					FollowerRadialMenu::iconEntries.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["icons"].Begin();
-						itr != d["icons"].End(); ++itr )
+					void* icons = json_node_get_member(root, "icons");
+					uint32_t iconCount = json_node_array_size(icons);
+					for ( uint32_t i = 0; i < iconCount; ++i )
 					{
+						void* elem = json_node_element_at(icons, i);
 						DynamicString actionName = "";
-						if ( (*itr).HasMember("action") )
+						if ( json_node_has_member(elem, "action") )
 						{
-							actionName = (*itr)["action"].GetString();
+							actionName = json_str(elem, "action");
 						}
 						if ( actionName == "" )
 						{
@@ -1870,54 +1817,43 @@ void FollowerRadialMenu::loadFollowerJSON()
 						}
 						FollowerRadialMenu::iconEntries[actionName] = FollowerRadialMenu::IconEntry();
 						FollowerRadialMenu::iconEntries[actionName].name = actionName;
-						if ( (*itr).HasMember("id") )
+						if ( json_node_has_member(elem, "id") ) { FollowerRadialMenu::iconEntries[actionName].id = json_int(elem, "id"); }
+						if ( json_node_has_member(elem, "path") ) { FollowerRadialMenu::iconEntries[actionName].path = json_str(elem, "path"); }
+						if ( json_node_has_member(elem, "path_active") ) { FollowerRadialMenu::iconEntries[actionName].path_active = json_str(elem, "path_active"); }
+						if ( json_node_has_member(elem, "path_hover") ) { FollowerRadialMenu::iconEntries[actionName].path_hover = json_str(elem, "path_hover"); }
+						if ( json_node_has_member(elem, "path_active_hover") ) { FollowerRadialMenu::iconEntries[actionName].path_active_hover = json_str(elem, "path_active_hover"); }
+						if ( json_node_has_member(elem, "text_maps") )
 						{
-							FollowerRadialMenu::iconEntries[actionName].id = (*itr)["id"].GetInt();
-						}
-						if ( (*itr).HasMember("path") )
-						{
-							FollowerRadialMenu::iconEntries[actionName].path = (*itr)["path"].GetString();
-						}
-						if ( (*itr).HasMember("path_active") )
-						{
-							FollowerRadialMenu::iconEntries[actionName].path_active = (*itr)["path_active"].GetString();
-						}
-						if ( (*itr).HasMember("path_hover") )
-						{
-							FollowerRadialMenu::iconEntries[actionName].path_hover = (*itr)["path_hover"].GetString();
-						}
-						if ( (*itr).HasMember("path_active_hover") )
-						{
-							FollowerRadialMenu::iconEntries[actionName].path_active_hover = (*itr)["path_active_hover"].GetString();
-						}
-						if ( (*itr).HasMember("text_maps") )
-						{
-							for ( rapidjson::Value::ConstValueIterator itr2 = (*itr)["text_maps"].Begin();
-								itr2 != (*itr)["text_maps"].End(); ++itr2 )
+							void* textMaps = json_node_get_member(elem, "text_maps");
+							uint32_t textMapCount = json_node_array_size(textMaps);
+							for ( uint32_t j = 0; j < textMapCount; ++j )
 							{
-								for ( rapidjson::Value::ConstMemberIterator itr3 = itr2->MemberBegin();
-									itr3 != itr2->MemberEnd(); ++itr3 )
+								void* mapObj = json_node_element_at(textMaps, j);
+								uint32_t mapCount = json_node_member_count(mapObj);
+								for ( uint32_t k = 0; k < mapCount; ++k )
 								{
-									DynamicString mapKey = itr3->name.GetString();
-									DynamicString mapText = itr3->value["text"].GetString();
+									DynamicString mapKey = json_node_member_name_at(mapObj, k);
+									void* mapVal = json_node_member_value_at(mapObj, k);
+									DynamicString mapText = json_str(mapVal, "text");
 									DynamicSetI32 mapHighlights;
-									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
-										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
+									void* highlights = json_node_get_member(mapVal, "word_highlights");
+									uint32_t hlCount = json_node_array_size(highlights);
+									for ( uint32_t h = 0; h < hlCount; ++h )
 									{
-										mapHighlights.insert(highlightItr->GetInt());
+										int32_t hv = 0; json_node_get_int(json_node_element_at(highlights, h), &hv);
+										mapHighlights.insert(hv);
 									}
-									{
 									IconEntryTextMap_t v;
 									v.text = mapText;
 									v.highlights = mapHighlights;
 									FollowerRadialMenu::iconEntries[actionName].text_map.put(mapKey, v);
-								}
 								}
 							}
 						}
 					}
 				}
 				printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
+				json_reader_destroy(jsonReader);
 			}
 		}
 	}
@@ -27418,165 +27354,126 @@ void CalloutRadialMenu::loadCalloutJSON()
 			char buf[65536];
 			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 			buf[count] = '\0';
-			rapidjson::StringStream is(buf);
 			FileIO::close(fp);
-			rapidjson::Document d;
-			d.ParseStream(is);
-			if ( !d.HasMember("version") )
+			void* jsonReader = json_reader_parse(buf);
+			if ( !jsonReader )
 			{
 				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
 			}
 			else
 			{
-				if ( d.HasMember("panel_center_x_offset") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "panel_center_x_offset") )
 				{
-					CalloutRadialMenu::followerWheelFrameOffsetX = d["panel_center_x_offset"].GetInt();
+					CalloutRadialMenu::followerWheelFrameOffsetX = json_int(root, "panel_center_x_offset");
 				}
-				if ( d.HasMember("panel_center_y_offset") )
+				if ( json_node_has_member(root, "panel_center_y_offset") )
 				{
-					CalloutRadialMenu::followerWheelFrameOffsetY = d["panel_center_y_offset"].GetInt();
+					CalloutRadialMenu::followerWheelFrameOffsetY = json_int(root, "panel_center_y_offset");
 				}
-				if ( d.HasMember("panel_radius") )
+				if ( json_node_has_member(root, "panel_radius") )
 				{
-					CalloutRadialMenu::followerWheelRadius = d["panel_radius"].GetInt();
+					CalloutRadialMenu::followerWheelRadius = json_int(root, "panel_radius");
 				}
-				if ( d.HasMember("panel_button_thickness") )
+				if ( json_node_has_member(root, "panel_button_thickness") )
 				{
-					CalloutRadialMenu::followerWheelButtonThickness = d["panel_button_thickness"].GetInt();
+					CalloutRadialMenu::followerWheelButtonThickness = json_int(root, "panel_button_thickness");
 				}
-				if ( d.HasMember("panel_inner_circle_radius_offset") )
+				if ( json_node_has_member(root, "panel_inner_circle_radius_offset") )
 				{
-					CalloutRadialMenu::followerWheelInnerCircleRadiusOffset = d["panel_inner_circle_radius_offset"].GetInt();
+					CalloutRadialMenu::followerWheelInnerCircleRadiusOffset = json_int(root, "panel_inner_circle_radius_offset");
 				}
-				if ( d.HasMember("colors") )
+				if ( json_node_has_member(root, "colors") )
 				{
-					if ( d["colors"].HasMember("banner_default") )
+					void* colors = json_node_get_member(root, "colors");
+					if ( json_node_has_member(colors, "banner_default") )
 					{
-						followerBannerTextColor = makeColor(
-							d["colors"]["banner_default"]["r"].GetInt(),
-							d["colors"]["banner_default"]["g"].GetInt(),
-							d["colors"]["banner_default"]["b"].GetInt(),
-							d["colors"]["banner_default"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "banner_default");
+						followerBannerTextColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("banner_highlight_default") )
+					if ( json_node_has_member(colors, "banner_highlight_default") )
 					{
-						followerBannerTextHighlightColor = makeColor(
-							d["colors"]["banner_highlight_default"]["r"].GetInt(),
-							d["colors"]["banner_highlight_default"]["g"].GetInt(),
-							d["colors"]["banner_highlight_default"]["b"].GetInt(),
-							d["colors"]["banner_highlight_default"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "banner_highlight_default");
+						followerBannerTextHighlightColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("title") )
+					if ( json_node_has_member(colors, "title") )
 					{
-						followerTitleColor = makeColor(
-							d["colors"]["title"]["r"].GetInt(),
-							d["colors"]["title"]["g"].GetInt(),
-							d["colors"]["title"]["b"].GetInt(),
-							d["colors"]["title"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "title");
+						followerTitleColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
-					if ( d["colors"].HasMember("title_creature_highlight") )
+					if ( json_node_has_member(colors, "title_creature_highlight") )
 					{
-						followerTitleHighlightColor = makeColor(
-							d["colors"]["title_creature_highlight"]["r"].GetInt(),
-							d["colors"]["title_creature_highlight"]["g"].GetInt(),
-							d["colors"]["title_creature_highlight"]["b"].GetInt(),
-							d["colors"]["title_creature_highlight"]["a"].GetInt());
+						void* c = json_node_get_member(colors, "title_creature_highlight");
+						followerTitleHighlightColor = makeColor(json_int(c, "r"), json_int(c, "g"), json_int(c, "b"), json_int(c, "a"));
 					}
 				}
-				if ( d.HasMember("panels") )
+				if ( json_node_has_member(root, "panels") )
 				{
 					CalloutRadialMenu::panelEntries.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["panels"].Begin();
-						itr != d["panels"].End(); ++itr )
+					void* panels = json_node_get_member(root, "panels");
+					uint32_t panelCount = json_node_array_size(panels);
+					for ( uint32_t i = 0; i < panelCount; ++i )
 					{
+						void* elem = json_node_element_at(panels, i);
 						CalloutRadialMenu::panelEntries.push_back(CalloutRadialMenu::PanelEntry());
 						auto& entry = CalloutRadialMenu::panelEntries[CalloutRadialMenu::panelEntries.size() - 1];
-						if ( (*itr).HasMember("x") )
-						{
-							entry.x = (*itr)["x"].GetInt();
-						}
-						if ( (*itr).HasMember("y") )
-						{
-							entry.y = (*itr)["y"].GetInt();
-						}
-						if ( (*itr).HasMember("path") )
-						{
-							entry.path = (*itr)["path"].GetString();
-						}
-						if ( (*itr).HasMember("path_hover") )
-						{
-							entry.path_hover = (*itr)["path_hover"].GetString();
-						}
-						if ( (*itr).HasMember("icon_offset_x") )
-						{
-							entry.icon_offsetx = (*itr)["icon_offset_x"].GetInt();
-						}
-						if ( (*itr).HasMember("icon_offset_y") )
-						{
-							entry.icon_offsety = (*itr)["icon_offset_y"].GetInt();
-						}
+						if ( json_node_has_member(elem, "x") ) { entry.x = json_int(elem, "x"); }
+						if ( json_node_has_member(elem, "y") ) { entry.y = json_int(elem, "y"); }
+						if ( json_node_has_member(elem, "path") ) { entry.path = json_str(elem, "path"); }
+						if ( json_node_has_member(elem, "path_hover") ) { entry.path_hover = json_str(elem, "path_hover"); }
+						if ( json_node_has_member(elem, "icon_offset_x") ) { entry.icon_offsetx = json_int(elem, "icon_offset_x"); }
+						if ( json_node_has_member(elem, "icon_offset_y") ) { entry.icon_offsety = json_int(elem, "icon_offset_y"); }
 					}
 				}
-				if ( d.HasMember("help_strings") )
+				if ( json_node_has_member(root, "help_strings") )
 				{
 					CalloutRadialMenu::helpDescriptors.clear();
-					for ( rapidjson::Value::ConstMemberIterator itr = d["help_strings"].MemberBegin();
-						itr != d["help_strings"].MemberEnd(); ++itr )
+					void* help = json_node_get_member(root, "help_strings");
+					uint32_t helpCount = json_node_member_count(help);
+					for ( uint32_t i = 0; i < helpCount; ++i )
 					{
-						CalloutRadialMenu::helpDescriptors[itr->name.GetString()] = itr->value.GetString();
+						const char* s = nullptr;
+						json_node_get_string(json_node_member_value_at(help, i), &s);
+						CalloutRadialMenu::helpDescriptors[json_node_member_name_at(help, i)] = s;
 					}
 				}
-				if ( d.HasMember("world_icons") )
+				if ( json_node_has_member(root, "world_icons") )
 				{
 					CalloutRadialMenu::worldIconEntries.clear();
 					CalloutRadialMenu::worldIconIDToEntryKey.clear();
 					int id = 0;
-					for ( rapidjson::Value::ConstMemberIterator itr = d["world_icons"].MemberBegin();
-						itr != d["world_icons"].MemberEnd(); ++itr )
+					void* worldIcons = json_node_get_member(root, "world_icons");
+					uint32_t iconCount = json_node_member_count(worldIcons);
+					for ( uint32_t i = 0; i < iconCount; ++i )
 					{
-						DynamicString key = (*itr).name.GetString();
+						DynamicString key = json_node_member_name_at(worldIcons, i);
+						void* val = json_node_member_value_at(worldIcons, i);
 						auto& entry = worldIconEntries[key];
 
 						DynamicString basePath = "*images/ui/CalloutWheel/WorldIcons/";
-						entry.pathDefault = basePath + (*itr).value["default"].GetString();
-						entry.pathPlayer1 = basePath + (*itr).value["0"].GetString();
-						entry.pathPlayer2 = basePath + (*itr).value["1"].GetString();
-						entry.pathPlayer3 = basePath + (*itr).value["2"].GetString();
-						entry.pathPlayer4 = basePath + (*itr).value["3"].GetString();
-						entry.pathPlayerX = basePath + (*itr).value["4"].GetString();
+						entry.pathDefault = basePath + json_str(val, "default");
+						entry.pathPlayer1 = basePath + json_str(val, "0");
+						entry.pathPlayer2 = basePath + json_str(val, "1");
+						entry.pathPlayer3 = basePath + json_str(val, "2");
+						entry.pathPlayer4 = basePath + json_str(val, "3");
+						entry.pathPlayerX = basePath + json_str(val, "4");
 						entry.id = id;
 						CalloutRadialMenu::worldIconIDToEntryKey[id] = key;
 						++id;
-						/*if ( auto img = Image::get(entry.pathDefault.c_str()) )
-						{
-						}
-						if ( auto img = Image::get(entry.pathPlayer1.c_str()) )
-						{
-						}
-						if ( auto img = Image::get(entry.pathPlayer2.c_str()) )
-						{
-						}
-						if ( auto img = Image::get(entry.pathPlayer3.c_str()) )
-						{
-						}
-						if ( auto img = Image::get(entry.pathPlayer4.c_str()) )
-						{
-						}
-						if ( auto img = Image::get(entry.pathPlayerX.c_str()) )
-						{
-						}*/
 					}
 				}
-				if ( d.HasMember("icons") )
+				if ( json_node_has_member(root, "icons") )
 				{
 					CalloutRadialMenu::iconEntries.clear();
-					for ( rapidjson::Value::ConstValueIterator itr = d["icons"].Begin();
-						itr != d["icons"].End(); ++itr )
+					void* icons = json_node_get_member(root, "icons");
+					uint32_t iconCount = json_node_array_size(icons);
+					for ( uint32_t i = 0; i < iconCount; ++i )
 					{
+						void* elem = json_node_element_at(icons, i);
 						DynamicString actionName = "";
-						if ( (*itr).HasMember("action") )
+						if ( json_node_has_member(elem, "action") )
 						{
-							actionName = (*itr)["action"].GetString();
+							actionName = json_str(elem, "action");
 						}
 						if ( actionName == "" )
 						{
@@ -27584,41 +27481,31 @@ void CalloutRadialMenu::loadCalloutJSON()
 						}
 						CalloutRadialMenu::iconEntries[actionName] = CalloutRadialMenu::IconEntry();
 						CalloutRadialMenu::iconEntries[actionName].name = actionName;
-						if ( (*itr).HasMember("id") )
+						if ( json_node_has_member(elem, "id") ) { CalloutRadialMenu::iconEntries[actionName].id = json_int(elem, "id"); }
+						if ( json_node_has_member(elem, "path") ) { CalloutRadialMenu::iconEntries[actionName].path = json_str(elem, "path"); }
+						if ( json_node_has_member(elem, "path_active") ) { CalloutRadialMenu::iconEntries[actionName].path_active = json_str(elem, "path_active"); }
+						if ( json_node_has_member(elem, "path_hover") ) { CalloutRadialMenu::iconEntries[actionName].path_hover = json_str(elem, "path_hover"); }
+						if ( json_node_has_member(elem, "path_active_hover") ) { CalloutRadialMenu::iconEntries[actionName].path_active_hover = json_str(elem, "path_active_hover"); }
+						if ( json_node_has_member(elem, "text_maps") )
 						{
-							CalloutRadialMenu::iconEntries[actionName].id = (*itr)["id"].GetInt();
-						}
-						if ( (*itr).HasMember("path") )
-						{
-							CalloutRadialMenu::iconEntries[actionName].path = (*itr)["path"].GetString();
-						}
-						if ( (*itr).HasMember("path_active") )
-						{
-							CalloutRadialMenu::iconEntries[actionName].path_active = (*itr)["path_active"].GetString();
-						}
-						if ( (*itr).HasMember("path_hover") )
-						{
-							CalloutRadialMenu::iconEntries[actionName].path_hover = (*itr)["path_hover"].GetString();
-						}
-						if ( (*itr).HasMember("path_active_hover") )
-						{
-							CalloutRadialMenu::iconEntries[actionName].path_active_hover = (*itr)["path_active_hover"].GetString();
-						}
-						if ( (*itr).HasMember("text_maps") )
-						{
-							for ( rapidjson::Value::ConstValueIterator itr2 = (*itr)["text_maps"].Begin();
-								itr2 != (*itr)["text_maps"].End(); ++itr2 )
+							void* textMaps = json_node_get_member(elem, "text_maps");
+							uint32_t textMapCount = json_node_array_size(textMaps);
+							for ( uint32_t j = 0; j < textMapCount; ++j )
 							{
-								for ( rapidjson::Value::ConstMemberIterator itr3 = itr2->MemberBegin();
-									itr3 != itr2->MemberEnd(); ++itr3 )
+								void* mapObj = json_node_element_at(textMaps, j);
+								uint32_t mapCount = json_node_member_count(mapObj);
+								for ( uint32_t k = 0; k < mapCount; ++k )
 								{
-									DynamicString mapKey = itr3->name.GetString();
-									DynamicString mapText = itr3->value["text"].GetString();
+									DynamicString mapKey = json_node_member_name_at(mapObj, k);
+									void* mapVal = json_node_member_value_at(mapObj, k);
+									DynamicString mapText = json_str(mapVal, "text");
 									DynamicSetI32 mapHighlights;
-									for ( rapidjson::Value::ConstValueIterator highlightItr = itr3->value["word_highlights"].Begin();
-										highlightItr != itr3->value["word_highlights"].End(); ++highlightItr )
+									void* highlights = json_node_get_member(mapVal, "word_highlights");
+									uint32_t hlCount = json_node_array_size(highlights);
+									for ( uint32_t h = 0; h < hlCount; ++h )
 									{
-										mapHighlights.insert(highlightItr->GetInt());
+										int32_t hv = 0; json_node_get_int(json_node_element_at(highlights, h), &hv);
+										mapHighlights.insert(hv);
 									}
 									DynamicString worldMsg = "";
 									DynamicString worldMsgSays = "";
@@ -27627,34 +27514,13 @@ void CalloutRadialMenu::loadCalloutJSON()
 									DynamicString worldMsgEmoteToYou = "";
 									DynamicString worldIcon = "";
 									DynamicString worldIconMini = "";
-									if ( itr3->value.HasMember("msg") )
-									{
-										worldMsg = itr3->value["msg"].GetString();
-									}
-									if ( itr3->value.HasMember("msg_says") )
-									{
-										worldMsgSays = itr3->value["msg_says"].GetString();
-									}
-									if ( itr3->value.HasMember("msg_emote") )
-									{
-										worldMsgEmote = itr3->value["msg_emote"].GetString();
-									}
-									if ( itr3->value.HasMember("msg_emote_you") )
-									{
-										worldMsgEmoteYou = itr3->value["msg_emote_you"].GetString();
-									}
-									if ( itr3->value.HasMember("msg_emote_to_you") )
-									{
-										worldMsgEmoteToYou = itr3->value["msg_emote_to_you"].GetString();
-									}
-									if ( itr3->value.HasMember("world_icon") )
-									{
-										worldIcon = itr3->value["world_icon"].GetString();
-									}
-									if ( itr3->value.HasMember("world_icon_small") )
-									{
-										worldIconMini = itr3->value["world_icon_small"].GetString();
-									}
+									if ( json_node_has_member(mapVal, "msg") ) { worldMsg = json_str(mapVal, "msg"); }
+									if ( json_node_has_member(mapVal, "msg_says") ) { worldMsgSays = json_str(mapVal, "msg_says"); }
+									if ( json_node_has_member(mapVal, "msg_emote") ) { worldMsgEmote = json_str(mapVal, "msg_emote"); }
+									if ( json_node_has_member(mapVal, "msg_emote_you") ) { worldMsgEmoteYou = json_str(mapVal, "msg_emote_you"); }
+									if ( json_node_has_member(mapVal, "msg_emote_to_you") ) { worldMsgEmoteToYou = json_str(mapVal, "msg_emote_to_you"); }
+									if ( json_node_has_member(mapVal, "world_icon") ) { worldIcon = json_str(mapVal, "world_icon"); }
+									if ( json_node_has_member(mapVal, "world_icon_small") ) { worldIconMini = json_str(mapVal, "world_icon_small"); }
 									IconEntryText_tMirror entry;
 									entry.bannerText = mapText;
 									entry.bannerHighlights = mapHighlights;
@@ -27680,6 +27546,7 @@ void CalloutRadialMenu::loadCalloutJSON()
 						}
 					}
 				}
+				json_reader_destroy(jsonReader);
 				printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 			}
 		}

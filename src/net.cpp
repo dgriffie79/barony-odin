@@ -17,6 +17,7 @@
 #include "messages.hpp"
 #include "entity.hpp"
 #include "files.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "monster.hpp"
 #include "interface/interface.hpp"
 #include "magic/magic.hpp"
@@ -6356,23 +6357,28 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				str += Compendium_t::Events_t::clientReceiveData[clientSequence][i];
 			}
 
-			rapidjson::Document d;
-			d.Parse(str.c_str());
-			if ( !d.HasParseError() )
+			void* jsonReader = json_reader_parse(str.c_str());
+			if ( jsonReader )
 			{
-				if ( d.HasMember("seq") && d.HasMember("item") )
+				void* root = json_node_root(jsonReader);
+				if ( json_node_has_member(root, "seq") && json_node_has_member(root, "item") )
 				{
-					if ( d["seq"].GetInt() == clientSequence )
+					int32_t seq = 0; json_node_get_int(json_node_get_member(root, "seq"), &seq);
+					if ( seq == clientSequence )
 					{
-						for ( auto itr = d["item"].MemberBegin(); itr != d["item"].MemberEnd(); ++itr )
+						void* item = json_node_get_member(root, "item");
+						uint32_t itemCount = json_node_member_count(item);
+						for ( uint32_t i = 0; i < itemCount; ++i )
 						{
-							int id = std::stoi(itr->name.GetString());
+							int id = std::stoi(json_node_member_name_at(item, i));
 							if ( id >= 0 && id < Compendium_t::EventTags::CPDM_EVENT_TAGS_MAX )
 							{
-								for ( auto itr2 = itr->value.MemberBegin(); itr2 != itr->value.MemberEnd(); ++itr2 )
+								void* itemObj = json_node_member_value_at(item, i);
+								uint32_t valueCount = json_node_member_count(itemObj);
+								for ( uint32_t j = 0; j < valueCount; ++j )
 								{
-									int itemType = std::stoi(itr2->name.GetString());
-									Sint32 value = itr2->value.GetInt();
+									int itemType = std::stoi(json_node_member_name_at(itemObj, j));
+									Sint32 value = 0; json_node_get_int(json_node_member_value_at(itemObj, j), &value);
 									if ( itemType >= Compendium_t::Events_t::kEventMonsterOffset && itemType < Compendium_t::Events_t::kEventMonsterOffset + 1000 )
 									{
 										Compendium_t::Events_t::eventUpdateMonster(0, (Compendium_t::EventTags)id, nullptr, value, false, itemType);
@@ -6408,6 +6414,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 						}
 					}
 				}
+				json_reader_destroy(jsonReader);
 			}
 			Compendium_t::Events_t::clientReceiveData[clientSequence].clear();
 

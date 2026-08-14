@@ -10,6 +10,7 @@
 -------------------------------------------------------------------------------*/
 
 #include "../main.hpp"
+#include "../../odin/json_shim/json_shim.hpp"
 #include "consolecommand.hpp"
 
 #include <sstream>
@@ -6451,12 +6452,15 @@ namespace ConsoleCommands {
 				char buf[65536];
 				int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 				buf[count] = '\0';
-				rapidjson::StringStream is(buf);
 				FileIO::close(fp);
 
-				rapidjson::Document d;
-				d.ParseStream(is);
-
+				JsonDoc jd(buf);
+				if ( !jd.ok() )
+				{
+					printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
+					return;
+				}
+				JsonNode& d = jd.root;
 				if ( !d.IsObject() || !d.HasMember("version") )
 				{
 					printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
@@ -6520,12 +6524,15 @@ namespace ConsoleCommands {
 				char buf[65536];
 				int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
 				buf[count] = '\0';
-				rapidjson::StringStream is(buf);
 				FileIO::close(fp);
 
-				rapidjson::Document d;
-				d.ParseStream(is);
-
+				JsonDoc jd(buf);
+				if ( !jd.ok() )
+				{
+					printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
+					return;
+				}
+				JsonNode& d = jd.root;
 				if ( !d.IsObject() || !d.HasMember("version") )
 				{
 					printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());

@@ -10,6 +10,7 @@
 -------------------------------------------------------------------------------*/
 
 #include "main.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "game.hpp"
 #include "stat.hpp"
 #include "messages.hpp"
@@ -2528,8 +2529,11 @@ void printFollowerTableForSkillsheet(int monsterclicked, Entity* my, Stat* mySta
 
 	outputList += "}";
 
-	rapidjson::Document d;
-	d.Parse(outputList.c_str());
+	JsonDoc jd(outputList.c_str());
+	if ( !jd.ok() )
+	{
+		return;
+	}
 
 	DynamicString outputPath = outputdir;
 	outputPath.append(PHYSFS_getDirSeparator());
@@ -2541,10 +2545,9 @@ void printFollowerTableForSkillsheet(int monsterclicked, Entity* my, Stat* mySta
 	{
 		return;
 	}
-	rapidjson::StringBuffer os;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(os);
-	d.Accept(writer);
-	fp->write(os.GetString(), sizeof(char), os.GetSize());
+	const char* json = json_node_serialize(jd.root.h, false);
+	fp->write(json, sizeof(char), strlen(json));
+	json_string_free(json);
 
 	FileIO::close(fp);
 	messagePlayer(0, MESSAGE_MISC, "Exported file: %s", outputPath.c_str());

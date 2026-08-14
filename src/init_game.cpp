@@ -13,6 +13,7 @@
 #include "main.hpp"
 #include "draw.hpp"
 #include "files.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "game.hpp"
 #include "stat.hpp"
 #include "interface/interface.hpp"
@@ -760,24 +761,29 @@ void loadAchievementData(const char* path) {
 	static char buf[120000];
 	int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf));
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
-
-	if (!d.HasMember("achievements") || !d["achievements"].IsObject()) {
+	void* jsonReader = json_reader_parse(buf);
+	if ( !jsonReader ) {
 		printlog("[JSON]: Error: could not parse %s", path);
 		return;
 	}
-	const auto& achievements = d["achievements"].GetObject();
+	void* root = json_node_root(jsonReader);
+	void* achievements = json_node_get_member(root, "achievements");
+	if ( !achievements || !json_node_is_object(achievements) ) {
+		printlog("[JSON]: Error: could not parse %s", path);
+		json_reader_destroy(jsonReader);
+		return;
+	}
 
-	for (const auto& it : achievements) {
-		if (!it.name.IsString()) {
+	uint32_t achCount = json_node_member_count(achievements);
+	for ( uint32_t i = 0; i < achCount; ++i ) {
+		const char* achName = json_node_member_name_at(achievements, i);
+		if ( !achName ) {
 			printlog("[JSON]: Error: could not parse %s", path);
+			json_reader_destroy(jsonReader);
 			return;
 		}
-		auto achName = it.name.GetString();
 		if ( !strcmp(achName, "BARONY_ACH_CARTOGRAPHER") )
 		{
 			continue;
@@ -802,51 +808,61 @@ void loadAchievementData(const char* path) {
 		{
 			continue;
 		}
-		const auto& ach = it.value.GetObject();
+		void* ach = json_node_member_value_at(achievements, i);
 		auto& achData = Compendium_t::achievements[achName];
-		if (ach.HasMember("name") && ach["name"].IsString()) {
-			achData.name = ach["name"].GetString();
+		if (json_node_has_member(ach, "name") && json_node_is_string(json_node_get_member(ach, "name"))) {
+			const char* s = nullptr; json_node_get_string(json_node_get_member(ach, "name"), &s);
+			achData.name = s;
 		}
-		if (ach.HasMember("description") && ach["description"].IsString()) {
-			achData.desc = ach["description"].GetString();
+		if (json_node_has_member(ach, "description") && json_node_is_string(json_node_get_member(ach, "description"))) {
+			const char* s = nullptr; json_node_get_string(json_node_get_member(ach, "description"), &s);
+			achData.desc = s;
 		}
-		if (ach.HasMember("hidden") && ach["hidden"].IsBool()) {
-			achData.hidden = ach["hidden"].GetBool();
+		if (json_node_has_member(ach, "hidden") && json_node_is_bool(json_node_get_member(ach, "hidden"))) {
+			bool b = false; json_node_get_bool(json_node_get_member(ach, "hidden"), &b);
+			achData.hidden = b;
 		}
-		if ( ach.HasMember("category") )
+		if ( json_node_has_member(ach, "category") )
 		{
-			achData.category = ach["category"].GetString();
+			const char* s = nullptr; json_node_get_string(json_node_get_member(ach, "category"), &s);
+			achData.category = s;
 		}
-		if ( ach.HasMember("lore_points") )
+		if ( json_node_has_member(ach, "lore_points") )
 		{
-			achData.lorePoints = ach["lore_points"].GetInt();
+			int32_t v = 0; json_node_get_int(json_node_get_member(ach, "lore_points"), &v);
+			achData.lorePoints = v;
 		}
 
 		achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_NORMAL;
-		if ( ach.HasMember("dlc") )
+		if ( json_node_has_member(ach, "dlc") )
 		{
-			if ( ach["dlc"].IsString() )
+			void* dlcNode = json_node_get_member(ach, "dlc");
+			if ( json_node_is_string(dlcNode) )
 			{
-				if ( !strcmp(ach["dlc"].GetString(), "myths_outcasts") )
+				const char* dlcStr = nullptr; json_node_get_string(dlcNode, &dlcStr);
+				if ( !strcmp(dlcStr, "myths_outcasts") )
 				{
 					achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_DLC1;
 				}
-				else if ( !strcmp(ach["dlc"].GetString(), "legends_pariahs") )
+				else if ( !strcmp(dlcStr, "legends_pariahs") )
 				{
 					achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_DLC2;
 				}
-				else if ( !strcmp(ach["dlc"].GetString(), "deserters_disciples") )
+				else if ( !strcmp(dlcStr, "deserters_disciples") )
 				{
 					achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_DLC3;
 				}
 			}
-			else if ( ach["dlc"].IsArray() )
+			else if ( json_node_is_array(dlcNode) )
 			{
-				for ( auto it = ach["dlc"].Begin(); it != ach["dlc"].End(); ++it )
+				uint32_t dlcCount = json_node_array_size(dlcNode);
+				for ( uint32_t j = 0; j < dlcCount; ++j )
 				{
-					if ( it->IsString() )
+					void* dlcElem = json_node_element_at(dlcNode, j);
+					if ( json_node_is_string(dlcElem) )
 					{
-						if ( !strcmp(it->GetString(), "myths_outcasts") )
+						const char* dlcStr = nullptr; json_node_get_string(dlcElem, &dlcStr);
+						if ( !strcmp(dlcStr, "myths_outcasts") )
 						{
 							if ( achData.dlcType == Compendium_t::AchievementData_t::ACH_TYPE_DLC2 )
 							{
@@ -857,7 +873,7 @@ void loadAchievementData(const char* path) {
 								achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_DLC1;
 							}
 						}
-						else if ( !strcmp(it->GetString(), "legends_pariahs") )
+						else if ( !strcmp(dlcStr, "legends_pariahs") )
 						{
 							if ( achData.dlcType == Compendium_t::AchievementData_t::ACH_TYPE_DLC1 )
 							{
@@ -868,7 +884,7 @@ void loadAchievementData(const char* path) {
 								achData.dlcType = Compendium_t::AchievementData_t::ACH_TYPE_DLC2;
 							}
 						}
-						else if ( !strcmp(it->GetString(), "deserters_disciples") )
+						else if ( !strcmp(dlcStr, "deserters_disciples") )
 						{
 							if ( achData.dlcType == Compendium_t::AchievementData_t::ACH_TYPE_DLC1_DLC2 )
 							{
@@ -884,6 +900,7 @@ void loadAchievementData(const char* path) {
 			}
 		}
 	}
+	json_reader_destroy(jsonReader);
 
 	for ( int statNum = 0; statNum < NUM_STEAM_STATISTICS; ++statNum )
 	{

@@ -2,191 +2,84 @@
 #include "files.hpp"
 #include "json.hpp"
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/error/en.h"
+#include "../odin/json_shim/json_shim.hpp"
 
 #include <cassert>
 
 const Uint32 BinaryFormatTag = *"spff";
 
-// Opaque state backing FileInterface when writing JSON. Holds the
-// rapidjson buffer + writer; the FileInterface methods forward here.
+// Opaque state backing FileInterface when writing JSON. Delegates to the
+// Odin JSON shim (odin/json_shim); the FileInterface methods forward here.
 struct JsonWriterState {
-	JsonWriterState(EFileFormat format)
-	: buffer()
-	, writer(buffer)
-	{
-		if ( format == EFileFormat::Json_Compact )
-		{
-			writer.SetIndent(' ', 2);
-			writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
-		}
+	void* handle;
+
+	JsonWriterState(EFileFormat format) {
+		handle = json_writer_create(format == EFileFormat::Json_Compact);
+	}
+	~JsonWriterState() {
+		json_writer_destroy(handle);
 	}
 
-	bool beginObject() {
-		return writer.StartObject();
-	}
-	void endObject() {
-		writer.EndObject();
-	}
+	bool beginObject() { return json_writer_begin_object(handle); }
+	void endObject() { json_writer_end_object(handle); }
 
-	bool beginArray(Uint32&) {
-		return writer.StartArray();
-	}
-	void endArray() {
-		writer.EndArray();
-	}
+	bool beginArray(Uint32&) { return json_writer_begin_array(handle); }
+	void endArray() { json_writer_end_array(handle); }
 
-	void propertyName(const char* fieldName) {
-		writer.Key(fieldName);
-	}
+	void propertyName(const char* fieldName) { json_writer_key(handle, fieldName); }
 
-	bool value(Uint32& value) {
-		return writer.Uint(value);
-	}
-	bool value(Sint32& value) {
-		return writer.Int(value);
-	}
-	bool value(float& value) {
-		return writer.Double(value);
-	}
-	bool value(double& value) {
-		return writer.Double(value);
-	}
-	bool value(bool& value) {
-		return writer.Bool(value);
-	}
-	bool value(std::string& value) {
-		return writer.String(value.c_str());
-	}
-	bool value(DynamicString& value) {
-		return writer.String(value.c_str());
-	}
+	bool value(Uint32& value) { return json_writer_uint(handle, value); }
+	bool value(Sint32& value) { return json_writer_int(handle, value); }
+	bool value(float& value) { return json_writer_double(handle, (double)value); }
+	bool value(double& value) { return json_writer_double(handle, value); }
+	bool value(bool& value) { return json_writer_bool(handle, value); }
+	bool value(std::string& value) { return json_writer_string(handle, value.c_str()); }
+	bool value(DynamicString& value) { return json_writer_string(handle, value.c_str()); }
 
 	void save(File* file) {
-		buffer.Flush();
-		file->puts(buffer.GetString());
+		file->puts(json_writer_get_string(handle));
 	}
-
-private:
-	rapidjson::StringBuffer buffer;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer;
 };
 
 struct JsonReaderState {
+	void* handle = nullptr;
 
-	bool beginObject() {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsObject()) {
-		    DocIterator di;
-		    di.it = cv;
-		    di.index = -1;
-		    stack.push_back(di);
-		    return true;
-		} else {
-		    return false;
-		}
+	JsonReaderState() = default;
+	~JsonReaderState() {
+		if (handle) json_reader_destroy(handle);
 	}
 
-	void endObject() {
-	    if (!stack.empty()) {
-		    stack.pop_back();
-		}
-	}
+	bool beginObject() { return json_reader_begin_object(handle); }
+	void endObject() { json_reader_end_object(handle); }
 
-	bool beginArray(Uint32 & size) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsArray()) {
-		    DocIterator di;
-		    di.it = cv;
-		    di.index = 0;
-		    stack.push_back(di);
-		    size = di.it->GetArray().Size();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
+	bool beginArray(Uint32& size) { return json_reader_begin_array(handle, &size); }
+	void endArray() { json_reader_end_array(handle); }
 
-	void endArray() {
-	    if (!stack.empty()) {
-		    stack.pop_back();
-		}
-	}
-	void propertyName(const char * fieldName) {
-		propName = fieldName;
-	}
-	bool value(Uint32& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsUint()) {
-		    value = cv->GetUint();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
-	bool value(Sint32& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsInt()) {
-		    value = cv->GetInt();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
-	bool value(float& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsFloat()) {
-		    value = cv->GetFloat();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
-	bool value(double& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsDouble()) {
-		    value = cv->GetDouble();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
-	bool value(bool& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsBool()) {
-		    value = cv->GetBool();
-		    return true;
-		} else {
-		    return false;
-		}
-	}
+	void propertyName(const char* fieldName) { json_reader_property_name(handle, fieldName); }
+
+	bool value(Uint32& value) { return json_reader_value_uint(handle, &value); }
+	bool value(Sint32& value) { return json_reader_value_int(handle, &value); }
+	bool value(float& value) { return json_reader_value_float(handle, &value); }
+	bool value(double& value) { return json_reader_value_double(handle, &value); }
+	bool value(bool& value) { return json_reader_value_bool(handle, &value); }
 	bool value(std::string& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsString()) {
-			value = cv->GetString();
-			return true;
-		} else {
-		    return false;
-		}
+		const char* s;
+		if (!json_reader_value_string(handle, &s)) return false;
+		value = s;
+		return true;
 	}
 	bool value(DynamicString& value) {
-		auto cv = GetCurrentValue();
-		if (cv && cv->IsString()) {
-			value = cv->GetString();
-			return true;
-		} else {
-		    return false;
-		}
+		const char* s;
+		if (!json_reader_value_string(handle, &s)) return false;
+		value = s;
+		return true;
 	}
 
-	bool readAllFileData(File * fp) {
+	bool readAllFileData(File* fp) {
 		long size = fp->size();
 
 		// reserve an extra byte for the null terminator
-		char * data = (char *)calloc(sizeof(char), size + 1);
+		char* data = (char*)calloc(sizeof(char), size + 1);
 		assert(data);
 
 		size_t bytesRead = fp->read(data, sizeof(char), size);
@@ -199,58 +92,17 @@ struct JsonReaderState {
 		// null terminate
 		data[size] = 0;
 
-		rapidjson::ParseResult result = doc.Parse(data);
+		handle = json_reader_parse(data);
 
 		free(data);
 
-		if (!result) {
-			printlog("JsonFileReader: parse error: %s (%d)", rapidjson::GetParseError_En(result.Code()), result.Offset());
+		if (!handle) {
+			printlog("JsonFileReader: parse error");
 			return false;
 		}
 
 		return true;
 	}
-
-	rapidjson::Value::ConstValueIterator GetCurrentValue() {
-		if (stack.empty()) {
-		    if (propName == nullptr) {
-			    return &doc;
-		    } else {
-		        return nullptr;
-		    }
-		}
-
-		DocIterator& di = stack.back();
-		if (di.it->IsArray()) {
-			if (di.index >= 0) {
-			    return &di.it->GetArray()[di.index++];
-			} else {
-			    return nullptr;
-			}
-		}
-
-		if (propName != nullptr) {
-		    rapidjson::Value::ConstValueIterator result;
-		    if ((*di.it).HasMember(propName)) {
-		        result = &(*di.it)[propName];
-		    } else {
-		        result = nullptr;
-		    }
-		    propName = nullptr;
-		    return result;
-		} else {
-		    return nullptr;
-		}
-	}
-
-	struct DocIterator {
-		rapidjson::Value::ConstValueIterator it;
-		Uint32 index;
-	};
-
-	rapidjson::Document doc;
-	const char * propName = nullptr;
-	std::vector<DocIterator> stack;
 };
 
 struct BinaryWriterState {

@@ -18,6 +18,7 @@
 
 #include "draw.hpp"
 #include "files.hpp"
+#include "../odin/json_shim/json_shim.hpp"
 #include "engine/audio/sound.hpp"
 #include "prng.hpp"
 #include "hash.hpp"
@@ -1013,15 +1014,19 @@ void readTilesJson()
 	char buf[1024];
 	int count = (int)fp->read(buf, sizeof(buf[0]), sizeof(buf));
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
-
-	if ( d.HasMember("tile_texture_size") )
+	void* jsonReader = json_reader_parse(buf);
+	if ( jsonReader )
 	{
-		*cvar_tileTextureSize = d["tile_texture_size"].GetInt();
+		void* root = json_node_root(jsonReader);
+		if ( json_node_has_member(root, "tile_texture_size") )
+		{
+			int32_t v = 0;
+			json_node_get_int(json_node_get_member(root, "tile_texture_size"), &v);
+			*cvar_tileTextureSize = v;
+		}
+		json_reader_destroy(jsonReader);
 	}
 	printlog("[JSON]: Tile texture size is: %d", *cvar_tileTextureSize);
 }

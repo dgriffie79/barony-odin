@@ -101,7 +101,6 @@ game_sources = files(
   'actpedestal.cpp',
   'actteleporter.cpp',
   'actmagictrap.cpp',
-  'steam_shared.cpp',
   'mod_tools.cpp',
   'json.cpp',
   'eos.cpp',
@@ -137,7 +136,6 @@ editor_sources = files(
   'stat_editor.cpp',
   'stat_shared.cpp',
   'items_editor.cpp',
-  'steam_shared.cpp',
   'json.cpp',
   'eos_editor.cpp',
   'mod_tools.cpp',
@@ -368,6 +366,7 @@ if host_system == 'windows'
         odin_root / 'containers' / 'dynamic_array.odin',
         odin_root / 'containers' / 'dynamic_map.odin',
         odin_root / 'containers' / 'dynamic_string.odin',
+        odin_root / 'json_shim' / 'json_shim.odin',
       ],
       depends : [barony_game_lib],
       command : [
@@ -389,6 +388,7 @@ if host_system == 'windows'
           odin_root / 'containers' / 'dynamic_array.odin',
           odin_root / 'containers' / 'dynamic_map.odin',
           odin_root / 'containers' / 'dynamic_string.odin',
+          odin_root / 'json_shim' / 'json_shim.odin',
         ],
         depends : [barony_editor_lib],
         command : [

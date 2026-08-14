@@ -8,6 +8,7 @@
 // in (so ported Odin procs can be called from C++ and vice versa).
 package main
 import "containers"
+import "json_shim"
 
 when !#config(EDITOR, false) {
 	foreign import _barony "../builddir/src/libbarony_game.a"

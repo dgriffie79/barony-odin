@@ -19,6 +19,7 @@
 #include "interface.hpp"
 #include "../scores.hpp"
 #include "../mod_tools.hpp"
+#include "../../odin/json_shim/json_shim.hpp"
 
 //Identify GUI definitions.
 SDL_Surface* identifyGUI_img;
@@ -606,44 +607,57 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 	static char buf[32000];
 	int count = fp->read(buf, sizeof(buf[0]), sizeof(buf) - 1);
 	buf[count] = '\0';
-	rapidjson::StringStream is(buf);
 	FileIO::close(fp);
 
-	rapidjson::Document d;
-	d.ParseStream(is);
-	if ( !d.IsObject() )
+	void* jsonReader = json_reader_parse(buf);
+	if ( !jsonReader )
 	{
 		return;
 	}
-	if ( !d.HasMember("version") 
-		|| !d.HasMember("appraisal_times") 
-		|| !d.HasMember("appraisal_tables")
-		|| !d.HasMember("fast_time_seconds") 
-		|| !d.HasMember("per_stat_mult") )
+	void* root = json_node_root(jsonReader);
+	if ( !json_node_is_object(root) )
+	{
+		json_reader_destroy(jsonReader);
+		return;
+	}
+	if ( !json_node_has_member(root, "version") 
+		|| !json_node_has_member(root, "appraisal_times") 
+		|| !json_node_has_member(root, "appraisal_tables")
+		|| !json_node_has_member(root, "fast_time_seconds") 
+		|| !json_node_has_member(root, "per_stat_mult") )
 	{
 		printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
+		json_reader_destroy(jsonReader);
 		return;
 	}
 
 	barony_dynamic_array_clear(&appraisal_time_points);
 	barony_dynamic_array_clear(&appraisal_tables);
 
-	fastTimeAppraisal = d["fast_time_seconds"].GetInt() * TICKS_PER_SECOND;
-	perStatMult = d["per_stat_mult"].GetInt();
+	int32_t ft = 0; json_node_get_int(json_node_get_member(root, "fast_time_seconds"), &ft);
+	fastTimeAppraisal = ft * TICKS_PER_SECOND;
+	int32_t psm = 0; json_node_get_int(json_node_get_member(root, "per_stat_mult"), &psm);
+	perStatMult = psm;
 
-	for ( auto itr = d["appraisal_times"].Begin(); itr != d["appraisal_times"].End(); ++itr )
+	void* appraisal_times = json_node_get_member(root, "appraisal_times");
+	uint32_t timesCount = json_node_array_size(appraisal_times);
+	for ( uint32_t i = 0; i < timesCount; ++i )
 	{
-		int value = (*itr)["value"].GetInt();
-		int slow_time = (*itr)["slow_time_seconds"].GetInt() * TICKS_PER_SECOND;
+		void* elem = json_node_element_at(appraisal_times, i);
+		int32_t value = 0; json_node_get_int(json_node_get_member(elem, "value"), &value);
+		int32_t slow_time = 0; json_node_get_int(json_node_get_member(elem, "slow_time_seconds"), &slow_time);
 
-		dynarray_pair_push<std::pair<int, int>>(appraisal_time_points, std::make_pair(value, slow_time));
+		dynarray_pair_push<std::pair<int, int>>(appraisal_time_points, std::make_pair((int)value, (int)(slow_time * TICKS_PER_SECOND)));
 	}
 
-	for ( auto itr = d["appraisal_tables"].Begin(); itr != d["appraisal_tables"].End(); ++itr )
+	void* appraisal_tables_node = json_node_get_member(root, "appraisal_tables");
+	uint32_t tablesCount = json_node_array_size(appraisal_tables_node);
+	for ( uint32_t i = 0; i < tablesCount; ++i )
 	{
-		int skill = (*itr)["skill"].GetInt();
-		int gold_value_limit = (*itr)["gold_value_limit"].GetInt();
-		int fast_time_gold = (*itr)["fast_time_gold"].GetInt();
+		void* elem = json_node_element_at(appraisal_tables_node, i);
+		int32_t skill = 0; json_node_get_int(json_node_get_member(elem, "skill"), &skill);
+		int32_t gold_value_limit = 0; json_node_get_int(json_node_get_member(elem, "gold_value_limit"), &gold_value_limit);
+		int32_t fast_time_gold = 0; json_node_get_int(json_node_get_member(elem, "fast_time_gold"), &fast_time_gold);
 
 		dynarray_push<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t());
 		auto& table = *dynarray_at<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables, dynarray_size<Player::Inventory_t::Appraisal_t::AppraisalBreakpoint_t>(appraisal_tables) - 1);
@@ -652,6 +666,8 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 		table.goldValueLimit = gold_value_limit;
 		table.fastTimeGold = fast_time_gold;
 	}
+
+	json_reader_destroy(jsonReader);
 }
 
 int Player::Inventory_t::Appraisal_t::getAppraisalTime(Item* item)
