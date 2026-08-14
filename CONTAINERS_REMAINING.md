@@ -1,36 +1,31 @@
 # Remaining std:: containers in headers
 
-Regenerated 2026-08-13 (post-D3cu, accurate at commit b8bc47f). This list is
+Regenerated 2026-08-13 (accurate at commit a91ad93, post-D3d7). This list is
 **HEADER MEMBERS ONLY** — the shared-struct + global state that must de-STL to
 cross the C++↔Odin boundary — plus flagged signatures that return/pass std
 containers. `std::string` members are tracked separately (the bulk-string phase,
 PORTING.md step 2) and are NOT counted here. `std::array` members are listed in
 their own section at the bottom (fixed-size, low priority).
 
-## DONE since the previous doc (D3ce … D3cu)
+## DONE since the previous doc (D3cw … D3d7)
 
-- input.hpp `Input::keys`, main.hpp `keystatus` → `DynamicMapI32T<bool>` (demo v2)
-- player.hpp `targetsCompelled` → `DynamicMapU32Map`
-- magic.hpp `particleTimerEmitterHitEntities` → `DynamicMapU32MapEmitterHit`
-- player.hpp `mapDisplayNamesDescriptions` → `DynamicMapStringPair`
-- mod_tools.hpp `colliderRandomGenPool` → `DynamicMapStrI32Map`
-- mod_tools.hpp `colliderData` → `DynamicMapI32T<EntityColliderData_t>`
-- mod_tools.hpp `spellItems` → `DynamicMapI32T<spellItem_t>`
-- mod_tools.hpp `tooltips` → `DynamicMapStrT<ItemTooltip_t>`
-- mod_tools.hpp `allEntries` → `DynamicMapStrT<Entry_t>`
-- mod_tools.hpp `allStatues` → `DynamicMapI32T<Statue_t>`
-- mod_tools.hpp `monsterModelsMap` → nested `map<int,map<int,ModelOffset_t>>`
-- mod_tools.hpp `adjectives` → nested `map<string,map<string,string>>`
-- player.hpp `itemEvents` → `DynamicMapStrI32Map`
-- player.hpp `floorEvents` → nested str-i32-i32 map
-- scores.hpp `entityAchievementsToProcess` → `DynamicMapI32IntPair`
-- mod_tools.hpp `TreasureRoomGenerator` sets + floor maps
-- `std::list<std::string>` returns/members → `DynamicArrayStr`:
-  files.hpp `directoryContents`/`physfsGetFileNamesInDirectory`,
-  menu.hpp `currentDirectoryFiles`, mod_tools.hpp `localModFoldernames`,
-  steam.hpp `workshopItemTags`
+- set<string> → `DynamicSetStr`: `mods_loaded_local/workshop`,
+  `achievementUnlockedLookup`, `Event_t::attributes`
+- vector<pair<string,string>> → `DynamicArrayStringPair`: `mountedFilepaths*`
+  (new `Kind_StringPair`)
+- vector<pair<SDL_Surface**, string>> → `DynamicArraySurfacePtrStringPair`:
+  `systemResourceImagesToReload` + `systemResourceImages` (new
+  `Kind_SurfacePtrStringPair`)
+- compendium `contents`×7 / `contents_unfiltered` / `achievementCategories` →
+  `DynamicMapStrArrayStringPair` (new `MK_ArrayStringPair`)
+- compendium struct maps (each a new owning map value kind + Odin mirror):
+  `achievementsBookDisplay` (`MK_CompendiumAchievementsDisplay`),
+  `compendiumObjectMapTiles` (`MK_CompendiumMapTiles`),
+  `compendiumObjectLimbs` (`MK_ObjectLimbs`), `worldObjects` (`MK_World`),
+  `codex` (`MK_Codex`), `items`+`magic` (`MK_ItemsCodex`),
+  `monsters` (`MK_Monster`)
 
-(plus the earlier D3aw–D3cc batch, see git log.)
+(plus the earlier D3aw–D3cu batch, see git log.)
 
 ## Value-kind families now available
 
@@ -38,14 +33,17 @@ their own section at the bottom (fixed-size, low priority).
 - i32-key: `DynamicMapI32T<V>` (`barony_dynamic_map_i32_*`)
 - **ptr-key:** `DynamicMapPtrT<V>` (`barony_dynamic_map_ptr_*`) — `map[rawptr]V`
 - sets: `DynamicSetI32` / `DynamicSetStr`
-- arrays: `DynamicArrayT<V>` (`barony_dynamic_array_elem_*`), raw `DynamicArray`,
-  `DynamicArrayStr` / `DynamicArrayS32` / `DynamicArrayU32` / `DynamicArrayIcon` /
-  `DynamicArrayOption` / `DynamicArrayEntryVar` + `dynarray_pair_*` helpers
-- string: `DynamicString`; owning pair mirrors `DynamicStringPair_t`, `IntPair_t`
+- arrays: `DynamicArrayT<V>`, raw `DynamicArray`, `DynamicArrayStr`/`S32`/`U32`/
+  `Icon`/`Option`/`EntryVar`, `DynamicArrayStringPair`,
+  `DynamicArraySurfacePtrStringPair`
+- string: `DynamicString`; pair mirrors `DynamicStringPair_t`, `IntPair_t`,
+  `SurfacePtrStringPair_t`
 - nested-map value kinds: `MK_I32Map`, `MK_U32Map`, `MK_U32MapEmitterHit`,
-  `MK_StrMapStr`, `MK_StrI32Map`, `MK_I32MapModelOffset`, `MK_I32MapIntPair`
-  (typedefs `DynamicMapI32Map`, `DynamicMapU32Map`, `DynamicMapU32MapEmitterHit`,
-  `DynamicMapStrI32Map`, `DynamicMapI32IntPair`, …)
+  `MK_StrMapStr`, `MK_StrI32Map`, `MK_I32MapModelOffset`, `MK_I32MapIntPair`,
+  `MK_ArrayStringPair`
+- owning struct value kinds: `MK_*` for EntityColliderData, SpellItem, ItemTooltip,
+  Entry, DropDown, Statue, CompendiumAchievementsDisplay, CompendiumMapTiles,
+  ObjectLimbs, World, Codex, ItemsCodex, Monster, …
 
 ## Remaining header members (by file)
 
@@ -60,10 +58,10 @@ their own section at the bottom (fixed-size, low priority).
 ### src/game.hpp (1)
 - `DebugStatsClass::networkPackets` — `unordered_map<unsigned long, pair<string,int>>`
 
-### src/interface/interface.hpp (3)
+### src/interface/interface.hpp (2)
 - `scrolls` — `unordered_map<string, pair<int,bool>>`
 - `sortedScrolls` — `vector<pair<string,pair<int,bool>>>`
-- `systemResourceImages` — `extern vector<pair<SDL_Surface**, string>>`
+- (`systemResourceImages` is DONE in D3cz)
 
 ### src/interface/ui.hpp (1)
 - `allNotifications` — `std::list<UIToastNotification>`
@@ -77,28 +75,9 @@ their own section at the bottom (fixed-size, low priority).
 - `savegamesList` — `extern vector<tuple<int,int,int,string>>`
 - `getResolutionList(int, std::list<resolution>&)` — out-param
 
-### src/mod_tools.hpp (the remaining big block)
+### src/mod_tools.hpp (event block + timepoints + one keep)
 
-Mods statics:
-- `systemResourceImagesToReload` — `static vector<pair<SDL_Surface**, string>>`
-- `mountedFilepaths` / `mountedFilepathsSaved` — `static vector<pair<string,string>>`
-- `mods_loaded_local` / `mods_loaded_workshop` — `static set<string>`
-
-Timepoints:
-- `timepoints` — `map<string, vector<pair<string, time_point>>>` (needs a `time_point` value kind)
-
-Compendium (across all six sections — achievements/monsters/world/codex/items/magic):
-- `achievementNamesSorted` — `set<pair<string,string>, Comparator>`
-- `achievementCategories` — `map<string, vector<pair<string,string>>>`
-- `achievementUnlockedLookup` — `unordered_set<string>`
-- `achievementsBookDisplay` — `map<string, CompendiumAchievementsDisplay>`
-- `contents` / `contents_unfiltered` — `static map<string, vector<pair<string,string>>>` (×6 sections)
-- `monsters` / `worldObjects` / `codex` / `items` / `magic` — `map<string, X_t>`
-- `compendiumObjectLimbs` — `map<string, ObjectLimbs_t>`
-- `compendiumObjectMapTiles` — `map<string, pair<CompendiumMap_t, vector<int>>>`
-- `attributes` — `set<string>` (inside monster variant tooltips)
-
-Event block:
+Event block (enum-keyed maps; needs `map[EventTags]V` + set value kinds):
 - `events` — `static map<EventTags, Event_t>`
 - `itemEventLookup` — `static map<int, set<EventTags>>`
 - `eventItemLookup` / `eventMonsterLookup` — `static map<EventTags, set<int>>`
@@ -108,6 +87,14 @@ Event block:
 - `eventCustomLangEntries` — `static map<string, map<string,string>>`
 - `playerEvents` — `static map<EventTags, map<int, EventVal_t>>`
 - `serverPlayerEvents[MAXPLAYERS]` — `static map<EventTags, map<int, EventVal_t>>`
+
+Timepoints:
+- `timepoints` — `map<string, vector<pair<string, time_point>>>` (needs a `time_point` value kind)
+
+Keep (order-dependent):
+- `achievementNamesSorted` — `set<pair<string,string>, Comparator>` **KEEP**
+  (custom std::function comparator + sorted iteration in init_game.cpp; port
+  with file — hash sets would drop the ordering)
 
 ### src/net.hpp (1 — port-with-file)
 - `game_packets` — `queue<SteamPacketWrapper*>`
@@ -150,15 +137,23 @@ Voice-chat subsystem (port-with-file candidate; listed so it isn't missed):
 
 1. **Pointer-keyed maps** need `DynamicMapPtrT<V>` / `map[rawptr]V` (done in D3c9).
 2. **bool-valued maps + `sizeof()` demo serialization** — `Input::keys` and
-   `keystatus` are written raw to demo files; the demo v2 format was handled in
-   D3ce. Keep the demo-format decision in sync with any future conversion.
+   `keystatus` were handled in D3ce (demo v2). Keep the demo-format decision in sync.
 3. **Non-zero struct defaults** — per-kind `default_value` on the entry path
    (e.g. `ChunkDither` defaults `value=10`).
 4. **Nested maps** — each `map<K, map<K2,V>>` needs its own value kind + Odin
-   free/copy ops. Not yet built: `map<string, vector<pair<string,string>>>`,
-   `map<EventTags, set<int>>`, `map<EventTags, map<int,EventVal_t>>`,
-   `map<Monster, vector<pair<Monster,string>>>`, `map<string, vector<pair<string,time_point>>>`.
-5. **`find()` returns a copy** — write-through must use `operator[]`/`contains()`
-   on the live slot, never `find()->second = x`.
-6. **Port-with-file globals** — `allGameSpells`, `surfaceCache`, `indicators`,
-   `game_packets`, voice-chat structs (order-dependent or owning C++ resources).
+   free/copy. Not yet built: `map<EventTags, set<int>>`,
+   `map<EventTags, map<int,EventVal_t>>`, `map<int, set<EventTags>>`,
+   `map<Monster, vector<pair<Monster,string>>>`,
+   `map<string, vector<pair<string,time_point>>>`.
+5. **`find()` returns a snapshot copy** — write-through must use
+   `operator[]`/`contains()` on the live slot, never `find()->second = x`.
+   (Fixed several of these during D3d3–D3d7: refreshCompendiumCamera, the
+   `read*TranslationsFromFile` blocks, and GameUI codexEntry address-of.)
+6. **`&find->second` is a dangling pointer to the snapshot** — take the address of
+   `map[key]` (live slot) instead (fixed in GameUI codexEntry, D3d5).
+7. **Port-with-file globals** — `allGameSpells`, `surfaceCache`, `indicators`,
+   `game_packets`, `achievementNamesSorted`, voice-chat structs (order-dependent
+   or owning C++ resources).
+8. **Narrowing in default member initializers** — `Uint32 x = -1;` triggers C2397
+   once the type lands in a list-initialized map-value slot; use `(Uint32)-1`
+   (fixed for `CompendiumMap_t::ceiling` in D3d2).
