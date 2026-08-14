@@ -4196,7 +4196,7 @@ struct Compendium_t
 		static int completionPercent;
 		static int numUnread;
 	};
-	std::map<std::string, CompendiumItems_t::Codex_t> items;
+	DynamicMapStrT<CompendiumItems_t::Codex_t> items;
 	void readItemsFromFile(bool forceLoadBaseDirectory = false);
 	void readItemsTranslationsFromFile(bool forceLoadBaseDirectory = false);
 
@@ -4208,7 +4208,7 @@ struct Compendium_t
 		static int completionPercent;
 		static int numUnread;
 	};
-	std::map<std::string, CompendiumItems_t::Codex_t> magic;
+	DynamicMapStrT<CompendiumItems_t::Codex_t> magic;
 	void readMagicFromFile(bool forceLoadBaseDirectory = false);
 	void readMagicTranslationsFromFile(bool forceLoadBaseDirectory = false);
 	static Item compendiumItem;
@@ -4380,6 +4380,7 @@ template <> struct MapValueKindOf<Compendium_t::CompendiumMapTiles_t> { static c
 template <> struct MapValueKindOf<Compendium_t::ObjectLimbs_t> { static constexpr int value = MK_ObjectLimbs; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumWorld_t::World_t> { static constexpr int value = MK_World; };
 template <> struct MapValueKindOf<Compendium_t::CompendiumCodex_t::Codex_t> { static constexpr int value = MK_Codex; };
+template <> struct MapValueKindOf<Compendium_t::CompendiumItems_t::Codex_t> { static constexpr int value = MK_ItemsCodex; };
 
 
 extern Compendium_t CompendiumEntries;

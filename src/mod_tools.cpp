@@ -12810,13 +12810,13 @@ void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 	for ( auto itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr )
 	{
 		std::string key = itr->name.GetString();
-		auto find = items.find(key);
-		if ( find != items.end() )
+		if ( items.contains(key) )
 		{
-			find->second.blurb.clear();
+			auto& entry = items[key];
+			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
-				jsonVecToVec(itr->value["blurb"], find->second.blurb);
+				jsonVecToVec(itr->value["blurb"], entry.blurb);
 			}
 		}
 	}
@@ -13136,13 +13136,13 @@ void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 	for ( auto itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr )
 	{
 		std::string key = itr->name.GetString();
-		auto find = magic.find(key);
-		if ( find != magic.end() )
+		if ( magic.contains(key) )
 		{
-			find->second.blurb.clear();
+			auto& entry = magic[key];
+			entry.blurb.clear();
 			if ( itr->value.HasMember("blurb") )
 			{
-				jsonVecToVec(itr->value["blurb"], find->second.blurb);
+				jsonVecToVec(itr->value["blurb"], entry.blurb);
 			}
 		}
 	}
