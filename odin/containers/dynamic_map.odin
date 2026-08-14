@@ -1921,6 +1921,13 @@ dialogue_t_copy :: proc(dst: rawptr, src: rawptr) {
 	dynamic_string_copy_elem(rawptr(&d.dialogueStrCurrent), rawptr(&s.dialogueStrCurrent))
 }
 
+array_monster_string_pair_free :: proc(p: rawptr) {
+	barony_dynamic_array_elem_destroy((^Raw_Dynamic_Array)(p), size_of(MonsterStringPair_t), Kind_MonsterStringPair)
+}
+array_monster_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
+	barony_dynamic_array_elem_copy((^Raw_Dynamic_Array)(dst), (^Raw_Dynamic_Array)(src), size_of(MonsterStringPair_t), Kind_MonsterStringPair)
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -3074,6 +3081,7 @@ Value_Kind :: enum i32 {
 	MK_I32MapEventVal = 74,
 	MK_Setting = 75,
 	MK_Dialogue = 76,
+	MK_ArrayMonsterStringPair = 77,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -3142,6 +3150,8 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{}
 	case .MK_Dialogue:
 		return Value_Ops{ free = dialogue_t_free, copy = dialogue_t_copy }
+	case .MK_ArrayMonsterStringPair:
+		return Value_Ops{ free = array_monster_string_pair_free, copy = array_monster_string_pair_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -3649,6 +3659,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_U64: i32_map_put(m, key, value, u64, ops)
 	case .MK_String:  i32_map_put(m, key, value, string, ops)
 	case .MK_DynArrayStr: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: i32_map_put(m, key, value, Raw_Dynamic_Array, ops)
@@ -3705,6 +3716,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_U64: return i32_map_get(m, key, out, u64, ops)
 	case .MK_String:  return i32_map_get(m, key, out, string, ops)
 	case .MK_DynArrayStr: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return i32_map_get(m, key, out, Raw_Dynamic_Array, ops)
@@ -3761,6 +3773,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_U64: return i32_map_len(m, u64)
 	case .MK_String:  return i32_map_len(m, string)
 	case .MK_DynArrayStr: return i32_map_len(m, Raw_Dynamic_Array)
+	case .MK_ArrayMonsterStringPair: return i32_map_len(m, Raw_Dynamic_Array)
 	case .MK_ArrayStringPair: return i32_map_len(m, Raw_Dynamic_Array)
 	case .MK_DynArrayS32: return i32_map_len(m, Raw_Dynamic_Array)
 	case .MK_StatueLimbArray: return i32_map_len(m, Raw_Dynamic_Array)
@@ -3818,6 +3831,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U64: i32_map_clear(m, u64, ops)
 	case .MK_String:  i32_map_clear(m, string, ops)
 	case .MK_DynArrayStr: i32_map_clear(m, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: i32_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: i32_map_clear(m, Raw_Dynamic_Array, ops)
@@ -3874,6 +3888,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_U64: i32_map_destroy(m, u64, ops)
 	case .MK_String:  i32_map_destroy(m, string, ops)
 	case .MK_DynArrayStr: i32_map_destroy(m, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: i32_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: i32_map_destroy(m, Raw_Dynamic_Array, ops)
@@ -3929,6 +3944,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U64: return i32_map_entry(m, key, u64)
 	case .MK_String:  return i32_map_entry(m, key, string)
 	case .MK_DynArrayStr: return i32_map_entry(m, key, Raw_Dynamic_Array)
+	case .MK_ArrayMonsterStringPair: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_ArrayStringPair: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_DynArrayS32: return i32_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_StatueLimbArray: return i32_map_entry(m, key, Raw_Dynamic_Array)
@@ -3986,6 +4002,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_U64: return i32_map_entries(m, key_ptrs, val_ptrs, count, u64, ops)
 	case .MK_String:  return i32_map_entries(m, key_ptrs, val_ptrs, count, string, ops)
 	case .MK_DynArrayStr: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return i32_map_entries(m, key_ptrs, val_ptrs, count, Raw_Dynamic_Array, ops)
@@ -4043,6 +4060,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_U64: i32_map_for_each(m, u64, f, userdata)
 	case .MK_String:  i32_map_for_each(m, string, f, userdata)
 	case .MK_DynArrayStr: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
+	case .MK_ArrayMonsterStringPair: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_ArrayStringPair: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_DynArrayS32: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_StatueLimbArray: i32_map_for_each(m, Raw_Dynamic_Array, f, userdata)
@@ -4099,6 +4117,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_U64: return i32_map_erase(m, key, u64, ops)
 	case .MK_String:  return i32_map_erase(m, key, string, ops)
 	case .MK_DynArrayStr: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return i32_map_erase(m, key, Raw_Dynamic_Array, ops)
@@ -4239,6 +4258,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_U64: return i32_map_find(m, key, out_val, out_val_len, u64, ops)
 	case .MK_String:  return i32_map_find(m, key, out_val, out_val_len, string, ops)
 	case .MK_DynArrayStr: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
+	case .MK_ArrayMonsterStringPair: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)
 	case .MK_StatueLimbArray: return i32_map_find(m, key, out_val, out_val_len, Raw_Dynamic_Array, ops)

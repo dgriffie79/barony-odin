@@ -26064,7 +26064,7 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 									}
 									if ( allyType >= 0 )
 									{
-										allyTable[(Monster)monsterType].push_back(std::make_pair((Monster)allyType, entry_itr->value.GetString()));
+										allyTable[(Monster)monsterType].push_back(MonsterStringPair_t{(Monster)allyType, entry_itr->value.GetString()});
 									}
 								}
 							}

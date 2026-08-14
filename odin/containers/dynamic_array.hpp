@@ -224,6 +224,7 @@ enum DynamicArrayKind {
     Kind_FollowerBarPair = 34,
     Kind_StringPair = 35,
     Kind_SurfacePtrStringPair = 36,
+    Kind_MonsterStringPair = 37,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };

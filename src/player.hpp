@@ -643,6 +643,13 @@ void initGameControllers();
 static const unsigned NUM_HOTBAR_SLOTS = 10; //NOTE: If you change this, you must dive into drawstatus.c and update the hotbar code. It expects 10.
 static const unsigned NUM_HOTBAR_ALTERNATES = 5;
 
+struct MonsterStringPair_t {
+	Monster first;
+	DynamicString second;
+};
+template <> struct DynamicArrayKindOf<MonsterStringPair_t> { static constexpr int value = Kind_MonsterStringPair; };
+template <> struct MapValueKindOf<DynamicArrayT<MonsterStringPair_t>> { static constexpr int value = MK_ArrayMonsterStringPair; };
+
 class Player
 {
 	//Splitscreen support. Every player gets their own screen.
@@ -1462,7 +1469,7 @@ public:
 			DynamicArrayStr potionNamesToFilter;
 			DynamicMapI32T<DynamicArrayS32> leadershipAllyTableBase;
 			DynamicMapI32T<DynamicArrayS32> leadershipAllyTableLegendary;
-			std::map<Monster, std::vector<std::pair<Monster, std::string>>> leadershipAllyTableSpecialRecruitment;
+			DynamicMapI32T<DynamicArrayT<MonsterStringPair_t>> leadershipAllyTableSpecialRecruitment;
 		} skillSheetData;
 
 		void selectSkill(int skill);
