@@ -511,6 +511,7 @@ enum MapValueKind {
     MK_StrI32Map = 60,           // nested map<int,map<string,map<int,i32>>> (owning)
     MK_IntPair = 61,             // pair<int,int> (8B POD)
     MK_I32MapIntPair = 62,       // nested map<Uint32,map<int,pair<int,int>>> (owning)
+    MK_ArrayStringPair = 63,     // vector<pair<string,string>> (owning Raw_Dynamic_Array of string pairs)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -1069,6 +1070,8 @@ using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
 using DynamicArrayStringPair = DynamicArrayT<DynamicStringPair_t>;  // vector<pair<string,string>>
+using DynamicMapStrArrayStringPair = DynamicMapStrT<DynamicArrayStringPair>;  // map<string, vector<pair<string,string>>>
+template <> struct MapValueKindOf<DynamicArrayStringPair> { static constexpr int value = MK_ArrayStringPair; };
 using DynamicArraySurfacePtrStringPair = DynamicArrayT<SurfacePtrStringPair_t>;  // vector<pair<SDL_Surface**, string>>
 using DynamicMapStrI32Map = DynamicMapStrT<DynamicMapI32T<int>>;   // map<string, map<int,int>>
 template <> struct MapValueKindOf<DynamicMapStrI32Map> { static constexpr int value = MK_StrI32Map; };

@@ -1025,7 +1025,7 @@ void sortAchievementsForDisplay()
 	for ( auto& entry : Compendium_t::AchievementData_t::achievementNamesSorted )
 	{
 		auto& achData = Compendium_t::achievements[entry.first];
-		Compendium_t::AchievementData_t::achievementCategories[achData.category].push_back(entry);
+		Compendium_t::AchievementData_t::achievementCategories[achData.category].push_back(DynamicStringPair_t{entry.first, entry.second});
 	}
 
 	Compendium_t::AchievementData_t::achievementsBookDisplay.clear();

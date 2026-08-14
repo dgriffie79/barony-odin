@@ -3582,7 +3582,7 @@ struct Compendium_t
 		static void pointsChangeEvent(Sint32 amount);
 	};
 
-	static void readContentsLang(std::string name, std::map<std::string, std::vector<std::pair<std::string, std::string>>>& contents,
+	static void readContentsLang(std::string name, DynamicMapStrArrayStringPair& contents,
 		DynamicMapStr& contentsMap);
 	enum CompendiumUnlockStatus : int {
 		LOCKED_UNKNOWN,
@@ -3621,10 +3621,10 @@ struct Compendium_t
 		static bool achievementsNeedFirstData;
 		typedef std::function<bool(std::pair<std::string, std::string>, std::pair<std::string, std::string>)> Comparator;
 		static std::set<std::pair<std::string, std::string>, Comparator> achievementNamesSorted;
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> achievementCategories;
+		static DynamicMapStrArrayStringPair achievementCategories;
 		static DynamicSetStr achievementUnlockedLookup;
 		static void onAchievementUnlock(const char* ach);
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static DynamicMapI32 unlocks;
 		static int completionPercent;
@@ -4078,9 +4078,9 @@ struct Compendium_t
 			int lorePoints = 0;
 			DynamicArrayS32 getDisplayStat(const char* name);
 		};
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents_unfiltered;
+		static DynamicMapStrArrayStringPair contents_unfiltered;
 		static void readContentsLang();
 		static DynamicMapI32 unlocks;
 		static int completionPercent;
@@ -4124,7 +4124,7 @@ struct Compendium_t
 			int id = -1;
 			int lorePoints = 0;
 		};
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
 		static DynamicMapI32 unlocks;
@@ -4152,7 +4152,7 @@ struct Compendium_t
 			int lorePoints = 0;
 			bool enableTutorial = false;
 		};
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
 		static DynamicMapI32 unlocks;
@@ -4183,7 +4183,7 @@ struct Compendium_t
 			DynamicArrayT<CodexItem_t> items_in_category;
 			int lorePoints = 0;
 		};
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
 		static DynamicMapI32 unlocks;
@@ -4197,7 +4197,7 @@ struct Compendium_t
 
 	struct CompendiumMagic_t
 	{
-		static std::map<std::string, std::vector<std::pair<std::string, std::string>>> contents;
+		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static void readContentsLang();
 		static int completionPercent;

@@ -12564,23 +12564,23 @@ Entity Compendium_t::compendiumItemModel(-1, 0, nullptr, nullptr);
 bool Compendium_t::tooltipNeedUpdate = false;
 SDL_Rect Compendium_t::tooltipPos;
 
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumMonsters_t::contents;
 DynamicMapStr Compendium_t::CompendiumMonsters_t::contentsMap;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMonsters_t::contents_unfiltered;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumMonsters_t::contents_unfiltered;
 DynamicMapI32 Compendium_t::CompendiumMonsters_t::unlocks;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumWorld_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumWorld_t::contents;
 DynamicMapStr Compendium_t::CompendiumWorld_t::contentsMap;
 DynamicMapI32 Compendium_t::CompendiumWorld_t::unlocks;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumCodex_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumCodex_t::contents;
 DynamicMapStr Compendium_t::CompendiumCodex_t::contentsMap;
 DynamicMapI32 Compendium_t::CompendiumCodex_t::unlocks;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumItems_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumItems_t::contents;
 DynamicMapStr Compendium_t::CompendiumItems_t::contentsMap;
 DynamicMapI32 Compendium_t::CompendiumItems_t::unlocks;
 DynamicMapI32T<Compendium_t::CompendiumUnlockStatus> Compendium_t::CompendiumItems_t::itemUnlocks;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::CompendiumMagic_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::CompendiumMagic_t::contents;
 DynamicMapStr Compendium_t::CompendiumMagic_t::contentsMap;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::AchievementData_t::contents;
+DynamicMapStrArrayStringPair Compendium_t::AchievementData_t::contents;
 DynamicMapI32 Compendium_t::AchievementData_t::unlocks;
 DynamicMapStr Compendium_t::AchievementData_t::contentsMap;
 int Compendium_t::CompendiumMonsters_t::completionPercent = 0;
@@ -12601,7 +12601,7 @@ DynamicMapI32Str Compendium_t::Events_t::codexIDToString;
 DynamicMapI32Str Compendium_t::Events_t::worldIDToString;
 DynamicMapI32Str Compendium_t::Events_t::itemIDToString;
 
-void Compendium_t::readContentsLang(std::string name, std::map<std::string, std::vector<std::pair<std::string, std::string>>>& contents,
+void Compendium_t::readContentsLang(std::string name, DynamicMapStrArrayStringPair& contents,
 	DynamicMapStr& contentsMap)
 {
 	contents.clear();
@@ -12645,7 +12645,7 @@ void Compendium_t::readContentsLang(std::string name, std::map<std::string, std:
 	{
 		for ( auto itr2 = itr->MemberBegin(); itr2 != itr->MemberEnd(); ++itr2 )
 		{
-			contents["default"].push_back(std::make_pair(itr2->value.GetString(), itr2->name.GetString()));
+			contents["default"].push_back(DynamicStringPair_t{itr2->value.GetString(), itr2->name.GetString()});
 			if ( name == "contents_monsters"
 				&& (!strcmp(itr2->value.GetString(), "crab") || !strcmp(itr2->value.GetString(), "bubbles")) )
 			{
@@ -12664,7 +12664,7 @@ void Compendium_t::readContentsLang(std::string name, std::map<std::string, std:
 		{
 			for ( auto itr2 = itr->MemberBegin(); itr2 != itr->MemberEnd(); ++itr2 )
 			{
-				contents["alphabetical"].push_back(std::make_pair(itr2->value.GetString(), itr2->name.GetString()));
+				contents["alphabetical"].push_back(DynamicStringPair_t{itr2->value.GetString(), itr2->name.GetString()});
 				if ( name == "contents_monsters"
 					&& (!strcmp(itr2->value.GetString(), "crab") || !strcmp(itr2->value.GetString(), "bubbles")) )
 				{
@@ -19172,7 +19172,7 @@ int Compendium_t::lorePointsFromAchievements = 0;
 int Compendium_t::lorePointsAchievementsTotal = 0;
 int Compendium_t::lorePointsSpent = 0;
 std::set<std::pair<std::string, std::string>, Compendium_t::AchievementData_t::Comparator> Compendium_t::AchievementData_t::achievementNamesSorted;
-std::map<std::string, std::vector<std::pair<std::string, std::string>>> Compendium_t::AchievementData_t::achievementCategories;
+DynamicMapStrArrayStringPair Compendium_t::AchievementData_t::achievementCategories;
 std::map<std::string, Compendium_t::AchievementData_t::CompendiumAchievementsDisplay> Compendium_t::AchievementData_t::achievementsBookDisplay;
 DynamicSetStr Compendium_t::AchievementData_t::achievementUnlockedLookup;
 bool Compendium_t::AchievementData_t::sortAlphabetical = false;
