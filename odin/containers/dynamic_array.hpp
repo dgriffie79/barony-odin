@@ -277,6 +277,12 @@ public:
 
     int64_t size() const { return barony_dynamic_array_elem_len(const_cast<DynamicArray*>(&raw), sizeof(T)); }
     bool empty() const { return size() == 0; }
+    bool contains(const T& v) const {
+        for (int64_t i = 0; i < size(); ++i) {
+            if ((*this)[i] == v) return true;
+        }
+        return false;
+    }
     T* data() { return (T*)raw.data; }
     const T* data() const { return (const T*)raw.data; }
     T& back() { return (*this)[size() - 1]; }

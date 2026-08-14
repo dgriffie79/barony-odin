@@ -31446,7 +31446,7 @@ int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerI
 	return 1000;
 }
 
-void Entity::alertAlliesOnBeingHit(Entity* attacker, std::unordered_set<Entity*>* skipEntitiesToAlert)
+void Entity::alertAlliesOnBeingHit(Entity* attacker, DynamicArrayT<Entity*>* skipEntitiesToAlert)
 {
 	if ( !attacker ) 
 	{ 
@@ -31480,7 +31480,7 @@ void Entity::alertAlliesOnBeingHit(Entity* attacker, std::unordered_set<Entity*>
 	{
 		Entity* entity = (Entity*)node->element;
 		if ( !entity ) { continue; }
-		if ( skipEntitiesToAlert && (skipEntitiesToAlert->find(entity) != skipEntitiesToAlert->end()) )
+		if ( skipEntitiesToAlert && skipEntitiesToAlert->contains(entity) )
 		{
 			continue;
 		}

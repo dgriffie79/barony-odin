@@ -973,7 +973,7 @@ public:
 	bool checkEnemy(Entity* your);
 	bool checkFriend(Entity* your);
 	bool friendlyFireProtection(Entity* your);
-	void alertAlliesOnBeingHit(Entity* attacker, std::unordered_set<Entity*>* skipEntitiesToAlert = nullptr);
+	void alertAlliesOnBeingHit(Entity* attacker, DynamicArrayT<Entity*>* skipEntitiesToAlert = nullptr);
 
 	//Act functions.
 	void actChest();

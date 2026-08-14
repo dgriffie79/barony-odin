@@ -2143,7 +2143,7 @@ void actThrown(Entity* my)
 					// alert other monsters too
 					if ( alertAllies && !targetHealed )
 					{
-						std::unordered_set<Entity*> entitiesToSkip = { polymorphedTarget };
+						DynamicArrayT<Entity*> entitiesToSkip = { polymorphedTarget };
 						hit.entity->alertAlliesOnBeingHit(parent, &entitiesToSkip);
 					}
 					hit.entity->updateEntityOnHit(parent, alertTarget);
