@@ -1343,9 +1343,9 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 			playSound(399, 64); 
 		}
 	}
-	minimapPings[destPlayer].len += (int64_t)sizeof(MinimapPing);
 	{
 		auto& _mpa = minimapPings[destPlayer];
+		dynarray_push<MinimapPing>(_mpa, newPing); // allocates if needed (was: raw .len += sizeof -> null data on first ping)
 		for ( int64_t _k = dynarray_size<MinimapPing>(_mpa) - 1; _k > 0; --_k )
 			(*dynarray_at<MinimapPing>(_mpa, _k)) = (*dynarray_at<MinimapPing>(_mpa, _k - 1));
 		*dynarray_at<MinimapPing>(_mpa, 0) = newPing;
