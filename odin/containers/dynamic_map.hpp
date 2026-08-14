@@ -559,6 +559,8 @@ enum MapValueKind {
     MK_Event = 72,                   // Events_t::Event_t (owning string + set)
     MK_EventVal = 73,                // Events_t::EventVal_t (16B POD)
     MK_I32MapEventVal = 74,          // nested map<int, EventVal_t> (owning)
+    MK_Setting = 75,                 // Player::WorldUI_t::...::Setting_t (56B POD)
+    MK_Dialogue = 76,                // Player::WorldUI_t::...::Dialogue_t (owning 2 strings)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.

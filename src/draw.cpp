@@ -2348,19 +2348,18 @@ void drawEntities3D(view_t* camera, int mode)
 				spritesToDraw.push_back(std::make_tuple(camDist, &players[i]->worldUI.worldTooltipDialogue.playerDialogue, SPRITE_DIALOGUE));
 			}
 		}
-		for ( auto it = players[i]->worldUI.worldTooltipDialogue.sharedDialogues.begin();
-			it != players[i]->worldUI.worldTooltipDialogue.sharedDialogues.end(); ++it )
+		players[i]->worldUI.worldTooltipDialogue.sharedDialogues.forEach([&](int, auto& dialogue)
 		{
-			if ( it->second.init && it->second.draw )
+			if ( dialogue.init && dialogue.draw )
 			{
 				if ( i == currentPlayerViewport )
 				{
-					real_t camDist = (pow(camera->x * 16.0 - it->second.x, 2)
-						+ pow(camera->y * 16.0 - it->second.y, 2));
-					spritesToDraw.push_back(std::make_tuple(camDist, &it->second, SPRITE_DIALOGUE));
+					real_t camDist = (pow(camera->x * 16.0 - dialogue.x, 2)
+						+ pow(camera->y * 16.0 - dialogue.y, 2));
+					spritesToDraw.push_back(std::make_tuple(camDist, &dialogue, SPRITE_DIALOGUE));
 				}
 			}
-		}
+		});
 	}
 #endif
 

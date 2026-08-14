@@ -7678,10 +7678,10 @@ extern "C" int barony_main(int argc, char** argv)
 						bar.updateWorldCoordinates(); // update enemy bar world coordinates before drawEntities3D called
 					});
 					players[c]->worldUI.worldTooltipDialogue.playerDialogue.updateWorldCoordinates(); // update dialogue world coordinates before drawEntities3D called
-					for ( auto& worldTooltipDialogue : players[c]->worldUI.worldTooltipDialogue.sharedDialogues )
+					players[c]->worldUI.worldTooltipDialogue.sharedDialogues.forEach([&](int, auto& worldTooltipDialogue)
 					{
-						worldTooltipDialogue.second.updateWorldCoordinates();
-					}
+						worldTooltipDialogue.updateWorldCoordinates();
+					});
 				}
 
 				if ( !MainMenu::isCutsceneActive() && fadealpha < 255 )

@@ -271,8 +271,7 @@ DamageIndicatorSettings_t damageIndicatorSettings;
 std::vector<int> LevelUpAnimBreakpoints;
 LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];
 
-std::map<Player::WorldUI_t::WorldTooltipDialogue_t::DialogueType_t, 
-	Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t> Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::settings;
+DynamicMapI32T<Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t> Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::settings;
 real_t Player::WorldUI_t::WorldTooltipItem_t::WorldItemSettings_t::scaleMod = 0.0;
 real_t Player::WorldUI_t::WorldTooltipItem_t::WorldItemSettings_t::opacity = 0.0;
 
@@ -41714,21 +41713,22 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::deactivate()
 void Player::WorldUI_t::WorldTooltipDialogue_t::update()
 {
 	playerDialogue.update();
+	sharedDialogues.forEach([&](int, auto& d)
+	{
+		d.update();
+	});
+	std::vector<int> toErase;
 	for ( auto& d : sharedDialogues )
 	{
-		d.second.update();
+		if ( !d.second.active && d.second.alpha <= 0.0
+			&& (ticks - d.second.spawnTick >= d.second.expiryTicks) )
+		{
+			toErase.push_back(d.first);
+		}
 	}
-	for ( auto it = sharedDialogues.cbegin(); it != sharedDialogues.cend(); )
+	for ( int key : toErase )
 	{
-		if ( !it->second.active && it->second.alpha <= 0.0
-			&& (ticks - it->second.spawnTick >= it->second.expiryTicks) )
-		{
-			it = sharedDialogues.erase(it);
-		}
-		else
-		{
-			++it;
-		}
+		sharedDialogues.erase(key);
 	}
 }
 

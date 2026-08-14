@@ -2074,7 +2074,7 @@ public:
 				};
 			};
 			Dialogue_t playerDialogue;
-			std::map<Uint32, Dialogue_t> sharedDialogues;
+			DynamicMapI32T<Dialogue_t> sharedDialogues;
 			int getPlayerNum() { return player.playernum; }
 			WorldTooltipDialogue_t(Player& p) : player(p)
 			{};
@@ -2097,7 +2097,7 @@ public:
 					int padAfterFirstLine = 0;
 					real_t scaleMod = 0.0;
 				};
-				static std::map<Player::WorldUI_t::WorldTooltipDialogue_t::DialogueType_t, Setting_t> settings;
+				static DynamicMapI32T<Setting_t> settings;
 			};
 		} worldTooltipDialogue;
 
@@ -2468,6 +2468,8 @@ template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::Sk
 template <> struct DynamicArrayKindOf<Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t> { static constexpr int value = Kind_SkillEntry; };
 template <> struct DynamicArrayKindOf<std::pair<Uint32, Player::HUD_t::FollowerBar_t>> { static constexpr int value = Kind_FollowerBarPair; };
 template <> struct MapValueKindOf<Player::GUIDropdown_t::DropDown_t> { static constexpr int value = MK_DropDown; };
+template <> struct MapValueKindOf<Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t> { static constexpr int value = MK_Setting; };
+template <> struct MapValueKindOf<Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t> { static constexpr int value = MK_Dialogue; };
 
 
 extern Player* players[MAXPLAYERS];
