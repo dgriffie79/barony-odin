@@ -75,21 +75,17 @@ their own section at the bottom (fixed-size, low priority).
 - `savegamesList` — `extern vector<tuple<int,int,int,string>>`
 - `getResolutionList(int, std::list<resolution>&)` — out-param
 
-### src/mod_tools.hpp (event block + timepoints + one keep)
+### src/mod_tools.hpp (2 deferred + 1 keep)
 
-Event block (enum-keyed maps; needs `map[EventTags]V` + set value kinds):
-- `events` — `static map<EventTags, Event_t>`
-- `itemEventLookup` — `static map<int, set<EventTags>>`
-- `eventItemLookup` / `eventMonsterLookup` — `static map<EventTags, set<int>>`
-- `eventWorldLookup` / `eventCodexLookup` — `static map<EventTags, set<string>>`
-- `eventClassIds` — `static map<EventTags, map<int,int>>`
-- `eventLangEntries` — `static map<EventTags, map<string,string>>`
-- `eventCustomLangEntries` — `static map<string, map<string,string>>`
-- `playerEvents` — `static map<EventTags, map<int, EventVal_t>>`
-- `serverPlayerEvents[MAXPLAYERS]` — `static map<EventTags, map<int, EventVal_t>>`
+Event block is **DONE** (D3d9: `events`, `itemEventLookup`, `eventItemLookup`,
+`eventMonsterLookup`, `eventWorldLookup`, `eventCodexLookup`, `eventClassIds`,
+`eventLangEntries`, `eventCustomLangEntries`, `playerEvents`,
+`serverPlayerEvents` → i32-keyed DynamicMaps; new `MK_SetOfStr`, `MK_Event`,
+`MK_EventVal`, `MK_I32MapEventVal` kinds).
 
-Timepoints:
-- `timepoints` — `map<string, vector<pair<string, time_point>>>` (needs a `time_point` value kind)
+Port-with-file (defer):
+- `timepoints` — `map<string, vector<pair<string, time_point>>>` (dormant debug
+  utility; needs a `time_point` value kind — disproportionate for a debug timer)
 
 Keep (order-dependent):
 - `achievementNamesSorted` — `set<pair<string,string>, Comparator>` **KEEP**
