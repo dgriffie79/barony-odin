@@ -95,13 +95,13 @@ Keep (order-dependent):
 ### src/net.hpp (1 — port-with-file)
 - `game_packets` — `queue<SteamPacketWrapper*>`
 
-### src/player.hpp (6)
-- `allDropDowns` — `static map<string, DropDown_t>` (has a `MK_DropDown` value kind already)
-- `leadershipAllyTableSpecialRecruitment` — `map<Monster, vector<pair<Monster,string>>>`
-- `notification_messages` — `list<Message*>`
-- `sharedDialogues` — `map<Uint32, Dialogue_t>`
-- `settings` — `static map<DialogueType_t, Setting_t>`
-- `mapDetails` — `static vector<pair<string,string>>`
+### src/player.hpp (done — D3db…D3dd)
+- `mapDetails` → `DynamicArrayStringPair`, `allDropDowns` → `DynamicMapStrT`,
+  `notification_messages` → `DynamicArrayT<Message*>`, `settings` /
+  `sharedDialogues` → `DynamicMapI32T` (new `MK_Setting`, `MK_Dialogue`),
+  `leadershipAllyTableSpecialRecruitment` → `DynamicMapI32T<DynamicArrayT<…>>`
+  (new `Kind_MonsterStringPair` + `MK_ArrayMonsterStringPair`)
+- Only `std::array` members remain (see bottom section)
 
 ### src/scores.hpp (2 — KEEP)
 - `map_messages` / `additional_data` — `vector<pair<string,string>>` **KEEP**
