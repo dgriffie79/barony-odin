@@ -55,7 +55,7 @@ const int Player::Inventory_t::MAX_SPELLS_Y = 70;
 const int Player::Inventory_t::MAX_CHEST_X = 4;
 const int Player::Inventory_t::MAX_CHEST_Y = 3;
 
-std::array<GameController, MAX_GAME_CONTROLLERS> game_controllers;
+GameController game_controllers[MAX_GAME_CONTROLLERS];
 Inputs inputs;
 
 GameController::GameController()
@@ -6977,7 +6977,7 @@ void Player::clearGUIPointers()
 	minimap.mapWindow = nullptr;
 	minimap.mapParentFrame = nullptr;
 
-	std::fill(hotbar.hotbarSlotFrames.begin(), hotbar.hotbarSlotFrames.end(), nullptr);
+	std::fill(hotbar.hotbarSlotFrames, hotbar.hotbarSlotFrames + NUM_HOTBAR_SLOTS, nullptr);
 	hotbar.hotbarFrame = nullptr;
 
 	auto& genericGUI = GenericGUI[playernum];

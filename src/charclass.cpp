@@ -3744,7 +3744,7 @@ void initShapeshiftHotbar(int player)
 	for ( Uint32 slotIndex = 0; slotIndex < NUM_HOTBAR_SLOTS; ++slotIndex )
 	{
 		hotbar_alternate[Player::Hotbar_t::HOTBAR_DEFAULT][slotIndex].item = hotbar[slotIndex].item; // store our current hotbar.
-		hotbar[slotIndex].item = newHotbar->at(slotIndex).item; // load from the monster's hotbar.
+		hotbar[slotIndex].item = (*newHotbar)[slotIndex].item; // load from the monster's hotbar.
 	}
 
 	// find "shapeshift" only spells, add em to view.
@@ -3913,7 +3913,7 @@ void deinitShapeshiftHotbar(int player)
 	{
 		swapItem = hotbar[slotIndex].item;
 		hotbar[slotIndex].item = hotbar_alternate[Player::Hotbar_t::HOTBAR_DEFAULT][slotIndex].item; // swap back to default loadout
-		newHotbar->at(slotIndex).item = swapItem;
+		(*newHotbar)[slotIndex].item = swapItem;
 
 		// double check for shapeshift spells and remove them.
 		Item* item = uidToItem(hotbar[slotIndex].item);

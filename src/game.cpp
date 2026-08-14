@@ -4923,7 +4923,7 @@ bool handleEvents(void)
 
 				// now find a free controller slot.
                 int id = -1;
-				for ( int c = 0; c < game_controllers.size(); ++c )
+				for ( int c = 0; c < MAX_GAME_CONTROLLERS; ++c )
 				{
 					auto& controller = game_controllers[c];
 					if ( controller.isActive() )

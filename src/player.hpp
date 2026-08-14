@@ -324,7 +324,7 @@ public:
 	float y_forceMaxStrafeThreshold = 0.7;
 };
 const int MAX_GAME_CONTROLLERS = 16;
-extern std::array<GameController, MAX_GAME_CONTROLLERS> game_controllers;
+extern GameController game_controllers[MAX_GAME_CONTROLLERS];
 
 class Inputs
 {
@@ -2179,7 +2179,7 @@ public:
 				slotType = SLOT_MAX;
 			}
 		};
-		std::array<PaperDollSlot_t, kNumPaperDollSlots> dollSlots;
+		PaperDollSlot_t dollSlots[kNumPaperDollSlots];
 		//const int getSlotSize() const;
 		void initSlots()
 		{
@@ -2220,11 +2220,11 @@ public:
 	} paperDoll;
 
 	class Hotbar_t {
-		std::array<hotbar_slot_t, NUM_HOTBAR_SLOTS> hotbar;
-		std::array<std::array<hotbar_slot_t, NUM_HOTBAR_SLOTS>, NUM_HOTBAR_ALTERNATES> hotbar_alternate;
+		hotbar_slot_t hotbar[NUM_HOTBAR_SLOTS];
+		hotbar_slot_t hotbar_alternate[NUM_HOTBAR_ALTERNATES][NUM_HOTBAR_SLOTS];
 		Player& player;
 	public:
-		std::array<Frame*, NUM_HOTBAR_SLOTS> hotbarSlotFrames;
+		Frame* hotbarSlotFrames[NUM_HOTBAR_SLOTS];
 		int current_hotbar = 0;
 		bool hotbarShapeshiftInit[NUM_HOTBAR_ALTERNATES] = { false, false, false, false, false };
 		int swapHotbarOnShapeshift = 0;
@@ -2272,7 +2272,7 @@ public:
 		
 		real_t animHide = 0.0;
 
-		std::array<SDL_Rect, NUM_HOTBAR_SLOTS> faceButtonPositions;
+		SDL_Rect faceButtonPositions[NUM_HOTBAR_SLOTS];
 		const int getSlotSize() const { return 48; }
 		const int getHotbarStartY1() const { return -106; }
 		const int getHotbarStartY2() const { return -96; }

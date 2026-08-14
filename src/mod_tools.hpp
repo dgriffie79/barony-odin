@@ -4069,7 +4069,7 @@ struct Compendium_t
 			DynamicArrayS32 dex;
 			MonsterSpecies species;
 			DynamicArrayS32 lvl;
-			std::array<int, 7> resistances;
+			int resistances[7];
 			DynamicArrayStr abilities;
 			DynamicArrayStr inventory;
 			DynamicString imagePath = "";
