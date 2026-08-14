@@ -47,16 +47,15 @@ their own section at the bottom (fixed-size, low priority).
 
 ## Remaining header members (by file)
 
-### src/draw.hpp (3)
-- `Mesh::ElementsPerVBO` — `static const std::unordered_map<BufferType, int>` (enum key)
-- `Mesh::data` — `std::vector<float>[BufferType::Max]` (array of vectors)
-- `Chunk::tiles` — `std::vector<Sint32>`
+### src/draw.hpp (done — D3df)
+- `ElementsPerVBO` → static `int[BufferType::Max]`, `Mesh::data` →
+  `DynamicArrayT<float>[]`, `Chunk::tiles` → `DynamicArrayS32`
 
-### src/entity.hpp (1 signature)
-- `alertAlliesOnBeingHit(Entity*, std::unordered_set<Entity*>*)` — param
+### src/entity.hpp (done — D3di)
+- `alertAlliesOnBeingHit` param → `DynamicArrayT<Entity*>*`
 
-### src/game.hpp (1)
-- `DebugStatsClass::networkPackets` — `unordered_map<unsigned long, pair<string,int>>`
+### src/game.hpp (done — D3dg)
+- `networkPackets` → `DynamicMapI32T<NetworkPacket_t>` (`MK_NetworkPacket`)
 
 ### src/interface/interface.hpp (2)
 - `scrolls` — `unordered_map<string, pair<int,bool>>`
@@ -71,9 +70,9 @@ their own section at the bottom (fixed-size, low priority).
 - `surfaceCache` — `static map<int, map<tuple<...>, SDL_Surface*>>` (tuple-keyed)
 - `indicators` — `static map<Uint32, Indicator_t>` (owning)
 
-### src/menu.hpp (2)
-- `savegamesList` — `extern vector<tuple<int,int,int,string>>`
-- `getResolutionList(int, std::list<resolution>&)` — out-param
+### src/menu.hpp (done — D3dh)
+- `savegamesList` → `DynamicArrayT<SaveGameListEntry_t>` (`Kind_SaveGameListEntry`),
+  `getResolutionList` → `DynamicArrayT<resolution>&`
 
 ### src/mod_tools.hpp (2 deferred + 1 keep)
 
@@ -92,8 +91,8 @@ Keep (order-dependent):
   (custom std::function comparator + sorted iteration in init_game.cpp; port
   with file — hash sets would drop the ordering)
 
-### src/net.hpp (1 — port-with-file)
-- `game_packets` — `queue<SteamPacketWrapper*>`
+### src/net.hpp (done — D3dj)
+- `game_packets` → `DynamicArrayT<SteamPacketWrapper*>`
 
 ### src/player.hpp (done — D3db…D3dd)
 - `mapDetails` → `DynamicArrayStringPair`, `allDropDowns` → `DynamicMapStrT`,
