@@ -371,6 +371,7 @@ if host_system == 'windows'
         odin_root / 'messages.odin',
         odin_root / 'menu.odin',
         odin_root / 'net.odin',
+        odin_root / 'files.odin',
         odin_root / 'game.odin',
         odin_root / 'prng.odin',
         odin_root / 'containers' / 'dynamic_array.odin',
