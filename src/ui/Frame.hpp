@@ -7,7 +7,6 @@
 #include "Font.hpp"
 #include "Widget.hpp"
 
-#include <memory>
 
 class Field;
 class Button;
@@ -68,19 +67,6 @@ public:
 
 	struct entry_t;
 
-	//! list entry listener
-	struct listener_t {
-		listener_t(entry_t* _entry) :
-			entry(_entry) {}
-
-		void onDeleted();
-		void onChangeColor(bool selected, bool highlighted);
-		void onChangeName(const char* name);
-
-		//! Frame::entry_t*
-		entry_t* entry = nullptr;
-	};
-
 	//! frame list entry
 	struct entry_t {
 		entry_t(Frame& _parent) : parent(_parent) {}
@@ -108,8 +94,6 @@ public:
 		void (*highlight)(entry_t&) = nullptr;
 		void (*highlighting)(entry_t&) = nullptr;
 		void (*selected)(entry_t&) = nullptr;
-
-		std::shared_ptr<listener_t> listener;
 	};
 
 	//! frame processing result structure

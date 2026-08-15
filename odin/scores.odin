@@ -3,13 +3,6 @@ package main
 
 import "containers"
 
-// enum EFileFormat (json.hpp)
-EFileFormat :: enum i32 {
-	Json,
-	Json_Compact,
-	Binary,
-}
-
 // struct item_t (scores.hpp serialization mirror) — 32 bytes
 score_item_t :: struct {
 	type:       u32,

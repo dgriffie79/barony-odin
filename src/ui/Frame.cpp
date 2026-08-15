@@ -69,36 +69,6 @@ Frame* gui = nullptr;
 
 Frame::FrameSearchType Frame::findFrameDefaultSearchType = Frame::FRAME_SEARCH_BREADTH_FIRST;
 
-void Frame::listener_t::onDeleted() {
-	if (!entry) {
-		return;
-	}
-	Frame::entry_t* entryCast = (Frame::entry_t *)entry;
-	entryCast->suicide = true;
-}
-
-void Frame::listener_t::onChangeColor(bool selected, bool highlighted) {
-	if (!entry) {
-		return;
-	}
-	Frame::entry_t* entryCast = (Frame::entry_t *)entry;
-	if (selected) {
-		entryCast->color = makeColor( 255, 0, 0, 255);
-	} else if (highlighted) {
-		entryCast->color = makeColor( 255, 255, 0, 255);
-	} else {
-		entryCast->color = 0xffffffff;
-	}
-}
-
-void Frame::listener_t::onChangeName(const char* name) {
-	if (!entry) {
-		return;
-	}
-	Frame::entry_t* entryCast = (Frame::entry_t *)entry;
-	entryCast->text = name;
-}
-
 #ifndef EDITOR
 CvarBool ui_filter("/ui_filter", false);
 static ConsoleCommand ui_filter_refresh("/ui_filter_refresh", "refresh ui filter state",
