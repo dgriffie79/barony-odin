@@ -21130,8 +21130,8 @@ bool GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::isItemVisible(Item* item) c
 const int GenericGUIMenu::FeatherGUI_t::MAX_FEATHER_X = 1;
 const int GenericGUIMenu::FeatherGUI_t::MAX_FEATHER_Y = NUMLABELS - 1;
 
-bool GenericGUIMenu::FeatherGUI_t::scrollSortFunc(const std::pair<std::string, std::pair<int, bool>>& lhs, 
-	const std::pair<std::string, std::pair<int, bool>>& rhs)
+bool GenericGUIMenu::FeatherGUI_t::scrollSortFunc(const SortedScrollEntry_t& lhs, 
+	const SortedScrollEntry_t& rhs)
 {
 	int lhsVal = lhs.second.second == true ? 1 : 0; // second.second is identified status, convert to int
 	int rhsVal = rhs.second.second == true ? 1 : 0; // second.second is identified status, convert to int
@@ -21285,11 +21285,12 @@ void GenericGUIMenu::FeatherGUI_t::sortScrolls()
 
 	if ( !scrollListRequiresSorting )
 	{
-		for ( auto& entry : sortedScrolls )
+		for ( int64_t i = 0; i < sortedScrolls.size(); ++i )
 		{
-			if ( scrolls.find(entry.first) != scrolls.end() )
+			auto& entry = sortedScrolls[i];
+			if ( scrolls.find(entry.first.c_str()) != scrolls.end() )
 			{
-				entry.second = scrolls[entry.first];
+				entry.second = scrolls[entry.first.c_str()];
 			}
 		}
 		return;
@@ -21302,13 +21303,13 @@ void GenericGUIMenu::FeatherGUI_t::sortScrolls()
 		auto find = scrolls.find(scroll_label[i]);
 		if ( find != scrolls.end() )
 		{
-			sortedScrolls.push_back(std::make_pair((*find).first, (*find).second));
+			sortedScrolls.push_back(SortedScrollEntry_t{ DynamicString(find->first, find->first_len), find->second });
 		}
 	}
 	if ( sortType != SORT_SCROLL_DEFAULT )
 	{
-		std::sort(sortedScrolls.begin(), sortedScrolls.end(), [this](const std::pair<std::string, std::pair<int, bool>>& lhs,
-			const std::pair<std::string, std::pair<int, bool>>& rhs) {
+		sortedScrolls.sort([this](const SortedScrollEntry_t& lhs,
+			const SortedScrollEntry_t& rhs) {
 			return this->scrollSortFunc(lhs, rhs);
 		});
 	}
@@ -21381,7 +21382,8 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 						break;
 					}
 				}
-				scrolls[label] = std::make_pair(item->type, identified);
+				scrolls[label].first = item->type;
+				scrolls[label].second = identified;
 			}
 		}
 	}
@@ -21389,8 +21391,9 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 	sortScrolls();
 
 	int index = 0;
-	for ( auto& scroll : sortedScrolls )
+	for ( int64_t si = 0; si < sortedScrolls.size(); ++si )
 	{
+		auto& scroll = sortedScrolls[si];
 		Item* scrollItem = nullptr;
 		for ( node_t* node = parentGUI.scribingTotalItems.first; node; node = node->next )
 		{
@@ -22412,8 +22415,9 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 				}
 				char buf[128] = "";
 				int index = 0;
-				for ( auto& scroll : sortedScrolls )
+				for ( int64_t si = 0; si < sortedScrolls.size(); ++si )
 				{
+					auto& scroll = sortedScrolls[si];
 					if ( scroll.first == inscribeSuccessName )
 					{
 						if ( auto frame = getFeatherSlotFrame(0, index) )

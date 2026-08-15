@@ -222,6 +222,7 @@ Kind_FieldCacheEntry           :: 39
 Kind_UIToastNotification        :: 40
 Kind_MonsterStringPair          :: 37
 Kind_SaveGameListEntry           :: 38
+Kind_SortedScrollEntry           :: 41
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -1497,6 +1498,25 @@ field_cache_entry_free :: proc(p: rawptr) {
 	v := (^FieldCacheEntry_t)(p)
 	dynamic_string_free_elem(rawptr(&v.first))
 }
+
+// SortedScrollEntry_t — 24B owning (string + {int,bool}). Value for
+// GenericGUIMenu::FeatherGUI_t::sortedScrolls.
+SortedScrollEntry_t :: struct {
+	first:  string,
+	second: ScrollEntry_t,
+}
+#assert(size_of(SortedScrollEntry_t) == 24)
+
+sorted_scroll_entry_free :: proc(p: rawptr) {
+	v := (^SortedScrollEntry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+}
+sorted_scroll_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SortedScrollEntry_t)(dst)
+	s := (^SortedScrollEntry_t)(src)
+	d.second = s.second
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+}
 field_cache_entry_copy :: proc(dst: rawptr, src: rawptr) {
 	d := (^FieldCacheEntry_t)(dst)
 	s := (^FieldCacheEntry_t)(src)
@@ -1803,7 +1823,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [41]Element_Ops{
+element_ops := [42]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1845,6 +1865,7 @@ element_ops := [41]Element_Ops{
 	38 = { free = save_game_list_entry_free, copy = save_game_list_entry_copy },
 	39 = { free = field_cache_entry_free, copy = field_cache_entry_copy },
 	40 = { free = ui_toast_free, copy = ui_toast_copy },
+	41 = { free = sorted_scroll_entry_free, copy = sorted_scroll_entry_copy },
 }
 
 @(export)

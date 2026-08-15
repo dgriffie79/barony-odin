@@ -509,6 +509,20 @@ struct ChunkDither_t {
     uint32_t lastUpdateTick = 0;
 };
 
+// ScrollEntry_t — 8B POD mirror of std::pair<int,bool>. Value for
+// GenericGUIMenu::FeatherGUI_t::scrolls (unordered_map<string, pair<int,bool>>).
+struct ScrollEntry_t {
+    int32_t first = 0;   // item->type
+    bool second = false; // identified
+};
+
+// SortedScrollEntry_t — 24B owning mirror of std::pair<string, pair<int,bool>>.
+// Value for GenericGUIMenu::FeatherGUI_t::sortedScrolls.
+struct SortedScrollEntry_t {
+    DynamicString first;   // scroll label (owned)
+    ScrollEntry_t second;  // { type, identified }
+};
+
 
 
 // ---- value kinds (must match value_kind mapping in dynamic_map.odin) ----
@@ -592,6 +606,7 @@ enum MapValueKind {
     MK_Dialogue = 76,                // Player::WorldUI_t::...::Dialogue_t (owning 2 strings)
     MK_ArrayMonsterStringPair = 77,  // vector<pair<Monster,string>> (owning array of pair<int,string>)
     MK_NetworkPacket = 78,           // DebugStatsClass::networkPackets value (DynamicString + int)
+    MK_ScrollEntry = 79,             // pair<int,bool> (8B POD)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -624,6 +639,9 @@ template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value 
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };
 template <> struct MapValueKindOf<DynamicSetStr> { static constexpr int value = MK_SetOfStr; };
 template <> struct MapValueKindOf<NetworkPacket_t> { static constexpr int value = MK_NetworkPacket; };
+template <> struct MapValueKindOf<ScrollEntry_t> { static constexpr int value = MK_ScrollEntry; };
+// Array elem kind for vector<pair<string, pair<int,bool>>> (sortedScrolls).
+template <> struct DynamicArrayKindOf<SortedScrollEntry_t> { static constexpr int value = Kind_SortedScrollEntry; };
 template <> struct MapValueKindOf<bool> { static constexpr int value = MK_Bool; };
 
 // 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.
@@ -1152,6 +1170,8 @@ using DynamicMapClass = DynamicMapStrT<Class_tMirror>;
 using DynamicMapStrArrStr = DynamicMapStrT<DynamicArrayStr>;       // map<string, vector<string>>
 using DynamicMapI32Str = DynamicMapI32T<DynamicString>;           // map<int,string>
 using DynamicMapStringPair = DynamicMapStrT<DynamicStringPair_t>;  // map<string, pair<string,string>>
+using DynamicMapScrollEntry = DynamicMapStrT<ScrollEntry_t>;         // map<string, pair<int,bool>>
+using DynamicArraySortedScrollEntry = DynamicArrayT<SortedScrollEntry_t>;  // vector<pair<string, pair<int,bool>>>
 using DynamicArrayStringPair = DynamicArrayT<DynamicStringPair_t>;  // vector<pair<string,string>>
 using DynamicMapStrArrayStringPair = DynamicMapStrT<DynamicArrayStringPair>;  // map<string, vector<pair<string,string>>>
 template <> struct MapValueKindOf<DynamicArrayStringPair> { static constexpr int value = MK_ArrayStringPair; };

@@ -1172,12 +1172,12 @@ public:
 		SortTypes_t sortType = SORT_SCROLL_DEFAULT;
 		void sortScrolls();
 		void updateScrolls();
-		std::unordered_map<std::string, std::pair<int, bool>> scrolls;
-		std::vector<std::pair<std::string, std::pair<int, bool>>> sortedScrolls;
+		DynamicMapScrollEntry scrolls;
+		DynamicArraySortedScrollEntry sortedScrolls;
 		bool scrollListRequiresSorting = false;
 		void changeSortingType(SortTypes_t newType);
-		bool scrollSortFunc(const std::pair<std::string, std::pair<int, bool>>& lhs,
-			const std::pair<std::string, std::pair<int, bool>>& rhs);
+		bool scrollSortFunc(const SortedScrollEntry_t& lhs,
+			const SortedScrollEntry_t& rhs);
 	};
 	FeatherGUI_t featherGUI;
 
