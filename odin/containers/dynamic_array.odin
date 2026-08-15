@@ -219,6 +219,7 @@ Kind_FollowerBarPair         :: 34
 Kind_StringPair               :: 35
 Kind_SurfacePtrStringPair      :: 36
 Kind_FieldCacheEntry           :: 39
+Kind_UIToastNotification        :: 40
 Kind_MonsterStringPair          :: 37
 Kind_SaveGameListEntry           :: 38
 Kind_I32Map          :: 13
@@ -1450,6 +1451,48 @@ FieldCacheEntry_t :: struct {
 }
 #assert(size_of(FieldCacheEntry_t) == 24)
 
+// UIToastNotification - 320B with 7 owned DynamicStrings + raw ptrs.
+// The Odin mirror lives in the game package; the containers handlers only need
+// the string offsets, so they operate on a minimal layout-matching view.
+UIToastStrings_t :: struct #packed {
+	_0: [32]u8,  // actionFlags..posy
+	notificationImage: string,
+	_1: [80]u8,  // isInit..idleTicksToHide (32+16+80 = 128)
+	displayedText: string,     // 128
+	mainCardText: string,      // 144
+	secondaryCardText: string, // 160
+	headerCardText: string,    // 176
+	actionText: string,        // 192
+	_2: [16]u8,  // statisticUpdateCurrent..pendingStatisticUpdateCurrent (192+80=272? no)
+	achievementID: string,     // 224
+	_3: [80]u8,  // skipDrawing..progressBarBackground (224+16+80 = 320)
+}
+#assert(size_of(UIToastStrings_t) == 320)
+
+ui_toast_free :: proc(p: rawptr) {
+	v := (^UIToastStrings_t)(p)
+	dynamic_string_free_elem(rawptr(&v.notificationImage))
+	dynamic_string_free_elem(rawptr(&v.displayedText))
+	dynamic_string_free_elem(rawptr(&v.mainCardText))
+	dynamic_string_free_elem(rawptr(&v.secondaryCardText))
+	dynamic_string_free_elem(rawptr(&v.headerCardText))
+	dynamic_string_free_elem(rawptr(&v.actionText))
+	dynamic_string_free_elem(rawptr(&v.achievementID))
+}
+ui_toast_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^UIToastStrings_t)(dst)
+	s := (^UIToastStrings_t)(src)
+	// copy the whole 320B then deep-copy the strings so dst owns its own buffers
+	mem.copy(d, s, 320)
+	dynamic_string_copy_elem(rawptr(&d.notificationImage), rawptr(&s.notificationImage))
+	dynamic_string_copy_elem(rawptr(&d.displayedText), rawptr(&s.displayedText))
+	dynamic_string_copy_elem(rawptr(&d.mainCardText), rawptr(&s.mainCardText))
+	dynamic_string_copy_elem(rawptr(&d.secondaryCardText), rawptr(&s.secondaryCardText))
+	dynamic_string_copy_elem(rawptr(&d.headerCardText), rawptr(&s.headerCardText))
+	dynamic_string_copy_elem(rawptr(&d.actionText), rawptr(&s.actionText))
+	dynamic_string_copy_elem(rawptr(&d.achievementID), rawptr(&s.achievementID))
+}
+
 field_cache_entry_free :: proc(p: rawptr) {
 	v := (^FieldCacheEntry_t)(p)
 	dynamic_string_free_elem(rawptr(&v.first))
@@ -1760,7 +1803,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [40]Element_Ops{
+element_ops := [41]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1801,6 +1844,7 @@ element_ops := [40]Element_Ops{
 	37 = { free = monster_string_pair_free, copy = monster_string_pair_copy },
 	38 = { free = save_game_list_entry_free, copy = save_game_list_entry_copy },
 	39 = { free = field_cache_entry_free, copy = field_cache_entry_copy },
+	40 = { free = ui_toast_free, copy = ui_toast_copy },
 }
 
 @(export)

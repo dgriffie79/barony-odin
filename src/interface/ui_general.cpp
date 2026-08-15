@@ -480,15 +480,17 @@ void UIToastNotificationManager_t::drawNotifications(bool isMoviePlaying, bool b
 	frame->bringToTop();
 
 	int cardPosY = 110; // update the card y values if number of notifications change.
-	for ( auto& card : allNotifications )
+	for ( int64_t i = 0; i < allNotifications.size(); ++i )
 	{
+		auto& card = allNotifications[i];
 		card.skipDrawingCardThisTick = false;
 	}
 
 	bool bFirstDockedCard = true;
 
-	for ( auto& card : allNotifications )
+	for ( int64_t i = 0; i < allNotifications.size(); ++i )
 	{
+		auto& card = allNotifications[i];
 		if (isMoviePlaying || !intro)
 		{
 			if (!(card.actionFlags & UIToastNotification::ActionFlags::UI_NOTIFICATION_REMOVABLE))
@@ -530,8 +532,9 @@ void UIToastNotificationManager_t::drawNotifications(bool isMoviePlaying, bool b
 		maxAchievementCards = 1;
 	}
 	int currentNumAchievementCards = 0;
-	for ( auto& card : allNotifications )
+	for ( int64_t i = 0; i < allNotifications.size(); ++i )
 	{
+		auto& card = allNotifications[i];
 		if ( (isMoviePlaying || !intro) 
 			&& !(card.actionFlags & UIToastNotification::ActionFlags::UI_NOTIFICATION_REMOVABLE))
 		{
@@ -591,14 +594,23 @@ void UIToastNotificationManager_t::drawNotifications(bool isMoviePlaying, bool b
 		card.draw();
 	}
 
-	auto next = allNotifications.begin();
-	for ( auto it = allNotifications.begin(); it != allNotifications.end(); it = next )
+	for ( int64_t i = 0; i < allNotifications.size(); )
 	{
-		++next;
-		auto& card = *it;
+		auto& card = allNotifications[i];
 		if (card.getCardState() == UIToastNotification::CardState::UI_CARD_STATE_REMOVED)
 		{
-			allNotifications.erase(it);
+			// manual cleanup (no dtor in Odin): remove the frame from the widget
+			// tree, null the UI pointers; the owned DynamicStrings are freed by
+			// the array's Kind_UIToastNotification free handler.
+			if (card.frame) {
+				card.frame->removeSelf();
+				card.resetUIPointers();
+			}
+			allNotifications.erase(i);
+		}
+		else
+		{
+			++i;
 		}
 	}
 }
@@ -610,7 +622,7 @@ UIToastNotification* UIToastNotificationManager_t::addNotification(const char* i
 		init();
 	}
 
-	allNotifications.emplace_back(getImage(image));
+	allNotifications.push_back(UIToastNotification(getImage(image)));
 	auto& notification = allNotifications.back();
 	return &notification;
 }

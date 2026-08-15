@@ -40,12 +40,9 @@ public:
 	UIToastNotification(const char* image) :
 		notificationImage(image)
 	{}
-	~UIToastNotification() {
-		if (frame) {
-			frame->removeSelf();
-			resetUIPointers();
-		}
-	}
+	// No destructor: Odin has none. The frame cleanup (removeSelf + resetUIPointers)
+	// and string free happen explicitly where the element is removed from
+	// allNotifications (see UIToastNotificationManager_t::drawNotifications).
 
 	Uint32 actionFlags = 0;
 	enum ActionFlags : Uint32
@@ -195,6 +192,10 @@ private:
 	}
 };
 
+// owning array element: the 7 DynamicString members are deep-copied/freed by
+// the Kind_UIToastNotification handlers (Odin side).
+template <> struct DynamicArrayKindOf<UIToastNotification> { static constexpr int value = Kind_UIToastNotification; };
+
 class UIToastNotificationManager_t
 {
 	friend class UIToastNotification;
@@ -247,8 +248,9 @@ public:
 		}
 		else
 		{
-			for ( auto& n : allNotifications )
+			for ( int64_t i = 0; i < allNotifications.size(); ++i )
 			{
+				auto& n = allNotifications[i];
 				n.isInit = false;
 				n.resetUIPointers();
 			}
@@ -274,8 +276,9 @@ public:
 
 	UIToastNotification* getNotificationSingle(UIToastNotification::CardType cardType)
 	{
-		for ( auto& card : allNotifications )
+		for ( int64_t i = 0; i < allNotifications.size(); ++i )
 		{
+			auto& card = allNotifications[i];
 			if ( card.cardType == cardType )
 			{
 				return &card;
@@ -285,8 +288,9 @@ public:
 	}
 	UIToastNotification* getNotificationAchievementSingle(const char* achName)
 	{
-		for ( auto& card : allNotifications )
+		for ( int64_t i = 0; i < allNotifications.size(); ++i )
 		{
+			auto& card = allNotifications[i];
 			if ( card.cardType == UIToastNotification::CardType::UI_CARD_ACHIEVEMENT )
 			{
 				if ( card.matchesAchievementName(achName) )
@@ -297,7 +301,7 @@ public:
 		}
 		return nullptr;
 	}
-	std::list<UIToastNotification> allNotifications;
+	DynamicArrayT<UIToastNotification> allNotifications;
 };
 extern UIToastNotificationManager_t UIToastNotificationManager;
 
