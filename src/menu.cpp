@@ -6937,26 +6937,6 @@ void doNewGame(bool makeHighscore) {
 	if ( multiplayer != CLIENT )
 	{
 		// stop all sounds
-#ifdef USE_FMOD
-		if ( sound_group )
-		{
-			sound_group->stop();
-		}
-		if ( soundAmbient_group )
-		{
-			soundAmbient_group->stop();
-		}
-		if ( soundEnvironment_group )
-		{
-			soundEnvironment_group->stop();
-		}
-		if ( soundNotification_group )
-		{
-			soundNotification_group->stop();
-		}
-		ensembleSounds.stopPlaying(true);
-		VoiceChat.deinitRecording(false);
-#elif defined USE_OPENAL
 		if ( sound_group )
 		{
 			OPENAL_ChannelGroup_Stop(sound_group);
@@ -6969,7 +6949,6 @@ void doNewGame(bool makeHighscore) {
 		{
 			OPENAL_ChannelGroup_Stop(soundEnvironment_group);
 		}
-#endif
 
         if ( !loadingsavegame )
         {
@@ -7417,26 +7396,6 @@ void doNewGame(bool makeHighscore) {
 		}
 
 		// stop all sounds
-#ifdef USE_FMOD
-		if ( sound_group )
-		{
-			sound_group->stop();
-		}
-		if ( soundAmbient_group )
-		{
-			soundAmbient_group->stop();
-		}
-		if ( soundEnvironment_group )
-		{
-			soundEnvironment_group->stop();
-		}
-		if ( soundNotification_group )
-		{
-			soundNotification_group->stop();
-		}
-		ensembleSounds.stopPlaying(true);
-		VoiceChat.deinitRecording(false);
-#elif defined USE_OPENAL
 		if ( sound_group )
 		{
 			OPENAL_ChannelGroup_Stop(sound_group);
@@ -7449,7 +7408,6 @@ void doNewGame(bool makeHighscore) {
 		{
 			OPENAL_ChannelGroup_Stop(soundEnvironment_group);
 		}
-#endif
 		// load next level
 		entity_uids = 1;
 		lastEntityUIDs = entity_uids;
@@ -7910,26 +7868,6 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 	}
 
 	// stop all sounds
-#ifdef USE_FMOD
-	if ( sound_group )
-	{
-		sound_group->stop();
-	}
-	if ( soundAmbient_group )
-	{
-		soundAmbient_group->stop();
-	}
-	if ( soundEnvironment_group )
-	{
-		soundEnvironment_group->stop();
-	}
-	if ( soundNotification_group )
-	{
-		soundNotification_group->stop();
-	}
-	ensembleSounds.stopPlaying(true);
-	VoiceChat.deinitRecording(true);
-#elif defined USE_OPENAL
 	if ( sound_group )
 	{
 		OPENAL_ChannelGroup_Stop(sound_group);
@@ -7942,7 +7880,6 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 	{
 		OPENAL_ChannelGroup_Stop(soundEnvironment_group);
 	}
-#endif
 
 	if ( net_packet )
 	{

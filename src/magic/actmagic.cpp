@@ -11935,21 +11935,6 @@ void actParticleTimer(Entity* my)
 					my->entity_sound = playSoundEntity(my, 757, 128);
 				}
 
-#ifdef USE_FMOD
-				bool isPlaying = false;
-				if ( my->entity_sound )
-				{
-					my->entity_sound->isPlaying(&isPlaying);
-					if ( isPlaying )
-					{
-						FMOD_VECTOR position;
-						position.x = (float)(my->x / (real_t)16.0);
-						position.y = (float)(0.0);
-						position.z = (float)(my->y / (real_t)16.0);
-						my->entity_sound->set3DAttributes(&position, nullptr);
-					}
-				}
-#endif
 
 				Entity* parent = nullptr;
 				if ( multiplayer != CLIENT )
@@ -19001,38 +18986,12 @@ void actParticleWave(Entity* my)
 
 	if ( my->skill[7] == 1 && my->actParticleWaveMagicType == ParticleTimerEffect_t::EFFECT_FIRE_WAVE )
 	{
-#ifdef USE_FMOD
-		if ( my->skill[8] == 0 )
-		{
-			my->skill[8]--;
-			my->stopEntitySound();
-			my->entity_sound = playSoundEntityLocal(my, 710, 64);
-		}
-		if ( my->entity_sound )
-		{
-			bool playing = false;
-			my->entity_sound->isPlaying(&playing);
-			if ( !playing )
-			{
-				my->entity_sound = nullptr;
-			}
-			else
-			{
-				FMOD_VECTOR position;
-				position.x = (float)(my->x / (real_t)16.0);
-				position.y = (float)(0.0);
-				position.z = (float)(my->y / (real_t)16.0);
-				fmod_result = my->entity_sound->set3DAttributes(&position, nullptr);
-			}
-		}
-#else
 		my->skill[8]--;
 		if ( my->skill[8] <= 0 )
 		{
 			my->skill[8] = 480;
 			playSoundEntityLocal(my, 133, 128);
 		}
-#endif
 	}
 
 	if ( multiplayer != CLIENT )

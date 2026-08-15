@@ -246,9 +246,6 @@ endif
 if curl_enabled
   barony_deps += curl
 endif
-if opus_enabled
-  barony_deps += opus
-endif
 
 barony_game_lib = static_library('barony_game',
   game_sources + magic_sources + interface_sources + ui_sources + audio_sources,

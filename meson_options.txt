@@ -1,7 +1,5 @@
 option('openal', type : 'boolean', value : true,
        description : 'Use OpenAL for the sound engine (required; FMOD removed in the Odin port)')
-option('tremor', type : 'boolean', value : false,
-       description : 'Use Tremor (fixed-point) instead of libvorbis for OpenAL decoding')
 option('theoraplay', type : 'boolean', value : false,
        description : 'Enable TheoraPlay .ogv video playback for animated signs (vendored in third_party/theoraplay)')
 
@@ -14,8 +12,6 @@ option('curl', type : 'boolean', value : false,
        description : 'DEAD END - libcurl HTTP (was only used for Steam Workshop image cache; not ported)')
 option('playfab', type : 'boolean', value : false,
        description : 'DEAD END - PlayFab telemetry/leaderboards/challenges (requires Steam/Epic auth + PlayFab title credentials; not ported)')
-option('opus', type : 'boolean', value : false,
-       description : 'DEAD END - Opus voice codec (was only meaningful with FMOD voice chat, which is removed; not ported)')
 
 option('editor', type : 'boolean', value : true,
        description : 'Build the level editor executable in addition to the game')

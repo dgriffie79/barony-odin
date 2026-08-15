@@ -3095,7 +3095,6 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 		nummonsters = 0;
 		minotaurlevel = 0;
 
-#if defined (USE_FMOD) || defined(USE_OPENAL)
 		if ( strcmp(oldmapname, map.name) )
 		{
 			if ( gameModeManager.getMode() != GameModeManager_t::GAME_MODE_TUTORIAL
@@ -3104,12 +3103,6 @@ int loadMap(const char* filename2, map_t* destmap, list_t* entlist, list_t* crea
 				levelmusicplaying = false;
 			}
 		}
-#endif
-#ifdef USE_FMOD
-#ifndef EDITOR
-		VoiceChat.updateOnMapChange3DRolloff();
-#endif
-#endif
 
 #ifndef EDITOR
 		map.setMapHDRSettings();
@@ -5367,9 +5360,6 @@ void physfsReloadSounds(bool reloadAll)
 			{
 				if ( sounds[c] != nullptr )
 				{
-#ifdef USE_FMOD
-					sounds[c]->release();    //Free the sound in FMOD
-#endif
 #ifdef USE_OPENAL
 					OPENAL_Sound_Release(sounds[c]); //Free the sound in OPENAL
 #endif
@@ -5418,23 +5408,6 @@ void physfsReloadSounds(bool reloadAll)
 					}
 				}
 
-#ifdef USE_FMOD
-				if ( !reloadAll )
-				{
-					sounds[c]->release();
-					sounds[c] = nullptr;
-				}
-				FMOD_MODE flags = FMOD_DEFAULT | FMOD_3D | FMOD_LOWMEM;
-				if ( c == 133 || c == 672 || c == 135 || c == 155 || c == 149 )
-				{
-					flags |= FMOD_LOOP_NORMAL;
-				}
-				fmod_result = fmod_system->createSound(soundFile.c_str(), flags, nullptr, &sounds[c]); //TODO: FMOD_SOFTWARE -> FMOD_DEFAULT?
-				if ( FMODErrorCheck() )
-				{
-					printlog("warning: failed to load '%s' listed at line %d in sounds.txt\n", name, c + 1);
-				}
-#endif
 #ifdef USE_OPENAL
 				if ( !reloadAll )
 				{

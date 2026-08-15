@@ -46,36 +46,15 @@ void Entity::actMagicTrapCeiling()
 {
 	if ( actTrapSabotaged == 0 )
 	{
-#ifdef USE_FMOD
-		if ( spellTrapAmbience == 0 )
-		{
-			spellTrapAmbience--;
-			stopEntitySound();
-			entity_sound = playSoundEntityLocal(this, 149, 16);
-		}
-		if ( entity_sound )
-		{
-			bool playing = false;
-			entity_sound->isPlaying(&playing);
-			if ( !playing )
-			{
-				entity_sound = nullptr;
-			}
-		}
-#else
 		spellTrapAmbience--;
 		if ( spellTrapAmbience <= 0 )
 		{
 			spellTrapAmbience = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(this, 149, 16);
 		}
-#endif
 	}
 	else
 	{
-#ifdef USE_FMOD
-		stopEntitySound();
-#endif
 		return;
 	}
 
@@ -334,30 +313,12 @@ void Entity::actTeleportShrine()
 		spawnAmbientParticles(80, 576, 10 + local_rng.rand() % 40, 1.0, false);
 	}
 
-#ifdef USE_FMOD
-	if ( shrineAmbience == 0 )
-	{
-		shrineAmbience--;
-		stopEntitySound();
-		entity_sound = playSoundEntityLocal(this, 149, 16);
-	}
-	if ( entity_sound )
-	{
-		bool playing = false;
-		entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			entity_sound = nullptr;
-		}
-	}
-#else
 	shrineAmbience--;
 	if ( shrineAmbience <= 0 )
 	{
 		shrineAmbience = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
-#endif
 
 	if ( multiplayer == CLIENT )
 	{
@@ -669,30 +630,12 @@ void Entity::actDaedalusShrine()
 		spawnAmbientParticles(80, 576, 10 + local_rng.rand() % 40, 1.0, false);
 	}
 
-#ifdef USE_FMOD
-	if ( shrineAmbience == 0 )
-	{
-		shrineAmbience--;
-		stopEntitySound();
-		entity_sound = playSoundEntityLocal(this, 149, 16);
-	}
-	if ( entity_sound )
-	{
-		bool playing = false;
-		entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			entity_sound = nullptr;
-		}
-	}
-#else
 	shrineAmbience--;
 	if ( shrineAmbience <= 0 )
 	{
 		shrineAmbience = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
-#endif
 
 	if ( !shrineInit )
 	{
@@ -906,30 +849,12 @@ void Entity::actAssistShrine()
 	}
 
 	this->removeLightField();
-#ifdef USE_FMOD
-	if ( shrineAmbience == 0 )
-	{
-		shrineAmbience--;
-		stopEntitySound();
-		entity_sound = playSoundEntityLocal(this, 149, 16);
-	}
-	if ( entity_sound )
-	{
-		bool playing = false;
-		entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			entity_sound = nullptr;
-		}
-	}
-#else
 	shrineAmbience--;
 	if ( shrineAmbience <= 0 )
 	{
 		shrineAmbience = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
-#endif
 
 	if ( !shrineInit )
 	{

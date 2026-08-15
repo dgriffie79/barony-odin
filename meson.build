@@ -11,16 +11,13 @@ project('barony', 'cpp', 'c',
 # ---------------------------------------------------------------------------
 # Options
 # ---------------------------------------------------------------------------
-# Sound engine: OpenAL (required for now; FMOD removed in the Odin port)
+# Sound engine: OpenAL (the only backend; FMOD and its voice chat were removed)
 openal_enabled = get_option('openal')
-# Tremor (fixed-point vorbis decoder) instead of libvorbis for OpenAL
-tremor_enabled = get_option('tremor')
 # TheoraPlay video playback (vendored in third_party/theoraplay)
 theoraplay_enabled = get_option('theoraplay')
 # Optional online features
 curl_enabled = get_option('curl')
 playfab_enabled = get_option('playfab')
-opus_enabled = get_option('opus')
 # Build the editor executable (in addition to the game)
 editor_enabled = get_option('editor')
 
@@ -122,18 +119,12 @@ theora = dependency('theora', required : true)
 vcpkg_inc = include_directories('C:/dev/vcpkg/installed/x64-windows/include')
 add_project_arguments('-I' + 'C:/dev/vcpkg/installed/x64-windows/include', language : 'cpp')
 
-# OpenAL + vorbis (or tremor)
+# OpenAL + vorbis
 audio_deps = []
 if openal_enabled
   openal = dependency('openal', required : true)
   audio_deps += openal
-  if tremor_enabled
-    add_project_arguments('-DUSE_TREMOR', language : 'cpp')
-    tremor = dependency('tremor', required : true)
-    audio_deps += tremor
-  else
-    audio_deps += [vorbis, ogg]
-  endif
+  audio_deps += [vorbis, ogg]
   add_project_arguments('-DUSE_OPENAL', language : 'cpp')
 endif
 
@@ -151,10 +142,6 @@ if curl_enabled
   curl = dependency('libcurl', required : true)
 endif
 
-if opus_enabled
-  add_project_arguments('-DUSE_OPUS', language : 'cpp')
-  opus = dependency('opus', required : true)
-endif
 
 # ---------------------------------------------------------------------------
 # Config.hpp generation (replaces CMake's configure_file of src/Config.hpp.in)
@@ -171,10 +158,9 @@ config_data.set('PLAYFAB_ENABLED', playfab_enabled ? 1 : 0)
 config_data.set('IMGUI', 0)
 config_data.set('CURL_ENABLED', curl_enabled ? 1 : 0)
 config_data.set('THEORAPLAYER_ENABLED', 0)
-config_data.set('OPUS_ENABLED', opus_enabled ? 1 : 0)
+config_data.set('OPUS_ENABLED', 0)
 config_data.set('FMOD', 0)
 config_data.set('OPENAL', openal_enabled ? 1 : 0)
-config_data.set('TREMOR', tremor_enabled ? 1 : 0)
 config_data.set('PANDORA', 0)
 config_data.set('NOT_DWORD_DEFINED', 1)
 config_data.set('BUILD_ENV_PR', '')

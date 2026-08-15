@@ -116,36 +116,15 @@ void actArrowTrap(Entity* my)
 
 	if ( my->actTrapSabotaged == 0 )
 	{
-#ifdef USE_FMOD
-		if ( ARROWTRAP_AMBIENCE == 0 )
-		{
-			ARROWTRAP_AMBIENCE--;
-			my->stopEntitySound();
-			my->entity_sound = playSoundEntityLocal(my, 149, 64);
-		}
-		if ( my->entity_sound )
-		{
-			bool playing = false;
-			my->entity_sound->isPlaying(&playing);
-			if ( !playing )
-			{
-				my->entity_sound = nullptr;
-			}
-		}
-#else
 		ARROWTRAP_AMBIENCE--;
 		if ( ARROWTRAP_AMBIENCE <= 0 )
 		{
 			ARROWTRAP_AMBIENCE = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal( my, 149, 64 );
 		}
-#endif
 	}
 	else
 	{
-#ifdef USE_FMOD
-		my->stopEntitySound();
-#endif
 	}
 
 	if ( multiplayer == CLIENT )

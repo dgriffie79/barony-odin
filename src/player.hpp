@@ -1537,13 +1537,8 @@ public:
 		bool bowIsBeingDrawn = false;
 		Uint32 bowStartDrawingTick = 0;
 		Uint32 bowDrawBaseTicks = 50;
-#ifdef USE_FMOD
-		FMOD::Channel* bowDrawingSoundChannel = NULL;
-		bool bowDrawingSoundPlaying = 0;
-#elif defined USE_OPENAL
 		OPENAL_SOUND* bowDrawingSoundChannel = NULL;
 		ALboolean bowDrawingSoundPlaying = 0;
-#endif
 		struct Cursor_t
 		{
 			real_t animateX = 0.0;

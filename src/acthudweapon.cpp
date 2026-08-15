@@ -446,13 +446,8 @@ void actHudWeapon(Entity* my)
 	Uint32& bowStartDrawingTick = playerHud.bowStartDrawingTick;
 	const Uint32& bowDrawBaseTicks = playerHud.bowDrawBaseTicks;
 #ifdef SOUND
-#ifdef USE_FMOD
-	FMOD::Channel*& bowDrawingSoundChannel = playerHud.bowDrawingSoundChannel;
-	bool& bowDrawingSoundPlaying = playerHud.bowDrawingSoundPlaying;
-#elif defined USE_OPENAL
 	OPENAL_SOUND*& bowDrawingSoundChannel = playerHud.bowDrawingSoundChannel;
 	ALboolean& bowDrawingSoundPlaying = playerHud.bowDrawingSoundPlaying;
-#endif
 #endif
 
 	// isn't active during intro/menu sequence

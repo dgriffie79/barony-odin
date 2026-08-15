@@ -329,11 +329,6 @@ int initGame()
 		loadAllScores(SCORESFILE);
 		loadAllScores(SCORESFILE_MULTIPLAYER);
 
-#ifdef USE_FMOD
-#ifndef EDITOR
-		ensembleSounds.setup();
-#endif
-#endif
 
 		updateLoadingScreen(98);
 		loading_done = true;
@@ -401,9 +396,6 @@ int initGame()
 #endif
 
 #ifndef EDITOR
-#ifdef USE_FMOD
-		VoiceChat.init();
-#endif
 #endif
 	}
 
@@ -567,46 +559,6 @@ void deinitGame()
 		safePacketsReceivedMap[c].clear();
 	}
 #ifdef SOUND
-#ifdef USE_FMOD
-	if ( !no_sound )
-	{
-		music_channel->stop();
-		music_channel2->stop();
-		introductionmusic->release();
-		intermissionmusic->release();
-		minetownmusic->release();
-		splashmusic->release();
-		librarymusic->release();
-		shopmusic->release();
-		herxmusic->release();
-		templemusic->release();
-		endgamemusic->release();
-		escapemusic->release();
-		devilmusic->release();
-		sanctummusic->release();
-		gnomishminesmusic->release();
-		greatcastlemusic->release();
-		sokobanmusic->release();
-		caveslairmusic->release();
-		bramscastlemusic->release();
-		hamletmusic->release();
-		tutorialmusic->release();
-		gameovermusic->release();
-		introstorymusic->release();
-		ensembleSounds.deinit();
-		for ( int c = 0; c < NUMMINESMUSIC; c++ ) { minesmusic[c]->release(); } if ( minesmusic ) { free(minesmusic); }
-		for ( int c = 0; c < NUMSWAMPMUSIC; c++ ) { swampmusic[c]->release(); } if ( swampmusic ) { free(swampmusic); }
-		for ( int c = 0; c < NUMLABYRINTHMUSIC; c++ ) { labyrinthmusic[c]->release(); } if ( labyrinthmusic ) { free(labyrinthmusic); }
-		for ( int c = 0; c < NUMRUINSMUSIC; c++ ) { ruinsmusic[c]->release(); } if ( ruinsmusic ) { free(ruinsmusic); }
-		for ( int c = 0; c < NUMUNDERWORLDMUSIC; c++ ) { underworldmusic[c]->release(); } if ( underworldmusic ) { free(underworldmusic); }
-		for ( int c = 0; c < NUMHELLMUSIC; c++ ) { hellmusic[c]->release(); } if ( hellmusic ) { free(hellmusic); }
-		for ( int c = 0; c < NUMMINOTAURMUSIC; c++ ) { minotaurmusic[c]->release(); } if ( minotaurmusic ) { free(minotaurmusic); }
-		for ( int c = 0; c < NUMCAVESMUSIC; c++ ) { cavesmusic[c]->release(); } if ( cavesmusic ) { free(cavesmusic); }
-		for ( int c = 0; c < NUMCITADELMUSIC; c++ ) { citadelmusic[c]->release(); } if ( citadelmusic ) { free(citadelmusic); }
-		for ( int c = 0; c < NUMINTROMUSIC; c++ ) { intromusic[c]->release(); } if ( intromusic ) { free(intromusic); }
-		for ( int c = 0; c < NUMFORTRESSMUSIC; c++ ) { fortressmusic[c]->release(); } if ( fortressmusic ) { free(fortressmusic); }
-	}
-#elif defined USE_OPENAL
 	if ( !no_sound )
 	{
 		// OPENAL_BUFFER/OPENAL_SOUND are C structs; use the wrapper functions.
@@ -646,16 +598,7 @@ void deinitGame()
 		for ( int c = 0; c < NUMFORTRESSMUSIC; c++ ) { OPENAL_Sound_Release(fortressmusic[c]); } if ( fortressmusic ) { free(fortressmusic); }
 	}
 #endif
-#endif
 
-#ifdef USE_FMOD
-#ifndef EDITOR
-	VoiceChat.deinit();
-#ifdef USE_OPUS
-	OpusAudioCodec.deinit();
-#endif
-#endif
-#endif
 
 	// free items
 	printlog( "freeing item data...\n");

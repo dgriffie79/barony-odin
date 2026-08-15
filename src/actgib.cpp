@@ -2522,21 +2522,6 @@ void actLeafPile(Entity* my)
 		}
 	}
 
-#ifdef USE_FMOD
-	bool isPlaying = false;
-	if ( my->entity_sound )
-	{
-		my->entity_sound->isPlaying(&isPlaying);
-		if ( isPlaying )
-		{
-			FMOD_VECTOR position;
-			position.x = (float)(my->x / (real_t)16.0);
-			position.y = (float)(0.0);
-			position.z = (float)(my->y / (real_t)16.0);
-			my->entity_sound->set3DAttributes(&position, nullptr);
-		}
-	}
-#endif
 
 	if ( multiplayer != CLIENT )
 	{
@@ -2560,17 +2545,6 @@ void actLeafPile(Entity* my)
 					{
 						spinEvent = 1;
 					}
-#ifdef USE_FMOD
-					bool isPlaying = false;
-					if ( my->entity_sound )
-					{
-						my->entity_sound->isPlaying(&isPlaying);
-					}
-					if ( !isPlaying )
-					{
-						my->entity_sound = playSoundEntityLocal(my, 752 + local_rng.rand() % 2, 128);
-					}
-#endif
 				}
 			}
 		}

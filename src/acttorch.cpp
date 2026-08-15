@@ -46,30 +46,12 @@ void actTorch(Entity* my)
 	}
 
 	// ambient noises (yeah, torches can make these...)
-#ifdef USE_FMOD
-	if ( TORCH_FIRE == 0 )
-	{
-		TORCH_FIRE--;
-		//TORCH_FIRE = 480;
-		my->entity_sound = playSoundEntityLocal(my, 133, 32);
-	}
-	if ( my->entity_sound )
-	{
-		bool playing = false;
-		my->entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			my->entity_sound = nullptr;
-		}
-	}
-#else
 	TORCH_FIRE--;
 	if ( TORCH_FIRE <= 0 )
 	{
 		TORCH_FIRE = 480;
 		playSoundEntityLocal(my, 133, 32);
 	}
-#endif
 
 	if ( flickerLights || my->ticks % TICKS_PER_SECOND == 1 )
 	{
@@ -219,30 +201,12 @@ void actCrystalShard(Entity* my)
 	}
 
 	// ambient noises (yeah, torches can make these...)
-#ifdef USE_FMOD
-	if ( TORCH_FIRE == 0 )
-	{
-		TORCH_FIRE--;
-		//TORCH_FIRE = 480;
-		my->entity_sound = playSoundEntityLocal(my, 133, 32);
-	}
-	if ( my->entity_sound )
-	{
-		bool playing = false;
-		my->entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			my->entity_sound = nullptr;
-		}
-	}
-#else
 	TORCH_FIRE--;
 	if ( TORCH_FIRE <= 0 )
 	{
 		TORCH_FIRE = 480;
 		playSoundEntityLocal(my, 133, 32);
 	}
-#endif
 	if ( flickerLights || my->ticks % TICKS_PER_SECOND == 1 )
 	{
 	    /*Entity* entity = spawnFlame(my, SPRITE_CRYSTALFLAME);

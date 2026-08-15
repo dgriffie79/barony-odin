@@ -106,26 +106,10 @@ public:
     DynamicMapPtrT<Dither_t> dithering;
 	vec4_t lightBonus;
 
-#ifdef USE_FMOD
-	FMOD::Channel* entity_sound = nullptr;
-#else
 	void* entity_sound = nullptr;
-#endif
 
 	void stopEntitySound()
 	{
-#ifdef USE_FMOD
-		if ( entity_sound )
-		{
-			bool playing = false;
-			entity_sound->isPlaying(&playing);
-			if ( playing )
-			{
-				entity_sound->stop();
-				entity_sound = nullptr;
-			}
-		}
-#endif
 	}
 
 	void setEntityString(const char* str)

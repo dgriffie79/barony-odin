@@ -5772,30 +5772,12 @@ void actBell(Entity* my)
 	my->focaly = -6;
 	my->focalz = -10.75;
 
-#ifdef USE_FMOD
-	if ( BELL_AMBIENCE == 0 )
-	{
-		BELL_AMBIENCE--;
-		my->stopEntitySound();
-		my->entity_sound = playSoundEntityLocal(my, 149, 16);
-	}
-	if ( my->entity_sound )
-	{
-		bool playing = false;
-		my->entity_sound->isPlaying(&playing);
-		if ( !playing )
-		{
-			my->entity_sound = nullptr;
-		}
-	}
-#else
 	BELL_AMBIENCE--;
 	if ( BELL_AMBIENCE <= 0 )
 	{
 		BELL_AMBIENCE = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(my, 149, 16);
 	}
-#endif
 
 	const int pullTimerStart = 100;
 #ifndef NDEBUG

@@ -13,9 +13,6 @@
 
 #include "main.hpp"
 
-#ifdef USE_FMOD
-#include <fmod.hpp>
-#endif
 
 class Item;
 //enum Item;
@@ -150,11 +147,7 @@ public:
 	Item* mask;
 
 	// misc
-#ifdef USE_FMOD
-	FMOD::Channel* monster_sound;
-#else
 	void* monster_sound;
-#endif
 	int monster_idlevar;
 
 	list_t magic_effects; //Makes things like the invisibility spell work.

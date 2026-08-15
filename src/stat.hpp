@@ -11,9 +11,6 @@
 
 #pragma once
 
-#ifdef USE_FMOD
-#include <fmod.hpp>
-#endif
 #include <cassert>
 #include "items.hpp"
 
@@ -447,11 +444,7 @@ public:
 	Item* mask;
 
 	// misc
-#ifdef USE_FMOD
-	FMOD::Channel* monster_sound;
-#else
 	void* monster_sound;
-#endif
 	int monster_idlevar;
 	DynamicMapStr attributes;
 	struct Lootbag_t

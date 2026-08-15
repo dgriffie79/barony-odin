@@ -9843,30 +9843,14 @@ void GameplayPreferences_t::process()
 					break;
 				case GPREF_VOICE_NO_RECV:
 					// we don't have voice receive volume set, drop packets
-#ifdef USE_FMOD
-					pref.set(((!VoiceChat.useSystem || !VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_ENABLE_VOICE_RECEIVE)) ? 1 : 0) << player);
-#else
 					pref.set(1 << player);
-#endif
 					break;
 				case GPREF_VOICE_NO_SEND:
 					// we don't have voice input device or otherwise don't want to use it
-#ifdef USE_FMOD
-					pref.set(((!VoiceChat.useSystem || !VoiceChat.bRecordingInit
-						|| (VoiceChat.mainMenuAudioTabOpen()
-							&& VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_LOOPBACK_LOCAL_RECORD))
-						|| !VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_ENABLE_VOICE_INPUT) 
-							|| !VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_ENABLE_VOICE_RECEIVE)) ? 1 : 0) << player);
-#else				
 					pref.set(1 << player);
-#endif
 					break;
 				case GPREF_VOICE_PTT:
-#ifdef USE_FMOD
-					pref.set((VoiceChat.getAudioSettingBool(VoiceChat_t::AudioSettingBool::VOICE_SETTING_PUSHTOTALK) ? 1 : 0) << player);
-#else
 					pref.set(1 << player);
-#endif
 
 					break;
 				default:

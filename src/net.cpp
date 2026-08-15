@@ -2230,26 +2230,6 @@ static void changeLevel() {
 	}
 
 	// stop all sounds
-#ifdef USE_FMOD
-	if ( sound_group )
-	{
-		sound_group->stop();
-	}
-	if ( soundAmbient_group )
-	{
-		soundAmbient_group->stop();
-	}
-	if ( soundEnvironment_group )
-	{
-		soundEnvironment_group->stop();
-	}
-	if ( soundNotification_group )
-	{
-		soundNotification_group->stop();
-	}
-	ensembleSounds.stopPlaying(true);
-	VoiceChat.deinitRecording(false);
-#elif defined USE_OPENAL
 	if ( sound_group )
 	{
 		OPENAL_ChannelGroup_Stop(sound_group);
@@ -2262,7 +2242,6 @@ static void changeLevel() {
 	{
 		OPENAL_ChannelGroup_Stop(soundEnvironment_group);
 	}
-#endif
 	if ( openedChest[clientnum] )
 	{
 		closeChestClientside(clientnum);
@@ -6633,9 +6612,6 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 	} },
 
 	{ 'VOIP',[]() {
-#ifdef USE_FMOD
-		VoiceChat.receivePacket(net_packet);
-#endif
 	} },
 
 	{ 'MAPT',[]() {
@@ -9235,9 +9211,6 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 	} },
 
 	{ 'VOIP',[]() {
-#ifdef USE_FMOD
-		VoiceChat.receivePacket(net_packet);
-#endif
 	} },
 
 	{ 'FXGD',[]() {

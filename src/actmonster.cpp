@@ -2997,17 +2997,10 @@ void actMonster(Entity* my)
 			}
 			if ( foundlights )
 			{
-#ifdef USE_FMOD
-				if ( MONSTER_SOUND )
-				{
-					MONSTER_SOUND->stop();
-				}
-#elif defined USE_OPENAL
 				if ( MONSTER_SOUND )
 				{
 					OPENAL_Channel_Stop(MONSTER_SOUND);
 				}
-#endif
 				int c;
 				for ( c = 0; c < MAXPLAYERS; c++ )
 				{
@@ -3939,17 +3932,10 @@ void actMonster(Entity* my)
 		}
 
 		// die
-#ifdef USE_FMOD
-		if ( MONSTER_SOUND )
-		{
-			MONSTER_SOUND->stop();
-		}
-#elif defined USE_OPENAL
 		if ( MONSTER_SOUND )
 		{
 			OPENAL_Channel_Stop(MONSTER_SOUND);
 		}
-#endif
 		myStats = my->getStats();
 
 		real_t deathLocationX = my->x;
@@ -4247,21 +4233,12 @@ void actMonster(Entity* my)
 		auto time2 = std::chrono::high_resolution_clock::now();
 		auto accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
 #endif
-#ifdef USE_FMOD
-		bool playing;
-		MONSTER_SOUND->isPlaying(&playing);
-		if (!playing)
-		{
-			MONSTER_SOUND = nullptr;
-		}
-#elif defined USE_OPENAL
 		ALboolean playing;
 		OPENAL_Channel_IsPlaying(MONSTER_SOUND, &playing);
 		if (!playing)
 		{
 			MONSTER_SOUND = NULL;
 		}
-#endif
 
 #ifdef DEBUG_EVENT_TIMERS
 		time2 = std::chrono::high_resolution_clock::now();
@@ -5857,32 +5834,6 @@ void actMonster(Entity* my)
 							{
 								// idle sounds. if player follower, reduce noise frequency by 66%.
 								bool doIdleSound = true;
-#ifdef USE_FMOD
-								if ( myStats->type == KOBOLD )
-								{
-									doIdleSound = local_rng.rand() % 2 == 0;
-									for ( node_t* node = map.creatures->first; node && doIdleSound; node = node->next )
-									{
-										Entity* entity = (Entity*)node->element;
-										if ( entity->behavior == &actMonster && entity->skill[19] == MONSTER_IDLESND ) // skill 19 is monster idle snd
-										{
-											if ( Stat* stats = entity->getStats() )
-											{
-												if ( stats->monster_sound )
-												{
-													bool playing;
-													stats->monster_sound->isPlaying(&playing);
-													if ( playing )
-													{
-														doIdleSound = false;
-														break;
-													}
-												}
-											}
-										}
-									}
-								}
-#endif
 								if ( doIdleSound )
 								{
 									MONSTER_SOUND = playSoundEntity(my, MONSTER_IDLESND + (local_rng.rand() % MONSTER_IDLEVAR), 128);

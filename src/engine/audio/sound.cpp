@@ -17,20 +17,10 @@
 #include "../../player.hpp"
 #endif
 
-#ifdef USE_FMOD
-#include "fmod_errors.h"
-#elif defined USE_OPENAL
-#ifdef USE_TREMOR
-#include <tremor/ivorbisfile.h>
-#else
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <vorbis/codec.h>
-#endif
-#endif
 
-#ifdef USE_FMOD
-#elif defined USE_OPENAL
 void setGlobalVolume(real_t master, real_t music, real_t gameplay, real_t ambient, real_t environment, real_t notification)
 {
 	master = std::min(std::max(0.0, master), 1.0);
@@ -57,391 +47,7 @@ void setRecordDevice(const std::string& device)
 	// OpenAL recording device selection is not implemented.
 	(void)device;
 }
-#else
-void setGlobalVolume(real_t master, real_t music, real_t gameplay, real_t ambient, real_t environment, real_t notification)
-{
-	return;
-}
-void setAudioDevice(const std::string& device)
-{
-	return;
-}
-#endif
 
-#ifdef USE_FMOD
-
-bool FMODErrorCheck()
-{
-	if (no_sound)
-	{
-		return false;
-	}
-	if (fmod_result != FMOD_OK)
-	{
-		printlog("[FMOD Error] Error Code (%d): \"%s\"\n", fmod_result, FMOD_ErrorString(fmod_result)); //Report the FMOD error.
-		return true;
-	}
-
-	return false;
-}
-
-void setAudioDevice(const std::string& device) {
-	int selected_driver = 0;
-	int numDrivers = 0;
-	fmod_system->getNumDrivers(&numDrivers);
-	for (int i = 0; i < numDrivers; ++i) {
-		FMOD_GUID guid;
-		fmod_result = fmod_system->getDriverInfo(i, nullptr, 0, &guid, nullptr, nullptr, nullptr);
-
-		uint32_t _1; memcpy(&_1, &guid.Data1, sizeof(_1));
-		uint64_t _2; memcpy(&_2, &guid.Data4, sizeof(_2));
-		char guid_string[25];
-		snprintf(guid_string, sizeof(guid_string), FMOD_AUDIO_GUID_FMT, _1, _2);
-		if (!selected_driver && device == guid_string) {
-			selected_driver = i;
-		}
-	}
-	fmod_system->setDriver(selected_driver);
-}
-
-void setRecordDevice(const std::string& device)
-{
-#ifndef EDITOR
-	int selected_driver = 0;
-	int numDrivers = 0;
-	fmod_system->getRecordNumDrivers(&numDrivers, nullptr);
-	for ( int i = 0; i < numDrivers; ++i ) {
-		FMOD_GUID guid;
-		constexpr int driverNameLen = 64;
-		char driverName[driverNameLen] = "";
-		fmod_result = fmod_system->getRecordDriverInfo(i, driverName, driverNameLen, &guid, nullptr, nullptr, nullptr, nullptr);
-		if ( strstr(driverName, "[loopback]") )
-		{
-			continue;
-		}
-		uint32_t _1; memcpy(&_1, &guid.Data1, sizeof(_1));
-		uint64_t _2; memcpy(&_2, &guid.Data4, sizeof(_2));
-		char guid_string[25];
-		snprintf(guid_string, sizeof(guid_string), FMOD_AUDIO_GUID_FMT, _1, _2);
-		if ( !selected_driver && device == guid_string ) {
-			selected_driver = i;
-		}
-	}
-	VoiceChat.setRecordingDevice(selected_driver);
-#endif
-}
-
-void setGlobalVolume(real_t master, real_t music, real_t gameplay, real_t ambient, real_t environment, real_t notification) {
-    master = std::min(std::max(0.0, master), 1.0);
-    music = std::min(std::max(0.0, music / 4.0), 1.0); // music volume cut in half because the music is loud...
-    gameplay = std::min(std::max(0.0, gameplay), 1.0);
-    ambient = std::min(std::max(0.0, ambient), 1.0);
-    environment = std::min(std::max(0.0, environment), 1.0);
-	notification = std::min(std::max(0.0, notification), 1.0);
-
-	music_group->setVolume(master * music);
-	sound_group->setVolume(master * gameplay);
-	soundAmbient_group->setVolume(master * ambient);
-	soundEnvironment_group->setVolume(master * environment);
-	music_notification_group->setVolume(master * notification);
-	soundNotification_group->setVolume(master * notification);
-	music_ensemble_global_send_group->setVolume(1.f);
-
-#ifndef EDITOR
-	ensembleSounds.ensemble_recv_global_volume = master * (music * 4);
-	ensembleSounds.ensemble_recv_player_volume = master * gameplay;
-	if ( VoiceChat.outChannelGroup )
-	{
-		VoiceChat.outChannelGroup->setVolume(master);
-	}
-#endif
-}
-
-#ifndef EDITOR
-	static ConsoleVariable<float> cvar_sfx_notification_music_fade("/sfx_notification_music_fade", 0.5f);
-	static ConsoleVariable<float> cvar_sfx_ensemble_music_fade("/sfx_ensemble_music_fade", 0.f);
-#endif // !EDITOR
-
-void sound_update(int player, int index, int numplayers)
-{
-#ifdef DEBUG_EVENT_TIMERS
-	auto time1 = std::chrono::high_resolution_clock::now();
-	auto time2 = std::chrono::high_resolution_clock::now();
-	auto accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-	if ( accum > 5 )
-	{
-		printlog("Large tick time: [10] %f", accum);
-	}
-	time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-	if (no_sound)
-	{
-		return;
-	}
-	if (!fmod_system)
-	{
-		return;
-	}
-
-	FMOD_VECTOR position, forward, up;
-	bool playing = false;
-
-	auto& camera = cameras[index];
-
-	position.x = (float)(camera.x);
-	position.y = (float)(camera.z / (real_t)32.0);
-	position.z = (float)(camera.y);
-
-	/*forward.x = -1.0 * cos(camera.ang) * cos(camera.vang);
-	forward.y =  1.0 * sin(camera.vang);
-	forward.z = -1.0 * sin(camera.ang) * cos(camera.vang);*/
- 
-    forward.x = (float)((real_t)1.0 * cos(camera.ang));
-    forward.y = 0.f;
-    forward.z = (float)((real_t)1.0 * sin(camera.ang));
-
-	/*up.x = -1.0 * cos(camera.ang) * sin(camera.vang);
-	up.y =  1.0 * cos(camera.vang);
-	up.z = -1.0 * sin(camera.ang) * sin(camera.vang);*/
-    up.x = 0.f;
-    up.y = 1.f;
-    up.z = 0.f;
-
-	//FMOD_System_Set3DListenerAttributes(fmod_system, 0, &position, &velocity, &forward, &up);
-	fmod_system->set3DNumListeners(numplayers);
-
-#ifdef DEBUG_EVENT_TIMERS
-	time2 = std::chrono::high_resolution_clock::now();
-	accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-	if ( accum > 5 )
-	{
-		printlog("Large tick time: [11] %f", accum);
-	}
-	time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-	fmod_system->set3DListenerAttributes(player, &position, nullptr, &forward, &up);
-
-#ifdef DEBUG_EVENT_TIMERS
-	time2 = std::chrono::high_resolution_clock::now();
-	accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-	if ( accum > 5 )
-	{
-		printlog("Large tick time: [12] %f", accum);
-	}
-	time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-	if (player == 0) {
-#ifndef EDITOR
-		//Fade in the currently playing music.
-		bool notificationPlaying = false;
-		if ( music_notification_group )
-		{
-			music_notification_group->isPlaying(&notificationPlaying);
-		}
-		bool ensemblePlaying = false;
-		if ( music_ensemble_global_send_group )
-		{
-			music_ensemble_global_send_group->isPlaying(&ensemblePlaying);
-			if ( ensemblePlaying )
-			{
-				bool ensemblePaused = false;
-				music_ensemble_global_send_group->getPaused(&ensemblePaused); // if playing, then check if paused
-				if ( ensemblePaused )
-				{
-					ensemblePlaying = false;
-				}
-				else
-				{
-					Uint32 globalEnsemblePlaying = 0;
-					Uint32 localEnsemblePlaying = 0;
-					for ( int i = 0; i < MAXPLAYERS; ++i )
-					{
-						if ( players[i]->isLocalPlayerAlive() )
-						{
-							globalEnsemblePlaying |= (players[i]->mechanics.ensembleDataUpdate >> 16) & 0xFFFF;
-							localEnsemblePlaying |= (players[i]->mechanics.ensembleDataUpdate >> 8) & 0xFF;
-						}
-						/*if ( players[i]->entity && !client_disconnected[i] )
-						{
-							// if we want other players to override the main soundtrack with local sound
-							localEnsemblePlaying |= (players[i]->mechanics.ensembleDataUpdate >> 8) & 0xFF;
-						}*/
-					}
-					if ( globalEnsemblePlaying == 0 || (*cvar_ensemble_vol_bg <= -79.f && localEnsemblePlaying == 0)
-						|| (!instrument_bg_enabled && localEnsemblePlaying == 0) )
-					{
-						ensemblePlaying = false;
-					}
-				}
-			}
-		}
-#endif
-
-#ifdef DEBUG_EVENT_TIMERS
-		time2 = std::chrono::high_resolution_clock::now();
-		accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-		if ( accum > 5 )
-		{
-			printlog("Large tick time: [13] %f", accum);
-		}
-		time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-		if (music_channel)
-		{
-			playing = false;
-			music_channel->isPlaying(&playing);
-			if (playing)
-			{
-				float volume = 1.0f;
-				music_channel->getVolume(&volume);
-
-#ifdef DEBUG_EVENT_TIMERS
-				time2 = std::chrono::high_resolution_clock::now();
-				accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-				if ( accum > 5 )
-				{
-					printlog("Large tick time: [14] %f", accum);
-				}
-				time1 = std::chrono::high_resolution_clock::now();
-#endif
-#ifdef EDITOR
-				if ( volume < 1.0f )
-				{
-					volume += fadein_increment * 2;
-					if ( volume > 1.0f )
-					{
-						volume = 1.0f;
-					}
-					music_channel->setVolume(volume);
-				}
-#else
-				if ( notificationPlaying && volume > 0.0f )
-				{
-					volume -= fadeout_increment * 5;
-					if ( volume < *cvar_sfx_notification_music_fade )
-					{
-						volume = *cvar_sfx_notification_music_fade;
-					}
-					music_channel->setVolume(volume);
-				}
-				else if ( ensemblePlaying )
-				{
-					volume -= fadeout_increment * 5;
-					if ( volume < *cvar_sfx_ensemble_music_fade )
-					{
-						volume = *cvar_sfx_ensemble_music_fade;
-					}
-					music_channel->setVolume(volume);
-				}
-				else if (volume < 1.0f)
-				{
-					volume += fadein_increment * 2;
-					if (volume > 1.0f)
-					{
-						volume = 1.0f;
-					}
-					music_channel->setVolume(volume);
-				}
-#endif
-#ifdef DEBUG_EVENT_TIMERS
-				time2 = std::chrono::high_resolution_clock::now();
-				accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-				if ( accum > 5 )
-				{
-					printlog("Large tick time: [15] %f", accum);
-				}
-				time1 = std::chrono::high_resolution_clock::now();
-#endif
-			}
-		}
-
-		//The following makes crossfading possible. Fade out the last playing music. //TODO: Support for saving music so that it can be resumed (for stuff interrupting like combat music).
-		if (music_channel2)
-		{
-			playing = false;
-
-#ifdef DEBUG_EVENT_TIMERS
-			time2 = std::chrono::high_resolution_clock::now();
-			accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-			if ( accum > 5 )
-			{
-				printlog("Large tick time: [16] %f", accum);
-			}
-			time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-			music_channel2->isPlaying(&playing);
-			if (playing)
-			{
-				float volume = 0.0f;
-				music_channel2->getVolume(&volume);
-
-#ifdef DEBUG_EVENT_TIMERS
-				time2 = std::chrono::high_resolution_clock::now();
-				accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-				if ( accum > 5 )
-				{
-					printlog("Large tick time: [17] %f", accum);
-				}
-				time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-				if (volume > 0.0f)
-				{
-					volume -= fadeout_increment * 2;
-					if (volume < 0.0f)
-					{
-						volume = 0.0f;
-					}
-					music_channel2->setVolume(volume);
-				}
-
-#ifdef DEBUG_EVENT_TIMERS
-				time2 = std::chrono::high_resolution_clock::now();
-				accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-				if ( accum > 5 )
-				{
-					printlog("Large tick time: [18] %f", accum);
-				}
-				time1 = std::chrono::high_resolution_clock::now();
-#endif
-			}
-		}
-	}
-
-#ifdef DEBUG_EVENT_TIMERS
-	time2 = std::chrono::high_resolution_clock::now();
-	accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-	if ( accum > 5 )
-	{
-		printlog("Large tick time: [19] %f", accum);
-	}
-	time1 = std::chrono::high_resolution_clock::now();
-#endif
-
-	if (player == numplayers - 1) {
-#ifndef EDITOR
-		VoiceChat.update();
-#endif
-		fmod_system->update();
-	}
-
-#ifdef DEBUG_EVENT_TIMERS
-	time2 = std::chrono::high_resolution_clock::now();
-	accum = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1).count();
-	if ( accum > 5 )
-	{
-		printlog("Large tick time: [20] %f", accum);
-	}
-	time1 = std::chrono::high_resolution_clock::now();
-#endif
-}
-
-#elif defined USE_OPENAL
 
 struct OPENAL_BUFFER {
 	ALuint id;
@@ -573,11 +179,7 @@ static int openal_streamread(OPENAL_SOUND *self, ALuint buffer) {
 
 
 	while (size < OGGSIZE) {
-		#ifdef USE_TREMOR
-		result = ov_read(&self->oggStream, pcm+size, OGGSIZE -size, &section);
-		#else
 		result = ov_read(&self->oggStream, pcm+size, OGGSIZE -size, 0, 2, 1, &section);
-		#endif
 		if(result==0 && self->loop)
 			ov_raw_seek(&self->oggStream, 0);
 
@@ -863,7 +465,7 @@ void sound_update(int player, int index, int numplayers)
 		return;
 	}
 
-	FMOD_VECTOR position;
+	Vec3 position;
 
 	auto& camera = cameras[index];
 	if ( splitscreen )
@@ -1055,11 +657,7 @@ int OPENAL_CreateSound(const char* name, bool b3D, OPENAL_BUFFER **buffer) {
 	size_t sz = 0;
 	do {
 		int bitStream;
-		#ifdef USE_TREMOR
-		bytes = ov_read(&oggFile, ptr, size, &bitStream);
-		#else
 		bytes = ov_read(&oggFile, ptr, size, 0, 2, 1, &bitStream);
-		#endif
 		size-=bytes;
 		ptr+=bytes;
 		sz+=bytes;
@@ -1222,7 +820,6 @@ void OPENAL_Sound_Release(OPENAL_BUFFER* buffer) {
 	free(buffer);
 }
 
-#endif
 
 bool physfsSearchMusicToUpdate_helper_findModifiedMusic(uint32_t numMusic, const char* filenameTemplate)
 {
@@ -1353,62 +950,6 @@ bool physfsSearchMusicToUpdate()
 	{
 		return false;
 	}
-#ifdef USE_FMOD
-#ifdef SOUND
-
-	for ( auto it = themeMusic.begin(); it != themeMusic.end(); ++it )
-	{
-		DynamicString filename = *it;
-		if ( PHYSFS_getRealDir(filename.c_str()) != nullptr )
-		{
-			DynamicString musicDir = PHYSFS_getRealDir(filename.c_str());
-			if ( musicDir.compare("./") != 0 )
-			{
-				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
-				return true;
-			}
-		}
-	}
-
-	int c;
-
-	if ( physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMMINESMUSIC, "music/mines%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMSWAMPMUSIC, "music/swamp%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMLABYRINTHMUSIC, "music/labyrinth%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMRUINSMUSIC, "music/ruins%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMUNDERWORLDMUSIC, "music/underworld%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMHELLMUSIC, "music/hell%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMMINOTAURMUSIC, "music/minotaur%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMCAVESMUSIC, "music/caves%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMCITADELMUSIC, "music/citadel%02d.ogg")
-		|| physfsSearchMusicToUpdate_helper_findModifiedMusic(NUMFORTRESSMUSIC, "music/fortress%02d.ogg") )
-	{
-		return true;
-	}
-
-	for ( c = 0; c < NUMINTROMUSIC; c++ )
-	{
-		if ( c == 0 )
-		{
-			strcpy(tempstr, "music/intro.ogg");
-		}
-		else
-		{
-			snprintf(tempstr, 1000, "music/intro%02d.ogg", c);
-		}
-		if ( PHYSFS_getRealDir(tempstr) != nullptr )
-		{
-			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
-			if ( musicDir.compare("./") != 0 )
-			{
-				printlog("[PhysFS]: Found modified music in music/ directory, reloading music files...");
-				return true;
-			}
-		}
-	}
-#endif // SOUND
-	return false;
-#elif defined USE_OPENAL
 	// OpenAL music hot-reload: check the same numbered arrays + theme tracks.
 #ifdef SOUND
 	const char* themePaths[] = {
@@ -1446,48 +987,8 @@ bool physfsSearchMusicToUpdate()
 	}
 #endif // SOUND
 	return false;
-#else
-	return false;
-#endif
 }
 
-#ifdef USE_FMOD
-FMOD_RESULT physfsReloadMusic_helper_reloadMusicArray(uint32_t numMusic, const char* filenameTemplate, FMOD::Sound** musicArray, bool reloadAll)
-{
-	for ( int c = 0; c < numMusic; c++ )
-	{
-		snprintf(tempstr, 1000, filenameTemplate, c);
-		if ( PHYSFS_getRealDir(tempstr) != nullptr )
-		{
-			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
-			if ( musicDir.compare("./") != 0 || reloadAll )
-			{
-				musicDir.append(PHYSFS_getDirSeparator()).append(tempstr);
-				printlog("[PhysFS]: Loading music file %s...", tempstr);
-				if ( musicArray )
-				{
-					musicArray[c]->release();
-				}
-                if ( musicPreload )
-                {
-                    fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &musicArray[c]); //TODO: Any other FMOD_MODEs should be used here? FMOD_SOFTWARE -> what now? FMOD_2D? LOOP?
-                }
-                else
-                {
-                    fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &musicArray[c]); //TODO: Any other FMOD_MODEs should be used here? FMOD_SOFTWARE -> what now? FMOD_2D? LOOP?
-                }
-                if (fmod_result != FMOD_OK)
-                {
-                    printlog("[PhysFS]: ERROR: Failed reloading music file \"%s\".");
-                    return fmod_result;
-                }
-			}
-		}
-	}
-
-	return FMOD_OK;
-}
-#endif
 
 void physfsReloadMusic(bool &introMusicChanged, bool reloadAll) //TODO: This should probably return an error.
 {
@@ -1495,233 +996,6 @@ void physfsReloadMusic(bool &introMusicChanged, bool reloadAll) //TODO: This sho
 	{
 		return;
 	}
-#ifdef USE_FMOD
-	int index = 0;
-	bool ensembleNeedsUpdate = false;
-	for ( auto it = themeMusic.begin(); it != themeMusic.end(); ++it )
-	{
-		DynamicString filename = *it;
-		if ( PHYSFS_getRealDir(filename.c_str()) != nullptr )
-		{
-			DynamicString musicDir = PHYSFS_getRealDir(filename.c_str());
-			if ( musicDir.compare("./") != 0 || reloadAll )
-			{
-				musicDir += PHYSFS_getDirSeparator() + filename;
-				printlog("[PhysFS]: Loading music file %s...", filename.c_str());
-				switch ( index )
-				{
-					case 0:
-						if ( introductionmusic ) { introductionmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &introductionmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &introductionmusic); }
-						break;
-					case 1:
-						if ( intermissionmusic ) { intermissionmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &intermissionmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &intermissionmusic); }
-						break;
-					case 2:
-						if ( minetownmusic ) { minetownmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &minetownmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &minetownmusic); }
-						break;
-					case 3:
-						if ( splashmusic ) { splashmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &splashmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &splashmusic); }
-						break;
-					case 4:
-						if ( librarymusic ) { librarymusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &librarymusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &librarymusic); }
-						break;
-					case 5:
-						if ( shopmusic ) { shopmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &shopmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &shopmusic); }
-						break;
-					case 6:
-						if ( herxmusic ) { herxmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &herxmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &herxmusic); }
-						break;
-					case 7:
-						if ( templemusic ) { templemusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &templemusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &templemusic); }
-						break;
-					case 8:
-						if ( endgamemusic ) { endgamemusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &endgamemusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &endgamemusic); }
-						break;
-					case 9:
-						if ( escapemusic ) { escapemusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &escapemusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &escapemusic); }
-						break;
-					case 10:
-						if ( devilmusic ) { devilmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &devilmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &devilmusic); }
-						break;
-					case 11:
-						if ( sanctummusic ) { sanctummusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &sanctummusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &sanctummusic); }
-						break;
-					case 12:
-						if ( gnomishminesmusic ) { gnomishminesmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &gnomishminesmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &gnomishminesmusic); }
-						break;
-					case 13:
-						if ( greatcastlemusic ) { greatcastlemusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &greatcastlemusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &greatcastlemusic); }
-						break;
-					case 14:
-						if ( sokobanmusic ) { sokobanmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &sokobanmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &sokobanmusic); }
-						break;
-					case 15:
-						if ( caveslairmusic ) { caveslairmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &caveslairmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &caveslairmusic); }
-						break;
-					case 16:
-						if ( bramscastlemusic ) { bramscastlemusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &bramscastlemusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &bramscastlemusic); }
-						break;
-					case 17:
-						if ( hamletmusic ) { hamletmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &hamletmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &hamletmusic); }
-						break;
-					case 18:
-						if ( tutorialmusic ) { tutorialmusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &tutorialmusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &tutorialmusic); }
-						break;
-					case 19:
-						if ( gameovermusic ) { gameovermusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &gameovermusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &gameovermusic); }
-						break;
-					case 20:
-						if ( introstorymusic ) { introstorymusic->release(); }
-						if ( musicPreload ) { fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &introstorymusic); }
-						else { fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &introstorymusic); }
-						break;
-					default:
-						break;
-				}
-				if (fmod_result != FMOD_OK)
-				{
-					printlog("[PhysFS]: ERROR: Failed reloading music file \"%s\".", filename.c_str());
-				}
-			}
-		}
-		++index;
-	}
-
-	int c;
-	FMOD::Sound** music = nullptr;
-
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMMINESMUSIC, "music/mines%02d.ogg", minesmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload mines music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMSWAMPMUSIC, "music/swamp%02d.ogg", swampmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload swamp music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMLABYRINTHMUSIC, "music/labyrinth%02d.ogg", labyrinthmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload labyrinth music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMRUINSMUSIC, "music/ruins%02d.ogg", ruinsmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload ruins music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMUNDERWORLDMUSIC, "music/underworld%02d.ogg", underworldmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload underworld music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMHELLMUSIC, "music/hell%02d.ogg", hellmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload hell music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMMINOTAURMUSIC, "music/minotaur%02d.ogg", minotaurmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload minotaur music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMCAVESMUSIC, "music/caves%02d.ogg", cavesmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload caves music array.");
-	}
-	if (FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMCITADELMUSIC, "music/citadel%02d.ogg", citadelmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload citadel music array.");
-	}
-	if ( FMOD_OK != (fmod_result = physfsReloadMusic_helper_reloadMusicArray(NUMFORTRESSMUSIC, "music/fortress%02d.ogg", fortressmusic, reloadAll)) )
-	{
-		printlog("[PhysFS]: Failed to reload fortress music array.");
-	}
-
-	bool introChanged = false;
-
-	for ( c = 0; c < NUMINTROMUSIC; c++ )
-	{
-		if ( c == 0 )
-		{
-			strcpy(tempstr, "music/intro.ogg");
-		}
-		else
-		{
-			snprintf(tempstr, 1000, "music/intro%02d.ogg", c);
-		}
-		if ( PHYSFS_getRealDir(tempstr) != nullptr )
-		{
-			DynamicString musicDir = PHYSFS_getRealDir(tempstr);
-			if ( musicDir.compare("./") != 0 || reloadAll )
-			{
-				musicDir.append(PHYSFS_getDirSeparator()).append(tempstr);
-				printlog("[PhysFS]: Loading music file %s...", tempstr);
-				music = intromusic;
-				if ( music )
-				{
-					music[c]->release();
-				}
-				if ( musicPreload )
-				{
-					fmod_result = fmod_system->createSound(musicDir.c_str(), FMOD_2D, nullptr, &music[c]);
-				}
-				else
-				{
-					fmod_result = fmod_system->createStream(musicDir.c_str(), FMOD_2D, nullptr, &music[c]);
-				}
-				introChanged = true;
-				if (fmod_result != FMOD_OK)
-				{
-					printlog("[PhysFS]: ERROR: Failed reloading music file \"%s\".");
-					break;
-				}
-			}
-		}
-	}
-
-#ifndef EDITOR
-	if ( ensembleNeedsUpdate && !ensembleSounds.firstTimeSetup )
-	{
-		ensembleSounds.setup();
-	}
-#endif
-
-	introMusicChanged = introChanged;
-#elif defined USE_OPENAL
 	// OpenAL music loading: OPENAL_CreateStreamSound records the file path;
 	// decoding/streaming happens at play time (openal_oggopen). This mirrors
 	// the FMOD path: load the theme tracks + the numbered per-level arrays.
@@ -1802,48 +1076,12 @@ void physfsReloadMusic(bool &introMusicChanged, bool reloadAll) //TODO: This sho
 	}
 
 	introMusicChanged = introChanged;
-#else
-	introMusicChanged = false;
-	(void)reloadAll;
-#endif
 }
 
 void gamemodsUnloadCustomThemeMusic()
 {
 #ifdef SOUND
 	// free custom music slots, not used by official music assets.
-#ifdef USE_FMOD
-	if ( gnomishminesmusic )
-	{
-		gnomishminesmusic->release();
-		gnomishminesmusic = nullptr;
-	}
-	if ( greatcastlemusic )
-	{
-		greatcastlemusic->release();
-		greatcastlemusic = nullptr;
-	}
-	if ( sokobanmusic )
-	{
-		sokobanmusic->release();
-		sokobanmusic = nullptr;
-	}
-	if ( caveslairmusic )
-	{
-		caveslairmusic->release();
-		caveslairmusic = nullptr;
-	}
-	if ( bramscastlemusic )
-	{
-		bramscastlemusic->release();
-		bramscastlemusic = nullptr;
-	}
-	if ( hamletmusic )
-	{
-		hamletmusic->release();
-		hamletmusic = nullptr;
-	}
-#elif defined USE_OPENAL
 	if ( gnomishminesmusic )
 	{
 		OPENAL_Sound_Release(gnomishminesmusic);
@@ -1874,6 +1112,5 @@ void gamemodsUnloadCustomThemeMusic()
 		OPENAL_Sound_Release(hamletmusic);
 		hamletmusic = nullptr;
 	}
-#endif
 #endif // SOUND
 }

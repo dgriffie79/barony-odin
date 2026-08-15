@@ -1965,26 +1965,6 @@ void gameLogic(void)
 					}
 
 					// stop all sounds
-#ifdef USE_FMOD
-					if ( sound_group )
-					{
-						sound_group->stop();
-					}
-					if ( soundAmbient_group )
-					{
-						soundAmbient_group->stop();
-					}
-					if ( soundEnvironment_group )
-					{
-						soundEnvironment_group->stop();
-					}
-					if ( soundNotification_group )
-					{
-						soundNotification_group->stop();
-					}
-					ensembleSounds.stopPlaying(true);
-					VoiceChat.deinitRecording(false);
-#elif defined USE_OPENAL
 					if ( sound_group )
 					{
 						OPENAL_ChannelGroup_Stop(sound_group);
@@ -1997,7 +1977,6 @@ void gameLogic(void)
 					{
 						OPENAL_ChannelGroup_Stop(soundEnvironment_group);
 					}
-#endif
 					// stop combat music
 					// close chests
 					for ( c = 0; c < MAXPLAYERS; ++c )
@@ -7277,15 +7256,6 @@ extern "C" int barony_main(int argc, char** argv)
 					// black background
 					drawRect(NULL, 0, 255);
 
-#ifdef USE_FMOD
-					// fmod logo
-					auto fmod_logo = Image::get("images/system/fmod-logo.png");
-					int w = fmod_logo->getWidth() / 3;
-					int h = fmod_logo->getHeight() / 3;
-					fmod_logo->drawColor(nullptr,
-					    SDL_Rect{xres - w - 16, yres - h - 16, w, h},
-					    SDL_Rect{0, 0, xres, yres}, makeColor(150, 150, 150, 255));
-#endif
 
 					// team splash
                     const float factor = xres / 1280.f;
