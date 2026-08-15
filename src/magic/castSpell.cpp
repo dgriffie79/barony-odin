@@ -781,10 +781,10 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 				if ( !achievementObserver.playerAchievements[caster->skill[2]].gastricBypass )
 				{
 					int fullCostOfSpell = getCostOfSpell(spell, caster);
-					achievementObserver.playerAchievements[caster->skill[2]].gastricBypassSpell = std::make_pair(0, 0);
+					achievementObserver.playerAchievements[caster->skill[2]].gastricBypassSpell = { 0, 0 };
 					if ( stat->MP <= 5 && stat->MP + fullCostOfSpell > 5 )
 					{
-						achievementObserver.playerAchievements[caster->skill[2]].gastricBypassSpell = std::make_pair(spell->ID, caster->ticks);
+						achievementObserver.playerAchievements[caster->skill[2]].gastricBypassSpell = { spell->ID, caster->ticks };
 					}
 				}
 			}
@@ -6199,7 +6199,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 
 					if ( caster->getStats() && !caster->getStats()->getEffectActive(EFF_FLUTTER) )
 					{
-						achievementObserver.playerAchievements[i].flutterShyCoordinates = std::make_pair(caster->x, caster->y);
+						achievementObserver.playerAchievements[i].flutterShyCoordinates = { caster->x, caster->y };
 					}
 
 					if ( caster->setEffect(EFF_FLUTTER, true, duration, true) )

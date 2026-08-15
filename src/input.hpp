@@ -143,7 +143,7 @@ public:
 	static float getAnalogToggleThreshold() { return analogToggleThreshold; }
 
 	//! list of connected input devices
-	static std::string lastInputOfAnyKind;
+	static DynamicString lastInputOfAnyKind;
 	static int waitingToBindControllerForPlayer;
 	static DynamicMapI32T<SDL_GameController*> gameControllers;
 	static DynamicMapI32T<SDL_Joystick*> joysticks;

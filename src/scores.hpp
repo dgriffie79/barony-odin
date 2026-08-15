@@ -987,12 +987,12 @@ public:
 		int sourceEngine = 0;
 		int parryTank = 0;
 
-		std::pair<int, int> realBoy;
+		IntPair_t realBoy;
 		DynamicMapI32T<int> caughtInAMoshTargets;
 		DynamicArrayU32 strungOutTicks;
 		DynamicSetI32 ironicPunishmentTargets;
-		std::pair<real_t, real_t> flutterShyCoordinates;
-		std::pair<int, Uint32> gastricBypassSpell;
+		RealPair_t flutterShyCoordinates;
+		IntU32Pair_t gastricBypassSpell;
 		DynamicSetI32 rat5000secondRule;
 		DynamicSetI32 phantomMaskFirstStrikes;
 		DynamicSetI32 bountyTargets;
@@ -1004,9 +1004,9 @@ public:
 		
 		PlayerAchievements()
 		{
-			realBoy = std::make_pair(0, 0);
-			gastricBypassSpell = std::make_pair(0, 0);
-			flutterShyCoordinates = std::make_pair(0.0, 0.0);
+			realBoy = { 0, 0 };
+			gastricBypassSpell = { 0, 0 };
+			flutterShyCoordinates = { 0.0, 0.0 };
 		};
 		bool checkPathBetweenObjects(Entity* player, Entity* target, int achievement);
 		bool checkTraditionKill(Entity* player, Entity* target);

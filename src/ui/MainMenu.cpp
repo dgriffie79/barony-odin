@@ -5870,7 +5870,7 @@ namespace MainMenu {
 						if (!result) {
 							goto bind_failed;
 						}
-						auto begin = Input::lastInputOfAnyKind.substr(0, 3);
+						auto begin = DynamicString(Input::lastInputOfAnyKind.substr(0, 3));
 						DynamicString newinput = begin == "Pad" || begin == "Joy" ?
 								Input::lastInputOfAnyKind.substr(4) : Input::lastInputOfAnyKind;
 						bound_button->setText(newinput.c_str());

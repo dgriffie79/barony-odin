@@ -4517,13 +4517,13 @@ bool handleEvents(void)
                 } else {
                     mousestatus[event.button.button] = 1; // set this mouse button to 1
                     Input::mouseButtons[event.button.button] = 1;
-                    Input::lastInputOfAnyKind = std::string("Mouse") + std::to_string(event.button.button);
+                    Input::lastInputOfAnyKind = "Mouse" + std::to_string(event.button.button);
                     lastkeypressed = 282 + event.button.button;
                 }
 #else
                 mousestatus[event.button.button] = 1; // set this mouse button to 1
                 Input::mouseButtons[event.button.button] = 1;
-                Input::lastInputOfAnyKind = std::string("Mouse") + std::to_string(event.button.button);
+                Input::lastInputOfAnyKind = "Mouse" + std::to_string(event.button.button);
                 lastkeypressed = 282 + event.button.button;
 #endif
 				break;

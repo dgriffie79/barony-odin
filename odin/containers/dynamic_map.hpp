@@ -479,6 +479,20 @@ struct IntPair_t {
     int32_t second = 0;
 };
 
+// RealPair_t — 16B POD mirror of std::pair<real_t,real_t> (double,double on
+// x64). Used by PlayerAchievements::flutterShyCoordinates.
+struct RealPair_t {
+    double first = 0.0;
+    double second = 0.0;
+};
+
+// IntU32Pair_t — 8B POD mirror of std::pair<int,Uint32>.
+// Used by PlayerAchievements::gastricBypassSpell.
+struct IntU32Pair_t {
+    int32_t first = 0;
+    uint32_t second = 0;
+};
+
 // ChunkDither_t — same 8B layout, but its map value kind (MK_ChunkDither)
 // defaults `value` to 10 on insert (Chunk::Dither { value = MAX; }), matching
 // the std::unordered_map value-initialization for chunk dithering.

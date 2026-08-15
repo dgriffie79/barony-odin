@@ -27,7 +27,7 @@ DynamicMapI32T<bool> Input::keys;
 bool Input::mouseButtons[18] = { false };
 const int Input::MOUSE_WHEEL_UP = 16;
 const int Input::MOUSE_WHEEL_DOWN = 17;
-std::string Input::lastInputOfAnyKind;
+DynamicString Input::lastInputOfAnyKind;
 int Input::waitingToBindControllerForPlayer = 0;
 
 void Input::defaultBindings() {

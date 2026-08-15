@@ -3521,11 +3521,11 @@ bool AchievementObserver::updateOnLevelChange()
 	{
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
-			playerAchievements[i].flutterShyCoordinates = std::make_pair(0.0, 0.0);
+			playerAchievements[i].flutterShyCoordinates = { 0.0, 0.0 };
 			playerAchievements[i].caughtInAMoshTargets.clear();
 			playerAchievements[i].strungOutTicks.clear();
 			playerAchievements[i].ironicPunishmentTargets.clear();
-			playerAchievements[i].gastricBypassSpell = std::make_pair(0, 0);
+			playerAchievements[i].gastricBypassSpell = { 0, 0 };
 			playerAchievements[i].rat5000secondRule.clear();
 			playerAchievements[i].phantomMaskFirstStrikes.clear();
 			playerAchievements[i].bountyTargets.clear();
@@ -4418,12 +4418,12 @@ void AchievementObserver::clearPlayerAchievementData()
 		playerAchievements[i].sourceEngine = 0;
 		playerAchievements[i].parryTank = 0;
 
-		playerAchievements[i].realBoy = std::make_pair(0, 0);
+		playerAchievements[i].realBoy = { 0, 0 };
 		playerAchievements[i].caughtInAMoshTargets.clear();
 		playerAchievements[i].strungOutTicks.clear();
 		playerAchievements[i].ironicPunishmentTargets.clear();
-		playerAchievements[i].flutterShyCoordinates = std::make_pair(0.0, 0.0);
-		playerAchievements[i].gastricBypassSpell = std::make_pair(0, 0);
+		playerAchievements[i].flutterShyCoordinates = { 0.0, 0.0 };
+		playerAchievements[i].gastricBypassSpell = { 0, 0 };
 		playerAchievements[i].rat5000secondRule.clear();
 		playerAchievements[i].phantomMaskFirstStrikes.clear();
 		playerAchievements[i].bountyTargets.clear();

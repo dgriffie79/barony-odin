@@ -298,7 +298,7 @@ struct LastCreatedCharacter {
 	int characterAppearance[NUM_LAST_CHARACTERS];
 	int characterSex[NUM_LAST_CHARACTERS];
 	int characterRace[NUM_LAST_CHARACTERS];
-	std::string characterName[NUM_LAST_CHARACTERS];
+	DynamicString characterName[NUM_LAST_CHARACTERS];
 	LastCreatedCharacter()
 	{
 		for ( int i = 0; i < NUM_LAST_CHARACTERS; ++i )

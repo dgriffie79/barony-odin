@@ -23,7 +23,7 @@ public:
 	{
 		for ( int _i = 0; _i < kNumSearchResults; ++_i )
 		{
-			lobbyDisplayedSearchResults[_i] = std::make_pair(-1, LOBBY_DISABLE);
+			lobbyDisplayedSearchResults[_i] = { -1, LOBBY_DISABLE };
 		}
 	};
 
@@ -33,6 +33,11 @@ public:
 		LOBBY_STEAM,
 		LOBBY_CROSSPLAY,
 		LOBBY_COMBINED
+	};
+	// POD mirror of std::pair<Sint32, LobbyServiceType> (8B: index + enum).
+	struct LobbySearchResult_t {
+		Sint32 first;
+		LobbyServiceType second;
 	};
 	LobbyServiceType hostingType = LOBBY_DISABLE;
 	LobbyServiceType joiningType = LOBBY_DISABLE;
@@ -45,7 +50,7 @@ public:
 	void drawLobbyFilters();
 	LobbyServiceType getDisplayedResultLobbyType(int selection);
 	Sint32 getDisplayedResultLobbyIndex(int selection);
-	std::pair<Sint32, LobbyServiceType> lobbyDisplayedSearchResults[kNumSearchResults];
+	LobbySearchResult_t lobbyDisplayedSearchResults[kNumSearchResults];
 	Uint32 numLobbyDisplaySearchResults = 0;
 	int selectedLobbyInList = 0;
 	bool showLobbyFilters = false;
