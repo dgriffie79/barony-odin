@@ -359,6 +359,12 @@ if host_system == 'windows'
       input : [
         odin_root / 'main.odin',
         odin_root / 'main_types.odin',
+        odin_root / 'hash.odin',
+        odin_root / 'paths.odin',
+        odin_root / 'collision.odin',
+        odin_root / 'light.odin',
+        odin_root / 'stat.odin',
+        odin_root / 'items.odin',
         odin_root / 'game.odin',
         odin_root / 'prng.odin',
         odin_root / 'containers' / 'dynamic_array.odin',
