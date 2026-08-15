@@ -3,6 +3,34 @@ package main
 
 import "containers"
 
+// struct PlayerSettings_t (player.hpp:53, file scope) — 80 bytes.
+// NOTE: distinct from the nested Player::PlayerSettings_t (16B, mirrored below
+// as Player_Settings_T). This is the type of the global playerSettings[MAXPLAYERS].
+PlayerSettings_T :: struct {
+	player:                         i32,
+	shootmode_crosshair:            i32,
+	shootmode_crosshair_opacity:    i32,
+	mousespeed:                     f64, // real_t
+	mkb_world_tooltips_enabled:     bool,
+	gamepad_facehotbar:             bool,
+	hotbar_numkey_quick_add:        bool,
+	hotbar_numkey_change_slot:      bool,
+	reversemouse:                   bool,
+	smoothmouse:                    bool,
+	gamepad_rightx_sensitivity:     f64, // real_t
+	gamepad_righty_sensitivity:     f64, // real_t
+	gamepad_rightx_invert:          bool,
+	gamepad_righty_invert:          bool,
+	quick_turn_speed:               f32,
+	quick_turn_speed_mkb:           f32,
+	mouse_event_limit_mkb:          i32,
+	spell_quickcast_mkb:            bool,
+	spell_quickcast_controller:     bool,
+	left_stick_deadzone:            i32, // Sint32
+	right_stick_deadzone:           i32, // Sint32
+}
+#assert(size_of(PlayerSettings_T) == 80)
+
 // ---------------------------------------------------------------------------
 // Enums (4-byte i32 unless noted)
 // ---------------------------------------------------------------------------
