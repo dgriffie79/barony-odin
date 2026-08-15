@@ -358,6 +358,7 @@ if host_system == 'windows'
       output : 'barony.exe',
       input : [
         odin_root / 'main.odin',
+        odin_root / 'main_types.odin',
         odin_root / 'game.odin',
         odin_root / 'prng.odin',
         odin_root / 'containers' / 'dynamic_array.odin',
@@ -381,6 +382,7 @@ if host_system == 'windows'
         output : 'editor.exe',
         input : [
           odin_root / 'main.odin',
+          odin_root / 'main_types.odin',
           odin_root / 'editor.odin',
           odin_root / 'containers' / 'dynamic_array.odin',
           odin_root / 'containers' / 'dynamic_map.odin',
