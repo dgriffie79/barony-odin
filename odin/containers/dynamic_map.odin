@@ -2127,6 +2127,14 @@ IntPair_t :: struct {
 	second: i32,
 }
 
+// Uint32IntPair_t — 8B POD (pair<Uint32,int>). Value for
+// GenericGUIMenu::ItemEffectGUI_t::confirmActionOnItemSteps.
+Uint32IntPair_t :: struct {
+	first:  u32,
+	second: i32,
+}
+#assert(size_of(Uint32IntPair_t) == 8)
+
 // nested map<int, map<int, pair<int,int>>> value (int -> IntPair_t inner map).
 i32_map_intpair_value_free :: proc(p: rawptr) {
 	mm := transmute(^map[[4]byte]IntPair_t)(p)

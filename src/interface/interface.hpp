@@ -781,7 +781,7 @@ public:
 			ITEMFX_ACTION_NEED_SKILL_LVLS,
 			ITEMFX_ACTION_CANT_AFFORD_MANA_AND_GOLD
 		};
-		std::pair<Uint32, int> confirmActionOnItemSteps;
+		Uint32IntPair_t confirmActionOnItemSteps;
 		ItemEffectActions_t itemActionType = ITEMFX_ACTION_NONE;
 		bool itemRequiresTitleReflow = true;
 		real_t animTooltip = 0.0;

@@ -501,6 +501,13 @@ struct IntU32Pair_t {
     uint32_t second = 0;
 };
 
+// Uint32IntPair_t — 8B POD mirror of std::pair<Uint32,int>.
+// Used by GenericGUIMenu::ItemEffectGUI_t::confirmActionOnItemSteps.
+struct Uint32IntPair_t {
+    uint32_t first = 0;
+    int32_t second = 0;
+};
+
 // ChunkDither_t — same 8B layout, but its map value kind (MK_ChunkDither)
 // defaults `value` to 10 on insert (Chunk::Dither { value = MAX; }), matching
 // the std::unordered_map value-initialization for chunk dithering.
