@@ -84,9 +84,9 @@ extern int GAMEUI_FRAMEDATA_SPELL_LEARNABLE; // if spell provides skill xp
 extern bool newui;
 extern bool bUsePreciseFieldTextReflow;
 extern bool bUseSelectedSlotCycleAnimation;
-extern ConsoleVariable<bool> shareMinimap;
+extern CvarBool shareMinimap;
 extern Frame::result_t framesProcResult;
-extern ConsoleVariable<bool> framesEatMouse;
+extern CvarBool framesEatMouse;
 
 Frame* createPauseMenuPlayerBars();
 void openMinimap(int player);

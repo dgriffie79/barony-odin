@@ -33,22 +33,22 @@
 
 -------------------------------------------------------------------------------*/
 
-static ConsoleVariable<float> cvar_hudweapon_yaw_ang("/hudweapon_yaw_ang", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_yaw_spd("/hudweapon_yaw_spd", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_pitch_ang("/hudweapon_pitch_ang", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_pitch_spd("/hudweapon_pitch_spd", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_roll_ang("/hudweapon_roll_ang", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_roll_spd("/hudweapon_roll_spd", 1.0);
-static ConsoleVariable<float> cvar_hudweapon_x_ang("/hudweapon_x_ang", 2.0);
-static ConsoleVariable<float> cvar_hudweapon_x_spd("/hudweapon_x_spd", 0.5);
-static ConsoleVariable<float> cvar_hudweapon_y_ang("/hudweapon_y_ang", -4.0);
-static ConsoleVariable<float> cvar_hudweapon_y_spd("/hudweapon_y_spd", 1.0);
-static ConsoleVariable<float> cvar_hudweapon_z_ang("/hudweapon_z_ang", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_z_spd("/hudweapon_z_spd", 0.0);
-static ConsoleVariable<float> cvar_hudweapon_timescale("/hudweapon_timescale", 0.5);
-static ConsoleVariable<float> cvar_hudweapon_timescale2("/hudweapon_timescale2", 0.675);
-static ConsoleVariable<float> cvar_hudweapon_timescale3("/hudweapon_timescale3", 1.0);
-//static ConsoleVariable<int> cvar_claymore_toggle("/claymore_toggle", 0);
+static CvarFloat cvar_hudweapon_yaw_ang("/hudweapon_yaw_ang", 0.0);
+static CvarFloat cvar_hudweapon_yaw_spd("/hudweapon_yaw_spd", 0.0);
+static CvarFloat cvar_hudweapon_pitch_ang("/hudweapon_pitch_ang", 0.0);
+static CvarFloat cvar_hudweapon_pitch_spd("/hudweapon_pitch_spd", 0.0);
+static CvarFloat cvar_hudweapon_roll_ang("/hudweapon_roll_ang", 0.0);
+static CvarFloat cvar_hudweapon_roll_spd("/hudweapon_roll_spd", 1.0);
+static CvarFloat cvar_hudweapon_x_ang("/hudweapon_x_ang", 2.0);
+static CvarFloat cvar_hudweapon_x_spd("/hudweapon_x_spd", 0.5);
+static CvarFloat cvar_hudweapon_y_ang("/hudweapon_y_ang", -4.0);
+static CvarFloat cvar_hudweapon_y_spd("/hudweapon_y_spd", 1.0);
+static CvarFloat cvar_hudweapon_z_ang("/hudweapon_z_ang", 0.0);
+static CvarFloat cvar_hudweapon_z_spd("/hudweapon_z_spd", 0.0);
+static CvarFloat cvar_hudweapon_timescale("/hudweapon_timescale", 0.5);
+static CvarFloat cvar_hudweapon_timescale2("/hudweapon_timescale2", 0.675);
+static CvarFloat cvar_hudweapon_timescale3("/hudweapon_timescale3", 1.0);
+//static CvarInt cvar_claymore_toggle("/claymore_toggle", 0);
 void hudWeaponAnimateVariable(real_t& variable, real_t target, real_t speed)
 {
 	if ( variable < target )
@@ -2132,10 +2132,10 @@ void actHudWeapon(Entity* my)
 		}
 		else if ( flail )
 		{
-			static ConsoleVariable<float> cvar_anim_flail("/anim_flail", 1.0);
-			static ConsoleVariable<float> cvar_anim_flail_x1("/anim_flail_x1", 0.3);
-			static ConsoleVariable<float> cvar_anim_flail_x2("/anim_flail_x2", 8.0);
-			static ConsoleVariable<float> cvar_anim_flail_x3("/anim_flail_x3", 0.0);
+			static CvarFloat cvar_anim_flail("/anim_flail", 1.0);
+			static CvarFloat cvar_anim_flail_x1("/anim_flail_x1", 0.3);
+			static CvarFloat cvar_anim_flail_x2("/anim_flail_x2", 8.0);
+			static CvarFloat cvar_anim_flail_x3("/anim_flail_x3", 0.0);
 			HUDWEAPON_PITCH += .55 * *cvar_anim_flail;
 			if ( HUDWEAPON_PITCH >= PI * *cvar_anim_flail_x1 )
 			{
@@ -3577,7 +3577,7 @@ void actHudWeapon(Entity* my)
 	}
 	else if ( HUDWEAPON_CHOP == 24 )
 	{
-		//static ConsoleVariable<float> cvar_anim_flail2("/anim_flail2", 0.25);
+		//static CvarFloat cvar_anim_flail2("/anim_flail2", 0.25);
 		real_t rate = 0.25;
 		if ( HUDWEAPON_MOVEX > 0 )
 		{
@@ -4099,7 +4099,7 @@ void actHudWeapon(Entity* my)
 #define HUDSHIELD_FOCI_EASE my->fskill[7]
 #define HUDSHIELD_FOCI_BOB my->fskill[8]
 #define HUDSHIELD_DUCK_CHARGE my->fskill[9]
-static ConsoleVariable<bool> cvar_hud_toggle_defend("/hud_toggle_defend", false);
+static CvarBool cvar_hud_toggle_defend("/hud_toggle_defend", false);
 
 void actHudShield(Entity* my)
 {
@@ -5129,11 +5129,11 @@ void actHudShield(Entity* my)
 			{
 				if ( stats[HUDSHIELD_PLAYERNUM]->shield->type == TOOL_FOCI_FIRE )
 				{
-					static ConsoleVariable<float> cvar_foci_charge_init("/foci_charge_init", 1.f);
+					static CvarFloat cvar_foci_charge_init("/foci_charge_init", 1.f);
 					int chargeTimeInit = (float)(TICKS_PER_SECOND / 4) * *cvar_foci_charge_init;
 					if ( HUDSHIELD_DEFEND >= chargeTimeInit )
 					{
-						static ConsoleVariable<float> cvar_foci_charge("/foci_charge", 1.f);
+						static CvarFloat cvar_foci_charge("/foci_charge", 1.f);
 						int chargeTime = (float)(TICKS_PER_SECOND / 4) * *cvar_foci_charge;
 						if ( (HUDSHIELD_DEFEND - chargeTimeInit) % chargeTime == 0 )
 						{
@@ -5228,7 +5228,7 @@ void actHudAdditional2(Entity* my)
 	my->focaly = 0;
 	my->focalz = 4;
 
-	/*static ConsoleVariable<float> cvar_bounce("/bounce", 1.f);
+	/*static CvarFloat cvar_bounce("/bounce", 1.f);
 	if ( keystatus[SDLK_F1] )
 	{
 		keystatus[SDLK_F1] = 0;
@@ -5289,10 +5289,10 @@ void actHudAdditional2(Entity* my)
 		prevYaw = newYaw;
 	}
 	
-	static ConsoleVariable<float> cvar_anim_flail_damp("/anim_flail_damp", 2.f);
-	static ConsoleVariable<float> cvar_anim_flail_mass("/anim_flail_mass", 5.f);
-	static ConsoleVariable<float> cvar_anim_flail_spring("/anim_flail_spring", 5.f);
-	static ConsoleVariable<float> cvar_anim_flail_mult("/anim_flail_mult", .1f);
+	static CvarFloat cvar_anim_flail_damp("/anim_flail_damp", 2.f);
+	static CvarFloat cvar_anim_flail_mass("/anim_flail_mass", 5.f);
+	static CvarFloat cvar_anim_flail_spring("/anim_flail_spring", 5.f);
+	static CvarFloat cvar_anim_flail_mult("/anim_flail_mult", .1f);
 	// spring motion
 	{
 		real_t accel = (-*cvar_anim_flail_damp * bounce - *cvar_anim_flail_spring * hudFlail.roll) / *cvar_anim_flail_mass;
@@ -5330,7 +5330,7 @@ void actHudAdditional2(Entity* my)
 			if ( fmod(rollSpin, 2 * PI) >= PI )
 			{
 				spinState = 2;
-				static ConsoleVariable<float> cvar_anim_flail_atk_spin("/anim_flail_atk_spin", 2.5);
+				static CvarFloat cvar_anim_flail_atk_spin("/anim_flail_atk_spin", 2.5);
 				spin2 = 1.0;
 				spin = *cvar_anim_flail_atk_spin;
 

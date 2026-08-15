@@ -352,7 +352,7 @@ Input::ControllerType Input::getControllerType() const {
 }
 
 #ifndef EDITOR
-static ConsoleVariable<int> cvar_forceGlyphs("/forceglyphs", -1, "Force use of specific controller glyphs");
+static CvarInt cvar_forceGlyphs("/forceglyphs", -1, "Force use of specific controller glyphs");
 #endif
 
 Input::ControllerType Input::getControllerType(int index) {

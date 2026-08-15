@@ -1177,7 +1177,7 @@ void Entity::mimicSetStats(Stat* myStats)
 
 MimicGenerator mimic_generator;
 
-static ConsoleVariable<bool> cvar_mimic_test2("/mimic_test2", false);
+static CvarBool cvar_mimic_test2("/mimic_test2", false);
 
 void MimicGenerator::init()
 {

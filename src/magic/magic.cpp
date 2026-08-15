@@ -4402,7 +4402,7 @@ real_t getSpellPropertyFromID(spell_t::SpellBasePropertiesFloat prop, int spellI
 				{
 					maxDist = 128.0;
 				}
-				static ConsoleVariable<float> cvar_spell_max_distance("/spell_max_distance", 96.0);
+				static CvarFloat cvar_spell_max_distance("/spell_max_distance", 96.0);
 				if ( svFlags & SV_FLAG_CHEATS )
 				{
 					maxDist = *cvar_spell_max_distance;

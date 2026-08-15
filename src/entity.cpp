@@ -42,7 +42,7 @@ Construct an Entity
 
 -------------------------------------------------------------------------------*/
 
-ConsoleVariable<int> cvar_entity_bodypart_sync_tick("/entity_bodypart_sync_tick", TICKS_PER_SECOND / 4);
+CvarInt cvar_entity_bodypart_sync_tick("/entity_bodypart_sync_tick", TICKS_PER_SECOND / 4);
 void Entity::setUID(Uint32 new_uid)
 {
 	if ( !mynode ) { return; }
@@ -3795,7 +3795,7 @@ void Entity::monsterRollLevelUpStats(int increasestat[3])
 	increasestat[2] = r;
 }
 
-static ConsoleVariable<bool> cvar_noxp("/noxp", false);
+static CvarBool cvar_noxp("/noxp", false);
 
 void Entity::handleEffects(Stat* myStats)
 {
@@ -4094,7 +4094,7 @@ void Entity::handleEffects(Stat* myStats)
 		Uint32 color = makeColorRGB(255, 255, 0);
 		messagePlayerColor(player, MESSAGE_SPAM_MISC, color, Language::get(622));
 
-		static ConsoleVariable<int> cvar_lvlup_ally_sfx("/lvlup_ally_sfx", 520);
+		static CvarInt cvar_lvlup_ally_sfx("/lvlup_ally_sfx", 520);
 		bool alreadyProcessedMaxHPIncrease = false;
 		// now pick three attributes to increase
 
@@ -5722,7 +5722,7 @@ void Entity::handleEffects(Stat* myStats)
 						}
 						players[player]->mechanics.lastFociHeldType = myStats->shield->type;
 
-						static ConsoleVariable<float> cvar_foci_charge_init("/foci_charge_init", 1.f);
+						static CvarFloat cvar_foci_charge_init("/foci_charge_init", 1.f);
 						int chargeTimeInit = (float)(TICKS_PER_SECOND / 4);
 						if ( svFlags & SV_FLAG_CHEATS )
 						{
@@ -5745,7 +5745,7 @@ void Entity::handleEffects(Stat* myStats)
 								}
 							}
 
-							static ConsoleVariable<float> cvar_foci_charge("/foci_charge", 1.f);
+							static CvarFloat cvar_foci_charge("/foci_charge", 1.f);
  							int chargeTime = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spellID,
 								this, myStats, this);
 							if ( svFlags & SV_FLAG_CHEATS )
@@ -6124,7 +6124,7 @@ void Entity::handleEffects(Stat* myStats)
 								}
 							}
 
-							static ConsoleVariable<bool> cvar_ensemble_debug_length("/ensemble_debug_length", false);
+							static CvarBool cvar_ensemble_debug_length("/ensemble_debug_length", false);
 
 							Uint8 effectStrength = std::max(1, std::min(255, CHR + 1));
 							if ( castCycle == 1 )
@@ -6152,7 +6152,7 @@ void Entity::handleEffects(Stat* myStats)
 											bool effectIncrease = effectStrength > entitystats->getEffectActive(effect);
 
 											int durationTotal = entitystats->EFFECTS_TIMERS[effect] + duration;
-											static ConsoleVariable<int> cvar_ensemble_max_length("/ensemble_max_length", (TICKS_PER_SECOND * 60 * 5));
+											static CvarInt cvar_ensemble_max_length("/ensemble_max_length", (TICKS_PER_SECOND * 60 * 5));
 											int durationMax = !(svFlags & SV_FLAG_CHEATS) ? (TICKS_PER_SECOND * 60 * 5) : *cvar_ensemble_max_length;
 
 											if ( entity == this && durationTotal > durationMax + 5 )
@@ -12949,7 +12949,7 @@ void Entity::attack(int pose, int charge, Entity* target)
 						}
 					}
 
-					static ConsoleVariable<bool> cvar_atkonhit("/enemy_debugatkonhit", false);
+					static CvarBool cvar_atkonhit("/enemy_debugatkonhit", false);
 					if ( (weaponskill >= PRO_SWORD && weaponskill < PRO_SHIELD) || (weaponskill == PRO_UNARMED && behavior != &actMonster) || weaponskill == PRO_RANGED )
 					{
 						if ( *cvar_atkonhit )
@@ -17841,7 +17841,7 @@ void Entity::awardXP(Entity* src, bool share, bool root)
 	}
 	int baseXpTop = baseXp;
 
-	static ConsoleVariable<bool> cvar_level_curve("/levelcurve", true);
+	static CvarBool cvar_level_curve("/levelcurve", true);
 	if ( svFlags & SV_FLAG_CHEATS && !*cvar_level_curve )
 	{
 		// disabled curve
@@ -27002,7 +27002,7 @@ int Entity::getHealthRegenInterval(Entity* my, Stat& myStats, bool isPlayer, boo
 			real_t regenPerMinute = 60 * TICKS_PER_SECOND / (real_t)(HEAL_TIME);
 			auto& baseGrowths = ClassBaseGrowths::getClassBaseGrowths(client_classes[player]);
 			real_t factor = ClassBaseGrowths::hpRegenFactor;
-			static ConsoleVariable<float> cvar_class_hp_regen_factor("/class_hp_regen_factor", 1.0);
+			static CvarFloat cvar_class_hp_regen_factor("/class_hp_regen_factor", 1.0);
 			if ( svFlags & SV_FLAG_CHEATS )
 			{
 				factor *= *cvar_class_hp_regen_factor;
@@ -27113,7 +27113,7 @@ int getBaseManaRegen(Entity* my, Stat& myStats, bool excludeItemsEffectsBonus)
 		real_t regenPerMinute = 60 * TICKS_PER_SECOND / (real_t)(MAGIC_REGEN_TIME);
 		auto& baseGrowths = ClassBaseGrowths::getClassBaseGrowths(client_classes[player]);
 		real_t factor = ClassBaseGrowths::mpRegenFactor;
-		static ConsoleVariable<float> cvar_class_mp_regen_factor("/class_mp_regen_factor", 1.0);
+		static CvarFloat cvar_class_mp_regen_factor("/class_mp_regen_factor", 1.0);
 		if ( svFlags & SV_FLAG_CHEATS )
 		{
 			factor *= *cvar_class_mp_regen_factor;
@@ -31436,8 +31436,8 @@ void Entity::alertAlliesOnBeingHit(Entity* attacker, DynamicArrayT<Entity*>* ski
 	}
 
 	bool infightingStop = false;
-	static ConsoleVariable<bool> cvar_infightingprotect("/infighting_protect", true);
-	static ConsoleVariable<bool> cvar_infightingprotectplayerallies("/infighting_protect_player_allies", true);
+	static CvarBool cvar_infightingprotect("/infighting_protect", true);
+	static CvarBool cvar_infightingprotectplayerallies("/infighting_protect_player_allies", true);
 	if ( (behavior == &actMonster && attacker->behavior == &actPlayer)
 		|| (behavior == &actPlayer && attacker->behavior == &actMonster) )
 	{

@@ -865,9 +865,9 @@ void revenantSkullAnimate(Entity* my, Stat* myStats, double dist)
 						{
 							if ( poke )
 							{
-								static ConsoleVariable<float> cvar_revenant_pokeset("/revenant_pokeset", 90);
-								static ConsoleVariable<float> cvar_revenant_pokespd("/revenant_pokespd", 0.01);
-								static ConsoleVariable<float> cvar_revenant_pokespd2("/revenant_pokespd2", -0.25);
+								static CvarFloat cvar_revenant_pokeset("/revenant_pokeset", 90);
+								static CvarFloat cvar_revenant_pokespd("/revenant_pokespd", 0.01);
+								static CvarFloat cvar_revenant_pokespd2("/revenant_pokespd2", -0.25);
 								if ( entity->skill[1] == 0 )
 								{
 									real_t speed = *cvar_revenant_pokespd;
@@ -941,8 +941,8 @@ void revenantSkullAnimate(Entity* my, Stat* myStats, double dist)
 						{
 							if ( poke )
 							{
-								static ConsoleVariable<float> cvar_revenant_pokeset1("/revenant_pokeset1", 110.0);
-								static ConsoleVariable<float> cvar_revenant_pokespd1("/revenant_pokespd1", -0.25);
+								static CvarFloat cvar_revenant_pokeset1("/revenant_pokeset1", 110.0);
+								static CvarFloat cvar_revenant_pokespd1("/revenant_pokespd1", -0.25);
 								real_t speed = *cvar_revenant_pokespd1;
 								real_t setpoint = (*cvar_revenant_pokeset1 * PI / 180.0);
 								if ( limbAngleWithinRange(entity->fskill[0], -speed, setpoint) )
@@ -1827,9 +1827,9 @@ void earthElementalAnimate(Entity* my, Stat* myStats, double dist)
 	//my->setEffect(EFF_STUNNED, true, -1, false);
 	//my->monsterLookDir = 0.0;
 	//my->yaw = 0.0;
-	//static ConsoleVariable<int> cvar_ee_yaw("/ee_yaw", 0);
-	//static ConsoleVariable<int> cvar_ee_pitch("/ee_pitch", 0);
-	//static ConsoleVariable<int> cvar_ee_roll("/ee_roll", 0);
+	//static CvarInt cvar_ee_yaw("/ee_yaw", 0);
+	//static CvarInt cvar_ee_pitch("/ee_pitch", 0);
+	//static CvarInt cvar_ee_roll("/ee_roll", 0);
 	if ( enableDebugKeys && (svFlags & SV_FLAG_CHEATS) )
 	{
 		if ( keystatus[SDLK_KP_5] )

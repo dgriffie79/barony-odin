@@ -398,7 +398,7 @@ void actArrow(Entity* my)
 
 			my->processEntityWind();
 			bool halfSpeedCheck = false;
-			static ConsoleVariable<bool> cvar_arrow_clip("/arrow_clip_test", true);
+			static CvarBool cvar_arrow_clip("/arrow_clip_test", true);
 			if ( my->arrowSpeed > 4.0 ) // can clip through thin gates
 			{
 				auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1);

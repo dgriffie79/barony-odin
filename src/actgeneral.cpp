@@ -1624,7 +1624,7 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 		}
 		entity->yaw = dir * (PI / 4);
 	}
-	/*static ConsoleVariable<int> debugColliderType("/collider_type", 14);
+	/*static CvarInt debugColliderType("/collider_type", 14);
 	entity->colliderDamageTypes = *debugColliderType;*/
 	auto find = EditorEntityData_t::colliderData.find(entity->colliderDamageTypes);
 	if ( find != EditorEntityData_t::colliderData.end() )
@@ -5759,7 +5759,7 @@ void actBell(Entity* my)
 	}
 
 	my->z = 0;
-	static ConsoleVariable<bool> cvar_bell_crash("/bell_crash", false);
+	static CvarBool cvar_bell_crash("/bell_crash", false);
 #ifndef NDEBUG
 	if ( keystatus[SDLK_KP_5] && enableDebugKeys )
 	{
@@ -6002,13 +6002,13 @@ void actBell(Entity* my)
 	bool bellEventTriggered = false;
 	bool shortRing = (BELL_CURRENT_EVENT != BELL_RING_BUFF);
 	bool startBellAnim = false;
-	static ConsoleVariable<float> cvar_bell_max_spd("/bell_max_spd", 4.0);
-	static ConsoleVariable<int> cvar_bell_clap_rot("/bell_clap_rot", 245);
-	static ConsoleVariable<int> cvar_bell_anim_tick("/bell_anim_tick", 90);
-	static ConsoleVariable<int> cvar_bell_pull_tick("/bell_pull_tick", 30);
-	static ConsoleVariable<int> cvar_bell_dong1("/bell_dong1", 100);
-	static ConsoleVariable<int> cvar_bell_dong2("/bell_dong2", 140);
-	static ConsoleVariable<int> cvar_bell_dong3("/bell_dong3", 190);
+	static CvarFloat cvar_bell_max_spd("/bell_max_spd", 4.0);
+	static CvarInt cvar_bell_clap_rot("/bell_clap_rot", 245);
+	static CvarInt cvar_bell_anim_tick("/bell_anim_tick", 90);
+	static CvarInt cvar_bell_pull_tick("/bell_pull_tick", 30);
+	static CvarInt cvar_bell_dong1("/bell_dong1", 100);
+	static CvarInt cvar_bell_dong2("/bell_dong2", 140);
+	static CvarInt cvar_bell_dong3("/bell_dong3", 190);
 	if ( my->skill[0] == *cvar_bell_anim_tick )
 	{
 		startBellAnim = true;
@@ -6035,7 +6035,7 @@ void actBell(Entity* my)
 	Entity* bell = nullptr;
 	Entity* clapper = nullptr;
 	node_t* nextnode = nullptr;
-	static ConsoleVariable<int> cvar_bell_crash_sfx("/bell_crash_sfx", 691);
+	static CvarInt cvar_bell_crash_sfx("/bell_crash_sfx", 691);
 	for ( node_t* node = my->children.first; node; node = nextnode )
 	{
 		nextnode = node->next;

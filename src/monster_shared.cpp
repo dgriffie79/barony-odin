@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-ConsoleVariable<bool> cvar_summonBosses("/summonbosses", false, "Always summon bosses");
+CvarBool cvar_summonBosses("/summonbosses", false, "Always summon bosses");
 
 void Entity::initMonster(int mySprite)
 {

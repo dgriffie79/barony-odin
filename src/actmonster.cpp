@@ -14877,7 +14877,7 @@ void mimicResetIdle(Entity* my)
 	}
 }
 
-static ConsoleVariable<bool> cvar_monster_debug_models("/monster_debug_models", false);
+static CvarBool cvar_monster_debug_models("/monster_debug_models", false);
 bool monsterDebugModels(Entity* my, real_t* dist)
 {
 #ifdef NDEBUG

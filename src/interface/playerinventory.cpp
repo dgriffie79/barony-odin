@@ -4975,7 +4975,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                 tr->pos.w = imgGet->getWidth();
                 tr->pos.h = imgGet->getHeight();
             }
-            static ConsoleVariable<Vector4> cvar_titleOnlyColor("/tooltip_title_only_color", Vector4{ 188, 154, 114, 255 });
+            static CvarVector4 cvar_titleOnlyColor("/tooltip_title_only_color", Vector4{ 188, 154, 114, 255 });
             titleOnlyTxt->setTextColor(makeColor(
                                                  cvar_titleOnlyColor->x,
                                                  cvar_titleOnlyColor->y,
@@ -5205,8 +5205,8 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             imgSpellIconBg->disabled = false;
             imgSpellIcon->path = ItemTooltips.getSpellIconPath(player, *item, -1);
             
-            static ConsoleVariable<int> cvar_spelltooltipIconX("/spell_tooltip_icon_x", 0);
-            static ConsoleVariable<int> cvar_spelltooltipIconY("/spell_tooltip_icon_y", -4);
+            static CvarInt cvar_spelltooltipIconX("/spell_tooltip_icon_x", 0);
+            static CvarInt cvar_spelltooltipIconY("/spell_tooltip_icon_y", -4);
             imgSpellIcon->pos.x = frameAttrPos.w - imgSpellIcon->pos.w - 2 * padx + *cvar_spelltooltipIconX;
             imgSpellIcon->pos.y = 3 * pady + *cvar_spelltooltipIconY;
             imgSpellIconBg->pos.x = imgSpellIcon->pos.x - 5;
@@ -5233,7 +5233,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         auto txtDescriptionNegative = frameDesc->findField("inventory mouse tooltip description negative text");
         
         {
-            static ConsoleVariable<int> cvar_item_tooltip_attr_padding("/item_tooltip_attr_padding", -4);
+            static CvarInt cvar_item_tooltip_attr_padding("/item_tooltip_attr_padding", -4);
             txtPrimaryValue->setPaddingPerLine(*cvar_item_tooltip_attr_padding);
             txtPrimaryValueHighlight->setPaddingPerLine(*cvar_item_tooltip_attr_padding);
             txtPrimaryValuePositive->setPaddingPerLine(*cvar_item_tooltip_attr_padding);
@@ -6167,7 +6167,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
             
             if ( !imgSpellIcon->disabled )
             {
-                static ConsoleVariable<int> cvar_spelltooltipIconY2("/spell_tooltip_icon_y2", -2);
+                static CvarInt cvar_spelltooltipIconY2("/spell_tooltip_icon_y2", -2);
                 imgPrimaryIcon->pos.y = imgSpellIcon->pos.y + (imgSpellIcon->pos.h / 2) - imgPrimaryIcon->pos.h / 2 + *cvar_spelltooltipIconY2;
             }
             
@@ -6779,8 +6779,8 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
         SDL_Rect frameDescPos = frameDesc->getSize();
         frameDescPos.h = tooltipDisplayedSettings.tooltipDescriptionHeight;
         
-        static ConsoleVariable<int> cvar_item_tooltip_max_height("/item_tooltip_max_height", 348);
-        static ConsoleVariable<int> cvar_item_tooltip_max_height_compact("/item_tooltip_max_height_compact", 264);
+        static CvarInt cvar_item_tooltip_max_height("/item_tooltip_max_height", 348);
+        static CvarInt cvar_item_tooltip_max_height_compact("/item_tooltip_max_height_compact", 264);
         int maxHeight = !players[player]->bUseCompactGUIHeight() ? *cvar_item_tooltip_max_height : *cvar_item_tooltip_max_height_compact;
 		if ( compendiumTooltip )
 		{
@@ -6959,7 +6959,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
 					players[player]->inventoryUI.appraisal.manual_appraised_item = item->uid;
 				}
 			}
-			static ConsoleVariable<int> cvar_appraisal_display("/appraisal_display", 0);
+			static CvarInt cvar_appraisal_display("/appraisal_display", 0);
 			if ( *cvar_appraisal_display == 0 )
 			{
 				char buf[64];
@@ -7589,8 +7589,8 @@ void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, i
 	}
 	else
 	{
-		static ConsoleVariable<int> cvar_item_tooltip_lowest_y("/item_tooltip_lowest_y", 90);
-		static ConsoleVariable<int> cvar_item_tooltip_lowest_y_compact("/item_tooltip_lowest_y_compact", 0);
+		static CvarInt cvar_item_tooltip_lowest_y("/item_tooltip_lowest_y", 90);
+		static CvarInt cvar_item_tooltip_lowest_y_compact("/item_tooltip_lowest_y_compact", 0);
 		SDL_Rect mainPos = frameMain->getSize();
 		int totalHeight = mainPos.y + mainPos.h;
 		if ( !frameTooltipPrompt->isDisabled() )
@@ -8352,8 +8352,8 @@ void Player::Inventory_t::updateInventory()
 
 		SDL_Rect autosortFrameSize = autosortFrame->getSize();
 		SDL_Rect portraitSize = playerInventoryFrames[player].characterPreview->getSize();
-		static ConsoleVariable<int> cvar_autosortBtnX("/autosort_button_x", 0);
-		static ConsoleVariable<int> cvar_autosortBtnY("/autosort_button_y", 0);
+		static CvarInt cvar_autosortBtnX("/autosort_button_x", 0);
+		static CvarInt cvar_autosortBtnY("/autosort_button_y", 0);
 		autosortFrameSize.x = portraitSize.x + 2 + *cvar_autosortBtnX;
 		autosortFrameSize.y = portraitSize.y + 2 + *cvar_autosortBtnY;
 		autosortFrame->setSize(autosortFrameSize);
@@ -9225,7 +9225,7 @@ void Player::Inventory_t::updateInventory()
 				if ( auto slotFrame = getItemSlotFrame(item, itemx, itemy) )
 				{
 					slotFrame->setUserData(&GAMEUI_FRAMEDATA_SHOP_ITEM);
-					static ConsoleVariable<bool> cvar_shop_backgrounds("/shopbackgrounds", false);
+					static CvarBool cvar_shop_backgrounds("/shopbackgrounds", false);
 					if ( *cvar_shop_backgrounds )
 					{
 						updateSlotFrameFromItem(slotFrame, item);

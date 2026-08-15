@@ -1738,10 +1738,10 @@ void raycast(const view_t& camera, Sint8 (*minimap)[MINIMAP_MAX_DIMENSION], bool
     static constexpr bool DoRaysInParallel = true;
     static constexpr bool WriteOutsSequentially = false;
 #else
-    static ConsoleVariable<int> cvar_numRays("/raycast_num", 100);
-    static ConsoleVariable<int> cvar_numRaysPerJob("/raycast_num_per_job", 50);
-    static ConsoleVariable<bool> cvar_parallelRays("/raycast_multithread", false); // note: crashes on nintendo
-    static ConsoleVariable<bool> cvar_writeOutsSequentially("/raycast_write_outs_sequentially", false);
+    static CvarInt cvar_numRays("/raycast_num", 100);
+    static CvarInt cvar_numRaysPerJob("/raycast_num_per_job", 50);
+    static CvarBool cvar_parallelRays("/raycast_multithread", false); // note: crashes on nintendo
+    static CvarBool cvar_writeOutsSequentially("/raycast_write_outs_sequentially", false);
     
     static int NumRays;
     NumRays = *cvar_numRays;
@@ -2049,7 +2049,7 @@ void temporarilyDisableDithering() {
 void drawEntities3D(view_t* camera, int mode)
 {
 #ifndef EDITOR
-    static ConsoleVariable<bool> cvar_drawEnts("/draw_entities", true);
+    static CvarBool cvar_drawEnts("/draw_entities", true);
 	if (!*cvar_drawEnts) {
 	    return;
 	}
@@ -2239,7 +2239,7 @@ void drawEntities3D(view_t* camera, int mode)
 					if ( (entity->flags[INVISIBLE] && entity->flags[INVISIBLE_DITHER]) || entity->flags[STASIS_DITHER] )
 					{
 #ifndef EDITOR
-						static ConsoleVariable<int> cvar_dither_invisibility("/dither_invisibility", 5);
+						static CvarInt cvar_dither_invisibility("/dither_invisibility", 5);
 						dither.value = decrease ? std::max(0, dither.value - 2) :
 							std::min(*cvar_dither_invisibility, dither.value + 1);
 #else
@@ -2250,7 +2250,7 @@ void drawEntities3D(view_t* camera, int mode)
 					else if ( entity->mistformGLRender >= 0.45 )
 					{
 #ifndef EDITOR
-						static ConsoleVariable<int> cvar_dither_mistform("/dither_mistform", 6);
+						static CvarInt cvar_dither_mistform("/dither_mistform", 6);
 						dither.value = decrease ? std::max(0, dither.value - 2) :
 							std::min(*cvar_dither_mistform, dither.value + 1);
 #else
@@ -3808,8 +3808,8 @@ void occlusionCulling(map_t& map, view_t& camera)
 {
 	// cvars
 #ifndef EDITOR
-    static ConsoleVariable<bool> disabled("/skipculling", false);
-	static ConsoleVariable<bool> disableInWalls("/disable_culling_in_walls", false);
+    static CvarBool disabled("/skipculling", false);
+	static CvarBool disableInWalls("/disable_culling_in_walls", false);
 #else
 	static bool ed_disabled = false;
 	static bool ed_disableInWalls = true;

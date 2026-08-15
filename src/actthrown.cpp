@@ -996,7 +996,7 @@ void actThrown(Entity* my)
 	bool hitSomething = false;
 	real_t result = 0.0;
 	bool halfSpeedCheck = false;
-	static ConsoleVariable<bool> cvar_thrown_clip("/thrown_clip_test", true);
+	static CvarBool cvar_thrown_clip("/thrown_clip_test", true);
 	real_t speed = sqrt(THROWN_VELX * THROWN_VELX + THROWN_VELY * THROWN_VELY);
 	if ( speed > 4.0 ) // can clip through thin gates
 	{

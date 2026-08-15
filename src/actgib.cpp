@@ -1096,20 +1096,20 @@ Entity* spawnFociGib(real_t x, real_t y, real_t z, real_t dir, real_t velocityBo
 	rng.seedBytes(&seed, sizeof(Uint32));
 
 #ifndef NDEBUG
-	static ConsoleVariable<float> cvar_foci_vel("/foci_vel", 1.f);
-	static ConsoleVariable<float> cvar_foci_vel_decay("/foci_vel_decay", 0.95);
-	static ConsoleVariable<float> cvar_foci_life("/foci_life", 1.f);
-	static ConsoleVariable<float> cvar_foci_spread("/foci_spread", 1.f);
-	static ConsoleVariable<int> cvar_foci_delay("/foci_delay", 0);
-	static ConsoleVariable<bool> cvar_foci_model("/foci_model", false);
-	static ConsoleVariable<float> cvar_foci_scale("/foci_scale", 1.f);
-	static ConsoleVariable<float> cvar_foci_shrink("/foci_shrink", 0.1);
-	static ConsoleVariable<float> cvar_foci_osc_h("/foci_osc_h", 0.0);
-	static ConsoleVariable<float> cvar_foci_swirl("/foci_swirl", 0.2);
-	static ConsoleVariable<int> cvar_foci_particle("/foci_particle", 0);
-	static ConsoleVariable<bool> cvar_foci_invertz("/foci_invertz", false);
-	static ConsoleVariable<float> cvar_foci_gravity("/foci_gravity", 1.0);
-	static ConsoleVariable<float> cvar_foci_velz("/foci_velz", 1.0);
+	static CvarFloat cvar_foci_vel("/foci_vel", 1.f);
+	static CvarFloat cvar_foci_vel_decay("/foci_vel_decay", 0.95);
+	static CvarFloat cvar_foci_life("/foci_life", 1.f);
+	static CvarFloat cvar_foci_spread("/foci_spread", 1.f);
+	static CvarInt cvar_foci_delay("/foci_delay", 0);
+	static CvarBool cvar_foci_model("/foci_model", false);
+	static CvarFloat cvar_foci_scale("/foci_scale", 1.f);
+	static CvarFloat cvar_foci_shrink("/foci_shrink", 0.1);
+	static CvarFloat cvar_foci_osc_h("/foci_osc_h", 0.0);
+	static CvarFloat cvar_foci_swirl("/foci_swirl", 0.2);
+	static CvarInt cvar_foci_particle("/foci_particle", 0);
+	static CvarBool cvar_foci_invertz("/foci_invertz", false);
+	static CvarFloat cvar_foci_gravity("/foci_gravity", 1.0);
+	static CvarFloat cvar_foci_velz("/foci_velz", 1.0);
 
 	real_t foci_vel = *cvar_foci_vel;
 	real_t foci_vel_decay = *cvar_foci_vel_decay;

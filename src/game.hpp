@@ -552,11 +552,11 @@ public:
 	void storeEventStats();
 };
 
-extern ConsoleVariable<bool> cvar_enableKeepAlives;
-extern ConsoleVariable<bool> cvar_map_sequence_rng;
+extern CvarBool cvar_enableKeepAlives;
+extern CvarBool cvar_map_sequence_rng;
 
 extern DebugStatsClass DebugStats;
-//extern ConsoleVariable<bool> cvar_useTimerInterpolation;
+//extern CvarBool cvar_useTimerInterpolation;
 
 #include "draw.hpp"
 

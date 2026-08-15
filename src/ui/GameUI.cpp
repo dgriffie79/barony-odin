@@ -76,10 +76,10 @@ static const char* bigfont_no_outline = "fonts/pixelmix.ttf#16#0";
 static const char* smallfont_outline = "fonts/pixel_maz_multiline.ttf#16#2";
 static const char* smallfont_no_outline = "fonts/pixel_maz_multiline.ttf#16#0";
 
-static ConsoleVariable<Vector4> mapBgColor("/map_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
-static ConsoleVariable<Vector4> logBgColor("/log_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
-static ConsoleVariable<bool> cvar_hotbar_compact_disable("/hotbar_compact_disable", false); // dont use compact at all
-static ConsoleVariable<bool> cvar_hotbar_compact_use_fullsize("/hotbar_compact_fullsize", true); // dont use extra compact view, just normal compact
+static CvarVector4 mapBgColor("/map_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
+static CvarVector4 logBgColor("/log_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
+static CvarBool cvar_hotbar_compact_disable("/hotbar_compact_disable", false); // dont use compact at all
+static CvarBool cvar_hotbar_compact_use_fullsize("/hotbar_compact_fullsize", true); // dont use extra compact view, just normal compact
 
 Frame* gameUIFrame[MAXPLAYERS] = { nullptr };
 bool newui = true;
@@ -551,7 +551,7 @@ void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensi
 	mm->pos.h = ml->pos.h;
 }
 
-static ConsoleVariable<bool> cvar_mp_flash_whole_bar("/mp_flash_whole_bar", true);
+static CvarBool cvar_mp_flash_whole_bar("/mp_flash_whole_bar", true);
 struct MPBarPaths_t
 {
 	static const std::map<std::string, std::string> normalMPBars;
@@ -1065,7 +1065,7 @@ void updateCalloutPromptFrame(const int player)
 
 	int alignX = 8;
 	int alignY = 0;
-	static ConsoleVariable<bool> cvar_callout_prompt_horizontal("/callout_prompt_horizontal", false);
+	static CvarBool cvar_callout_prompt_horizontal("/callout_prompt_horizontal", false);
 	if ( hud_t.allyPlayerFrame && !hud_t.allyPlayerFrame->isDisabled()
 		&& hud_t.allyPlayerFrame->getOpacity() > 0.0 )
 	{
@@ -1147,7 +1147,7 @@ void updateCalloutPromptFrame(const int player)
 
 	auto icon = frame->findImage("icon");
 	icon->disabled = true;
-	static ConsoleVariable<bool> cvar_callout_prompt_wheel("/callout_prompt_wheel", false);
+	static CvarBool cvar_callout_prompt_wheel("/callout_prompt_wheel", false);
 	if ( !glyph->disabled )
 	{
 		if ( *cvar_callout_prompt_wheel &&
@@ -1175,7 +1175,7 @@ void updateCalloutPromptFrame(const int player)
 
 	auto text = frame->findField("prompt");
 	text->setDisabled(true);
-	static ConsoleVariable<bool> cvar_callout_prompt_text("/callout_prompt_text", false);
+	static CvarBool cvar_callout_prompt_text("/callout_prompt_text", false);
 	if ( !icon->disabled && *cvar_callout_prompt_text )
 	{
 		if ( CalloutMenu[player].calloutMenuIsOpen() && CalloutMenu[player].selectMoveTo )
@@ -1244,8 +1244,8 @@ Frame* createAllyPlayerFrame(const int player, Frame* baseFrame)
 	return frame;
 }
 
-static ConsoleVariable<int> cvar_assist_icon_txt_x("/assist_icon_txt_x", 0);
-static ConsoleVariable<int> cvar_assist_icon_txt_y("/assist_icon_txt_y", 14);
+static CvarInt cvar_assist_icon_txt_x("/assist_icon_txt_x", 0);
+static CvarInt cvar_assist_icon_txt_y("/assist_icon_txt_y", 14);
 
 Frame* createAllyPlayerEntry(const int player, Frame* baseFrame)
 {
@@ -2291,7 +2291,7 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 		hpField->setText(buf);
 		if ( bPlayerBars )
 		{
-			static ConsoleVariable<bool> cvar_playerbars_use_colors("/playerbars_use_colors", true);
+			static CvarBool cvar_playerbars_use_colors("/playerbars_use_colors", true);
 			if ( *cvar_playerbars_use_colors )
 			{
 				nameField->setColor(playerColor(uid, colorblind_lobby, false));
@@ -2981,8 +2981,8 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 							titleSelectorGlyph->pos.x = titleSelector->pos.x - 2 * selectorAnimW - titleSelectorGlyph->pos.w;
 							titleSelectorGlyph->pos.y = titleSelector->pos.y + titleSelector->pos.h / 2 - titleSelectorGlyph->pos.h / 2;
 
-							static ConsoleVariable<int> followerMenuOpenGlyphX("/followermenu_open_glyph_x", 6);
-							static ConsoleVariable<int> followerMenuOpenGlyphY("/followermenu_open_glyph_y", 0);
+							static CvarInt followerMenuOpenGlyphX("/followermenu_open_glyph_x", 6);
+							static CvarInt followerMenuOpenGlyphY("/followermenu_open_glyph_y", 0);
 							titleSelectorGlyph->pos.x += *followerMenuOpenGlyphX;
 							titleSelectorGlyph->pos.y += *followerMenuOpenGlyphY;
 							if ( titleSelectorGlyph->pos.y % 2 == 1 )
@@ -3023,10 +3023,10 @@ void updateAllyBarFrame(const int player, Frame* baseFrame, int activeBars, int 
 
 	if ( !bPlayerBars && titleFrame && hud_t.allyFollowerGlyphFrame && !hud_t.allyFollowerGlyphFrame->isDisabled() )
 	{
-		static ConsoleVariable<int> followerMenuCommandGlyphX("/followermenu_cmd_glyph_x", -96);
-		static ConsoleVariable<int> followerMenuCommandGlyphY("/followermenu_cmd_glyph_y", 0);
-		static ConsoleVariable<int> followerMenuRepeatGlyphX("/followermenu_repeat_glyph_x", 0);
-		static ConsoleVariable<int> followerMenuRepeatGlyphY("/followermenu_repeat_glyph_y", 0);
+		static CvarInt followerMenuCommandGlyphX("/followermenu_cmd_glyph_x", -96);
+		static CvarInt followerMenuCommandGlyphY("/followermenu_cmd_glyph_y", 0);
+		static CvarInt followerMenuRepeatGlyphX("/followermenu_repeat_glyph_x", 0);
+		static CvarInt followerMenuRepeatGlyphY("/followermenu_repeat_glyph_y", 0);
 
 		auto glyphFrame = hud_t.allyFollowerGlyphFrame;
 		SDL_Rect glyphFramePos{ baseFrame->getSize().x, titleFrame->getSize().y, 150, 80 };
@@ -3134,7 +3134,7 @@ void updateAllyFollowerFrame(const int player)
 	Frame* titleFrame = hud_t.allyFollowerTitleFrame;
 	Frame* glyphFrame = hud_t.allyFollowerGlyphFrame;
 
-	static ConsoleVariable<bool> cvar_followerbars("/followerbars", true);
+	static CvarBool cvar_followerbars("/followerbars", true);
 
 	if ( !players[player]->isLocalPlayer() || !(*cvar_followerbars) )
 	{
@@ -3665,8 +3665,8 @@ void updateAllyPlayerFrame(const int player, Frame* baseFrame)
 
 	auto& hud_t = players[player]->hud;
 
-	static ConsoleVariable<bool> cvar_playerbars("/playerbars", true);
-	static ConsoleVariable<int> cvar_playerbars_debug("/playerbars_debug", -1);
+	static CvarBool cvar_playerbars("/playerbars", true);
+	static CvarInt cvar_playerbars_debug("/playerbars_debug", -1);
 
 	if ( !players[player]->isLocalPlayer() || !(*cvar_playerbars) )
 	{
@@ -4871,7 +4871,7 @@ void Player::HUD_t::updateUINavigation()
 	auto skillsButton = uiNavFrame->findButton("skills button");
 	auto skillsButtonGlyph = uiNavFrame->findImage("skills button glyph");
 
-	static ConsoleVariable<bool> cvar_spell_unread_blink("/spell_unread_blink", true);
+	static CvarBool cvar_spell_unread_blink("/spell_unread_blink", true);
 	if ( *cvar_spell_unread_blink 
 		&& player.magic.bHasUnreadNewSpell && ticks % TICKS_PER_SECOND >= TICKS_PER_SECOND / 2 )
 	{
@@ -5621,7 +5621,7 @@ int StatusEffectQueue_t::getBaseEffectPosY()
 	return statusEffectFrame->getSize().h / 2 - 50;
 }
 
-static ConsoleVariable<int> cvar_statusfx_spell_size("/statusfx_spell_size", 36);
+static CvarInt cvar_statusfx_spell_size("/statusfx_spell_size", 36);
 int StatusEffectQueueEntry_t::getEffectSpriteNormalWidth()
 {
 	if ( effect == StatusEffectQueue_t::kEffectBread
@@ -5833,7 +5833,7 @@ void StatusEffectQueueEntry_t::animateNotification(int player)
 	pos.h = animateStartH + destH * animateH;
 }
 
-static ConsoleVariable<bool> cvar_statusfx_align_text_right("/statusfx_align_text_right", false);
+static CvarBool cvar_statusfx_align_text_right("/statusfx_align_text_right", false);
 void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
 	Frame* frame = (Frame*)&widget;
 	if ( auto parent = frame->getParent() )
@@ -8633,7 +8633,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 	automatonHungerFrame->setDisabled(true);
 	auto automatonFlameImg = automatonHungerFrame->findImage("flame");
 
-	static ConsoleVariable<int> cvar_statusfx_iconsize("/statusfx_iconsize", 36);
+	static CvarInt cvar_statusfx_iconsize("/statusfx_iconsize", 36);
 	int iconSize = *cvar_statusfx_iconsize;
 	int movex = splitscreen ? 4 : 0;
 	if ( hungerIconActive )
@@ -11336,7 +11336,7 @@ int Player::HUD_t::actionPromptBackingSize = 44;
 int Player::HUD_t::actionPromptIconSize = 32;
 int Player::HUD_t::actionPromptIconOpacity = 255;
 int Player::HUD_t::actionPromptIconBackingOpacity = 255;
-static ConsoleVariable<bool> disableActionPrompts(
+static CvarBool disableActionPrompts(
 	"/disableactionprompts", false, "Disable action prompts in HUD");
 void Player::HUD_t::updateActionPrompts()
 {
@@ -11363,7 +11363,7 @@ void Player::HUD_t::updateActionPrompts()
 	}
 
 	bool ghostPrompts = player.ghost.isActive();
-	static ConsoleVariable<int> actionPromptCompactHeightY("/actionpromptcompactheighty", 16);
+	static CvarInt actionPromptCompactHeightY("/actionpromptcompactheighty", 16);
 	bShowActionPrompts = *disableActionPrompts;
 	bShortHPMPForActionBars = false;
 
@@ -11963,7 +11963,7 @@ void HUDDrawGameEndHint(const int player, SDL_Rect rect)
 
 		if ( everyonedead && players[player]->hud.animDeadPromptDisplay )
 		{
-			static ConsoleVariable<float> cvar_anim_dead_prompt_speed("/anim_dead_prompt_speed", 0.003);
+			static CvarFloat cvar_anim_dead_prompt_speed("/anim_dead_prompt_speed", 0.003);
 			players[player]->hud.animDeadPrompt += *cvar_anim_dead_prompt_speed;
 			if ( players[player]->hud.animDeadPrompt >= 1.0 )
 			{
@@ -12140,7 +12140,7 @@ void Player::HUD_t::processHUD()
 		}
 	}
 
-	static ConsoleVariable<bool> cvar_disable_controller_reconnect("/disable_controller_reconnect", false);
+	static CvarBool cvar_disable_controller_reconnect("/disable_controller_reconnect", false);
 	if ( !*cvar_disable_controller_reconnect )
 	{
 		if ( MainMenu::isPlayerSignedIn(player.playernum) && players[player.playernum]->isLocalPlayer() )
@@ -12148,7 +12148,7 @@ void Player::HUD_t::processHUD()
 			checkControllerState(player.playernum);
 		}
 	}
-	static ConsoleVariable<int> cvar_ui_above_hotbar_y("/ui_above_hotbar_y", 56);
+	static CvarInt cvar_ui_above_hotbar_y("/ui_above_hotbar_y", 56);
 	offsetHUDAboveHotbarHeight = 0;
 	if ( player.bUseCompactGUIWidth() )
 	{
@@ -12278,12 +12278,12 @@ void Player::MessageZone_t::createChatbox()
 	}
 }
 
-static ConsoleVariable<int> cvar_log_lineheight_offset("/log_lineheight_offset", -6);
-static ConsoleVariable<int> cvar_log_lineheight_min("/log_lineheight_minimum", 24);
-static ConsoleVariable<int> cvar_log_multiline_pady("/log_multiline_pady", -4);
+static CvarInt cvar_log_lineheight_offset("/log_lineheight_offset", -6);
+static CvarInt cvar_log_lineheight_min("/log_lineheight_minimum", 24);
+static CvarInt cvar_log_multiline_pady("/log_multiline_pady", -4);
 const char* Player::MessageZone_t::bigfont = "fonts/pixelmix.ttf#16#2";
 const char* Player::MessageZone_t::smallfont = "fonts/pixel_maz_multiline.ttf#16#2";
-static ConsoleVariable<int> cvar_message_fade_min("/message_fade_min", 25);
+static CvarInt cvar_message_fade_min("/message_fade_min", 25);
 void Player::MessageZone_t::processChatbox()
 {
 	if (!chatFrame) {
@@ -12310,11 +12310,11 @@ void Player::MessageZone_t::processChatbox()
 
 	static const char* bigfont = "fonts/pixelmix.ttf#16#2";
 	static const char* smallfont = "fonts/pixel_maz_multiline.ttf#16#2";
-	static ConsoleVariable<bool> cvar_smallmessages("/smallmessages", false);
-    //static ConsoleVariable<bool> cvar_top_aligned("/topmessages", false);
-	//static ConsoleVariable<std::string> alignment("/alignmessages", "");
-	static ConsoleVariable<std::string> cvar_setalignment("/alignmessages", "");
-	static ConsoleVariable<int> cvar_messages_left_y("/messages_left_y", 200);
+	static CvarBool cvar_smallmessages("/smallmessages", false);
+    //static CvarBool cvar_top_aligned("/topmessages", false);
+	//static CvarString alignment("/alignmessages", "");
+	static CvarString cvar_setalignment("/alignmessages", "");
+	static CvarInt cvar_messages_left_y("/messages_left_y", 200);
 	useBigFont = !player.bUseCompactGUIHeight() && !player.bUseCompactGUIWidth();// || (playercount == 2 && !*MainMenu::vertical_splitscreen);
 	if ( *cvar_smallmessages )
 	{
@@ -12555,8 +12555,8 @@ void Player::MessageZone_t::processChatbox()
 	messageBoxFrame->setSize(messageBoxSize);
 }
 
-ConsoleVariable<bool> shareMinimap("/shareminimap", true);
-ConsoleVariable<bool> cvar_minimap_prompt_vertical("/minimap_prompt_vertical", false);
+CvarBool shareMinimap("/shareminimap", true);
+CvarBool cvar_minimap_prompt_vertical("/minimap_prompt_vertical", false);
 Frame* minimapFrame = nullptr; // shared minimap
 SDL_Rect Player::Minimap_t::sharedMinimapPos{ 0, 0, 0, 0 };
 int Player::Minimap_t::fullSize = 200;
@@ -12714,7 +12714,7 @@ static Frame* createMinimap(int player) {
 		real_t scale_small = 50.0;
 		real_t scale_big = Player::Minimap_t::fullBigScale;
 		int maxSize = Player::Minimap_t::fullSize;
-		static ConsoleVariable<int> cvar_minimap_compact_offset_y("/minimap_compact_offset_y", 44);
+		static CvarInt cvar_minimap_compact_offset_y("/minimap_compact_offset_y", 44);
 		int mapBigOffsetY = 0;
 		if ( players[player]->bUseCompactGUIHeight() ) // 2p wide
 		{
@@ -12904,27 +12904,27 @@ void openMapWindow(int player) {
 	{
 		if ( players[player]->bUseCompactGUIHeight() && players[player]->bUseCompactGUIWidth() )
 		{
-			static ConsoleVariable<int> cvar_map_splitscreen_w("/map_splitscreen_wborder", 64);
-			static ConsoleVariable<int> cvar_map_splitscreen_h("/map_splitscreen_hborder", 16);
-			static ConsoleVariable<int> cvar_map_splitscreen_offset_y("/map_splitscreen_offset_y", 0);
+			static CvarInt cvar_map_splitscreen_w("/map_splitscreen_wborder", 64);
+			static CvarInt cvar_map_splitscreen_h("/map_splitscreen_hborder", 16);
+			static CvarInt cvar_map_splitscreen_offset_y("/map_splitscreen_offset_y", 0);
 			_w = size.w - *cvar_map_splitscreen_w;
 			_h = size.h - *cvar_map_splitscreen_h;
 			yoffset = *cvar_map_splitscreen_offset_y;
 		}
 		else if ( players[player]->bUseCompactGUIHeight() )
 		{
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_wide_w("/map_splitscreen_2p_wide_wborder", 64);
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_wide_h("/map_splitscreen_2p_wide_hborder", 8);
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_wide_offset_y("/map_splitscreen_2p_wide_offset_y", 0);
+			static CvarInt cvar_map_splitscreen_2p_wide_w("/map_splitscreen_2p_wide_wborder", 64);
+			static CvarInt cvar_map_splitscreen_2p_wide_h("/map_splitscreen_2p_wide_hborder", 8);
+			static CvarInt cvar_map_splitscreen_2p_wide_offset_y("/map_splitscreen_2p_wide_offset_y", 0);
 			_w = size.w - *cvar_map_splitscreen_2p_wide_w;
 			_h = size.h - *cvar_map_splitscreen_2p_wide_h;
 			yoffset = *cvar_map_splitscreen_2p_wide_offset_y;
 		}
 		else if ( players[player]->bUseCompactGUIWidth() )
 		{
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_tall_w("/map_splitscreen_2p_tall_wborder", 64);
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_tall_h("/map_splitscreen_2p_tall_hborder", 64);
-			static ConsoleVariable<int> cvar_map_splitscreen_2p_wide_offset_y("/map_splitscreen_2p_tall_offset_y", 0);
+			static CvarInt cvar_map_splitscreen_2p_tall_w("/map_splitscreen_2p_tall_wborder", 64);
+			static CvarInt cvar_map_splitscreen_2p_tall_h("/map_splitscreen_2p_tall_hborder", 64);
+			static CvarInt cvar_map_splitscreen_2p_wide_offset_y("/map_splitscreen_2p_tall_offset_y", 0);
 			if ( *MainMenu::clipped_splitscreen )
 			{
 				*cvar_map_splitscreen_2p_tall_h = 156;
@@ -13111,7 +13111,7 @@ void openMapWindow(int player) {
 			}
 		}
 
-	    static ConsoleVariable<float> speed("/minimap_cursor_speed", 4.f);
+	    static CvarFloat speed("/minimap_cursor_speed", 4.f);
 
 	    // gamepad moves cursor with right stick
 	    auto& cursor = minimap_cursor[player];
@@ -13142,7 +13142,7 @@ void openMapWindow(int player) {
             }
         }
 
-        static ConsoleVariable<bool> minimapGimpEnabled("/minimap_gimp_enabled", true);
+        static CvarBool minimapGimpEnabled("/minimap_gimp_enabled", true);
 
         // minimap pings
 		if (minimapPingGimpTimer[player] <= 0 || !*minimapGimpEnabled) {
@@ -13245,7 +13245,7 @@ void addMessageToLogWindow(int player, string_t* string) {
 		y = subframe_size.h + *cvar_log_lineheight_offset;
 	}
 
-    static ConsoleVariable<bool> timestamp_messages("/log_timestamp", true);
+    static CvarBool timestamp_messages("/log_timestamp", true);
 
     char buf[1024];
     const Uint32 time = string->time / TICKS_PER_SECOND;
@@ -13258,9 +13258,9 @@ void addMessageToLogWindow(int player, string_t* string) {
         snprintf(buf, sizeof(buf), "%s", string->data);
     const int size = std::min(std::max(0, (int)sizeof(buf)), result);
 
-    static ConsoleVariable<std::string> font("/log_font",
+    static CvarString font("/log_font",
         "fonts/PixelMaz_monospace.ttf#32#2");
-	static ConsoleVariable<std::string> compactfont("/log_font_compact",
+	static CvarString compactfont("/log_font_compact",
 		"fonts/pixel_maz.ttf#32#2");
 
 	const bool bCompactWidth = players[player]->bUseCompactGUIWidth();
@@ -13366,8 +13366,8 @@ void openLogWindow(int player) {
     const SDL_Rect size = parent->getSize();
     int w = std::max(Frame::virtualScreenX / 2, size.w - 432);
     int h = std::max(Frame::virtualScreenY / 2, size.h - 256);
-	static ConsoleVariable<int> cvar_log_splitscreen_w("/log_splitscreen_wborder", 40);
-	static ConsoleVariable<int> cvar_log_splitscreen_h("/log_splitscreen_hborder", 64);
+	static CvarInt cvar_log_splitscreen_w("/log_splitscreen_wborder", 40);
+	static CvarInt cvar_log_splitscreen_h("/log_splitscreen_hborder", 64);
 	int yoffset = 32;
 	if ( (players[player]->bUseCompactGUIHeight() && players[player]->bUseCompactGUIWidth())
 		|| players[player]->bUseCompactGUIWidth() )
@@ -21198,7 +21198,7 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 				else
 				{
 					sexImg->path = "*#images/ui/CharSheet/HUD_CharSheet_Sex_M_02.png";
-					static ConsoleVariable<int> cvar_sexoffset("/sexoffsetx", -1);
+					static CvarInt cvar_sexoffset("/sexoffsetx", -1);
 					offsetx = *cvar_sexoffset;
 				}
 			}
@@ -23675,7 +23675,7 @@ void createInventoryTooltipFrame(const int player,
 view_t playerPortraitView[MAXPLAYERS];
 view_t monsterPortraitView;
 view_t itemPortraitView;
-static ConsoleVariable<bool> cvar_compendium_portrait_static_angle("/compendium_portrait_static_angle", true);
+static CvarBool cvar_compendium_portrait_static_angle("/compendium_portrait_static_angle", true);
 void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark)
 {
 	if ( !item ) { return; }
@@ -24882,7 +24882,7 @@ void drawCharacterPreview(const int player, SDL_Rect pos, int fov, real_t offset
 	{
         GL_CHECK_ERR(glClear(GL_DEPTH_BUFFER_BIT));
 
-		static ConsoleVariable<bool> cvar_char_portrait_static_angle("/char_portrait_static_angle", true);
+		static CvarBool cvar_char_portrait_static_angle("/char_portrait_static_angle", true);
 		view.x = playerEntity->x / 16.0 + (.92 * cos(offsetyaw
 			+ (*cvar_char_portrait_static_angle ? playerEntity->yaw : 0)));
 		view.y = playerEntity->y / 16.0 + (.92 * sin(offsetyaw
@@ -27767,8 +27767,8 @@ void createPlayerInventory(const int player)
 				auto& scrollInertia = players[player]->paperDoll.portraitRotationInertia;
 				auto& scrollPercent = players[player]->paperDoll.portraitRotationPercent;
 				auto& portraitYaw = players[player]->paperDoll.portraitYaw;
-				static ConsoleVariable<float> cvar_char_portrait_spd("/char_portrait_spd", 15.0);
-				static ConsoleVariable<float> cvar_char_portrait_decel("/char_portrait_decel", 25.0);
+				static CvarFloat cvar_char_portrait_spd("/char_portrait_spd", 15.0);
+				static CvarFloat cvar_char_portrait_decel("/char_portrait_decel", 25.0);
 
 				bool close = false;
 				if ( players[player]->GUI.activeModule == Player::GUI_t::MODULE_PORTRAIT )
@@ -30550,7 +30550,7 @@ void Player::HUD_t::updateMinimapPrompts()
 	mapPromptFrame->setSize(pos);
 }
 
-static ConsoleVariable<bool> cvar_showmapseed("/showmapseed", false);
+static CvarBool cvar_showmapseed("/showmapseed", false);
 
 void Player::HUD_t::updateGameTimer()
 {
@@ -31083,7 +31083,7 @@ void Player::HUD_t::updateXPBar()
 }
 
 bool EnemyHPDamageBarHandler::bEnemyBarSimpleBlit = false;
-static ConsoleVariable<bool> cvar_enemybar_simple_blit("/enemybar_simple_blit", true);
+static CvarBool cvar_enemybar_simple_blit("/enemybar_simple_blit", true);
 
 // to nest deep maps and suppress visual studio warnings
 struct enemybarMapLowDurationTick_k {
@@ -32845,7 +32845,7 @@ void Player::HUD_t::updateEnemyBar(Frame* whichFrame)
 
 const int HPMPdividerThresholdInterval = 20;
 const int kHPMPWidthReduce2pWideClippedActionPrompts = 60;
-//static ConsoleVariable<int> cvar_hpanimdebug("/hpmpanimdebug", 1);
+//static CvarInt cvar_hpanimdebug("/hpmpanimdebug", 1);
 void Player::HUD_t::updateHPBar()
 {
 	if ( !hpFrame )
@@ -33674,9 +33674,9 @@ void Player::HUD_t::updateMPBar()
 	allMPBarImages.push_back(mpFadedEndCap);
 	allMPBarImages.push_back(mpBase);
 	allMPBarImages.push_back(mpProgressEndCapFlash);
-	static ConsoleVariable<Vector4> cvar_mp_color_ht("/mp_color_ht", { 0.85, 0.85, 1.0, 1.0 });
-	static ConsoleVariable<Vector4> cvar_mp_color_ht_high("/mp_color_ht_high", { 1.0, 1.0, 1.0, 1.0 });
-	static ConsoleVariable<Vector4> cvar_mp_color_default("/mp_color_default", { 1.0, 1.0, 1.0, 1.0 });
+	static CvarVector4 cvar_mp_color_ht("/mp_color_ht", { 0.85, 0.85, 1.0, 1.0 });
+	static CvarVector4 cvar_mp_color_ht_high("/mp_color_ht_high", { 1.0, 1.0, 1.0, 1.0 });
+	static CvarVector4 cvar_mp_color_default("/mp_color_default", { 1.0, 1.0, 1.0, 1.0 });
 	Vector4 mpColor = *cvar_mp_color_default;
 	if ( &MPBarPaths_t::getMPBar(player.playernum) == &MPBarPaths_t::automatonHTBars )
 	{
@@ -33899,7 +33899,7 @@ void Player::Hotbar_t::updateHotbar()
 	hotbarStartY1 += ((bCompactView || loweredY) ? hotbarCompactOffsetY : hotbarOffsetY);
 	hotbarStartY2 += ((bCompactView || loweredY) ? hotbarCompactOffsetY : hotbarOffsetY);
 
-	static ConsoleVariable<int> cvar_hotbar_splitscreen_center_x("/hotbar_splitscreen_center_x", 0);
+	static CvarInt cvar_hotbar_splitscreen_center_x("/hotbar_splitscreen_center_x", 0);
 	const int hotbarCentreX = (hotbarFrame->getSize().w / 2) + *cvar_hotbar_splitscreen_center_x;
 	int hotbarCentreXLeft = hotbarCentreX - 148 + (bCompactView ? hotbarCompactOffsetX : compactDisableLeftRightOffsetX);
 	int hotbarCentreXRight = hotbarCentreX + 148 - (bCompactView ? hotbarCompactOffsetX : compactDisableLeftRightOffsetX);
@@ -33977,8 +33977,8 @@ void Player::Hotbar_t::updateHotbar()
 	{
 		cancelPromptTxt->setDisabled(false);
 		cancelPromptTxt->setText(Language::get(3063));
-		static ConsoleVariable<int> cvar_hotbar_cancel_prompt_y("/hotbar_cancel_prompt_y", -6);
-		static ConsoleVariable<int> cvar_hotbar_cancel_prompt_x("/hotbar_cancel_prompt_x", 29);
+		static CvarInt cvar_hotbar_cancel_prompt_y("/hotbar_cancel_prompt_y", -6);
+		static CvarInt cvar_hotbar_cancel_prompt_x("/hotbar_cancel_prompt_x", 29);
 		cancelPromptGlyph->path = Input::inputs[player.playernum].getGlyphPathForBinding("Hotbar Down / Cancel");
 		if ( auto imgGet = Image::get(cancelPromptGlyph->path.c_str()) )
 		{
@@ -34531,12 +34531,12 @@ Frame::result_t doFrames() {
 			++gui_ticks;
 		}
 
-        static ConsoleVariable<bool> gui_process("/gui_process", true);
+        static CvarBool gui_process("/gui_process", true);
         if (*gui_process) {
 	        result = gui->process();
 	    }
 
-        static ConsoleVariable<bool> gui_draw("/gui_draw", true);
+        static CvarBool gui_draw("/gui_draw", true);
         if (*gui_draw) {
 		    gui->predraw();
 		    gui->draw();
@@ -35136,7 +35136,7 @@ void Player::SkillSheet_t::closeSkillSheet()
 	}
 }
 
-static ConsoleVariable<bool> cvar_skillsheet_blit("/skillsheet_blit", true);
+static CvarBool cvar_skillsheet_blit("/skillsheet_blit", true);
 void Player::SkillSheet_t::openSkillSheet()
 {
 	player.GUI.previousModule = player.GUI.activeModule;
@@ -36251,7 +36251,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 	}*/
 	else if ( proficiency == PRO_SORCERY || proficiency == PRO_MYSTICISM || proficiency == PRO_THAUMATURGY || proficiency == NUMPROFICIENCIES )
 	{
-		static ConsoleVariable<int> cvar_skillsheet_magic_namelen("/skillsheet_magic_namelen", 14);
+		static CvarInt cvar_skillsheet_magic_namelen("/skillsheet_magic_namelen", 14);
 		snprintf(buf, sizeof(buf), "%d", 0);
 		if ( tag == "MAGIC_CURRENT_TIER" )
 		{
@@ -37003,7 +37003,7 @@ void sliderSkillsheetUpdateSelectorOnHighlight(const int player, Slider* slider)
 	}
 }
 
-static ConsoleVariable<bool> cvar_skillsheet_optimise("/skillsheet_optimise", true);
+static CvarBool cvar_skillsheet_optimise("/skillsheet_optimise", true);
 void Player::SkillSheet_t::processSkillSheet()
 {
 	//DebugTimers.addTimePoint("skill 1", "start");
@@ -37917,7 +37917,7 @@ void Player::SkillSheet_t::processSkillSheet()
 			auto effectFrameBgImgTmp = scrollArea->findImage("effect frame bg tmp");
 			effectFrameBgImgTmp->disabled = false;
 
-			static ConsoleVariable<bool> cvar_skillsheet_skip_spell_list("/skillsheet_skip_spell_list", true);
+			static CvarBool cvar_skillsheet_skip_spell_list("/skillsheet_skip_spell_list", true);
 
 			for ( int eff = 0; eff < 10; ++eff )
 			{
@@ -39102,7 +39102,7 @@ void Player::Inventory_t::SpellPanel_t::updateSpellPanel()
 			real_t setpointDiff = 0.0;
 
 			// slightly faster on gamepad
-			static ConsoleVariable<float> cvar_spell_slider_speed("/spell_slider_speed", 1.f);
+			static CvarFloat cvar_spell_slider_speed("/spell_slider_speed", 1.f);
 			const real_t factor = (3.0 * (*cvar_spell_slider_speed + (usingGamepad ? -.5f : 0.f)));
 			if ( scrollSetpoint - scrollAnimateX > 0.0 )
 			{
@@ -39924,16 +39924,16 @@ void Player::HUD_t::updateMinotaurWarning()
 		return;
 	}
 
-	static ConsoleVariable<bool> cvar_minoanimdebug("/minoanimdebug", false);
+	static CvarBool cvar_minoanimdebug("/minoanimdebug", false);
 	if ( *cvar_minoanimdebug && player.playernum == clientnum )
 	{
 		*cvar_minoanimdebug = false;
 		m.init();
 	}
 
-	static ConsoleVariable<float> cvar_minoflashmax("/minoflashmax", 1.25);
-	static ConsoleVariable<float> cvar_minoflashmin("/minoflashmin", 0.25);
-	static ConsoleVariable<float> cvar_minoflashrate("/minoflashrate", 0.125);
+	static CvarFloat cvar_minoflashmax("/minoflashmax", 1.25);
+	static CvarFloat cvar_minoflashmin("/minoflashmin", 0.25);
+	static CvarFloat cvar_minoflashrate("/minoflashrate", 0.125);
 
 	if ( m.processedOnTick == 0 )
 	{
@@ -40099,8 +40099,8 @@ void Player::HUD_t::updateMinotaurWarning()
 		}
 	}
 
-	static ConsoleVariable<float> cvar_minoanimspeed("/minoanimspeed", 1.0);
-	static ConsoleVariable<int> cvar_minoanimvolume("/minoanimvolume", 128);
+	static CvarFloat cvar_minoanimspeed("/minoanimspeed", 1.0);
+	static CvarInt cvar_minoanimvolume("/minoanimvolume", 128);
 	real_t animspeed = 5.0 * (*cvar_minoanimspeed);//5.0 / 4.0;
 	const int movementAmount = 0;
 	real_t scalingAmount = 2.0;
@@ -41758,7 +41758,7 @@ void DamageIndicatorHandler_t::insert(const int player, const real_t _x, const r
 	i.hitDealtDamage = damaged;
 }
 
-static ConsoleVariable<int> cvar_indicatoranimdebug("/indicatoranimdebug", 1);
+static CvarInt cvar_indicatoranimdebug("/indicatoranimdebug", 1);
 
 void DamageIndicatorHandler_t::DamageIndicator_t::process()
 {
@@ -41934,7 +41934,7 @@ void createLevelUpFrame(const int player)
 	}
 }
 
-static ConsoleVariable<int> cvar_lvlup_sfx("/lvlup_sfx", 526);
+static CvarInt cvar_lvlup_sfx("/lvlup_sfx", 526);
 Uint32 levelupSoundDelay = 0;
 void LevelUpAnimation_t::addLevelUp(const int currentLvl, const int increaseLvl, DynamicArrayT<LevelUp_t::StatUp_t>& statInfo)
 {
@@ -42030,10 +42030,10 @@ void LevelUpAnimation_t::LevelUp_t::StatUp_t::setAnimatePosition(int destx, int 
 	animateH = 0.0;
 }
 
-static ConsoleVariable<int> cvar_skill_ding_sfx("/skill_sfx_ding", 554);
-static ConsoleVariable<int> cvar_lvl_ding_sfx("/lvl_sfx_ding", 555);
-static ConsoleVariable<int> cvar_skill_sfx_volume("/skill_sfx_volume", 128);
-static ConsoleVariable<int> cvar_skill_newspell_sfx("/skill_sfx_newspell", 560);
+static CvarInt cvar_skill_ding_sfx("/skill_sfx_ding", 554);
+static CvarInt cvar_lvl_ding_sfx("/lvl_sfx_ding", 555);
+static CvarInt cvar_skill_sfx_volume("/skill_sfx_volume", 128);
+static CvarInt cvar_skill_newspell_sfx("/skill_sfx_newspell", 560);
 
 bool SkillUpAnimation_t::soundIndexUsedForNotification(const int index)
 {
@@ -42080,10 +42080,10 @@ bool SkillUpAnimation_t::soundIndexUsedForNotification(const int index)
 void LevelUpAnimation_t::LevelUp_t::StatUp_t::animateNotification(const int player)
 {
 	real_t animspeed = 5.0 / (4.0);
-	static ConsoleVariable<float> cvar_lvlup_speed("/lvlup_speed", .5);
-	static ConsoleVariable<float> cvar_lvlup_bounce("/lvlup_bounce", 1.0 /*2.5*/);
-	static ConsoleVariable<float> cvar_lvlup_animfall("/lvlup_animfall", 0.5/*2.0*/);
-	static ConsoleVariable<int> cvar_lvlup_ding_volume("/lvlup_ding_volume", 64);
+	static CvarFloat cvar_lvlup_speed("/lvlup_speed", .5);
+	static CvarFloat cvar_lvlup_bounce("/lvlup_bounce", 1.0 /*2.5*/);
+	static CvarFloat cvar_lvlup_animfall("/lvlup_animfall", 0.5/*2.0*/);
+	static CvarInt cvar_lvlup_ding_volume("/lvlup_ding_volume", 64);
 	animspeed *= *cvar_lvlup_speed;
 	int movementAmount = 0;
 	if ( players[player]->bUseCompactGUIHeight() )
@@ -42241,8 +42241,8 @@ void LevelUpAnimation_t::LevelUp_t::animateTitle(SDL_Rect basePos)
 		titleAnimatePos = basePos;
 	}
 
-	static ConsoleVariable<int> cvar_lvlup_title_ticks("/lvlup_title_ticks", 15);
-	static ConsoleVariable<int> cvar_lvlup_title_fade_ticks("/lvlup_title_fade_ticks", TICKS_PER_SECOND);
+	static CvarInt cvar_lvlup_title_ticks("/lvlup_title_ticks", 15);
+	static CvarInt cvar_lvlup_title_fade_ticks("/lvlup_title_fade_ticks", TICKS_PER_SECOND);
 	real_t anim = std::min(1.0, ticksActive / (real_t)*cvar_lvlup_title_ticks);
 	real_t grow = 1.0;
 
@@ -42295,7 +42295,7 @@ void updateLevelUpFrame(const int player)
 	auto frame = hud_t.levelupFrame;
 	auto& lvlUpAnimation = levelUpAnimation[player];
 
-	static ConsoleVariable<int> cvar_lvlup_debug("/lvlup_debug", 0);
+	static CvarInt cvar_lvlup_debug("/lvlup_debug", 0);
 	if ( *cvar_lvlup_debug > 0 )
 	{
 		std::vector<int> statPicks;
@@ -42395,10 +42395,10 @@ void updateLevelUpFrame(const int player)
 
 	auto& lvlUp = lvlUpAnimation.lvlUps.front();
 
-	static ConsoleVariable<int> cvar_lvlup_angle("/lvlup_angle", 16);
-	static ConsoleVariable<int> cvar_lvlup_falldist("/lvlup_falldist", 64);
-	static ConsoleVariable<int> cvar_lvlup_currentstatY("/lvlup_currentstatY", -10);
-	static ConsoleVariable<int> cvar_lvlup_increasestatY("/lvlup_increasestatY", 0);
+	static CvarInt cvar_lvlup_angle("/lvlup_angle", 16);
+	static CvarInt cvar_lvlup_falldist("/lvlup_falldist", 64);
+	static CvarInt cvar_lvlup_currentstatY("/lvlup_currentstatY", -10);
+	static CvarInt cvar_lvlup_increasestatY("/lvlup_increasestatY", 0);
 
 	if ( !lvlUp.expired )
 	{
@@ -42612,7 +42612,7 @@ void updateLevelUpFrame(const int player)
 		++lvlUp.ticksActive;
 	}
 
-	static ConsoleVariable<int> cvar_lvlup_framey("/lvlup_framey", 16);
+	static CvarInt cvar_lvlup_framey("/lvlup_framey", 16);
 	SDL_Rect levelUpFramePos{ hud_t.hudFrame->getSize().w / 2 - frameWidth / 2, *cvar_lvlup_framey,
 		frameWidth, std::max(lvlupImg->pos.y + lvlupImg->pos.h, statsFramePos.y + statsFramePos.h)};
 	levelUpFramePos.x += players[player]->camera_virtualx1();
@@ -42720,11 +42720,11 @@ int SkillUpAnimation_t::SkillUp_t::getIconNominalSize()
 void SkillUpAnimation_t::SkillUp_t::animateNotification(const int player)
 {
 	real_t animspeed = 5.0 / (4.0);
-	static ConsoleVariable<float> cvar_skillup_speed("/skillup_speed", .5);
-	static ConsoleVariable<float> cvar_skillup_bounce("/skillup_bounce", 1.0 /*2.5*/);
-	static ConsoleVariable<float> cvar_skillup_animfall("/skillup_animfall", 0.5/*2.0*/);
-	static ConsoleVariable<int> cvar_skillup_increase_delay("/skillup_increase_delay", 50);
-	static ConsoleVariable<int> cvar_skillup_ding_volume("/skillup_ding_volume", 32);
+	static CvarFloat cvar_skillup_speed("/skillup_speed", .5);
+	static CvarFloat cvar_skillup_bounce("/skillup_bounce", 1.0 /*2.5*/);
+	static CvarFloat cvar_skillup_animfall("/skillup_animfall", 0.5/*2.0*/);
+	static CvarInt cvar_skillup_increase_delay("/skillup_increase_delay", 50);
+	static CvarInt cvar_skillup_ding_volume("/skillup_ding_volume", 32);
 	animspeed *= *cvar_skillup_speed;
 	int movementAmount = 0;
 	if ( players[player]->bUseCompactGUIHeight() )
@@ -43109,10 +43109,10 @@ void updateSkillUpFrame(const int player)
 
 	auto& skillUp = skillUpAnim.getSkillUpToDisplay();
 
-	static ConsoleVariable<int> cvar_skillup_angle("/skillup_angle", 16);
-	static ConsoleVariable<int> cvar_skillup_falldist("/skillup_falldist", 64);
-	static ConsoleVariable<int> cvar_skillup_currentstatY("/skillup_currentstatY", -10);
-	static ConsoleVariable<int> cvar_skillup_increasestatY("/skillup_increasestatY", 0);
+	static CvarInt cvar_skillup_angle("/skillup_angle", 16);
+	static CvarInt cvar_skillup_falldist("/skillup_falldist", 64);
+	static CvarInt cvar_skillup_currentstatY("/skillup_currentstatY", -10);
+	static CvarInt cvar_skillup_increasestatY("/skillup_increasestatY", 0);
 
 	if ( !skillUp.expired )
 	{
@@ -43562,7 +43562,7 @@ void updateSkillUpFrame(const int player)
 		}
 	}
 
-	static ConsoleVariable<int> cvar_skillup_framey("/skillup_framey", 48);
+	static CvarInt cvar_skillup_framey("/skillup_framey", 48);
 	int framey = *cvar_skillup_framey;
 	if ( players[player]->bUseCompactGUIHeight() && players[player]->shootmode )
 	{

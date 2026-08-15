@@ -36,8 +36,8 @@ size_t getNumTextLines(std::string& str)
 }
 
 #ifndef EDITOR
-static ConsoleVariable<bool> cvar_text_render_addspace("/text_render_addspace", true);
-static ConsoleVariable<bool> cvar_text_delay_dumpcache("/text_delay_dumpcache", false);
+static CvarBool cvar_text_render_addspace("/text_render_addspace", true);
+static CvarBool cvar_text_delay_dumpcache("/text_delay_dumpcache", false);
 #endif
 
 void Text::render() {

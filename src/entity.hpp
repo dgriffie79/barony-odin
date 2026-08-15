@@ -42,7 +42,7 @@
 // number of entity skills and fskills
 static const int NUMENTITYSKILLS = 60;
 static const int NUMENTITYFSKILLS = 30;
-extern ConsoleVariable<int> cvar_entity_bodypart_sync_tick;
+extern CvarInt cvar_entity_bodypart_sync_tick;
 struct spell_t;
 
 // entity class

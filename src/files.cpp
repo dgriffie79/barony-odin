@@ -44,8 +44,8 @@ const char* holidayThemeDirs[HolidayTheme::THEME_MAX] = {
 };
 
 #ifndef EDITOR
-ConsoleVariable<int> cvar_forceHoliday("/force_holiday", 0);
-ConsoleVariable<bool> cvar_disableHoliday("/disable_holiday", false);
+CvarInt cvar_forceHoliday("/force_holiday", 0);
+CvarBool cvar_disableHoliday("/disable_holiday", false);
 #endif
 
 HolidayTheme getCurrentHoliday(bool force) {
@@ -2296,8 +2296,8 @@ voxel_t* loadVoxel(char* filename)
 
 constexpr float hellAmbience = 32.f;
 #ifndef EDITOR
-static ConsoleVariable<float> cvar_hell_ambience("/hell_ambience", hellAmbience);
-static ConsoleVariable<Vector4> cvar_map_ambience("/map_ambience", { 0.f, 0.f, 0.f, 0.f });
+static CvarFloat cvar_hell_ambience("/hell_ambience", hellAmbience);
+static CvarVector4 cvar_map_ambience("/map_ambience", { 0.f, 0.f, 0.f, 0.f });
 #endif
 
 /*-------------------------------------------------------------------------------

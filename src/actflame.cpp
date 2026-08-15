@@ -81,7 +81,7 @@ void actFlame(Entity* my)
 
 -------------------------------------------------------------------------------*/
 
-static ConsoleVariable<bool> cvar_flame_use_vismap("/flame_use_vismap", true);
+static CvarBool cvar_flame_use_vismap("/flame_use_vismap", true);
 
 Entity* spawnFlameSprites(Entity* parentent, Sint32 sprite)
 {
@@ -217,7 +217,7 @@ Entity* spawnFlame(Entity* parentent, Sint32 sprite )
 	entity->flags[PASSABLE] = true;
 	entity->flags[SPRITE] = true;
 	entity->flags[UNCLICKABLE] = true;
-	static ConsoleVariable<float> cvar_flameLightBonus("/flame_light_bonus", 0.5f);
+	static CvarFloat cvar_flameLightBonus("/flame_light_bonus", 0.5f);
 	entity->lightBonus = vec4(*cvar_flameLightBonus, *cvar_flameLightBonus, *cvar_flameLightBonus, 0.f);
     entity->ditheringDisabled = true;
 	entity->behavior = &actFlame;

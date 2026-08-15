@@ -441,7 +441,7 @@ void UIToastNotification::drawActionButton(const SDL_Rect& src)
 }
 
 UIToastNotificationManager_t UIToastNotificationManager;
-static ConsoleVariable<bool> cvar_achievements_warning("/achievements_warning", true);
+static CvarBool cvar_achievements_warning("/achievements_warning", true);
 void UIToastNotificationManager_t::drawNotifications(bool isMoviePlaying, bool beforeFadeout)
 {
 	if ( !bIsInit )

@@ -541,7 +541,7 @@ bool entityInsideSomething(Entity* entity)
 	return false;
 }
 
-static ConsoleVariable<float> cvar_linetrace_smallcollision("/linetrace_smallcollision", 4.0);
+static CvarFloat cvar_linetrace_smallcollision("/linetrace_smallcollision", 4.0);
 bool useSmallCollision(Entity& my, Stat& myStats, Entity& your, Stat& yourStats)
 {
 	if ( (my.behavior == &actMonster || my.behavior == &actPlayer) &&
@@ -2403,7 +2403,7 @@ real_t lineTrace( Entity* my, real_t x1, real_t y1, real_t angle, real_t range, 
 			// debug particles.
 			if ( my && my->behavior == &actPlayer && (entities & LINETRACE_ATK_CHECK_FRIENDLYFIRE) )
 			{
-				static ConsoleVariable<bool> cvar_linetracedebug("/linetracedebug", false);
+				static CvarBool cvar_linetracedebug("/linetracedebug", false);
 				if ( *cvar_linetracedebug )
 				{
 					Entity* particle = spawnMagicParticle(my);
@@ -2587,7 +2587,7 @@ real_t lineTraceTarget(Entity* my, real_t x1, real_t y1, real_t angle, real_t ra
 			// debug particles.
 			if ( my && my->behavior == &actMonster && (entities == 0 || (entities & LINETRACE_ATK_CHECK_FRIENDLYFIRE)) )
 			{
-				static ConsoleVariable<bool> cvar_linetracetargetdebug("/linetracetargetdebug", false);
+				static CvarBool cvar_linetracetargetdebug("/linetracetargetdebug", false);
 				if ( *cvar_linetracetargetdebug )
 				{
 					Entity* particle = spawnMagicParticle(my);

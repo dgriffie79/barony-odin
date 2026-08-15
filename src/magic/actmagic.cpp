@@ -26,8 +26,8 @@
 #include "magic.hpp"
 #include "../mod_tools.hpp"
 
-static ConsoleVariable<float> cvar_magic_fx_light_bonus("/magic_fx_light_bonus", 0.25f);
-static ConsoleVariable<bool> cvar_magic_fx_use_vismap("/magic_fx_use_vismap", true);
+static CvarFloat cvar_magic_fx_light_bonus("/magic_fx_light_bonus", 0.25f);
+static CvarBool cvar_magic_fx_use_vismap("/magic_fx_use_vismap", true);
 
 void spawnAdditionalParticleForMissile(Entity* my)
 {
@@ -2126,7 +2126,7 @@ void actMagicMissile(Entity* my)   //TODO: Verify this function.
 					my->processEntityWind();
 
 					bool halfSpeedCheck = false;
-					static ConsoleVariable<bool> cvar_magic_clip("/magic_clip_test", true);
+					static CvarBool cvar_magic_clip("/magic_clip_test", true);
 					real_t speed = sqrt(pow(my->vel_x, 2) + pow(my->vel_y, 2));
 					if ( speed > 4.0 ) // can clip through thin gates
 					{
@@ -2234,7 +2234,7 @@ void actMagicMissile(Entity* my)   //TODO: Verify this function.
 					my->processEntityWind();
 
 					bool halfSpeedCheck = false;
-					static ConsoleVariable<bool> cvar_magic_clip2("/magic_clip_test2", true);
+					static CvarBool cvar_magic_clip2("/magic_clip_test2", true);
 					real_t speed = sqrt(pow(my->vel_x, 2) + pow(my->vel_y, 2));
 					if ( speed > 4.0 ) // can clip through thin gates
 					{
@@ -5165,7 +5165,7 @@ void actMagicMissile(Entity* my)   //TODO: Verify this function.
 					if ( hit.entity )
 					{
 						int volume = 128;
-						static ConsoleVariable cvar_slimehit_sfx("/slimehit_sfx", 173);
+						static CvarInt cvar_slimehit_sfx("/slimehit_sfx", 173);
 						int hitsfx = *cvar_slimehit_sfx;
 						int hitvolume = (particleEmitterHitProps && particleEmitterHitProps->hits == 1) ? 128 : 64;
 						if ( spell->ID == SPELL_SLIME_WATER || spell->ID == SPELL_SLIME_TAR || spell->ID == SPELL_GREASE_SPRAY )
@@ -9678,7 +9678,7 @@ void actParticleAestheticOrbit(Entity* my)
 			bool particle = false;
 			if ( my->ticks >= 2 * TICKS_PER_SECOND )
 			{
-				static ConsoleVariable<float> cvar_magic_egaze3("/magic_egaze3", 2.5);
+				static CvarFloat cvar_magic_egaze3("/magic_egaze3", 2.5);
 				if ( my->skill[3] == 0 )
 				{
 					real_t diff = std::max(0.1, (32.0 - my->scaley) / *cvar_magic_egaze3);
@@ -9702,7 +9702,7 @@ void actParticleAestheticOrbit(Entity* my)
 				}
 
 				{
-					static ConsoleVariable<float> cvar_magic_egaze4("/magic_egaze4", 10.0);
+					static CvarFloat cvar_magic_egaze4("/magic_egaze4", 10.0);
 					real_t diff = std::min(-0.05, (my->fskill[3] - my->fskill[2]) / *cvar_magic_egaze4);
 					my->fskill[2] += diff;
 					my->fskill[2] = std::max(my->fskill[2], my->fskill[3]);
@@ -9733,8 +9733,8 @@ void actParticleAestheticOrbit(Entity* my)
 
 			if ( particle )
 			{
-				static ConsoleVariable<float> cvar_magic_egaze5("/magic_egaze5", 0.25);
-				static ConsoleVariable<float> cvar_magic_egaze6("/magic_egaze6", 1.0);
+				static CvarFloat cvar_magic_egaze5("/magic_egaze5", 0.25);
+				static CvarFloat cvar_magic_egaze6("/magic_egaze6", 1.0);
 				Entity* fx = spawnMagicParticleCustom(my, 1866, *cvar_magic_egaze5, *cvar_magic_egaze6);
 				fx->vel_z = -0.3;
 				fx->ditheringDisabled = true;
@@ -9742,7 +9742,7 @@ void actParticleAestheticOrbit(Entity* my)
 		}
 		else if ( my->skill[1] == PARTICLE_EFFECT_ETERNALS_GAZE2 )
 		{
-			static ConsoleVariable<float> cvar_magic_egaze8("/eg8", 2.5);
+			static CvarFloat cvar_magic_egaze8("/eg8", 2.5);
 			if ( my->skill[3] == 0 )
 			{
 				real_t diff = std::max(0.1, (64.0 - my->scaley) / *cvar_magic_egaze8);
@@ -11919,8 +11919,8 @@ void actParticleTimer(Entity* my)
 
 					for ( int i = 0; i < 3; ++i )
 					{
-						static ConsoleVariable<int> cvar_magic_vortex_sprite("/magic_vortex_sprite", 1719);
-						static ConsoleVariable<float> cvar_magic_vortex_scale("/magic_vortex_scale", 0.5);
+						static CvarInt cvar_magic_vortex_sprite("/magic_vortex_sprite", 1719);
+						static CvarFloat cvar_magic_vortex_scale("/magic_vortex_scale", 0.5);
 						Entity* fx = createParticleAestheticOrbit(my, *cvar_magic_vortex_sprite, PARTICLE_LIFE, PARTICLE_EFFECT_VORTEX_ORBIT);
 						fx->scalex = *cvar_magic_vortex_scale;
 						fx->scaley = *cvar_magic_vortex_scale;
@@ -11963,8 +11963,8 @@ void actParticleTimer(Entity* my)
 					}
 				}
 
-				static ConsoleVariable<int> cvar_vortex_particle_interval("/vortex_particle_interval", 30);
-				static ConsoleVariable<float> cvar_vortex_particle_decay("/vortex_particle_decay", 0.9);
+				static CvarInt cvar_vortex_particle_interval("/vortex_particle_interval", 30);
+				static CvarFloat cvar_vortex_particle_decay("/vortex_particle_decay", 0.9);
 				if ( my->particleTimerVariable1 == 1 || my->particleTimerVariable1 % *cvar_vortex_particle_interval == 0 )
 				{
 					real_t offset = PI * (local_rng.rand() % 360) / 180.0;// -((my->ticks % 50) / 50.0) * 2 * PI;
@@ -12924,8 +12924,8 @@ void actParticleTimer(Entity* my)
 			{
 				if ( my->ticks == 1 )
 				{
-					static ConsoleVariable<float> cvar_magic_egaze7("/magic_egaze7", -8.25);
-					static ConsoleVariable<float> cvar_magic_egaze9("/magic_egaze9", 0.05);
+					static CvarFloat cvar_magic_egaze7("/magic_egaze7", -8.25);
+					static CvarFloat cvar_magic_egaze9("/magic_egaze9", 0.05);
 					for ( int i = 0; i < 5; ++i )
 					{
 						Entity* fx = createParticleAestheticOrbit(my, 1865, 4 * TICKS_PER_SECOND, PARTICLE_EFFECT_ETERNALS_GAZE2);
@@ -13103,8 +13103,8 @@ void actParticleTimer(Entity* my)
 				}
 				if ( my->ticks == 1 )
 				{
-					static ConsoleVariable<float> cvar_magic_egaze1("/magic_egaze1", -16.25);
-					static ConsoleVariable<float> cvar_magic_egaze2("/magic_egaze2", 7.75);
+					static CvarFloat cvar_magic_egaze1("/magic_egaze1", -16.25);
+					static CvarFloat cvar_magic_egaze2("/magic_egaze2", 7.75);
 					for ( int i = 0; i < 4; ++i )
 					{
 						Entity* fx = createParticleAestheticOrbit(my, 1865, 4 * TICKS_PER_SECOND, PARTICLE_EFFECT_ETERNALS_GAZE1);
@@ -14977,7 +14977,7 @@ void createParticleFollowerCommand(real_t x, real_t y, real_t z, int sprite, Uin
 
 }
 
-static ConsoleVariable<float> cvar_follower_particle_speed("/follower_particle_speed", 2.0);
+static CvarFloat cvar_follower_particle_speed("/follower_particle_speed", 2.0);
 void actParticleFollowerCommand(Entity* my)
 {
 	if ( PARTICLE_LIFE < 0 )
@@ -15658,7 +15658,7 @@ Entity* createParticleSpellPinpointTarget(Entity* parent, Uint32 casterUid, int 
 	entity->x = parent->x;
 	entity->y = parent->y;
 	entity->z = 7.5;
-	static ConsoleVariable<float> cvar_pinpoint_z("/pinpoint_z", 0.0);
+	static CvarFloat cvar_pinpoint_z("/pinpoint_z", 0.0);
 	entity->fskill[0] = parent->z + *cvar_pinpoint_z;
 	if ( parent->behavior == &actBoulderTrapHole )
 	{
@@ -16114,10 +16114,10 @@ Entity* createParticleCastingIndicator(Entity* parent, real_t x, real_t y, real_
 	entity->x = x;
 	entity->y = y;
 	entity->z = 7.470;
-	static ConsoleVariable<float> cvar_sprite_cast_indicator_scale("/sprite_cast_indicator_scale", 0.025);
-	static ConsoleVariable<float> cvar_sprite_cast_indicator_rotate("/sprite_cast_indicator_rotate", 0.025);
-	static ConsoleVariable<float> cvar_sprite_cast_indicator_alpha("/sprite_cast_indicator_alpha", 0.5);
-	static ConsoleVariable<float> cvar_sprite_cast_indicator_alpha_glow("/sprite_cast_indicator_alpha_glow", 0.0625);
+	static CvarFloat cvar_sprite_cast_indicator_scale("/sprite_cast_indicator_scale", 0.025);
+	static CvarFloat cvar_sprite_cast_indicator_rotate("/sprite_cast_indicator_rotate", 0.025);
+	static CvarFloat cvar_sprite_cast_indicator_alpha("/sprite_cast_indicator_alpha", 0.5);
+	static CvarFloat cvar_sprite_cast_indicator_alpha_glow("/sprite_cast_indicator_alpha_glow", 0.0625);
 	entity->ditheringDisabled = true;
 	entity->flags[SPRITE] = true;
 	entity->flags[PASSABLE] = true;
@@ -16305,7 +16305,7 @@ void AOEIndicators_t::Indicator_t::updateIndicator()
 	//auto t5 = std::chrono::high_resolution_clock::now();
 	bool circle = !castingTarget;
 
-	static ConsoleVariable<bool> cvar_aoe_indicator_cache("/aoe_indicator_cache", true);
+	static CvarBool cvar_aoe_indicator_cache("/aoe_indicator_cache", true);
 	if ( !*cvar_aoe_indicator_cache )
 	{
 		cacheType = CACHE_NONE;
@@ -16665,10 +16665,10 @@ Entity* createParticleAOEIndicator(Entity* parent, real_t x, real_t y, real_t z,
 	entity->x = x;
 	entity->y = y;
 	entity->z = z + 7.49;
-	static ConsoleVariable<float> cvar_sprite_aoe_indicator_scale("/sprite_aoe_indicator_scale", 2.0);
-	static ConsoleVariable<float> cvar_sprite_aoe_indicator_rotate("/sprite_aoe_indicator_rotate", 0.0);
-	static ConsoleVariable<float> cvar_sprite_aoe_indicator_alpha("/sprite_aoe_indicator_alpha", 0.5);
-	static ConsoleVariable<float> cvar_sprite_aoe_indicator_alpha_glow("/sprite_aoe_indicator_alpha_glow", 0.0625);
+	static CvarFloat cvar_sprite_aoe_indicator_scale("/sprite_aoe_indicator_scale", 2.0);
+	static CvarFloat cvar_sprite_aoe_indicator_rotate("/sprite_aoe_indicator_rotate", 0.0);
+	static CvarFloat cvar_sprite_aoe_indicator_alpha("/sprite_aoe_indicator_alpha", 0.5);
+	static CvarFloat cvar_sprite_aoe_indicator_alpha_glow("/sprite_aoe_indicator_alpha_glow", 0.0625);
 	entity->ditheringDisabled = true;
 	entity->flags[SPRITE] = true;
 	entity->flags[PASSABLE] = true;
@@ -17006,11 +17006,11 @@ void actParticleVortex(Entity* my)
 		}
 
 
-		static ConsoleVariable<float> cvar_particle_speed("/particle_speed", 1.0);
-		static ConsoleVariable<float> cvar_particle_z("/particle_z", 1.0);
-		static ConsoleVariable<float> cvar_particle_yaw("/particle_yaw", 1.0);
-		static ConsoleVariable<float> cvar_particle_radius("/particle_radius", 1.0);
-		static ConsoleVariable<float> cvar_particle_scale("/particle_scale", 1.0);
+		static CvarFloat cvar_particle_speed("/particle_speed", 1.0);
+		static CvarFloat cvar_particle_z("/particle_z", 1.0);
+		static CvarFloat cvar_particle_yaw("/particle_yaw", 1.0);
+		static CvarFloat cvar_particle_radius("/particle_radius", 1.0);
+		static CvarFloat cvar_particle_scale("/particle_scale", 1.0);
 		real_t dist = std::max(0.25, (1.0 + cos(PI + PI * my->fskill[3])) / 2);
 		my->x = my->fskill[0] + 4.0 * *cvar_particle_radius * dist * cos(my->yaw);
 		my->y = my->fskill[1] + 4.0 * *cvar_particle_radius * dist * sin(my->yaw);
@@ -19751,8 +19751,8 @@ Entity* createMagicRadiusBadge(Entity& parent)
 	entity->parent = parent.getUID();
 	entity->x = parent.x;
 	entity->y = parent.y;
-	static ConsoleVariable<float> cvar_magic_radius_badge1("/magic_radius_badge1", 4.0);
-	static ConsoleVariable<float> cvar_magic_radius_badge2("/magic_radius_badge2", 0.0);
+	static CvarFloat cvar_magic_radius_badge1("/magic_radius_badge1", 4.0);
+	static CvarFloat cvar_magic_radius_badge2("/magic_radius_badge2", 0.0);
 	entity->z = 4.0;
 	int mapx = entity->x / 16;
 	int mapy = entity->y / 16;
@@ -21268,7 +21268,7 @@ void actParticleShatterEarth(Entity* my)
 		{
 			if ( enableDebugKeys && (svFlags & SV_FLAG_CHEATS) )
 			{
-				static ConsoleVariable<int> cvar_se9("/se9", -5);
+				static CvarInt cvar_se9("/se9", -5);
 				tallCeilingDelay = *cvar_se9;
 			}
 			else
@@ -21277,7 +21277,7 @@ void actParticleShatterEarth(Entity* my)
 			}
 		}
 
-		static ConsoleVariable<int> cvar_se4("/se4", 20);
+		static CvarInt cvar_se4("/se4", 20);
 		int boulderSpawn = 20 + tallCeilingDelay;
 		if ( enableDebugKeys && (svFlags & SV_FLAG_CHEATS) )
 		{
@@ -21366,7 +21366,7 @@ void actParticleShatterEarth(Entity* my)
 			}
 		}
 
-		static ConsoleVariable<int> cvar_se5("/se5", 45);
+		static CvarInt cvar_se5("/se5", 45);
 		if ( my->ticks == *cvar_se5 + tallCeilingDelay + my->actmagicDelayMove )
 		{
 			for ( int i = 0; i < 8; ++i )
@@ -21382,7 +21382,7 @@ void actParticleShatterEarth(Entity* my)
 				entity->roll = (local_rng.rand() % 360) * PI / 180.0;
 				entity->yaw = (local_rng.rand() % 360) * PI / 180.0;
 				entity->behavior = &actParticleShatterEarthRock;
-				static ConsoleVariable<float> cvar_se2("/se2", 3.0);
+				static CvarFloat cvar_se2("/se2", 3.0);
 				entity->vel_z = *cvar_se2;
 				entity->lightBonus = vec4(*cvar_magic_fx_light_bonus, *cvar_magic_fx_light_bonus,
 					*cvar_magic_fx_light_bonus, 0.f);
@@ -21399,9 +21399,9 @@ void actParticleShatterEarth(Entity* my)
 			my->flags[INVISIBLE] = true;
 		}
 
-		static ConsoleVariable<int> cvar_se6("/se6", 50);
-		static ConsoleVariable<int> cvar_se7("/se7", 87);
-		static ConsoleVariable<int> cvar_se8("/se8", 20);
+		static CvarInt cvar_se6("/se6", 50);
+		static CvarInt cvar_se7("/se7", 87);
+		static CvarInt cvar_se8("/se8", 20);
 
 		if ( noground )
 		{
@@ -21455,11 +21455,11 @@ void actParticleShatterEarth(Entity* my)
 	}
 	else if ( my->sprite == 1868 )
 	{
-		static ConsoleVariable<int> cvar_se10("/se10", 42);
+		static CvarInt cvar_se10("/se10", 42);
 		int tallCeilingDelay = 0;
 		if ( tallCeiling )
 		{
-			static ConsoleVariable<int> cvar_se11("/se11", -5);
+			static CvarInt cvar_se11("/se11", -5);
 			tallCeilingDelay = *cvar_se11;
 		}
 		if ( my->ticks >= TICKS_PER_SECOND * 2 + my->actmagicDelayMove )
@@ -21532,7 +21532,7 @@ void actParticleShatterEarthRock(Entity* my)
 		{
 			if ( my->z >= 7.5 )
 			{
-				static ConsoleVariable<float> cvar_se3("/se3", -0.5);
+				static CvarFloat cvar_se3("/se3", -0.5);
 				my->z = 7.5;
 				my->vel_z = *cvar_se3;
 				my->skill[0] = 1;
@@ -21582,7 +21582,7 @@ void createParticleShatterEarth(Entity* my, Entity* caster, real_t _x, real_t _y
 		entity->x = x * 16.0 + 8.0;
 		entity->y = y * 16.0 + 8.0;
 
-		static ConsoleVariable<float> cvar_se("/se", -10.5);
+		static CvarFloat cvar_se("/se", -10.5);
 		entity->z = *cvar_se + (tallCeiling ? -16.0 : 0.0);
 		entity->yaw = 0.0;
 		entity->pitch = PI;
@@ -21615,7 +21615,7 @@ void createParticleShatterEarth(Entity* my, Entity* caster, real_t _x, real_t _y
 		entity->x = x * 16.0 + 8.0;
 		entity->y = y * 16.0 + 8.0;
 
-		static ConsoleVariable<float> cvar_se1("/se1", -8.0);
+		static CvarFloat cvar_se1("/se1", -8.0);
 		entity->z = *cvar_se1 + (tallCeiling ? -16.0 : 0.0);
 		entity->yaw = 0.0;
 		entity->scalex = 0.25;

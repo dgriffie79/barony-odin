@@ -215,9 +215,9 @@ LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
 }
 #endif
 
-ConsoleVariable<bool> cvar_enableKeepAlives("/keepalive_enabled", true);
-ConsoleVariable<bool> cvar_animate_tiles("/animate_tiles", true);
-ConsoleVariable<bool> cvar_map_sequence_rng("/map_sequence_rng", true);
+CvarBool cvar_enableKeepAlives("/keepalive_enabled", true);
+CvarBool cvar_animate_tiles("/animate_tiles", true);
+CvarBool cvar_map_sequence_rng("/map_sequence_rng", true);
 
 DynamicArrayStr randomPlayerNamesMale;
 DynamicArrayStr randomPlayerNamesFemale;
@@ -257,7 +257,7 @@ Uint32 messagesEnabled = 0xffffffff; // all enabled
 real_t getFPSScale(real_t baseFPS)
 {
 #ifndef EDITOR
-	static ConsoleVariable<bool> cvar_ui_fps_scale_fixed("/ui_fps_scale_fixed", false);
+	static CvarBool cvar_ui_fps_scale_fixed("/ui_fps_scale_fixed", false);
 	if ( *cvar_ui_fps_scale_fixed )
 	{
 		return baseFPS / (std::max(1U, fpsLimit));
@@ -271,7 +271,7 @@ real_t getFPSScale(real_t baseFPS)
 #endif
 }
 
-//ConsoleVariable<bool> cvar_useTimerInterpolation("/timer_interpolation_enabled", true);
+//CvarBool cvar_useTimerInterpolation("/timer_interpolation_enabled", true);
 TimerExperiments::time_point TimerExperiments::timepoint{};
 TimerExperiments::time_point TimerExperiments::currentTime = Clock::now();
 TimerExperiments::duration TimerExperiments::accumulator = std::chrono::milliseconds{ 0 };
@@ -583,7 +583,7 @@ void TimerExperiments::updateClocks()
 		bIsInit = true;
 	}
 
-	static ConsoleVariable<bool> cvar_frameLagCheck("/framelagcheck", false);
+	static CvarBool cvar_frameLagCheck("/framelagcheck", false);
 	if ( *cvar_frameLagCheck )
 	{
 		static Uint32 doneTick = 0;
@@ -595,8 +595,8 @@ void TimerExperiments::updateClocks()
 		}
 	}
 
-	static ConsoleVariable<int> cvar_frameTime("/frametimelimit", 32);
-	static ConsoleVariable<bool> cvar_frameTimeAutoSet("/frametimeautolimit", true);
+	static CvarInt cvar_frameTime("/frametimelimit", 32);
+	static CvarBool cvar_frameTimeAutoSet("/frametimeautolimit", true);
 	int frameTimeLimit = (*cvar_frameTime);
 	if ( *cvar_frameTimeAutoSet )
 	{
@@ -613,10 +613,10 @@ void TimerExperiments::updateClocks()
 		}
 	}
 
-	static ConsoleVariable<float> cvar_cameraLerpFactor("/cameralerp", 30.0);
+	static CvarFloat cvar_cameraLerpFactor("/cameralerp", 30.0);
 	lerpFactor = (*cvar_cameraLerpFactor);
 
-	static ConsoleVariable<bool> cvar_lerpAutoAdjust("/autocameralerp", true);
+	static CvarBool cvar_lerpAutoAdjust("/autocameralerp", true);
 
 	time_point newTime = Clock::now();
 	auto frameTime = newTime - currentTime;
@@ -950,9 +950,9 @@ static ConsoleCommand ccmd_demo_play("/demo_play", "play a recorded demo(default
 
 -------------------------------------------------------------------------------*/
 
-ConsoleVariable<bool> framesEatMouse("/gui_eat_mouseclicks", true);
-static ConsoleVariable<bool> cvar_lava_use_vismap("/lava_use_vismap", true);
-static ConsoleVariable<bool> cvar_lava_bubbles_enabled("/lava_bubbles_enabled", true);
+CvarBool framesEatMouse("/gui_eat_mouseclicks", true);
+static CvarBool cvar_lava_use_vismap("/lava_use_vismap", true);
+static CvarBool cvar_lava_bubbles_enabled("/lava_bubbles_enabled", true);
 
 static real_t drunkextend[MAXPLAYERS] = { (real_t)0.0 };
 
@@ -1058,7 +1058,7 @@ void gameLogic(void)
 		auto& camera_shakey2 = cameravars[c].shakey2;
 		if ( shaking )
 		{
-			static ConsoleVariable<int> cvar_shake_max("/shake_max", 15);
+			static CvarInt cvar_shake_max("/shake_max", 15);
 			camera_shakex = std::min(camera_shakex, *cvar_shake_max / 100.0);
 			camera_shakey = std::min(camera_shakey, *cvar_shake_max);
 
@@ -1330,7 +1330,7 @@ void gameLogic(void)
 	}
 	else
 	{
-		static ConsoleVariable<bool> cvar_appraisal_auto_switch("/appraisal_auto_switch", true);
+		static CvarBool cvar_appraisal_auto_switch("/appraisal_auto_switch", true);
 		DebugStats.eventsT2 = std::chrono::high_resolution_clock::now();
 		if ( multiplayer != CLIENT )   // server/singleplayer code
 		{
@@ -1662,7 +1662,7 @@ void gameLogic(void)
 
 			//if( TICKS_PER_SECOND )
 			//generatePathMaps();
-			static ConsoleVariable<bool> cvar_debug_monster_timer("/debug_monster_timer", false);
+			static CvarBool cvar_debug_monster_timer("/debug_monster_timer", false);
 			bool debugMonsterTimer = *cvar_debug_monster_timer && !gamePaused && keystatus[SDLK_F1];
 			if ( debugMonsterTimer )
 			{
@@ -4211,7 +4211,7 @@ bool handleEvents(void)
 	}
 
 	static std::map<Uint32, int> mouseMotionEventsTimestamp;
-	static ConsoleVariable<bool> cvar_debug_mouse_motion("/debug_mouse_motion", false);
+	static CvarBool cvar_debug_mouse_motion("/debug_mouse_motion", false);
 	if ( *cvar_debug_mouse_motion )
 	{
 		int maxMotion = 0;
@@ -5456,7 +5456,7 @@ bool frameRateLimit( Uint32 maxFrameRate, bool resetAccumulator, bool sleep )
 	const float accumulatedSeconds = framerateAccumulatedTicks / (float)ticksPerSecond;
 	const float diff = desiredFrameSeconds - accumulatedSeconds;
 
-    static ConsoleVariable<bool> allowSleep("/timer_sleep_enabled", true,
+    static CvarBool allowSleep("/timer_sleep_enabled", true,
         "allow main thread to sleep between ticks (saves power)");
 	if ( diff >= 0.f )
 	{
@@ -5469,8 +5469,8 @@ bool frameRateLimit( Uint32 maxFrameRate, bool resetAccumulator, bool sleep )
 			auto microseconds = std::chrono::microseconds((Uint64)(diff * 1000000));
 			preciseSleep(microseconds.count() / 1e6);
 #else
-            static ConsoleVariable<float> sleepLimit("/timer_sleep_limit", 0.001f);
-            static ConsoleVariable<float> sleepFactor("/timer_sleep_factor", 0.97f);
+            static CvarFloat sleepLimit("/timer_sleep_limit", 0.001f);
+            static CvarFloat sleepFactor("/timer_sleep_factor", 0.97f);
             if ( diff >= *sleepLimit )
             {
 				std::this_thread::sleep_for(std::chrono::microseconds((Uint64)(diff * 1000000 * (*sleepFactor))));
@@ -6084,7 +6084,7 @@ void ingameHud()
 			//}
 		}
 
-		static ConsoleVariable<bool> cvar_debugmouse("/debugmouse", false);
+		static CvarBool cvar_debugmouse("/debugmouse", false);
 		if ( *cvar_debugmouse )
 		{
 			int x = players[player]->camera_x1() + 12;
@@ -6127,7 +6127,7 @@ void ingameHud()
 	DebugStats.t9GUI = std::chrono::high_resolution_clock::now();
 
 	UIToastNotificationManager.drawNotifications(MainMenu::isCutsceneActive(), true); // draw this before the cursors
-    static ConsoleVariable<bool> cvar_debugVMouse("/debug_virtual_mouse", false);
+    static CvarBool cvar_debugVMouse("/debug_virtual_mouse", false);
 
 	// pointer in inventory screen
 	for ( int player = 0; player < MAXPLAYERS; ++player )
@@ -7696,7 +7696,7 @@ extern "C" int barony_main(int argc, char** argv)
 				ingameHud();
 				Compendium_t::updateTooltip();
 
-                static ConsoleVariable<bool> showConsumeMouseInputs("/debug_consume_mouse", false);
+                static CvarBool showConsumeMouseInputs("/debug_consume_mouse", false);
                 if (!framesProcResult.usable) {
 				    if (*showConsumeMouseInputs) {
 				        printText(font8x8_bmp, 16, 16, "eating mouse input");
@@ -7802,7 +7802,7 @@ extern "C" int barony_main(int argc, char** argv)
 			if ( enableDebugKeys )
 			{
 				printTextFormatted(font8x8_bmp, 8, 20, "gui module: %d\ngui mode: %d", players[0]->GUI.activeModule, players[0]->gui_mode);
-				static ConsoleVariable<bool> cvar_map_debug("/mapdebug", false);
+				static CvarBool cvar_map_debug("/mapdebug", false);
 				if ( *cvar_map_debug )
 				{
 					int ix = (int)cameras[clientnum].x;
@@ -7813,7 +7813,7 @@ extern "C" int barony_main(int argc, char** argv)
 							ix, iy, pathMapGrounded[iy + ix * map.height]);
 					}
 				}
-				static ConsoleVariable<bool> cvar_light_debug("/lightdebug", false);
+				static CvarBool cvar_light_debug("/lightdebug", false);
 				if ( *cvar_light_debug )
 				{
 					if ( players[clientnum]->entity )
@@ -7852,7 +7852,7 @@ extern "C" int barony_main(int argc, char** argv)
 			DebugTimers.printAllTimepoints();
 			DebugTimers.clearAllTimepoints();
 
-			static ConsoleVariable<bool> cvar_frame_search_count("/framesearchcount", false);
+			static CvarBool cvar_frame_search_count("/framesearchcount", false);
 			if ( *cvar_frame_search_count )
 			{
 				printTextFormatted(font8x8_bmp, 300, 32, "findFrame() calls: %d / loop", Frame::numFindFrameCalls);

@@ -28,7 +28,7 @@ static real_t getLightAtModifier = 1.0;
 static real_t getLightAtAdder = 0.0;
 
 #ifndef EDITOR
-static ConsoleVariable<bool> cvar_fullBright("/fullbright", false);
+static CvarBool cvar_fullBright("/fullbright", false);
 #endif
 
 static void perspectiveGL(GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar)
@@ -586,7 +586,7 @@ static void fillSmoothLightmap(int which, map_t& map) {
     constexpr float epsilon = 1.f;
     constexpr float defaultSmoothRate = 4.f;
 #ifndef EDITOR
-    static ConsoleVariable<float> cvar_smoothingRate("/lightupdate", defaultSmoothRate);
+    static CvarFloat cvar_smoothingRate("/lightupdate", defaultSmoothRate);
     const float smoothingRate = *cvar_smoothingRate;
 #else
     const float smoothingRate = defaultSmoothRate;
@@ -650,7 +650,7 @@ static void loadLightmapTexture(int which, map_t& map) {
 #else
     const bool fullbright = (&map == &CompendiumEntries.compendiumMap) ? true :// compendium virtual map is always fullbright
         (conductGameChallenges[CONDUCT_CHEATS_ENABLED] ? *cvar_fullBright : false);
-    static ConsoleVariable<Vector4> cvar_shade_factor("/light_shade_factor", {0.8f, 0.8f, 0.63f, 0.f });
+    static CvarVector4 cvar_shade_factor("/light_shade_factor", {0.8f, 0.8f, 0.63f, 0.f });
 #endif
     
     // build lightmap texture data
@@ -709,10 +709,10 @@ void beginGraphics() {
 }
 
 #ifndef EDITOR
-ConsoleVariable<float> cvar_fogDistance("/fog_distance", 0.f);
-ConsoleVariable<Vector4> cvar_fogColor("/fog_color", {0.f, 0.f, 0.f, 0.f});
-ConsoleVariable<float> cvar_fogRate("/fog_rate", 0.0);
-ConsoleVariable<float> cvar_fogFade("/fog_fade", 0.0);
+CvarFloat cvar_fogDistance("/fog_distance", 0.f);
+CvarVector4 cvar_fogColor("/fog_color", {0.f, 0.f, 0.f, 0.f});
+CvarFloat cvar_fogRate("/fog_rate", 0.0);
+CvarFloat cvar_fogFade("/fog_fade", 0.0);
 #endif
 
 static void uploadUniforms(Shader& shader, float* proj, float* view, float* mapDims) {
@@ -786,10 +786,10 @@ static vec4_t* HSVtoRGB(vec4_t* result, const vec4_t* hsv){
 }
 
 #ifndef EDITOR
-static ConsoleVariable<Vector4> cvar_color_mist_form("/color_mist_form", Vector4{ 0.6, 0.75, 0.0, 0.f });
-static ConsoleVariable<Vector4> cvar_color_hologram("/color_hologram", Vector4{ 0.9, 0.2, 0.5, 0.f });
-static ConsoleVariable<Vector4> cvar_color_force_shield("/color_force_shield", Vector4{ 0.8, 0.8, 0.0, 0.f });
-static ConsoleVariable<Vector4> cvar_color_reflector_shield("/color_reflector_shield", Vector4{ 0.8, 0.8, 0.0, 0.f });
+static CvarVector4 cvar_color_mist_form("/color_mist_form", Vector4{ 0.6, 0.75, 0.0, 0.f });
+static CvarVector4 cvar_color_hologram("/color_hologram", Vector4{ 0.9, 0.2, 0.5, 0.f });
+static CvarVector4 cvar_color_force_shield("/color_force_shield", Vector4{ 0.8, 0.8, 0.0, 0.f });
+static CvarVector4 cvar_color_reflector_shield("/color_reflector_shield", Vector4{ 0.8, 0.8, 0.0, 0.f });
 #endif
 
 static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, int mode, bool remap) {
@@ -857,7 +857,7 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
 #endif
 
 #ifndef EDITOR
-            static ConsoleVariable<Vector4> cvar_colortest("/colortest", Vector4{1.f, 1.f, 1.f, 0.f});
+            static CvarVector4 cvar_colortest("/colortest", Vector4{1.f, 1.f, 1.f, 0.f});
             if ( cvar_colortest->w > 0.001f )
             {
                 const auto period = TICKS_PER_SECOND * 3; // 3 seconds
@@ -867,7 +867,7 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
                 remap.y.y *= (1.0 - 0.5 + 0.5 * sin(2 * PI * time) * cvar_colortest->y);
                 remap.z.z *= (1.0 - 0.5 + 0.5 * sin(2 * PI * time) * cvar_colortest->z);
             }
-            static ConsoleVariable<bool> cvar_rainbowTest("/rainbowtest", false);
+            static CvarBool cvar_rainbowTest("/rainbowtest", false);
             if (*cvar_rainbowTest) {
                 remap = mat4x4_t(0.f);
                 
@@ -923,7 +923,7 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
 
             Vector4 defaultLight{ 0.1f, 0.1f, 0.25f, 1.f };
 #ifndef EDITOR
-            static ConsoleVariable<Vector4> cvar_lightColor("/telepath_color", defaultLight);
+            static CvarVector4 cvar_lightColor("/telepath_color", defaultLight);
             const auto& light = *cvar_lightColor;
 #else
             const auto& light = defaultLight;
@@ -1013,15 +1013,15 @@ constexpr float defaultSamples = 16384;         // how many samples (pixels) to 
 #ifdef EDITOR
 bool hdrEnabled = true;
 #else
-ConsoleVariable<Vector4> cvar_hdrBrightness("/hdr_brightness", defaultBrightness);
-static ConsoleVariable<bool> cvar_hdrMultithread("/hdr_multithread", defaultMultithread);
-ConsoleVariable<float> cvar_hdrExposure("/hdr_exposure", defaultExposure);
-ConsoleVariable<float> cvar_hdrGamma("/hdr_gamma", defaultGamma);
-ConsoleVariable<float> cvar_hdrAdjustment("/hdr_adjust_rate", defaultAdjustmentRate);
-ConsoleVariable<float> cvar_hdrLimitHigh("/hdr_limit_high", defaultLimitHigh);
-ConsoleVariable<float> cvar_hdrLimitLow("/hdr_limit_low", defaultLimitLow);
-static ConsoleVariable<int> cvar_hdrSamples("/hdr_samples", defaultSamples);
-static ConsoleVariable<Vector4> cvar_hdrLuma("/hdr_luma", Vector4{defaultLumaRed, defaultLumaGreen, defaultLumaBlue, 0.f});
+CvarVector4 cvar_hdrBrightness("/hdr_brightness", defaultBrightness);
+static CvarBool cvar_hdrMultithread("/hdr_multithread", defaultMultithread);
+CvarFloat cvar_hdrExposure("/hdr_exposure", defaultExposure);
+CvarFloat cvar_hdrGamma("/hdr_gamma", defaultGamma);
+CvarFloat cvar_hdrAdjustment("/hdr_adjust_rate", defaultAdjustmentRate);
+CvarFloat cvar_hdrLimitHigh("/hdr_limit_high", defaultLimitHigh);
+CvarFloat cvar_hdrLimitLow("/hdr_limit_low", defaultLimitLow);
+static CvarInt cvar_hdrSamples("/hdr_samples", defaultSamples);
+static CvarVector4 cvar_hdrLuma("/hdr_luma", Vector4{defaultLumaRed, defaultLumaGreen, defaultLumaBlue, 0.f});
 bool hdrEnabled = true;
 #endif
 
@@ -1306,7 +1306,7 @@ void glDrawVoxel(view_t* camera, Entity* entity, int mode) {
     voxel_t* model = nullptr;
     int modelindex = -1;
 #ifndef EDITOR
-	static ConsoleVariable<int> cvar_forceModel("/forcemodel", -1, "force all voxel models to use a specific index");
+	static CvarInt cvar_forceModel("/forcemodel", -1, "force all voxel models to use a specific index");
 	modelindex = *cvar_forceModel;
 #endif
 	if (modelindex < 0) {
@@ -1545,10 +1545,10 @@ Mesh spriteMesh = {
 };
 
 #ifndef EDITOR
-static ConsoleVariable<GLfloat> cvar_enemybarDepthRange("/enemybar_depth_range", 0.5);
-static ConsoleVariable<float> cvar_ulight_factor_min("/sprite_ulight_factor_min", 0.5f);
-static ConsoleVariable<float> cvar_ulight_factor_max("/sprite_ulight_factor_max", 1.7f);
-static ConsoleVariable<float> cvar_ulight_factor_mult("/sprite_ulight_factor_mult", 4.f);
+static CvarFloat cvar_enemybarDepthRange("/enemybar_depth_range", 0.5);
+static CvarFloat cvar_ulight_factor_min("/sprite_ulight_factor_min", 0.5f);
+static CvarFloat cvar_ulight_factor_max("/sprite_ulight_factor_max", 1.7f);
+static CvarFloat cvar_ulight_factor_mult("/sprite_ulight_factor_mult", 4.f);
 #endif
 
 void glDrawEnemyBarSprite(view_t* camera, int mode, int playerViewport, void* enemyHPBarDetails)
@@ -1925,7 +1925,7 @@ void glDrawWorldUISprite(view_t* camera, Entity* entity, int mode)
 }
 
 #ifndef EDITOR
-static ConsoleVariable<GLfloat> cvar_dmgSpriteDepthRange("/dmg_sprite_depth_range", 0.49);
+static CvarFloat cvar_dmgSpriteDepthRange("/dmg_sprite_depth_range", 0.49);
 #endif // !EDITOR
 
 void glDrawSprite(view_t* camera, Entity* entity, int mode)
@@ -2337,13 +2337,13 @@ Mesh skyMesh = {
 };
 
 #ifndef EDITOR
-static ConsoleVariable<bool> cvar_allowChunkRebuild("/allow_chunk_rebuild", true);
+static CvarBool cvar_allowChunkRebuild("/allow_chunk_rebuild", true);
 #endif
 
 void glDrawWorld(view_t* camera, int mode)
 {
 #ifndef EDITOR
-    static ConsoleVariable<bool> cvar_skipDrawWorld("/skipdrawworld", false);
+    static CvarBool cvar_skipDrawWorld("/skipdrawworld", false);
     if (*cvar_skipDrawWorld) {
         return;
     }

@@ -57,18 +57,18 @@ namespace MainMenu {
 	float master_volume = 1.f;
 	bool arachnophobia_filter = false;
 	bool hidden_roomcode = false;
-	ConsoleVariable<bool> vertical_splitscreen("/vertical_splitscreen", false);
-    ConsoleVariable<bool> staggered_splitscreen("/split_staggered", true);
-    ConsoleVariable<bool> clipped_splitscreen("/split_clipped", true);
-    static ConsoleVariable<int> clipped_size("/split_clipped_percent", 20);
-    ConsoleVariable<bool> cvar_fastRestart("/fastrestart", false, "if true, game restarts 1 second after last player death");
-	ConsoleVariable<float> cvar_worldtooltip_scale("/worldtooltip_scale", 100.0);
-	ConsoleVariable<float> cvar_worldtooltip_scale_splitscreen("/worldtooltip_scale_splitscreen", 150.0);
-	ConsoleVariable<bool> cvar_hold_to_activate("/hold_to_activate", true);
-	ConsoleVariable<float> cvar_enemybar_scale("/enemybar_scale", 100.0);
-    ConsoleVariable<int> cvar_desiredFps("/desiredfps", AUTO_FPS);
-    ConsoleVariable<int> cvar_displayHz("/displayhz", 0);
-	ConsoleVariable<bool> cvar_hdrEnabled("/hdr_enabled", true);
+	CvarBool vertical_splitscreen("/vertical_splitscreen", false);
+    CvarBool staggered_splitscreen("/split_staggered", true);
+    CvarBool clipped_splitscreen("/split_clipped", true);
+    static CvarInt clipped_size("/split_clipped_percent", 20);
+    CvarBool cvar_fastRestart("/fastrestart", false, "if true, game restarts 1 second after last player death");
+	CvarFloat cvar_worldtooltip_scale("/worldtooltip_scale", 100.0);
+	CvarFloat cvar_worldtooltip_scale_splitscreen("/worldtooltip_scale_splitscreen", 150.0);
+	CvarBool cvar_hold_to_activate("/hold_to_activate", true);
+	CvarFloat cvar_enemybar_scale("/enemybar_scale", 100.0);
+    CvarInt cvar_desiredFps("/desiredfps", AUTO_FPS);
+    CvarInt cvar_displayHz("/displayhz", 0);
+	CvarBool cvar_hdrEnabled("/hdr_enabled", true);
 	static const int numFilters = NUM_SERVER_FLAGS + 2;
 	enum Filter : int {
 		UNCHECKED,
@@ -848,7 +848,7 @@ namespace MainMenu {
     static SDL_Surface* fireSurface = nullptr;
     static TempTexture* fireTexture = nullptr;
 
-	static ConsoleVariable<bool> cvar_story_fire_fx("/story_fire_fx", false);
+	static CvarBool cvar_story_fire_fx("/story_fire_fx", false);
 
     static void fireStart() {
 		if ( !*cvar_story_fire_fx )
@@ -7752,8 +7752,8 @@ bind_failed:
 				}
 				statChecks.clear();
 			});
-		static ConsoleVariable<bool> cvar_leaderboard_show_id("/leaderboard_show_id", false);
-		static ConsoleVariable<bool> cvar_leaderboard_copy_id("/leaderboard_copy_id", false);
+		static CvarBool cvar_leaderboard_show_id("/leaderboard_show_id", false);
+		static CvarBool cvar_leaderboard_copy_id("/leaderboard_copy_id", false);
         static auto add_score = [](score_t* score, const char* name, const char* prev, const char* next, int index,
 			int rank, int selectIndex){
             auto window = main_menu_frame->findFrame("leaderboards"); assert(window);
@@ -8631,7 +8631,7 @@ bind_failed:
     static Uint32 new_lobby_chat_message_alert = 0;
     static const constexpr int lobby_chat_max_messages = 200;
     static std::list<LobbyChatMessage> lobby_chat_messages;
-    static ConsoleVariable<std::string> lobby_chat_font("/chat_font",
+    static CvarString lobby_chat_font("/chat_font",
         "fonts/PixelMaz_monospace.ttf#32#2");
 
     static void addLobbyChatMessage(Uint32 color, const char* msg, bool add_to_list = true) {
@@ -8682,7 +8682,7 @@ bind_failed:
         auto subframe_size = subframe->getActualSize();
         int y = subframe_size.h;
 
-        static ConsoleVariable<bool> timestamp_messages("/chat_timestamp", false);
+        static CvarBool timestamp_messages("/chat_timestamp", false);
 
         char buf[1024];
         const Uint32 hour = seconds / 3600;
@@ -8742,7 +8742,7 @@ bind_failed:
         const int w = 848;
         const int h = 320;
 
-        static ConsoleVariable<Vector4> chatBgColor("/chat_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
+        static CvarVector4 chatBgColor("/chat_background_color", Vector4{22.f, 24.f, 29.f, 223.f});
 
         frame = lobby->addFrame("chat window");
 		frame->setOwner(clientnum);
@@ -16129,7 +16129,7 @@ failed:
         lobby->setAllowScrollBinds(false);
 		lobby->setBorder(0);
         
-        static ConsoleVariable<float> cvar_lobbyScroll("/lobby_scroll", 10.f);
+        static CvarFloat cvar_lobbyScroll("/lobby_scroll", 10.f);
         
         auto scrollRight = lobby->addButton("scroll_right");
         scrollRight->setBackground("*#images/ui/Main Menus/Settings/Settings_Button_R00.png");
@@ -18530,7 +18530,7 @@ failed:
 	    // scan for lobbies immediately
 	    refresh->activate();
 #else
-        static ConsoleVariable<bool> cvar_testLobbyBrowser("/test_lobby_browser", false,
+        static CvarBool cvar_testLobbyBrowser("/test_lobby_browser", false,
             "Fill the lobby browser with bogus entries to test its features.");
         if (*cvar_testLobbyBrowser) {
             // test lobbies
@@ -22058,7 +22058,7 @@ failed:
         auto cmouse = inputs.getVirtualMouse(inputs.getPlayerIDAllowedKeyboard());
         cmouse->draw_cursor = isMouseVisible();
 
-		static ConsoleVariable<bool> cvar_disableFadeFinished("/test_disable_fade_finished", false);
+		static CvarBool cvar_disableFadeFinished("/test_disable_fade_finished", false);
 		if (fadeout && fadealpha >= 255 && !*cvar_disableFadeFinished) {
             handleFadeFinished(ingame);
         }
@@ -22938,7 +22938,7 @@ failed:
 	}
 
     void openGameoverWindow(int player, bool tutorial) {
-        static ConsoleVariable<bool> gameover_purple("/gameover_purple", true);
+        static CvarBool gameover_purple("/gameover_purple", true);
 
 		bool purple_window = *gameover_purple;
 		if ( gameModeManager.getMode() == GameModeManager_t::GAME_MODE_CUSTOM_RUN
@@ -25399,7 +25399,7 @@ failed:
 	static Entity* compendiumMonster = nullptr;
 	static bool compendiumMonsterOverride = false;
 	static std::vector<Entity*> compendiumMonsterLimbs;
-	static ConsoleVariable<bool> cvar_compendium_monster_entity("/compendium_monster_entity", false);
+	static CvarBool cvar_compendium_monster_entity("/compendium_monster_entity", false);
 	static void populateRecordsSectionItems(Frame* page_right, int entryType, const char* entryName = "", int specificClass = -1);
 	static void refreshCompendiumCamera(const DynamicString& modelsPath)
 	{
@@ -25467,7 +25467,7 @@ failed:
 		return compendiumMonster;
 	}
 
-	static ConsoleVariable<int> compendiumMonsterSectionPadY("/compendiumMonsterSectionPadY", 32);
+	static CvarInt compendiumMonsterSectionPadY("/compendiumMonsterSectionPadY", 32);
 	static const int compendiumPageRightInnerY = 32;
 	static const int compendiumPageRightInnerHeight = 412 - 114 + 22;
 	static const int compendiumPageRightInnerHeightExpanded = 412;
@@ -27175,7 +27175,7 @@ failed:
 	};
 
 #if !defined(NDEBUG)
-	static ConsoleVariable<bool>cvar_compendium_reveal("/compendium_reveal", false);
+	static CvarBool cvar_compendium_reveal("/compendium_reveal", false);
 #endif
 	static bool compendiumEntryControlEnabled = false;
 	static void refreshCompendiumEntryItemsList(DynamicString name, Frame* parent, const bool gamepadClick)
@@ -28243,7 +28243,7 @@ failed:
 				}
 
 				std::vector<DynamicString> entries;
-				static ConsoleVariable cvar_compendium_class_sort_playtime("/compendium_class_sort_playtime", true);
+				static CvarBool cvar_compendium_class_sort_playtime("/compendium_class_sort_playtime", true);
 				if ( name == "classes list" )
 				{
 					if ( *cvar_compendium_class_sort_playtime )
@@ -30440,31 +30440,31 @@ failed:
 			}
 		};
 
-		static ConsoleVariable<Vector4> cvar_compendium_achievement_title_locked("/compendium_achievement_title_locked", { 224.f, 224.f, 224.f, 255.f });
+		static CvarVector4 cvar_compendium_achievement_title_locked("/compendium_achievement_title_locked", { 224.f, 224.f, 224.f, 255.f });
 		static Uint32 colorTitleLocked;
 		colorTitleLocked = makeColorRGB(
 			(int)cvar_compendium_achievement_title_locked->x,
 			(int)cvar_compendium_achievement_title_locked->y,
 			(int)cvar_compendium_achievement_title_locked->z);
-		static ConsoleVariable<Vector4> cvar_compendium_achievement_title_unlocked("/compendium_achievement_title_unlocked", { 67.f, 195.f, 157.f, 255.f });
+		static CvarVector4 cvar_compendium_achievement_title_unlocked("/compendium_achievement_title_unlocked", { 67.f, 195.f, 157.f, 255.f });
 		static Uint32 colorTitleUnlocked;
 		colorTitleUnlocked = makeColorRGB(
 			(int)cvar_compendium_achievement_title_unlocked->x,
 			(int)cvar_compendium_achievement_title_unlocked->y,
 			(int)cvar_compendium_achievement_title_unlocked->z);
-		static ConsoleVariable<Vector4> cvar_compendium_achievement_desc_locked("/compendium_achievement_desc_locked", { 224.f, 224.f, 224.f, 255.f });
+		static CvarVector4 cvar_compendium_achievement_desc_locked("/compendium_achievement_desc_locked", { 224.f, 224.f, 224.f, 255.f });
 		static Uint32 colorDescLocked;
 		colorDescLocked = makeColorRGB(
 			(int)cvar_compendium_achievement_desc_locked->x,
 			(int)cvar_compendium_achievement_desc_locked->y,
 			(int)cvar_compendium_achievement_desc_locked->z);
-		static ConsoleVariable<Vector4> cvar_compendium_achievement_desc_unlocked("/compendium_achievement_desc_unlocked", { 188.f, 154.f, 114.f, 255.f });
+		static CvarVector4 cvar_compendium_achievement_desc_unlocked("/compendium_achievement_desc_unlocked", { 188.f, 154.f, 114.f, 255.f });
 		static Uint32 colorDescUnlocked;
 		colorDescUnlocked = makeColorRGB(
 			(int)cvar_compendium_achievement_desc_unlocked->x,
 			(int)cvar_compendium_achievement_desc_unlocked->y,
 			(int)cvar_compendium_achievement_desc_unlocked->z);
-		static ConsoleVariable<Vector4> cvar_compendium_achievement_unlock("/compendium_achievement_unlock", { 221.f, 210.f, 84.f, 255.f });
+		static CvarVector4 cvar_compendium_achievement_unlock("/compendium_achievement_unlock", { 221.f, 210.f, 84.f, 255.f });
 		static Uint32 colorUnlocked;
 		colorUnlocked = makeColorRGB(
 			(int)cvar_compendium_achievement_unlock->x,
@@ -31796,7 +31796,7 @@ failed:
 		[](int argc, const char** argv) {
 			CompendiumEntries.exportCurrentMonster(compendiumMonster);
 		});
-	static ConsoleVariable<bool> cvar_compendiumautoreload("/compendiumautoreload", 
+	static CvarBool cvar_compendiumautoreload("/compendiumautoreload", 
 #if !defined(NDEBUG)
 		true
 #else
@@ -32209,7 +32209,7 @@ failed:
 		dimmer->setColor(makeColor(0, 0, 0, 191));
 		dimmer->setBorder(0);
 
-		static ConsoleVariable<int> cvar_compendium_book_x("/compendium_book_x", 119);
+		static CvarInt cvar_compendium_book_x("/compendium_book_x", 119);
 
 		auto window = dimmer->addFrame("compendium");
 		window->setSize(dimmer->getSize());
@@ -32326,7 +32326,7 @@ failed:
 					Compendium_t::PointsAnim_t::pointsChangeEvent(0);
 				}
 				//int lorePointsCurrent = std::max(0, Compendium_t::lorePointsFromAchievements - Compendium_t::lorePointsSpent);
-				static ConsoleVariable<Vector4> cvar_lore_point_highlight("/compendium_lore_point_highlight", Vector4{ 63, 64, -48, 0 });
+				static CvarVector4 cvar_lore_point_highlight("/compendium_lore_point_highlight", Vector4{ 63, 64, -48, 0 });
 				if ( Compendium_t::PointsAnim_t::noFundsAnimate )
 				{
 					txt->setColor(makeColor(215, 38, 61, 255)); // red
@@ -32491,7 +32491,7 @@ failed:
 				txt->setText(str.c_str());
 
 				real_t percent = totalCompletion / 100.0;
-				static ConsoleVariable<Vector4> cvar_completion_point_highlight("/cvar_completion_point_highlight", Vector4{ 63, 64, -48, 0 });
+				static CvarVector4 cvar_completion_point_highlight("/cvar_completion_point_highlight", Vector4{ 63, 64, -48, 0 });
 				txt->setColor(makeColorRGB(158 + cvar_completion_point_highlight->x * percent,
 					146 + cvar_completion_point_highlight->y * percent,
 					132 + cvar_completion_point_highlight->z * percent));

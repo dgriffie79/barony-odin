@@ -21,7 +21,7 @@
 #include "collision.hpp"
 
 //Circuits do not overlap. They connect to all their neighbors, allowing for circuits to interfere with eachother.
-static ConsoleVariable<bool> cvar_wire_debug("/wire_debug", false);
+static CvarBool cvar_wire_debug("/wire_debug", false);
 void signalGateANDOnReceive(Entity& gate, const bool powered, const int receivex, const int receivey);
 
 void actCircuit(Entity* my)
@@ -1532,7 +1532,7 @@ void Entity::actWallButton()
 		return;
 	}
 
-	static ConsoleVariable<float> cvar_wall_button_key_z("/wall_button_key_z", 0.5);
+	static CvarFloat cvar_wall_button_key_z("/wall_button_key_z", 0.5);
 
 	bool updateNeighbors = false;
 	if ( wallLockPower > 0 )
@@ -1822,8 +1822,8 @@ void Entity::actWallLock()
 		return;
 	}
 
-	static ConsoleVariable<float> cvar_wall_lock_key_z("/wall_lock_key_z", 0.5);
-	static ConsoleVariable<float> cvar_wall_lock_key_scale("/wall_lock_key_scale", 0.9);
+	static CvarFloat cvar_wall_lock_key_z("/wall_lock_key_z", 0.5);
+	static CvarFloat cvar_wall_lock_key_scale("/wall_lock_key_scale", 0.9);
 	const real_t scaleDown = 1.0 - *cvar_wall_lock_key_scale;
 
 	if ( wallLockClientInteractDelay > 0 )
@@ -2196,7 +2196,7 @@ void actWind(Entity* my)
 	my->actWind();
 }
 
-static ConsoleVariable<float> cvar_map_tile_wind("/map_tile_wind", 1.0);
+static CvarFloat cvar_map_tile_wind("/map_tile_wind", 1.0);
 
 bool entityInsideWind(Entity* entity1, Entity* wind)
 {

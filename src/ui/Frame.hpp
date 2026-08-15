@@ -496,5 +496,5 @@ extern float uiScale;
 
 #ifndef EDITOR
 #include "../interface/consolecommand.hpp"
-extern ConsoleVariable<bool> ui_filter;
+extern CvarBool ui_filter;
 #endif

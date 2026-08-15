@@ -193,7 +193,7 @@ bool TreasureRoomGenerator::bForceStationSpawnForCurrentFloor(int secretlevelexi
 
 bool TreasureRoomGenerator::bForceSpawnForCurrentFloor(int secretlevelexit, bool minotaur, BaronyRNG& mapRNG)
 {
-	static ConsoleVariable<bool> cvar_treasure_room_test("/treasure_room_test", false);
+	static CvarBool cvar_treasure_room_test("/treasure_room_test", false);
 	if ( *cvar_treasure_room_test && (svFlags & SV_FLAG_CHEATS) )
 	{
 		return true;
@@ -287,7 +287,7 @@ Sint32 doorFrameSprite() {
 
 -------------------------------------------------------------------------------*/
 
-static ConsoleVariable<std::string> cvar_monster_curve("/monster_curve", "nothing");
+static CvarString cvar_monster_curve("/monster_curve", "nothing");
 int monsterCurve(int level)
 {
 	if ( svFlags & SV_FLAG_CHEATS )
@@ -1590,8 +1590,8 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 		}
 	}
 
-	static ConsoleVariable<std::string> cvar_treasure_room_spawn("/treasure_room_spawn", "");
-	static ConsoleVariable<std::string> cvar_treasure_room_spawn_subroom("/treasure_room_spawn_subroom", "");
+	static CvarString cvar_treasure_room_spawn("/treasure_room_spawn", "");
+	static CvarString cvar_treasure_room_spawn_subroom("/treasure_room_spawn_subroom", "");
 
 	// load treasure rooms
 	for ( int treasureRoomType = TreasureRoomTypes::TREASURE_TYPE_BRONZE;
@@ -1601,19 +1601,19 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 
 		if ( (svFlags & SV_FLAG_CHEATS) && *cvar_treasure_room_spawn != "" )
 		{
-			if ( (*cvar_treasure_room_spawn).find("lockg") != std::string::npos )
+			if ( (*cvar_treasure_room_spawn).find("lockg") != DynamicString::npos )
 			{
 				treasureRoomType = TREASURE_TYPE_GOLD;
 			}
-			else if ( (*cvar_treasure_room_spawn).find("lockb") != std::string::npos )
+			else if ( (*cvar_treasure_room_spawn).find("lockb") != DynamicString::npos )
 			{
 				treasureRoomType = TREASURE_TYPE_SILVER;
 			}
-			else if ( (*cvar_treasure_room_spawn).find("locki") != std::string::npos )
+			else if ( (*cvar_treasure_room_spawn).find("locki") != DynamicString::npos )
 			{
 				treasureRoomType = TREASURE_TYPE_IRON;
 			}
-			else if ( (*cvar_treasure_room_spawn).find("locks") != std::string::npos )
+			else if ( (*cvar_treasure_room_spawn).find("locks") != DynamicString::npos )
 			{
 				treasureRoomType = TREASURE_TYPE_BRONZE;
 			}
@@ -1737,7 +1737,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 					weight = 0;
 					if ( (svFlags & SV_FLAG_CHEATS) && *cvar_treasure_room_spawn != "" )
 					{
-						if ( (*cvar_treasure_room_spawn).find("locki") != std::string::npos )
+						if ( (*cvar_treasure_room_spawn).find("locki") != DynamicString::npos )
 						{
 							weight = 1;
 						}
@@ -3907,7 +3907,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 	int numGenDecorations = 0;
 
 	std::vector<Uint32> itemsGeneratedList;
-	static ConsoleVariable<bool> cvar_underworldshrinetest("/underworldshrinetest", false);
+	static CvarBool cvar_underworldshrinetest("/underworldshrinetest", false);
 
 	int exit_x = -1;
 	int exit_y = -1;
@@ -5089,7 +5089,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 		int id = -1;
 	};
 
-	static ConsoleVariable<bool> cvar_debug_station_spawn("/debug_station_spawn", false);
+	static CvarBool cvar_debug_station_spawn("/debug_station_spawn", false);
 	if ( treasure_room_generator.bForceStationSpawnForCurrentFloor(secretlevelexit) )
 	{
 		bool* possibleLocationsStations = (bool*)malloc(sizeof(bool) * map.width * map.height);
@@ -5985,7 +5985,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 	int breakableGoodies = breakableLocations.size() * 80 / 100;
 	int breakableMonsters = 0;
 	int breakableMonsterLimit = 2 + (currentlevel / LENGTH_OF_LEVEL_REGION) * (1 + map_rng.rand() % 2);
-	static ConsoleVariable<int> cvar_breakableMonsterLimit("/breakable_monster_limit", 0);
+	static CvarInt cvar_breakableMonsterLimit("/breakable_monster_limit", 0);
 	std::set<Uint32> generatedBreakables;
 	if ( svFlags & SV_FLAG_CHEATS )
 	{
@@ -6072,7 +6072,7 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 
 				int index = (y) * MAPLAYERS + (x) * MAPLAYERS * map.height;
 
-				static ConsoleVariable<int> cvar_breakableMonsterChance("/breakable_monster_chance", 10);
+				static CvarInt cvar_breakableMonsterChance("/breakable_monster_chance", 10);
 
 				if ( spellEventExists )
 				{
@@ -6429,8 +6429,8 @@ int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> 
 		}
 	}
 
-	static ConsoleVariable<Vector4> cvar_treasure_chances("/treasure_chances", Vector4{ 0.f, 0.f, 0.f, 0.f });
-	static ConsoleVariable<int> cvar_treasure_key_force("/treasure_key_force", 0);
+	static CvarVector4 cvar_treasure_chances("/treasure_chances", Vector4{ 0.f, 0.f, 0.f, 0.f });
+	static CvarInt cvar_treasure_key_force("/treasure_key_force", 0);
 	if ( *cvar_treasure_key_force > 0 && (svFlags & SV_FLAG_CHEATS) )
 	{
 		for ( int i = 0; i < *cvar_treasure_key_force; ++i )
@@ -10765,7 +10765,7 @@ void assignActions(map_t* map)
 
 	std::vector<Entity*> chests;
 	std::vector<Entity*> textScripts;
-	static ConsoleVariable<bool> cvar_spellbookdebug("/spellbook_debug", false);
+	static CvarBool cvar_spellbookdebug("/spellbook_debug", false);
 	if ( currentlevel == 0 )
 	{
 		generatedSpellbooks.clear();
@@ -10807,8 +10807,8 @@ void assignActions(map_t* map)
 		numMimics = 0;
 	}
 
-	static ConsoleVariable<int> cvar_mimic_chance("/mimic_chance", 5);
-	static ConsoleVariable<bool> cvar_mimic_debug("/mimic_debug", false);
+	static CvarInt cvar_mimic_chance("/mimic_chance", 5);
+	static CvarBool cvar_mimic_debug("/mimic_debug", false);
 
 	std::vector<Entity*> mimics;
 	if ( chests.size() > 0 )

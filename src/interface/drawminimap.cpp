@@ -499,7 +499,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 		imgGet->drawColor(&src, dest, viewport, color);
 	};
 
-	static ConsoleVariable<float> cvar_skullbountyscale("/minimap_skullbountyscale", 1.5);
+	static CvarFloat cvar_skullbountyscale("/minimap_skullbountyscale", 1.5);
 
 	// draw special points of interest (exits, items, revealed monsters, etc)
 	for ( auto entity : entityPointsOfInterest )
@@ -867,7 +867,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 		}
 	}
 
-	static ConsoleVariable<float> cvar_skullscale("/minimap_skullscale", 1.75);
+	static CvarFloat cvar_skullscale("/minimap_skullscale", 1.75);
 	for ( auto& skullInfo : deathboxSkulls )
 	{
 		Uint32 color = skullInfo.first;
@@ -933,8 +933,8 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					// draw a circle
 					if (ping.radiusPing) 
 					{
-					    static ConsoleVariable<float> pingSize("/map_radiusping_size", 20.f);
-					    static ConsoleVariable<float> pingRate("/map_radiusping_rate", 0.4f);
+					    static CvarFloat pingSize("/map_radiusping_size", 20.f);
+					    static CvarFloat pingRate("/map_radiusping_rate", 0.4f);
 					    int rate = (int)(TICKS_PER_SECOND / *pingRate);
 					    real_t scale = (((ticks - ping.tickStart) % rate) / (real_t)rate) * (*pingSize);
 			            drawCircleMesh((real_t)ping.x + 0.5, (real_t)ping.y + 0.5, scale, rect, color);
@@ -1239,8 +1239,8 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					}
 				}
 
-				static ConsoleVariable<bool> cvar_brightTriangles("/minimap_bright_triangles", false);
-				static ConsoleVariable<bool> cvar_outlineTriangles("/minimap_outline_triangles", false);
+				static CvarBool cvar_brightTriangles("/minimap_bright_triangles", false);
+				static CvarBool cvar_outlineTriangles("/minimap_outline_triangles", false);
                 
                 if (!triangle_mesh.isInitialized()) {
                     triangle_mesh.init();
@@ -1352,7 +1352,7 @@ void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPi
 	}
 }
 
-static ConsoleVariable<float> cvar_shrine_reveal_steps("/shrine_reveal_steps", 8.0);
+static CvarFloat cvar_shrine_reveal_steps("/shrine_reveal_steps", 8.0);
 void shrineDaedalusRevealMap(Entity& my)
 {
 	Entity* exitEntity = nullptr;

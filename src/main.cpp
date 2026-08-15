@@ -193,7 +193,7 @@ struct cvar_thingy {
 } cvar_enableDebugKeys;
 #else
 #include "interface/consolecommand.hpp"
-static ConsoleVariable<bool> cvar_enableDebugKeys("/enabledebugkeys", false, "if true, certain special keys can be used for debugging");
+static CvarBool cvar_enableDebugKeys("/enabledebugkeys", false, "if true, certain special keys can be used for debugging");
 #endif
 
 // main definitions

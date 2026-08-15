@@ -12,13 +12,10 @@
 #pragma once
 
 #include "shader.hpp"
+#include "interface/consolecommand.hpp"
 
-struct Vector4 {
-    float x;
-    float y;
-    float z;
-    float w;
-};
+// Vector4 is defined in consolecommand.hpp (the console registry needs it by
+// value for Vector4 cvars); draw.hpp uses it for hdrDraw below.
 
 vec4_t vec4_copy(const vec4_t* v);
 vec4_t* mul_mat_vec4(vec4_t* result, const mat4x4_t* m, const vec4_t* v);
@@ -436,15 +433,14 @@ unsigned int GO_GetPixelU32(int x, int y, view_t& camera);
 extern bool hdrEnabled;
 
 #ifndef EDITOR
-#include "interface/consolecommand.hpp"
-extern ConsoleVariable<Vector4> cvar_hdrBrightness;
-extern ConsoleVariable<float> cvar_fogDistance;
-extern ConsoleVariable<Vector4> cvar_fogColor;
-extern ConsoleVariable<float> cvar_hdrExposure;
-extern ConsoleVariable<float> cvar_hdrGamma;
-extern ConsoleVariable<float> cvar_hdrAdjustment;
-extern ConsoleVariable<float> cvar_hdrLimitHigh;
-extern ConsoleVariable<float> cvar_hdrLimitLow;
+extern CvarVector4 cvar_hdrBrightness;
+extern CvarFloat cvar_fogDistance;
+extern CvarVector4 cvar_fogColor;
+extern CvarFloat cvar_hdrExposure;
+extern CvarFloat cvar_hdrGamma;
+extern CvarFloat cvar_hdrAdjustment;
+extern CvarFloat cvar_hdrLimitHigh;
+extern CvarFloat cvar_hdrLimitLow;
 extern const Vector4 defaultBrightness;
 extern const float defaultGamma;
 extern const float defaultExposure;

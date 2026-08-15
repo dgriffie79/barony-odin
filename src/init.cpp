@@ -44,7 +44,7 @@
 #include "mod_tools.hpp"
 #include "ui/MainMenu.hpp"
 #include "interface/consolecommand.hpp"
-static ConsoleVariable<bool> cvar_sdl_disablejoystickrawinput("/sdl_joystick_rawinput_disable", false, "disable SDL rawinput for gamepads (helps SDL_HapticOpen())");
+static CvarBool cvar_sdl_disablejoystickrawinput("/sdl_joystick_rawinput_disable", false, "disable SDL rawinput for gamepads (helps SDL_HapticOpen())");
 #endif
 
 #include <thread>
@@ -991,7 +991,7 @@ static constexpr int numTileAtlases = sizeof(AnimatedTile::indices) / sizeof(Ani
 static GLuint tileTextures[numTileAtlases] = { 0 };
 
 #ifndef EDITOR
-static ConsoleVariable<int> cvar_tileTextureSize("/tile_texture_size", 32, "the size of a tile texture");
+static CvarInt cvar_tileTextureSize("/tile_texture_size", 32, "the size of a tile texture");
 void readTilesJson()
 {
 	if ( !PHYSFS_getRealDir("/data/tiles.json") )

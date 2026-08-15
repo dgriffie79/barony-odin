@@ -2637,7 +2637,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 		}
 	}
 
-	static ConsoleVariable<bool> cvar_showoldwheel("/followerwheel_old_enable", false);
+	static CvarBool cvar_showoldwheel("/followerwheel_old_enable", false);
 
 	if ( followerToCommand )
 	{
@@ -14991,7 +14991,7 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 	SDL_Rect displayItemNamePos{ displayItemTextImg->pos.x + 6, displayItemTextImg->pos.y - 4, 208, 24 };
 	displayItemNamePos.h = 50;
 	displayItemName->setSize(displayItemNamePos);
-	static ConsoleVariable<int> cvar_tinkerPromptY("/tinker_action_prompt_y", -2);
+	static CvarInt cvar_tinkerPromptY("/tinker_action_prompt_y", -2);
 	SDL_Rect actionPromptTxtPos{ 0, 211 + *cvar_tinkerPromptY, baseFrame->getSize().w - 18 - 8, 24 };
 	actionPromptTxt->setSize(actionPromptTxtPos);
 
@@ -15508,8 +15508,8 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 	auto filterNavRightArrow = baseFrame->findImage("filter nav right arrow");
 	filterNavRightArrow->disabled = true;
 
-	static ConsoleVariable<int> cvar_tinkNavGlyphX("/tinker_glyph_nav_x", 8);
-	static ConsoleVariable<int> cvar_tinkNavGlyphY("/tinker_glyph_nav_y", 30);
+	static CvarInt cvar_tinkNavGlyphX("/tinker_glyph_nav_x", 8);
+	static CvarInt cvar_tinkNavGlyphY("/tinker_glyph_nav_y", 30);
 
 	if ( usingGamepad )
 	{
@@ -17299,9 +17299,9 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 		}
 	}
 
-	static ConsoleVariable<int> cvar_alchemy_potion1_destx1("/alchemy_potion1_destx1", 36);
-	static ConsoleVariable<int> cvar_alchemy_potion1_destx2("/alchemy_potion1_destx2", 128);
-	static ConsoleVariable<int> cvar_alchemy_potion1_desty1("/alchemy_potion1_desty1", 128);
+	static CvarInt cvar_alchemy_potion1_destx1("/alchemy_potion1_destx1", 36);
+	static CvarInt cvar_alchemy_potion1_destx2("/alchemy_potion1_destx2", 128);
+	static CvarInt cvar_alchemy_potion1_desty1("/alchemy_potion1_desty1", 128);
 	animPotion1DestX = baseFrame->getSize().x + *cvar_alchemy_potion1_destx1;
 	animPotion1DestY = baseFrame->getSize().y + *cvar_alchemy_potion1_desty1;
 	animPotion2DestX = baseFrame->getSize().x + *cvar_alchemy_potion1_destx2;
@@ -20692,8 +20692,8 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::updateRecipePanel()
 	baseBackgroundImg->path = "*#images/ui/Alchemy/Alchemy_Recipes_00.png";
 	bool reversed = false;
 	auto recipeFramePos = recipeFrame->getSize();
-	static ConsoleVariable<int> cvar_alchemy_recipeOffsetX("/alch_recipe_offsetx", 8);
-	static ConsoleVariable<int> cvar_alchemy_recipeOffsetY("/alch_recipe_offsety", 14);
+	static CvarInt cvar_alchemy_recipeOffsetX("/alch_recipe_offsetx", 8);
+	static CvarInt cvar_alchemy_recipeOffsetY("/alch_recipe_offsety", 14);
 	const int frameOffsetX = *cvar_alchemy_recipeOffsetX;
 	const int frameOffsetY = *cvar_alchemy_recipeOffsetY;
 	if ( players[player]->inventoryUI.inventoryPanelJustify == Player::PANEL_JUSTIFY_LEFT )
@@ -22305,7 +22305,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 	SDL_Rect displayItemNamePos{ displayItemTextImg->pos.x + 6, displayItemTextImg->pos.y - 4, 208, 24 };
 	displayItemNamePos.h = 50;
 	displayItemName->setSize(displayItemNamePos);
-	static ConsoleVariable<int> cvar_featherPromptY("/feather_action_prompt_y", -2);
+	static CvarInt cvar_featherPromptY("/feather_action_prompt_y", -2);
 	SDL_Rect actionPromptTxtPos{ 26, 251 + *cvar_featherPromptY + heightOffsetCompact, baseFrame->getSize().w - (26 * 2), 24 };
 	actionPromptTxt->setSize(actionPromptTxtPos);
 
@@ -22755,8 +22755,8 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 	auto filterNavRightArrow = baseFrame->findImage("filter nav right arrow");
 	filterNavRightArrow->disabled = true;
 
-	static ConsoleVariable<int> cvar_featherNavGlyphX("/feather_glyph_nav_x", 8);
-	static ConsoleVariable<int> cvar_featherNavGlyphY("/feather_glyph_nav_y", 30);
+	static CvarInt cvar_featherNavGlyphX("/feather_glyph_nav_x", 8);
+	static CvarInt cvar_featherNavGlyphY("/feather_glyph_nav_y", 30);
 
 	if ( usingGamepad )
 	{
@@ -23160,7 +23160,7 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 			real_t setpointDiff = 0.0;
 
 			// slightly faster on gamepad
-			static ConsoleVariable<float> cvar_feather_slider_speed("/feather_slider_speed", 1.f);
+			static CvarFloat cvar_feather_slider_speed("/feather_slider_speed", 1.f);
 			const real_t factor = (3.0 * (*cvar_feather_slider_speed + (usingGamepad ? -.25f : 0.f)));
 			if ( scrollSetpoint - scrollAnimateX > 0.0 )
 			{
@@ -25961,7 +25961,7 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 	SDL_Rect displayItemNamePos{ displayItemTextImg->pos.x + 6, displayItemTextImg->pos.y - 4, 208, 24 };
 	displayItemNamePos.h = 50;
 	displayItemName->setSize(displayItemNamePos);
-	static ConsoleVariable<int> cvar_itemfxPromptY("/itemfx_action_prompt_y", -2);
+	static CvarInt cvar_itemfxPromptY("/itemfx_action_prompt_y", -2);
 	SDL_Rect actionPromptTxtPos{ 0, 205 + *cvar_itemfxPromptY + heightOffsetCompact, baseFrame->getSize().w - 18 - 8, 24 };
 	if ( modeHasCostEffect == COST_EFFECT_GOLD
 		|| modeHasCostEffect == COST_EFFECT_MANA )
@@ -29363,7 +29363,7 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForUid(const int
 	return CalloutRadialMenu::getCalloutTypeForEntity(player, parent);
 }
 
-static ConsoleVariable<bool> cvar_callout_debug("/callout_debug", false);
+static CvarBool cvar_callout_debug("/callout_debug", false);
 bool CalloutRadialMenu::calloutMenuEnabledForGamemode()
 {
 	if ( *cvar_callout_debug )
@@ -29820,9 +29820,9 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 
 void CalloutRadialMenu::CalloutParticle_t::animate()
 {
-	static ConsoleVariable<float> cvar_calloutanimspeed("/calloutanimspeed", 0.3);
-	static ConsoleVariable<float> cvar_calloutbouncespeed("/calloutbouncespeed", 0.9);
-	static ConsoleVariable<int> cvar_calloutbouncestate("/calloutbouncestate", 0);
+	static CvarFloat cvar_calloutanimspeed("/calloutanimspeed", 0.3);
+	static CvarFloat cvar_calloutbouncespeed("/calloutbouncespeed", 0.9);
+	static CvarInt cvar_calloutbouncestate("/calloutbouncestate", 0);
 	real_t animspeed = 5.0 * *cvar_calloutanimspeed;
 	if ( animateState == 0 )
 	{
@@ -30029,7 +30029,7 @@ void CalloutRadialMenu::update()
 int CalloutRadialMenu::CALLOUT_SFX_NEUTRAL = 605;
 int CalloutRadialMenu::CALLOUT_SFX_NEGATIVE = 607;
 int CalloutRadialMenu::CALLOUT_SFX_POSITIVE = 606;
-static ConsoleVariable<int> cvar_callout_sfx_vol("/callout_sfx_vol", 128);
+static CvarInt cvar_callout_sfx_vol("/callout_sfx_vol", 128);
 
 bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu::CalloutCommand _cmd, Uint32 overrideUID)
 {
@@ -32547,7 +32547,7 @@ bool GenericGUIMenu::AssistShrineGUI_t::warpMouseToSelectedAssistShrineItem(Item
 	return false;
 }
 
-static ConsoleVariable<int> cvar_assistClassListGridY("/assist_grid_y", 112);
+static CvarInt cvar_assistClassListGridY("/assist_grid_y", 112);
 const int kAssistClassHeaderHeight = 46;
 const int kAssistClassFooterHeight = 32;
 const int kAssistClassGridImgHeight = 240;
@@ -35271,7 +35271,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 		&& !player->usingCommand()
 		&& !player->GUI.isDropdownActive();
 
-	static ConsoleVariable<float> cvar_assist_slider_speed("/assist_slider_speed", 1.f);
+	static CvarFloat cvar_assist_slider_speed("/assist_slider_speed", 1.f);
 	{
 		auto slider = assistClassFrame->findSlider("class slider");
 		auto drawerSlotsFrame = assistClassFrame->findFrame("class slots");
@@ -36576,8 +36576,8 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 	const Uint32 negativeColor = hudColors.characterSheetRed;
 
 	auto claimItemGlyph = assistItemFrame->findImage("claim item glyph");
-	static ConsoleVariable<int> cvar_assist_pt_y("/assist_pt_y", -94);
-	static ConsoleVariable<int> cvar_assist_pt_y2("/assist_pt_y2", -54);
+	static CvarInt cvar_assist_pt_y("/assist_pt_y", -94);
+	static CvarInt cvar_assist_pt_y2("/assist_pt_y2", -54);
 	{
 		auto claimItemBtn = assistItemFrame->findButton("claim item button");
 		claimItemBtn->setDisabled(true);
@@ -38015,7 +38015,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 	auto actionPromptImg2 = baseFrame->findImage("action prompt glyph2");
 	auto actionPromptImg3 = baseFrame->findImage("action prompt glyph3");
 
-	static ConsoleVariable<int> cvar_assistPromptY("/assist_action_prompt_y", -28);
+	static CvarInt cvar_assistPromptY("/assist_action_prompt_y", -28);
 	SDL_Rect actionPromptTxtPos{ 0, 211 + *cvar_assistPromptY, baseFrame->getSize().w - 18 - 8, 24 };
 	actionPromptTxt->setSize(actionPromptTxtPos);
 
@@ -39243,8 +39243,8 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 		}
 	}*/
 
-	static ConsoleVariable<int> cvar_mail_send_item_destx1("/mail_send_item_destx1", 36);
-	static ConsoleVariable<int> cvar_mail_send_item_desty1("/mail_send_item_desty1", 128);
+	static CvarInt cvar_mail_send_item_destx1("/mail_send_item_destx1", 36);
+	static CvarInt cvar_mail_send_item_desty1("/mail_send_item_desty1", 128);
 	animSendItem1DestX = baseFrame->getSize().x + *cvar_mail_send_item_destx1;
 	animSendItem1DestY = baseFrame->getSize().y + *cvar_mail_send_item_desty1;
 	animRecvItemStartX = baseFrame->getSize().x + 74;

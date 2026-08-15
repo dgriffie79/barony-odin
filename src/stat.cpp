@@ -2241,7 +2241,7 @@ void Stat::MonsterRangedAccuracy::modifyProjectile(Entity& my, Entity& projectil
 			{
 				diff -= 360;
 			}
-			static ConsoleVariable<int> cvar_monster_ranged_accuracy("/monster_ranged_accuracy", 0);
+			static CvarInt cvar_monster_ranged_accuracy("/monster_ranged_accuracy", 0);
 			int maxDiff = std::min(15, currentlevel / 2);
 			if ( myStats->type == SHOPKEEPER )
 			{

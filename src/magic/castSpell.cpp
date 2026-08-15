@@ -7622,7 +7622,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 			&& (spell->ID == SPELL_FOCI_ARCS || spell->ID == SPELL_FOCI_FIRE || spell->ID == SPELL_FOCI_SNOW
 			|| spell->ID == SPELL_FOCI_NEEDLES || spell->ID == SPELL_FOCI_SANDBLAST || spell->ID == SPELL_BREATHE_FIRE) )
 		{
-			static ConsoleVariable<int> cvar_foci_sprite("/foci_sprite", 13);
+			static CvarInt cvar_foci_sprite("/foci_sprite", 13);
 			int particle = -1;
 			if ( svFlags & SV_FLAG_CHEATS )
 			{
@@ -7931,7 +7931,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 
 										duration = std::max(innerElement->duration * charge, duration);
 
-										static ConsoleVariable<bool> cvar_foci_light_debug("/foci_light_debug", false);
+										static CvarBool cvar_foci_light_debug("/foci_light_debug", false);
 										if ( *cvar_foci_light_debug )
 										{
 											messagePlayer(caster->isEntityPlayer(), MESSAGE_DEBUG, "Duration: %.2f", duration / (real_t)TICKS_PER_SECOND);

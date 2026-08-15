@@ -80,9 +80,9 @@ bool spellcasting_animation_manager_t::hideShieldFromBasicCast()
 	return false;
 }
 
-static ConsoleVariable<int> cvar_vibe_spell_x("/vibe_spell_x", 4000);
-static ConsoleVariable<int> cvar_vibe_spell_y("/vibe_spell_y", 0);
-static ConsoleVariable<int> cvar_vibe_spell_s("/vibe_spell_s", 0);
+static CvarInt cvar_vibe_spell_x("/vibe_spell_x", 4000);
+static CvarInt cvar_vibe_spell_y("/vibe_spell_y", 0);
+static CvarInt cvar_vibe_spell_s("/vibe_spell_s", 0);
 void spellcasting_animation_manager_t::executeAttackSpell(bool swingweapon)
 {
 	if ( player < 0 || player >= MAXPLAYERS ) { return; }
@@ -417,10 +417,10 @@ void spellcasting_animation_manager_t::setRangeFinderLocation()
 		}
 	}
 
-	static ConsoleVariable<float> cvar_rangefinderStartZ("/rangefinder_start_z", -2.5);
-	static ConsoleVariable<float> cvar_rangefinderMoveTo("/rangefinder_moveto_z", 1.0);
-	static ConsoleVariable<float> cvar_rangefinderStartZLimit("/rangefinder_start_z_limit", 7.5);
-	static ConsoleVariable<bool> cvar_rangefinder_cam("/rangefinder_cam", false);
+	static CvarFloat cvar_rangefinderStartZ("/rangefinder_start_z", -2.5);
+	static CvarFloat cvar_rangefinderMoveTo("/rangefinder_moveto_z", 1.0);
+	static CvarFloat cvar_rangefinderStartZLimit("/rangefinder_start_z_limit", 7.5);
+	static CvarBool cvar_rangefinder_cam("/rangefinder_cam", false);
 	real_t startx = caster->x;
 	real_t starty = caster->y;
 	real_t startz = caster->z;
@@ -446,7 +446,7 @@ void spellcasting_animation_manager_t::setRangeFinderLocation()
 	wallDir = 0;
 
 	real_t spellDistance = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, nullptr, caster);
-	static ConsoleVariable<bool> cvar_rangefinder_linetrace("/rangefinder_linetrace", true);
+	static CvarBool cvar_rangefinder_linetrace("/rangefinder_linetrace", true);
 
 	if ( rangefinder == RANGEFINDER_TOUCH_WALL_TILE )
 	{
@@ -2533,13 +2533,13 @@ void actMagicRangefinder(Entity* my)
 		}
 	}
 	my->z = 7.499;
-	static ConsoleVariable<float> cvar_player_cast_indicator_scale("/player_cast_indicator_scale", 1.0);
-	static ConsoleVariable<float> cvar_player_cast_indicator_rotate("/player_cast_indicator_rotate", 0.0);
-	static ConsoleVariable<float> cvar_player_cast_indicator_alpha("/player_cast_indicator_alpha", 0.5);
-	static ConsoleVariable<float> cvar_player_cast_indicator_alpha_glow("/player_cast_indicator_alpha_glow", 0.0625);
-	static ConsoleVariable<float> cvar_player_cast_indicator_r("/player_cast_indicator_r", 1.0);
-	static ConsoleVariable<float> cvar_player_cast_indicator_g("/player_cast_indicator_g", 1.0);
-	static ConsoleVariable<float> cvar_player_cast_indicator_b("/player_cast_indicator_b", 1.0);
+	static CvarFloat cvar_player_cast_indicator_scale("/player_cast_indicator_scale", 1.0);
+	static CvarFloat cvar_player_cast_indicator_rotate("/player_cast_indicator_rotate", 0.0);
+	static CvarFloat cvar_player_cast_indicator_alpha("/player_cast_indicator_alpha", 0.5);
+	static CvarFloat cvar_player_cast_indicator_alpha_glow("/player_cast_indicator_alpha_glow", 0.0625);
+	static CvarFloat cvar_player_cast_indicator_r("/player_cast_indicator_r", 1.0);
+	static CvarFloat cvar_player_cast_indicator_g("/player_cast_indicator_g", 1.0);
+	static CvarFloat cvar_player_cast_indicator_b("/player_cast_indicator_b", 1.0);
 	my->ditheringDisabled = true;
 	my->flags[SPRITE] = true;
 	my->flags[PASSABLE] = true;

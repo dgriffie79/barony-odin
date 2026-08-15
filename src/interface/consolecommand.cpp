@@ -45,148 +45,157 @@ bool logCheckMainLoopTimers = false;
 bool autoLimbReload = false;
 
 /*******************************************************************************
-	DynamicString cvars
+	Console registry — one sorted array of ConsoleCommand* (commands + cvars).
+	Entries are appended at static-init time; the array is lazily sorted on first
+	lookup (see ensure_console_sorted). Replaces the old per-type std::map
+	registries and the ConsoleVariable<T> template.
 *******************************************************************************/
 
-template ConsoleVariable<std::string>::ConsoleVariable(const char*, std::string const&, const char*);
-template<> void ConsoleVariable<std::string>::set(const char* arg)
+struct ConsoleRegistry {
+	DynamicArray entries{};  // raw array of ConsoleCommand* (8B elements)
+	bool sorted = false;
+};
+static ConsoleRegistry g_console_registry;
+
+void register_console_entry(ConsoleCommand* e)
 {
-	data = arg;
-	messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%s\"",
-		name + 1, data.c_str());
-}
-
-/*******************************************************************************
-	int cvars
-*******************************************************************************/
-
-template ConsoleVariable<int>::ConsoleVariable(const char*, int const&, const char*);
-template<> void ConsoleVariable<int>::set(const char* arg)
-{
-	if (arg && arg[0] != '\0') {
-		data = (int)strtol(arg, nullptr, 10);
-	}
-	messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%d\"",
-		name + 1, data);
-}
-
-/*******************************************************************************
-	float cvars
-*******************************************************************************/
-
-template ConsoleVariable<float>::ConsoleVariable(const char*, float const&, const char*);
-template<> void ConsoleVariable<float>::set(const char* arg)
-{
-	if (arg && arg[0] != '\0') {
-		data = strtof(arg, nullptr);
-	}
-	messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%f\"",
-		name + 1, data);
-}
-
-/*******************************************************************************
-	bool cvars
-*******************************************************************************/
-
-template ConsoleVariable<bool>::ConsoleVariable(const char*, bool const&, const char*);
-template<> void ConsoleVariable<bool>::set(const char* arg)
-{
-	if (arg && arg[0] != '\0') {
-		data = !(!strcmp(arg, "false") || !strcmp(arg, "0"));
-	}
-	messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%s\"",
-		name + 1, data ? "true" : "false");
-}
-
-/*******************************************************************************
-	Vector4 cvars
-*******************************************************************************/
-
-template ConsoleVariable<Vector4>::ConsoleVariable(const char*, Vector4 const&, const char*);
-template<> void ConsoleVariable<Vector4>::set(const char* arg)
-{
-	if (arg && arg[0] != '\0') {
-		char* ptr = const_cast<char*>(arg);
-		data.x = strtof(ptr, &ptr);
-		data.y = strtof(ptr, &ptr);
-		data.z = strtof(ptr, &ptr);
-		data.w = strtof(ptr, &ptr);
-	}
-	messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%f %f %f %f\"",
-		name + 1, data.x, data.y, data.z, data.w);
-}
-
-/******************************************************************************/
-
-template<typename T>
-ConsoleVariable<T>::ConsoleVariable(const char* _name, const T& _default, const char* _desc) :
-	ConsoleCommand(_name, _desc, &ConsoleVariable<T>::setter)
-{
-	add_to_map();
-	data = _default;
-}
-
-template<typename T>
-void ConsoleVariable<T>::setter(int argc, const char** argv)
-{
-	auto& map = getConsoleVariables();
-	auto find = map.find(argv[0]);
-	if (find != map.end()) {
-		auto& cvar = find->second;
-		if (argc >= 2) {
-			DynamicString data;
-			data = argv[1];
-			for (int c = 2; c < argc; ++c) {
-				data.append(" ");
-				data.append(argv[c]);
-			}
-			cvar.set(data.c_str());
-		}
-		else {
-			cvar.set("");
+	// Duplicate-name check (matches the old std::map emplace assert).
+	int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+	for (int64_t i = 0; i < n; ++i) {
+		ConsoleCommand* ex = *dynarray_at<ConsoleCommand*>(g_console_registry.entries, i);
+		if (ex && strcmp(ex->name, e->name) == 0) {
+			printlog("A ConsoleCommand by the name \"%s\" already exists! Aborting\n", e->name);
+			assert(0 && "A ConsoleCommand with a duplicate name was found. Aborting");
+			exit(1);
 		}
 	}
+	dynarray_push<ConsoleCommand*>(g_console_registry.entries, e);
+	g_console_registry.sorted = false;
 }
 
-template<typename T>
-void ConsoleVariable<T>::add_to_map()
+static int console_entry_name_cmp(const void* a, const void* b)
 {
-	auto& map = getConsoleVariables();
-	(void)map.emplace(name, *this);
+	ConsoleCommand* const* pa = (ConsoleCommand* const*)a;
+	ConsoleCommand* const* pb = (ConsoleCommand* const*)b;
+	return strcmp((*pa)->name, (*pb)->name);
 }
 
-template <typename T>
-typename ConsoleVariable<T>::cvar_map_t& ConsoleVariable<T>::getConsoleVariables()
+static void ensure_console_sorted()
 {
-	static ConsoleVariable<T>::cvar_map_t cvar_map;
-	return cvar_map;
+	if (g_console_registry.sorted) {
+		return;
+	}
+	int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+	if (n > 1) {
+		qsort(g_console_registry.entries.data, (size_t)n, sizeof(ConsoleCommand*), console_entry_name_cmp);
+	}
+	g_console_registry.sorted = true;
 }
 
-/******************************************************************************/
-
-ConsoleCommand::ConsoleCommand(const char* _name, const char* _desc, const ccmd_function _func) :
-	name(_name),
-	desc(_desc),
-	func(_func)
+static ConsoleCommand* find_console_entry(const char* name)
 {
-	add_to_map();
+	ensure_console_sorted();
+	int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+	ConsoleCommand** base = (ConsoleCommand**)g_console_registry.entries.data;
+	int64_t lo = 0, hi = n;
+	while (lo < hi) {
+		int64_t mid = (lo + hi) / 2;
+		int c = strcmp(base[mid]->name, name);
+		if (c < 0) lo = mid + 1;
+		else hi = mid;
+	}
+	if (lo < n && strcmp(base[lo]->name, name) == 0) {
+		return base[lo];
+	}
+	return nullptr;
 }
 
-typedef std::map<std::string, ConsoleCommand> ccmd_map_t;
-static ccmd_map_t& getConsoleCommands()
+static ConsoleCommand* lower_bound_console_entry(const char* name)
 {
-	static ccmd_map_t ccmd_map;
-	return ccmd_map;
+	ensure_console_sorted();
+	int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+	ConsoleCommand** base = (ConsoleCommand**)g_console_registry.entries.data;
+	int64_t lo = 0, hi = n;
+	while (lo < hi) {
+		int64_t mid = (lo + hi) / 2;
+		if (strcmp(base[mid]->name, name) < 0) lo = mid + 1;
+		else hi = mid;
+	}
+	return (lo < n) ? base[lo] : nullptr;
 }
 
-void ConsoleCommand::add_to_map()
+/*******************************************************************************
+	cvar set dispatch — one entry point for all cvar kinds, selected by the
+	entry's type tag. Behavior matches the old per-type ConsoleVariable<T>::set.
+*******************************************************************************/
+
+void cvar_setter(int argc, const char** argv)
 {
-	auto& map = getConsoleCommands();
-	auto result = map.emplace(name, *this);
-	if (result.second == false) {
-		printlog("A ConsoleCommand by the name \"%s\" already exists! Aborting\n", name);
-		assert(0 && "A ConsoleCommand with a duplicate name was found. Aborting");
-		exit(1);
+	ConsoleCommand* e = find_console_entry(argv[0]);
+	if (!e || e->type == ConsoleEntryType::Command) {
+		return;
+	}
+
+	DynamicString joined;
+	if (argc >= 2) {
+		joined = argv[1];
+		for (int c = 2; c < argc; ++c) {
+			joined.append(" ");
+			joined.append(argv[c]);
+		}
+	}
+	const char* arg = joined.c_str();
+
+	switch (e->type) {
+	case ConsoleEntryType::CvarString: {
+		auto& data = *(DynamicString*)e->data_ptr;
+		data = arg;
+		messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%s\"",
+			e->name + 1, data.c_str());
+		break;
+	}
+	case ConsoleEntryType::CvarInt: {
+		auto& data = *(int*)e->data_ptr;
+		if (arg && arg[0] != '\0') {
+			data = (int)strtol(arg, nullptr, 10);
+		}
+		messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%d\"",
+			e->name + 1, data);
+		break;
+	}
+	case ConsoleEntryType::CvarFloat: {
+		auto& data = *(float*)e->data_ptr;
+		if (arg && arg[0] != '\0') {
+			data = strtof(arg, nullptr);
+		}
+		messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%f\"",
+			e->name + 1, data);
+		break;
+	}
+	case ConsoleEntryType::CvarBool: {
+		auto& data = *(bool*)e->data_ptr;
+		if (arg && arg[0] != '\0') {
+			data = !(!strcmp(arg, "false") || !strcmp(arg, "0"));
+		}
+		messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%s\"",
+			e->name + 1, data ? "true" : "false");
+		break;
+	}
+	case ConsoleEntryType::CvarVector4: {
+		auto& data = *(Vector4*)e->data_ptr;
+		if (arg && arg[0] != '\0') {
+			char* ptr = const_cast<char*>(arg);
+			data.x = strtof(ptr, &ptr);
+			data.y = strtof(ptr, &ptr);
+			data.z = strtof(ptr, &ptr);
+			data.w = strtof(ptr, &ptr);
+		}
+		messagePlayer(clientnum, MESSAGE_MISC, "\"%s\" is \"%f %f %f %f\"",
+			e->name + 1, data.x, data.y, data.z, data.w);
+		break;
+	}
+	default:
+		break;
 	}
 }
 
@@ -220,9 +229,8 @@ void consoleCommand(char const* const command_str)
 		token = strtok(nullptr, " ");
 	}
 
-	auto& map = getConsoleCommands();
-	auto find = map.find(command);
-	if (find == map.end())
+	ConsoleCommand* ccmd = find_console_entry(command);
+	if (!ccmd)
 	{
 		// invalid command
 		if (intro || !initialized)
@@ -236,8 +244,7 @@ void consoleCommand(char const* const command_str)
 	}
 	else
 	{
-		auto& ccmd = find->second;
-		ccmd(tokens.size(), tokens.data());
+		(*ccmd)(tokens.size(), tokens.data());
 	}
 }
 
@@ -246,12 +253,20 @@ const char* FindConsoleCommand(const char* str, int index) {
 		return nullptr;
 	}
 	size_t len = strlen(str);
-	int count = 0;
-	auto& map = getConsoleCommands();
-	auto lower = map.lower_bound(str);
-	auto it = lower;
-	for (; count < index; ++it, ++count);
-	auto cmd = it == map.end() ? nullptr : it->first.c_str();
+	ensure_console_sorted();
+	int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+	ConsoleCommand** base = (ConsoleCommand**)g_console_registry.entries.data;
+	int64_t i = 0;
+	// lower_bound equivalent: first entry whose name >= str
+	int64_t lo = 0, hi = n;
+	while (lo < hi) {
+		int64_t mid = (lo + hi) / 2;
+		if (strcmp(base[mid]->name, str) < 0) lo = mid + 1;
+		else hi = mid;
+	}
+	i = lo;
+	for (int count = 0; count < index && i < n; ++i, ++count) {}
+	const char* cmd = (i < n) ? base[i]->name : nullptr;
 	if (cmd && strncmp(str, cmd, len) == 0) {
 		return cmd;
 	}
@@ -261,10 +276,10 @@ const char* FindConsoleCommand(const char* str, int index) {
 }
 
 namespace Test {
-	static ConsoleVariable<bool> cvar_bool("/cvar_test_bool", true, "test bools in cvars");
-	static ConsoleVariable<float> cvar_float("/cvar_test_float", 1.f, "test floats in cvars");
-	static ConsoleVariable<int> cvar_int("/cvar_test_int", 1, "test ints in cvars");
-	static ConsoleVariable<std::string> cvar_string("/cvar_test_string", "Hello world", "test strings in cvars");
+	static CvarBool cvar_bool("/cvar_test_bool", true, "test bools in cvars");
+	static CvarFloat cvar_float("/cvar_test_float", 1.f, "test floats in cvars");
+	static CvarInt cvar_int("/cvar_test_int", 1, "test ints in cvars");
+	static CvarString cvar_string("/cvar_test_string", "Hello world", "test strings in cvars");
 
 	static ConsoleCommand print_bool("/test_print_bool", "print contents of cvar_test_bool",
 		[](int argc, const char** argv) {
@@ -292,10 +307,11 @@ namespace Test {
 namespace ConsoleCommands {
 	static ConsoleCommand ccmd_help("/help", "get help for a command (eg: /help listcmds)", []CCMD{
 		const char* cmd = argc == 1 ? "help" : argv[1];
-		auto& map = getConsoleCommands();
-		auto find = map.find(std::string("/") + cmd);
-		if (find != map.end()) {
-			messagePlayer(clientnum, MESSAGE_MISC, "%s", find->second.desc);
+		DynamicString full("/");
+		full.append(cmd);
+		ConsoleCommand* e = find_console_entry(full.c_str());
+		if (e) {
+			messagePlayer(clientnum, MESSAGE_MISC, "%s", e->desc);
 		}
  else {
   messagePlayer(clientnum, MESSAGE_MISC, "command '%s' not found", cmd);
@@ -303,16 +319,18 @@ namespace ConsoleCommands {
 		});
 
 	static ConsoleCommand ccmd_listcmds("/listcmds", "list all console commands", []CCMD{
-		auto & map = getConsoleCommands();
+		ensure_console_sorted();
+		int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+		ConsoleCommand** base = (ConsoleCommand**)g_console_registry.entries.data;
 		int pagenum = argc > 1 ? atoi(argv[1]) : 0;
 		int index = 0;
 		const int num_per_page = 5;
-		for (auto& pair : map) {
-			auto& cmd = pair.second;
+		for (int64_t i = 0; i < n; ++i) {
+			ConsoleCommand* cmd = base[i];
 			++index;
 			const int cur_page = index / num_per_page;
 			if (cur_page == pagenum) {
-				messagePlayer(clientnum, MESSAGE_MISC, "%s", cmd.name);
+				messagePlayer(clientnum, MESSAGE_MISC, "%s", cmd->name);
 			}
 			else if (cur_page > pagenum) {
 				break;
@@ -322,10 +340,11 @@ namespace ConsoleCommands {
 		});
 
 	static ConsoleCommand ccmd_listcmds_all("/listcmds_all", "list all console commands", []CCMD{
-		auto & map = getConsoleCommands();
-		for ( auto& pair : map ) {
-			auto& cmd = pair.second;
-			messagePlayer(clientnum, MESSAGE_MISC, "%s", cmd.name);
+		ensure_console_sorted();
+		int64_t n = dynarray_size<ConsoleCommand*>(g_console_registry.entries);
+		ConsoleCommand** base = (ConsoleCommand**)g_console_registry.entries.data;
+		for (int64_t i = 0; i < n; ++i) {
+			messagePlayer(clientnum, MESSAGE_MISC, "%s", base[i]->name);
 		}
 		});
 

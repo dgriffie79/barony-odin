@@ -173,7 +173,7 @@ void blitFieldToFrame(SDL_Surface* textSurf, SDL_Surface* destSurf, SDL_Rect src
 }
 
 #ifndef EDITOR
-static ConsoleVariable<bool> cvar_enableFieldCache(
+static CvarBool cvar_enableFieldCache(
 	"/fieldcache", false, "toggle fields caching their own text");
 #endif
 

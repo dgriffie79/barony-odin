@@ -373,8 +373,8 @@ bool isCurrentHoliday(bool force = false);
 
 #ifndef EDITOR
 #include "interface/consolecommand.hpp"
-extern ConsoleVariable<int> cvar_forceHoliday;
-extern ConsoleVariable<bool> cvar_disableHoliday;
+extern CvarInt cvar_forceHoliday;
+extern CvarBool cvar_disableHoliday;
 #endif
 
 extern char datadir[PATH_MAX]; //PATH_MAX as defined in main.hpp -- maybe define in Config.hpp?

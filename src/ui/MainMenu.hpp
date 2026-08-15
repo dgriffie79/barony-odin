@@ -20,17 +20,17 @@ namespace MainMenu {
 	extern DynamicString current_recording_audio_device; // guid of the recording audio device currently in use
 	extern float master_volume; // range is [0 - 100]
 	extern bool arachnophobia_filter; // if true, all spiders are crabs'
-	extern ConsoleVariable<bool> vertical_splitscreen; // if true, 2-player splitscreen has a vertical rather than horizontal layout
-	extern ConsoleVariable<bool> staggered_splitscreen; // if true, viewport sizes are reduced to preserve aspect ratio
-	extern ConsoleVariable<bool> clipped_splitscreen; // if true, viewports rest in a corner rather than centered
-    extern ConsoleVariable<bool> cvar_fastRestart;
-	extern ConsoleVariable<float> cvar_worldtooltip_scale;
-	extern ConsoleVariable<float> cvar_worldtooltip_scale_splitscreen;
-	extern ConsoleVariable<bool> cvar_hold_to_activate;
-	extern ConsoleVariable<float> cvar_enemybar_scale;
-    extern ConsoleVariable<int> cvar_desiredFps;
-    extern ConsoleVariable<int> cvar_displayHz;
-	extern ConsoleVariable<bool> cvar_hdrEnabled;
+	extern CvarBool vertical_splitscreen; // if true, 2-player splitscreen has a vertical rather than horizontal layout
+	extern CvarBool staggered_splitscreen; // if true, viewport sizes are reduced to preserve aspect ratio
+	extern CvarBool clipped_splitscreen; // if true, viewports rest in a corner rather than centered
+    extern CvarBool cvar_fastRestart;
+	extern CvarFloat cvar_worldtooltip_scale;
+	extern CvarFloat cvar_worldtooltip_scale_splitscreen;
+	extern CvarBool cvar_hold_to_activate;
+	extern CvarFloat cvar_enemybar_scale;
+    extern CvarInt cvar_desiredFps;
+    extern CvarInt cvar_displayHz;
+	extern CvarBool cvar_hdrEnabled;
 	
 	static constexpr const char* emptyBinding = "[unbound]"; // string appended to default empty bindings
 	static constexpr const char* hiddenBinding = "[hidden]"; // string appended to hidden bindings on the UI

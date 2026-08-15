@@ -43,7 +43,7 @@
 const int BOULDER_LAVA_SPRITE = 989;
 const int BOULDER_ARCANE_SPRITE = 990;
 
-static ConsoleVariable<bool> cvar_boulderDisableAutoBreak("/boulder_disable_auto_break", false);
+static CvarBool cvar_boulderDisableAutoBreak("/boulder_disable_auto_break", false);
 bool boulderCheckIfBlockedExit(Entity* my)
 {
 	if ( *cvar_boulderDisableAutoBreak )

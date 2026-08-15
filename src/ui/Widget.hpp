@@ -226,5 +226,5 @@ protected:
 
 #ifndef EDITOR
 #include "../interface/consolecommand.hpp"
-extern ConsoleVariable<bool> cvar_hideGlyphs;
+extern CvarBool cvar_hideGlyphs;
 #endif

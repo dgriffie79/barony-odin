@@ -75,7 +75,7 @@ bool achievementUnlocked(const char* achName)
 void steamAchievement(const char* achName)
 {
 #ifdef DEBUG_ACHIEVEMENTS
-	static ConsoleVariable<bool> cvar_achievements_debug("/achievements_debug", false);
+	static CvarBool cvar_achievements_debug("/achievements_debug", false);
 	if ( *cvar_achievements_debug )
 	{
 		messagePlayer(clientnum, MESSAGE_DEBUG, "%s", achName);
@@ -548,7 +548,7 @@ void steamStatisticUpdate(int statisticNum, ESteamStatTypes type, int value)
 		steamIndicateStatisticProgress(statisticNum, type);
 	}
 #ifdef DEBUG_ACHIEVEMENTS
-	static ConsoleVariable<bool> cvar_statistics_debug("/statistics_debug", false);
+	static CvarBool cvar_statistics_debug("/statistics_debug", false);
 	if ( *cvar_statistics_debug )
 	{
 		messagePlayer(clientnum, MESSAGE_DEBUG, "%s: %d, %d", steamStatAchStringsAndMaxVals[statisticNum].first.c_str(),
@@ -799,7 +799,7 @@ void steamIndicateStatisticProgress(int statisticNum, ESteamStatTypes type)
 				break;
 		}
 #ifdef DEBUG_ACHIEVEMENTS
-		static ConsoleVariable<bool> cvar_statistics_indicate_debug("/statistics_indicate_debug", false);
+		static CvarBool cvar_statistics_indicate_debug("/statistics_indicate_debug", false);
 		if ( *cvar_statistics_indicate_debug )
 		{
 			messagePlayer(clientnum, MESSAGE_DEBUG, "%s: %d, %d", steamStatAchStringsAndMaxVals[statisticNum].first.c_str(),

@@ -2059,7 +2059,7 @@ Player::GUI_t::GUIModules Player::GUI_t::handleModuleNavigation(bool checkDestin
 	return MODULE_NONE;
 }
 
-static ConsoleVariable<int> cvar_game_ui_sfx_volume("/game_ui_sfx_volume", 32);
+static CvarInt cvar_game_ui_sfx_volume("/game_ui_sfx_volume", 32);
 void Player::soundMovement()
 {
 	playSound(604, *cvar_game_ui_sfx_volume);
@@ -3822,7 +3822,7 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 						}
 					}
 
-					static ConsoleVariable<bool> cvar_calloutboulderdebug("/calloutboulderdebug", false);
+					static CvarBool cvar_calloutboulderdebug("/calloutboulderdebug", false);
 					if ( *cvar_calloutboulderdebug )
 					{
 						Entity* particle = spawnMagicParticle(playerEntity);

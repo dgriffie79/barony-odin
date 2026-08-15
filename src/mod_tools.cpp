@@ -8214,7 +8214,7 @@ void VideoManager_t::drawTexturedQuad(unsigned int texID, int tw, int th, const 
 }
 
 #ifndef EDITOR
-static ConsoleVariable<bool> cvar_doublebufferVideo("/video_doublebuffer", true);
+static CvarBool cvar_doublebufferVideo("/video_doublebuffer", true);
 #endif
 
 void VideoManager_t::drawAsFrameCallback(const Widget& widget, SDL_Rect frameSize, SDL_Rect offset, float alpha)
@@ -12221,9 +12221,9 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::reset()
 }
 
 #ifndef NDEBUG
-static ConsoleVariable<int> cvar_challengerace("/challengerace", -1);
-static ConsoleVariable<int> cvar_challengeclass("/challengeclass", -1);
-static ConsoleVariable<int> cvar_challengeevent("/challengeevent", -1);
+static CvarInt cvar_challengerace("/challengerace", -1);
+static CvarInt cvar_challengeclass("/challengeclass", -1);
+static CvarInt cvar_challengeevent("/challengeevent", -1);
 #endif
 
 bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
@@ -15930,7 +15930,7 @@ void Compendium_t::Events_t::loadItemsSaveData()
 	CompendiumEntries.migrateOldSkillIndexes = false;
 }
 
-static ConsoleVariable<bool> cvar_compendiumClientSave("/compendium_client_save", false);
+static CvarBool cvar_compendiumClientSave("/compendium_client_save", false);
 static ConsoleCommand ccmd_compendium_dummy_data(
 	"/compendium_dummy_data", "Create test compendium data",
 	[](int argc, const char** argv) {
@@ -17023,7 +17023,7 @@ bool allowedCompendiumProgress()
 	return true;
 }
 
-static ConsoleVariable<bool> cvar_compendiumDebugSave("/compendium_debug_save", false);
+static CvarBool cvar_compendiumDebugSave("/compendium_debug_save", false);
 
 void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, const ItemType type, 
 	Sint32 value, const bool loadingValue, const int spellID)

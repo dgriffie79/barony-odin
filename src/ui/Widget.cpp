@@ -17,7 +17,7 @@
 static Widget* _selectedWidgets[MAXPLAYERS] = { nullptr };
 
 #ifndef EDITOR
-ConsoleVariable<bool> cvar_hideGlyphs("/hideprompts", false, "hide button glyphs and prompts");
+CvarBool cvar_hideGlyphs("/hideprompts", false, "hide button glyphs and prompts");
 #endif
 
 Widget::~Widget() {

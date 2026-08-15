@@ -882,18 +882,18 @@ void Entity::actAssistShrine()
 		}
 	}
 
-	static ConsoleVariable<float> cvar_assist_flame_x1("/assist_flame_x1", 0.5);
-	static ConsoleVariable<float> cvar_assist_flame_y1("/assist_flame_y1", -3.f);
-	static ConsoleVariable<float> cvar_assist_flame_x2("/assist_flame_x2", -1.f);
-	static ConsoleVariable<float> cvar_assist_flame_y2("/assist_flame_y2", -1.f);
-	static ConsoleVariable<float> cvar_assist_flame_x3("/assist_flame_x3", -1.f);
-	static ConsoleVariable<float> cvar_assist_flame_y3("/assist_flame_y3", -3.5);
-	static ConsoleVariable<float> cvar_assist_flame_x4("/assist_flame_x4", 0.5);
-	static ConsoleVariable<float> cvar_assist_flame_y4("/assist_flame_y4", -1.f);
-	static ConsoleVariable<float> cvar_assist_flame_z1("/assist_flame_z1", 6.5);
-	static ConsoleVariable<float> cvar_assist_flame_z2("/assist_flame_z2", 9.f);
-	static ConsoleVariable<float> cvar_assist_flame_z3("/assist_flame_z3", 6.5);
-	static ConsoleVariable<float> cvar_assist_flame_z4("/assist_flame_z4", 10.f);
+	static CvarFloat cvar_assist_flame_x1("/assist_flame_x1", 0.5);
+	static CvarFloat cvar_assist_flame_y1("/assist_flame_y1", -3.f);
+	static CvarFloat cvar_assist_flame_x2("/assist_flame_x2", -1.f);
+	static CvarFloat cvar_assist_flame_y2("/assist_flame_y2", -1.f);
+	static CvarFloat cvar_assist_flame_x3("/assist_flame_x3", -1.f);
+	static CvarFloat cvar_assist_flame_y3("/assist_flame_y3", -3.5);
+	static CvarFloat cvar_assist_flame_x4("/assist_flame_x4", 0.5);
+	static CvarFloat cvar_assist_flame_y4("/assist_flame_y4", -1.f);
+	static CvarFloat cvar_assist_flame_z1("/assist_flame_z1", 6.5);
+	static CvarFloat cvar_assist_flame_z2("/assist_flame_z2", 9.f);
+	static CvarFloat cvar_assist_flame_z3("/assist_flame_z3", 6.5);
+	static CvarFloat cvar_assist_flame_z4("/assist_flame_z4", 10.f);
 	const int spriteCandle = 202;
 	const int spriteCandleBlue = 203;
 	if ( numFlames > 0 && ( flickerLights || this->ticks % TICKS_PER_SECOND == 1 ) )

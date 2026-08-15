@@ -1008,7 +1008,7 @@ void mothAnimate(Entity* my, Stat* myStats, double dist)
 
 			if ( abs(BODY_CIRCLING_AMOUNT) > 0.01 || abs(BODY_CIRCLING_ATTACK) > 0.01 )
 			{
-				static ConsoleVariable<float> cvar_moth_circle_yaw("/moth_circle_yaw", PI / 2);
+				static CvarFloat cvar_moth_circle_yaw("/moth_circle_yaw", PI / 2);
 				if ( (bodypart - MOTH_BODY) / 3 < 4 ) // static bodies
 				{
 					// no yaw?

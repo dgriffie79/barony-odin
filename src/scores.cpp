@@ -634,7 +634,7 @@ void loadScore(int scorenum)
 	saves all highscores to the scores data file
 
 -------------------------------------------------------------------------------*/
-static ConsoleVariable<bool> cvar_scores_json("/scores_json", true);
+static CvarBool cvar_scores_json("/scores_json", true);
 void saveAllScoresJSON(const std::string& scoresfilename)
 {
 	if ( !*cvar_scores_json )
@@ -5485,7 +5485,7 @@ int saveGame(int saveIndex) {
 		return 1;
 	}
 
-	static ConsoleVariable<bool> cvar_saveText("/save_text_format", true);
+	static CvarBool cvar_saveText("/save_text_format", true);
 
 	char path[PATH_MAX] = "";
 	DynamicString savefile = setSaveGameFileName(multiplayer == SINGLE, SaveFileType::JSON, saveIndex);

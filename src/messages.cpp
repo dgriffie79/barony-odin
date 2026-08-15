@@ -129,7 +129,7 @@ void Player::MessageZone_t::addMessage(Uint32 color, const char* content)
 	}
 }
 
-static ConsoleVariable<int> cvar_messages_max_lines("/messages_max_lines", 7);
+static CvarInt cvar_messages_max_lines("/messages_max_lines", 7);
 
 int Player::MessageZone_t::getMaxTotalLines()
 {

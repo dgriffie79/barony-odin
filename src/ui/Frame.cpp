@@ -100,7 +100,7 @@ void Frame::listener_t::onChangeName(const char* name) {
 }
 
 #ifndef EDITOR
-ConsoleVariable<bool> ui_filter("/ui_filter", false);
+CvarBool ui_filter("/ui_filter", false);
 static ConsoleCommand ui_filter_refresh("/ui_filter_refresh", "refresh ui filter state",
     [](int argc, const char** argv){
     Frame::fboDestroy();
@@ -282,10 +282,10 @@ Frame::~Frame() {
 }
 
 #ifndef EDITOR
-static ConsoleVariable<bool> ui_scale_native("/ui_scale_native", false);    // if true, causes the UI to blit from a backbuffer even if it's already native res
-static ConsoleVariable<bool> ui_upscale("/ui_upscale", false);              // upscale UI layer to 4k before downscaling to native res
-static ConsoleVariable<bool> ui_downscale("/ui_downscale", false);          // downscale UI layer to 360p before upscaling to native res
-static ConsoleVariable<bool> ui_scale("/ui_scale", true);                   // scale the UI layer to native res (should always be on)
+static CvarBool ui_scale_native("/ui_scale_native", false);    // if true, causes the UI to blit from a backbuffer even if it's already native res
+static CvarBool ui_upscale("/ui_upscale", false);              // upscale UI layer to 4k before downscaling to native res
+static CvarBool ui_downscale("/ui_downscale", false);          // downscale UI layer to 360p before upscaling to native res
+static CvarBool ui_scale("/ui_scale", true);                   // scale the UI layer to native res (should always be on)
 #endif
 
 #if !defined(EDITOR)
@@ -1319,8 +1319,8 @@ Frame::result_t Frame::process(SDL_Rect _size, SDL_Rect _actualSize, bool usable
 	const bool mouseActive = isMouseActive(owner);
 
 #ifndef EDITOR
-	static ConsoleVariable<float> cvar_scrollFriction("/scroll_friction", 10.0);
-	static ConsoleVariable<float> cvar_scrollSpeed("/scroll_speed", 50000.0);
+	static CvarFloat cvar_scrollFriction("/scroll_friction", 10.0);
+	static CvarFloat cvar_scrollSpeed("/scroll_speed", 50000.0);
 	const real_t scrollFriction = *cvar_scrollFriction * timeFactor;
 	const real_t scrollSpeed = *cvar_scrollSpeed * timeFactor;
 #else
@@ -1780,7 +1780,7 @@ void Frame::processSlider(const SDL_Rect& _size, Slider& slider, Widget*& destWi
 
 void Frame::postprocess() {
 #if !defined(EDITOR) && !defined(NDEBUG)
-    static ConsoleVariable<bool> cvar("/disableframetick", false);
+    static CvarBool cvar("/disableframetick", false);
     if (*cvar) {
         return;
     }

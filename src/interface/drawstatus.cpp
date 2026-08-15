@@ -2478,7 +2478,7 @@ void drawStatusNew(const int player)
 							}
 							if ( hotbar_t.useHotbarFaceMenu )
 							{
-								static ConsoleVariable<int> cvar_tooltip_title_only_facemenu_y("/tooltip_title_only_facemenu_y", 4);
+								static CvarInt cvar_tooltip_title_only_facemenu_y("/tooltip_title_only_facemenu_y", 4);
 								if ( inputs.hasController(player) )
 								{
 									tooltipPos.y -= 12 * hotbar_t.selectedSlotAnimateCurrentValue;
@@ -2496,7 +2496,7 @@ void drawStatusNew(const int player)
 							}
 							else
 							{
-								static ConsoleVariable<int> cvar_tooltip_title_only_y("/tooltip_title_only_y", 8);
+								static CvarInt cvar_tooltip_title_only_y("/tooltip_title_only_y", 8);
 								tooltipPos.x = hotbar_t.hotbarFrame->getSize().w / 2 - tooltipPos.w / 2;
 								tooltipPos.y += *cvar_tooltip_title_only_y;
 								if ( tooltipPos.x % 2 == 1 )

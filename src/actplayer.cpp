@@ -37,12 +37,12 @@ bool disablemouserotationlimit = true;
 bool settings_disablemouserotationlimit = false;
 bool swimDebuffMessageHasPlayed = false;
 bool partymode = false;
-static ConsoleVariable<float> cvar_calloutStartZ("/callout_start_z", -2.5);
-static ConsoleVariable<float> cvar_calloutMoveTo("/callout_moveto_z", 0.1);
-static ConsoleVariable<float> cvar_calloutStartZLimit("/callout_start_z_limit", 7.5);
-static ConsoleVariable<float> cvar_followerStartZ("/follower_start_z", -2.5);
-static ConsoleVariable<float> cvar_followerMoveTo("/follower_moveto_z", 0.1);
-static ConsoleVariable<float> cvar_followerStartZLimit("/follower_start_z_limit", 7.5);
+static CvarFloat cvar_calloutStartZ("/callout_start_z", -2.5);
+static CvarFloat cvar_calloutMoveTo("/callout_moveto_z", 0.1);
+static CvarFloat cvar_calloutStartZLimit("/callout_start_z_limit", 7.5);
+static CvarFloat cvar_followerStartZ("/follower_start_z", -2.5);
+static CvarFloat cvar_followerMoveTo("/follower_moveto_z", 0.1);
+static CvarFloat cvar_followerStartZLimit("/follower_start_z_limit", 7.5);
 
 /*-------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ static ConsoleVariable<float> cvar_followerStartZLimit("/follower_start_z_limit"
 #define GHOSTCAM_HOVER my->fskill[11]
 #define GHOSTCAM_THIRD_PERSON_CUSTOM my->fskill[12]
 
-static ConsoleVariable<bool> cvar_player_can_move_in_gui("/player_can_move_in_gui", true);
+static CvarBool cvar_player_can_move_in_gui("/player_can_move_in_gui", true);
 bool playerAllowedMovement(const int playernum)
 {
 	if ( !*cvar_player_can_move_in_gui )
@@ -105,8 +105,8 @@ void Player::Ghost_t::handleGhostCameraBobbing(bool useRefreshRateDelta)
 	}
 
 	Input& input = Input::inputs[playernum];
-	static ConsoleVariable<float> cvar_ghostBob("/ghost_bob", 0.25);
-	static ConsoleVariable<float> cvar_ghostBobSpeed("/ghost_bob_speed", 4.0);
+	static CvarFloat cvar_ghostBob("/ghost_bob", 0.25);
+	static CvarFloat cvar_ghostBobSpeed("/ghost_bob_speed", 4.0);
 
 	// camera bobbing
 	if ( bobbing )
@@ -195,8 +195,8 @@ void Player::Ghost_t::handleGhostMovement(const bool useRefreshRateDelta)
 
 	// calculate movement forces
 	bool allowMovement = isControllable() && playerAllowedMovement(player.playernum);
-	static ConsoleVariable<float> cvar_ghostSpeed("/ghost_speed", 1.5);
-	static ConsoleVariable<float> cvar_ghostDrag("/ghost_drag", 0.95);
+	static CvarFloat cvar_ghostSpeed("/ghost_speed", 1.5);
+	static CvarFloat cvar_ghostDrag("/ghost_drag", 0.95);
 	real_t drag = *cvar_ghostDrag;
 	if ( ((!player.usingCommand() && player.bControlEnabled && !gamePaused))
 		&& allowMovement )
@@ -306,7 +306,7 @@ void Player::Ghost_t::startQuickTurn()
 	bDoingQuickTurn = true;
 }
 
-static ConsoleVariable<float> cvar_quick_turn_speed("/quick_turn_speed", 1.f);
+static CvarFloat cvar_quick_turn_speed("/quick_turn_speed", 1.f);
 
 bool Player::Ghost_t::handleQuickTurn(bool useRefreshRateDelta)
 {
@@ -2455,8 +2455,8 @@ void actDeathGhost(Entity* my)
 		my->light = addLight(my->x / 16, my->y / 16, light_type, 0, playernum + 1);
 	}
 
-	static ConsoleVariable<float> cvar_ghostSquish("/ghost_squish", 6.f);
-	static ConsoleVariable<float> cvar_ghostSquishFactor("/ghost_squish_factor", 0.3f);
+	static CvarFloat cvar_ghostSquish("/ghost_squish", 6.f);
+	static CvarFloat cvar_ghostSquishFactor("/ghost_squish_factor", 0.3f);
 
 	if ( player->isLocalPlayer() && !player->ghost.isActive() )
 	{
@@ -2512,7 +2512,7 @@ void actDeathGhost(Entity* my)
 		camang = my->yaw;
 		camvang = my->pitch;
 
-		static ConsoleVariable<bool> cvar_ghostThirdPerson("/ghost_thirdperson", false);
+		static CvarBool cvar_ghostThirdPerson("/ghost_thirdperson", false);
 		/*if ( keystatus[SDLK_h] )
 		{
 			keystatus[SDLK_h] = 0;
@@ -2610,7 +2610,7 @@ void actDeathGhost(Entity* my)
 		}
 	}
 
-	static ConsoleVariable<float> cvar_ghostBounce("/ghost_bounce", -1.0);
+	static CvarFloat cvar_ghostBounce("/ghost_bounce", -1.0);
 	real_t dist = 0.0;
 	if ( player->isLocalPlayer() )
 	{
@@ -3986,7 +3986,7 @@ void Player::PlayerMovement_t::handlePlayerCameraUpdate(bool useRefreshRateDelta
 	}
 	my->pitch -= PLAYER_ROTY * refreshRateDelta;
 
-	static ConsoleVariable<float> cvar_player_cam_pitch("/player_cam_pitch", PI / 3);
+	static CvarFloat cvar_player_cam_pitch("/player_cam_pitch", PI / 3);
 	if ( my->pitch > *cvar_player_cam_pitch )
 	{
 		my->pitch = *cvar_player_cam_pitch;
@@ -4526,9 +4526,9 @@ void Player::PlayerMovement_t::handlePlayerMovement(bool useRefreshRateDelta)
 		}
 	}
 
-	static ConsoleVariable<float> cvar_map_tile_slippery("/map_tile_slippery", 0.99);
-	static ConsoleVariable<float> cvar_map_tile_greasy("/map_tile_greasy", 0.99);
-	static ConsoleVariable<float> cvar_map_tile_slow("/map_tile_slow", 0.25);
+	static CvarFloat cvar_map_tile_slippery("/map_tile_slippery", 0.99);
+	static CvarFloat cvar_map_tile_greasy("/map_tile_greasy", 0.99);
+	static CvarFloat cvar_map_tile_slow("/map_tile_slow", 0.25);
 	real_t movementDrag = 0.75;
 	{
 		if ( map.tileHasAttribute(static_cast<int>(my->x / 16), static_cast<int>(my->y / 16), 0, map_t::TILE_ATTRIBUTE_SLIPPERY) )
@@ -4696,7 +4696,7 @@ void Player::PlayerMovement_t::handlePlayerMovement(bool useRefreshRateDelta)
 			}
 		}
 
-		static ConsoleVariable<bool> cvar_debugspeedfactor("/player_showspeedfactor", false);
+		static CvarBool cvar_debugspeedfactor("/player_showspeedfactor", false);
 		if ( *cvar_debugspeedfactor && ticks % 50 == 0 )
 		{
 			Sint32 STR = statGetSTR(stats[PLAYER_NUM], players[PLAYER_NUM]->entity);
@@ -5072,7 +5072,7 @@ void statueCycleItem(Item& item, bool dirForward)
 
 void followerDebugEquipment(int player)
 {
-	static ConsoleVariable<bool> cvar_followerdebugequipment("/followerdebugequipment", false);
+	static CvarBool cvar_followerdebugequipment("/followerdebugequipment", false);
 	Entity* follower = nullptr;
 	if ( *cvar_followerdebugequipment && (svFlags & SV_FLAG_CHEATS) )
 	{
@@ -5915,13 +5915,13 @@ void playerDebugTests(Entity* my)
 		return;
 	}
 
-	static ConsoleVariable<bool> cvar_test_frameskip("/test_frameskip", false);
+	static CvarBool cvar_test_frameskip("/test_frameskip", false);
 	if ( *cvar_test_frameskip && ticks % (5 * TICKS_PER_SECOND) == 0 )
 	{
 		SDL_Delay(250);
 	}
 
-	static ConsoleVariable<int> cvar_test_xp("/test_xp", 0);
+	static CvarInt cvar_test_xp("/test_xp", 0);
 	struct XPGain_t
 	{
 		int numKills = 0;
@@ -6209,7 +6209,7 @@ void actPlayer(Entity* my)
 		}
 	}
 	
-	static ConsoleVariable<int> cvar_pbaoe("/pbaoe", 15);
+	static CvarInt cvar_pbaoe("/pbaoe", 15);
 	if ( keystatus[SDLK_x] && enableDebugKeys && (svFlags & SV_FLAG_CHEATS) )
 	{
 		//spawnPlayerXP(my->x + 16.0, my->y, 0, 10);
@@ -6529,8 +6529,8 @@ void actPlayer(Entity* my)
 					{
 						fx->pitch += PI / 8;
 					}
-					static ConsoleVariable<float> cvar_pbaoe8_var1("/pbaoe8_var1", 0.25);
-					static ConsoleVariable<float> cvar_pbaoe8_var2("/pbaoe8_var2", 0.8);
+					static CvarFloat cvar_pbaoe8_var1("/pbaoe8_var1", 0.25);
+					static CvarFloat cvar_pbaoe8_var2("/pbaoe8_var2", 0.8);
 					/*if ( i >= 2 )
 					{
 						fx->yaw += PI;
@@ -6623,8 +6623,8 @@ void actPlayer(Entity* my)
 					}
 					fx->z = 8.0;
 					fx->z -= (i / 2) * 0.5;
-					static ConsoleVariable<float> cvar_pbaoe5_velz("/pbaoe5_velz", 0.25);
-					static ConsoleVariable<float> cvar_pbaoe5_yaw("/pbaoe5_yaw", 0.3);
+					static CvarFloat cvar_pbaoe5_velz("/pbaoe5_velz", 0.25);
+					static CvarFloat cvar_pbaoe5_yaw("/pbaoe5_yaw", 0.3);
 					fx->vel_z -= *cvar_pbaoe5_velz;
 					fx->fskill[0] = *cvar_pbaoe5_yaw; // rotate
 					fx->scalex = 0.5;// + (i / 2) * 0.25 / 12;
@@ -6687,8 +6687,8 @@ void actPlayer(Entity* my)
 
 		static std::map<int, std::vector<ParticleTimerEffect_t::EffectLocations_t>> effLocations;
 
-		static ConsoleVariable<int> cvar_particle_sprite("/particle_sprite", 1718);
-		static ConsoleVariable<int> cvar_particle_test("/particle_test", 7);
+		static CvarInt cvar_particle_sprite("/particle_sprite", 1718);
+		static CvarInt cvar_particle_test("/particle_test", 7);
 		int lifetime = TICKS_PER_SECOND * 2;
 		real_t dist = 64.0 * 1.25;
 		if ( *cvar_particle_test == 3 )
@@ -6843,10 +6843,10 @@ void actPlayer(Entity* my)
 
 			if ( *cvar_particle_test == -1 )
 			{
-				static ConsoleVariable<float> c1("/c1", 1.0);
-				static ConsoleVariable<int> c2("/c2", 4);
-				static ConsoleVariable<float> c3("/c3", 13.75);
-				static ConsoleVariable<int> c4("/c4", 5);
+				static CvarFloat c1("/c1", 1.0);
+				static CvarInt c2("/c2", 4);
+				static CvarFloat c3("/c3", 13.75);
+				static CvarInt c4("/c4", 5);
 				real_t grouping = *c3;
 				real_t scale = *c1;
 				if ( *c4 == 3 )
@@ -6984,8 +6984,8 @@ void actPlayer(Entity* my)
 						/*if ( i == 4 ) { grouping -= 4.0; }
 						if ( i >= 4 )
 						{
-							static ConsoleVariable<float> c1("/c1", 1.0);
-							static ConsoleVariable<int> c2("/c2", 4);
+							static CvarFloat c1("/c1", 1.0);
+							static CvarInt c2("/c2", 4);
 							wave->skill[5] = *c2;
 						}*/
 						if ( i >= 4 )
@@ -7122,11 +7122,11 @@ void actPlayer(Entity* my)
 		//	entity->x = my->x + 16.0 * cos(my->yaw);
 		//	entity->y = my->y + 16.0 * sin(my->yaw);
 		//	entity->z = 7.499;
-		//	static ConsoleVariable<float> cvar_sprite_scale("/sprite_scale", 1.0);
-		//	static ConsoleVariable<float> cvar_sprite_rotate("/sprite_rotate", 0.0);
-		//	static ConsoleVariable<float> cvar_sprite_alpha("/sprite_alpha", 1.0);
-		//	static ConsoleVariable<float> cvar_sprite_alpha_glow("/sprite_alpha_glow", 0.0);
-		//	static ConsoleVariable<float> cvar_sprite_grouping("/sprite_grouping", 8.0);
+		//	static CvarFloat cvar_sprite_scale("/sprite_scale", 1.0);
+		//	static CvarFloat cvar_sprite_rotate("/sprite_rotate", 0.0);
+		//	static CvarFloat cvar_sprite_alpha("/sprite_alpha", 1.0);
+		//	static CvarFloat cvar_sprite_alpha_glow("/sprite_alpha_glow", 0.0);
+		//	static CvarFloat cvar_sprite_grouping("/sprite_grouping", 8.0);
 		//	entity->ditheringDisabled = true;
 		//	entity->flags[SPRITE] = true;
 		//	entity->flags[PASSABLE] = true;
@@ -8307,7 +8307,7 @@ void actPlayer(Entity* my)
 	// debug stuff
 	if (enableDebugKeys)
 	{
-		static ConsoleVariable<bool> cvar_levelgentest("/levelgentest", false);
+		static CvarBool cvar_levelgentest("/levelgentest", false);
 		if ( *cvar_levelgentest && PLAYER_ALIVETIME == 15 )
 		{
 			consoleCommand("/jumplevel -1");
@@ -8395,7 +8395,7 @@ void actPlayer(Entity* my)
 	    }
 	}
 
-	static ConsoleVariable<bool> cvar_player_light_radius_test("/player_light_radius_test", false);
+	static CvarBool cvar_player_light_radius_test("/player_light_radius_test", false);
 	if ( *cvar_player_light_radius_test && (svFlags & SV_FLAG_CHEATS) )
 	{
 		if ( ticks % 4 == 0 )
@@ -10442,7 +10442,7 @@ void actPlayer(Entity* my)
     my->removeLightField();
     bool ambientLight = false;
     const char* light_type = nullptr;
-    static ConsoleVariable<bool> cvar_playerLight("/player_light_enabled", true);
+    static CvarBool cvar_playerLight("/player_light_enabled", true);
 	int range_bonus = std::min(std::max(0, statGetPER(stats[PLAYER_NUM], my) / 5), 2);
 	int equipmentBonus = 0;
 	if ( stats[PLAYER_NUM]->mask && stats[PLAYER_NUM]->mask->type == MASK_EYEPATCH )

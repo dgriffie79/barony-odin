@@ -25,7 +25,7 @@ See LICENSE for details.
 #include "interface/consolecommand.hpp"
 #include "scores.hpp"
 
-static ConsoleVariable<bool> cvar_spawnArtemisia("/spawn_artemisia", false);
+static CvarBool cvar_spawnArtemisia("/spawn_artemisia", false);
 
 void initShadow(Entity* my, Stat* myStats)
 {
