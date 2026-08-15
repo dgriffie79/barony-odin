@@ -1,0 +1,103 @@
+// draw.odin — Odin mirrors of draw.hpp.
+package main
+
+import "containers"
+
+// enum class ClipResult::Direction
+Clip_Result_Direction :: enum i32 {
+	Invalid,
+	Left,
+	Right,
+	Top,
+	Bottom,
+	Front,
+	Behind,
+}
+
+// struct ClipResult — 24 bytes
+Clip_Result :: struct {
+	direction:     i32, // ClipResult::Direction enum
+	is_behind:     bool,
+	// 3B padding
+	clipped_coords: vec4_t, // 16B
+}
+#assert(size_of(Clip_Result) == 24)
+
+// union uif32 — 4 bytes
+UIF32 :: struct #raw_union {
+	f: f32,
+	i: u32,
+}
+#assert(size_of(UIF32) == 4)
+
+// class TempTexture — has reference members (texid/w/h are int& aliases), so
+// it is NOT data-carrying; skip (private helper, used via pointers only).
+
+// struct Mesh — 144 bytes (140 data + pad to 8-alignment)
+Mesh :: struct {
+	data:          [3]containers.Raw_Dynamic_Array, // DynamicArrayT<float>[3] (40B each = 120B)
+	vao:           u32,
+	vbo:           [3]u32,
+	num_vertices:  u32,
+}
+#assert(size_of(Mesh) == 144)
+
+// struct framebuffer — 36 bytes
+Framebuffer :: struct {
+	fbo:        u32,
+	fbo_color:  u32,
+	fbo_depth:  u32,
+	xsize:      u32,
+	ysize:      u32,
+	pbos:       [2]u32, // NUM_PBOS = 2
+	pbo_index:  u32,
+	mapped:     bool,
+}
+#assert(size_of(Framebuffer) == 36)
+
+// typedef struct view_t — 320 bytes
+View_T :: struct {
+	x:                        f64, // real_t
+	y:                        f64,
+	z:                        f64,
+	ang:                      f64,
+	vang:                     f64,
+	winx:                     i32, // Sint32
+	winy:                     i32,
+	winw:                     i32,
+	winh:                     i32,
+	global_light_modifier:    f64, // real_t
+	global_light_modifier_entities: f64,
+	global_light_modifier_active: i32, // LightModifierValues enum
+	fb:                       [1]Framebuffer,
+	vismap:                   ^bool, // bool*
+	luminance:                f32,
+	drawn_frames:             u32,
+	projview:                 mat4x4_t,
+	proj:                     mat4x4_t,
+	proj_hud:                 mat4x4_t,
+}
+#assert(size_of(View_T) == 320)
+
+// struct Chunk — 112 bytes
+Chunk :: struct {
+	vao:            u32,
+	vbo_positions:  u32,
+	vbo_texcoords:  u32,
+	vbo_colors:     u32,
+	indices:        i32,
+	x:              i32,
+	y:              i32,
+	w:              i32,
+	h:              i32,
+	tiles:          containers.Raw_Dynamic_Array, // DynamicArrayS32 (40B)
+	dithering:      containers.Raw_Map,           // DynamicMapPtrT<ChunkDither_t> (32B)
+}
+#assert(size_of(Chunk) == 112)
+
+// struct Chunk::Dither — 8 bytes
+Chunk_Dither :: struct {
+	value:            i32, // default MAX = 10
+	last_update_tick: u32,
+}
+#assert(size_of(Chunk_Dither) == 8)
