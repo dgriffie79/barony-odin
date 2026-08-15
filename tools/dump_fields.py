@@ -24,7 +24,7 @@ def parse(header):
 def dump_class(header, clsname):
     tu = parse(header)
     for node in tu.cursor.walk_preorder():
-        if node.kind == CursorKind.CLASS_DECL and node.spelling == clsname:
+        if node.kind in (CursorKind.CLASS_DECL, CursorKind.STRUCT_DECL) and node.spelling == clsname:
             kids = list(node.get_children())
             if not any(k.kind == CursorKind.FIELD_DECL for k in kids):
                 continue

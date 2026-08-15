@@ -35,9 +35,6 @@ KilledBy :: enum i32 {
 	WATER,
 }
 
-// Monster is defined in monster.hpp; referenced here as i32 so Stat's layout
-// is correct (the full enum is mirrored in monster.odin). ItemType is in items.odin.
-Monster  :: i32
 
 // struct Lootbag_t — 48 bytes
 // { int spawn_x, spawn_y; bool spawnedOnGround, looted; DynamicArrayT<Item> items; }
