@@ -523,6 +523,43 @@ struct SortedScrollEntry_t {
     ScrollEntry_t second;  // { type, identified }
 };
 
+// SurvivalComplexityEntry_t — 32B owning mirror of std::tuple<int,string,Uint32>.
+// Value for MainMenu::ClassDescriptions::DescData_t::survivalComplexity.
+struct SurvivalComplexityEntry_t {
+    int32_t value = 0;        // complexity level (1-5)
+    DynamicString label;      // "*".."*****" (owned)
+    uint32_t color = 0;       // display color
+};
+
+// ClassDescData_t — 200B owning mirror of MainMenu::ClassDescriptions::DescData_t
+// (after de-STL: survivalComplexity is a DynamicArray of SurvivalComplexityEntry_t).
+struct ClassDescData_t {
+    DynamicString text;
+    DynamicString internal_name;
+    DynamicArrayT<SurvivalComplexityEntry_t> survivalComplexity;
+    DynamicArrayU32 statRatings;
+    DynamicArrayStr statRatingsStrings;
+    int32_t hp = 0;
+    int32_t mp = 0;
+    DynamicArrayS32 linePaddings;
+};
+
+// RaceDescData_t — 248B owning mirror of MainMenu::RaceDescriptions::DescData_t.
+struct RaceDescData_t {
+    DynamicString textLeft;
+    DynamicString textRight;
+    DynamicSetI32 traitLines;
+    DynamicSetI32 proLines;
+    DynamicArrayS32 linePaddings;
+    DynamicString title;
+    DynamicString traitsBasedOnPlayerRace;
+    DynamicString traitsBasedOnMonsterType;
+    DynamicString resistances;
+    DynamicString weaknesses;
+    DynamicString friendlyWith;
+    DynamicString racialSpells;
+};
+
 
 
 // ---- value kinds (must match value_kind mapping in dynamic_map.odin) ----
@@ -607,6 +644,8 @@ enum MapValueKind {
     MK_ArrayMonsterStringPair = 77,  // vector<pair<Monster,string>> (owning array of pair<int,string>)
     MK_NetworkPacket = 78,           // DebugStatsClass::networkPackets value (DynamicString + int)
     MK_ScrollEntry = 79,             // pair<int,bool> (8B POD)
+    MK_ClassDescData = 80,           // MainMenu ClassDescriptions::DescData_t (owning)
+    MK_RaceDescData = 81,            // MainMenu RaceDescriptions::DescData_t (owning)
 };
 
 // value_kind_of<V> — compile-time kind for the shim's value_kind arg.
@@ -642,6 +681,9 @@ template <> struct MapValueKindOf<NetworkPacket_t> { static constexpr int value 
 template <> struct MapValueKindOf<ScrollEntry_t> { static constexpr int value = MK_ScrollEntry; };
 // Array elem kind for vector<pair<string, pair<int,bool>>> (sortedScrolls).
 template <> struct DynamicArrayKindOf<SortedScrollEntry_t> { static constexpr int value = Kind_SortedScrollEntry; };
+template <> struct DynamicArrayKindOf<SurvivalComplexityEntry_t> { static constexpr int value = Kind_SurvivalComplexityEntry; };
+template <> struct MapValueKindOf<ClassDescData_t> { static constexpr int value = MK_ClassDescData; };
+template <> struct MapValueKindOf<RaceDescData_t> { static constexpr int value = MK_RaceDescData; };
 template <> struct MapValueKindOf<bool> { static constexpr int value = MK_Bool; };
 
 // 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.

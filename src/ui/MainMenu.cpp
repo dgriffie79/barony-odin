@@ -10385,10 +10385,10 @@ failed:
 /******************************************************************************/
 
 	bool ClassDescriptions::init = false;
-	std::unordered_map<int, ClassDescriptions::DescData_t> ClassDescriptions::data;
+	DynamicMapI32T<ClassDescriptions::DescData_t> ClassDescriptions::data;
 
 	bool RaceDescriptions::init = false;
-	std::unordered_map<std::string, RaceDescriptions::DescData_t> RaceDescriptions::data;
+	DynamicMapStrT<RaceDescriptions::DescData_t> RaceDescriptions::data;
 
 	void ClassDescriptions::readFromFile()
 	{
@@ -10474,29 +10474,29 @@ failed:
 			for ( auto it2 = it->value["survival_complexity"].Begin(); it2 != it->value["survival_complexity"].End(); ++it2 )
 			{
 				int value = it2->GetInt();
-				classEntry.survivalComplexity.push_back(std::make_tuple(value, "", 0));
+				classEntry.survivalComplexity.push_back(SurvivalComplexityEntry_t{ value, DynamicString(), 0 });
 				auto& survivalComplexity = classEntry.survivalComplexity.back();
 				switch ( value )
 				{
 					case 1: 
-						std::get<1>(survivalComplexity) = "*"; 
-						std::get<2>(survivalComplexity) = (c == 0 ? bad : good);
+						survivalComplexity.label = "*"; 
+						survivalComplexity.color = (c == 0 ? bad : good);
 						break;
 					case 2: 
-						std::get<1>(survivalComplexity) = "**"; 
-						std::get<2>(survivalComplexity) = (c == 0 ? poor : decent);
+						survivalComplexity.label = "**"; 
+						survivalComplexity.color = (c == 0 ? poor : decent);
 						break;
 					case 3: 
-						std::get<1>(survivalComplexity) = "***"; 
-						std::get<2>(survivalComplexity) = (c == 0 ? average : average);
+						survivalComplexity.label = "***"; 
+						survivalComplexity.color = (c == 0 ? average : average);
 						break;
 					case 4: 
-						std::get<1>(survivalComplexity) = "****"; 
-						std::get<2>(survivalComplexity) = (c == 0 ? decent : poor);
+						survivalComplexity.label = "****"; 
+						survivalComplexity.color = (c == 0 ? decent : poor);
 						break;
 					case 5: 
-						std::get<1>(survivalComplexity) = "*****"; 
-						std::get<2>(survivalComplexity) = (c == 0 ? good : bad); 
+						survivalComplexity.label = "*****"; 
+						survivalComplexity.color = (c == 0 ? good : bad); 
 						break;
 					default:
 						break;
@@ -13949,12 +13949,12 @@ failed:
 	        static auto stars_fn = [](Field& field, int index){
 		        const int i = std::min(std::max(0, client_classes[index]), (Sint32)(ClassDescriptions::data.size() - 1));
 		        for (int c = 0; c < 2; ++c) {
-					field.addColorToLine(c, std::get<2>(ClassDescriptions::data[i].survivalComplexity[c]));
+					field.addColorToLine(c, ClassDescriptions::data[i].survivalComplexity[c].color);
 		        }
 		        char buf[star_buf_size];
 		        snprintf(buf, sizeof(buf), "%s\n%s", 
-					std::get<1>(ClassDescriptions::data[i].survivalComplexity[0]).c_str(), 
-					std::get<1>(ClassDescriptions::data[i].survivalComplexity[1]).c_str());
+					ClassDescriptions::data[i].survivalComplexity[0].label.c_str(), 
+					ClassDescriptions::data[i].survivalComplexity[1].label.c_str());
 		        field.setText(buf);
 	        };
 

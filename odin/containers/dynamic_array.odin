@@ -223,6 +223,7 @@ Kind_UIToastNotification        :: 40
 Kind_MonsterStringPair          :: 37
 Kind_SaveGameListEntry           :: 38
 Kind_SortedScrollEntry           :: 41
+Kind_SurvivalComplexityEntry      :: 42
 Kind_I32Map          :: 13
 
 Book_t :: struct {
@@ -1517,6 +1518,27 @@ sorted_scroll_entry_copy :: proc(dst: rawptr, src: rawptr) {
 	d.second = s.second
 	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
 }
+
+// SurvivalComplexityEntry_t — 32B owning (int + string + u32). Value for
+// MainMenu::ClassDescriptions::DescData_t::survivalComplexity.
+SurvivalComplexityEntry_t :: struct {
+	value: i32,
+	label: string,
+	color: u32,
+}
+#assert(size_of(SurvivalComplexityEntry_t) == 32)
+
+survival_complexity_entry_free :: proc(p: rawptr) {
+	v := (^SurvivalComplexityEntry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.label))
+}
+survival_complexity_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^SurvivalComplexityEntry_t)(dst)
+	s := (^SurvivalComplexityEntry_t)(src)
+	d.value = s.value
+	d.color = s.color
+	dynamic_string_copy_elem(rawptr(&d.label), rawptr(&s.label))
+}
 field_cache_entry_copy :: proc(dst: rawptr, src: rawptr) {
 	d := (^FieldCacheEntry_t)(dst)
 	s := (^FieldCacheEntry_t)(src)
@@ -1823,7 +1845,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [42]Element_Ops{
+element_ops := [43]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1866,6 +1888,7 @@ element_ops := [42]Element_Ops{
 	39 = { free = field_cache_entry_free, copy = field_cache_entry_copy },
 	40 = { free = ui_toast_free, copy = ui_toast_copy },
 	41 = { free = sorted_scroll_entry_free, copy = sorted_scroll_entry_copy },
+	42 = { free = survival_complexity_entry_free, copy = survival_complexity_entry_copy },
 }
 
 @(export)

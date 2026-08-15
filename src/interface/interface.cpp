@@ -37537,12 +37537,12 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 								{
 									const int i = std::min((Sint32)itemType, (Sint32)(MainMenu::ClassDescriptions::data.size() - 1));
 									for ( int c = 0; c < 2; ++c ) {
-										difficulty_stars->addColorToLine(c, std::get<2>(MainMenu::ClassDescriptions::data[i].survivalComplexity[c]));
+										difficulty_stars->addColorToLine(c, MainMenu::ClassDescriptions::data[i].survivalComplexity[c].color);
 									}
 									char buf[32];
 									snprintf(buf, sizeof(buf), "%s\n%s",
-										std::get<1>(MainMenu::ClassDescriptions::data[i].survivalComplexity[0]).c_str(),
-										std::get<1>(MainMenu::ClassDescriptions::data[i].survivalComplexity[1]).c_str());
+										MainMenu::ClassDescriptions::data[i].survivalComplexity[0].label.c_str(),
+										MainMenu::ClassDescriptions::data[i].survivalComplexity[1].label.c_str());
 									difficulty_stars->setText(buf);
 								}
 

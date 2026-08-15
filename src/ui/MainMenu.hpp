@@ -128,14 +128,14 @@ namespace MainMenu {
 		{
 			DynamicString text;
 			DynamicString internal_name;
-			std::vector<std::tuple<int, std::string, Uint32>> survivalComplexity;
+			DynamicArrayT<SurvivalComplexityEntry_t> survivalComplexity;
 			DynamicArrayU32 statRatings;
 			DynamicArrayStr statRatingsStrings;
 			Sint32 hp = DEFAULT_HP;
 			Sint32 mp = DEFAULT_MP;
 			DynamicArrayS32 linePaddings;
 		};
-		static std::unordered_map<int, DescData_t> data;
+		static DynamicMapI32T<DescData_t> data;
 		static void readFromFile();
 		static bool init;
 		static void update_stat_growths(Frame& card, int classnum, int shapeshiftedType);
@@ -158,7 +158,7 @@ namespace MainMenu {
 			DynamicString friendlyWith;
 			DynamicString racialSpells;
 		};
-		static std::unordered_map<std::string, DescData_t> data;
+		static DynamicMapStrT<DescData_t> data;
 		static void readFromFile();
 		static std::string getRaceKey(int race)
 		{

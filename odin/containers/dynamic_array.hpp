@@ -229,6 +229,7 @@ enum DynamicArrayKind {
     Kind_FieldCacheEntry = 39,
     Kind_UIToastNotification = 40,
     Kind_SortedScrollEntry = 41,
+    Kind_SurvivalComplexityEntry = 42,
 };
 
 template <typename T> struct DynamicArrayKindOf { static constexpr int value = Kind_POD; };

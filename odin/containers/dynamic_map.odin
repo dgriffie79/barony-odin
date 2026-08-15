@@ -1958,6 +1958,94 @@ ScrollEntry_t :: struct {
 }
 #assert(size_of(ScrollEntry_t) == 8)
 
+// ClassDescData_t — 200B owning. Value for MainMenu::ClassDescriptions::data
+// (unordered_map<int, DescData_t>). Mirrors MainMenu::ClassDescriptions::DescData_t.
+ClassDescData_t :: struct {
+	text:              string,
+	internal_name:     string,
+	survivalComplexity: Raw_Dynamic_Array, // of SurvivalComplexityEntry_t (32B)
+	statRatings:       Raw_Dynamic_Array, // of u32
+	statRatingsStrings: Raw_Dynamic_Array, // of string
+	hp:                i32,
+	mp:                i32,
+	linePaddings:      Raw_Dynamic_Array, // of i32
+}
+#assert(size_of(ClassDescData_t) == 200)
+
+class_desc_data_free :: proc(p: rawptr) {
+	v := (^ClassDescData_t)(p)
+	dynamic_string_free_elem(rawptr(&v.text))
+	dynamic_string_free_elem(rawptr(&v.internal_name))
+	barony_dynamic_array_elem_destroy(&v.survivalComplexity, size_of(SurvivalComplexityEntry_t), Kind_SurvivalComplexityEntry)
+	barony_dynamic_array_elem_destroy(&v.statRatings, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_destroy(&v.statRatingsStrings, size_of(string), Kind_DynamicString)
+	barony_dynamic_array_elem_destroy(&v.linePaddings, size_of(i32), Kind_POD)
+}
+class_desc_data_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^ClassDescData_t)(dst)
+	s := (^ClassDescData_t)(src)
+	d^ = ClassDescData_t{}
+	d.hp = s.hp
+	d.mp = s.mp
+	dynamic_string_copy_elem(rawptr(&d.text), rawptr(&s.text))
+	dynamic_string_copy_elem(rawptr(&d.internal_name), rawptr(&s.internal_name))
+	barony_dynamic_array_elem_copy(&d.survivalComplexity, &s.survivalComplexity, size_of(SurvivalComplexityEntry_t), Kind_SurvivalComplexityEntry)
+	barony_dynamic_array_elem_copy(&d.statRatings, &s.statRatings, size_of(u32), Kind_POD)
+	barony_dynamic_array_elem_copy(&d.statRatingsStrings, &s.statRatingsStrings, size_of(string), Kind_DynamicString)
+	barony_dynamic_array_elem_copy(&d.linePaddings, &s.linePaddings, size_of(i32), Kind_POD)
+}
+
+// RaceDescData_t — 248B owning. Value for MainMenu::RaceDescriptions::data
+// (unordered_map<string, DescData_t>). Mirrors MainMenu::RaceDescriptions::DescData_t.
+RaceDescData_t :: struct {
+	textLeft:                string,
+	textRight:               string,
+	traitLines:              map[i32]struct{},
+	proLines:                map[i32]struct{},
+	linePaddings:            Raw_Dynamic_Array, // of i32
+	title:                   string,
+	traitsBasedOnPlayerRace: string,
+	traitsBasedOnMonsterType: string,
+	resistances:             string,
+	weaknesses:              string,
+	friendlyWith:            string,
+	racialSpells:            string,
+}
+#assert(size_of(RaceDescData_t) == 248)
+
+race_desc_data_free :: proc(p: rawptr) {
+	v := (^RaceDescData_t)(p)
+	dynamic_string_free_elem(rawptr(&v.textLeft))
+	dynamic_string_free_elem(rawptr(&v.textRight))
+	dynamic_string_free_elem(rawptr(&v.title))
+	dynamic_string_free_elem(rawptr(&v.traitsBasedOnPlayerRace))
+	dynamic_string_free_elem(rawptr(&v.traitsBasedOnMonsterType))
+	dynamic_string_free_elem(rawptr(&v.resistances))
+	dynamic_string_free_elem(rawptr(&v.weaknesses))
+	dynamic_string_free_elem(rawptr(&v.friendlyWith))
+	dynamic_string_free_elem(rawptr(&v.racialSpells))
+	barony_dynamic_set_i32_destroy(&v.traitLines)
+	barony_dynamic_set_i32_destroy(&v.proLines)
+	barony_dynamic_array_elem_destroy(&v.linePaddings, size_of(i32), Kind_POD)
+}
+race_desc_data_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^RaceDescData_t)(dst)
+	s := (^RaceDescData_t)(src)
+	d^ = RaceDescData_t{}
+	dynamic_string_copy_elem(rawptr(&d.textLeft), rawptr(&s.textLeft))
+	dynamic_string_copy_elem(rawptr(&d.textRight), rawptr(&s.textRight))
+	dynamic_string_copy_elem(rawptr(&d.title), rawptr(&s.title))
+	dynamic_string_copy_elem(rawptr(&d.traitsBasedOnPlayerRace), rawptr(&s.traitsBasedOnPlayerRace))
+	dynamic_string_copy_elem(rawptr(&d.traitsBasedOnMonsterType), rawptr(&s.traitsBasedOnMonsterType))
+	dynamic_string_copy_elem(rawptr(&d.resistances), rawptr(&s.resistances))
+	dynamic_string_copy_elem(rawptr(&d.weaknesses), rawptr(&s.weaknesses))
+	dynamic_string_copy_elem(rawptr(&d.friendlyWith), rawptr(&s.friendlyWith))
+	dynamic_string_copy_elem(rawptr(&d.racialSpells), rawptr(&s.racialSpells))
+	barony_dynamic_set_i32_copy(&d.traitLines, &s.traitLines)
+	barony_dynamic_set_i32_copy(&d.proLines, &s.proLines)
+	barony_dynamic_array_elem_copy(&d.linePaddings, &s.linePaddings, size_of(i32), Kind_POD)
+}
+
 // nested map<int, map<int, ModelOffset_t>> value: deep free/copy the inner
 // map of ModelOffset_t (owning, 2 nested i32 maps each).
 i32_map_modeloffset_free :: proc(p: rawptr) {
@@ -3114,6 +3202,8 @@ Value_Kind :: enum i32 {
 	MK_ArrayMonsterStringPair = 77,
 	MK_NetworkPacket = 78,
 	MK_ScrollEntry = 79,
+	MK_ClassDescData = 80,
+	MK_RaceDescData = 81,
 }
 
 value_ops_for :: proc(kind: i32) -> Value_Ops {
@@ -3188,6 +3278,10 @@ value_ops_for :: proc(kind: i32) -> Value_Ops {
 		return Value_Ops{ free = network_packet_free, copy = network_packet_copy }
 	case .MK_ScrollEntry:
 		return Value_Ops{}
+	case .MK_ClassDescData:
+		return Value_Ops{ free = class_desc_data_free, copy = class_desc_data_copy }
+	case .MK_RaceDescData:
+		return Value_Ops{ free = race_desc_data_free, copy = race_desc_data_copy }
 	case .MK_DynArrayS32:
 		return Value_Ops{ free = dynarrs32_value_free, copy = dynarrs32_value_copy }
 	case .MK_StatueLimbArray:
@@ -3280,6 +3374,7 @@ barony_dynamic_map_str_put :: proc "c" (m: rawptr, key: string, value: rawptr, v
 	case .MK_Binding: str_map_put(m, key, value, binding_t, ops)
 	case .MK_Class: str_map_put(m, key, value, Class_t, ops)
 	case .MK_ScrollEntry: str_map_put(m, key, value, ScrollEntry_t, ops)
+	case .MK_RaceDescData: str_map_put(m, key, value, RaceDescData_t, ops)
 	case .MK_DynArrayStr: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: str_map_put(m, key, value, Raw_Dynamic_Array, ops)
@@ -3325,6 +3420,7 @@ barony_dynamic_map_str_get :: proc "c" (m: rawptr, key: string, out: rawptr, val
 	case .MK_Binding: return str_map_get(m, key, out, binding_t, ops)
 	case .MK_Class: return str_map_get(m, key, out, Class_t, ops)
 	case .MK_ScrollEntry: return str_map_get(m, key, out, ScrollEntry_t, ops)
+	case .MK_RaceDescData: return str_map_get(m, key, out, RaceDescData_t, ops)
 	case .MK_DynArrayStr: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return str_map_get(m, key, out, Raw_Dynamic_Array, ops)
@@ -3370,6 +3466,7 @@ barony_dynamic_map_str_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_Binding: return str_map_len(m, binding_t)
 	case .MK_Class: return str_map_len(m, Class_t)
 	case .MK_ScrollEntry: return str_map_len(m, ScrollEntry_t)
+	case .MK_RaceDescData: return str_map_len(m, RaceDescData_t)
 	case .MK_DynArrayStr: return str_map_len(m, Raw_Dynamic_Array)
 	case .MK_ArrayStringPair: return str_map_len(m, Raw_Dynamic_Array)
 	case .MK_DynArrayS32: return str_map_len(m, Raw_Dynamic_Array)
@@ -3416,6 +3513,7 @@ barony_dynamic_map_str_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_Binding: str_map_clear(m, binding_t, ops)
 	case .MK_Class: str_map_clear(m, Class_t, ops)
 	case .MK_ScrollEntry: str_map_clear(m, ScrollEntry_t, ops)
+	case .MK_RaceDescData: str_map_clear(m, RaceDescData_t, ops)
 	case .MK_DynArrayStr: str_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: str_map_clear(m, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: str_map_clear(m, Raw_Dynamic_Array, ops)
@@ -3461,6 +3559,7 @@ barony_dynamic_map_str_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_Binding: str_map_destroy(m, binding_t, ops)
 	case .MK_Class: str_map_destroy(m, Class_t, ops)
 	case .MK_ScrollEntry: str_map_destroy(m, ScrollEntry_t, ops)
+	case .MK_RaceDescData: str_map_destroy(m, RaceDescData_t, ops)
 	case .MK_DynArrayStr: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: str_map_destroy(m, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: str_map_destroy(m, Raw_Dynamic_Array, ops)
@@ -3505,6 +3604,7 @@ barony_dynamic_map_str_entry :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_Binding: return str_map_entry(m, key, binding_t)
 	case .MK_Class: return str_map_entry(m, key, Class_t)
 	case .MK_ScrollEntry: return str_map_entry(m, key, ScrollEntry_t)
+	case .MK_RaceDescData: return str_map_entry(m, key, RaceDescData_t)
 	case .MK_DynArrayStr: return str_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_ArrayStringPair: return str_map_entry(m, key, Raw_Dynamic_Array)
 	case .MK_DynArrayS32: return str_map_entry(m, key, Raw_Dynamic_Array)
@@ -3551,6 +3651,7 @@ barony_dynamic_map_str_entries :: proc "c" (m: rawptr, key_ptrs: [^]rawptr, key_
 	case .MK_Binding: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, binding_t, ops)
 	case .MK_Class: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Class_t, ops)
 	case .MK_ScrollEntry: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, ScrollEntry_t, ops)
+	case .MK_RaceDescData: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, RaceDescData_t, ops)
 	case .MK_DynArrayStr: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return str_map_entries(m, key_ptrs, key_lens, val_ptrs, count, Raw_Dynamic_Array, ops)
@@ -3597,6 +3698,7 @@ barony_dynamic_map_str_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_Binding: str_map_for_each(m, binding_t, f, userdata)
 	case .MK_Class: str_map_for_each(m, Class_t, f, userdata)
 	case .MK_ScrollEntry: str_map_for_each(m, ScrollEntry_t, f, userdata)
+	case .MK_RaceDescData: str_map_for_each(m, RaceDescData_t, f, userdata)
 	case .MK_DynArrayStr: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_ArrayStringPair: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
 	case .MK_DynArrayS32: str_map_for_each(m, Raw_Dynamic_Array, f, userdata)
@@ -3648,6 +3750,7 @@ barony_dynamic_map_str_erase :: proc "c" (m: rawptr, key: string, value_kind: i3
 	case .MK_Binding: return str_map_erase(m, key, binding_t, ops)
 	case .MK_Class: return str_map_erase(m, key, Class_t, ops)
 	case .MK_ScrollEntry: return str_map_erase(m, key, ScrollEntry_t, ops)
+	case .MK_RaceDescData: return str_map_erase(m, key, RaceDescData_t, ops)
 	case .MK_DynArrayStr: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return str_map_erase(m, key, Raw_Dynamic_Array, ops)
@@ -3725,6 +3828,7 @@ barony_dynamic_map_i32_put :: proc "c" (m: rawptr, key: rawptr, value: rawptr, v
 	case .MK_Setting: i32_map_put(m, key, value, Setting_t, ops)
 	case .MK_Dialogue: i32_map_put(m, key, value, Dialogue_t, ops)
 	case .MK_NetworkPacket: i32_map_put(m, key, value, NetworkPacket_t, ops)
+	case .MK_ClassDescData: i32_map_put(m, key, value, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: i32_map_put(m, key, value, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_put(m, key, value, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_put(m, key, value, map[[4]byte]IntPair_t, ops)
@@ -3783,6 +3887,7 @@ barony_dynamic_map_i32_get :: proc "c" (m: rawptr, key: rawptr, out: rawptr, val
 	case .MK_Setting: return i32_map_get(m, key, out, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_get(m, key, out, Dialogue_t, ops)
 	case .MK_NetworkPacket: return i32_map_get(m, key, out, NetworkPacket_t, ops)
+	case .MK_ClassDescData: return i32_map_get(m, key, out, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_get(m, key, out, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_get(m, key, out, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_get(m, key, out, map[[4]byte]IntPair_t, ops)
@@ -3841,6 +3946,7 @@ barony_dynamic_map_i32_len :: proc "c" (m: rawptr, value_kind: i32) -> i32 {
 	case .MK_Setting: return i32_map_len(m, Setting_t)
 	case .MK_Dialogue: return i32_map_len(m, Dialogue_t)
 	case .MK_NetworkPacket: return i32_map_len(m, NetworkPacket_t)
+	case .MK_ClassDescData: return i32_map_len(m, ClassDescData_t)
 	case .MK_I32MapModelOffset: return i32_map_len(m, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_len(m, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_len(m, map[[4]byte]IntPair_t)
@@ -3900,6 +4006,7 @@ barony_dynamic_map_i32_clear :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_Setting: i32_map_clear(m, Setting_t, ops)
 	case .MK_Dialogue: i32_map_clear(m, Dialogue_t, ops)
 	case .MK_NetworkPacket: i32_map_clear(m, NetworkPacket_t, ops)
+	case .MK_ClassDescData: i32_map_clear(m, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: i32_map_clear(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_clear(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_clear(m, map[[4]byte]IntPair_t, ops)
@@ -3958,6 +4065,7 @@ barony_dynamic_map_i32_destroy :: proc "c" (m: rawptr, value_kind: i32) {
 	case .MK_Setting: i32_map_destroy(m, Setting_t, ops)
 	case .MK_Dialogue: i32_map_destroy(m, Dialogue_t, ops)
 	case .MK_NetworkPacket: i32_map_destroy(m, NetworkPacket_t, ops)
+	case .MK_ClassDescData: i32_map_destroy(m, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: i32_map_destroy(m, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: i32_map_destroy(m, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: i32_map_destroy(m, map[[4]byte]IntPair_t, ops)
@@ -4015,6 +4123,7 @@ barony_dynamic_map_i32_entry :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_Setting: return i32_map_entry(m, key, Setting_t)
 	case .MK_Dialogue: return i32_map_entry(m, key, Dialogue_t)
 	case .MK_NetworkPacket: return i32_map_entry(m, key, NetworkPacket_t)
+	case .MK_ClassDescData: return i32_map_entry(m, key, ClassDescData_t)
 	case .MK_I32MapModelOffset: return i32_map_entry(m, key, map[[4]byte]ModelOffset_t)
 	case .MK_StrI32Map: return i32_map_entry(m, key, map[string]map[[4]byte]i32)
 	case .MK_I32MapIntPair: return i32_map_entry(m, key, map[[4]byte]IntPair_t)
@@ -4074,6 +4183,7 @@ barony_dynamic_map_i32_entries :: proc "c" (m: rawptr, key_ptrs: [^][4]byte, val
 	case .MK_Setting: return i32_map_entries(m, key_ptrs, val_ptrs, count, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_entries(m, key_ptrs, val_ptrs, count, Dialogue_t, ops)
 	case .MK_NetworkPacket: return i32_map_entries(m, key_ptrs, val_ptrs, count, NetworkPacket_t, ops)
+	case .MK_ClassDescData: return i32_map_entries(m, key_ptrs, val_ptrs, count, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_entries(m, key_ptrs, val_ptrs, count, map[[4]byte]IntPair_t, ops)
@@ -4133,6 +4243,7 @@ barony_dynamic_map_i32_for_each :: proc "c" (m: rawptr, value_kind: i32, cb: raw
 	case .MK_Setting: i32_map_for_each(m, Setting_t, f, userdata)
 	case .MK_Dialogue: i32_map_for_each(m, Dialogue_t, f, userdata)
 	case .MK_NetworkPacket: i32_map_for_each(m, NetworkPacket_t, f, userdata)
+	case .MK_ClassDescData: i32_map_for_each(m, ClassDescData_t, f, userdata)
 	case .MK_I32MapModelOffset: i32_map_for_each(m, map[[4]byte]ModelOffset_t, f, userdata)
 	case .MK_StrI32Map: i32_map_for_each(m, map[string]map[[4]byte]i32, f, userdata)
 	case .MK_I32MapIntPair: i32_map_for_each(m, map[[4]byte]IntPair_t, f, userdata)
@@ -4191,6 +4302,7 @@ barony_dynamic_map_i32_erase :: proc "c" (m: rawptr, key: rawptr, value_kind: i3
 	case .MK_Setting: return i32_map_erase(m, key, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_erase(m, key, Dialogue_t, ops)
 	case .MK_NetworkPacket: return i32_map_erase(m, key, NetworkPacket_t, ops)
+	case .MK_ClassDescData: return i32_map_erase(m, key, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_erase(m, key, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_erase(m, key, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_erase(m, key, map[[4]byte]IntPair_t, ops)
@@ -4259,6 +4371,7 @@ barony_dynamic_map_str_find :: proc "c" (m: rawptr, key: string, out_key: ^rawpt
 	case .MK_Binding: return str_map_find(m, key, out_key, out_key_len, out_val, binding_t, ops)
 	case .MK_Class: return str_map_find(m, key, out_key, out_key_len, out_val, Class_t, ops)
 	case .MK_ScrollEntry: return str_map_find(m, key, out_key, out_key_len, out_val, ScrollEntry_t, ops)
+	case .MK_RaceDescData: return str_map_find(m, key, out_key, out_key_len, out_val, RaceDescData_t, ops)
 	case .MK_DynArrayStr: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	case .MK_ArrayStringPair: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
 	case .MK_DynArrayS32: return str_map_find(m, key, out_key, out_key_len, out_val, Raw_Dynamic_Array, ops)
@@ -4334,6 +4447,7 @@ barony_dynamic_map_i32_find :: proc "c" (m: rawptr, key: rawptr, out_val: rawptr
 	case .MK_Setting: return i32_map_find(m, key, out_val, out_val_len, Setting_t, ops)
 	case .MK_Dialogue: return i32_map_find(m, key, out_val, out_val_len, Dialogue_t, ops)
 	case .MK_NetworkPacket: return i32_map_find(m, key, out_val, out_val_len, NetworkPacket_t, ops)
+	case .MK_ClassDescData: return i32_map_find(m, key, out_val, out_val_len, ClassDescData_t, ops)
 	case .MK_I32MapModelOffset: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]ModelOffset_t, ops)
 	case .MK_StrI32Map: return i32_map_find(m, key, out_val, out_val_len, map[string]map[[4]byte]i32, ops)
 	case .MK_I32MapIntPair: return i32_map_find(m, key, out_val, out_val_len, map[[4]byte]IntPair_t, ops)
