@@ -229,8 +229,6 @@ Animated_Tile :: struct {
 	indices: [8]i32,
 }
 
-// forward decl (class Entity in main.hpp)
-Entity :: struct{}
 
 // ---------------------------------------------------------------------------
 // Layout parity checks (C++ sizeof from the real headers, verified by probe)

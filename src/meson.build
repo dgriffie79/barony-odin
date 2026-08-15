@@ -365,6 +365,7 @@ if host_system == 'windows'
         odin_root / 'light.odin',
         odin_root / 'stat.odin',
         odin_root / 'items.odin',
+        odin_root / 'entity.odin',
         odin_root / 'game.odin',
         odin_root / 'prng.odin',
         odin_root / 'containers' / 'dynamic_array.odin',
