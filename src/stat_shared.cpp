@@ -18,35 +18,15 @@ See LICENSE for details.
 #include "prng.hpp"
 
 // Constructor
-Stat::Stat(Sint32 sprite) :
-	sneaking(MISC_FLAGS[1]),
-	allyItemPickup(MISC_FLAGS[2]),
-	allyClass(MISC_FLAGS[3]),
-	playerRace(MISC_FLAGS[4]),
-	playerPolymorphStorage(MISC_FLAGS[5]),
-	playerSummonLVLHP(MISC_FLAGS[6]),
-	playerSummonSTRDEXCONINT(MISC_FLAGS[7]),
-	playerSummonPERCHR(MISC_FLAGS[8]),
-	playerSummon2LVLHP(MISC_FLAGS[9]),
-	playerSummon2STRDEXCONINT(MISC_FLAGS[10]),
-	playerSummon2PERCHR(MISC_FLAGS[11]),
-	monsterIsCharmed(MISC_FLAGS[12]),
-	playerShapeshiftStorage(MISC_FLAGS[13]),
-	monsterTinkeringStatus(MISC_FLAGS[14]),
-	monsterMimicLockedBy(MISC_FLAGS[14]),
-	monsterDemonHasBeenExorcised(MISC_FLAGS[15]),
-	bleedInflictedBy(MISC_FLAGS[17]),
-	burningInflictedBy(MISC_FLAGS[18]),
-	monsterNoDropItems(MISC_FLAGS[19]),
-	monsterForceAllegiance(MISC_FLAGS[20])
+Stat::Stat(Sint32 sprite)
 {
 	this->type = NOTHING;
 	strcpy(this->name, "");
 	strcpy(this->obituary, Language::get(1500));
 	this->defending = false;
 	this->poisonKiller = 0;
-	this->burningInflictedBy = 0;
-	this->bleedInflictedBy = 0;
+	this->burningInflictedBy() = 0;
+	this->bleedInflictedBy() = 0;
 	this->killer = KilledBy::UNKNOWN;
 	this->killer_monster = NOTHING;
 	this->killer_uid = 0;
@@ -1257,7 +1237,7 @@ void setDefaultMonsterStats(Stat* stats, int sprite)
 			stats->CHR = 0;
 			stats->EXP = 0;
 			stats->LVL = 3;
-			stats->monsterTinkeringStatus = DECREPIT; // store the type of item that was used to summon me.
+			stats->monsterTinkeringStatus() = DECREPIT; // store the type of item that was used to summon me.
 			break;
 		case 165:
 		case (1000 + DUMMYBOT):
@@ -1274,7 +1254,7 @@ void setDefaultMonsterStats(Stat* stats, int sprite)
 			stats->CHR = 0;
 			stats->EXP = 0;
 			stats->LVL = 3;
-			stats->monsterTinkeringStatus = DECREPIT; // store the type of item that was used to summon me.
+			stats->monsterTinkeringStatus() = DECREPIT; // store the type of item that was used to summon me.
 			break;
 		case 166:
 		case (1000 + GYROBOT):
@@ -1288,7 +1268,7 @@ void setDefaultMonsterStats(Stat* stats, int sprite)
 			stats->CHR = 0;
 			stats->EXP = 0;
 			stats->LVL = 1;
-			stats->monsterTinkeringStatus = DECREPIT; // store the type of item that was used to summon me.
+			stats->monsterTinkeringStatus() = DECREPIT; // store the type of item that was used to summon me.
 			break;
 		case (1000 + MIMIC):
 			stats->type = MIMIC;

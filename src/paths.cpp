@@ -341,11 +341,11 @@ int pathCheckObstacle(int x, int y, Entity* my, Entity* target)
 		{
 			if ( (int)floor(entity->x / 16) == u && (int)floor(entity->y / 16) == v )
 			{
-				if ( entity->colliderHasCollision != 0 || entity->colliderDiggable != 0 )
+				if ( entity->colliderHasCollision() != 0 || entity->colliderDiggable() != 0 )
 				{
 					return 1;
 				}
-				auto find = EditorEntityData_t::colliderData.find(entity->colliderDamageTypes);
+				auto find = EditorEntityData_t::colliderData.find(entity->colliderDamageTypes());
 				if ( find != EditorEntityData_t::colliderData.end() )
 				{
 					auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[find->second.damageCalculationType];
@@ -629,7 +629,7 @@ list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target,
 		}
 		if ( entity->behavior == &actDoorFrame 
 			|| entity->behavior == &actDoor 
-			|| (entity->behavior == &actIronDoor && (entity->doorLocked == 0))
+			|| (entity->behavior == &actIronDoor && (entity->doorLocked() == 0))
 			|| entity->behavior == &actMagicMissile )
 		{
 			continue;
@@ -649,7 +649,7 @@ list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target,
 		{
 			continue;
 		}
-		if ( entity->behavior == &actPlayer && my->monsterAllyIndex >= 0 
+		if ( entity->behavior == &actPlayer && my->monsterAllyIndex() >= 0 
 			/*&& (my->monsterTarget == 0 || my->monsterAllyState == ALLY_STATE_MOVETO)*/ )
 		{
 			continue;
@@ -675,13 +675,13 @@ list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target,
 				|| entity->behavior == &::actDaedalusShrine
 				|| entity->behavior == &actIronDoor
 				|| (entity->isDamageableCollider()
-				&& (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))))
+				&& (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))))
 		{
 			// minotaurs bust through boulders, not an obstacle
 			continue;
 		}
 		else if ( (my && my->behavior == &actMonster) && entity->isDamageableCollider()
-			&& (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC))
+			&& (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC))
 		{
 			if ( *cvar_pathing_collider_npc )
 			{
@@ -1285,7 +1285,7 @@ bool isPathObstacle(Entity* entity)
 	{
 		return true;
 	}
-	else if ( entity->behavior == &actColliderDecoration && entity->colliderHasCollision != 0
+	else if ( entity->behavior == &actColliderDecoration && entity->colliderHasCollision() != 0
 		&& !entity->isDamageableCollider() )
 	{
 		return true;

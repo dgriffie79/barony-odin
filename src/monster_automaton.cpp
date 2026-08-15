@@ -49,7 +49,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	        {
 	            my->sprite = 1007;
 	        }
-			if ( my->monsterStoreType == 1 )
+			if ( my->monsterStoreType() == 1 )
 			{
 				strcpy(myStats->name, "damaged automaton");
 			}
@@ -410,7 +410,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[AUTOMATON][6][0]; // 2.5
 	entity->focaly = limbs[AUTOMATON][6][1]; // 0
 	entity->focalz = limbs[AUTOMATON][6][2]; // 0
@@ -432,7 +432,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[AUTOMATON][7][0]; // 2
 	entity->focaly = limbs[AUTOMATON][7][1]; // 0
 	entity->focalz = limbs[AUTOMATON][7][2]; // 0
@@ -456,7 +456,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[AUTOMATON][8][0]; // 0
 	entity->focaly = limbs[AUTOMATON][8][1]; // 0
 	entity->focalz = limbs[AUTOMATON][8][2]; // 4
@@ -480,7 +480,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[AUTOMATON][9][0]; // 0
 	entity->focaly = limbs[AUTOMATON][9][1]; // 0
 	entity->focalz = limbs[AUTOMATON][9][2]; // -2
@@ -501,7 +501,7 @@ void initAutomaton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[AUTOMATON][10][0]; // 0
 	entity->focaly = limbs[AUTOMATON][10][1]; // 0
 	entity->focalz = limbs[AUTOMATON][10][2]; // .5
@@ -642,15 +642,15 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 		// sleeping
 		if ( myStats->getEffectActive(EFF_ASLEEP) 
-			&& (my->monsterSpecialState != AUTOMATON_MALFUNCTION_START && my->monsterSpecialState != AUTOMATON_MALFUNCTION_RUN) )
+			&& (my->monsterSpecialState() != AUTOMATON_MALFUNCTION_START && my->monsterSpecialState() != AUTOMATON_MALFUNCTION_RUN) )
 		{
 			my->z = 2;
 			my->pitch = PI / 4;
 		}
 		else
 		{
-			if ( my->monsterSpecialState != AUTOMATON_MALFUNCTION_START 
-				&& my->monsterSpecialState != AUTOMATON_MALFUNCTION_RUN )
+			if ( my->monsterSpecialState() != AUTOMATON_MALFUNCTION_START 
+				&& my->monsterSpecialState() != AUTOMATON_MALFUNCTION_RUN )
 			{
 				my->z = -.5;
 				my->pitch = 0;
@@ -663,8 +663,8 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						// threshold for boom boom
 						if ( local_rng.rand() % 4 > 0 ) // 3/4
 						{
-							my->monsterSpecialState = AUTOMATON_MALFUNCTION_START;
-							my->monsterSpecialTimer = MONSTER_SPECIAL_COOLDOWN_AUTOMATON_MALFUNCTION;
+							my->monsterSpecialState() = AUTOMATON_MALFUNCTION_START;
+							my->monsterSpecialTimer() = MONSTER_SPECIAL_COOLDOWN_AUTOMATON_MALFUNCTION;
 							serverUpdateEntitySkill(my, 33);
 
 							myStats->setEffectActive(EFF_PARALYZED, 1);
@@ -686,18 +686,18 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			}
 		}
 
-		if ( my->monsterSpecialState != AUTOMATON_MALFUNCTION_START
-			&& my->monsterSpecialState != AUTOMATON_MALFUNCTION_RUN )
+		if ( my->monsterSpecialState() != AUTOMATON_MALFUNCTION_START
+			&& my->monsterSpecialState() != AUTOMATON_MALFUNCTION_RUN )
 		{
 			my->creatureHandleLiftZ();
 		}
 	}
 
-	if ( my->monsterSpecialState == AUTOMATON_MALFUNCTION_START || my->monsterSpecialState == AUTOMATON_MALFUNCTION_RUN )
+	if ( my->monsterSpecialState() == AUTOMATON_MALFUNCTION_START || my->monsterSpecialState() == AUTOMATON_MALFUNCTION_RUN )
 	{
-		if ( my->monsterSpecialState == AUTOMATON_MALFUNCTION_START )
+		if ( my->monsterSpecialState() == AUTOMATON_MALFUNCTION_START )
 		{
-			my->monsterSpecialState = AUTOMATON_MALFUNCTION_RUN;
+			my->monsterSpecialState() = AUTOMATON_MALFUNCTION_RUN;
 			createParticleExplosionCharge(my, 174, 100, 0.1);
 
 			if ( multiplayer != CLIENT && my->monsterCanTradeWith(-1) )
@@ -723,7 +723,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		}
 		if ( multiplayer != CLIENT )
 		{
-			if ( my->monsterSpecialTimer <= 0 )
+			if ( my->monsterSpecialTimer() <= 0 )
 			{
 				my->attack(MONSTER_POSE_AUTOMATON_MALFUNCTION, 0, my);
 				spawnExplosion(my->x, my->y, my->z);
@@ -746,14 +746,14 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			if ( multiplayer != CLIENT )
 			{
-				if ( bodypart == 0 && my->monsterSpecialState == AUTOMATON_MALFUNCTION_RUN  )
+				if ( bodypart == 0 && my->monsterSpecialState() == AUTOMATON_MALFUNCTION_RUN  )
 				{
-					--my->monsterSpecialTimer;
-					if ( my->monsterSpecialTimer == 100 )
+					--my->monsterSpecialTimer();
+					if ( my->monsterSpecialTimer() == 100 )
 					{
 						playSoundEntity(my, 321, 128);
 					}
-					if ( my->monsterSpecialTimer < 80 )
+					if ( my->monsterSpecialTimer() < 80 )
 					{
 						my->z += 0.02;
 						limbAnimateToLimit(my, ANIMATE_PITCH, 0.1, 0.7, true, 0.1);
@@ -769,7 +769,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		entity = (Entity*)node->element;
 		entity->x = my->x;
 		entity->y = my->y;
-		if ( my->monsterSpecialState != AUTOMATON_MALFUNCTION_START && my->monsterSpecialState != AUTOMATON_MALFUNCTION_RUN )
+		if ( my->monsterSpecialState() != AUTOMATON_MALFUNCTION_START && my->monsterSpecialState() != AUTOMATON_MALFUNCTION_RUN )
 		{
 			entity->z = my->z;
 		}
@@ -796,7 +796,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 		if ( bodypart == LIMB_HUMANOID_RIGHTLEG || bodypart == LIMB_HUMANOID_LEFTARM )
 		{
-			if ( bodypart == LIMB_HUMANOID_LEFTARM && my->monsterSpecialState == AUTOMATON_MALFUNCTION_RUN )
+			if ( bodypart == LIMB_HUMANOID_LEFTARM && my->monsterSpecialState() == AUTOMATON_MALFUNCTION_RUN )
 			{
 				limbAnimateToLimit(entity, ANIMATE_PITCH, -0.1, 13 * PI / 8, true, 0.1);
 			}
@@ -813,7 +813,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				weaponarm = entity;
 				if ( MONSTER_ATTACK > 0 )
 				{
-					if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+					if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 					{
 						Entity* rightbody = nullptr;
 						// set rightbody to left leg.
@@ -828,11 +828,11 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 
 						// magic wiggle hands
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->pitch = 0;
 							weaponarm->yaw = my->yaw;
@@ -854,7 +854,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						double animationPitchSetpoint = 0.f;
 						double animationPitchEndpoint = 0.f;
 
-						switch ( my->monsterSpellAnimation )
+						switch ( my->monsterSpellAnimation() )
 						{
 							case MONSTER_SPELLCAST_HUMANOID:
 								animationYawSetpoint = normaliseAngle2PI(my->yaw + 1 * PI / 8);
@@ -888,16 +888,16 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							}
 						}
 
-						if ( my->monsterAttackTime >= 3 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 3 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							weaponarm->skill[0] = rightbody->skill[0];
 							weaponarm->pitch = rightbody->pitch;
-							my->monsterArmbended = 0;
-							my->monsterAttack = 0;
+							my->monsterArmbended() = 0;
+							my->monsterAttack() = 0;
 							if ( multiplayer != CLIENT )
 							{
 								spawnMagicEffectParticles(my->x, my->y, my->z / 2, 174);
-								my->monsterSpecialState = AUTOMATON_RECYCLE_ANIMATION_COMPLETE;
+								my->monsterSpecialState() = AUTOMATON_RECYCLE_ANIMATION_COMPLETE;
 							}
 						}
 					}
@@ -912,7 +912,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				entity->pitch = entity->fskill[0];
 			}
 
-			if ( bodypart == LIMB_HUMANOID_RIGHTARM && my->monsterSpecialState == AUTOMATON_MALFUNCTION_RUN )
+			if ( bodypart == LIMB_HUMANOID_RIGHTARM && my->monsterSpecialState() == AUTOMATON_MALFUNCTION_RUN )
 			{
 				limbAnimateToLimit(entity, ANIMATE_PITCH, -0.1, 13 * PI / 8, true, 0.1);
 			}
@@ -1068,7 +1068,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack == 0) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack() == 0) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[AUTOMATON][4][0]; // 0
@@ -1115,7 +1115,7 @@ void automatonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, AUTOMATON, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1476,7 +1476,7 @@ bool Entity::automatonCanWieldItem(const Item& item) const
 		return false;
 	}
 
-	if ( monsterAllyIndex >= 0 && (monsterAllyClass != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
+	if ( monsterAllyIndex() >= 0 && (monsterAllyClass() != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
 	{
 		return monsterAllyEquipmentInClass(item);
 	}
@@ -1525,7 +1525,7 @@ void Entity::automatonRecycleItem()
 		return;
 	}
 
-	if ( this->monsterSpecialTimer > 0 && !(this->monsterSpecialState == AUTOMATON_RECYCLE_ANIMATION_COMPLETE) )
+	if ( this->monsterSpecialTimer() > 0 && !(this->monsterSpecialState() == AUTOMATON_RECYCLE_ANIMATION_COMPLETE) )
 	{
 		// if we're on cooldown, skip checking
 		// also we need the callback from my->attack() to set monsterSpecialState = AUTOMATON_RECYCLE_ANIMATION_COMPLETE once the animation completes.
@@ -1541,10 +1541,10 @@ void Entity::automatonRecycleItem()
 		return;
 	}
 
-	if ( this->monsterSpecialTimer == 0 && this->monsterSpecialState == AUTOMATON_RECYCLE_ANIMATION_WAITING )
+	if ( this->monsterSpecialTimer() == 0 && this->monsterSpecialState() == AUTOMATON_RECYCLE_ANIMATION_WAITING )
 	{
 		// put the skill on cooldown.
-		this->monsterSpecialTimer = MONSTER_SPECIAL_COOLDOWN_AUTOMATON_RECYCLE;
+		this->monsterSpecialTimer() = MONSTER_SPECIAL_COOLDOWN_AUTOMATON_RECYCLE;
 	}
 
 	int i = 0;
@@ -1581,18 +1581,18 @@ void Entity::automatonRecycleItem()
 
 	if ( matches < 2 ) // not enough valid items found.
 	{
-		this->monsterSpecialTimer = 250; // reset cooldown to 5 seconds to check again quicker.
+		this->monsterSpecialTimer() = 250; // reset cooldown to 5 seconds to check again quicker.
 		return;
 	}
 	
-	if ( this->monsterSpecialState == AUTOMATON_RECYCLE_ANIMATION_WAITING )
+	if ( this->monsterSpecialState() == AUTOMATON_RECYCLE_ANIMATION_WAITING )
 	{
 		// this is the first run of the check, we'll execute the casting animation and wait for this to be set to 1 when it ends.
 		this->attack(MONSTER_POSE_SPECIAL_WINDUP1, 0, nullptr);
 		return;
 	}
 
-	this->monsterSpecialState = AUTOMATON_RECYCLE_ANIMATION_WAITING; // reset my special state after the previous lines.
+	this->monsterSpecialState() = AUTOMATON_RECYCLE_ANIMATION_WAITING; // reset my special state after the previous lines.
 	int pickItem1 = local_rng.rand() % matches; // pick random valid item index in inventory
 	int pickItem2 = local_rng.rand() % matches;
 	while ( pickItem2 == pickItem1 )

@@ -848,7 +848,7 @@ static void demo_record(const char* filename) {
     demo_file->write(&uniqueGameKey, sizeof(uniqueGameKey), 1);
 
     // write player stats
-    demo_file->write(&stats[clientnum]->playerRace, sizeof(Stat::playerRace), 1);
+    demo_file->write(&stats[clientnum]->playerRace(), sizeof(stats[clientnum]->playerRace()), 1);
     demo_file->write(&stats[clientnum]->sex, sizeof(Stat::sex), 1);
     demo_file->write(&stats[clientnum]->stat_appearance, sizeof(Stat::stat_appearance), 1);
     demo_file->write(&client_classes[clientnum], sizeof(client_classes[clientnum]), 1);
@@ -897,7 +897,7 @@ static void demo_play(const char* filename) {
     net_rng.seedBytes(&uniqueGameKey, sizeof(uniqueGameKey));
 
     // read player stats
-    demo_file->read(&stats[clientnum]->playerRace, sizeof(Stat::playerRace), 1);
+    demo_file->read(&stats[clientnum]->playerRace(), sizeof(stats[clientnum]->playerRace()), 1);
     demo_file->read(&stats[clientnum]->sex, sizeof(Stat::sex), 1);
     demo_file->read(&stats[clientnum]->stat_appearance, sizeof(Stat::stat_appearance), 1);
     demo_file->read(&client_classes[clientnum], sizeof(client_classes[clientnum]), 1);
@@ -1596,16 +1596,16 @@ void gameLogic(void)
 
 									if ( followerCount >= 4 && !(achievementObserver.playerAchievements[c].caughtInAMosh) )
 									{
-										if ( follower->monsterTarget != 0 
-											&& (follower->monsterState == MONSTER_STATE_ATTACK || follower->monsterState == MONSTER_STATE_HUNT) &&
+										if ( follower->monsterTarget() != 0 
+											&& (follower->monsterState() == MONSTER_STATE_ATTACK || follower->monsterState() == MONSTER_STATE_HUNT) &&
 											(followerStats->type == SENTRYBOT || followerStats->type == SPELLBOT) )
 										{
-											auto it = achievementObserver.playerAchievements[c].caughtInAMoshTargets.find(follower->monsterTarget);
+											auto it = achievementObserver.playerAchievements[c].caughtInAMoshTargets.find(follower->monsterTarget());
 											if ( it != achievementObserver.playerAchievements[c].caughtInAMoshTargets.end() )
 											{
 												// key exists.
-												achievementObserver.playerAchievements[c].caughtInAMoshTargets[follower->monsterTarget] += 1; // increase value
-												if ( achievementObserver.playerAchievements[c].caughtInAMoshTargets[follower->monsterTarget] >= 4 )
+												achievementObserver.playerAchievements[c].caughtInAMoshTargets[follower->monsterTarget()] += 1; // increase value
+												if ( achievementObserver.playerAchievements[c].caughtInAMoshTargets[follower->monsterTarget()] >= 4 )
 												{
 													achievementObserver.awardAchievement(c, AchievementObserver::BARONY_ACH_CAUGHT_IN_A_MOSH);
 													achievementObserver.playerAchievements[c].caughtInAMosh = true;
@@ -1613,7 +1613,7 @@ void gameLogic(void)
 											}
 											else
 											{
-												achievementObserver.playerAchievements[c].caughtInAMoshTargets.put(static_cast<Uint32>(follower->monsterTarget), 1);
+												achievementObserver.playerAchievements[c].caughtInAMoshTargets.put(static_cast<Uint32>(follower->monsterTarget()), 1);
 											}
 										}
 									}
@@ -1817,7 +1817,7 @@ void gameLogic(void)
 							if ( debugMonsterTimer )
 							{
 								auto t2 = std::chrono::high_resolution_clock::now();
-								//printlog("%d: %d %f", entity->sprite, entity->monsterState,
+								//printlog("%d: %d %f", entity->sprite, entity->monsterState(),
 								//	1000 * std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t).count());
 								accum += 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t).count();
 								entityAccum[entity->sprite] += 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t).count();
@@ -1858,7 +1858,7 @@ void gameLogic(void)
 						entity->flags[NOUPDATE] = true;
 						if ( entity->behavior == &actGoldBag )
 						{
-							totalFloorGold += entity->goldAmount;
+							totalFloorGold += entity->goldAmount();
 						}
 						else if ( entity->behavior == &actItem )
 						{
@@ -2022,7 +2022,7 @@ void gameLogic(void)
 							if ( follower )
 							{
 								Stat* followerStats = follower->getStats();
-								if ( (int)follower->monsterSpecialAttackUnequipSafeguard > 0 )
+								if ( (int)follower->monsterSpecialAttackUnequipSafeguard() > 0 )
 								{
 									// force deinit of special attacks to not be invalid state on next level.
 									//messagePlayer(0, MESSAGE_DEBUG, "Cleared monster special");
@@ -2391,19 +2391,19 @@ void gameLogic(void)
 					{
 						if (players[c] && players[c]->entity && !client_disconnected[c])
 						{
-							if ( stats[c] && stats[c]->getEffectActive(EFF_POLYMORPH) && stats[c]->playerPolymorphStorage != NOTHING )
+							if ( stats[c] && stats[c]->getEffectActive(EFF_POLYMORPH) && stats[c]->playerPolymorphStorage() != NOTHING )
 							{
-								players[c]->entity->effectPolymorph = stats[c]->playerPolymorphStorage;
+								players[c]->entity->effectPolymorph() = stats[c]->playerPolymorphStorage();
 								serverUpdateEntitySkill(players[c]->entity, 50); // update visual polymorph effect for clients.
 							}
-							if ( stats[c] && stats[c]->getEffectActive(EFF_SHAPESHIFT) && stats[c]->playerShapeshiftStorage != NOTHING )
+							if ( stats[c] && stats[c]->getEffectActive(EFF_SHAPESHIFT) && stats[c]->playerShapeshiftStorage() != NOTHING )
 							{
-								players[c]->entity->effectShapeshift = stats[c]->playerShapeshiftStorage;
+								players[c]->entity->effectShapeshift() = stats[c]->playerShapeshiftStorage();
 								serverUpdateEntitySkill(players[c]->entity, 53); // update visual polymorph effect for clients.
 							}
 							if ( stats[c] && stats[c]->getEffectActive(EFF_VAMPIRICAURA) && stats[c]->EFFECTS_TIMERS[EFF_VAMPIRICAURA] == -2 )
 							{
-								players[c]->entity->playerVampireCurse = 1;
+								players[c]->entity->playerVampireCurse() = 1;
 								serverUpdateEntitySkill(players[c]->entity, 51); // update curse progression
 							}
 
@@ -2457,7 +2457,7 @@ void gameLogic(void)
 									/*if (!monsterally[HUMAN][monsterStats->type])
 									{
 									}*/
-									monster->monsterAllyIndex = c;
+									monster->monsterAllyIndex() = c;
 									if ( multiplayer == SERVER )
 									{
 										serverUpdateEntitySkill(monster, 42); // update monsterAllyIndex for clients.
@@ -2465,19 +2465,19 @@ void gameLogic(void)
 
 									if ( multiplayer != CLIENT )
 									{
-										monster->monsterAllyClass = monsterStats->allyClass;
-										monster->monsterAllyPickupItems = monsterStats->allyItemPickup;
-										if ( stats[c]->playerSummonPERCHR != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton knight") )
+										monster->monsterAllyClass() = monsterStats->allyClass();
+										monster->monsterAllyPickupItems() = monsterStats->allyItemPickup();
+										if ( stats[c]->playerSummonPERCHR() != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton knight") )
 										{
-											monster->monsterAllySummonRank = (stats[c]->playerSummonPERCHR & 0x0000FF00) >> 8;
+											monster->monsterAllySummonRank() = (stats[c]->playerSummonPERCHR() & 0x0000FF00) >> 8;
 										}
-										else if ( stats[c]->playerSummon2PERCHR != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton sentinel") )
+										else if ( stats[c]->playerSummon2PERCHR() != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton sentinel") )
 										{
-											monster->monsterAllySummonRank = (stats[c]->playerSummon2PERCHR & 0x0000FF00) >> 8;
+											monster->monsterAllySummonRank() = (stats[c]->playerSummon2PERCHR() & 0x0000FF00) >> 8;
 										}
 										else if ( monsterStats->getAttribute("SUMMONED_CREATURE") != "" )
 										{
-											monster->monsterAllySummonRank = std::stoi(monsterStats->getAttribute("SUMMONED_CREATURE"));
+											monster->monsterAllySummonRank() = std::stoi(monsterStats->getAttribute("SUMMONED_CREATURE"));
 										}
 										serverUpdateEntitySkill(monster, 46); // update monsterAllyClass
 										serverUpdateEntitySkill(monster, 44); // update monsterAllyPickupItems
@@ -2575,7 +2575,7 @@ void gameLogic(void)
 											int appearance = monsterTinkeringConvertHPToAppearance(tempStats);
 											if ( type != WOODEN_SHIELD )
 											{
-												Item* item = newItem(type, static_cast<Status>(tempStats->monsterTinkeringStatus),
+												Item* item = newItem(type, static_cast<Status>(tempStats->monsterTinkeringStatus()),
 													0, 1, appearance, true, &gyroStats->inventory);
 											}
 										}
@@ -2594,7 +2594,7 @@ void gameLogic(void)
 
 						if ( c == clientnum && !playerDied[c] )
 						{
-							if ( stats[c]->type == MYCONID && stats[c]->playerRace == RACE_MYCONID && stats[c]->stat_appearance == 0
+							if ( stats[c]->type == MYCONID && stats[c]->playerRace() == RACE_MYCONID && stats[c]->stat_appearance == 0
 								&& stats[c]->helmet && gameStatistics[STATISTICS_NO_CAP] >= 0 )
 							{
 								gameStatistics[STATISTICS_NO_CAP]++;
@@ -2604,8 +2604,8 @@ void gameLogic(void)
 								}
 							}
 							if ( stats[c]->getEffectActive(EFF_GROWTH) >= 2
-								&& ((stats[c]->type == MYCONID && stats[c]->playerRace == RACE_MYCONID)
-									|| (stats[c]->type == DRYAD && stats[c]->playerRace == RACE_DRYAD)) && stats[c]->stat_appearance == 0
+								&& ((stats[c]->type == MYCONID && stats[c]->playerRace() == RACE_MYCONID)
+									|| (stats[c]->type == DRYAD && stats[c]->playerRace() == RACE_DRYAD)) && stats[c]->stat_appearance == 0
 								&& !stats[c]->helmet && gameStatistics[STATISTICS_DONT_TOUCH_HAIR] >= 0 )
 							{
 								gameStatistics[STATISTICS_DONT_TOUCH_HAIR]++;
@@ -2614,7 +2614,7 @@ void gameLogic(void)
 									steamAchievement("BARONY_ACH_DONT_TOUCH_HAIR");
 								}
 							}
-							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace == RACE_SALAMANDER && stats[c]->stat_appearance == 0
+							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace() == RACE_SALAMANDER && stats[c]->stat_appearance == 0
 								&& stats[c]->getEffectActive(EFF_SALAMANDER_HEART) >= 3 && stats[c]->getEffectActive(EFF_SALAMANDER_HEART) <= 4
 								&& gameStatistics[STATISTICS_GARGOYLES_QUEST] >= 0 )
 							{
@@ -2624,7 +2624,7 @@ void gameLogic(void)
 									steamAchievement("BARONY_ACH_GARGOYLES_QUEST");
 								}
 							}
-							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace == RACE_SALAMANDER && stats[c]->stat_appearance == 0
+							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace() == RACE_SALAMANDER && stats[c]->stat_appearance == 0
 								&& stats[c]->getEffectActive(EFF_SALAMANDER_HEART) >= 1 && stats[c]->getEffectActive(EFF_SALAMANDER_HEART) <= 2
 								&& gameStatistics[STATISTICS_FIRE_FIGHTER] >= 0 )
 							{
@@ -2634,7 +2634,7 @@ void gameLogic(void)
 									steamAchievement("BARONY_ACH_FIRE_FIGHTER");
 								}
 							}
-							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace == RACE_SALAMANDER && stats[c]->stat_appearance == 0
+							if ( stats[c]->type == SALAMANDER && stats[c]->playerRace() == RACE_SALAMANDER && stats[c]->stat_appearance == 0
 								&& !stats[c]->getEffectActive(EFF_SALAMANDER_HEART)
 								&& gameStatistics[STATISTICS_DISCIPLINE] >= 0 )
 							{
@@ -3002,7 +3002,7 @@ void gameLogic(void)
 						}
 					}
 
-					if ( item->type == FOOD_BLOOD && stats[player]->playerRace == RACE_VAMPIRE && stats[player]->stat_appearance == 0 )
+					if ( item->type == FOOD_BLOOD && stats[player]->playerRace() == RACE_VAMPIRE && stats[player]->stat_appearance == 0 )
 					{
 						bloodCount += item->count;
 						if ( bloodCount >= 20 )
@@ -3745,7 +3745,7 @@ void gameLogic(void)
 					}
 				}
 
-				if ( item->type == FOOD_BLOOD && stats[clientnum]->playerRace == RACE_VAMPIRE && stats[clientnum]->stat_appearance == 0 )
+				if ( item->type == FOOD_BLOOD && stats[clientnum]->playerRace() == RACE_VAMPIRE && stats[clientnum]->stat_appearance == 0 )
 				{
 					bloodCount += item->count;
 					if ( bloodCount >= 20 )
@@ -5749,9 +5749,9 @@ void ingameHud()
 
 				    if ( allowCasting && castSpellbook && players[player] && players[player]->entity )
 				    {
-					    if ( players[player]->entity->effectShapeshift != NOTHING )
+					    if ( players[player]->entity->effectShapeshift() != NOTHING )
 					    {
-						    if ( players[player]->entity->effectShapeshift == CREATURE_IMP )
+						    if ( players[player]->entity->effectShapeshift() == CREATURE_IMP )
 						    {
 							    // imp allowed to cast via spellbook.
 						    }
@@ -6552,11 +6552,11 @@ void drawAllPlayerCameras() {
 									{
 										/*if ( mapCreature->getStats() && mapCreature->getStats()->getEffectActive(EFF_DETECT_ENEMY) )
 										{
-											mapCreature->monsterEntityRenderAsTelepath = 2;
+											mapCreature->monsterEntityRenderAsTelepath() = 2;
 										}
 										else*/
 										{
-											mapCreature->monsterEntityRenderAsTelepath = 1;
+											mapCreature->monsterEntityRenderAsTelepath() = 1;
 										}
 									}
 								}
@@ -6591,7 +6591,7 @@ void drawAllPlayerCameras() {
 							Entity* mapCreature = (Entity*)mapNode->element;
 							if ( mapCreature )
 							{
-								mapCreature->monsterEntityRenderAsTelepath = 0;
+								mapCreature->monsterEntityRenderAsTelepath() = 0;
 							}
 						}
 					}
@@ -6625,7 +6625,7 @@ void drawAllPlayerCameras() {
 						Entity* mapCreature = (Entity*)mapNode->element;
 						if ( mapCreature )
 						{
-							mapCreature->monsterEntityRenderAsTelepath = 0;
+							mapCreature->monsterEntityRenderAsTelepath() = 0;
 						}
 					}
 				}
@@ -7346,7 +7346,7 @@ extern "C" int barony_main(int argc, char** argv)
 						stats[0]->stat_appearance = local_rng.rand() % NUMAPPEARANCES;
 						stats[0]->clearStats();
 						initClass(0);
-						if ( stats[0]->playerRace != RACE_HUMAN )
+						if ( stats[0]->playerRace() != RACE_HUMAN )
 						{
 							stats[0]->stat_appearance = 0;
 						}

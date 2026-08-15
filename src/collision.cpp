@@ -169,7 +169,7 @@ Entity* entityClicked(bool* clickedOnGUI, bool clickCheckOverride, int player, E
 				}
 				if ( players[player]->worldUI.bTooltipActiveForPlayer(*tooltip) )
 				{
-					if ( tooltip->worldTooltipRequiresButtonHeld == 1 
+					if ( tooltip->worldTooltipRequiresButtonHeld() == 1 
 						&& *MainMenu::cvar_hold_to_activate
 						&& clicktype != ENTITY_CLICK_CALLOUT )
 					{
@@ -514,7 +514,7 @@ bool entityInsideSomething(Entity* entity)
 					|| type == EARTH_ELEMENTAL)) )
 			{
 				if ( testEntity->behavior == &actMonster || testEntity->behavior == &actPlayer 
-					|| (testEntity->isDamageableCollider() && (testEntity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC)) )
+					|| (testEntity->isDamageableCollider() && (testEntity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC)) )
 				{
 					continue;
 				}
@@ -615,7 +615,7 @@ bool Entity::collisionProjectileMiss(Entity* parent, Entity* projectile)
 					}
 				}
 			}
-			else if ( projectile->behavior == &actArrow && projectile->arrowQuiverType == QUIVER_FIRE )
+			else if ( projectile->behavior == &actArrow && projectile->arrowQuiverType() == QUIVER_FIRE )
 			{
 				SetEntityOnFire(parent);
 				if ( parent && flags[BURNING] )
@@ -758,8 +758,8 @@ bool Entity::collisionProjectileMiss(Entity* parent, Entity* projectile)
 					fx->x += 4.0 * cos(tangent);
 					fx->y += 4.0 * sin(tangent);
 					fx->yaw = tangent;
-					fx->actmagicOrbitDist = 0;
-					fx->actmagicNoLight = 0;
+					fx->actmagicOrbitDist() = 0;
+					fx->actmagicNoLight() = 0;
 					serverSpawnMiscParticlesAtLocation(fx->x, fx->y, fx->z, PARTICLE_EFFECT_NULL_PARTICLE, 1817, 0, fx->yaw * 256.0);
 				}
 				return true;
@@ -777,7 +777,7 @@ bool Entity::collisionProjectileMiss(Entity* parent, Entity* projectile)
 					projectile->collisionIgnoreTargets.insert(getUID());
 					return true;
 				}
-				if ( myStats->type == BAT_SMALL && monsterSpecialState == BAT_REST )
+				if ( myStats->type == BAT_SMALL && monsterSpecialState() == BAT_REST )
 				{
 					return false;
 				}
@@ -795,9 +795,9 @@ bool Entity::collisionProjectileMiss(Entity* parent, Entity* projectile)
 					}
 					else
 					{
-						if ( (monsterState == MONSTER_STATE_WAIT
-							|| monsterState == MONSTER_STATE_PATH
-							|| (monsterState == MONSTER_STATE_HUNT /*&& uidToEntity(monsterTarget) == nullptr*/))
+						if ( (monsterState() == MONSTER_STATE_WAIT
+							|| monsterState() == MONSTER_STATE_PATH
+							|| (monsterState() == MONSTER_STATE_HUNT /*&& uidToEntity(monsterTarget) == nullptr*/))
 							&& !myStats->getEffectActive(EFF_ROOTED) )
 						{
 							// unaware monster, get backstab damage.
@@ -1028,7 +1028,7 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 							if ( !(svFlags & SV_FLAG_FRIENDLYFIRE) )
 							{
 								if ( !(my->behavior == &actMagicMissile
-									&& (my->actmagicTinkerTrapFriendlyFire == 1 || my->actmagicAllowFriendlyFireHit == 1))
+									&& (my->actmagicTinkerTrapFriendlyFire() == 1 || my->actmagicAllowFriendlyFireHit() == 1))
 									&& (my->behavior == &actMagicMissile || my->behavior == &actArrow) )
 								{
 									friendlyFireCheck = true;
@@ -1186,17 +1186,17 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 					continue;
 				}
 			}
-			if ( entity->behavior == &actParticleTimer && static_cast<Uint32>(entity->particleTimerTarget) == my->getUID() )
+			if ( entity->behavior == &actParticleTimer && static_cast<Uint32>(entity->particleTimerTarget()) == my->getUID() )
 			{
 				continue;
 			}
-			if ( ((entity->isDamageableCollider() && (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))
+			if ( ((entity->isDamageableCollider() && (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))
 				|| entity->behavior == &::actDaedalusShrine)
 				&& my->behavior == &actMonster && type == MINOTAUR )
 			{
 				continue;
 			}
-			if ( entity->isDamageableCollider() && (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC)
+			if ( entity->isDamageableCollider() && (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC)
 				&& ((my->behavior == &actMonster 
 					&& (type == GYROBOT 
 						|| type == BAT_SMALL 
@@ -1210,7 +1210,7 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 			{
 				continue;
 			}
-			if ( projectileAttack && entity->isDamageableCollider() && entity->colliderSpellEvent > 0 )
+			if ( projectileAttack && entity->isDamageableCollider() && entity->colliderSpellEvent() > 0 )
 			{
 				entityDodgeChance = true;
 			}
@@ -1354,8 +1354,8 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 					}
 					else
 					{
-						if ( my->behavior == &actPlayer && yourStats->monsterForceAllegiance == Stat::MONSTER_FORCE_PLAYER_ENEMY
-							|| entity->behavior == &actPlayer && myStats->monsterForceAllegiance == Stat::MONSTER_FORCE_PLAYER_ENEMY )
+						if ( my->behavior == &actPlayer && yourStats->monsterForceAllegiance() == Stat::MONSTER_FORCE_PLAYER_ENEMY
+							|| entity->behavior == &actPlayer && myStats->monsterForceAllegiance() == Stat::MONSTER_FORCE_PLAYER_ENEMY )
 						{
 							// forced enemies.
 						}
@@ -1416,11 +1416,11 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 				}
 				if ( tryReduceCollisionSize )
 				{
-					if ( my->behavior == &actMagicMissile && my->actmagicSpray == 1 )
+					if ( my->behavior == &actMagicMissile && my->actmagicSpray() == 1 )
 					{
-						if ( my->actmagicEmitter > 0 )
+						if ( my->actmagicEmitter() > 0 )
 						{
-							auto& emitterHit = particleTimerEmitterHitEntities[my->actmagicEmitter];
+							auto& emitterHit = particleTimerEmitterHitEntities[my->actmagicEmitter()];
 							auto find = emitterHit.find(entity->getUID());
 							if ( find != emitterHit.end() )
 							{
@@ -1444,7 +1444,7 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 							{
 								continue;
 							}
-							if ( my->behavior == &actMagicMissile && my->actmagicSpray == 1 )
+							if ( my->behavior == &actMagicMissile && my->actmagicSpray() == 1 )
 							{
 								continue;
 							}
@@ -1539,7 +1539,7 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 
 					if ( my && my->behavior == &actMagicMissile )
 					{
-						if ( my->actmagicIsVertical == MAGIC_ISVERTICAL_XYZ )
+						if ( my->actmagicIsVertical() == MAGIC_ISVERTICAL_XYZ )
 						{
 							if ( my->sprite == 2209 || my->sprite == 233 )
 							{
@@ -1618,17 +1618,17 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 									{
 										if ( myStats->getEffectActive(EFF_FLAME_CLOAK) )
 										{
-											hit.entity->char_fire = std::min(hit.entity->char_fire, 
+											hit.entity->char_fire() = std::min(hit.entity->char_fire(), 
 												getSpellEffectDurationSecondaryFromID(SPELL_FLAME_CLOAK, my, nullptr, my));
 										}
-										yourStats->burningInflictedBy = my->getUID();
+										yourStats->burningInflictedBy() = my->getUID();
 
 										if ( my->behavior == &actPlayer )
 										{
 											bool alertTarget = hit.entity->monsterAlertBeforeHit(my);
 
 											// alert the monster!
-											if ( hit.entity->monsterState != MONSTER_STATE_ATTACK && (yourStats->type < LICH || yourStats->type >= SHOPKEEPER) )
+											if ( hit.entity->monsterState() != MONSTER_STATE_ATTACK && (yourStats->type < LICH || yourStats->type >= SHOPKEEPER) )
 											{
 												if ( alertTarget )
 												{
@@ -1687,17 +1687,17 @@ int barony_clear(real_t tx, real_t ty, Entity* my)
 									{
 										if ( yourStats->getEffectActive(EFF_FLAME_CLOAK) )
 										{
-											my->char_fire = std::min(my->char_fire,
+											my->char_fire() = std::min(my->char_fire(),
 												getSpellEffectDurationSecondaryFromID(SPELL_FLAME_CLOAK, hit.entity, nullptr, hit.entity));
 										}
-										myStats->burningInflictedBy = hit.entity->getUID();
+										myStats->burningInflictedBy() = hit.entity->getUID();
 
 										if ( hit.entity->behavior == &actPlayer )
 										{
 											bool alertTarget = my->monsterAlertBeforeHit(hit.entity);
 
 											// alert the monster!
-											if ( my->monsterState != MONSTER_STATE_ATTACK && (myStats->type < LICH || myStats->type >= SHOPKEEPER) )
+											if ( my->monsterState() != MONSTER_STATE_ATTACK && (myStats->type < LICH || myStats->type >= SHOPKEEPER) )
 											{
 												if ( alertTarget )
 												{
@@ -2751,24 +2751,24 @@ int checkObstacle(long x, long y, Entity* my, Entity* target, bool useTileEntity
 						if ( !entity ) { continue; }
 						if ( entity->flags[PASSABLE] || entity == my || entity == target 
 							|| entity->behavior == &actDoor
-							|| (entity->behavior == &actIronDoor && entity->doorLocked == 0) )
+							|| (entity->behavior == &actIronDoor && entity->doorLocked() == 0) )
 						{
 							continue;
 						}
-						if ( my && entity->behavior == &actParticleTimer && static_cast<Uint32>(entity->particleTimerTarget) == my->getUID() )
+						if ( my && entity->behavior == &actParticleTimer && static_cast<Uint32>(entity->particleTimerTarget()) == my->getUID() )
 						{
 							continue;
 						}
 						if ( isMonster && my->getMonsterTypeFromSprite() == MINOTAUR 
 							&& ((entity->isDamageableCollider()
-									&& (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))
+									&& (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO))
 								|| entity->behavior == &::actDaedalusShrine
 								|| entity->behavior == &actIronDoor) )
 						{
 							continue;
 						}
 						else if ( isMonster && my->getMonsterTypeFromSprite() == GYROBOT && entity->isDamageableCollider()
-							&& (entity->colliderHasCollision & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC) )
+							&& (entity->colliderHasCollision() & EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC) )
 						{
 							continue;
 						}

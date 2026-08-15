@@ -395,7 +395,7 @@ void actSentryBotLimb(Entity* my)
 void sentryBotDie(Entity* my)
 {
 	bool gibs = true;
-	if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+	if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 	{
 		// don't make noises etc.
 		Stat* myStats = my->getStats();
@@ -414,7 +414,7 @@ void sentryBotDie(Entity* my)
 			type = TOOL_SPELLBOT;
 		}
 		bool dropBrokenShell = true;
-		if ( myStats && myStats->monsterNoDropItems == 1 && !my->monsterAllyGetPlayerLeader() )
+		if ( myStats && myStats->monsterNoDropItems() == 1 && !my->monsterAllyGetPlayerLeader() )
 		{
 			dropBrokenShell = false;
 		}
@@ -510,7 +510,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 
 	if ( multiplayer != CLIENT )
 	{
-		if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+		if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 		{
 			if ( limbAnimateToLimit(my, ANIMATE_PITCH, 0.01, PI / 8, false, 0.0) )
 			{
@@ -520,7 +520,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 				{
 					type = TOOL_SPELLBOT;
 				}
-				Item* item = newItem(type, static_cast<Status>(myStats->monsterTinkeringStatus), 0, 1, appearance, true, &myStats->inventory);
+				Item* item = newItem(type, static_cast<Status>(myStats->monsterTinkeringStatus()), 0, 1, appearance, true, &myStats->inventory);
 				myStats->HP = 0;
 				myStats->killer = KilledBy::NO_FUEL;
 				my->setObituary(Language::get(3631));
@@ -574,7 +574,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 		}
 		if ( bodypart == WEAPON_LOADER || bodypart == WEAPON_LIMB )
 		{
-			if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				entity->pitch = my->pitch;
 			}
@@ -582,7 +582,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 
 		if ( bodypart == GEAR_MIDDLE && !my->flags[INVISIBLE] )
 		{
-			if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				entity->pitch += 0.02;
 			}
@@ -607,17 +607,17 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 				entity->pitch -= 2 * PI;
 			}
 
-			if ( my->monsterAttack > 0 )
+			if ( my->monsterAttack() > 0 )
 			{
-				if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1 )
+				if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						//createParticleDot(my);
 						Entity* particle = createParticleAestheticOrbit(my, 173, 15, PARTICLE_EFFECT_SPELLBOT_ORBIT);
 						if ( particle )
 						{
-							particle->actmagicOrbitDist = 1;
+							particle->actmagicOrbitDist() = 1;
 							particle->x = my->x + 2 * cos(my->yaw);
 							particle->y = my->y + 2 * sin(my->yaw);
 							particle->fskill[0] = particle->x;
@@ -632,7 +632,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 
 					entity->pitch += entity->fskill[0];
 
-					if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+					if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -640,16 +640,16 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP1 )
+				else if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP1 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						entity->fskill[0] = -0.2;
 					}
 
 					entity->pitch += entity->fskill[0];
 
-					if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+					if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -657,7 +657,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_RANGED_SHOOT1 || my->monsterAttack == MONSTER_POSE_MAGIC_CAST1 )
+				else if ( my->monsterAttack() == MONSTER_POSE_RANGED_SHOOT1 || my->monsterAttack() == MONSTER_POSE_MAGIC_CAST1 )
 				{
 					if ( entity->fskill[0] < 0.01 )
 					{
@@ -669,9 +669,9 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 						entity->fskill[0] = std::max(entity->fskill[0] * 0.95, 0.01);
 					}
 
-					if ( my->monsterAttackTime >= 20 )
+					if ( my->monsterAttackTime() >= 20 )
 					{
-						my->monsterAttack = 0;
+						my->monsterAttack() = 0;
 					}
 				}
 			}
@@ -744,7 +744,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 			}
 
 			// spin the gear as the head turns.
-			if ( bodypart == GEAR_BODY_LEFT && my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( bodypart == GEAR_BODY_LEFT && my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				entity->pitch -= 0.1;
 			}
@@ -893,7 +893,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 				entity->x += limbs[race][10][0];
 				entity->y += limbs[race][10][1];
 				entity->z += limbs[race][10][2];
-				if ( my->monsterAttack == MONSTER_POSE_RANGED_SHOOT1 )
+				if ( my->monsterAttack() == MONSTER_POSE_RANGED_SHOOT1 )
 				{
 					entity->fskill[0] = std::min(3.5, 2 + entity->fskill[0]);
 					entity->focalx += entity->fskill[0];
@@ -916,7 +916,7 @@ void sentryBotAnimate(Entity* my, Stat* myStats, double dist)
 				entity->focalx = limbs[race][6][0];
 				entity->focaly = limbs[race][6][1];
 				entity->focalz = limbs[race][6][2];
-				if ( my->monsterAttack == MONSTER_POSE_RANGED_SHOOT1 )
+				if ( my->monsterAttack() == MONSTER_POSE_RANGED_SHOOT1 )
 				{
 					entity->flags[INVISIBLE] = true;
 				}
@@ -1038,7 +1038,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			if ( dropped )
 			{
-				int leader = my->monsterAllyIndex;
+				int leader = my->monsterAllyIndex();
 				if ( leader >= 0 )
 				{
 					Uint32 color = makeColorRGB(0, 255, 0);
@@ -1049,7 +1049,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 	}
 
 	int detectDuration = 5 * TICKS_PER_SECOND;
-	if ( my->ticks % (detectDuration) == 0 && my->monsterAllyIndex >= 0 && players[my->monsterAllyIndex]->isLocalPlayer() )
+	if ( my->ticks % (detectDuration) == 0 && my->monsterAllyIndex() >= 0 && players[my->monsterAllyIndex()]->isLocalPlayer() )
 	{
 		Entity* playerLeader = my->monsterAllyGetPlayerLeader();
 		bool doPing = false;
@@ -1064,17 +1064,17 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			if ( ent->skill[28] > 0 ) // mechanism
 			{
-				if ( my->monsterAllyPickupItems != ALLY_GYRO_DETECT_TRAPS )
+				if ( my->monsterAllyPickupItems() != ALLY_GYRO_DETECT_TRAPS )
 				{
 					continue;
 				}
 			}
 			if ( playerLeader )
 			{
-				if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_MONSTERS )
+				if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_MONSTERS )
 				{
-					if ( (ent->behavior == &actMonster && ent->monsterAllyIndex < 0)
-						|| (ent->isDamageableCollider() && ent->colliderHideMonster != 0) )
+					if ( (ent->behavior == &actMonster && ent->monsterAllyIndex() < 0)
+						|| (ent->isDamageableCollider() && ent->colliderHideMonster() != 0) )
 					{
 						if ( entityDist(my, ent) < TOUCHRANGE * 5 )
 						{
@@ -1091,7 +1091,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_TRAPS )
+				else if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_TRAPS )
 				{
 					if ( ent->behavior == &actBoulderTrap || ent->behavior == &actArrowTrap
 						|| ent->behavior == &actMagicTrap || ent->behavior == &actMagicTrapCeiling
@@ -1114,7 +1114,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_EXITS )
+				else if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_EXITS )
 				{
 					if ( ent->behavior == &actLadder || ent->behavior == &actPortal )
 					{
@@ -1133,9 +1133,9 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_METAL
-					|| my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_MAGIC
-					|| my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_VALUABLE )
+				else if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_METAL
+					|| my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_MAGIC
+					|| my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_VALUABLE )
 				{
 					if ( ent->behavior == &actItem )
 					{
@@ -1147,7 +1147,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 							if ( itemOnGround )
 							{
 								GenericGUIMenu::tinkeringGetItemValue(itemOnGround, &metal, &magic);
-								if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_METAL
+								if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_METAL
 									&& metal > 0 )
 								{
 									if ( gyroBotFoundNewEntity(*ent) )
@@ -1161,7 +1161,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 										ent->setEntityShowOnMap(Entity::SHOW_MAP_GYRO, detectDuration);
 									}
 								}
-								else if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_MAGIC
+								else if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_MAGIC
 									&& magic > 0 )
 								{
 									if ( gyroBotFoundNewEntity(*ent) )
@@ -1175,7 +1175,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 										ent->setEntityShowOnMap(Entity::SHOW_MAP_GYRO, detectDuration);
 									}
 								}
-								else if ( my->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_VALUABLE
+								else if ( my->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_VALUABLE
 									&& (itemOnGround->getGoldValue() >= 400
 										|| (itemOnGround->type >= KEY_STONE && itemOnGround->type <= KEY_MACHINE)) )
 								{
@@ -1206,8 +1206,8 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 		{
 			int pingx = my->x / 16;
 			int pingy = my->y / 16;
-			MinimapPing radiusPing(ticks, my->monsterAllyIndex, pingx, pingy, true);
-			minimapPingAdd(my->monsterAllyIndex, my->monsterAllyIndex, radiusPing);
+			MinimapPing radiusPing(ticks, my->monsterAllyIndex(), pingx, pingy, true);
+			minimapPingAdd(my->monsterAllyIndex(), my->monsterAllyIndex(), radiusPing);
 
 			if ( foundGoodSound >= 1 )
 			{
@@ -1221,9 +1221,9 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 	}
 
 	my->removeLightField();
-	if ( my->monsterAllyClass > ALLY_GYRO_LIGHT_NONE )
+	if ( my->monsterAllyClass() > ALLY_GYRO_LIGHT_NONE )
 	{
-		switch ( my->monsterAllyClass )
+		switch ( my->monsterAllyClass() )
 		{
 			case ALLY_GYRO_LIGHT_FAINT:
 				my->light = addLight(my->x / 16, my->y / 16, "gyrobot_faint");
@@ -1243,8 +1243,8 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 	{
 		//my->z = limbs[GYROBOT][3][2];
 		if ( my->ticks % (TICKS_PER_SECOND * 15) == 0 
-			&& my->monsterSpecialTimer == 0
-			&& my->monsterSpecialState == 0 )
+			&& my->monsterSpecialTimer() == 0
+			&& my->monsterSpecialState() == 0 )
 		{
 			bool doACoolFlip = true;
 
@@ -1271,7 +1271,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			if ( doACoolFlip )
 			{
 				my->attack(MONSTER_POSE_RANGED_WINDUP1, 0, nullptr);
-				my->monsterSpecialTimer = TICKS_PER_SECOND * 8;
+				my->monsterSpecialTimer() = TICKS_PER_SECOND * 8;
 
 				if ( auto leader = my->monsterAllyGetPlayerLeader() )
 				{
@@ -1280,33 +1280,33 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			}
 		}
 
-		if ( my->monsterSpecialState == GYRO_RETURN_LANDING )
+		if ( my->monsterSpecialState() == GYRO_RETURN_LANDING )
 		{
 			if ( limbAnimateToLimit(my, ANIMATE_Z, 0.05, 0, false, 0.0) )
 			{
 				int appearance = monsterTinkeringConvertHPToAppearance(myStats);
-				Item* item = newItem(TOOL_GYROBOT, static_cast<Status>(myStats->monsterTinkeringStatus), 0, 1, appearance, true, &myStats->inventory);
+				Item* item = newItem(TOOL_GYROBOT, static_cast<Status>(myStats->monsterTinkeringStatus()), 0, 1, appearance, true, &myStats->inventory);
 				myStats->HP = 0;
 				myStats->killer = KilledBy::NO_FUEL;
 				my->setObituary(Language::get(3631));
 				return;
 			}
 		}
-		else if ( my->monsterSpecialState == GYRO_INTERACT_LANDING )
+		else if ( my->monsterSpecialState() == GYRO_INTERACT_LANDING )
 		{
 			if ( limbAnimateToLimit(my, ANIMATE_Z, 0.1, 0, false, 0.0) )
 			{
 				my->attack(MONSTER_POSE_RANGED_WINDUP1, 0, nullptr);
-				my->monsterSpecialTimer = TICKS_PER_SECOND * 5;
+				my->monsterSpecialTimer() = TICKS_PER_SECOND * 5;
 				if ( my->monsterAllySetInteract() )
 				{
 					// do interact.
-					my->monsterAllyInteractTarget = 0;
-					my->monsterAllyState = ALLY_STATE_DEFAULT;
+					my->monsterAllyInteractTarget() = 0;
+					my->monsterAllyState() = ALLY_STATE_DEFAULT;
 				}
-				my->monsterSpecialState = 0;
+				my->monsterSpecialState() = 0;
 				serverUpdateEntitySkill(my, 33);
-				my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_ENDPOINT;
+				my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_ENDPOINT;
 			}
 		}
 		else
@@ -1317,21 +1317,21 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			else
 			{
-				if ( my->monsterSpecialState == GYRO_START_FLYING )
+				if ( my->monsterSpecialState() == GYRO_START_FLYING )
 				{
 					if ( limbAnimateToLimit(my, ANIMATE_Z, -0.1, -6, false, 0.0) )
 					{
-						my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
-						my->monsterSpecialState = 0;
+						my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
+						my->monsterSpecialState() = 0;
 						serverUpdateEntitySkill(my, 33);
 					}
 				}
 				else
 				{
-					if ( my->monsterAnimationLimbOvershoot == ANIMATE_OVERSHOOT_NONE )
+					if ( my->monsterAnimationLimbOvershoot() == ANIMATE_OVERSHOOT_NONE )
 					{
 						my->z = -6;
-						my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+						my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 					}
 					if ( dist < 0.1 )
 					{
@@ -1364,10 +1364,10 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 		if ( bodypart == GYRO_ROTOR_SMALL )
 		{
 			entity->yaw = my->yaw; // face the monster's direction
-			if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP1 )
+			if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP1 )
 			{
 				entity->skill[0] = 1;
-				my->monsterAttack = 0;
+				my->monsterAttack() = 0;
 				my->pitch = 0;
 				entity->fskill[0] = 0.05;
 			}
@@ -1404,7 +1404,7 @@ void gyroBotAnimate(Entity* my, Stat* myStats, double dist)
 			entity->yaw = my->yaw;
 			entity->roll += 0.1;
 
-			if ( (my->z > -4 && my->monsterSpecialState == 0) || my->monsterSpecialState == GYRO_START_FLYING )
+			if ( (my->z > -4 && my->monsterSpecialState() == 0) || my->monsterSpecialState() == GYRO_START_FLYING )
 			{
 				entity->roll += 1;
 			}
@@ -1546,7 +1546,7 @@ void actGyroBotLimb(Entity* my)
 void gyroBotDie(Entity* my)
 {
 	bool gibs = true;
-	if ( my->monsterSpecialState == GYRO_RETURN_LANDING )
+	if ( my->monsterSpecialState() == GYRO_RETURN_LANDING )
 	{
 		// don't make noises etc.
 		Stat* myStats = my->getStats();
@@ -1782,7 +1782,7 @@ void actDummyBotLimb(Entity* my)
 void dummyBotDie(Entity* my)
 {
 	bool gibs = true;
-	if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+	if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 	{
 		// don't make noises etc.
 		Stat* myStats = my->getStats();
@@ -1796,7 +1796,7 @@ void dummyBotDie(Entity* my)
 	{
 		Stat* myStats = my->getStats();
 		bool dropBrokenShell = true;
-		if ( myStats && myStats->monsterNoDropItems == 1 && !my->monsterAllyGetPlayerLeader() )
+		if ( myStats && myStats->monsterNoDropItems() == 1 && !my->monsterAllyGetPlayerLeader() )
 		{
 			dropBrokenShell = false;
 		}
@@ -1927,7 +1927,7 @@ void dummyBotAnimate(Entity* my, Stat* myStats, double dist)
 				}
 			}
 
-			if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				bool pitchZero = false;
 				while ( entity->pitch > 2 * PI )
@@ -1964,7 +1964,7 @@ void dummyBotAnimate(Entity* my, Stat* myStats, double dist)
 					{
 						// kill me!
 						int appearance = monsterTinkeringConvertHPToAppearance(myStats);
-						Item* item = newItem(TOOL_DUMMYBOT, static_cast<Status>(myStats->monsterTinkeringStatus), 0, 1, appearance, true, &myStats->inventory);
+						Item* item = newItem(TOOL_DUMMYBOT, static_cast<Status>(myStats->monsterTinkeringStatus()), 0, 1, appearance, true, &myStats->inventory);
 						myStats->HP = 0;
 						myStats->killer = KilledBy::NO_FUEL;
 						my->setObituary(Language::get(3643));
@@ -1993,17 +1993,17 @@ void dummyBotAnimate(Entity* my, Stat* myStats, double dist)
 			else
 			{
 				entity->z = my->z;
-				if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP1 )
+				if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP1 )
 				{
-					my->monsterAttack = 0;
+					my->monsterAttack() = 0;
 					entity->skill[4] = 1;
 					entity->fskill[1] = 0.06;
 					entity->fskill[2] = PI / 6;
-					entity->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+					entity->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 				}
 				if ( entity->skill[4] > 0 )
 				{
-					if ( entity->monsterAnimationLimbOvershoot == ANIMATE_OVERSHOOT_NONE )
+					if ( entity->monsterAnimationLimbOvershoot() == ANIMATE_OVERSHOOT_NONE )
 					{
 						if ( entity->pitch > 0 )
 						{
@@ -2054,7 +2054,7 @@ void dummyBotAnimate(Entity* my, Stat* myStats, double dist)
 		}
 		else if ( bodypart == DUMMY_LID )
 		{
-			if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				if ( head && head->z > 11 )
 				{
@@ -2071,7 +2071,7 @@ void dummyBotAnimate(Entity* my, Stat* myStats, double dist)
 		}
 		else if ( bodypart == DUMMY_CRANK )
 		{
-			if ( my->monsterSpecialState == DUMMYBOT_RETURN_FORM )
+			if ( my->monsterSpecialState() == DUMMYBOT_RETURN_FORM )
 			{
 				entity->pitch -= 0.5;
 				if ( entity->pitch < 0 )

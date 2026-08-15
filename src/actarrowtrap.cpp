@@ -114,7 +114,7 @@ void actArrowTrap(Entity* my)
 		return;
 	}
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
 		ARROWTRAP_AMBIENCE--;
 		if ( ARROWTRAP_AMBIENCE <= 0 )
@@ -141,7 +141,7 @@ void actArrowTrap(Entity* my)
 	Entity* targetToAutoHit = nullptr;
 
 	// received on signal
-	if ( (my->skill[28] == 2 || ARROWTRAP_DISABLED == -1) && my->actTrapSabotaged == 0 )
+	if ( (my->skill[28] == 2 || ARROWTRAP_DISABLED == -1) && my->actTrapSabotaged() == 0 )
 	{
 		if ( ARROWTRAP_FIRED % 2 == 1 ) // not ready to fire.
 		{
@@ -226,10 +226,10 @@ void actArrowTrap(Entity* my)
 					entity->flags[PASSABLE] = true;
 
 					// arrow power
-					entity->arrowPower = 17;
+					entity->arrowPower() = 17;
 					if ( currentlevel >= 10 )
 					{
-						entity->arrowPower += currentlevel - 10;
+						entity->arrowPower() += currentlevel - 10;
 					}
 					bool stronger = false;
 					if ( gameModeManager.currentSession.challengeRun.isActive(GameModeManager_t::CurrentSession_t::ChallengeRun_t::CHEVENT_STRONG_TRAPS) )
@@ -243,7 +243,7 @@ void actArrowTrap(Entity* my)
 							if ( stronger ) { ARROWTRAP_REFIRE = 50; }
 							break;
 						case QUIVER_PIERCE:
-							entity->arrowArmorPierce = 2;
+							entity->arrowArmorPierce() = 2;
 							entity->sprite = 925;
 							if ( stronger ) { ARROWTRAP_REFIRE = 50; }
 							break;
@@ -267,7 +267,7 @@ void actArrowTrap(Entity* my)
 						case QUIVER_HUNTING:
 							entity->sprite = 930;
 							// causes poison for six seconds
-							entity->arrowPoisonTime = 360;
+							entity->arrowPoisonTime() = 360;
 							if ( stronger ) { ARROWTRAP_REFIRE = 25; }
 							break;
 						case QUIVER_BONE:
@@ -281,10 +281,10 @@ void actArrowTrap(Entity* my)
 						default:
 							break;
 					}
-					entity->arrowQuiverType = ARROWTRAP_TYPE;
-					entity->arrowSpeed = 7;
-					entity->vel_x = cos(entity->yaw) * entity->arrowSpeed;
-					entity->vel_y = sin(entity->yaw) * entity->arrowSpeed;
+					entity->arrowQuiverType() = ARROWTRAP_TYPE;
+					entity->arrowSpeed() = 7;
+					entity->vel_x = cos(entity->yaw) * entity->arrowSpeed();
+					entity->vel_y = sin(entity->yaw) * entity->arrowSpeed();
 					if ( multiplayer == SERVER )
 					{
 						Sint32 val = (1 << 31);
@@ -292,7 +292,7 @@ void actArrowTrap(Entity* my)
 						val |= (((Uint16)(TOOL_SENTRYBOT) & 0xFFF) << 8);
 						val |= (8) << 20;
 						entity->skill[2] = val;//-(1000 + TOOL_SENTRYBOT); // invokes actArrow for clients.
-						entity->arrowShotByWeapon = TOOL_SENTRYBOT;
+						entity->arrowShotByWeapon() = TOOL_SENTRYBOT;
 					}
 					if ( targetToAutoHit )
 					{
@@ -302,15 +302,15 @@ void actArrowTrap(Entity* my)
 						{
 							double tangent = atan2(entity->y - targetToAutoHit->y, entity->x - targetToAutoHit->x);
 							entity->yaw = tangent + PI;
-							entity->vel_x = cos(entity->yaw) * entity->arrowSpeed;
-							entity->vel_y = sin(entity->yaw) * entity->arrowSpeed;
+							entity->vel_x = cos(entity->yaw) * entity->arrowSpeed();
+							entity->vel_y = sin(entity->yaw) * entity->arrowSpeed();
 							targetToAutoHit = nullptr;
 						}
 						else if ( local_rng.rand() % 2 == 0 )
 						{
 							entity->yaw = entity->yaw - PI / 12 + (0.1 * (local_rng.rand() % 11) * (PI / 6)); // -/+ PI/12 range
-							entity->vel_x = cos(entity->yaw) * entity->arrowSpeed;
-							entity->vel_y = sin(entity->yaw) * entity->arrowSpeed;
+							entity->vel_x = cos(entity->yaw) * entity->arrowSpeed();
+							entity->vel_y = sin(entity->yaw) * entity->arrowSpeed();
 							targetToAutoHit = nullptr;
 						}
 					}

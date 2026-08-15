@@ -341,15 +341,15 @@ void lichAnimate(Entity* my, double dist)
 		{
 			my->light = addLight(my->x / 16, my->y / 16, "herx_glow");
 		}
-		else if ( !my->monsterLichBattleState )
+		else if ( !my->monsterLichBattleState() )
 		{
-			my->monsterLichBattleState = 1;
+			my->monsterLichBattleState() = 1;
 			serverUpdateEntitySkill(my, 27);
 		}
 	}
 	else
 	{
-		if ( !my->monsterLichBattleState )
+		if ( !my->monsterLichBattleState() )
 		{
 			my->light = addLight(my->x / 16, my->y / 16, "herx_glow");
 		}

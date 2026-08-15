@@ -65,7 +65,7 @@ void initHuman(Entity* my, Stat* myStats)
 
 			// boss variants
 			// generate special loadout
-			if ( my->monsterSpecialTimer == 0 )
+			if ( my->monsterSpecialTimer() == 0 )
 			{
 				if ( ((*cvar_summonBosses && conductGameChallenges[CONDUCT_CHEATS_ENABLED]) || rng.rand() % 25 == 0) && !myStats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS]
 					&& strcmp(myStats->name, "scriptNPC") && myStats->MISC_FLAGS[STAT_FLAG_NPC] == 0
@@ -387,11 +387,11 @@ void initHuman(Entity* my, Stat* myStats)
 
 			if ( specialMonsterVariant == 0 && isDefaultStats )
 			{
-				if ( my->monsterStoreType == 0 && currentlevel > 5 )
+				if ( my->monsterStoreType() == 0 && currentlevel > 5 )
 				{
-					my->monsterStoreType = (currentlevel / 5) * 3 + (rng.rand() % 4); // scale humans with depth.  3 LVL each 5 floors, + 0-3.
+					my->monsterStoreType() = (currentlevel / 5) * 3 + (rng.rand() % 4); // scale humans with depth.  3 LVL each 5 floors, + 0-3.
 				}
-				myStats->EXP += 100 * my->monsterStoreType; // apply experience to level up the humans with floor depth.
+				myStats->EXP += 100 * my->monsterStoreType(); // apply experience to level up the humans with floor depth.
 				while ( myStats->EXP >= 100 )
 				{
 					myStats->LVL++;
@@ -813,7 +813,7 @@ void initHuman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[HUMAN][6][0]; // 1.5
 	entity->focaly = limbs[HUMAN][6][1]; // 0
 	entity->focalz = limbs[HUMAN][6][2]; // -.5
@@ -834,7 +834,7 @@ void initHuman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[HUMAN][7][0]; // 2
 	entity->focaly = limbs[HUMAN][7][1]; // 0
 	entity->focalz = limbs[HUMAN][7][2]; // 0
@@ -857,7 +857,7 @@ void initHuman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[HUMAN][8][0]; // 0
 	entity->focaly = limbs[HUMAN][8][1]; // 0
 	entity->focalz = limbs[HUMAN][8][2]; // 4
@@ -880,7 +880,7 @@ void initHuman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[HUMAN][9][0]; // 0
 	entity->focaly = limbs[HUMAN][9][1]; // 0
 	entity->focalz = limbs[HUMAN][9][2]; // -1.75
@@ -903,7 +903,7 @@ void initHuman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	//entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[HUMAN][10][0]; // 0
 	entity->focaly = limbs[HUMAN][10][1]; // 0
 	entity->focalz = limbs[HUMAN][10][2]; // .5
@@ -1056,7 +1056,7 @@ void humanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		else
 		{
 			my->z = -1;
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				my->pitch = 0;
 			}
@@ -1110,7 +1110,7 @@ void humanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(weaponarm);
 				}
@@ -1456,7 +1456,7 @@ void humanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( tempNode )
 				{
 					Entity* weapon = (Entity*)tempNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[HUMAN][4][0]; // 0
@@ -1558,7 +1558,7 @@ void humanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( tempNode )
 				{
 					Entity* shield = (Entity*)tempNode->element;
-					if ( shield->flags[INVISIBLE] && (my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( shield->flags[INVISIBLE] && (my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if shield invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[HUMAN][5][0]; // 0
@@ -1575,7 +1575,7 @@ void humanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, HUMAN, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1937,7 +1937,7 @@ bool Entity::humanCanWieldItem(const Item& item) const
 		return false;
 	}
 
-	if ( monsterAllyIndex >= 0 && (monsterAllyClass != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
+	if ( monsterAllyIndex() >= 0 && (monsterAllyClass() != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
 	{
 		return monsterAllyEquipmentInClass(item);
 	}

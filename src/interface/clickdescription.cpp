@@ -134,13 +134,13 @@ void clickDescription(int player, Entity* entity)
 				}
 				else if ( entity->behavior == &actGoldBag )
 				{
-					if ( entity->goldAmount == 1 )
+					if ( entity->goldAmount() == 1 )
 					{
 						messagePlayer(player, MESSAGE_INSPECTION, Language::get(258));
 					}
 					else
 					{
-						messagePlayer(player, MESSAGE_INSPECTION, Language::get(259), entity->goldAmount);
+						messagePlayer(player, MESSAGE_INSPECTION, Language::get(259), entity->goldAmount());
 					}
 				}
 				else if ( entity->behavior == &actCampfire)
@@ -222,7 +222,7 @@ void clickDescription(int player, Entity* entity)
 				}
 				else if ( entity->behavior == &actFurniture )
 				{
-					switch ( entity->furnitureType )
+					switch ( entity->furnitureType() )
 					{
 						case FURNITURE_CHAIR:
 							messagePlayer(player, MESSAGE_INSPECTION, Language::get(273));
@@ -287,7 +287,7 @@ void clickDescription(int player, Entity* entity)
 						(entity->sprite >= 278 && entity->sprite < 282) ||
 						(entity->sprite >= 614 && entity->sprite < 618) ||
 						(entity->sprite >= 992 && entity->sprite < 995) ||
-						(entity->sprite == 620) || entity->teleporterType == 3)
+						(entity->sprite == 620) || entity->teleporterType() == 3)
 					{
 						messagePlayer(player, MESSAGE_INSPECTION, Language::get(272));
 					}
@@ -295,14 +295,14 @@ void clickDescription(int player, Entity* entity)
 				else if ( entity->behavior == &::actWallLock
 					|| (entity->sprite >= 1585 && entity->sprite <= 1592) )
 				{
-					int wallLockState = entity->wallLockState;
-					int wallLockMaterial = entity->wallLockMaterial;
+					int wallLockState = entity->wallLockState();
+					int wallLockMaterial = entity->wallLockMaterial();
 					if ( entity->sprite >= 1585 && entity->sprite <= 1592 )
 					{
 						if ( Entity* parent = uidToEntity(entity->parent) )
 						{
-							wallLockState = parent->wallLockState;
-							wallLockMaterial = parent->wallLockMaterial;
+							wallLockState = parent->wallLockState();
+							wallLockMaterial = parent->wallLockMaterial();
 						}
 					}
 

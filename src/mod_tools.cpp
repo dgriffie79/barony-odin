@@ -91,7 +91,7 @@ void GameModeManager_t::Tutorial_t::startTutorial(std::string mapToSet)
 	stats[0]->clearStats();
 	strcpy(stats[0]->name, "Player");
 	stats[0]->sex = static_cast<sex_t>(local_rng.rand() % 2);
-	stats[0]->playerRace = RACE_HUMAN;
+	stats[0]->playerRace() = RACE_HUMAN;
 	stats[0]->stat_appearance = local_rng.rand() % NUMAPPEARANCES;
 	client_classes[0] = CLASS_WARRIOR;
 	initClass(0);
@@ -3810,7 +3810,7 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 				if ( item.type == HAT_WARM )
 				{
 					real_t coldMultiplier = 1.0;
-					if ( !(players[player]->entity && players[player]->entity->effectShapeshift != NOTHING) )
+					if ( !(players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING) )
 					{
 						if ( item.beatitude >= 0 || shouldInvertEquipmentBeatitude(stats[player]) )
 						{
@@ -7097,7 +7097,7 @@ void StatueManager_t::refreshAllStatues()
 		auto entity = (Entity*)node->element;
 		if ( entity->behavior == &actStatue )
 		{
-			entity->statueInit = 0;
+			entity->statueInit() = 0;
 			node_t* nextnode2 = nullptr;
 			for ( node_t* node2 = entity->children.first; node2; node2 = nextnode2 )
 			{
@@ -17855,9 +17855,9 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 				if ( findRaceTag != eventClassIds.end() )
 				{
 					int race = RACE_HUMAN;
-					if ( stats[playernum]->playerRace > 0 && stats[playernum]->stat_appearance == 0 )
+					if ( stats[playernum]->playerRace() > 0 && stats[playernum]->stat_appearance == 0 )
 					{
-						race = stats[playernum]->playerRace;
+						race = stats[playernum]->playerRace();
 					}
 					auto findRaceId = findRaceTag->second.find(race);
 					if ( findRaceId != findRaceTag->second.end() )

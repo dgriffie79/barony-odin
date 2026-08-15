@@ -366,7 +366,7 @@ bool item_PotionWater(Item*& item, Entity* entity, Entity* usedBy)
 				if ( stats->getEffectActive(EFF_POLYMORPH) )
 				{
 					entity->setEffect(EFF_POLYMORPH, false, 0, true);
-					entity->effectPolymorph = 0;
+					entity->effectPolymorph() = 0;
 					serverUpdateEntitySkill(entity, 50);
 
 					messagePlayer(player, MESSAGE_STATUS, Language::get(3192));
@@ -777,7 +777,7 @@ bool item_PotionBooze(Item*& item, Entity* entity, Entity* usedBy, bool shouldCo
 					stats->HUNGER = std::min(1499, stats->HUNGER + 100);
 				}
 			}
-			if ( stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+			if ( stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 			{
 				stats->HUNGER += 250;
 			}
@@ -786,7 +786,7 @@ bool item_PotionBooze(Item*& item, Entity* entity, Entity* usedBy, bool shouldCo
 	else
 	{
 		// hunger off.
-		if ( entity->behavior == &actPlayer && stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+		if ( entity->behavior == &actPlayer && stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 		{
 			entity->modMP(5 * (1 + item->beatitude));
 		}
@@ -935,7 +935,7 @@ bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy)
 						stats->HUNGER = std::min(1499, stats->HUNGER + 50);
 					}
 				}
-				if ( stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+				if ( stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 				{
 					stats->HUNGER += 200;
 				}
@@ -944,7 +944,7 @@ bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy)
 		else
 		{
 			// hunger off.
-			if ( entity->behavior == &actPlayer && stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+			if ( entity->behavior == &actPlayer && stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 			{
 				entity->modMP(5);
 			}
@@ -968,7 +968,7 @@ bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy)
 						stats->HUNGER = std::min(1499, stats->HUNGER + 50);
 					}
 				}
-				if ( stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+				if ( stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 				{
 					stats->HUNGER += 200;
 				}
@@ -977,7 +977,7 @@ bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy)
 		else
 		{
 			// hunger off.
-			if ( entity->behavior == &actPlayer && stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+			if ( entity->behavior == &actPlayer && stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 			{
 				entity->modMP(5 * (1 + item->beatitude));
 			}
@@ -1307,7 +1307,7 @@ bool item_PotionConfusion(Item*& item, Entity* entity, Entity* usedBy)
 	{
 		if ( entity->behavior == &actMonster )
 		{
-			entity->monsterTarget = 0; // monsters forget what they're doing
+			entity->monsterTarget() = 0; // monsters forget what they're doing
 		}
 		if ( usedBy && entity != usedBy && usedBy->behavior == &actPlayer )
 		{
@@ -1611,7 +1611,7 @@ bool item_PotionInvisibility(Item*& item, Entity* entity, Entity* usedBy)
 		for ( node_t* node = map.creatures->first; node != nullptr; node = node->next )
 		{
 			Entity* creature = (Entity*)node->element;
-			if ( creature && creature->behavior == &actMonster && creature->monsterTarget == entity->getUID() )
+			if ( creature && creature->behavior == &actMonster && creature->monsterTarget() == entity->getUID() )
 			{
 				if ( !creature->isBossMonster() )
 				{
@@ -2169,10 +2169,10 @@ bool item_PotionUnstableStorm(Item*& item, Entity* entity, Entity* usedBy, Entit
 				fx->fskill[0] = fx->x;
 				fx->fskill[1] = fx->y;
 				fx->vel_z = -0.05;
-				fx->actmagicOrbitDist = 2;
+				fx->actmagicOrbitDist() = 2;
 				fx->fskill[2] = players[player]->entity->yaw + (local_rng.rand() % 8) * PI / 4.0;
 				fx->yaw = fx->fskill[2];
-				fx->actmagicNoLight = 1;
+				fx->actmagicNoLight() = 1;
 
 				serverSpawnMiscParticles(players[player]->entity, PARTICLE_EFFECT_FLAMES, 233, 0, fx->skill[0]);
 			}
@@ -2696,7 +2696,7 @@ bool item_PotionRestoreMagic(Item*& item, Entity* entity, Entity* usedBy)
 
 	if ( svFlags & SV_FLAG_HUNGER )
 	{
-		if ( player >= 0 && stats->playerRace == RACE_INSECTOID && stats->stat_appearance == 0 )
+		if ( player >= 0 && stats->playerRace() == RACE_INSECTOID && stats->stat_appearance == 0 )
 		{
 			Sint32 hungerPointPerMana = entity->playerInsectoidHungerValueOfManaPoint(*stats);
 			stats->HUNGER += amount * hungerPointPerMana;
@@ -4503,7 +4503,7 @@ void item_ScrollSummon(Item*& item, int player)
 			{
 				if ( forceFollower(*players[player]->entity, *monster) )
 				{
-					monster->monsterAllyIndex = player;
+					monster->monsterAllyIndex() = player;
 					if ( multiplayer == SERVER )
 					{
 						serverUpdateEntitySkill(monster, 42); // update monsterAllyIndex for clients.
@@ -5103,8 +5103,8 @@ void item_Food(Item*& item, int player)
 		{
 			conductVegetarian = false;
 		}
-		if ( stats[player]->playerRace == RACE_SKELETON && stats[player]->stat_appearance == 0
-			&& players[player] && players[player]->entity->effectPolymorph > NUMMONSTERS )
+		if ( stats[player]->playerRace() == RACE_SKELETON && stats[player]->stat_appearance == 0
+			&& players[player] && players[player]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			steamAchievement("BARONY_ACH_MUSCLE_MEMORY");
 		}
@@ -5158,7 +5158,7 @@ void item_Food(Item*& item, int player)
 		pukeChance = 1;
 	}
 
-	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 	{
 		pukeChance = 100; // shapeshifted players don't puke
 	}
@@ -5182,7 +5182,7 @@ void item_Food(Item*& item, int player)
 		{
 			if ( stats[player]->mask && stats[player]->mask->type == MASK_HAZARD_GOGGLES )
 			{
-				if ( !(players[player]->entity->behavior == &actPlayer && players[player]->entity->effectShapeshift != NOTHING) )
+				if ( !(players[player]->entity->behavior == &actPlayer && players[player]->entity->effectShapeshift() != NOTHING) )
 				{
 					messagePlayerColor(player, MESSAGE_STATUS, makeColorRGB(0, 255, 0), Language::get(6088));
 				}
@@ -5223,7 +5223,7 @@ void item_Food(Item*& item, int player)
 		{
 			if ( players[player]->entity->entityCanVomit() )
 			{
-				players[player]->entity->char_gonnavomit = 40 + local_rng.rand() % 10;
+				players[player]->entity->char_gonnavomit() = 40 + local_rng.rand() % 10;
 			}
 			else if ( stats[player]->type == MYCONID && local_rng.rand() % 3 == 0 )
 			{
@@ -5389,7 +5389,7 @@ void item_Food(Item*& item, int player)
 			messagePlayer(player, MESSAGE_WORLD, Language::get(911));
 
 
-			if ( stats[player]->playerRace == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
 			{
 				real_t manaRegenPercent = 0.f;
 				switch ( item->type )
@@ -5564,8 +5564,8 @@ void item_FoodTin(Item*& item, int player)
 	{
 		conductFoodless = false;
 		conductVegetarian = false;
-		if ( stats[player]->playerRace == RACE_SKELETON && stats[player]->stat_appearance == 0
-			&& players[player] && players[player]->entity && players[player]->entity->effectPolymorph > NUMMONSTERS )
+		if ( stats[player]->playerRace() == RACE_SKELETON && stats[player]->stat_appearance == 0
+			&& players[player] && players[player]->entity && players[player]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			steamAchievement("BARONY_ACH_MUSCLE_MEMORY");
 		}
@@ -5649,7 +5649,7 @@ void item_FoodTin(Item*& item, int player)
 	// chance of rottenness
 	pukeChance = item->foodGetPukeChance(stats[player]);
 
-	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 	{
 		pukeChance = 100; // shapeshifted players don't puke
 	}
@@ -5690,7 +5690,7 @@ void item_FoodTin(Item*& item, int player)
 		{
 			if ( players[player]->entity->entityCanVomit() )
 			{
-				players[player]->entity->char_gonnavomit = 40 + local_rng.rand() % 10;
+				players[player]->entity->char_gonnavomit() = 40 + local_rng.rand() % 10;
 			}
 			else if ( stats[player]->type == MYCONID && local_rng.rand() % 3 == 0 )
 			{
@@ -5829,7 +5829,7 @@ void item_FoodTin(Item*& item, int player)
 
 			players[player]->entity->modHP(std::max(1, (int)(foodMod * foodMult)));
 			messagePlayer(player, MESSAGE_WORLD, Language::get(911));
-			if ( stats[player]->playerRace == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
 			{
 				real_t manaRegenPercent = 0.6 * foodMult;
 				int manaAmount = std::min(stats[player]->MAXMP, 50) * manaRegenPercent;
@@ -5928,13 +5928,13 @@ void item_AmuletSexChange(Item*& item, int player)
 
 	// find out what creature we are...
 	if ( stats[player]->sex == FEMALE 
-		&& stats[player]->playerRace == RACE_INCUBUS 
+		&& stats[player]->playerRace() == RACE_INCUBUS 
 		&& stats[player]->stat_appearance == 0 )
 	{
 		messagePlayer(player, MESSAGE_HINT, Language::get(4048)); // don't feel like yourself
 	}
 	else if ( stats[player]->sex == MALE 
-		&& stats[player]->playerRace == RACE_SUCCUBUS 
+		&& stats[player]->playerRace() == RACE_SUCCUBUS 
 		&& stats[player]->stat_appearance == 0 )
 	{
 		messagePlayer(player, MESSAGE_HINT, Language::get(4048)); // don't feel like yourself
@@ -5996,13 +5996,13 @@ void item_Spellbook(Item*& item, int player)
 
 	if ( players[player] && players[player]->entity )
 	{
-		if ( players[player]->entity->effectShapeshift != NOTHING )
+		if ( players[player]->entity->effectShapeshift() != NOTHING )
 		{
 			messagePlayer(player, MESSAGE_HINT, Language::get(3445));
 			playSoundPlayer(player, 90, 64);
 			return;
 		}
-		else if ( stats[player] && (stats[player]->type == GOBLIN || (stats[player]->playerRace == RACE_GOBLIN && stats[player]->stat_appearance == 0)) )
+		else if ( stats[player] && (stats[player]->type == GOBLIN || (stats[player]->playerRace() == RACE_GOBLIN && stats[player]->stat_appearance == 0)) )
 		{
 			messagePlayer(player, MESSAGE_HINT, Language::get(3444));
 			playSoundPlayer(player, 90, 64);
@@ -6376,7 +6376,7 @@ void item_Spellbook(Item*& item, int player)
 					consumeItem(item, player);
 				}
 
-				if ( stats[player] && stats[player]->playerRace == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
+				if ( stats[player] && stats[player]->playerRace() == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
 				{
 					steamStatisticUpdate(STEAM_STAT_BOOKWORM, STEAM_STAT_INT, 1);
 				}
@@ -6521,7 +6521,7 @@ void item_FoodAutomaton(Item*& item, int player)
 			break;
 		case READABLE_BOOK:
 			stats[player]->HUNGER += 400;
-			if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 			{
 				steamStatisticUpdateClient(player, STEAM_STAT_FASCIST, STEAM_STAT_INT, 1);
 			}
@@ -6554,7 +6554,7 @@ void item_FoodAutomaton(Item*& item, int player)
 			stats[player]->HUNGER += 1500;
 			players[player]->entity->modMP(stats[player]->MAXMP);
 			messagePlayerColor(player, MESSAGE_STATUS, color, Language::get(3699)); // superheats
-			if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 			{
 				steamStatisticUpdateClient(player, STEAM_STAT_SPICY, STEAM_STAT_INT, 1);
 			}
@@ -6581,17 +6581,17 @@ void item_FoodAutomaton(Item*& item, int player)
 				fx->fskill[0] = fx->x;
 				fx->fskill[1] = fx->y;
 				fx->vel_z = -0.05;
-				fx->actmagicOrbitDist = 2;
+				fx->actmagicOrbitDist() = 2;
 				fx->fskill[2] = players[player]->entity->yaw + (local_rng.rand() % 8) * PI / 4.0;
 				fx->yaw = fx->fskill[2];
-				fx->actmagicNoLight = 1;
+				fx->actmagicNoLight() = 1;
 
 				serverSpawnMiscParticles(players[player]->entity, PARTICLE_EFFECT_FLAMES, 233, 0, fx->skill[0]);
 			}
 			break;
 		}
 		case TOOL_METAL_SCRAP:
-			if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 			{
 				achievementObserver.playerAchievements[player].trashCompactor += 1;
 			}
@@ -6609,7 +6609,7 @@ void item_FoodAutomaton(Item*& item, int player)
 			}
 			break;
 		case TOOL_MAGIC_SCRAP:
-			if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+			if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 			{
 				achievementObserver.playerAchievements[player].trashCompactor += 1;
 			}
@@ -6638,7 +6638,7 @@ void item_FoodAutomaton(Item*& item, int player)
 
 	if ( itemCategory(item) == SCROLL )
 	{
-		if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+		if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 		{
 			steamStatisticUpdateClient(player, STEAM_STAT_FASCIST, STEAM_STAT_INT, 1);
 		}
@@ -6797,7 +6797,7 @@ void updateHungerMessages(Entity* my, Stat* myStats, Item* eaten)
 		}
 		else if ( myStats->HUNGER >= 1500 )
 		{
-			if ( my->effectShapeshift != NOTHING )
+			if ( my->effectShapeshift() != NOTHING )
 			{
 				messagePlayer(my->skill[2], MESSAGE_STATUS, Language::get(916)); // shapeshifted players don't puke
 			}
@@ -6810,7 +6810,7 @@ void updateHungerMessages(Entity* my, Stat* myStats, Item* eaten)
 				if ( my->entityCanVomit() )
 				{
 					messagePlayer(my->skill[2], MESSAGE_STATUS, Language::get(917));
-					my->char_gonnavomit = 40 + local_rng.rand() % 10;
+					my->char_gonnavomit() = 40 + local_rng.rand() % 10;
 				}
 			}
 		}

@@ -598,7 +598,7 @@ void initMonsterS(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SALAMANDER][6][0]; // 1.5
 	entity->focaly = limbs[SALAMANDER][6][1]; // 0
 	entity->focalz = limbs[SALAMANDER][6][2]; // -.5
@@ -619,7 +619,7 @@ void initMonsterS(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SALAMANDER][7][0]; // 2
 	entity->focaly = limbs[SALAMANDER][7][1]; // 0
 	entity->focalz = limbs[SALAMANDER][7][2]; // 0
@@ -639,7 +639,7 @@ void initMonsterS(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SALAMANDER][8][0]; // 0
 	entity->focaly = limbs[SALAMANDER][8][1]; // 0
 	entity->focalz = limbs[SALAMANDER][8][2]; // 4
@@ -662,7 +662,7 @@ void initMonsterS(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SALAMANDER][9][0]; // 0
 	entity->focaly = limbs[SALAMANDER][9][1]; // 0
 	entity->focalz = limbs[SALAMANDER][9][2]; // -2
@@ -682,7 +682,7 @@ void initMonsterS(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SALAMANDER][10][0]; // 0
 	entity->focaly = limbs[SALAMANDER][10][1]; // 0
 	entity->focalz = limbs[SALAMANDER][10][2]; // .25
@@ -849,7 +849,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			my->z = getNormalHeightMonsterS(*my);
 
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				if ( debugModel )
 				{
@@ -878,7 +878,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		if ( bodypart < LIMB_HUMANOID_TORSO )
 		{
 			// post-swing head animation. client doesn't need to adjust the entity pitch, server will handle.
-			if ( my->monsterAttack != MONSTER_POSE_RANGED_WINDUP3 && bodypart == 1 && multiplayer != CLIENT )
+			if ( my->monsterAttack() != MONSTER_POSE_RANGED_WINDUP3 && bodypart == 1 && multiplayer != CLIENT )
 			{
 				limbAnimateToLimit(my, ANIMATE_PITCH, 0.1, 0, false, 0.0);
 			}
@@ -909,7 +909,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				weaponarm = entity;
 				if ( MONSTER_ATTACK > 0 )
 				{
-					if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP3 )
+					if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP3 )
 					{
 						Entity* rightbody = nullptr;
 						// set rightbody to left leg.
@@ -923,12 +923,12 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							return;
 						}
 
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							if ( multiplayer != CLIENT )
@@ -946,7 +946,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, 7 * PI / 4, true, 0.0);
 						//limbAnimateToLimit(weaponarm, ANIMATE_ROLL, -0.25, 7 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -1172,7 +1172,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( weaponNode )
 			{
 				Entity* weapon = (Entity*)weaponNode->element;
-				if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+				if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 				{
 					// if weapon invisible and I'm not attacking, relax arm.
 					entity->focalx = limbs[SALAMANDER][4][0]; // 0
@@ -1276,7 +1276,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( shieldNode )
 			{
 				Entity* shield = (Entity*)shieldNode->element;
-				if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+				if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 				{
 					entity->focalx = limbs[SALAMANDER][5][0]; // 0
 					entity->focaly = limbs[SALAMANDER][5][1];
@@ -1303,7 +1303,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				}
 			}
 			my->setHumanoidLimbOffset(entity, SALAMANDER, LIMB_HUMANOID_LEFTARM);
-			if ( my->monsterDefend && my->monsterAttack == 0 )
+			if ( my->monsterDefend() && my->monsterAttack() == 0 )
 			{
 				MONSTER_SHIELDYAW = PI / 5;
 			}
@@ -1716,7 +1716,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->fskill[0] += std::min(dist * MONSTER_SWALKSPEED, 2.f * MONSTER_SWALKSPEED); // move proportional to move speed
 				}
-				else if ( my->monsterAttack != 0 )
+				else if ( my->monsterAttack() != 0 )
 				{
 					entity->fskill[0] += MONSTER_SWALKSPEED; // move fixed speed when attacking if stationary
 				}
@@ -1725,7 +1725,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					entity->fskill[0] += 0.01; // otherwise move slow idle
 				}
 
-				if ( entity->fskill[0] > PI / 3 || ((!moving || my->monsterAttack != 0) && entity->fskill[0] > PI / 5) )
+				if ( entity->fskill[0] > PI / 3 || ((!moving || my->monsterAttack() != 0) && entity->fskill[0] > PI / 5) )
 				{
 					// switch direction if angle too great, angle is shorter if attacking or stationary
 					entity->skill[0] = 1;
@@ -1737,7 +1737,7 @@ void monsterSMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->fskill[0] -= std::min(dist * MONSTER_SWALKSPEED, 2.f * MONSTER_SWALKSPEED);
 				}
-				else if ( my->monsterAttack != 0 )
+				else if ( my->monsterAttack() != 0 )
 				{
 					entity->fskill[0] -= MONSTER_SWALKSPEED;
 				}

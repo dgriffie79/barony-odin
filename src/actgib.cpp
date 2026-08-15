@@ -140,7 +140,7 @@ void actGib(Entity* my)
 		my->removeLightField();
 	}
 
-	if ( my->actGibHitGroundEvent == 1 )
+	if ( my->actGibHitGroundEvent() == 1 )
 	{
 		if ( my->sprite == 245 && my->flags[SPRITE] )
 		{
@@ -331,7 +331,7 @@ void actFociGib(Entity* my)
 			}
 			else
 			{
-				if ( my->actGibMagicParticle > 0 )
+				if ( my->actGibMagicParticle() > 0 )
 				{
 					my->pitch = atan(my->vel_z / std::max(1.0, sqrt(GIB_VELX * GIB_VELX + GIB_VELY * GIB_VELY)));
 
@@ -622,11 +622,11 @@ void actFociGib(Entity* my)
 
 							entity->skill[4] = 0; // life start
 							entity->skill[5] = 2; //lifetime
-							entity->actmagicSpray = 2;
-							entity->actmagicOrbitHitTargetUID4 = targetUid;
-							entity->actmagicReflectionCount = my->actmagicReflectionCount;
-							entity->actmagicSpellbookBonus = my->actmagicSpellbookBonus;
-							entity->actmagicFromSpellbook = my->actmagicFromSpellbook;
+							entity->actmagicSpray() = 2;
+							entity->actmagicOrbitHitTargetUID4() = targetUid;
+							entity->actmagicReflectionCount() = my->actmagicReflectionCount();
+							entity->actmagicSpellbookBonus() = my->actmagicSpellbookBonus();
+							entity->actmagicFromSpellbook() = my->actmagicFromSpellbook();
 
 							node_t* node = list_AddNodeFirst(&entity->children);
 							node->element = copySpell(spell);
@@ -668,7 +668,7 @@ void actFociGib(Entity* my)
 		my->removeLightField();
 	}
 
-	if ( my->actGibMagicParticle > 0 )
+	if ( my->actGibMagicParticle() > 0 )
 	{
 		if ( my->sprite == 2154 )
 		{
@@ -677,7 +677,7 @@ void actFociGib(Entity* my)
 			}
 			else
 			{
-				int sprite = my->actGibMagicParticle;
+				int sprite = my->actGibMagicParticle();
 				if ( local_rng.rand() % 2 == 0 )
 				{
 					sprite = 260;
@@ -715,7 +715,7 @@ void actFociGib(Entity* my)
 
 			if ( my->ticks % 2 == 0 )
 			{
-				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle, my->scalex, 10.0) )
+				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle(), my->scalex, 10.0) )
 				{
 					fx->ditheringDisabled = true;
 					fx->fskill[1] = 0.05; // decay size
@@ -759,7 +759,7 @@ void actFociGib(Entity* my)
 		else if ( my->sprite == 2156 )
 		{
 			my->roll = fmod(my->roll + 0.1, 2 * PI);
-			if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle, 1.0, 1.0) )
+			if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle(), 1.0, 1.0) )
 			{
 				fx->flags[SPRITE] = my->flags[SPRITE];
 				fx->ditheringDisabled = true;
@@ -777,7 +777,7 @@ void actFociGib(Entity* my)
 		{
 			if ( my->ticks % 2 == 0 )
 			{
-				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle, 1.0, 1.0) )
+				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle(), 1.0, 1.0) )
 				{
 					fx->sprite = my->sprite;
 					fx->flags[SPRITE] = my->flags[SPRITE];
@@ -797,7 +797,7 @@ void actFociGib(Entity* my)
 		{
 			if ( my->ticks % 2 == 0 )
 			{
-				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle, 1.0, 1.0) )
+				if ( Entity* fx = spawnMagicParticleCustom(my, my->actGibMagicParticle(), 1.0, 1.0) )
 				{
 					fx->flags[SPRITE] = true;// = my->flags[SPRITE];
 					fx->ditheringDisabled = true;
@@ -1339,7 +1339,7 @@ Entity* spawnFociGib(real_t x, real_t y, real_t z, real_t dir, real_t velocityBo
 	GIB_SWIRL = foci_swirl;
 	GIB_OSC_H = foci_osc_h;// *((my->ticks % 2) ? 1 : -1);
 	GIB_VEL_DECAY = foci_vel_decay;
-	my->actGibMagicParticle = foci_particle;
+	my->actGibMagicParticle() = foci_particle;
 	GIB_ORBIT_X = my->x;
 	GIB_ORBIT_Y = my->y;
 
@@ -1829,12 +1829,12 @@ void actGreasePuddleSpawner(Entity* my)
 									{
 										if ( entity->flags[BURNING] )
 										{
-											stats->burningInflictedBy = parent->getUID();
+											stats->burningInflictedBy() = parent->getUID();
 
 											bool alertTarget = entity->monsterAlertBeforeHit(parent);
 
 											// alert the monster!
-											if ( entity->monsterState != MONSTER_STATE_ATTACK && (stats->type < LICH || stats->type >= SHOPKEEPER) )
+											if ( entity->monsterState() != MONSTER_STATE_ATTACK && (stats->type < LICH || stats->type >= SHOPKEEPER) )
 											{
 												if ( alertTarget )
 												{

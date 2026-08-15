@@ -40,7 +40,7 @@ void initLichIce(Entity* my, Stat* myStats)
 
 	if ( multiplayer != CLIENT )
 	{
-	    my->monsterLichBattleState = LICH_BATTLE_IMMOBILE;
+	    my->monsterLichBattleState() = LICH_BATTLE_IMMOBILE;
 		MONSTER_SPOTSND = 377;
 		MONSTER_SPOTVAR = 4;
 		MONSTER_IDLESND = -1;
@@ -247,7 +247,7 @@ void lichIceDie(Entity* my)
 	playSoundEntity(my, 94, 128);
 	my->removeLightField();
 	// kill all other monsters on the level
-	for ( node = map.creatures->first; my->monsterLichAllyStatus == LICH_ALLY_DEAD && node != NULL; node = nextnode )
+	for ( node = map.creatures->first; my->monsterLichAllyStatus() == LICH_ALLY_DEAD && node != NULL; node = nextnode )
 	{
 		nextnode = node->next;
 		Entity* entity = (Entity*)node->element;
@@ -369,11 +369,11 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		}
 
 		// check tiles around the monster to be freed.
-		if ( my->monsterLichBattleState == LICH_BATTLE_IMMOBILE )
+		if ( my->monsterLichBattleState() == LICH_BATTLE_IMMOBILE )
 		{
 			my->flags[PASSABLE] = true;
 		}
-		if ( my->monsterLichBattleState == LICH_BATTLE_IMMOBILE && my->ticks > TICKS_PER_SECOND )
+		if ( my->monsterLichBattleState() == LICH_BATTLE_IMMOBILE && my->ticks > TICKS_PER_SECOND )
 		{
 			int sides = 0;
 			int my_x = static_cast<int>(my->x) >> 4;
@@ -400,7 +400,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			if ( sides != 4 )
 			{
-				my->monsterLichBattleState = LICH_BATTLE_READY;
+				my->monsterLichBattleState() = LICH_BATTLE_READY;
 				my->flags[PASSABLE] = false;
 				generatePathMaps();
 				/*swornenemies[LICH_ICE][AUTOMATON] = false;
@@ -439,13 +439,13 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		}
 
 		// passive floating effect, server only.
-		if ( my->monsterState == MONSTER_STATE_LICHICE_DIE )
+		if ( my->monsterState() == MONSTER_STATE_LICHICE_DIE )
 		{
 			my->z -= 0.03;
 		}
-		if ( my->monsterAttack == 0 )
+		if ( my->monsterAttack() == 0 )
 		{
-			if ( my->monsterAnimationLimbOvershoot == ANIMATE_OVERSHOOT_NONE )
+			if ( my->monsterAnimationLimbOvershoot() == ANIMATE_OVERSHOOT_NONE )
 			{
 				if ( my->z < -1.2 )
 				{
@@ -454,7 +454,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				else
 				{
 					my->z = -1.2;
-					my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+					my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 				}
 			}
 			if ( dist < 0.1 )
@@ -463,7 +463,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				limbAnimateWithOvershoot(my, ANIMATE_Z, 0.005, -1.5, 0.005, -1.2, ANIMATE_DIR_NEGATIVE);
 			}
 		}
-		else if ( my->monsterAttack == 1 || my->monsterAttack == 3 )
+		else if ( my->monsterAttack() == 1 || my->monsterAttack() == 3 )
 		{
 			if ( my->z < -1.2 )
 			{
@@ -472,7 +472,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 			else
 			{
 				my->z = -1.2;
-				my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_NONE;
+				my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_NONE;
 			}
 		}
 	}
@@ -486,17 +486,17 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 	}
 
 	//Lich stares you down while he does his special ability windup, and any of his spellcasting animations.
-	if ( (my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1
-		|| my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP2
-		|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1
-		|| my->monsterAttack == MONSTER_POSE_MAGIC_CAST1
-		|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP2
-		|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP3
-		|| my->monsterState == MONSTER_STATE_LICH_CASTSPELLS)
-		&& my->monsterState != MONSTER_STATE_LICHICE_DIE )
+	if ( (my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1
+		|| my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP2
+		|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1
+		|| my->monsterAttack() == MONSTER_POSE_MAGIC_CAST1
+		|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP2
+		|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP3
+		|| my->monsterState() == MONSTER_STATE_LICH_CASTSPELLS)
+		&& my->monsterState() != MONSTER_STATE_LICHICE_DIE )
 	{
 		//Always turn to face the target.
-		Entity* target = uidToEntity(my->monsterTarget);
+		Entity* target = uidToEntity(my->monsterTarget());
 		if ( target )
 		{
 			my->lookAtEntity(*target);
@@ -512,9 +512,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		{
 			if ( bodypart == 0 ) // insert head/body animation here.
 			{
-				if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+				if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 				{
-					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot >= ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot() >= ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// handle z movement on windup
 						limbAnimateWithOvershoot(my, ANIMATE_Z, 0.2, -0.6, 0.1, -3.2, ANIMATE_DIR_POSITIVE); // default z is -1.2
@@ -524,9 +524,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP3 || my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP3 )
+				else if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP3 || my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP3 )
 				{
-					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot >= ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot() >= ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// handle z movement on windup
 						limbAnimateWithOvershoot(my, ANIMATE_Z, 0.3, -0.6, 0.3, -4.0, ANIMATE_DIR_POSITIVE); // default z is -1.2
@@ -536,9 +536,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP2 )
+				else if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP2 )
 				{
-					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot >= ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot() >= ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// handle z movement on windup
 						limbAnimateWithOvershoot(my, ANIMATE_Z, 0.05, -0.6, 0.1, -2.0, ANIMATE_DIR_POSITIVE); // default z is -1.2
@@ -548,9 +548,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+				else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 				{
-					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot >= ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( multiplayer != CLIENT && my->monsterAnimationLimbOvershoot() >= ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// handle z movement on windup
 						limbAnimateWithOvershoot(my, ANIMATE_Z, 0.3, -0.6, 0.3, -4.0, ANIMATE_DIR_POSITIVE); // default z is -1.2
@@ -584,7 +584,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		if ( bodypart != LICH_HEAD )
 		{
 			// lich head turns to track player, other limbs will rotate as normal.
-			if ( bodypart == LICH_LEFTARM && my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1 )
+			if ( bodypart == LICH_LEFTARM && my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1 )
 			{
 				// don't rotate leftarm here during spellcast.
 			}
@@ -601,26 +601,26 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		{
 			// weapon holding arm.
 			weaponarm = entity;
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				entity->pitch = PI / 8; // default arm pitch when not attacking.
 			}
 			else
 			{
 				// vertical chop windup
-				if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP1 )
+				if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP1 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 					}
 
 					limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.3, 5 * PI / 4, false, 0.0);
 
-					if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+					if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -629,7 +629,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				// vertical chop attack
-				else if ( my->monsterAttack == 1 )
+				else if ( my->monsterAttack() == 1 )
 				{
 					if ( weaponarm->skill[1] == 0 )
 					{
@@ -643,31 +643,31 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					{
 						if ( limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.4, PI / 8, false, 0.0) )
 						{
-							my->monsterWeaponYaw = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->pitch = PI / 8;
 							weaponarm->roll = 0;
-							my->monsterAttack = 0;
+							my->monsterAttack() = 0;
 						}
 					}
 				}
 				// horizontal chop windup
-				else if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2 )
+				else if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
 						weaponarm->pitch = PI / 4;
 						weaponarm->roll = 0;
-						my->monsterArmbended = 1; // don't actually bend the arm, we're just using this to adjust the limb offsets in the weapon code.
+						my->monsterArmbended() = 1; // don't actually bend the arm, we're just using this to adjust the limb offsets in the weapon code.
 						weaponarm->skill[1] = 0;
-						my->monsterWeaponYaw = 6 * PI / 4;
+						my->monsterWeaponYaw() = 6 * PI / 4;
 					}
 
 					limbAnimateToLimit(weaponarm, ANIMATE_ROLL, -0.2, 3 * PI / 2, false, 0.0);
 					limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.2, 0, false, 0.0);
 
 
-					if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+					if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -676,7 +676,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				// horizontal chop attack
-				else if ( my->monsterAttack == 2 )
+				else if ( my->monsterAttack() == 2 )
 				{
 					if ( weaponarm->skill[1] == 0 )
 					{
@@ -697,28 +697,28 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 								&& limbAnimateToLimit(weaponarm, ANIMATE_PITCH, 0.4, PI / 8, false, 0.0) )
 							{
 								weaponarm->skill[1] = 0;
-								my->monsterWeaponYaw = 0;
+								my->monsterWeaponYaw() = 0;
 								weaponarm->pitch = PI / 8;
 								weaponarm->roll = 0;
-								my->monsterArmbended = 0;
-								my->monsterAttack = 0;
-								my->monsterAttackTime = 0;
+								my->monsterArmbended() = 0;
+								my->monsterAttack() = 0;
+								my->monsterAttackTime() = 0;
 							}
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+				else if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 						createParticleDot(my);
 						if ( multiplayer != CLIENT )
 						{
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							// lich can't be paralyzed, use EFF_STUNNED instead.
 							myStats->setEffectActive(EFF_STUNNED, 1);
 							myStats->EFFECTS_TIMERS[EFF_STUNNED] = 50;
@@ -726,12 +726,12 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 
 					// only do the following during 2nd + end stage of overshoot animation.
-					if ( my->monsterAnimationLimbOvershoot != ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() != ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						limbAnimateToLimit(head, ANIMATE_PITCH, -0.1, 11 * PI / 6, true, 0.05);
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.3, 5 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -745,19 +745,19 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP3 )
+				else if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP3 )
 				{
 					int windupDuration = 40; //(my->monsterState == MONSTER_STATE_LICHFIRE_CASTSPELLS) ? 20 : 40;
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 10 * PI / 6;
+						my->monsterWeaponYaw() = 10 * PI / 6;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 						createParticleDot(my);
 						if ( multiplayer != CLIENT )
 						{
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							//	// lich can't be paralyzed, use EFF_STUNNED instead.
 							myStats->setEffectActive(EFF_STUNNED, 1);
 							myStats->EFFECTS_TIMERS[EFF_STUNNED] = windupDuration;
@@ -765,12 +765,12 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 
 					// only do the following during 2nd + end stage of overshoot animation.
-					if ( my->monsterAnimationLimbOvershoot != ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() != ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						limbAnimateToLimit(head, ANIMATE_PITCH, -0.1, 11 * PI / 6, true, 0.05);
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.3, 5 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= windupDuration / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= windupDuration / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -780,7 +780,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				// vertical chop after melee3
-				else if ( my->monsterAttack == 3 )
+				else if ( my->monsterAttack() == 3 )
 				{
 					if ( weaponarm->skill[1] == 0 )
 					{
@@ -795,27 +795,27 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					{
 						if ( limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, PI / 8, false, 0.0) )
 						{
-							my->monsterWeaponYaw = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->pitch = PI / 8;
 							weaponarm->roll = 0;
-							my->monsterAttack = 0;
+							my->monsterAttack() = 0;
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP2 )
+				else if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP2 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 						createParticleDropRising(my, 592, 0.7);
 						if ( multiplayer != CLIENT )
 						{
-							if ( my->monsterState != MONSTER_STATE_LICHFIRE_DIE )
+							if ( my->monsterState() != MONSTER_STATE_LICHFIRE_DIE )
 							{
-								my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+								my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 								// lich can't be paralyzed, use EFF_STUNNED instead.
 								myStats->setEffectActive(EFF_STUNNED, 1);
 								myStats->EFFECTS_TIMERS[EFF_STUNNED] = 50;
@@ -832,23 +832,23 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					limbAnimateToLimit(my, ANIMATE_WEAPON_YAW, -0.1, 7 * PI / 4, false, 0.0);
 
 					// only do the following during 2nd + end stage of overshoot animation.
-					if ( my->monsterAnimationLimbOvershoot != ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() != ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.3, 5 * PI / 4, false, 0.0);
-						if ( my->monsterAttackTime >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
-								if ( my->monsterState != MONSTER_STATE_LICHICE_DIE )
+								if ( my->monsterState() != MONSTER_STATE_LICHICE_DIE )
 								{
 									my->attack(1, 0, nullptr);
 								}
 								else
 								{
-									my->monsterAttackTime = 25; //reset this attack time to allow successive strikes
+									my->monsterAttackTime() = 25; //reset this attack time to allow successive strikes
 								}
 
-								if ( my->monsterState == MONSTER_STATE_LICHICE_DIE )
+								if ( my->monsterState() == MONSTER_STATE_LICHICE_DIE )
 								{
 									int spellID = SPELL_DRAIN_SOUL;
 									for ( int i = 0; i < 8; ++i )
@@ -864,7 +864,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 								else
 								{
 									int spellID = SPELL_COLD;
-									if ( local_rng.rand() % 5 == 0 || (my->monsterLichAllyStatus == LICH_ALLY_DEAD && local_rng.rand() % 2 == 0) )
+									if ( local_rng.rand() % 5 == 0 || (my->monsterLichAllyStatus() == LICH_ALLY_DEAD && local_rng.rand() % 2 == 0) )
 									{
 										spellID = SPELL_DRAIN_SOUL;
 									}
@@ -882,18 +882,18 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP3 )
+				else if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP3 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 						createParticleDropRising(my, 678, 1.0);
 						if ( multiplayer != CLIENT )
 						{
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							// lich can't be paralyzed, use EFF_STUNNED instead.
 							myStats->setEffectActive(EFF_STUNNED, 1);
 							myStats->EFFECTS_TIMERS[EFF_STUNNED] = 50;
@@ -904,10 +904,10 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					limbAnimateToLimit(my, ANIMATE_WEAPON_YAW, 0.1, 1 * PI / 4, false, 0.0);
 
 					// only do the following during 2nd + end stage of overshoot animation.
-					if ( my->monsterAnimationLimbOvershoot != ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() != ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.3, 5 * PI / 4, false, 0.0);
-						if ( my->monsterAttackTime >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -921,7 +921,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 										// do some minor variations in spell angle
 										spell->yaw += ((PI * (-4 + local_rng.rand() % 9)) / 40);
 									}
-									Entity* target = uidToEntity(my->monsterTarget);
+									Entity* target = uidToEntity(my->monsterTarget());
 									if ( target )
 									{
 										real_t spellDistance = sqrt(pow(spell->x - target->x, 2) + pow(spell->y - target->y, 2));
@@ -933,7 +933,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 									}
 									spell->vel_x = horizontalSpeed * cos(spell->yaw);
 									spell->vel_y = horizontalSpeed * sin(spell->yaw);
-									spell->actmagicIsVertical = MAGIC_ISVERTICAL_XYZ;
+									spell->actmagicIsVertical() = MAGIC_ISVERTICAL_XYZ;
 									spell->z = -22.0;
 									spell->pitch = atan2(spell->vel_z, horizontalSpeed);
 								}
@@ -941,24 +941,24 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+				else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 				{
-					if ( my->monsterAttackTime == 0 )
+					if ( my->monsterAttackTime() == 0 )
 					{
 						// init rotations
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						weaponarm->roll = 0;
 						weaponarm->skill[1] = 0;
 						createParticleDropRising(my, 174, 0.5);
 						if ( multiplayer != CLIENT )
 						{
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							// lich can't be paralyzed, use EFF_STUNNED instead.
 							myStats->setEffectActive(EFF_STUNNED, 1);
 							myStats->EFFECTS_TIMERS[EFF_STUNNED] = 80;
 						}
 					}
-					else if ( my->monsterAttackTime % 20 == 0 )
+					else if ( my->monsterAttackTime() % 20 == 0 )
 					{
 						createParticleDropRising(my, 174, 0.5);
 					}
@@ -967,7 +967,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.1, 5 * PI / 4, false, 0.0);
 					limbAnimateToLimit(my, ANIMATE_WEAPON_YAW, 0.1, PI / 4, false, 0.0);
 
-					if ( my->monsterAttackTime >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
+					if ( my->monsterAttackTime() >= 50 / (monsterGlobalAnimationMultiplier / 10.0) )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -980,17 +980,17 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 		else if ( bodypart == LICH_LEFTARM )
 		{
 			spellarm = entity;
-			if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 
-				|| my->monsterAttack == MONSTER_POSE_MELEE_WINDUP3
-				|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP2
-				|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP3
-				|| my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+			if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 
+				|| my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP3
+				|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP2
+				|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP3
+				|| my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 			{
 				spellarm->pitch = weaponarm->pitch;
 			}
-			else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1 )
+			else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1 )
 			{
-				if ( my->monsterAttackTime == 0 )
+				if ( my->monsterAttackTime() == 0 )
 				{
 					// init rotations
 					spellarm->roll = 0;
@@ -1032,7 +1032,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					}
 				}
 
-				if ( my->monsterAttackTime >= 1 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+				if ( my->monsterAttackTime() >= 1 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 				{
 					if ( multiplayer != CLIENT )
 					{
@@ -1042,9 +1042,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				}
 			}
 			// raise arm to cast spell
-			else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP2 )
+			else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP2 )
 			{
-				if ( my->monsterAttackTime == 0 )
+				if ( my->monsterAttackTime() == 0 )
 				{
 					// init rotations
 					spellarm->pitch = 0;
@@ -1061,7 +1061,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				}
 			}
 			// vertical spell attack
-			else if ( my->monsterAttack == MONSTER_POSE_MAGIC_CAST1 )
+			else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_CAST1 )
 			{
 				if ( spellarm->skill[1] == 0 )
 				{
@@ -1088,7 +1088,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					{
 						spellarm->pitch = 0;
 						spellarm->roll = 0;
-						my->monsterAttack = 0;
+						my->monsterAttack() = 0;
 					}
 				}
 			}
@@ -1111,10 +1111,10 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				entity->x -= 2.75 * cos(my->yaw + PI / 2);
 				entity->y -= 2.75 * sin(my->yaw + PI / 2);
 				entity->z -= 3.25;
-				if ( !(my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2
-					|| my->monsterAttack == 2
-					|| my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1
-					|| my->monsterAttack == 3)
+				if ( !(my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2
+					|| my->monsterAttack() == 2
+					|| my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1
+					|| my->monsterAttack() == 3)
 					)
 				{
 					entity->yaw -= MONSTER_WEAPONYAW;
@@ -1127,8 +1127,8 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				node_t* tempNode;
 				Entity* playertotrack = NULL;
 				double disttoplayer = 0.0;
-				Entity* target = uidToEntity(my->monsterTarget);
-				if ( target && my->monsterAttack == 0 )
+				Entity* target = uidToEntity(my->monsterTarget());
+				if ( target && my->monsterAttack() == 0 )
 				{
 					entity->lookAtEntity(*target);
 					entity->monsterRotate();
@@ -1198,9 +1198,9 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					entity->y = weaponarm->y;// +1.5 * sin(weaponarm->yaw);// * (my->monsterAttack == 0);
 					entity->z = weaponarm->z;// -.5 * (my->monsterAttack == 0);
 					entity->pitch = weaponarm->pitch;
-					entity->yaw = weaponarm->yaw + 0.1 * (my->monsterAttack == 0);
+					entity->yaw = weaponarm->yaw + 0.1 * (my->monsterAttack() == 0);
 					entity->roll = weaponarm->roll;
-					if ( my->monsterAttack == 2 || my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2 )
+					if ( my->monsterAttack() == 2 || my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2 )
 					{
 						// don't boost pitch during side-swipe
 					}
@@ -1212,7 +1212,7 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 					entity->focalx = limbs[LICH_ICE][4][0];
 					entity->focaly = limbs[LICH_ICE][4][1];
 					entity->focalz = limbs[LICH_ICE][4][2];
-					if ( my->monsterArmbended )
+					if ( my->monsterArmbended() )
 					{
 						// adjust focal points during side swing
 						entity->focalx = limbs[LICH_ICE][4][0] - 0.8;
@@ -1226,13 +1226,13 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 				break;
 		}
 	}
-	if ( my->monsterAttack > 0 && my->monsterAttack <= MONSTER_POSE_MAGIC_CAST3 )
+	if ( my->monsterAttack() > 0 && my->monsterAttack() <= MONSTER_POSE_MAGIC_CAST3 )
 	{
-		my->monsterAttackTime++;
+		my->monsterAttackTime()++;
 	}
-	else if ( my->monsterAttack == 0 )
+	else if ( my->monsterAttack() == 0 )
 	{
-		my->monsterAttackTime = 0;
+		my->monsterAttackTime() = 0;
 	}
 	else
 	{
@@ -1242,37 +1242,37 @@ void lichIceAnimate(Entity* my, Stat* myStats, double dist)
 
 void Entity::lichIceSetNextAttack(Stat& myStats)
 {
-	monsterLichIceCastPrev = monsterLichIceCastSeq;
+	monsterLichIceCastPrev() = monsterLichIceCastSeq();
 	//messagePlayer(0, "melee: %d, magic %d", monsterLichMeleeSwingCount, monsterLichMagicCastCount);
-	switch ( monsterLichIceCastSeq )
+	switch ( monsterLichIceCastSeq() )
 	{
 		case LICH_ATK_VERTICAL_SINGLE:
-			if ( monsterSpecialState == 0 && monsterState != MONSTER_STATE_LICH_CASTSPELLS
-				&& monsterSpecialTimer == 0 && local_rng.rand() % 4 > 0 )
+			if ( monsterSpecialState() == 0 && monsterState() != MONSTER_STATE_LICH_CASTSPELLS
+				&& monsterSpecialTimer() == 0 && local_rng.rand() % 4 > 0 )
 			{
-				monsterLichMeleeSwingCount = 0;
-				monsterSpecialState = LICH_ICE_ATTACK_COMBO;
+				monsterLichMeleeSwingCount() = 0;
+				monsterSpecialState() = LICH_ICE_ATTACK_COMBO;
 				//createParticleDot(this);
 			}
-			++monsterLichMeleeSwingCount;
+			++monsterLichMeleeSwingCount();
 			switch ( local_rng.rand() % 3 )
 			{
 				case 0:
-					monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 1:
-					monsterLichIceCastSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				case 2:
-					if ( monsterSpecialState == LICH_ICE_ATTACK_COMBO )
+					if ( monsterSpecialState() == LICH_ICE_ATTACK_COMBO )
 					{
-						monsterLichIceCastSeq = LICH_ATK_FALLING_DIAGONAL;
+						monsterLichIceCastSeq() = LICH_ATK_FALLING_DIAGONAL;
 						//monsterSpecialState = 0;
 						//monsterSpecialTimer = 100;
 					}
 					else
 					{
-						monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+						monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					}
 					break;
 				case 3:
@@ -1285,32 +1285,32 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 			}
 			break;
 		case LICH_ATK_HORIZONTAL_SINGLE:
-			if ( monsterSpecialState == 0
-				&& monsterSpecialTimer == 0 && local_rng.rand() % 4 > 0 )
+			if ( monsterSpecialState() == 0
+				&& monsterSpecialTimer() == 0 && local_rng.rand() % 4 > 0 )
 			{
-				monsterLichMeleeSwingCount = 0;
-				monsterSpecialState = LICH_ICE_ATTACK_COMBO;
+				monsterLichMeleeSwingCount() = 0;
+				monsterSpecialState() = LICH_ICE_ATTACK_COMBO;
 				//createParticleDot(this);
 			}
-			++monsterLichMeleeSwingCount;
+			++monsterLichMeleeSwingCount();
 			switch ( local_rng.rand() % 3 )
 			{
 				case 0:
-					monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 1:
-					monsterLichIceCastSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				case 2:
-					if ( monsterSpecialState == LICH_ICE_ATTACK_COMBO )
+					if ( monsterSpecialState() == LICH_ICE_ATTACK_COMBO )
 					{
-						monsterLichIceCastSeq = LICH_ATK_FALLING_DIAGONAL;
+						monsterLichIceCastSeq() = LICH_ATK_FALLING_DIAGONAL;
 						//monsterSpecialState = 0;
 						//monsterSpecialTimer = 100;
 					}
 					else
 					{
-						monsterLichIceCastSeq = LICH_ATK_BASICSPELL_SINGLE;
+						monsterLichIceCastSeq() = LICH_ATK_BASICSPELL_SINGLE;
 					}
 					break;
 				default:
@@ -1318,27 +1318,27 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 			}
 			break;
 		case LICH_ATK_RISING_RAIN:
-			monsterLichMeleeSwingCount = 0;
+			monsterLichMeleeSwingCount() = 0;
 			switch ( local_rng.rand() % 4 )
 			{
 				case 0:
 				case 1:
 				case 2:
-					monsterLichFireMeleeSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichFireMeleeSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 3:
-					monsterLichFireMeleeSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichFireMeleeSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				default:
 					break;
 			}
 			break;
 		case LICH_ATK_BASICSPELL_SINGLE:
-			++monsterLichMagicCastCount;
-			if ( monsterLichMagicCastCount > 2 || local_rng.rand() % 2 == 0 )
+			++monsterLichMagicCastCount();
+			if ( monsterLichMagicCastCount() > 2 || local_rng.rand() % 2 == 0 )
 			{
-				monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
-				monsterLichMagicCastCount = 0;
+				monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
+				monsterLichMagicCastCount() = 0;
 			}
 			break;
 		case LICH_ATK_CHARGE_AOE:
@@ -1346,10 +1346,10 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 			switch ( local_rng.rand() % 2 )
 			{
 				case 0:
-					monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 1:
-					monsterLichIceCastSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				default:
 					break;
@@ -1359,10 +1359,10 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 			switch ( local_rng.rand() % 2 )
 			{
 				case 0:
-					monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 1:
-					monsterLichIceCastSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				default:
 					break;
@@ -1372,10 +1372,10 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 			switch ( local_rng.rand() % 2 )
 			{
 				case 0:
-					monsterLichIceCastSeq = LICH_ATK_VERTICAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_VERTICAL_SINGLE;
 					break;
 				case 1:
-					monsterLichIceCastSeq = LICH_ATK_HORIZONTAL_SINGLE;
+					monsterLichIceCastSeq() = LICH_ATK_HORIZONTAL_SINGLE;
 					break;
 				default:
 					break;
@@ -1388,22 +1388,22 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 
 void Entity::lichIceTeleport()
 {
-	monsterLichTeleportTimer = 0;
+	monsterLichTeleportTimer() = 0;
 	Entity* spellTimer = createParticleTimer(this, 40, 593);
-	if ( monsterState == MONSTER_STATE_LICHICE_TELEPORT_STATIONARY )
+	if ( monsterState() == MONSTER_STATE_LICHICE_TELEPORT_STATIONARY )
 	{
-		spellTimer->particleTimerEndAction = PARTICLE_EFFECT_LICHICE_TELEPORT_STATIONARY; // teleport behavior of timer.
+		spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_LICHICE_TELEPORT_STATIONARY; // teleport behavior of timer.
 	}
 	else
 	{
-		spellTimer->particleTimerEndAction = PARTICLE_EFFECT_LICH_TELEPORT_ROAMING; // teleport behavior of timer.
+		spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_LICH_TELEPORT_ROAMING; // teleport behavior of timer.
 	}
-	spellTimer->particleTimerEndSprite = 593; // sprite to use for end of timer function.
-	spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-	spellTimer->particleTimerCountdownSprite = 593;
+	spellTimer->particleTimerEndSprite() = 593; // sprite to use for end of timer function.
+	spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+	spellTimer->particleTimerCountdownSprite() = 593;
 	if ( multiplayer == SERVER )
 	{
-		serverSpawnMiscParticles(this, spellTimer->particleTimerEndAction, 593);
+		serverSpawnMiscParticles(this, spellTimer->particleTimerEndAction(), 593);
 	}
 }
 
@@ -1414,7 +1414,7 @@ void Entity::lichIceCreateCannon()
 	{
 		Entity* spellOrbit = castOrbitingMagicMissile(SPELL_MAGICMISSILE, 8.0, i * PI / 3, 500);
 		spellOrbit->z = -25;
-		spellOrbit->actmagicOrbitStartZ = spellOrbit->z;
+		spellOrbit->actmagicOrbitStartZ() = spellOrbit->z;
 	}
 	createParticleDropRising(this, 678, 1.0);
 	if ( multiplayer == SERVER )
@@ -1488,10 +1488,10 @@ void Entity::lichIceSummonMonster(Monster creature)
 			timer->x = spawn_x * 16.0 + 8;
 			timer->y = spawn_y * 16.0 + 8;
 			timer->z = 0;
-			timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SUMMON_MONSTER;
-			timer->particleTimerCountdownSprite = 174;
-			timer->particleTimerEndAction = PARTICLE_EFFECT_SUMMON_MONSTER;
-			timer->particleTimerVariable1 = creature;
+			timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SUMMON_MONSTER;
+			timer->particleTimerCountdownSprite() = 174;
+			timer->particleTimerEndAction() = PARTICLE_EFFECT_SUMMON_MONSTER;
+			timer->particleTimerVariable1() = creature;
 			serverSpawnMiscParticlesAtLocation(spawn_x, spawn_y, 0, PARTICLE_EFFECT_SUMMON_MONSTER, 174);
 		}
 	}

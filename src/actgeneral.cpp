@@ -130,19 +130,19 @@ void actFurniture(Entity* my)
 void Entity::furnitureHandleDamageMagic(int damage, Entity& magicProjectile, Entity* caster, bool messages, bool doSound)
 {
 	updateEntityOldHPBeforeMagicHit(*this, magicProjectile);
-	int oldHP = this->furnitureHealth;
-	this->furnitureHealth -= damage;
+	int oldHP = this->furnitureHealth();
+	this->furnitureHealth() -= damage;
 	if ( caster )
 	{
 		if ( caster->behavior == &actPlayer )
 		{
-			bool destroyed = oldHP > 0 && this->furnitureHealth <= 0;
+			bool destroyed = oldHP > 0 && this->furnitureHealth() <= 0;
 			if ( destroyed )
 			{
 				gameModeManager.currentSession.challengeRun.updateKillEvent(this);
 				players[caster->skill[2]]->mechanics.incrementBreakableCounter(Player::PlayerMechanics_t::BreakableEvent::GBREAK_COMMON, this);
 			}
-			switch ( this->furnitureType )
+			switch ( this->furnitureType() )
 			{
 			case FURNITURE_CHAIR:
 				if ( destroyed && messages )
@@ -179,26 +179,26 @@ void Entity::furnitureHandleDamageMagic(int damage, Entity& magicProjectile, Ent
 			}
 		}
 
-		switch ( this->furnitureType )
+		switch ( this->furnitureType() )
 		{
 		case FURNITURE_CHAIR:
-			updateEnemyBar(caster, this, Language::get(677), this->furnitureHealth, this->furnitureMaxHealth,
+			updateEnemyBar(caster, this, Language::get(677), this->furnitureHealth(), this->furnitureMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 			break;
 		case FURNITURE_TABLE:
-			updateEnemyBar(caster, this, Language::get(676), this->furnitureHealth, this->furnitureMaxHealth,
+			updateEnemyBar(caster, this, Language::get(676), this->furnitureHealth(), this->furnitureMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 			break;
 		case FURNITURE_BED:
-			updateEnemyBar(caster, this, Language::get(2505), this->furnitureHealth, this->furnitureMaxHealth,
+			updateEnemyBar(caster, this, Language::get(2505), this->furnitureHealth(), this->furnitureMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 			break;
 		case FURNITURE_BUNKBED:
-			updateEnemyBar(caster, this, Language::get(2506), this->furnitureHealth, this->furnitureMaxHealth,
+			updateEnemyBar(caster, this, Language::get(2506), this->furnitureHealth(), this->furnitureMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 			break;
 		case FURNITURE_PODIUM:
-			updateEnemyBar(caster, this, Language::get(2507), this->furnitureHealth, this->furnitureMaxHealth,
+			updateEnemyBar(caster, this, Language::get(2507), this->furnitureHealth(), this->furnitureMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 			break;
 		default:
@@ -215,24 +215,24 @@ void Entity::furnitureHandleDamageMagic(int damage, Entity& magicProjectile, Ent
 void Entity::actFurniture()
 {
 
-	if ( !furnitureInit )
+	if ( !furnitureInit() )
 	{
 		auto& rng = entity_rng ? *entity_rng : local_rng;
-		if ( furnitureType == FURNITURE_BUNKBED )
+		if ( furnitureType() == FURNITURE_BUNKBED )
 		{
 			this->createWorldUITooltip();
 		}
-		furnitureInit = 1;
-		if ( furnitureType == FURNITURE_TABLE || furnitureType == FURNITURE_BUNKBED || furnitureType == FURNITURE_BED || furnitureType == FURNITURE_PODIUM )
+		furnitureInit() = 1;
+		if ( furnitureType() == FURNITURE_TABLE || furnitureType() == FURNITURE_BUNKBED || furnitureType() == FURNITURE_BED || furnitureType() == FURNITURE_PODIUM )
 		{
-			furnitureHealth = 15 + rng.rand() % 5;
+			furnitureHealth() = 15 + rng.rand() % 5;
 		}
 		else
 		{
-			furnitureHealth = 4 + rng.rand() % 4;
+			furnitureHealth() = 4 + rng.rand() % 4;
 		}
-		furnitureMaxHealth = furnitureHealth;
-		furnitureOldHealth = furnitureHealth;
+		furnitureMaxHealth() = furnitureHealth();
+		furnitureOldHealth() = furnitureHealth();
 		flags[BURNABLE] = true;
 	}
 	else
@@ -244,14 +244,14 @@ void Entity::actFurniture()
 			{
 				if ( ticks % 15 == 0 )
 				{
-					furnitureHealth--;
+					furnitureHealth()--;
 				}
 			}
 
-			furnitureOldHealth = furnitureHealth;
+			furnitureOldHealth() = furnitureHealth();
 
 			// furniture mortality :p
-			if ( furnitureHealth <= 0 )
+			if ( furnitureHealth() <= 0 )
 			{
 				int c;
 				for ( c = 0; c < 5; c++ )
@@ -277,8 +277,8 @@ void Entity::actFurniture()
 				Entity* entity = uidToEntity(parent);
 				if ( entity != NULL )
 				{
-					entity->itemNotMoving = 0; // drop the item that was on the table
-					entity->itemNotMovingClient = 0; // clear the client item gravity flag
+					entity->itemNotMoving() = 0; // drop the item that was on the table
+					entity->itemNotMovingClient() = 0; // clear the client item gravity flag
 					serverUpdateEntitySkill(entity, 18); //update both the above flags.
 					serverUpdateEntitySkill(entity, 19);
 				}
@@ -294,7 +294,7 @@ void Entity::actFurniture()
 				{
 					if (inrange[i])
 					{
-						switch ( furnitureType )
+						switch ( furnitureType() )
 						{
 							case FURNITURE_CHAIR:
 								messagePlayer(i, MESSAGE_INTERACTION, Language::get(476));
@@ -446,24 +446,24 @@ void Entity::actStalagColumn()
 
 void actStatue(Entity* my)
 {
-	if ( my->statueInit == 0 && StatueManager.allStatues.size() > 0 )
+	if ( my->statueInit() == 0 && StatueManager.allStatues.size() > 0 )
 	{
 		// needs to init.
-		if ( StatueManager.allStatues.find(my->statueId) != StatueManager.allStatues.end() )
+		if ( StatueManager.allStatues.find(my->statueId()) != StatueManager.allStatues.end() )
 		{
-			my->statueInit = 1;
-			if ( my->statueDir >= 0 && my->statueDir < StatueManager.directionKeys.size() )
+			my->statueInit() = 1;
+			if ( my->statueDir() >= 0 && my->statueDir() < StatueManager.directionKeys.size() )
 			{
 				int index = 0;
 				real_t baseHeight = 0.0;
-				DynamicString directionString = StatueManager.directionKeys[my->statueDir];
-				for ( auto& limb : StatueManager.allStatues[my->statueId].limbs[directionString] )
+				DynamicString directionString = StatueManager.directionKeys[my->statueDir()];
+				for ( auto& limb : StatueManager.allStatues[my->statueId()].limbs[directionString] )
 				{
 					Entity* childEntity = newEntity(limb.sprite, 1, map.entities, nullptr);
 					childEntity->parent = my->getUID();
 					childEntity->x = my->x - limb.x;
 					childEntity->y = my->y - limb.y;
-					childEntity->z = limb.z + StatueManager.allStatues[my->statueId].heightOffset;
+					childEntity->z = limb.z + StatueManager.allStatues[my->statueId()].heightOffset;
 					childEntity->focalx = limb.focalx;
 					childEntity->focaly = limb.focaly;
 					childEntity->focalz = limb.focalz;
@@ -471,7 +471,7 @@ void actStatue(Entity* my)
 					childEntity->roll = limb.roll;
 					childEntity->yaw = limb.yaw;
 					childEntity->flags[PASSABLE] = true;
-					childEntity->grayscaleGLRender = 1.0;
+					childEntity->grayscaleGLRender() = 1.0;
 					node_t* tempNode = list_AddNodeLast(&my->children);
 					tempNode->element = childEntity; // add the node to the children list.
 					tempNode->deconstructor = &emptyDeconstructor;
@@ -615,7 +615,7 @@ void actPistonCam(Entity* my)
 
 void Entity::actPistonCam()
 {
-	yaw += pistonCamRotateSpeed;
+	yaw += pistonCamRotateSpeed();
 	while ( yaw > 2 * PI )
 	{
 		yaw -= 2 * PI;
@@ -624,61 +624,61 @@ void Entity::actPistonCam()
 	{
 		yaw += 2 * PI;
 	}
-	if ( (pistonCamDir == 0 || pistonCamDir == 2) && pistonCamRotateSpeed > 0 )
+	if ( (pistonCamDir() == 0 || pistonCamDir() == 2) && pistonCamRotateSpeed() > 0 )
 	{
-		if ( yaw <= PI && yaw >= -pistonCamRotateSpeed + PI )
+		if ( yaw <= PI && yaw >= -pistonCamRotateSpeed() + PI )
 		{
 			yaw = PI;
-			pistonCamRotateSpeed = 0;
+			pistonCamRotateSpeed() = 0;
 		}
 	}
-	--pistonCamTimer;
+	--pistonCamTimer();
 
-	if ( pistonCamDir == 0 ) // bottom
+	if ( pistonCamDir() == 0 ) // bottom
 	{
-		if ( pistonCamTimer <= 0 )
+		if ( pistonCamTimer() <= 0 )
 		{
-			pistonCamDir = 1; // up
-			pistonCamRotateSpeed = 0.2;
-			pistonCamTimer = local_rng.rand() % 5 * TICKS_PER_SECOND;
+			pistonCamDir() = 1; // up
+			pistonCamRotateSpeed() = 0.2;
+			pistonCamTimer() = local_rng.rand() % 5 * TICKS_PER_SECOND;
 		}
 	}
-	if ( pistonCamDir == 1 ) // up
+	if ( pistonCamDir() == 1 ) // up
 	{
 		z -= 0.1;
 		if ( z < -1.75 )
 		{
 			z = -1.75;
-			pistonCamRotateSpeed *= local_rng.rand() % 2 == 0 ? -1 : 1;
-			pistonCamDir = 2; // top
+			pistonCamRotateSpeed() *= local_rng.rand() % 2 == 0 ? -1 : 1;
+			pistonCamDir() = 2; // top
 		}
 	}
-	else if ( pistonCamDir == 2 ) // top
+	else if ( pistonCamDir() == 2 ) // top
 	{
-		if ( pistonCamTimer <= 0 )
+		if ( pistonCamTimer() <= 0 )
 		{
-			pistonCamDir = 3; // down
-			pistonCamRotateSpeed = -0.2;
-			pistonCamTimer = local_rng.rand() % 5 * TICKS_PER_SECOND;
+			pistonCamDir() = 3; // down
+			pistonCamRotateSpeed() = -0.2;
+			pistonCamTimer() = local_rng.rand() % 5 * TICKS_PER_SECOND;
 		}
 	}
-	else if ( pistonCamDir == 3 ) // down
+	else if ( pistonCamDir() == 3 ) // down
 	{
 		z += 0.1;
 		if ( z > 1.75 )
 		{
 			z = 1.75;
-			pistonCamRotateSpeed *= local_rng.rand() % 2 == 0 ? -1 : 1;
-			pistonCamDir = 0; // down
+			pistonCamRotateSpeed() *= local_rng.rand() % 2 == 0 ? -1 : 1;
+			pistonCamDir() = 0; // down
 		}
 	}
 }
 
 int colliderGetSpellRange(Entity* my)
 {
-	if ( my->colliderSpellEvent % 1000 == 0 ) { return 0; }
+	if ( my->colliderSpellEvent() % 1000 == 0 ) { return 0; }
 	int range = 32;
-	int effectType = my->colliderSpellEvent % 1000;
+	int effectType = my->colliderSpellEvent() % 1000;
 	switch ( effectType )
 	{
 	case 3:
@@ -719,10 +719,10 @@ void actColliderMushroomCap(Entity* my)
 	parent->scalez = 1.0 + bobScale * 0.25 * sin(my->fskill[0]);
 
 	int trigger = 0;
-	if ( parent->colliderSpellEventTrigger != 0 )
+	if ( parent->colliderSpellEventTrigger() != 0 )
 	{
-		trigger = parent->colliderSpellEventTrigger;
-		parent->colliderSpellEventTrigger = 0;
+		trigger = parent->colliderSpellEventTrigger();
+		parent->colliderSpellEventTrigger() = 0;
 	}
 
 	auto& friendlyFire = my->skill[1];
@@ -761,7 +761,7 @@ void actColliderMushroomCap(Entity* my)
 	if ( my->skill[0] > 0 )
 	{
 		int range = colliderGetSpellRange(parent);
-		int effectType = parent->colliderSpellEvent % 1000;
+		int effectType = parent->colliderSpellEvent() % 1000;
 		if ( effectType == 3 || effectType == 4 || effectType == 7 )
 		{
 			range = 32;
@@ -800,14 +800,14 @@ void actColliderMushroomCap(Entity* my)
 
 				if ( (effectType == 3 || effectType == 4 || effectType == 7) && multiplayer != CLIENT )
 				{
-					if ( Entity* target = uidToEntity(parent->colliderSpellTarget) )
+					if ( Entity* target = uidToEntity(parent->colliderSpellTarget()) )
 					{
 						real_t tangent = atan2(target->y - parent->y, target->x - parent->x);
 
 						Entity* caster = parent;
-						if ( parent->colliderCreatedParent != 0 )
+						if ( parent->colliderCreatedParent() != 0 )
 						{
-							if ( Entity* ent = uidToEntity(parent->colliderCreatedParent) )
+							if ( Entity* ent = uidToEntity(parent->colliderCreatedParent()) )
 							{
 								caster = ent;
 							}
@@ -835,7 +835,7 @@ void actColliderMushroomCap(Entity* my)
 					Entity* fx = createParticleAestheticOrbit(parent, gibSprite, 3 * TICKS_PER_SECOND, PARTICLE_EFFECT_MUSHROOM_SPELL);
 					fx->x = parent->x;
 					fx->y = parent->y;
-					fx->actmagicOrbitDist = range;
+					fx->actmagicOrbitDist() = range;
 					fx->yaw = parent->yaw + (i * PI / 4.0);
 					fx->pitch = -PI;
 					fx->fskill[4] = fx->yaw;
@@ -850,7 +850,7 @@ void actColliderMushroomCap(Entity* my)
 				if ( Entity* fx = createParticleAOEIndicator(parent, parent->x, parent->y, 0.0, TICKS_PER_SECOND * 2, range) )
 				{
 					//fx->actSpriteFollowUID = 0;
-					fx->actSpriteCheckParentExists = 0;
+					fx->actSpriteCheckParentExists() = 0;
 					//fx->scalex = 0.8;
 					//fx->scaley = 0.8;
 					if ( auto indicator = AOEIndicators_t::getIndicator(fx->skill[10]) )
@@ -879,14 +879,14 @@ void actColliderMushroomCap(Entity* my)
 				my->skill[0]--;
 				if ( my->skill[0] == 1 )
 				{
-					auto& colliderData = EditorEntityData_t::colliderData[parent->colliderDamageTypes];
+					auto& colliderData = EditorEntityData_t::colliderData[parent->colliderDamageTypes()];
 					if ( (effectType == 3 || effectType == 4) &&
 						colliderData.name.find("_fragile") != std::string::npos )
 					{
 						if ( multiplayer != CLIENT )
 						{
-							parent->colliderCurrentHP = 0;
-							parent->colliderKillerUid = 0;
+							parent->colliderCurrentHP() = 0;
+							parent->colliderKillerUid() = 0;
 						}
 					}
 					else
@@ -897,7 +897,7 @@ void actColliderMushroomCap(Entity* my)
 							Entity* fx = createParticleAestheticOrbit(parent, gibSprite, 3 * TICKS_PER_SECOND, PARTICLE_EFFECT_MUSHROOM_SPELL);
 							fx->x = parent->x;
 							fx->y = parent->y;
-							fx->actmagicOrbitDist = range;
+							fx->actmagicOrbitDist() = range;
 							fx->yaw = parent->yaw + (i * PI / 4.0) + PI / 8;
 							fx->pitch = -PI;
 							fx->fskill[4] = fx->yaw;
@@ -912,14 +912,14 @@ void actColliderMushroomCap(Entity* my)
 				}
 				else if ( friendlyFire == 0 )
 				{
-					auto& colliderData = EditorEntityData_t::colliderData[parent->colliderDamageTypes];
+					auto& colliderData = EditorEntityData_t::colliderData[parent->colliderDamageTypes()];
 					if ( !(effectType == 3 || effectType == 4) &&
 						colliderData.name.find("_fragile") != std::string::npos )
 					{
 						if ( multiplayer != CLIENT )
 						{
-							parent->colliderCurrentHP = 0;
-							parent->colliderKillerUid = 0;
+							parent->colliderCurrentHP() = 0;
+							parent->colliderKillerUid() = 0;
 						}
 					}
 				}
@@ -927,7 +927,7 @@ void actColliderMushroomCap(Entity* my)
 
 			if ( multiplayer != CLIENT )
 			{
-				Entity* caster = uidToEntity(parent->colliderCreatedParent);
+				Entity* caster = uidToEntity(parent->colliderCreatedParent());
 				DynamicArrayT<list_t*> entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(my, 1 + (range / 16));
 				for ( auto it : entLists )
 				{
@@ -1009,9 +1009,9 @@ void actColliderMushroomCap(Entity* my)
 							damage = getSpellDamageFromID(SPELL_MUSHROOM, caster, nullptr, my);
 
 							int bonusEffect = 0;
-							if ( parent && parent->colliderDropVariable > 0 )
+							if ( parent && parent->colliderDropVariable() > 0 )
 							{
-								bonusEffect = parent->colliderDropVariable;
+								bonusEffect = parent->colliderDropVariable();
 							}
 							if ( caster && caster->behavior == &actPlayer )
 							{
@@ -1034,7 +1034,7 @@ void actColliderMushroomCap(Entity* my)
 									friendlyFireTarget = true;
 								}
 							}
-							else if ( achievementObserver.checkUidIsFromPlayer(parent->colliderCreatedParent) >= 0 )
+							else if ( achievementObserver.checkUidIsFromPlayer(parent->colliderCreatedParent()) >= 0 )
 							{
 								if ( (entity->behavior == &actMonster && entity->monsterAllyGetPlayerLeader())
 									|| entity->behavior == &actPlayer )
@@ -1105,24 +1105,24 @@ void actColliderMushroomCap(Entity* my)
 									{
 										if ( !players[entity->skill[2]]->isLocalPlayer() )
 										{
-											entity->monsterKnockbackVelocity = pushbackMultiplier;
-											entity->monsterKnockbackTangentDir = tangent;
+											entity->monsterKnockbackVelocity() = pushbackMultiplier;
+											entity->monsterKnockbackTangentDir() = tangent;
 											serverUpdateEntityFSkill(entity, 11);
 											serverUpdateEntityFSkill(entity, 9);
 										}
 										else
 										{
-											entity->monsterKnockbackVelocity = pushbackMultiplier;
-											entity->monsterKnockbackTangentDir = tangent;
+											entity->monsterKnockbackVelocity() = pushbackMultiplier;
+											entity->monsterKnockbackTangentDir() = tangent;
 										}
 									}
 									else if ( entity->behavior == &actMonster )
 									{
 										entity->vel_x = cos(tangent) * pushbackMultiplier;
 										entity->vel_y = sin(tangent) * pushbackMultiplier;
-										entity->monsterKnockbackVelocity = 0.01;
-										entity->monsterKnockbackUID = parent->colliderCreatedParent;
-										entity->monsterKnockbackTangentDir = tangent;
+										entity->monsterKnockbackVelocity() = 0.01;
+										entity->monsterKnockbackUID() = parent->colliderCreatedParent();
+										entity->monsterKnockbackTangentDir() = tangent;
 									}
 								}
 							}
@@ -1144,7 +1144,7 @@ void actColliderMushroomCap(Entity* my)
 bool Entity::isColliderShownAsWallOnMinimap() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.showAsWallOnMinimap;
 }
@@ -1152,7 +1152,7 @@ bool Entity::isColliderShownAsWallOnMinimap() const
 bool Entity::isColliderWeakToBoulders() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.boulderDestroys;
 }
@@ -1160,7 +1160,7 @@ bool Entity::isColliderWeakToBoulders() const
 bool Entity::isColliderWeakToSkill(const int proficiency) const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.proficiencyBonusDamage.contains(proficiency);
 }
@@ -1168,7 +1168,7 @@ bool Entity::isColliderWeakToSkill(const int proficiency) const
 bool Entity::isColliderResistToSkill(const int proficiency) const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.proficiencyResistDamage.contains(proficiency);
 }
@@ -1176,7 +1176,7 @@ bool Entity::isColliderResistToSkill(const int proficiency) const
 bool Entity::isColliderDamageableByMelee() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.meleeAffects;
 }
@@ -1184,7 +1184,7 @@ bool Entity::isColliderDamageableByMelee() const
 bool Entity::isColliderDamageableByMagic() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.magicAffects;
 }
@@ -1192,7 +1192,7 @@ bool Entity::isColliderDamageableByMagic() const
 bool Entity::isColliderAttachableToBombs() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.bombsAttach;
 }
@@ -1200,19 +1200,19 @@ bool Entity::isColliderAttachableToBombs() const
 bool Entity::isColliderPathableMonster(Monster type) const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.pathableMonsters.find(type) != colliderData.pathableMonsters.end();
 }
 
 bool Entity::isDamageableCollider() const 
 { 
-	return behavior == &actColliderDecoration && colliderMaxHP > 0;
+	return behavior == &actColliderDecoration && colliderMaxHP() > 0;
 }
 
 bool Entity::isColliderWall() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	if ( colliderData.hpbarLookupName.find("_wall") != std::string::npos )
 	{
 		return true;
@@ -1223,7 +1223,7 @@ bool Entity::isColliderWall() const
 bool Entity::isColliderBreakableContainer() const
 {
 	if ( !isDamageableCollider() ) { return false; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	if ( colliderData.damageCalculationType.find("breakable") != std::string::npos )
 	{
 		return true;
@@ -1238,9 +1238,9 @@ void Entity::colliderOnDestroy()
 	flags[PASSABLE] = true;
 
 	Entity* killer = nullptr;
-	if ( colliderKillerUid != 0 )
+	if ( colliderKillerUid() != 0 )
 	{
-		killer = uidToEntity(colliderKillerUid);
+		killer = uidToEntity(colliderKillerUid());
 		if ( killer )
 		{
 			if ( isColliderBreakableContainer() )
@@ -1250,49 +1250,49 @@ void Entity::colliderOnDestroy()
 		}
 	}
 
-	auto find = EditorEntityData_t::colliderData.find(colliderDamageTypes);
+	auto find = EditorEntityData_t::colliderData.find(colliderDamageTypes());
 	if ( find != EditorEntityData_t::colliderData.end() )
 	{
 		if ( find->second.name == "mushroom_spell_casted" )
 		{
-			for ( int i = 0; i < this->colliderDropVariable; ++i )
+			for ( int i = 0; i < this->colliderDropVariable(); ++i )
 			{
 				if ( local_rng.rand() % 10 == 0 )
 				{
 					if ( Entity* ent = dropItemMonster(newItem(DUST_BALL, SERVICABLE, 0, 1, 0, true, nullptr), this, nullptr) )
 					{
-						ent->itemOriginalOwner = colliderCreatedParent;
-						ent->itemGerminateResult = 1;
+						ent->itemOriginalOwner() = colliderCreatedParent();
+						ent->itemGerminateResult() = 1;
 					}
 				}
 				else
 				{
 					if ( Entity* ent = dropItemMonster(newItem(FOOD_SHROOM, SERVICABLE, 0, 1, 0, true, nullptr), this, nullptr) )
 					{
-						ent->itemOriginalOwner = colliderCreatedParent;
-						ent->itemGerminateResult = 1;
+						ent->itemOriginalOwner() = colliderCreatedParent();
+						ent->itemGerminateResult() = 1;
 					}
 				}
 			}
-			Entity* parent = uidToEntity(this->colliderCreatedParent);
+			Entity* parent = uidToEntity(this->colliderCreatedParent());
 			floorMagicCreateSpores(this, this->x, this->y, parent ? parent : this, 0, SPELL_SPORES);
 		}
 		else if ( find->second.name == "germinate_spell_casted" )
 		{
-			for ( int i = 0; i < this->colliderDropVariable; ++i )
+			for ( int i = 0; i < this->colliderDropVariable(); ++i )
 			{
 				if ( Entity* ent = dropItemMonster(newItem(FOOD_NUT, SERVICABLE, 0, 1, 0, true, nullptr), this, nullptr) )
 				{
-					ent->itemOriginalOwner = colliderCreatedParent;
-					ent->itemGerminateResult = 1;
+					ent->itemOriginalOwner() = colliderCreatedParent();
+					ent->itemGerminateResult() = 1;
 				}
 			}
 		}
 	}
 
-	if ( colliderHideMonster != 0 )
+	if ( colliderHideMonster() != 0 )
 	{
-		int type = colliderHideMonster % 1000;
+		int type = colliderHideMonster() % 1000;
 		int numSpawns = type == BAT_SMALL ? 2 : 1;
 		int successes = 0;
 		for ( int i = 0; i < numSpawns; ++i )
@@ -1302,7 +1302,7 @@ void Entity::colliderOnDestroy()
 			{
 				monster->yaw = yaw;
 				monster->lookAtEntity(*monster);
-				monster->monsterLookDir = yaw;
+				monster->monsterLookDir() = yaw;
 				if ( Stat* stats = monster->getStats() )
 				{
 					stats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS] = 1;
@@ -1314,7 +1314,7 @@ void Entity::colliderOnDestroy()
 					stats->setAttribute("spawn_no_sleep", "1");
 					if ( stats->type == AUTOMATON && strcmp(map.filename, "automat.lmp") )
 					{
-						monster->monsterStoreType = 1; // damaged
+						monster->monsterStoreType() = 1; // damaged
 					}
 					++successes;
 				}
@@ -1351,9 +1351,9 @@ void Entity::colliderOnDestroy()
 			}
 		}
 	}
-	if ( colliderContainedEntity != 0 )
+	if ( colliderContainedEntity() != 0 )
 	{
-		if ( auto entity = uidToEntity(colliderContainedEntity) )
+		if ( auto entity = uidToEntity(colliderContainedEntity()) )
 		{
 			if ( entity->behavior == &actItem || entity->behavior == &actGoldBag )
 			{
@@ -1364,10 +1364,10 @@ void Entity::colliderOnDestroy()
 						entity->vel_x = (0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 						entity->vel_y = (0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 						entity->vel_z = (-40 - local_rng.rand() % 10) * .01;
-						entity->goldBouncing = 0;
+						entity->goldBouncing() = 0;
 						entity->z = 0.0 - (local_rng.rand() % 3);
 						entity->flags[INVISIBLE] = false;
-						entity->goldAmountBonus = entity->goldAmount;
+						entity->goldAmountBonus() = entity->goldAmount();
 
 						if ( multiplayer == SERVER )
 						{
@@ -1385,7 +1385,7 @@ void Entity::colliderOnDestroy()
 							}
 						}
 
-						int totalGold = entity->goldAmount;
+						int totalGold = entity->goldAmount();
 
 						// find other matching gold piles
 						auto entLists = TileEntityList.getEntitiesWithinRadiusAroundEntity(entity, 2);
@@ -1396,17 +1396,17 @@ void Entity::colliderOnDestroy()
 							for ( node = currentList->first; node != nullptr; node = node->next )
 							{
 								Entity* ent = (Entity*)node->element;
-								if ( ent && ent->behavior == &actGoldBag && ent != entity && ent->goldInContainer != 0
-									&& ent->goldInContainer == entity->goldInContainer )
+								if ( ent && ent->behavior == &actGoldBag && ent != entity && ent->goldInContainer() != 0
+									&& ent->goldInContainer() == entity->goldInContainer() )
 								{
 									ent->vel_x = (0.25 + .025 * (local_rng.rand() % 11)) * cos(ent->yaw);
 									ent->vel_y = (0.25 + .025 * (local_rng.rand() % 11)) * sin(ent->yaw);
 									ent->vel_z = (-40 - local_rng.rand() % 10) * .01;
-									ent->goldBouncing = 0;
-									ent->goldInContainer = 0;
+									ent->goldBouncing() = 0;
+									ent->goldInContainer() = 0;
 									ent->z = 0.0 - (local_rng.rand() % 3);
 									ent->flags[INVISIBLE] = false;
-									ent->goldAmountBonus = ent->goldAmount;
+									ent->goldAmountBonus() = ent->goldAmount();
 
 									if ( multiplayer == SERVER )
 									{
@@ -1424,7 +1424,7 @@ void Entity::colliderOnDestroy()
 										}
 									}
 
-									totalGold += ent->goldAmount;
+									totalGold += ent->goldAmount();
 								}
 							}
 						}
@@ -1435,7 +1435,7 @@ void Entity::colliderOnDestroy()
 								Compendium_t::Events_t::eventUpdateWorld(killer->skill[2], Compendium_t::CPDM_CONTAINER_GOLD, "containers", totalGold);
 							}
 						}
-						entity->goldInContainer = 0;
+						entity->goldInContainer() = 0;
 					}
 					else if ( entity->behavior == &actItem )
 					{
@@ -1443,10 +1443,10 @@ void Entity::colliderOnDestroy()
 						entity->vel_x = (0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 						entity->vel_y = (0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 						entity->vel_z = (-40 - local_rng.rand() % 5) * .01;
-						entity->itemContainer = 0;
+						entity->itemContainer() = 0;
 						entity->z = 0.0;
-						entity->itemNotMoving = 0;
-						entity->itemNotMovingClient = 0;
+						entity->itemNotMoving() = 0;
+						entity->itemNotMovingClient() = 0;
 						entity->flags[USERFLAG1] = false; // enable collision
 
 						if ( multiplayer == SERVER )
@@ -1482,42 +1482,42 @@ void Entity::colliderOnDestroy()
 int Entity::getColliderLangName() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.entityLangEntry;
 }
 
 int Entity::getColliderOnHitLangEntry() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.hitMessageLangEntry;
 }
 
 int Entity::getColliderOnBreakLangEntry() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.breakMessageLangEntry;
 }
 
 int Entity::getColliderOnJumpLangEntry() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.colliderJumpLangEntry;
 }
 
 int Entity::getColliderSfxOnHit() const
 {
 	if ( !isDamageableCollider() ) { return 0; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.sfxHit;
 }
 
 int Entity::getColliderSfxOnBreak() const
 {
 	if ( !isDamageableCollider() ) { return 0; }
-	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes];
+	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	if ( colliderData.sfxBreak.size() == 0 ) { return 0; }
 	return colliderData.sfxBreak[local_rng.rand() % colliderData.sfxBreak.size()];
 }
@@ -1588,9 +1588,9 @@ Entity* Entity::createBreakableCollider(int colliderDamageType, real_t _x, real_
 		}
 	}
 
-	breakable->colliderDamageTypes = colliderDamageType;
-	breakable->colliderCreatedParent = parent ? parent->getUID() : 0;
-	breakable->colliderDecorationRotation = 2 * (local_rng.rand() % 3);
+	breakable->colliderDamageTypes() = colliderDamageType;
+	breakable->colliderCreatedParent() = parent ? parent->getUID() : 0;
+	breakable->colliderDecorationRotation() = 2 * (local_rng.rand() % 3);
 	Entity::colliderAssignProperties(breakable, false, &map);
 
 	breakable->colliderSetServerSkillOnSpawned();
@@ -1603,8 +1603,8 @@ void Entity::colliderSetServerSkillOnSpawned()
 {
 	Sint32 val = (1 << 31);
 	val |= (Uint8)(25);
-	val |= (Uint8)(colliderDamageTypes) << 8;
-	val |= (Uint8)(colliderSpellEvent % 1000) << 16;
+	val |= (Uint8)(colliderDamageTypes()) << 8;
+	val |= (Uint8)(colliderSpellEvent() % 1000) << 16;
 	skill[2] = val;
 }
 
@@ -1616,17 +1616,17 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 
 	if ( mapGeneration || multiplayer != CLIENT )
 	{
-		int dir = entity->colliderDecorationRotation;
+		int dir = entity->colliderDecorationRotation();
 		if ( dir == -1 )
 		{
 			dir = rng.rand() % 8;
-			entity->colliderDecorationRotation = dir;
+			entity->colliderDecorationRotation() = dir;
 		}
 		entity->yaw = dir * (PI / 4);
 	}
 	/*static CvarInt debugColliderType("/collider_type", 14);
 	entity->colliderDamageTypes = *debugColliderType;*/
-	auto find = EditorEntityData_t::colliderData.find(entity->colliderDamageTypes);
+	auto find = EditorEntityData_t::colliderData.find(entity->colliderDamageTypes());
 	if ( find != EditorEntityData_t::colliderData.end() )
 	{
 		auto& data = find->second;
@@ -1634,83 +1634,83 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 		{
 			if ( mapGeneration || multiplayer != CLIENT )
 			{
-				entity->yaw = ((entity->colliderDecorationRotation + data.getOverride("dir_offset")) * (PI / 4));
+				entity->yaw = ((entity->colliderDecorationRotation() + data.getOverride("dir_offset")) * (PI / 4));
 			}
 		}
 		if ( data.hasOverride("model") )
 		{
-			entity->colliderDecorationModel = data.getOverride("model");
+			entity->colliderDecorationModel() = data.getOverride("model");
 		}
 		if ( data.hasOverride("height") )
 		{
-			entity->colliderDecorationHeightOffset = data.getOverride("height");
+			entity->colliderDecorationHeightOffset() = data.getOverride("height");
 		}
-		if ( entity->colliderDecorationRotation == 0 )
+		if ( entity->colliderDecorationRotation() == 0 )
 		{
 			if ( data.hasOverride("east_x") )
 			{
-				entity->colliderDecorationXOffset = data.getOverride("east_x");
+				entity->colliderDecorationXOffset() = data.getOverride("east_x");
 			}
 			if ( data.hasOverride("east_y") )
 			{
-				entity->colliderDecorationYOffset = data.getOverride("east_y");
+				entity->colliderDecorationYOffset() = data.getOverride("east_y");
 			}
 		}
-		else if ( entity->colliderDecorationRotation == 2 )
+		else if ( entity->colliderDecorationRotation() == 2 )
 		{
 			if ( data.hasOverride("south_x") )
 			{
-				entity->colliderDecorationXOffset = data.getOverride("south_x");
+				entity->colliderDecorationXOffset() = data.getOverride("south_x");
 			}
 			if ( data.hasOverride("south_y") )
 			{
-				entity->colliderDecorationYOffset = data.getOverride("south_y");
+				entity->colliderDecorationYOffset() = data.getOverride("south_y");
 			}
 		}
-		else if ( entity->colliderDecorationRotation == 4 )
+		else if ( entity->colliderDecorationRotation() == 4 )
 		{
 			if ( data.hasOverride("west_x") )
 			{
-				entity->colliderDecorationXOffset = data.getOverride("west_x");
+				entity->colliderDecorationXOffset() = data.getOverride("west_x");
 			}
 			if ( data.hasOverride("west_y") )
 			{
-				entity->colliderDecorationYOffset = data.getOverride("west_y");
+				entity->colliderDecorationYOffset() = data.getOverride("west_y");
 			}
 		}
-		else if ( entity->colliderDecorationRotation == 6 )
+		else if ( entity->colliderDecorationRotation() == 6 )
 		{
 			if ( data.hasOverride("north_x") )
 			{
-				entity->colliderDecorationXOffset = data.getOverride("north_x");
+				entity->colliderDecorationXOffset() = data.getOverride("north_x");
 			}
 			if ( data.hasOverride("north_y") )
 			{
-				entity->colliderDecorationYOffset = data.getOverride("north_y");
+				entity->colliderDecorationYOffset() = data.getOverride("north_y");
 			}
 		}
 		if ( data.hasOverride("collision") )
 		{
-			entity->colliderHasCollision = data.getOverride("collision");
+			entity->colliderHasCollision() = data.getOverride("collision");
 		}
 		if ( data.hasOverride("collision_x") )
 		{
-			entity->colliderSizeX = data.getOverride("collision_x");
+			entity->colliderSizeX() = data.getOverride("collision_x");
 		}
 		if ( data.hasOverride("collision_y") )
 		{
-			entity->colliderSizeY = data.getOverride("collision_y");
+			entity->colliderSizeY() = data.getOverride("collision_y");
 		}
 		if ( data.hasOverride("hp") )
 		{
-			entity->colliderMaxHP = data.getOverride("hp");
+			entity->colliderMaxHP() = data.getOverride("hp");
 		}
 		if ( data.hasOverride("diggable") )
 		{
-			entity->colliderDiggable = data.getOverride("diggable");
+			entity->colliderDiggable() = data.getOverride("diggable");
 		}
 
-		if ( entity->colliderIsMapGenerated == 0 && (mapGeneration || multiplayer != CLIENT)
+		if ( entity->colliderIsMapGenerated() == 0 && (mapGeneration || multiplayer != CLIENT)
 			&& entity->entity_rng )
 		{
 			static int lastSpellEvent = 0;
@@ -1757,22 +1757,22 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 					{
 						picked += 1000;
 					}
-					entity->colliderSpellEvent = picked;
+					entity->colliderSpellEvent() = picked;
 					lastSpellEvent = picked % 1000;
 				}
 			}
 		}
 	}
 
-	entity->sprite = entity->colliderDecorationModel;
-	entity->sizex = entity->colliderSizeX;
-	entity->sizey = entity->colliderSizeY;
+	entity->sprite = entity->colliderDecorationModel();
+	entity->sizex = entity->colliderSizeX();
+	entity->sizey = entity->colliderSizeY();
 
 	if ( mapGeneration || multiplayer != CLIENT )
 	{
-		entity->x += entity->colliderDecorationXOffset * 0.25;
-		entity->y += entity->colliderDecorationYOffset * 0.25;
-		entity->z = 7.5 - entity->colliderDecorationHeightOffset * 0.25;
+		entity->x += entity->colliderDecorationXOffset() * 0.25;
+		entity->y += entity->colliderDecorationYOffset() * 0.25;
+		entity->z = 7.5 - entity->colliderDecorationHeightOffset() * 0.25;
 		bool modifiedFocal = false;
 		if ( entity->x < 0.0 )
 		{
@@ -1821,7 +1821,7 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 
 	if ( mapGeneration )
 	{
-		entity->flags[PASSABLE] = entity->colliderHasCollision == 0;
+		entity->flags[PASSABLE] = entity->colliderHasCollision() == 0;
 	}
 	else
 	{
@@ -1829,8 +1829,8 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 	}
 	entity->flags[BLOCKSIGHT] = false;
 	entity->behavior = &actColliderDecoration;
-	entity->colliderCurrentHP = entity->colliderMaxHP;
-	entity->colliderOldHP = entity->colliderMaxHP;
+	entity->colliderCurrentHP() = entity->colliderMaxHP();
+	entity->colliderOldHP() = entity->colliderMaxHP();
 	if ( entity->isDamageableCollider() )
 	{
 		entity->flags[UNCLICKABLE] = false;
@@ -1854,16 +1854,16 @@ void actColliderDecoration(Entity* my)
 		return;
 	}
 
-	if ( !my->colliderInit )
+	if ( !my->colliderInit() )
 	{
-		my->colliderInit = 1;
-		if ( my->colliderDiggable != 0 )
+		my->colliderInit() = 1;
+		if ( my->colliderDiggable() != 0 )
 		{
-			my->colliderHasCollision = 1;
+			my->colliderHasCollision() = 1;
 		}
 		if ( my->isDamageableCollider() )
 		{
-			auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes];
+			auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes()];
 			auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 			if ( colliderDmgType.burnable )
 			{
@@ -1871,11 +1871,11 @@ void actColliderDecoration(Entity* my)
 			}
 			if ( colliderDmgType.minotaurPathThroughAndBreak )
 			{
-				my->colliderHasCollision |= EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO;
+				my->colliderHasCollision() |= EditorEntityData_t::COLLIDER_COLLISION_FLAG_MINO;
 			}
 			if ( colliderDmgType.allowNPCPathing )
 			{
-				my->colliderHasCollision |= EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC;
+				my->colliderHasCollision() |= EditorEntityData_t::COLLIDER_COLLISION_FLAG_NPC;
 			}
 
 			if ( colliderData.name.find("mushroom_spell") != std::string::npos )
@@ -1917,10 +1917,10 @@ void actColliderDecoration(Entity* my)
 
 			if ( multiplayer != CLIENT )
 			{
-				auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes];
+				auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes()];
 				if ( colliderData.name.find("germinate_spell") != std::string::npos )
 				{
-					Entity* caster = my->colliderCreatedParent != 0 ? uidToEntity(my->colliderCreatedParent) : my;
+					Entity* caster = my->colliderCreatedParent() != 0 ? uidToEntity(my->colliderCreatedParent()) : my;
 					createRadiusMagic(SPELL_HEAL_PULSE, caster,
 						my->x, my->y, 24, 10 * TICKS_PER_SECOND, nullptr);
 				}
@@ -1942,7 +1942,7 @@ void actColliderDecoration(Entity* my)
 		my->light = addLight(my->x / 16, my->y / 16, "object_burning");
 	}
 
-	if ( (my->colliderHasCollision == 0) )
+	if ( (my->colliderHasCollision() == 0) )
 	{
 		my->flags[PASSABLE] = true;
 	}
@@ -1985,7 +1985,7 @@ void actColliderDecoration(Entity* my)
 	if ( multiplayer != CLIENT )
 	{
 		bool checkWallDeletion = false;
-		if ( my->colliderHasCollision != 0 )
+		if ( my->colliderHasCollision() != 0 )
 		{
 			if ( my->sprite == 1203 || my->sprite == 1204 )
 			{
@@ -2025,8 +2025,8 @@ void actColliderDecoration(Entity* my)
 			my->createWorldUITooltip();
 		}
 
-		my->colliderTelepathy = 0;
-		if ( my->colliderContainedEntity != 0 )
+		my->colliderTelepathy() = 0;
+		if ( my->colliderContainedEntity() != 0 )
 		{
 			Sint32 telepathy = 0;
 			for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -2044,11 +2044,11 @@ void actColliderDecoration(Entity* my)
 			}
 			if ( telepathy )
 			{
-				if ( Entity* containedEntity = uidToEntity(my->colliderContainedEntity) )
+				if ( Entity* containedEntity = uidToEntity(my->colliderContainedEntity()) )
 				{
 					if ( containedEntity->behavior == &actGoldBag )
 					{
-						my->colliderTelepathy = telepathy;
+						my->colliderTelepathy() = telepathy;
 					}
 				}
 			}
@@ -2056,45 +2056,45 @@ void actColliderDecoration(Entity* my)
 
 		if ( multiplayer != CLIENT )
 		{
-			auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes];
+			auto& colliderData = EditorEntityData_t::colliderData[my->colliderDamageTypes()];
 			if ( my->flags[BURNING] && my->flags[BURNABLE] )
 			{
 				if ( ticks % 30 == 0 )
 				{
-					my->colliderCurrentHP--;
-					if ( my->colliderCurrentHP <= 0 )
+					my->colliderCurrentHP()--;
+					if ( my->colliderCurrentHP() <= 0 )
 					{
-						my->colliderKillerUid = 0;
+						my->colliderKillerUid() = 0;
 					}
 				}
 			}
 
-			auto prevOldHP = my->colliderOldHP;
-			my->colliderOldHP = my->colliderCurrentHP;
+			auto prevOldHP = my->colliderOldHP();
+			my->colliderOldHP() = my->colliderCurrentHP();
 
-			if ( my->colliderCurrentHP > 0 )
+			if ( my->colliderCurrentHP() > 0 )
 			{
-				if ( my->colliderSpellEvent > 0 )
+				if ( my->colliderSpellEvent() > 0 )
 				{
-					if ( my->colliderCreatedParent != 0 && my->ticks >= 10 * TICKS_PER_SECOND )
+					if ( my->colliderCreatedParent() != 0 && my->ticks >= 10 * TICKS_PER_SECOND )
 					{
 						// destroy self
-						my->colliderCurrentHP = 0;
-						my->colliderKillerUid = 0;
+						my->colliderCurrentHP() = 0;
+						my->colliderKillerUid() = 0;
 					}
-					else if ( my->colliderSpellEventCooldown > 0 )
+					else if ( my->colliderSpellEventCooldown() > 0 )
 					{
-						my->colliderSpellEventCooldown--;
+						my->colliderSpellEventCooldown()--;
 					}
-					else if ( (my->colliderSpellEvent % 1000) != 8 && (my->colliderSpellEvent % 1000) != 9 )
+					else if ( (my->colliderSpellEvent() % 1000) != 8 && (my->colliderSpellEvent() % 1000) != 9 )
 					{
 						Entity* found = nullptr;
 						bool rescan = false;
-						int effectType = my->colliderSpellEvent % 1000;
-						if ( prevOldHP != my->colliderCurrentHP )
+						int effectType = my->colliderSpellEvent() % 1000;
+						if ( prevOldHP != my->colliderCurrentHP() )
 						{
-							my->colliderSpellEventCooldown = 4 * TICKS_PER_SECOND;
-							my->colliderSpellEventTrigger = 100 + 75 + local_rng.rand() % 21;
+							my->colliderSpellEventCooldown() = 4 * TICKS_PER_SECOND;
+							my->colliderSpellEventTrigger() = 100 + 75 + local_rng.rand() % 21;
 							serverUpdateEntitySkill(my, 21);
 							if ( effectType == 3 || effectType == 4 || effectType == 7 )
 							{
@@ -2102,12 +2102,12 @@ void actColliderDecoration(Entity* my)
 							}
 						}
 
-						if ( (my->colliderSpellEventCooldown == 0 && (my->ticks % TICKS_PER_SECOND == 0 && my->colliderSpellEvent >= 1000) 
+						if ( (my->colliderSpellEventCooldown() == 0 && (my->ticks % TICKS_PER_SECOND == 0 && my->colliderSpellEvent() >= 1000) 
 							|| rescan) )
 						{
-							Entity* caster = (my->colliderCreatedParent != 0 ? uidToEntity(my->colliderCreatedParent) : nullptr);
+							Entity* caster = (my->colliderCreatedParent() != 0 ? uidToEntity(my->colliderCreatedParent()) : nullptr);
 							bool targetNonPlayer = false;
-							if ( !caster && achievementObserver.checkUidIsFromPlayer(my->colliderCreatedParent) >= 0 )
+							if ( !caster && achievementObserver.checkUidIsFromPlayer(my->colliderCreatedParent()) >= 0 )
 							{
 								targetNonPlayer = true;
 							}
@@ -2128,8 +2128,8 @@ void actColliderDecoration(Entity* my)
 										if ( caster == entity 
 											|| (caster->checkFriend(entity) 
 												&& !(caster->behavior == &actMonster && 
-													(caster->monsterTarget == entity->getUID() // caster targeting this
-														|| (entity->behavior == &actMonster && entity->monsterTarget == caster->getUID())))) ) // entity targeting caster
+													(caster->monsterTarget() == entity->getUID() // caster targeting this
+														|| (entity->behavior == &actMonster && entity->monsterTarget() == caster->getUID())))) ) // entity targeting caster
 										{
 											continue;
 										}
@@ -2187,11 +2187,11 @@ void actColliderDecoration(Entity* my)
 							{
 								if ( entitiesInRange.size() > 0 )
 								{
-									if ( caster && caster->behavior == &actMonster && caster->monsterTarget != 0 )
+									if ( caster && caster->behavior == &actMonster && caster->monsterTarget() != 0 )
 									{
 										for ( auto ent : entitiesInRange )
 										{
-											if ( ent->getUID() == caster->monsterTarget )
+											if ( ent->getUID() == caster->monsterTarget() )
 											{
 												found = ent;
 												break;
@@ -2204,7 +2204,7 @@ void actColliderDecoration(Entity* my)
 										{
 											for ( auto ent : entitiesInRange )
 											{
-												if ( ent->behavior == &actMonster && ent->monsterTarget == caster->getUID() )
+												if ( ent->behavior == &actMonster && ent->monsterTarget() == caster->getUID() )
 												{
 													found = ent;
 													break;
@@ -2216,19 +2216,19 @@ void actColliderDecoration(Entity* my)
 									{
 										found = entitiesInRange[local_rng.rand() % entitiesInRange.size()];
 									}
-									my->colliderSpellTarget = found->getUID();
+									my->colliderSpellTarget() = found->getUID();
 								}
 							}
 						}
 						if ( found )
 						{
-							my->colliderSpellEventCooldown = 4 * TICKS_PER_SECOND;
-							my->colliderSpellEventTrigger = 1 + local_rng.rand() % 75;
+							my->colliderSpellEventCooldown() = 4 * TICKS_PER_SECOND;
+							my->colliderSpellEventTrigger() = 1 + local_rng.rand() % 75;
 							serverUpdateEntitySkill(my, 21);
 						}
 					}
 				}
-				if ( my->colliderHideMonster >= 1000 ) // summon a monster when player is near
+				if ( my->colliderHideMonster() >= 1000 ) // summon a monster when player is near
 				{
 					Entity* found = nullptr;
 					if ( ticks % TICKS_PER_SECOND == 0 )
@@ -2260,8 +2260,8 @@ void actColliderDecoration(Entity* my)
 
 					if ( found )
 					{
-						int type = my->colliderHideMonster % 1000;
-						my->colliderHideMonster = 0;
+						int type = my->colliderHideMonster() % 1000;
+						my->colliderHideMonster() = 0;
 						bool bOldFlag = my->flags[PASSABLE];
 						my->flags[PASSABLE] = true;
 
@@ -2278,8 +2278,8 @@ void actColliderDecoration(Entity* my)
 								{
 									monster->monsterAcquireAttackTarget(*found, MONSTER_STATE_PATH);
 								}
-								my->colliderCurrentHP = 0;
-								my->colliderKillerUid = 0;
+								my->colliderCurrentHP() = 0;
+								my->colliderKillerUid() = 0;
 
 								if ( Stat* stats = monster->getStats() )
 								{
@@ -2292,7 +2292,7 @@ void actColliderDecoration(Entity* my)
 									stats->setAttribute("spawn_no_sleep", "1");
 									if ( stats->type == AUTOMATON && strcmp(map.filename, "automat.lmp") )
 									{
-										monster->monsterStoreType = 1; // damaged
+										monster->monsterStoreType() = 1; // damaged
 									}
 									++successes;
 								}
@@ -2329,7 +2329,7 @@ void actColliderDecoration(Entity* my)
 					}
 				}
 			}
-			if ( my->colliderCurrentHP <= 0 )
+			if ( my->colliderCurrentHP() <= 0 )
 			{
 				int sprite = colliderData.gib;
 				if ( sprite > 0 )
@@ -2352,17 +2352,17 @@ void actColliderDecoration(Entity* my)
 void Entity::colliderHandleDamageMagic(int damage, Entity &magicProjectile, Entity *caster, bool messages, bool doSound)
 {
 	updateEntityOldHPBeforeMagicHit(*this, magicProjectile);
-	auto oldHP = colliderCurrentHP;
-	colliderCurrentHP -= damage; //Decrease object health.
+	auto oldHP = colliderCurrentHP();
+	colliderCurrentHP() -= damage; //Decrease object health.
 	if ( caster )
 	{
-		if ( colliderCurrentHP <= 0 )
+		if ( colliderCurrentHP() <= 0 )
 		{
-			colliderKillerUid = caster->getUID();
+			colliderKillerUid() = caster->getUID();
 		}
 		if ( caster->behavior == &actPlayer )
 		{
-			if ( colliderCurrentHP <= 0 )
+			if ( colliderCurrentHP() <= 0 )
 			{
 				if ( oldHP > 0 )
 				{
@@ -2400,7 +2400,7 @@ void Entity::colliderHandleDamageMagic(int damage, Entity &magicProjectile, Enti
 				}
 			}
 		}
-		updateEnemyBar(caster, this, Language::get(getColliderLangName()), colliderCurrentHP, colliderMaxHP,
+		updateEnemyBar(caster, this, Language::get(getColliderLangName()), colliderCurrentHP(), colliderMaxHP(),
 			false, DamageGib::DMG_DEFAULT);
 	}
 
@@ -2435,12 +2435,12 @@ void actFloorDecoration(Entity* my)
 		return;
 	}
 
-	if ( my->floorDecorationDestroyIfNoWall >= 0 )
+	if ( my->floorDecorationDestroyIfNoWall() >= 0 )
 	{
 		int x = static_cast<int>(my->x) >> 4;
 		int y = static_cast<int>(my->y) >> 4;
 		std::vector<std::pair<int, int>> coords;
-		switch ( my->floorDecorationDestroyIfNoWall )
+		switch ( my->floorDecorationDestroyIfNoWall() )
 		{
 		case 0:
 			// east
@@ -2497,7 +2497,7 @@ void actFloorDecoration(Entity* my)
 		}
 	}
 
-	if ( my->floorDecorationInteractText1 == 0 )
+	if ( my->floorDecorationInteractText1() == 0 )
 	{
 		// no text.
 		return;
@@ -3014,7 +3014,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 			attachedEntities.clear();
 			list_FreeAll(&src.children); // reattach all the entities again.
 
-			textSourceScript.setScriptType(src.textSourceIsScript, textSourceScript.SCRIPT_ATTACHED);
+			textSourceScript.setScriptType(src.textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED);
 			int x1 = static_cast<int>(src.x / 16); // default to just whatever this script is sitting on.
 			int x2 = static_cast<int>(src.x / 16);
 			int y1 = static_cast<int>(src.y / 16);
@@ -3037,7 +3037,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 					y2 = (result >> 24) & 0xFF;
 				}
 			}
-			textSourceScript.setAttachedToEntityType(src.textSourceIsScript, attachTo);
+			textSourceScript.setAttachedToEntityType(src.textSourceIsScript(), attachTo);
 			for ( node_t* node = map.entities->first; node; node = node->next )
 			{
 				Entity* entity = (Entity*)node->element;
@@ -3653,7 +3653,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 										//{
 											//my->monsterLookTime = 1;
 											//my->monsterMoveTime = local_rng.rand() % 10 + 1;
-											entity->monsterLookDir = tangent;
+											entity->monsterLookDir() = tangent;
 											toAttack = target;
 										//}
 									}
@@ -3770,7 +3770,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 					{
 						if ( entity->behavior == &actChest )
 						{
-							entity->chestHealth -= damage;
+							entity->chestHealth() -= damage;
 						}
 						else if ( entity->behavior == &actMonster )
 						{
@@ -3778,15 +3778,15 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 						}
 						else if ( entity->behavior == &actDoor )
 						{
-							entity->doorHealth -= damage;
+							entity->doorHealth() -= damage;
 						}
 						else if ( entity->behavior == &actFurniture )
 						{
-							entity->furnitureHealth -= damage;
+							entity->furnitureHealth() -= damage;
 						}
 						else if ( entity->isDamageableCollider() )
 						{
-							entity->colliderCurrentHP -= damage;
+							entity->colliderCurrentHP() -= damage;
 						}
 					}
 				}
@@ -3850,7 +3850,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 						{
 							if ( entity->getStats() )
 							{
-								entity->getStats()->monsterNoDropItems = 1;
+								entity->getStats()->monsterNoDropItems() = 1;
 							}
 						}
 					}
@@ -3868,7 +3868,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 							{
 								if ( entity->getStats() )
 								{
-									entity->getStats()->monsterNoDropItems = 1;
+									entity->getStats()->monsterNoDropItems() = 1;
 								}
 							}
 						}
@@ -3958,7 +3958,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 							{
 								if ( entity->getStats() )
 								{
-									entity->getStats()->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ENEMY;
+									entity->getStats()->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ENEMY;
 									serverUpdateEntityStatFlag(entity, 20);
 								}
 							}
@@ -3978,7 +3978,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 							{
 								if ( entity->getStats() )
 								{
-									entity->getStats()->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ENEMY;
+									entity->getStats()->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ENEMY;
 									serverUpdateEntityStatFlag(entity, 20);
 								}
 							}
@@ -4009,7 +4009,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 							{
 								if ( entity->getStats() )
 								{
-									entity->getStats()->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ALLY;
+									entity->getStats()->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ALLY;
 								}
 							}
 						}
@@ -4028,7 +4028,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 							{
 								if ( entity->getStats() )
 								{
-									entity->getStats()->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ALLY;
+									entity->getStats()->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ALLY;
 								}
 							}
 						}
@@ -4109,7 +4109,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 				int y1 = (result >> 16) & 0xFF;
 				int y2 = (result >> 24) & 0xFF;
 				std::vector<Entity*> applyToEntities;
-				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_ITEMS )
+				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_ITEMS )
 				{
 					for ( auto entity : attachedEntities )
 					{
@@ -4286,9 +4286,9 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 					for ( auto entity : attachedEntities )
 					{
 						if ( (entity->behavior == &actMonster 
-							&& textSourceScript.getAttachedToEntityType(src.textSourceIsScript) != textSourceScript.TO_PLAYERS)
+							&& textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) != textSourceScript.TO_PLAYERS)
 							|| (entity->behavior == &actPlayer
-								&& textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_PLAYERS) )
+								&& textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_PLAYERS) )
 						{
 							applyToEntities.push_back(entity);
 						}
@@ -4362,7 +4362,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 				int y1 = (result >> 16) & 0xFF;
 				int y2 = (result >> 24) & 0xFF;
 				std::vector<Entity*> applyToEntities;
-				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_ITEMS )
+				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_ITEMS )
 				{
 					for ( auto entity : attachedEntities )
 					{
@@ -4416,19 +4416,19 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 				int y2 = (result >> 24) & 0xFF;
 				std::vector<Entity*> applyToEntities;
 				if ( processOnAttachedEntity 
-					&& (textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_ITEMS
-						|| textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_GOLD) )
+					&& (textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_ITEMS
+						|| textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_GOLD) )
 				{
 					for ( auto entity : attachedEntities )
 					{
-						if ( textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_ITEMS )
+						if ( textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_ITEMS )
 						{
 							if ( entity->behavior == &actItem )
 							{
 								applyToEntities.push_back(entity);
 							}
 						}
-						else if ( textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_GOLD )
+						else if ( textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_GOLD )
 						{
 							if ( entity->behavior == &actGoldBag )
 							{
@@ -4456,19 +4456,19 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 						{
 							if ( entity->behavior == &actItem )
 							{
-								if ( breakable->colliderContainedEntity != 0 )
+								if ( breakable->colliderContainedEntity() != 0 )
 								{
 									break; // only 1 item
 								}
-								entity->itemContainer = breakable->getUID();
+								entity->itemContainer() = breakable->getUID();
 							}
 							else
 							{
-								entity->goldInContainer = breakable->getUID();
+								entity->goldInContainer() = breakable->getUID();
 							}
 							entity->flags[INVISIBLE] = true;
 							serverUpdateEntityFlag(entity, INVISIBLE);
-							breakable->colliderContainedEntity = entity->getUID();
+							breakable->colliderContainedEntity() = entity->getUID();
 						}
 					}
 				}
@@ -4484,7 +4484,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 			if ( result != k_ScriptError )
 			{
 				std::vector<Entity*> applyToEntities;
-				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_BREAKABLE )
+				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_BREAKABLE )
 				{
 					for ( auto entity : attachedEntities )
 					{
@@ -4499,11 +4499,11 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 						int monsterType = NOTHING + (result - TO_NOTHING);
 						for ( auto entity : applyToEntities )
 						{
-							if ( entity->colliderHideMonster != 0 )
+							if ( entity->colliderHideMonster() != 0 )
 							{
 								continue;
 							}
-							entity->colliderHideMonster = monsterType;
+							entity->colliderHideMonster() = monsterType;
 						}
 					}
 				}
@@ -4519,7 +4519,7 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 			if ( result != k_ScriptError )
 			{
 				std::vector<Entity*> applyToEntities;
-				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript) == textSourceScript.TO_BREAKABLE )
+				if ( processOnAttachedEntity && textSourceScript.getAttachedToEntityType(src.textSourceIsScript()) == textSourceScript.TO_BREAKABLE )
 				{
 					for ( auto entity : attachedEntities )
 					{
@@ -4534,11 +4534,11 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 						int monsterType = NOTHING + (result - TO_NOTHING);
 						for ( auto entity : applyToEntities )
 						{
-							if ( entity->colliderHideMonster != 0 )
+							if ( entity->colliderHideMonster() != 0 )
 							{
 								continue;
 							}
-							entity->colliderHideMonster = 1000 + monsterType;
+							entity->colliderHideMonster() = 1000 + monsterType;
 						}
 					}
 				}
@@ -4842,23 +4842,23 @@ void Entity::actTextSource()
 		return;
 	}
 
-	if ( ((textSourceVariables4W >> 16) & 0xFFFF) == 0 ) // store the delay in the 16 leftmost bits.
+	if ( ((textSourceVariables4W() >> 16) & 0xFFFF) == 0 ) // store the delay in the 16 leftmost bits.
 	{
-		textSourceVariables4W |= (textSourceDelay << 16);
+		textSourceVariables4W() |= (textSourceDelay() << 16);
 	}
 
 	bool powered = false;
-	if ( textSourceScript.getScriptType(textSourceIsScript) == textSourceScript.NO_SCRIPT 
-		|| textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_POWER )
+	if ( textSourceScript.getScriptType(textSourceIsScript()) == textSourceScript.NO_SCRIPT 
+		|| textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_POWER )
 	{
-		powered = (circuit_status == CIRCUIT_ON);
+		powered = (circuit_status() == CIRCUIT_ON);
 	}
-	else if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_ALWAYS )
+	else if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_ALWAYS )
 	{
-		textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+		textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 		powered = true;
 	}
-	else if ( textSourceScript.getScriptType(textSourceIsScript) == textSourceScript.SCRIPT_ATTACHED )
+	else if ( textSourceScript.getScriptType(textSourceIsScript()) == textSourceScript.SCRIPT_ATTACHED )
 	{
 		int entitiesExisting = 0;
 		int entitiesVisible = 0;
@@ -4883,17 +4883,17 @@ void Entity::actTextSource()
 		}
 		if ( entitiesExisting == 0 )
 		{
-			if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_ISREMOVED )
+			if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_ISREMOVED )
 			{
-				textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+				textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 				powered = true;
 			}
 		}
 		else
 		{
-			if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_INTERACTED )
+			if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_INTERACTED )
 			{
-				if ( textSourceScript.getAttachedToEntityType(textSourceIsScript) == textSourceScript.TO_BELL )
+				if ( textSourceScript.getAttachedToEntityType(textSourceIsScript()) == textSourceScript.TO_BELL )
 				{
 					bool doEffect = false;
 					for ( node_t* node = children.first; node; node = node->next )
@@ -4914,37 +4914,37 @@ void Entity::actTextSource()
 					}
 					if ( doEffect )
 					{
-						textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+						textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 						powered = true;
 					}
 				}
 			}
 
-			if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_EXISTS )
+			if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_EXISTS )
 			{
-				textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+				textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 				powered = true;
 			}
-			else if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_INVIS
+			else if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_INVIS
 				&& entitiesInvisible == entitiesExisting )
 			{
-				textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+				textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 				powered = true;
 			}
-			else if ( textSourceScript.getTriggerType(textSourceIsScript) == textSourceScript.TRIGGER_ATTACHED_VISIBLE
+			else if ( textSourceScript.getTriggerType(textSourceIsScript()) == textSourceScript.TRIGGER_ATTACHED_VISIBLE
 				&& entitiesVisible == entitiesExisting )
 			{
-				textSourceScript.setScriptType(textSourceIsScript, textSourceScript.SCRIPT_ATTACHED_FIRED);
+				textSourceScript.setScriptType(textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED_FIRED);
 				powered = true;
 			}
 		}
 	}
-	else if ( textSourceScript.getScriptType(textSourceIsScript) == textSourceScript.SCRIPT_ATTACHED_FIRED )
+	else if ( textSourceScript.getScriptType(textSourceIsScript()) == textSourceScript.SCRIPT_ATTACHED_FIRED )
 	{
 		powered = true;
 	}
 
-	if ( textSourceScript.getScriptType(textSourceIsScript) != textSourceScript.NO_SCRIPT )
+	if ( textSourceScript.getScriptType(textSourceIsScript()) != textSourceScript.NO_SCRIPT )
 	{
 		if ( ticks <= 2 )
 		{
@@ -4955,25 +4955,25 @@ void Entity::actTextSource()
 	if ( powered )
 	{
 		// received power
-		if ( textSourceDelay > 0 )
+		if ( textSourceDelay() > 0 )
 		{
-			--textSourceDelay;
+			--textSourceDelay();
 			return;
 		}
 		else
 		{
-			textSourceDelay = (textSourceVariables4W >> 16) & 0xFFFF;
+			textSourceDelay() = (textSourceVariables4W() >> 16) & 0xFFFF;
 		}
-		if ( (textSourceVariables4W & 0xFF) == 0 )
+		if ( (textSourceVariables4W() & 0xFF) == 0 )
 		{
-			textSourceVariables4W |= 1;
+			textSourceVariables4W() |= 1;
 
 			DynamicString output = textSourceScript.getScriptFromEntity(*this);
 
-			Uint32 color = makeColorRGB((textSourceColorRGB >> 16) & 0xFF, (textSourceColorRGB >> 8) & 0xFF,
-				(textSourceColorRGB >> 0) & 0xFF);
+			Uint32 color = makeColorRGB((textSourceColorRGB() >> 16) & 0xFF, (textSourceColorRGB() >> 8) & 0xFF,
+				(textSourceColorRGB() >> 0) & 0xFF);
 
-			if ( textSourceIsScript != textSourceScript.NO_SCRIPT )
+			if ( textSourceIsScript() != textSourceScript.NO_SCRIPT )
 			{
 				textSourceScript.handleTextSourceScript(*this, output);
 				return;
@@ -5068,10 +5068,10 @@ void Entity::actTextSource()
 	}
 	else if ( !powered )
 	{
-		textSourceDelay = (textSourceVariables4W >> 16) & 0xFFFF;
-		if ( (textSourceVariables4W & 0xFF) == 1 && ((textSourceVariables4W >> 8) & 0xFF) == 0 )
+		textSourceDelay() = (textSourceVariables4W() >> 16) & 0xFFFF;
+		if ( (textSourceVariables4W() & 0xFF) == 1 && ((textSourceVariables4W() >> 8) & 0xFF) == 0 )
 		{
-			textSourceVariables4W -= 1;
+			textSourceVariables4W() -= 1;
 		}
 	}
 }
@@ -5227,7 +5227,7 @@ Entity* TextSourceScript::createScriptEntityInMapGen(int x, int y, const char* t
 	setSpriteAttributes(scriptEntity, nullptr, nullptr);
 	scriptEntity->x = x * 16.0;
 	scriptEntity->y = y * 16.0;
-	scriptEntity->textSourceDelay = 1;
+	scriptEntity->textSourceDelay() = 1;
 
 	if ( text )
 	{
@@ -5283,10 +5283,10 @@ void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 		{
 			script.erase(foundScriptTag, strlen("@script"));
 		}
-		textSourceScript.setScriptType(src.textSourceIsScript, textSourceScript.SCRIPT_NORMAL);
-		textSourceScript.setTriggerType(src.textSourceIsScript, textSourceScript.TRIGGER_POWER);
+		textSourceScript.setScriptType(src.textSourceIsScript(), textSourceScript.SCRIPT_NORMAL);
+		textSourceScript.setTriggerType(src.textSourceIsScript(), textSourceScript.TRIGGER_POWER);
 	}
-	if ( src.textSourceIsScript == NO_SCRIPT )
+	if ( src.textSourceIsScript() == NO_SCRIPT )
 	{
 		return;
 	}
@@ -5296,7 +5296,7 @@ void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 		int result = textSourceProcessScriptTag(script, "@triggerif=", src);
 		if ( result != k_ScriptError )
 		{
-			textSourceScript.setTriggerType(src.textSourceIsScript, static_cast<ScriptTriggeredBy>(result));
+			textSourceScript.setTriggerType(src.textSourceIsScript(), static_cast<ScriptTriggeredBy>(result));
 		}
 	}
 
@@ -5307,7 +5307,7 @@ void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 		{
 			return;
 		}
-		textSourceScript.setScriptType(src.textSourceIsScript, textSourceScript.SCRIPT_ATTACHED);
+		textSourceScript.setScriptType(src.textSourceIsScript(), textSourceScript.SCRIPT_ATTACHED);
 		int x1 = static_cast<int>(src.x / 16); // default to just whatever this script is sitting on.
 		int x2 = static_cast<int>(src.x / 16);
 		int y1 = static_cast<int>(src.y / 16);
@@ -5328,7 +5328,7 @@ void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 				y2 = (result >> 24) & 0xFF;
 			}
 		}
-		textSourceScript.setAttachedToEntityType(src.textSourceIsScript, attachTo);
+		textSourceScript.setAttachedToEntityType(src.textSourceIsScript(), attachTo);
 		for ( node_t* node = map.entities->first; node; node = node->next )
 		{
 			Entity* entity = (Entity*)node->element;
@@ -5382,7 +5382,7 @@ void bellAttractMonsters(Entity* my)
 			Entity* entity = (Entity*)node->element;
 			if ( entity->behavior == &actMonster && entity->monsterAllyGetPlayerLeader() == nullptr )
 			{
-				if ( (entity->monsterState == MONSTER_STATE_WAIT || entity->monsterTarget == 0) )
+				if ( (entity->monsterState() == MONSTER_STATE_WAIT || entity->monsterTarget() == 0) )
 				{
 					Stat* myStats = entity->getStats();
 					if ( !entity->isBossMonster() && !entity->monsterIsTinkeringCreation()
@@ -5394,8 +5394,8 @@ void bellAttractMonsters(Entity* my)
 							&& entity->monsterSetPathToLocation(my->x / 16, my->y / 16, 1,
 								GeneratePathTypes::GENERATE_PATH_DEFAULT, true) && entity->children.first )
 						{
-							entity->monsterTarget = my->getUID();
-							entity->monsterState = MONSTER_STATE_HUNT; // hunt state
+							entity->monsterTarget() = my->getUID();
+							entity->monsterState() = MONSTER_STATE_HUNT; // hunt state
 							serverUpdateEntitySkill(entity, 0);
 							if ( entity->setEffect(EFF_DISTRACTED_COOLDOWN, true, TICKS_PER_SECOND * 5, false) )
 							{
@@ -5453,7 +5453,7 @@ int getBellDmgOnEntity(Entity* entity)
 	}
 	else if ( stats->helmet )
 	{
-		bool shapeshifted = (entity->behavior == &actPlayer && entity->effectShapeshift != NOTHING);
+		bool shapeshifted = (entity->behavior == &actPlayer && entity->effectShapeshift() != NOTHING);
 
 		if ( !shapeshifted
 			&& (stats->helmet->type == HELM_MINING || stats->helmet->type == HAT_TOPHAT) )
@@ -5815,7 +5815,7 @@ void actBell(Entity* my)
 	{
 		if ( my->isInteractWithMonster() )
 		{
-			Entity* monsterInteracting = uidToEntity(my->interactedByMonster);
+			Entity* monsterInteracting = uidToEntity(my->interactedByMonster());
 			if ( monsterInteracting )
 			{
 				my->clearMonsterInteract();
@@ -6686,10 +6686,10 @@ void actBell(Entity* my)
 						entity->vel_x = 0.0; //(0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 						entity->vel_y = 0.0; //(0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 						entity->vel_z = (-2 - local_rng.rand() % 5) * .01;
-						entity->itemContainer = 0;
+						entity->itemContainer() = 0;
 						entity->z = -16;
-						entity->itemNotMoving = 0;
-						entity->itemNotMovingClient = 0;
+						entity->itemNotMoving() = 0;
+						entity->itemNotMovingClient() = 0;
 						entity->flags[USERFLAG1] = false; // enable collision
 
 						if ( multiplayer == SERVER )
@@ -6720,7 +6720,7 @@ void actBell(Entity* my)
 						entity->vel_x = 0.0;
 						entity->vel_y = 0.0;
 						entity->vel_z = (-2 - local_rng.rand() % 5) * .01;
-						entity->goldBouncing = 0;
+						entity->goldBouncing() = 0;
 						entity->z = -16;
 						entity->flags[INVISIBLE] = false;
 
@@ -6743,7 +6743,7 @@ void actBell(Entity* my)
 						if ( BELL_LAST_TOUCHED_PLAYER >= 0 )
 						{
 							messagePlayer(BELL_LAST_TOUCHED_PLAYER, MESSAGE_INTERACTION, Language::get(6272));
-							Compendium_t::Events_t::eventUpdateWorld(BELL_LAST_TOUCHED_PLAYER, Compendium_t::CPDM_BELL_LOOT_GOLD, "bell", entity->goldAmount);
+							Compendium_t::Events_t::eventUpdateWorld(BELL_LAST_TOUCHED_PLAYER, Compendium_t::CPDM_BELL_LOOT_GOLD, "bell", entity->goldAmount());
 						}
 					}
 

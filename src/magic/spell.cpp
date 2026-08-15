@@ -845,7 +845,7 @@ int getCostOfSpell(spell_t* spell, Entity* caster)
 		Stat* casterStats = caster->getStats();
 		if ( casterStats )
 		{
-			int summonLevel = casterStats->playerSummonLVLHP >> 16;
+			int summonLevel = casterStats->playerSummonLVLHP() >> 16;
 			cost += 5 * (summonLevel / 5);
 		}
 	}
@@ -863,7 +863,7 @@ int getCostOfSpell(spell_t* spell, Entity* caster)
 	}
 	else if ( caster && (spell->ID == SPELL_TELEPORTATION || spell->ID == SPELL_TELEPULL) )
 	{
-		if ( caster->creatureShadowTaggedThisUid != 0 && uidToEntity(caster->creatureShadowTaggedThisUid) )
+		if ( caster->creatureShadowTaggedThisUid() != 0 && uidToEntity(caster->creatureShadowTaggedThisUid()) )
 		{
 			cost /= 2;
 		}

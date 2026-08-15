@@ -666,7 +666,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[MYCONID][6][0]; // 1.5
 	entity->focaly = limbs[MYCONID][6][1]; // 0
 	entity->focalz = limbs[MYCONID][6][2]; // -.5
@@ -687,7 +687,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[MYCONID][7][0]; // 2
 	entity->focaly = limbs[MYCONID][7][1]; // 0
 	entity->focalz = limbs[MYCONID][7][2]; // 0
@@ -707,7 +707,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[MYCONID][8][0]; // 0
 	entity->focaly = limbs[MYCONID][8][1]; // 0
 	entity->focalz = limbs[MYCONID][8][2]; // 4
@@ -730,7 +730,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[MYCONID][9][0]; // 0
 	entity->focaly = limbs[MYCONID][9][1]; // 0
 	entity->focalz = limbs[MYCONID][9][2]; // -2
@@ -750,7 +750,7 @@ void initMonsterM(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[MYCONID][10][0]; // 0
 	entity->focaly = limbs[MYCONID][10][1]; // 0
 	entity->focalz = limbs[MYCONID][10][2]; // .25
@@ -882,7 +882,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 	if ( my->sprite == 1520 )
 	{
 		my->focalz += 0.5;
-		my->monsterSpellAnimation = MONSTER_SPELLCAST_SMALL_HUMANOID;
+		my->monsterSpellAnimation() = MONSTER_SPELLCAST_SMALL_HUMANOID;
 	}
 
 	bool debugModel = monsterDebugModels(my, &dist);
@@ -969,7 +969,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			my->z = getNormalHeightMonsterM(*my);
 
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				if ( debugModel )
 				{
@@ -998,7 +998,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		if ( bodypart < LIMB_HUMANOID_TORSO )
 		{
 			// post-swing head animation. client doesn't need to adjust the entity pitch, server will handle.
-			if ( my->monsterAttack != MONSTER_POSE_RANGED_WINDUP3 && my->monsterAttack != MONSTER_POSE_SPECIAL_WINDUP1
+			if ( my->monsterAttack() != MONSTER_POSE_RANGED_WINDUP3 && my->monsterAttack() != MONSTER_POSE_SPECIAL_WINDUP1
 				&& bodypart == 1 && multiplayer != CLIENT )
 			{
 				limbAnimateToLimit(my, ANIMATE_PITCH, 0.1, 0, false, 0.0);
@@ -1030,8 +1030,8 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				weaponarm = entity;
 				if ( MONSTER_ATTACK > 0 )
 				{
-					if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP3 
-						|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+					if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP3 
+						|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 					{
 						Entity* rightbody = nullptr;
 						// set rightbody to left leg.
@@ -1045,12 +1045,12 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							return;
 						}
 
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							playSoundEntityLocal(my, 747, 128);
@@ -1070,11 +1070,11 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, 7 * PI / 4, true, 0.0);
 						//limbAnimateToLimit(weaponarm, ANIMATE_ROLL, -0.25, 7 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
-								if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+								if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 								{
 									my->attack(MONSTER_POSE_MAGIC_WINDUP3, 0, nullptr);
 								}
@@ -1085,18 +1085,18 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							}
 						}
 					}
-					else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+					else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 					{
 						if ( multiplayer != CLIENT )
 						{
-							if ( my->monsterAttackTime == 1 )
+							if ( my->monsterAttackTime() == 1 )
 							{
 								int spellID = SPELL_SPORE_BOMB;
-								if ( my->monsterSpecialState == MONSTER_M_SPECIAL_CAST3 )
+								if ( my->monsterSpecialState() == MONSTER_M_SPECIAL_CAST3 )
 								{
 									real_t oldYaw = my->yaw;
 									real_t dist = 100.0;
-									if ( Entity* target = uidToEntity(my->monsterTarget) )
+									if ( Entity* target = uidToEntity(my->monsterTarget()) )
 									{
 										real_t tangent = atan2(target->y - my->y,
 											target->x - my->x);
@@ -1113,14 +1113,14 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 								{
 									real_t dist = 100.0;
 									real_t yawDiff = 0.0;
-									if ( Entity* target = uidToEntity(my->monsterTarget) )
+									if ( Entity* target = uidToEntity(my->monsterTarget()) )
 									{
 										yawDiff = my->yawDifferenceFromEntity(target);
 										dist = entityDist(my, target);
 									}
 									bool setProps = false;
 									CastSpellProps_t props;
-									if ( my->monsterSpecialState == MONSTER_M_SPECIAL_CAST1
+									if ( my->monsterSpecialState() == MONSTER_M_SPECIAL_CAST1
 										&& (dist > TOUCHRANGE || (yawDiff >= 0 && yawDiff < PI)) )
 									{
 										spellID = SPELL_TELEKINESIS;
@@ -1155,7 +1155,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 						if ( weaponarm->pitch >= 3 * PI / 2 )
 						{
-							my->monsterArmbended = 1;
+							my->monsterArmbended() = 1;
 						}
 
 						if ( weaponarm->skill[1] == 0 )
@@ -1182,10 +1182,10 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 									weaponarm->skill[0] = rightbody->skill[0];
 									weaponarm->pitch = rightbody->pitch;
 								}
-								my->monsterWeaponYaw = 0;
+								my->monsterWeaponYaw() = 0;
 								weaponarm->roll = 0;
-								my->monsterArmbended = 0;
-								my->monsterAttack = 0;
+								my->monsterArmbended() = 0;
+								my->monsterAttack() = 0;
 							}
 						}
 					}
@@ -1193,9 +1193,9 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					{
 						if ( multiplayer != CLIENT )
 						{
-							if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1 &&
-								my->monsterSpecialState == MONSTER_M_SPECIAL_CAST1
-								&& my->monsterAttackTime == 0 )
+							if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1 &&
+								my->monsterSpecialState() == MONSTER_M_SPECIAL_CAST1
+								&& my->monsterAttackTime() == 0 )
 							{
 								my->setEffect(EFF_ROOTED, true, 50, false, true, false, false);
 							}
@@ -1412,7 +1412,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( weaponNode )
 			{
 				Entity* weapon = (Entity*)weaponNode->element;
-				if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+				if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 				{
 					// if weapon invisible and I'm not attacking, relax arm.
 					entity->focalx = limbs[MYCONID][4][0]; // 0
@@ -1514,7 +1514,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( shieldNode )
 			{
 				Entity* shield = (Entity*)shieldNode->element;
-				if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+				if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 				{
 					entity->focalx = limbs[MYCONID][5][0]; // 0
 					entity->focaly = limbs[MYCONID][5][1];
@@ -1541,7 +1541,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				}
 			}
 			my->setHumanoidLimbOffset(entity, MYCONID, LIMB_HUMANOID_LEFTARM);
-			if ( my->monsterDefend && my->monsterAttack == 0 )
+			if ( my->monsterDefend() && my->monsterAttack() == 0 )
 			{
 				MONSTER_SHIELDYAW = PI / 5;
 			}
@@ -1924,7 +1924,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->fskill[0] += std::min(dist * MONSTER_MWALKSPEED, 2.f * MONSTER_MWALKSPEED); // move proportional to move speed
 				}
-				else if ( my->monsterAttack != 0 )
+				else if ( my->monsterAttack() != 0 )
 				{
 					entity->fskill[0] += MONSTER_MWALKSPEED; // move fixed speed when attacking if stationary
 				}
@@ -1933,7 +1933,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					entity->fskill[0] += 0.01; // otherwise move slow idle
 				}
 
-				if ( entity->fskill[0] > PI / 3 || ((!moving || my->monsterAttack != 0) && entity->fskill[0] > PI / 5) )
+				if ( entity->fskill[0] > PI / 3 || ((!moving || my->monsterAttack() != 0) && entity->fskill[0] > PI / 5) )
 				{
 					// switch direction if angle too great, angle is shorter if attacking or stationary
 					entity->skill[0] = 1;
@@ -1945,7 +1945,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->fskill[0] -= std::min(dist * MONSTER_MWALKSPEED, 2.f * MONSTER_MWALKSPEED);
 				}
-				else if ( my->monsterAttack != 0 )
+				else if ( my->monsterAttack() != 0 )
 				{
 					entity->fskill[0] -= MONSTER_MWALKSPEED;
 				}
@@ -2054,8 +2054,8 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			entity->scaley = 1.01 + bobScale * sin(entity->fskill[3]);
 			entity->scalez = 1.01 - bobScale * sin(entity->fskill[3]);
 
-			if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1
-				&& my->monsterAttackTime == 1 )
+			if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1
+				&& my->monsterAttackTime() == 1 )
 			{
 				entity->skill[0] = 4;
 
@@ -2206,7 +2206,7 @@ void monsterMMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 {
-	if ( monsterSpecialState != 0 )
+	if ( monsterSpecialState() != 0 )
 	{
 		//Holding a weapon assigned from the special attack. Don't switch weapons.
 		//messagePlayer()
@@ -2281,12 +2281,12 @@ void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 
 	if ( myStats->getAttribute("monster_m_type") == "discanter" )
 	{
-		if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0
+		if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0
 			&& local_rng.rand() % 3 == 0 )
 		{
 			if ( (dist >= TOUCHRANGE && local_rng.rand() % 3 == 0) || dist > 80.0 )
 			{
-				monsterSpecialState = MONSTER_M_SPECIAL_CAST3;
+				monsterSpecialState() = MONSTER_M_SPECIAL_CAST3;
 			}
 			else
 			{
@@ -2296,7 +2296,7 @@ void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 				}
 				else
 				{
-					monsterSpecialState = MONSTER_M_SPECIAL_CAST1;
+					monsterSpecialState() = MONSTER_M_SPECIAL_CAST1;
 				}
 			}
 		}
@@ -2308,7 +2308,7 @@ void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 	{
 		//First search the inventory for a THROWN weapon.
 		node_t *weaponNode = nullptr;
-		if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0
+		if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0
 			&& (dist > STRIKERANGE)
 			&& local_rng.rand() % 3 == 0 )
 		{
@@ -2317,7 +2317,7 @@ void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 			{
 				if ( swapMonsterWeaponWithInventoryItem(this, myStats, weaponNode, false, true) )
 				{
-					monsterSpecialState = MONSTER_M_SPECIAL_THROW;
+					monsterSpecialState() = MONSTER_M_SPECIAL_THROW;
 					return;
 				}
 			}

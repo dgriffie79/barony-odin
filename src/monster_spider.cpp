@@ -501,7 +501,7 @@ void spiderMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					{
 						rollRate = 0.1; // walking/chasing click click click
 					}
-					else if ( my->monsterState == MONSTER_STATE_WAIT )
+					else if ( my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						// idle, waiting
 						rollRate = 0.01;
@@ -526,7 +526,7 @@ void spiderMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 
-				if ( my->monsterState == MONSTER_STATE_WAIT )
+				if ( my->monsterState() == MONSTER_STATE_WAIT )
 				{
 					entity->fskill[0] = std::max(-PI * 10 / 180.0, entity->fskill[0] - 0.05); // lower the butt
 				}

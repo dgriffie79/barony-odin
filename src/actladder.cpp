@@ -187,10 +187,10 @@ void actPortal(Entity* my)
 	double dist;
 	int i, c;
 
-	if ( !my->portalInit )
+	if ( !my->portalInit() )
 	{
 		my->createWorldUITooltip();
-		my->portalInit = 1;
+		my->portalInit() = 1;
 		my->light = addLight(my->x / 16, my->y / 16, "portal_purple");
 		if ( !strncmp(map.name, "Cockatrice Lair", 15) )
 		{
@@ -203,10 +203,10 @@ void actPortal(Entity* my)
 		memset(mpPokeCooldown, 0, sizeof(mpPokeCooldown));
 	}
 
-	my->portalAmbience--;
-	if ( my->portalAmbience <= 0 )
+	my->portalAmbience()--;
+	if ( my->portalAmbience() <= 0 )
 	{
-		my->portalAmbience = TICKS_PER_SECOND * 2;
+		my->portalAmbience() = TICKS_PER_SECOND * 2;
 		if ( !my->flags[INVISIBLE] )
 		{
 			playSoundEntityLocal( my, 154, 128 );
@@ -397,7 +397,7 @@ void actPortal(Entity* my)
 						}
 					}
 				}
-				if ( !my->portalNotSecret )
+				if ( !my->portalNotSecret() )
 				{
 					secretlevel = (secretlevel == false);  // toggle level lists
 				}
@@ -451,14 +451,14 @@ void actWinningPortal(Entity* my)
 				if ( my->skill[28] == 2 )
 				{
 					// powered on.
-					if ( !my->portalFireAnimation )
+					if ( !my->portalFireAnimation() )
 					{
 						Entity* timer = createParticleTimer(my, 100, 174);
-						timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
-						timer->particleTimerCountdownSprite = 174;
-						timer->particleTimerEndAction = PARTICLE_EFFECT_PORTAL_SPAWN;
+						timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
+						timer->particleTimerCountdownSprite() = 174;
+						timer->particleTimerEndAction() = PARTICLE_EFFECT_PORTAL_SPAWN;
 						serverSpawnMiscParticles(my, PARTICLE_EFFECT_PORTAL_SPAWN, 174);
-						my->portalFireAnimation = 1;
+						my->portalFireAnimation() = 1;
 					}
 				}
 			}
@@ -471,7 +471,7 @@ void actWinningPortal(Entity* my)
 				{
 					my->flags[INVISIBLE] = true; // classic mode disabled, hide.
 					serverUpdateEntityFlag(my, INVISIBLE);
-					my->portalFireAnimation = 0;
+					my->portalFireAnimation() = 0;
 				}
 			}
 		}
@@ -484,16 +484,16 @@ void actWinningPortal(Entity* my)
 		}
 	}
 
-	if ( !my->portalInit )
+	if ( !my->portalInit() )
 	{
-		my->portalInit = 1;
+		my->portalInit() = 1;
 		my->light = addLight(my->x / 16, my->y / 16, "portal_white");
 	}
 
-	my->portalAmbience--;
-	if ( my->portalAmbience <= 0 )
+	my->portalAmbience()--;
+	if ( my->portalAmbience() <= 0 )
 	{
-		my->portalAmbience = TICKS_PER_SECOND * 2;
+		my->portalAmbience() = TICKS_PER_SECOND * 2;
 		playSoundEntityLocal( my, 154, 128 );
 	}
 
@@ -541,7 +541,7 @@ void actWinningPortal(Entity* my)
 					}
 				}
 
-				victory = my->portalVictoryType;
+				victory = my->portalVictoryType();
 
 				Uint8 cutscene = 0;
 				if (!strncmp(map.name, "Boss", 4)) {
@@ -590,9 +590,9 @@ void actWinningPortal(Entity* my)
 
 	            if (cutscene == 1) { // classic herx ending
 					int race = RACE_HUMAN;
-					if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+					if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 					{
-						race = stats[clientnum]->playerRace;
+						race = stats[clientnum]->playerRace();
 					}
 
 	                switch ( race ) {
@@ -623,9 +623,9 @@ void actWinningPortal(Entity* my)
 	            }
 	            else if (cutscene == 2) { // classic baphomet ending
 					int race = RACE_HUMAN;
-					if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+					if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 					{
-						race = stats[clientnum]->playerRace;
+						race = stats[clientnum]->playerRace();
 					}
 
 	                switch ( race ) {
@@ -708,19 +708,19 @@ void Entity::actExpansionEndGamePortal()
 					}
 				}
 			}
-			if ( circuit_status != 0 )
+			if ( circuit_status() != 0 )
 			{
-				if ( circuit_status == CIRCUIT_ON )
+				if ( circuit_status() == CIRCUIT_ON )
 				{
 					// powered on.
-					if ( !portalFireAnimation )
+					if ( !portalFireAnimation() )
 					{
 						Entity* timer = createParticleTimer(this, 100, 174);
-						timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
-						timer->particleTimerCountdownSprite = 174;
-						timer->particleTimerEndAction = PARTICLE_EFFECT_PORTAL_SPAWN;
+						timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
+						timer->particleTimerCountdownSprite() = 174;
+						timer->particleTimerEndAction() = PARTICLE_EFFECT_PORTAL_SPAWN;
 						serverSpawnMiscParticles(this, PARTICLE_EFFECT_PORTAL_SPAWN, 174);
-						portalFireAnimation = 1;
+						portalFireAnimation() = 1;
 					}
 				}
 			}
@@ -734,16 +734,16 @@ void Entity::actExpansionEndGamePortal()
 		}
 	}
 
-	if ( !portalInit )
+	if ( !portalInit() )
 	{
-		portalInit = 1;
+		portalInit() = 1;
 		light = addLight(x / 16, y / 16, "portal_blue");
 	}
 
-	portalAmbience--;
-	if ( portalAmbience <= 0 )
+	portalAmbience()--;
+	if ( portalAmbience() <= 0 )
 	{
-		portalAmbience = TICKS_PER_SECOND * 2;
+		portalAmbience() = TICKS_PER_SECOND * 2;
 		playSoundEntityLocal(this, 154, 128);
 	}
 
@@ -790,7 +790,7 @@ void Entity::actExpansionEndGamePortal()
 						return;
 					}
 				}
-				victory = portalVictoryType;
+				victory = portalVictoryType();
 				if ( multiplayer == SERVER )
 				{
 					for ( c = 1; c < MAXPLAYERS; c++ )
@@ -829,9 +829,9 @@ void Entity::actExpansionEndGamePortal()
 				}
 
 				int race = RACE_HUMAN;
-				if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+				if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 				{
-					race = stats[clientnum]->playerRace;
+					race = stats[clientnum]->playerRace();
 				}
 
                 switch ( race ) {
@@ -920,19 +920,19 @@ void Entity::actMidGamePortal()
 					}
 				}
 			}
-			if ( circuit_status != 0 )
+			if ( circuit_status() != 0 )
 			{
-				if ( circuit_status == CIRCUIT_ON )
+				if ( circuit_status() == CIRCUIT_ON )
 				{
 					// powered on.
-					if ( !portalFireAnimation )
+					if ( !portalFireAnimation() )
 					{
 						Entity* timer = createParticleTimer(this, 100, 174);
-						timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
-						timer->particleTimerCountdownSprite = 174;
-						timer->particleTimerEndAction = PARTICLE_EFFECT_PORTAL_SPAWN;
+						timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
+						timer->particleTimerCountdownSprite() = 174;
+						timer->particleTimerEndAction() = PARTICLE_EFFECT_PORTAL_SPAWN;
 						serverSpawnMiscParticles(this, PARTICLE_EFFECT_PORTAL_SPAWN, 174);
-						portalFireAnimation = 1;
+						portalFireAnimation() = 1;
 					}
 				}
 			}
@@ -945,7 +945,7 @@ void Entity::actMidGamePortal()
 				{
 					flags[INVISIBLE] = true; // classic mode enabled, hide.
 					serverUpdateEntityFlag(this, INVISIBLE);
-					portalFireAnimation = 0;
+					portalFireAnimation() = 0;
 				}
 			}
 		}
@@ -958,16 +958,16 @@ void Entity::actMidGamePortal()
 		}
 	}
 
-	if ( !portalInit )
+	if ( !portalInit() )
 	{
-		portalInit = 1;
+		portalInit() = 1;
 		light = addLight(x / 16, y / 16, "portal_blue");
 	}
 
-	portalAmbience--;
-	if ( portalAmbience <= 0 )
+	portalAmbience()--;
+	if ( portalAmbience() <= 0 )
 	{
-		portalAmbience = TICKS_PER_SECOND * 2;
+		portalAmbience() = TICKS_PER_SECOND * 2;
 		playSoundEntityLocal(this, 154, 128);
 	}
 
@@ -1043,9 +1043,9 @@ void Entity::actMidGamePortal()
 				}
 
 				int race = RACE_HUMAN;
-				if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+				if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 				{
-					race = stats[clientnum]->playerRace;
+					race = stats[clientnum]->playerRace();
 				}
 
 	            if (cutscene == 0) {
@@ -1315,14 +1315,14 @@ void actCustomPortal(Entity* my)
 				if ( my->skill[28] == 2 )
 				{
 					// powered on.
-					if ( !my->portalFireAnimation && my->portalCustomSpriteAnimationFrames > 0 )
+					if ( !my->portalFireAnimation() && my->portalCustomSpriteAnimationFrames() > 0 )
 					{
 						Entity* timer = createParticleTimer(my, 100, 174);
-						timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
-						timer->particleTimerCountdownSprite = 174;
-						timer->particleTimerEndAction = PARTICLE_EFFECT_PORTAL_SPAWN;
+						timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
+						timer->particleTimerCountdownSprite() = 174;
+						timer->particleTimerEndAction() = PARTICLE_EFFECT_PORTAL_SPAWN;
 						serverSpawnMiscParticles(my, PARTICLE_EFFECT_PORTAL_SPAWN, 174);
-						my->portalFireAnimation = 1;
+						my->portalFireAnimation() = 1;
 					}
 				}
 			}
@@ -1336,43 +1336,43 @@ void actCustomPortal(Entity* my)
 		}
 	}
 
-	if ( !my->portalInit )
+	if ( !my->portalInit() )
 	{
-		my->portalInit = 1;
-		if ( my->portalCustomSpriteAnimationFrames > 0 )
+		my->portalInit() = 1;
+		if ( my->portalCustomSpriteAnimationFrames() > 0 )
 		{
 			my->light = addLight(my->x / 16, my->y / 16, "portal_purple");
 		}
 	}
 
-	if ( my->portalCustomSpriteAnimationFrames > 0 )
+	if ( my->portalCustomSpriteAnimationFrames() > 0 )
 	{
-		my->portalAmbience--;
-		if ( my->portalAmbience <= 0 )
+		my->portalAmbience()--;
+		if ( my->portalAmbience() <= 0 )
 		{
-			my->portalAmbience = TICKS_PER_SECOND * 2; // portal whirr
+			my->portalAmbience() = TICKS_PER_SECOND * 2; // portal whirr
 			playSoundEntityLocal(my, 154, 128);
 		}
 	}
 	else
 	{
-		my->portalAmbience--;
-		if ( my->portalAmbience <= 0 )
+		my->portalAmbience()--;
+		if ( my->portalAmbience() <= 0 )
 		{
-			my->portalAmbience = TICKS_PER_SECOND * 30; // trap hum
+			my->portalAmbience() = TICKS_PER_SECOND * 30; // trap hum
 			playSoundEntityLocal(my, 149, 64);
 		}
 	}
 
 
-	if ( my->portalCustomSpriteAnimationFrames > 0 )
+	if ( my->portalCustomSpriteAnimationFrames() > 0 )
 	{
 		my->yaw += 0.01; // rotate slowly on my axis
-		my->sprite = my->portalCustomSprite + (my->ticks / 20) % my->portalCustomSpriteAnimationFrames; // animate
+		my->sprite = my->portalCustomSprite() + (my->ticks / 20) % my->portalCustomSpriteAnimationFrames(); // animate
 	}
 	else
 	{
-		my->sprite = my->portalCustomSprite;
+		my->sprite = my->portalCustomSprite();
 	}
 
 	if ( multiplayer == CLIENT )
@@ -1471,7 +1471,7 @@ void actCustomPortal(Entity* my)
 					}
 				}
 
-				if ( my->portalCustomLevelText1 != 0 )
+				if ( my->portalCustomLevelText1() != 0 )
 				{
 					// we're looking for a specific map name.
 					char mapName[64] = "";
@@ -1499,7 +1499,7 @@ void actCustomPortal(Entity* my)
 					{
 						mapName[totalChars] = '\0';
 					}
-					int levelToJumpTo = customPortalLookForMapWithName(mapName, my->portalNotSecret ? false : true, my->portalCustomLevelsToJump);
+					int levelToJumpTo = customPortalLookForMapWithName(mapName, my->portalNotSecret() ? false : true, my->portalCustomLevelsToJump());
 					if ( levelToJumpTo == -1000 )
 					{
 						// error.
@@ -1510,19 +1510,19 @@ void actCustomPortal(Entity* my)
 					{
 						// custom level not in the levels list, but was found in the maps folder.
 						// we've set the next map to warp to.
-						if ( my->portalCustomLevelsToJump - currentlevel > 0 )
+						if ( my->portalCustomLevelsToJump() - currentlevel > 0 )
 						{
-							skipLevelsOnLoad = my->portalCustomLevelsToJump - currentlevel;
+							skipLevelsOnLoad = my->portalCustomLevelsToJump() - currentlevel;
 						}
 						else
 						{
-							skipLevelsOnLoad = my->portalCustomLevelsToJump - currentlevel - 1;
+							skipLevelsOnLoad = my->portalCustomLevelsToJump() - currentlevel - 1;
 						}
 						if ( skipLevelsOnLoad == -1 )
 						{
 							loadingSameLevelAsCurrent = true;
 						}
-						if ( my->portalNotSecret )
+						if ( my->portalNotSecret() )
 						{
 							secretlevel = false;
 						}
@@ -1541,7 +1541,7 @@ void actCustomPortal(Entity* my)
 						return;
 					}
 					int levelDifference = currentlevel - levelToJumpTo;
-					if ( levelDifference == 0 && ((my->portalNotSecret && !secretlevel) || (!my->portalNotSecret && secretlevel)) )
+					if ( levelDifference == 0 && ((my->portalNotSecret() && !secretlevel) || (!my->portalNotSecret() && secretlevel)) )
 					{
 						//// error, we're reloading the same position, will glitch out clients.
 						//loadnextlevel = false;
@@ -1559,7 +1559,7 @@ void actCustomPortal(Entity* my)
 					{
 						skipLevelsOnLoad = levelToJumpTo - currentlevel - 1;
 					}
-					if ( my->portalNotSecret )
+					if ( my->portalNotSecret() )
 					{
 						secretlevel = false;
 					}
@@ -1570,12 +1570,12 @@ void actCustomPortal(Entity* my)
 				}
 				else
 				{
-					if ( !my->portalNotSecret )
+					if ( !my->portalNotSecret() )
 					{
 						secretlevel = (secretlevel == false);    // toggle level lists
 						skipLevelsOnLoad = -1; // don't skip levels when toggling.
 					}
-					skipLevelsOnLoad += my->portalCustomLevelsToJump;
+					skipLevelsOnLoad += my->portalCustomLevelsToJump();
 				}
 				return;
 			}

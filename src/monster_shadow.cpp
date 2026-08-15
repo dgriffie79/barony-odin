@@ -30,10 +30,10 @@ static CvarBool cvar_spawnArtemisia("/spawn_artemisia", false);
 void initShadow(Entity* my, Stat* myStats)
 {
 	node_t* node;
-	my->monsterShadowDontChangeName = 0; //By default, it does.
+	my->monsterShadowDontChangeName() = 0; //By default, it does.
 	if ( myStats && strcmp(myStats->name, "") != 0 )
 	{
-		my->monsterShadowDontChangeName = 1; //User set a name.
+		my->monsterShadowDontChangeName() = 1; //User set a name.
 	}
 
 	my->flags[BURNABLE] = true;
@@ -53,9 +53,9 @@ void initShadow(Entity* my, Stat* myStats)
 
 		if ( myStats != nullptr )
 		{
-			if ( !strncmp(map.name, "Underworld", 10) && currentlevel <= 7 && my->monsterStoreType == 0 )
+			if ( !strncmp(map.name, "Underworld", 10) && currentlevel <= 7 && my->monsterStoreType() == 0 )
 			{
-				my->monsterStoreType = 2;
+				my->monsterStoreType() = 2;
 			}
 			if ( !myStats->leader_uid )
 			{
@@ -74,13 +74,13 @@ void initShadow(Entity* my, Stat* myStats)
 			    !myStats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS];
 
 			// boss variants
-			if ( *cvar_spawnArtemisia || (my->monsterStoreType == 1 && !my->flags[USERFLAG2]) )
+			if ( *cvar_spawnArtemisia || (my->monsterStoreType() == 1 && !my->flags[USERFLAG2]) )
 			{
 				myStats->setAttribute("special_npc", "artemisia");
 				strcpy(myStats->name, MonsterData_t::getSpecialNPCName(*myStats).c_str());
 				my->sprite = MonsterData_t::getSpecialNPCBaseModel(*myStats);
 				myStats->sex = FEMALE;
-				my->monsterShadowDontChangeName = 1;
+				my->monsterShadowDontChangeName() = 1;
 				myStats->weapon = newItem(ARTIFACT_BOW, WORN, 0, 1, rng.rand(), false, nullptr);
 
 				ItemType type = static_cast<ItemType>(QUIVER_SILVER + rng.rand() % 7);
@@ -97,13 +97,13 @@ void initShadow(Entity* my, Stat* myStats)
 				strcpy(myStats->name, MonsterData_t::getSpecialNPCName(*myStats).c_str());
 				my->sprite = MonsterData_t::getSpecialNPCBaseModel(*myStats);
 				myStats->sex = MALE;
-				my->monsterShadowDontChangeName = 1; //Special monsters don't change their name either.
+				my->monsterShadowDontChangeName() = 1; //Special monsters don't change their name either.
 				myStats->GOLD = 1000;
 				myStats->RANDOM_GOLD = 500;
 				myStats->LVL = 50; // >:U
 				newItem(MASK_PHANTOM, static_cast<Status>(WORN + rng.rand() % 3), -2 + rng.rand() % 5, 1, rng.rand(), false, &myStats->inventory);
 			}
-			else if ( my->monsterStoreType == 2 )
+			else if ( my->monsterStoreType() == 2 )
 			{
 				myStats->HP = std::min(myStats->HP, 120);
 				myStats->MAXHP = myStats->HP;
@@ -264,7 +264,7 @@ void initShadow(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHADOW][6][0]; // 1.5
 	entity->focaly = limbs[SHADOW][6][1]; // 0
 	entity->focalz = limbs[SHADOW][6][2]; // -.5
@@ -285,7 +285,7 @@ void initShadow(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHADOW][7][0]; // 2
 	entity->focaly = limbs[SHADOW][7][1]; // 0
 	entity->focalz = limbs[SHADOW][7][2]; // 0
@@ -305,7 +305,7 @@ void initShadow(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHADOW][8][0]; // 0
 	entity->focaly = limbs[SHADOW][8][1]; // 0
 	entity->focalz = limbs[SHADOW][8][2]; // 4
@@ -328,7 +328,7 @@ void initShadow(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHADOW][9][0]; // 0
 	entity->focaly = limbs[SHADOW][9][1]; // 0
 	entity->focalz = limbs[SHADOW][9][2]; // -2
@@ -348,7 +348,7 @@ void initShadow(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHADOW][10][0]; // 0
 	entity->focaly = limbs[SHADOW][10][1]; // 0
 	entity->focalz = limbs[SHADOW][10][2]; // .25
@@ -471,16 +471,16 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( myStats->getEffectActive(EFF_LIFT) )
 			{
 				my->z = -1.2;
-				my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_NONE;
+				my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_NONE;
 				my->creatureHandleLiftZ();
 			}
 			else
 			{
-				my->creatureHoverZ = 0.0;
-				if ( my->monsterAnimationLimbOvershoot == ANIMATE_OVERSHOOT_NONE )
+				my->creatureHoverZ() = 0.0;
+				if ( my->monsterAnimationLimbOvershoot() == ANIMATE_OVERSHOOT_NONE )
 				{
 					my->z = -1.2;
-					my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+					my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 				}
 				if ( dist < 0.1 )
 				{
@@ -492,10 +492,10 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 	}
 
 	//Shadow stares you down while he does his special ability windup, and any of his spellcasting animations.
-	if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+	if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 	{
 		//Always turn to face the target.
-		Entity* target = uidToEntity(my->monsterTarget);
+		Entity* target = uidToEntity(my->monsterTarget());
 		if ( target )
 		{
 			my->lookAtEntity(*target);
@@ -519,7 +519,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					//my->z = 2.5;
 					my->pitch = PI / 4;
 				}
-				if ( my->monsterAttack != MONSTER_POSE_MAGIC_WINDUP3 )
+				if ( my->monsterAttack() != MONSTER_POSE_MAGIC_WINDUP3 )
 				{
 					if ( my->pitch >= 0 && my->pitch < PI )
 					{
@@ -550,11 +550,11 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		if ( bodypart == LIMB_HUMANOID_RIGHTLEG || bodypart == LIMB_HUMANOID_LEFTARM )
 		{
 			if ( bodypart == LIMB_HUMANOID_LEFTARM && 
-				(my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3
-					|| my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 
-					|| my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1
-					|| my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP2
-					|| (my->monsterAttack == MONSTER_POSE_MAGIC_CAST1)) )
+				(my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3
+					|| my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 
+					|| my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1
+					|| my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP2
+					|| (my->monsterAttack() == MONSTER_POSE_MAGIC_CAST1)) )
 			{
 				// leftarm follows the right arm during special mimic attack
 				// will not work when shield is visible
@@ -662,7 +662,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					Entity* rightbody = nullptr;
 					// set rightbody to left leg.
@@ -676,14 +676,14 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						return;
 					}
 				
-					if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 )
+					if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							createParticleDot(my);
@@ -707,12 +707,12 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							limbAnimateToLimit(my, ANIMATE_WEAPON_YAW, 0.25, 1 * PI / 8, false, 0.0);
 						}
 
-						if ( my->monsterAttackTime >= 3 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 3 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
 								// cast spell on target.
-								Entity* target = uidToEntity(my->monsterTarget);
+								Entity* target = uidToEntity(my->monsterTarget());
 								if ( target )
 								{
 									Entity* spellEntity = createParticleSapCenter(my, target, SHADOW_SPELLCAST, 624, 624);
@@ -727,15 +727,15 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							}
 						}
 					}
-					else if ( my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+					else if ( my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->skill[1] = 0;
 						}
 
-						if ( weaponarm->skill[1] == 0 && my->monsterAttackTime > 2 * ANIMATE_DURATION_WINDUP )
+						if ( weaponarm->skill[1] == 0 && my->monsterAttackTime() > 2 * ANIMATE_DURATION_WINDUP )
 						{
 							// swing and flare out arm.
 							if ( limbAnimateToLimit(weaponarm, ANIMATE_PITCH, 0.25, 1 * PI / 4, false, 0.0) && limbAnimateToLimit(weaponarm, ANIMATE_ROLL, -0.1, 30 * PI / 16, false, 0.0) )
@@ -748,14 +748,14 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							// return to neutral pitch.
 							limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, 0, false, 0.0);
 						}
-						if ( my->monsterAttackTime >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							weaponarm->skill[0] = rightbody->skill[0];
 							weaponarm->pitch = rightbody->pitch;
 							weaponarm->roll = 0;
-							my->monsterWeaponYaw = 0;
-							my->monsterArmbended = 0;
-							my->monsterAttack = 0;
+							my->monsterWeaponYaw() = 0;
+							my->monsterArmbended() = 0;
+							my->monsterAttack() = 0;
 							Entity* leftarm = nullptr;
 							node_t* leftarmNode = list_Node(&my->children, LIMB_HUMANOID_LEFTARM);
 							if ( leftarmNode )
@@ -766,11 +766,11 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 					}
 					// vertical chop attack
-					else if ( my->monsterAttack == MONSTER_POSE_MAGIC_CAST1 )
+					else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_CAST1 )
 					{
 						if ( weaponarm->pitch >= 3 * PI / 2 )
 						{
-							my->monsterArmbended = 1;
+							my->monsterArmbended() = 1;
 						}
 
 						if ( weaponarm->skill[1] == 0 )
@@ -786,11 +786,11 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							if ( limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, 7 * PI / 4, false, 0.0) )
 							{
 								weaponarm->skill[0] = rightbody->skill[0];
-								my->monsterWeaponYaw = 0;
+								my->monsterWeaponYaw() = 0;
 								weaponarm->pitch = rightbody->pitch;
 								weaponarm->roll = 0;
-								my->monsterArmbended = 0;
-								my->monsterAttack = 0;
+								my->monsterArmbended() = 0;
+								my->monsterAttack() = 0;
 								Entity* leftarm = nullptr;
 								// set leftbody to right leg.
 								node_t* leftarmNode = list_Node(&my->children, LIMB_HUMANOID_RIGHTLEG);
@@ -820,7 +820,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 			if ( bodypart == LIMB_HUMANOID_LEFTLEG )
 			{
-				if ( bodypart != LIMB_HUMANOID_RIGHTARM || (my->monsterAttack == 0 && my->monsterAttackTime == 0) )
+				if ( bodypart != LIMB_HUMANOID_RIGHTARM || (my->monsterAttack() == 0 && my->monsterAttackTime() == 0) )
 				{
 					if ( dist > 0.1 )
 					{
@@ -950,7 +950,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SHADOW][4][0] - 0.25; // 0
@@ -987,7 +987,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SHADOW][5][0] - 0.25; // 0
@@ -1004,11 +1004,11 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						entity->focalz = limbs[SHADOW][5][2];
 						entity->sprite = my->sprite == 1087 ? 1084 :
 						    (my->sprite == 1095 ? 1092 : 432);
-						if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP3 || my->monsterAttack == MONSTER_POSE_SPECIAL_WINDUP1 )
+						if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP3 || my->monsterAttack() == MONSTER_POSE_SPECIAL_WINDUP1 )
 						{
 							entity->yaw -= MONSTER_WEAPONYAW;
 						}
-						else if ( my->monsterAttack == MONSTER_POSE_MAGIC_WINDUP1 )
+						else if ( my->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP1 )
 						{
 							entity->yaw += (my->yaw - weaponarm->yaw);
 						}
@@ -1021,7 +1021,7 @@ void shadowMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->pitch = 0;
 				}
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1445,7 +1445,7 @@ void Entity::shadowSpecialAbility(bool initialMimic)
 		return;
 	}
 
-	Entity *target = uidToEntity(monsterTarget);
+	Entity *target = uidToEntity(monsterTarget());
 	if ( !target )
 	{
 		//messagePlayer(clientnum, "Shadow's target deaded!");
@@ -1471,7 +1471,7 @@ void Entity::shadowSpecialAbility(bool initialMimic)
 	//2. Copy target's weapon & shield on initial activation of this ability only.
 	if ( initialMimic )
 	{
-		if ( !monsterShadowDontChangeName )
+		if ( !monsterShadowDontChangeName() )
 		{
 			std::string newName = "Shadow of ";
 			if ( strcmp(targetStats->name, "") != 0 )
@@ -1485,7 +1485,7 @@ void Entity::shadowSpecialAbility(bool initialMimic)
 			strcpy(myStats->name, newName.c_str());
 		}
 
-		monsterShadowInitialMimic = 0;
+		monsterShadowInitialMimic() = 0;
 		//messagePlayer(clientnum, "[DEBUG: Entity::shadowSpecialAbility() ] Initial mimic.");
 		//TODO: On initial mimic, need to reset some the tracking info on what's already been mimic'ed.
 		//Such as dropping already equipped items.
@@ -1713,16 +1713,16 @@ bool Entity::shadowCanMimickSpell(int spellID)
 void Entity::shadowTeleportToTarget(const Entity* target, int range)
 {
 	Entity* spellTimer = createParticleTimer(this, 60, 625);
-	spellTimer->particleTimerPreDelay = 20; // wait 20 ticks before animation.
-	spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SHADOW_TELEPORT; // teleport behavior of timer.
-	spellTimer->particleTimerEndSprite = 625; // sprite to use for end of timer function.
-	spellTimer->particleTimerCountdownAction = 1;
-	spellTimer->particleTimerCountdownSprite = 625;
+	spellTimer->particleTimerPreDelay() = 20; // wait 20 ticks before animation.
+	spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SHADOW_TELEPORT; // teleport behavior of timer.
+	spellTimer->particleTimerEndSprite() = 625; // sprite to use for end of timer function.
+	spellTimer->particleTimerCountdownAction() = 1;
+	spellTimer->particleTimerCountdownSprite() = 625;
 	if ( target != nullptr )
 	{
-		spellTimer->particleTimerTarget = static_cast<Sint32>(target->getUID()); // get the target to teleport around.
+		spellTimer->particleTimerTarget() = static_cast<Sint32>(target->getUID()); // get the target to teleport around.
 	}
-	spellTimer->particleTimerVariable1 = range; // distance of teleport in tiles
+	spellTimer->particleTimerVariable1() = range; // distance of teleport in tiles
 	if ( multiplayer == SERVER )
 	{
 		serverSpawnMiscParticles(this, PARTICLE_EFFECT_SHADOW_TELEPORT, 625);
@@ -1731,14 +1731,14 @@ void Entity::shadowTeleportToTarget(const Entity* target, int range)
 
 void Entity::shadowChooseWeapon(const Entity* target, double dist)
 {
-	if ( monsterSpecialState != 0 )
+	if ( monsterSpecialState() != 0 )
 	{
 		//Holding a weapon assigned from the special attack. Don't switch weapons.
 		//messagePlayer(clientnum, "Shadow not choosing.");
 		// handle idle teleporting to target
-		if ( monsterSpecialState == SHADOW_TELEPORT_ONLY && monsterSpecialTimer == 0 )
+		if ( monsterSpecialState() == SHADOW_TELEPORT_ONLY && monsterSpecialTimer() == 0 )
 		{
-			monsterSpecialState = 0;
+			monsterSpecialState() = 0;
 			serverUpdateEntitySkill(this, 33); // for clients to keep track of animation
 		}
 		return;
@@ -1755,7 +1755,7 @@ void Entity::shadowChooseWeapon(const Entity* target, double dist)
 
 	bool inMeleeRange = monsterInMeleeRange(target, dist);
 
-	if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 )
+	if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 )
 	{
 		//messagePlayer(clientnum, "Preliminary special check.");
 		Stat* targetStats = target->getStats();
@@ -1778,7 +1778,7 @@ void Entity::shadowChooseWeapon(const Entity* target, double dist)
 			//messagePlayer(clientnum, "Rolled the special!");
 			node_t* node = nullptr;
 			bool telemimic  = (local_rng.rand() % 4 == 0); //By default, 25% chance it'll telepotty instead of casting a spell.
-			if ( monsterState != MONSTER_STATE_ATTACK )
+			if ( monsterState() != MONSTER_STATE_ATTACK )
 			{
 				//If it's hunting down the player, always want it to teleport and find them.
 				telemimic = true;
@@ -1790,7 +1790,7 @@ void Entity::shadowChooseWeapon(const Entity* target, double dist)
 				//Do the tele-mimic-invisibility special ability.
 				//messagePlayer(clientnum, "Executing telemimic.");
 				//monsterShadowInitialMimic = 0; //False!
-				monsterSpecialTimer = MONSTER_SPECIAL_COOLDOWN_SHADOW_TELEMIMICINVISI_ATTACK;
+				monsterSpecialTimer() = MONSTER_SPECIAL_COOLDOWN_SHADOW_TELEMIMICINVISI_ATTACK;
 				attack(MONSTER_POSE_MAGIC_WINDUP3, 0, nullptr);
 				return;
 			}
@@ -1801,15 +1801,15 @@ void Entity::shadowChooseWeapon(const Entity* target, double dist)
 			{
 				//messagePlayer(clientnum, "Shadow equipped a spell!");
 				swapMonsterWeaponWithInventoryItem(this, myStats, node, true, true);
-				monsterSpecialState = SHADOW_SPELLCAST;
+				monsterSpecialState() = SHADOW_SPELLCAST;
 				serverUpdateEntitySkill(this, 33); // for clients to keep track of animation
-				monsterHitTime = HITRATE * 2; // force immediate attack
+				monsterHitTime() = HITRATE * 2; // force immediate attack
 				return;
 			}
 			else
 			{
 				//Always set the cooldown, even if didn't cast anything.
-				monsterSpecialTimer = MONSTER_SPECIAL_COOLDOWN_SHADOW_SPELLCAST;
+				monsterSpecialTimer() = MONSTER_SPECIAL_COOLDOWN_SHADOW_SPELLCAST;
 			}
 		}
 	}

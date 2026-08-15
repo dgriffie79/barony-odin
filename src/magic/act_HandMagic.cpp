@@ -866,11 +866,11 @@ void spellcastAnimationUpdateReceive(int player, int attackPose, int castTime)
 	{
 		if ( attackPose == MONSTER_POSE_MAGIC_WINDUP1 )
 		{
-			players[player]->entity->playerCastTimeAnim = castTime;
+			players[player]->entity->playerCastTimeAnim() = castTime;
 			if ( players[player]->entity->skill[9] == MONSTER_POSE_MAGIC_WINDUP1 )
 			{
 				// add to the counter to not stagger restart
-				players[player]->entity->playerCastTimeAnim += players[player]->entity->skill[10];
+				players[player]->entity->playerCastTimeAnim() += players[player]->entity->skill[10];
 			}
 			else
 			{
@@ -1254,7 +1254,7 @@ void actLeftHandMagic(Entity* my)
 	}
 
 	if (players[HANDMAGIC_PLAYERNUM] == nullptr || players[HANDMAGIC_PLAYERNUM]->entity == nullptr
-		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam != 0) )
+		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam() != 0) )
 	{
 		players[HANDMAGIC_PLAYERNUM]->hud.magicLeftHand = nullptr;
 		spellcastingAnimationManager_deactivate(&cast_animation[HANDMAGIC_PLAYERNUM]);
@@ -1262,7 +1262,7 @@ void actLeftHandMagic(Entity* my)
 		return;
 	}
 
-	my->mistformGLRender = players[HANDMAGIC_PLAYERNUM]->entity->mistformGLRender;
+	my->mistformGLRender() = players[HANDMAGIC_PLAYERNUM]->entity->mistformGLRender();
 
 	//Set the initial values. (For the particle spray)
 	my->x = 8;
@@ -1279,22 +1279,22 @@ void actLeftHandMagic(Entity* my)
 	my->z -= 0.75;
 
 	//Sprite
-	Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace);
+	Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace());
 	int playerAppearance = stats[HANDMAGIC_PLAYERNUM]->stat_appearance;
-	if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+	if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 	{
-		playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift);
+		playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift());
 	}
-	else if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph != NOTHING )
+	else if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() != NOTHING )
 	{
-		if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph > NUMMONSTERS )
+		if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			playerRace = HUMAN;
-			playerAppearance = players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph - 100;
+			playerAppearance = players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() - 100;
 		}
 		else
 		{
-			playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph);
+			playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph());
 		}
 	}
 
@@ -1967,10 +1967,10 @@ void actLeftHandMagic(Entity* my)
 			float y = -my->y;
 			float z = my->z - 0.0;
 
-			Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace);
-			if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+			Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace());
+			if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 			{
-				playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift);
+				playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift());
 				if ( playerRace == RAT )
 				{
 					y = 0.0;
@@ -2063,14 +2063,14 @@ void actRightHandMagic(Entity* my)
 	}
 
 	if (players[HANDMAGIC_PLAYERNUM] == nullptr || players[HANDMAGIC_PLAYERNUM]->entity == nullptr
-		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam != 0) )
+		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam() != 0) )
 	{
 		players[HANDMAGIC_PLAYERNUM]->hud.magicRightHand = nullptr;
 		list_RemoveNode(my->mynode);
 		return;
 	}
 
-	my->mistformGLRender = players[HANDMAGIC_PLAYERNUM]->entity->mistformGLRender;
+	my->mistformGLRender() = players[HANDMAGIC_PLAYERNUM]->entity->mistformGLRender();
 
 	my->x = 8;
 	my->y = 3;
@@ -2086,22 +2086,22 @@ void actRightHandMagic(Entity* my)
 	my->z -= 0.75;
 
 	//Sprite
-	Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace);
+	Monster playerRace = players[HANDMAGIC_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HANDMAGIC_PLAYERNUM]->playerRace());
 	int playerAppearance = stats[HANDMAGIC_PLAYERNUM]->stat_appearance;
-	if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+	if ( players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 	{
-		playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift);
+		playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectShapeshift());
 	}
-	else if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph != NOTHING )
+	else if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() != NOTHING )
 	{
-		if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph > NUMMONSTERS )
+		if ( players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			playerRace = HUMAN;
-			playerAppearance = players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph - 100;
+			playerAppearance = players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph() - 100;
 		}
 		else
 		{
-			playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph);
+			playerRace = static_cast<Monster>(players[HANDMAGIC_PLAYERNUM]->entity->effectPolymorph());
 		}
 	}
 
@@ -2482,9 +2482,9 @@ void actMagicRangefinder(Entity* my)
 	}
 
 	if ( players[HANDMAGIC_PLAYERNUM] == nullptr || players[HANDMAGIC_PLAYERNUM]->entity == nullptr
-		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam != 0) )
+		|| (players[HANDMAGIC_PLAYERNUM]->entity && players[HANDMAGIC_PLAYERNUM]->entity->playerCreatedDeathCam() != 0) )
 	{
-		if ( auto indicator = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface) )
+		if ( auto indicator = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface()) )
 		{
 			indicator->expired = true;
 		}
@@ -2599,12 +2599,12 @@ void actMagicRangefinder(Entity* my)
 		*cvar_player_cast_indicator_alpha_glow * sin(2 * PI * (my->ticks % TICKS_PER_SECOND) / (real_t)(TICKS_PER_SECOND));
 	my->yaw += *cvar_player_cast_indicator_rotate;
 
-	if ( !AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface) )
+	if ( !AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface()) )
 	{
 		int size = 20;
-		my->actSpriteUseCustomSurface = AOEIndicators_t::createIndicator(4, size, size * 2 + 4, -1);
+		my->actSpriteUseCustomSurface() = AOEIndicators_t::createIndicator(4, size, size * 2 + 4, -1);
 	}
-	if ( auto indicator = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface) )
+	if ( auto indicator = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface()) )
 	{
 		indicator->cacheType = AOEIndicators_t::CACHE_CASTING;
 		indicator->gradient = 6;

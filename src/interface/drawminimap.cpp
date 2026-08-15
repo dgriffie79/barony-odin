@@ -178,7 +178,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 			}
 			if ( entity->behavior == &actMonster )
 			{
-				if ( entity->monsterAllyIndex < 0 )
+				if ( entity->monsterAllyIndex() < 0 )
 				{
 					entityPointsOfInterest.push_back(entity);
 				}
@@ -195,7 +195,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					}
 				}
 			}
-			else if ( entity->isDamageableCollider() && entity->colliderHideMonster != 0 )
+			else if ( entity->isDamageableCollider() && entity->colliderHideMonster() != 0 )
 			{
 				entityPointsOfInterest.push_back(entity);
 			}
@@ -213,7 +213,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 			{
 				entityPointsOfInterest.push_back(entity);
 			}
-			else if ( entity->behavior == &actItem && entity->itemShowOnMap == 1 )
+			else if ( entity->behavior == &actItem && entity->itemShowOnMap() == 1 )
 			{
 				entityPointsOfInterest.push_back(entity);
 			}
@@ -571,8 +571,8 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					}
 				}
 			}
-			if ( (entity->behavior == &actMonster && entity->monsterAllyIndex < 0)
-				|| (entity->isDamageableCollider() && entity->colliderHideMonster != 0) )
+			if ( (entity->behavior == &actMonster && entity->monsterAllyIndex() < 0)
+				|| (entity->isDamageableCollider() && entity->colliderHideMonster() != 0) )
 			{
 				bool warningEffect = false;
 				{
@@ -583,7 +583,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 							if ( !players[i]->isLocalPlayer() || client_disconnected[i] ) { continue; }
 
 							if ( (players[i] && players[i]->entity
-								&& players[i]->entity->creatureShadowTaggedThisUid == entity->getUID())
+								&& players[i]->entity->creatureShadowTaggedThisUid() == entity->getUID())
 								|| (entity->getStats() && entity->getStats()->getEffectActive(EFF_SHADOW_TAGGED)) )
 							{
 								warningEffect = true;
@@ -598,7 +598,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					{
 						const int i = player;
 						if ( (players[i] && players[i]->entity
-							&& players[i]->entity->creatureShadowTaggedThisUid == entity->getUID())
+							&& players[i]->entity->creatureShadowTaggedThisUid() == entity->getUID())
 							|| (entity->getStats() && entity->getStats()->getEffectActive(EFF_SHADOW_TAGGED)) )
 						{
 							warningEffect = true;
@@ -826,7 +826,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 
 				deathboxSkulls.push_back(std::make_pair(color, std::make_pair(skullx, skully)));
 			}
-			else if ( entity->behavior == &actItem && entity->itemShowOnMap == 1 )
+			else if ( entity->behavior == &actItem && entity->itemShowOnMap() == 1 )
 			{
 				int x = std::min<int>(std::max<int>(0, entity->x / 16), map.width - 1);
 				int y = std::min<int>(std::max<int>(0, entity->y / 16), map.height - 1);
@@ -1147,9 +1147,9 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 			}
 			else if ( entity->behavior == &actMonster )
 			{
-				if ( entity->monsterAllyIndex >= 0 )
+				if ( entity->monsterAllyIndex() >= 0 )
 				{
-					drawMonsterAlly = entity->monsterAllyIndex;
+					drawMonsterAlly = entity->monsterAllyIndex();
 				}
 			}
 			if ( drawMonsterAlly >= 0 || foundplayer >= 0 || entity->sprite == 239)
@@ -1165,7 +1165,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 						for ( int i = 0; i < MAXPLAYERS; ++i )
 						{
 							if ( players[i] && players[i]->entity
-								&& players[i]->entity->creatureShadowTaggedThisUid == entity->getUID() )
+								&& players[i]->entity->creatureShadowTaggedThisUid() == entity->getUID() )
 							{
 								foundShadowTaggedEntity = true;
 								break;
@@ -1175,7 +1175,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					else
 					{
 						if ( players[player] && players[player]->entity
-							&& players[player]->entity->creatureShadowTaggedThisUid == entity->getUID() )
+							&& players[player]->entity->creatureShadowTaggedThisUid() == entity->getUID() )
 						{
 							foundShadowTaggedEntity = true;
 						}
@@ -1212,7 +1212,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 						for ( int i = 0; i < MAXPLAYERS; ++i )
 						{
 							if ( players[i] && players[i]->entity
-								&& players[i]->entity->creatureShadowTaggedThisUid == entity->getUID() )
+								&& players[i]->entity->creatureShadowTaggedThisUid() == entity->getUID() )
 							{
 								foundShadowTaggedEntity = true;
 								break;
@@ -1222,7 +1222,7 @@ void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 					else
 					{
 						if ( players[player] && players[player]->entity
-							&& players[player]->entity->creatureShadowTaggedThisUid == entity->getUID() )
+							&& players[player]->entity->creatureShadowTaggedThisUid() == entity->getUID() )
 						{
 							foundShadowTaggedEntity = true;
 						}
@@ -1369,7 +1369,7 @@ void shrineDaedalusRevealMap(Entity& my)
 				exitEntity = entity;
 				break;
 			}
-			if ( entity->behavior == &actPortal && entity->portalNotSecret == 1 )
+			if ( entity->behavior == &actPortal && entity->portalNotSecret() == 1 )
 			{
 				exitEntity = entity;
 				break;

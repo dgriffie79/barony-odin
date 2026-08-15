@@ -47,10 +47,10 @@ void Entity::actTeleporter()
 		createWorldUITooltip();
 	}
 
-	if ( teleporterDuration > 0 && multiplayer != CLIENT )
+	if ( teleporterDuration() > 0 && multiplayer != CLIENT )
 	{
-		--teleporterDuration;
-		if ( teleporterDuration <= 0 )
+		--teleporterDuration();
+		if ( teleporterDuration() <= 0 )
 		{
 			this->removeLightField();
 			list_RemoveNode(this->mynode);
@@ -58,10 +58,10 @@ void Entity::actTeleporter()
 		}
 	}
 
-	teleporterAmbience--;
-	if ( teleporterAmbience <= 0 )
+	teleporterAmbience()--;
+	if ( teleporterAmbience() <= 0 )
 	{
-		teleporterAmbience = TICKS_PER_SECOND * 30;
+		teleporterAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 64);
 	}
 
@@ -70,12 +70,12 @@ void Entity::actTeleporter()
 	{
 		if ( this->isInteractWithMonster() )
 		{
-			Entity* monsterInteracting = uidToEntity(this->interactedByMonster);
+			Entity* monsterInteracting = uidToEntity(this->interactedByMonster());
 			if ( monsterInteracting )
 			{
-				if ( teleporterType == 3 )
+				if ( teleporterType() == 3 )
 				{
-					if ( monsterInteracting->teleport(teleporterX, teleporterY) )
+					if ( monsterInteracting->teleport(teleporterX(), teleporterY()) )
 					{
 						if ( Entity* caster = uidToEntity(this->parent) )
 						{
@@ -92,7 +92,7 @@ void Entity::actTeleporter()
 				}
 				else
 				{
-					monsterInteracting->teleporterMove(teleporterX, teleporterY, teleporterType);
+					monsterInteracting->teleporterMove(teleporterX(), teleporterY(), teleporterType());
 				}
 				this->clearMonsterInteract();
 				return;
@@ -105,7 +105,7 @@ void Entity::actTeleporter()
 			{
 				if ( inrange[i] && Player::getPlayerInteractEntity(i) )
 				{
-					switch ( teleporterType )
+					switch ( teleporterType() )
 					{
 						case 0:
 							messagePlayer(i, MESSAGE_INTERACTION, Language::get(2378));
@@ -119,9 +119,9 @@ void Entity::actTeleporter()
 						default:
 							break;
 					}
-					if ( teleporterType == 3 )
+					if ( teleporterType() == 3 )
 					{
-						if ( Player::getPlayerInteractEntity(i)->teleport(teleporterX, teleporterY) )
+						if ( Player::getPlayerInteractEntity(i)->teleport(teleporterX(), teleporterY()) )
 						{
 							messagePlayer(i, MESSAGE_INTERACTION, Language::get(6696));
 							if ( Entity* caster = uidToEntity(this->parent) )
@@ -139,7 +139,7 @@ void Entity::actTeleporter()
 					}
 					else
 					{
-						Player::getPlayerInteractEntity(i)->teleporterMove(teleporterX, teleporterY, teleporterType);
+						Player::getPlayerInteractEntity(i)->teleporterMove(teleporterX(), teleporterY(), teleporterType());
 					}
 					return;
 				}
@@ -147,7 +147,7 @@ void Entity::actTeleporter()
 		}
 	}
 
-	if ( teleporterType == 2 )
+	if ( teleporterType() == 2 )
 	{
 		if ( !light )
 		{
@@ -160,7 +160,7 @@ void Entity::actTeleporter()
 			sprite = 992 + ((this->ticks / 20) % 4) - 1; // animate through 992, 993, 994
 		}
 	}
-	else if ( teleporterType == 3 )
+	else if ( teleporterType() == 3 )
 	{
 		if ( !light )
 		{
@@ -169,11 +169,11 @@ void Entity::actTeleporter()
 
 		if ( ::ticks % 4 == 0 )
 		{
-			sprite = teleporterStartFrame + teleporterCurrentFrame;
-			++teleporterCurrentFrame;
-			if ( teleporterCurrentFrame >= teleporterNumFrames )
+			sprite = teleporterStartFrame() + teleporterCurrentFrame();
+			++teleporterCurrentFrame();
+			if ( teleporterCurrentFrame() >= teleporterNumFrames() )
 			{
-				teleporterCurrentFrame = 0;
+				teleporterCurrentFrame() = 0;
 			}
 		}
 

@@ -714,7 +714,7 @@ void initGnome(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GNOME][6][0]; // 2
 	entity->focaly = limbs[GNOME][6][1]; // 0
 	entity->focalz = limbs[GNOME][6][2]; // -.5
@@ -736,7 +736,7 @@ void initGnome(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GNOME][7][0]; // 0
 	entity->focaly = limbs[GNOME][7][1]; // 0
 	entity->focalz = limbs[GNOME][7][2]; // 1.5
@@ -760,7 +760,7 @@ void initGnome(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GNOME][8][0]; // 0
 	entity->focaly = limbs[GNOME][8][1]; // 0
 	entity->focalz = limbs[GNOME][8][2]; // 4
@@ -783,7 +783,7 @@ void initGnome(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GNOME][9][0]; // 0
 	entity->focaly = limbs[GNOME][9][1]; // 0
 	entity->focalz = limbs[GNOME][9][2]; // -2
@@ -803,7 +803,7 @@ void initGnome(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GNOME][10][0]; // 0
 	entity->focaly = limbs[GNOME][10][1]; // 0
 	entity->focalz = limbs[GNOME][10][2]; // .25
@@ -871,7 +871,7 @@ void gnomeDie(Entity* my)
 								if ( entity->setEffect(EFF_FEAR, true, TICKS_PER_SECOND * 5, true) )
 								{
 									entity->monsterAcquireAttackTarget(*killer, MONSTER_STATE_PATH);
-									entity->monsterFearfulOfUid = killer->getUID();
+									entity->monsterFearfulOfUid() = killer->getUID();
 									playSoundEntity(entity, 687, 128); // fear.ogg
 									affected = true;
 								}
@@ -1073,7 +1073,7 @@ void gnomeMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(entity);
 				}
@@ -1310,7 +1310,7 @@ void gnomeMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( my->monsterArmbended || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( my->monsterArmbended() || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						entity->focalx = limbs[GNOME][4][0]; // 0
 						entity->focaly = limbs[GNOME][4][1]; // 0
@@ -1405,7 +1405,7 @@ void gnomeMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						entity->focalx = limbs[GNOME][5][0]; // 0
 						entity->focaly = limbs[GNOME][5][1]; // 0
@@ -1427,7 +1427,7 @@ void gnomeMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, GNOME, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}

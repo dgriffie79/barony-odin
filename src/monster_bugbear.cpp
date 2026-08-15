@@ -269,7 +269,7 @@ void initBugbear(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[BUGBEAR][6][0];
 	entity->focaly = limbs[BUGBEAR][6][1];
 	entity->focalz = limbs[BUGBEAR][6][2];
@@ -290,7 +290,7 @@ void initBugbear(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[BUGBEAR][7][0];
 	entity->focaly = limbs[BUGBEAR][7][1];
 	entity->focalz = limbs[BUGBEAR][7][2];
@@ -334,7 +334,7 @@ void bugbearDie(Entity* my)
 real_t getWalkSpeed(Entity& my)
 {
 	real_t val = BUGBEARWALKSPEED;
-	if ( my.monsterState == MONSTER_STATE_GENERIC_CHARGE )
+	if ( my.monsterState() == MONSTER_STATE_GENERIC_CHARGE )
 	{
 		val /= 2;
 	}
@@ -498,7 +498,7 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				&& (MONSTER_ATTACK == MONSTER_POSE_SPECIAL_WINDUP1
 					|| MONSTER_ATTACK == MONSTER_POSE_BUGBEAR_SHIELD) )
 			{
-				my->monsterHitTime = 0;
+				my->monsterHitTime() = 0;
 				if ( MONSTER_ATTACK == MONSTER_POSE_SPECIAL_WINDUP1 )
 				{
 					if ( MONSTER_ATTACKTIME == 0 )
@@ -656,13 +656,13 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(entity);
 				}
 			}
 
-			if ( bodypart != LIMB_HUMANOID_RIGHTARM || (my->monsterAttack == 0 ) )
+			if ( bodypart != LIMB_HUMANOID_RIGHTARM || (my->monsterAttack() == 0 ) )
 			{
 				// swing right arm/ left leg in sync
 				if ( dist > 0.1 )
@@ -773,21 +773,21 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( my->monsterState != MONSTER_STATE_ATTACK && my->monsterAttack == 0 )
+					if ( my->monsterState() != MONSTER_STATE_ATTACK && my->monsterAttack() == 0 )
 					{
 						if ( weapon )
 						{
 							if ( weapon->sprite != items[HEAVY_CROSSBOW].index )
 							{
-								my->monsterArmbended = 1;
+								my->monsterArmbended() = 1;
 							}
 							else
 							{
-								my->monsterArmbended = 0;
+								my->monsterArmbended() = 0;
 							}
 						}
 					}
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[BUGBEAR][4][0];
@@ -799,7 +799,7 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						entity->y += limbs[BUGBEAR][16][0] * sin(my->yaw + PI / 2) + limbs[BUGBEAR][16][1] * sin(my->yaw);
 						entity->z += limbs[BUGBEAR][16][2];
 
-						if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2 || my->monsterAttack == 2 )
+						if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2 || my->monsterAttack() == 2 )
 						{
 							entity->focaly += 0.5;
 							entity->x += -1 * cos(my->yaw + PI / 2);
@@ -838,7 +838,7 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						// relax arm
 						entity->focalx = limbs[BUGBEAR][4][0];
@@ -869,7 +869,7 @@ void bugbearMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 				if ( MONSTER_ATTACK != MONSTER_POSE_BUGBEAR_SHIELD && MONSTER_ATTACK != MONSTER_POSE_SPECIAL_WINDUP1 )
 				{
-					if ( my->monsterDefend && my->monsterAttack == 0 )
+					if ( my->monsterDefend() && my->monsterAttack() == 0 )
 					{
 						if ( MONSTER_SHIELDYAW < 2 * PI / 5 )
 						{
@@ -1178,26 +1178,26 @@ void Entity::bugbearChooseWeapon(const Entity* target, double dist)
 		return;
 	}
 
-	if ( monsterSpecialState == BUGBEAR_DEFENSE )
+	if ( monsterSpecialState() == BUGBEAR_DEFENSE )
 	{
-		if ( monsterStrafeDirection == 0 && local_rng.rand() % 10 == 0 && ticks % 10 == 0 )
+		if ( monsterStrafeDirection() == 0 && local_rng.rand() % 10 == 0 && ticks % 10 == 0 )
 		{
 			setBugbearStrafeDir(true);
 			//monsterStrafeDirection = -1 + ((local_rng.rand() % 2 == 0) ? 2 : 0);
 		}
 	}
 
-	if ( monsterSpecialState != 0 || monsterSpecialTimer != 0 )
+	if ( monsterSpecialState() != 0 || monsterSpecialTimer() != 0 )
 	{
-		if ( monsterSpecialTimer < MONSTER_SPECIAL_COOLDOWN_BUGBEAR / 2 )
+		if ( monsterSpecialTimer() < MONSTER_SPECIAL_COOLDOWN_BUGBEAR / 2 )
 		{
-			monsterSpecialState = 0;
-			monsterStrafeDirection = 0;
+			monsterSpecialState() = 0;
+			monsterStrafeDirection() = 0;
 		}
 		return;
 	}
 
-	if ( monsterSpecialTimer == 0
+	if ( monsterSpecialTimer() == 0
 		&& (ticks % 10 == 0)
 		&& (dist < STRIKERANGE * 2 || hasRangedWeapon()) )
 	{
@@ -1238,24 +1238,24 @@ void Entity::bugbearChooseWeapon(const Entity* target, double dist)
 				leader = uidToEntity(parent);
 			}
 
-			if ( leader && leader->monsterSpecialState == BUGBEAR_DEFENSE )
+			if ( leader && leader->monsterSpecialState() == BUGBEAR_DEFENSE )
 			{
-				if ( local_rng.rand() % 2 != 0 || leader->monsterSpecialTimer >= MONSTER_SPECIAL_COOLDOWN_BUGBEAR - TICKS_PER_SECOND )
+				if ( local_rng.rand() % 2 != 0 || leader->monsterSpecialTimer() >= MONSTER_SPECIAL_COOLDOWN_BUGBEAR - TICKS_PER_SECOND )
 				{
 					return;
 				}
 			}
 
-			monsterSpecialState = BUGBEAR_DEFENSE;
-			monsterSpecialTimer = MONSTER_SPECIAL_COOLDOWN_BUGBEAR;
+			monsterSpecialState() = BUGBEAR_DEFENSE;
+			monsterSpecialTimer() = MONSTER_SPECIAL_COOLDOWN_BUGBEAR;
 
 			if ( leader )
 			{
-				if ( leader->monsterStrafeDirection != 0 )
+				if ( leader->monsterStrafeDirection() != 0 )
 				{
 					if ( local_rng.rand() % 2 == 0 )
 					{
-						monsterStrafeDirection = 0;
+						monsterStrafeDirection() = 0;
 						return;
 					}
 				}
@@ -1275,7 +1275,7 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 	{
 		return;
 	}
-	if ( monsterSpecialState != BUGBEAR_DEFENSE )
+	if ( monsterSpecialState() != BUGBEAR_DEFENSE )
 	{
 		return;
 	}
@@ -1298,7 +1298,7 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 	real_t ox = x;
 	real_t oy = y;
 
-	Entity* target = monsterTarget != 0 ? uidToEntity(monsterTarget) : nullptr;
+	Entity* target = monsterTarget() != 0 ? uidToEntity(monsterTarget()) : nullptr;
 
 	for ( auto dir : dirs )
 	{
@@ -1342,7 +1342,7 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 
 			if ( Stat* leaderStats = leader->getStats() )
 			{
-				if ( monsterTarget != 0 && leader->monsterTarget == monsterTarget )
+				if ( monsterTarget() != 0 && leader->monsterTarget() == monsterTarget() )
 				{
 					// check LOS of leader to their target
 					if ( target )
@@ -1369,12 +1369,12 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 
 	if ( gooddirs.size() > 0 )
 	{
-		if ( monsterStrafeDirection != 0 )
+		if ( monsterStrafeDirection() != 0 )
 		{
-			if ( gooddirs.size() >= 2 && gooddirs.find(monsterStrafeDirection) != gooddirs.end() )
+			if ( gooddirs.size() >= 2 && gooddirs.find(monsterStrafeDirection()) != gooddirs.end() )
 			{
 				// remove current direction
-				gooddirs.erase(monsterStrafeDirection);
+				gooddirs.erase(monsterStrafeDirection());
 			}
 		}
 		auto it = gooddirs.begin();
@@ -1383,23 +1383,23 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 		{
 			++it;
 		}
-		monsterStrafeDirection = *it;
+		monsterStrafeDirection() = *it;
 	}
 	else
 	{
-		if ( leader && leader->monsterStrafeDirection != 0 )
+		if ( leader && leader->monsterStrafeDirection() != 0 )
 		{
-			monsterStrafeDirection = -1 * leader->monsterStrafeDirection;
+			monsterStrafeDirection() = -1 * leader->monsterStrafeDirection();
 		}
 		else
 		{
-			if ( monsterStrafeDirection != 0 )
+			if ( monsterStrafeDirection() != 0 )
 			{
-				monsterStrafeDirection = -1 * monsterStrafeDirection;
+				monsterStrafeDirection() = -1 * monsterStrafeDirection();
 			}
 			else
 			{
-				monsterStrafeDirection = local_rng.rand() % 2 == 0 ? -1 : 1;
+				monsterStrafeDirection() = local_rng.rand() % 2 == 0 ? -1 : 1;
 			}
 		}
 	}

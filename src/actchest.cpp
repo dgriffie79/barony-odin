@@ -132,7 +132,7 @@ void createChestInventory(Entity* my, int chestType)
 		minimumQuality = 5;
 	}
 
-	if ( my->chestHasVampireBook && my->behavior == &::actChest )
+	if ( my->chestHasVampireBook() && my->behavior == &::actChest )
 	{
 		newItem(SPELLBOOK_VAMPIRIC_AURA, EXCELLENT, 0, 1, rng.rand(), true, inventory);
 	}
@@ -784,10 +784,10 @@ void createChestInventory(Entity* my, int chestType)
 
 void Entity::actChest()
 {
-	chestAmbience--;
-	if ( chestAmbience <= 0 )
+	chestAmbience()--;
+	if ( chestAmbience() <= 0 )
 	{
-		chestAmbience = TICKS_PER_SECOND * 30;
+		chestAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 32);
 	}
 
@@ -798,7 +798,7 @@ void Entity::actChest()
 
 	if ( sprite == 1791 )
 	{
-		if ( chestVoidState == 0 )
+		if ( chestVoidState() == 0 )
 		{
 			sprite = 188;
 			if ( parent != 0 )
@@ -812,7 +812,7 @@ void Entity::actChest()
 	}
 	else if ( sprite == 188 )
 	{
-		if ( chestVoidState != 0 )
+		if ( chestVoidState() != 0 )
 		{
 			sprite = 1791;
 			if ( parent != 0 )
@@ -827,7 +827,7 @@ void Entity::actChest()
 
 	if ( multiplayer == CLIENT )
 	{
-		if ( chestHasVampireBook )
+		if ( chestHasVampireBook() )
 		{
 			spawnAmbientParticles(40, 600, 20 + local_rng.rand() % 30, 0.5, true);
 			spawnAmbientParticles(40, 600, 20 + local_rng.rand() % 30, 0.5, true);
@@ -835,42 +835,42 @@ void Entity::actChest()
 		return;
 	}
 
-	if (!chestInit)
+	if (!chestInit())
 	{
 		auto& rng = entity_rng ? *entity_rng : local_rng;
-		chestInit = 1;
-		chestHealth = 90 + rng.rand() % 20;
-		chestMaxHealth = chestHealth;
-		chestOldHealth = chestHealth;
-		chestPreventLockpickCapstoneExploit = 1;
-		chestLockpickHealth = 40;
+		chestInit() = 1;
+		chestHealth() = 90 + rng.rand() % 20;
+		chestMaxHealth() = chestHealth();
+		chestOldHealth() = chestHealth();
+		chestPreventLockpickCapstoneExploit() = 1;
+		chestLockpickHealth() = 40;
 		int roll = 0;
 
-		if ( chestLocked == -1 )
+		if ( chestLocked() == -1 )
 		{
 			roll = rng.rand() % 10;
 			if ( roll == 0 )   // 10% chance //TODO: This should be weighted, depending on chest type.
 			{
-				chestLocked = 1;
-				chestPreventLockpickCapstoneExploit = 0;
+				chestLocked() = 1;
+				chestPreventLockpickCapstoneExploit() = 0;
 			}
 			else
 			{
-				chestLocked = 0;
+				chestLocked() = 0;
 			}
 			//messagePlayer(0, "Chest rolled: %d, locked: %d", roll, chestLocked); //debug print
 		}
-		else  if ( chestLocked >= 0 )
+		else  if ( chestLocked() >= 0 )
 		{
 			roll = rng.rand() % 100;
-			if ( roll < chestLocked )
+			if ( roll < chestLocked() )
 			{
-				chestLocked = 1;
-				chestPreventLockpickCapstoneExploit = 0;
+				chestLocked() = 1;
+				chestPreventLockpickCapstoneExploit() = 0;
 			}
 			else
 			{
-				chestLocked = 0;
+				chestLocked() = 0;
 			}
 
 			//messagePlayer(0, "Chest rolled: %d, locked: %d", roll, chestLocked); //debug print
@@ -881,13 +881,13 @@ void Entity::actChest()
 	node_t* node = NULL;
 	Item* item = NULL;
 
-	chestOldHealth = chestHealth;
+	chestOldHealth() = chestHealth();
 
-	if ( chestHealth <= 0 )
+	if ( chestHealth() <= 0 )
 	{
-		if ( chestVoidState > 0 )
+		if ( chestVoidState() > 0 )
 		{
-			chestVoidState = 0;
+			chestVoidState() = 0;
 			createParticleErupt(this, 625);
 			serverSpawnMiscParticles(this, PARTICLE_EFFECT_ERUPT, 625);
 		}
@@ -895,7 +895,7 @@ void Entity::actChest()
 
 		// the chest busts open, drops some items randomly, then destroys itself.
 		node_t* nextnode;
-		if ( chestVoidState == 0 )
+		if ( chestVoidState() == 0 )
 		{
 			for ( node = inventory->first; node != NULL; node = nextnode )
 			{
@@ -934,9 +934,9 @@ void Entity::actChest()
 		}
 		playSoundEntity(this, 177, 64);
 
-		if ( chestStatus == 1 )
+		if ( chestStatus() == 1 )
 		{
-			messagePlayer(chestOpener, MESSAGE_WORLD, Language::get(671)); // "The chest is smashed into pieces!" only notify if chest is currently open.
+			messagePlayer(chestOpener(), MESSAGE_WORLD, Language::get(671)); // "The chest is smashed into pieces!" only notify if chest is currently open.
 		}
 
 		this->closeChest();
@@ -952,7 +952,7 @@ void Entity::actChest()
 	}
 	else
 	{
-		if ( multiplayer != CLIENT && chestHasVampireBook )
+		if ( multiplayer != CLIENT && chestHasVampireBook() )
 		{
 			node = inventory->first;
 			if ( node )
@@ -966,23 +966,23 @@ void Entity::actChest()
 					}
 					else
 					{
-						chestHasVampireBook = 0;
+						chestHasVampireBook() = 0;
 						serverUpdateEntitySkill(this, 11);
 					}
 				}
 			}
 		}
-		if ( chestHasVampireBook )
+		if ( chestHasVampireBook() )
 		{
 			spawnAmbientParticles(40, 600, 20 + local_rng.rand() % 30, 0.5, true);
 		}
 	}
 
-	if ( chestStatus == 1 )
+	if ( chestStatus() == 1 )
 	{
-		if ( players[chestOpener] && players[chestOpener]->entity )
+		if ( players[chestOpener()] && players[chestOpener()]->entity )
 		{
-			unsigned int distance = sqrt(pow(x - players[chestOpener]->entity->x, 2) + pow(y - players[chestOpener]->entity->y, 2));
+			unsigned int distance = sqrt(pow(x - players[chestOpener()]->entity->x, 2) + pow(y - players[chestOpener()]->entity->y, 2));
 			if (distance > TOUCHRANGE)
 			{
 				closeChest();
@@ -994,14 +994,14 @@ void Entity::actChest()
 		}
 	}
 
-	if ( chestVoidState > 0 )
+	if ( chestVoidState() > 0 )
 	{
-		--chestVoidState;
-		if ( chestStatus == 1 )
+		--chestVoidState();
+		if ( chestStatus() == 1 )
 		{
-			chestVoidState = std::max(1, chestVoidState);
+			chestVoidState() = std::max(1, chestVoidState());
 		}
-		if ( chestVoidState == 0 )
+		if ( chestVoidState() == 0 )
 		{
 			serverUpdateEntitySkill(this, 17);
 			createParticleErupt(this, 625);
@@ -1021,23 +1021,23 @@ void Entity::actChest()
 			}
 		}
 	}
-	if ( chestLidClicked )
+	if ( chestLidClicked() )
 	{
-		chestclicked = chestLidClicked - 1;
-		chestLidClicked = 0;
+		chestclicked = chestLidClicked() - 1;
+		chestLidClicked() = 0;
 	}
 	if ( chestclicked >= 0 )
 	{
-		if ( !chestLocked && !openedChest[chestclicked] )
+		if ( !chestLocked() && !openedChest[chestclicked] )
 		{
-			if ( !chestStatus )
+			if ( !chestStatus() )
 			{
 				bool voidChestInUse = false;
-				if ( chestVoidState != 0 )
+				if ( chestVoidState() != 0 )
 				{
 					for ( int i = 0; i < MAXPLAYERS; ++i )
 					{
-						if ( openedChest[i] && openedChest[i]->chestVoidState != 0 )
+						if ( openedChest[i] && openedChest[i]->chestVoidState() != 0 )
 						{
 							voidChestInUse = true;
 						}
@@ -1055,13 +1055,13 @@ void Entity::actChest()
 
 					Compendium_t::Events_t::eventUpdateWorld(chestclicked, Compendium_t::CPDM_CHESTS_OPENED, "chest", 1);
 
-					chestOpener = chestclicked;
+					chestOpener() = chestclicked;
 					if ( !players[chestclicked]->isLocalPlayer() && multiplayer == SERVER)
 					{
 						//Send all of the items to the client.
 						strcpy((char*)net_packet->data, "CHST");  //Chest.
 						SDLNet_Write32((Uint32)getUID(), &net_packet->data[4]); //Give the client the UID.
-						net_packet->data[8] = chestVoidState != 0 ? 1 : 0;
+						net_packet->data[8] = chestVoidState() != 0 ? 1 : 0;
 						net_packet->address.host = net_clients[chestclicked - 1].host;
 						net_packet->address.port = net_clients[chestclicked - 1].port;
 						net_packet->len = 9;
@@ -1089,43 +1089,43 @@ void Entity::actChest()
 					{
 						players[chestclicked]->openStatusScreen(GUI_MODE_INVENTORY, INVENTORY_MODE_ITEM); // Reset the GUI to the inventory.
 						players[chestclicked]->GUI.activateModule(Player::GUI_t::MODULE_CHEST);
-						players[chestclicked]->inventoryUI.chestGUI.openChest(chestVoidState != 0);
+						players[chestclicked]->inventoryUI.chestGUI.openChest(chestVoidState() != 0);
 					}
-					chestStatus = 1; //Toggle chest open/closed.
+					chestStatus() = 1; //Toggle chest open/closed.
 				}
 			}
 			else
 			{
 				messagePlayer(chestclicked, MESSAGE_INTERACTION, Language::get(460)); // slam the chest shut
-				if ( !players[chestOpener]->isLocalPlayer() )
+				if ( !players[chestOpener()]->isLocalPlayer() )
 				{
 					strcpy((char*)net_packet->data, "CCLS");  //Chest close.
-					net_packet->address.host = net_clients[chestOpener - 1].host;
-					net_packet->address.port = net_clients[chestOpener - 1].port;
+					net_packet->address.host = net_clients[chestOpener() - 1].host;
+					net_packet->address.port = net_clients[chestOpener() - 1].port;
 					net_packet->len = 4;
-					sendPacketSafe(net_sock, -1, net_packet, chestOpener - 1);
+					sendPacketSafe(net_sock, -1, net_packet, chestOpener() - 1);
 				}
-				if (chestOpener != chestclicked)
+				if (chestOpener() != chestclicked)
 				{
-					messagePlayer(chestOpener, MESSAGE_HINT, Language::get(461));
+					messagePlayer(chestOpener(), MESSAGE_HINT, Language::get(461));
 				}
 				closeChestServer();
 			}
 		}
-		else if ( !chestLocked && chestStatus && openedChest[chestclicked] && chestOpener == chestclicked )
+		else if ( !chestLocked() && chestStatus() && openedChest[chestclicked] && chestOpener() == chestclicked )
 		{
 			messagePlayer(chestclicked, MESSAGE_INTERACTION, Language::get(460)); // slam the chest shut
-			if ( !players[chestOpener]->isLocalPlayer() )
+			if ( !players[chestOpener()]->isLocalPlayer() )
 			{
 				strcpy((char*)net_packet->data, "CCLS");  //Chest close.
-				net_packet->address.host = net_clients[chestOpener - 1].host;
-				net_packet->address.port = net_clients[chestOpener - 1].port;
+				net_packet->address.host = net_clients[chestOpener() - 1].host;
+				net_packet->address.port = net_clients[chestOpener() - 1].port;
 				net_packet->len = 4;
-				sendPacketSafe(net_sock, -1, net_packet, chestOpener - 1);
+				sendPacketSafe(net_sock, -1, net_packet, chestOpener() - 1);
 			}
 			closeChestServer();
 		}
-		else if ( chestLocked )
+		else if ( chestLocked() )
 		{
 			messagePlayer(chestclicked, MESSAGE_INTERACTION, Language::get(462));
 			playSoundEntity(this, 152, 64);
@@ -1238,7 +1238,7 @@ void Entity::closeChest()
 		if (openedChest[player] != NULL)
 		{
 			//Message server.
-			if ( chestHealth > 0 )
+			if ( chestHealth() > 0 )
 			{
 				messagePlayer(player, MESSAGE_INTERACTION, Language::get(460));
 			}
@@ -1255,40 +1255,40 @@ void Entity::closeChest()
 		}
 	}
 
-	if (chestStatus)
+	if (chestStatus())
 	{
-		chestStatus = 0;
+		chestStatus() = 0;
 
-		if ( chestHealth > 0 )
+		if ( chestHealth() > 0 )
 		{
 			messagePlayer(player, MESSAGE_INTERACTION, Language::get(460));
 		}
 
-		openedChest[chestOpener] = nullptr;
-		if ( !players[chestOpener]->isLocalPlayer() && multiplayer == SERVER)
+		openedChest[chestOpener()] = nullptr;
+		if ( !players[chestOpener()]->isLocalPlayer() && multiplayer == SERVER)
 		{
 			//Tell the client that the chest got closed.
 			strcpy((char*)net_packet->data, "CCLS");  //Chest close.
-			net_packet->address.host = net_clients[chestOpener - 1].host;
-			net_packet->address.port = net_clients[chestOpener - 1].port;
+			net_packet->address.host = net_clients[chestOpener() - 1].host;
+			net_packet->address.port = net_clients[chestOpener() - 1].port;
 			net_packet->len = 4;
-			sendPacketSafe(net_sock, -1, net_packet, chestOpener - 1);
+			sendPacketSafe(net_sock, -1, net_packet, chestOpener() - 1);
 		}
 		else
 		{
 			//Reset chest-gamepad related stuff here.
-			players[chestOpener]->inventoryUI.chestGUI.closeChest();
+			players[chestOpener()]->inventoryUI.chestGUI.closeChest();
 		}
 	}
 }
 
 void Entity::closeChestServer()
 {
-	if (chestStatus)
+	if (chestStatus())
 	{
-		chestStatus = 0;
-		openedChest[chestOpener] = NULL;
-		players[chestOpener]->inventoryUI.chestGUI.closeChest();
+		chestStatus() = 0;
+		openedChest[chestOpener()] = NULL;
+		players[chestOpener()]->inventoryUI.chestGUI.closeChest();
 	}
 }
 
@@ -1397,7 +1397,7 @@ Item* Entity::addItemToChest(Item* item, bool forceNewStack, Item* specificDesti
 	item->node->element = item;
 	item->node->deconstructor = &defaultDeconstructor;
 
-	if ( !players[chestOpener]->isLocalPlayer() && multiplayer == SERVER )
+	if ( !players[chestOpener()]->isLocalPlayer() && multiplayer == SERVER )
 	{
 		strcpy((char*)net_packet->data, "CITM");
 		SDLNet_Write32((Uint32)item->type, &net_packet->data[4]);
@@ -1409,10 +1409,10 @@ Item* Entity::addItemToChest(Item* item, bool forceNewStack, Item* specificDesti
 		net_packet->data[25] = forceNewStack ? 1 : 0;
 		net_packet->data[26] = (Sint8)item->x;
 		net_packet->data[27] = (Sint8)item->y;
-		net_packet->address.host = net_clients[chestOpener - 1].host;
-		net_packet->address.port = net_clients[chestOpener - 1].port;
+		net_packet->address.host = net_clients[chestOpener() - 1].host;
+		net_packet->address.port = net_clients[chestOpener() - 1].port;
 		net_packet->len = 28;
-		sendPacketSafe(net_sock, -1, net_packet, chestOpener - 1);
+		sendPacketSafe(net_sock, -1, net_packet, chestOpener() - 1);
 	}
 	return item;
 }
@@ -1692,7 +1692,7 @@ list_t* Entity::getChestInventoryList()
 	}
 	if ( behavior == &::actChest )
 	{
-		if ( chestVoidState != 0 )
+		if ( chestVoidState() != 0 )
 		{
 			return &stats[0]->void_chest_inventory;
 		}
@@ -1773,7 +1773,7 @@ Item* Entity::addItemToVoidChestServer(int player, Item* item, bool forceNewStac
 	bool voidChestInUse = false;
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		if ( openedChest[i] && openedChest[i]->chestVoidState != 0 && i != player )
+		if ( openedChest[i] && openedChest[i]->chestVoidState() != 0 && i != player )
 		{
 			voidChestInUse = true;
 			break;
@@ -1818,7 +1818,7 @@ Item* Entity::addItemToVoidChestServer(int player, Item* item, bool forceNewStac
 				entity->skill[14] = item->appearance;
 				entity->skill[15] = item->identified;
 				entity->parent = 0;
-				entity->itemOriginalOwner = 0;
+				entity->itemOriginalOwner() = 0;
 
 				playSoundPos(players[player]->player_last_x, players[player]->player_last_y, 47 + local_rng.rand() % 3, 64);
 			}
@@ -1917,7 +1917,7 @@ Item* Entity::addItemToVoidChestServer(int player, Item* item, bool forceNewStac
 				entity->skill[14] = item->appearance;
 				entity->skill[15] = item->identified;
 				entity->parent = 0;
-				entity->itemOriginalOwner = 0;
+				entity->itemOriginalOwner() = 0;
 
 				playSoundPos(players[player]->player_last_x, players[player]->player_last_y, 47 + local_rng.rand() % 3, 64);
 			}
@@ -2050,10 +2050,10 @@ bool Entity::removeItemFromChestServer(Item* item, int count)
 	Item* item2 = NULL;
 	node_t* t_node = NULL;
 
-	Sint32 oldVoidChestState = chestVoidState;
-	chestVoidState = 0;
+	Sint32 oldVoidChestState = chestVoidState();
+	chestVoidState() = 0;
 	list_t* inventory = getChestInventoryList();
-	chestVoidState = oldVoidChestState;
+	chestVoidState() = oldVoidChestState;
 	if (!inventory)
 	{
 		return false;
@@ -2102,13 +2102,13 @@ bool Entity::removeItemFromChestServer(Item* item, int count)
 
 void Entity::unlockChest()
 {
-	chestLocked = 0;
-	chestPreventLockpickCapstoneExploit = 1;
+	chestLocked() = 0;
+	chestPreventLockpickCapstoneExploit() = 1;
 }
 
 void Entity::lockChest()
 {
-	chestLocked = 1;
+	chestLocked() = 1;
 }
 
 void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity *caster, bool doSound)
@@ -2172,12 +2172,12 @@ void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity 
 	}
 	else
 	{
-		chestHealth -= damage; //Decrease chest health.
+		chestHealth() -= damage; //Decrease chest health.
 		if ( caster )
 		{
 			if ( caster->behavior == &actPlayer )
 			{
-				if ( chestHealth <= 0 )
+				if ( chestHealth() <= 0 )
 				{
 					if ( magicProjectile.behavior == &actBomb )
 					{
@@ -2189,7 +2189,7 @@ void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity 
 					}
 					Compendium_t::Events_t::eventUpdateWorld(caster->skill[2], Compendium_t::CPDM_CHESTS_DESTROYED, "chest", 1);
 
-					if ( chestOldHealth > 0 )
+					if ( chestOldHealth() > 0 )
 					{
 						players[caster->skill[2]]->mechanics.incrementBreakableCounter(Player::PlayerMechanics_t::BreakableEvent::GBREAK_COMMON, this);
 					}
@@ -2206,7 +2206,7 @@ void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity 
 					}
 				}
 			}
-			updateEnemyBar(caster, this, Language::get(675), chestHealth, chestMaxHealth,
+			updateEnemyBar(caster, this, Language::get(675), chestHealth(), chestMaxHealth(),
 				false, DamageGib::DMG_DEFAULT);
 		}
 	}

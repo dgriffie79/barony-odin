@@ -454,7 +454,7 @@ void sendEntityUDP(Entity* entity, int c, bool guarantee)
 	if ( entity->behavior == &actDeathGhost )
 	{
 		Uint32 flags = entity->skill[2];
-		flags |= ((entity->monsterSpecialState) & 0xFF) << 8;
+		flags |= ((entity->monsterSpecialState()) & 0xFF) << 8;
 		flags |= ((entity->skill[10]) & 0xFFFF) << 16;
 		SDLNet_Write32(flags, &net_packet->data[30]);
 	}
@@ -1345,12 +1345,12 @@ void serverUpdatePlayerSummonStrength(int player)
 	}
 
 	strcpy((char*)net_packet->data, "SUMS");
-	SDLNet_Write32(stats[player]->playerSummonLVLHP, &net_packet->data[4]);
-	SDLNet_Write32(stats[player]->playerSummonSTRDEXCONINT, &net_packet->data[8]);
-	SDLNet_Write32(stats[player]->playerSummonPERCHR, &net_packet->data[12]);
-	SDLNet_Write32(stats[player]->playerSummon2LVLHP, &net_packet->data[16]);
-	SDLNet_Write32(stats[player]->playerSummon2STRDEXCONINT, &net_packet->data[20]);
-	SDLNet_Write32(stats[player]->playerSummon2PERCHR, &net_packet->data[24]);
+	SDLNet_Write32(stats[player]->playerSummonLVLHP(), &net_packet->data[4]);
+	SDLNet_Write32(stats[player]->playerSummonSTRDEXCONINT(), &net_packet->data[8]);
+	SDLNet_Write32(stats[player]->playerSummonPERCHR(), &net_packet->data[12]);
+	SDLNet_Write32(stats[player]->playerSummon2LVLHP(), &net_packet->data[16]);
+	SDLNet_Write32(stats[player]->playerSummon2STRDEXCONINT(), &net_packet->data[20]);
+	SDLNet_Write32(stats[player]->playerSummon2PERCHR(), &net_packet->data[24]);
 	net_packet->address.host = net_clients[player - 1].host;
 	net_packet->address.port = net_clients[player - 1].port;
 	net_packet->len = 28;
@@ -1558,7 +1558,7 @@ NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool loc
 		stats[c]->sex = static_cast<sex_t>((int)SDLNet_Read32(&net_packet->data[40]));
 		Uint32 raceAndAppearance = (Uint32)SDLNet_Read32(&net_packet->data[44]);
 		stats[c]->stat_appearance = (raceAndAppearance & 0xFF00) >> 8;
-		stats[c]->playerRace = (raceAndAppearance & 0xFF);
+		stats[c]->playerRace() = (raceAndAppearance & 0xFF);
 		net_clients[c - 1].host = net_packet->address.host;
 		net_clients[c - 1].port = net_packet->address.port;
 		client_keepalive[c] = ticks;
@@ -1577,7 +1577,7 @@ NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool loc
 			net_packet->data[5] = client_classes[c]; // class
 			net_packet->data[6] = stats[c]->sex; // sex
 			net_packet->data[7] = (Uint8)stats[c]->stat_appearance; // appearance
-			net_packet->data[8] = (Uint8)stats[c]->playerRace; // player race
+			net_packet->data[8] = (Uint8)stats[c]->playerRace(); // player race
 			stringCopy((char*)net_packet->data + 9, stats[c]->name, 32, sizeof(Stat::name)); // name
 			net_packet->address.host = net_clients[x - 1].host;
 			net_packet->address.port = net_clients[x - 1].port;
@@ -1601,7 +1601,7 @@ NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool loc
 				net_packet->data[8 + x * chunk_size + 2] = client_classes[x]; // class
 				net_packet->data[8 + x * chunk_size + 3] = stats[x]->sex; // sex
 				net_packet->data[8 + x * chunk_size + 4] = (Uint8)stats[x]->stat_appearance; // appearance
-				net_packet->data[8 + x * chunk_size + 5] = (Uint8)stats[x]->playerRace; // player race
+				net_packet->data[8 + x * chunk_size + 5] = (Uint8)stats[x]->playerRace(); // player race
 
 				char shortname[32];
 				snprintf(shortname, sizeof(shortname), "%s", stats[x]->name);
@@ -1642,7 +1642,7 @@ NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool loc
 				net_packet->data[8 + x * chunk_size + 2] = client_classes[x]; // class
 				net_packet->data[8 + x * chunk_size + 3] = stats[x]->sex; // sex
 				net_packet->data[8 + x * chunk_size + 4] = (Uint8)stats[x]->stat_appearance; // appearance
-				net_packet->data[8 + x * chunk_size + 5] = (Uint8)stats[x]->playerRace; // player race
+				net_packet->data[8 + x * chunk_size + 5] = (Uint8)stats[x]->playerRace(); // player race
 
 				char shortname[32];
 				snprintf(shortname, sizeof(shortname), "%s", stats[x]->name);
@@ -1766,14 +1766,14 @@ Entity* receiveEntity(Entity* entity)
 		}
 	}
 
-	if ( entity->behavior == &actItem && entity->itemFollowUID != 0 )
+	if ( entity->behavior == &actItem && entity->itemFollowUID() != 0 )
 	{
 		excludeForAnimation = true;
 	}
 	const bool excludeYaw =
 		entity->behavior == &actMagiclightBall
 		|| (entity->behavior == &actLeafPile)
-		|| (entity->behavior == &actItem && entity->itemFollowUID != 0);
+		|| (entity->behavior == &actItem && entity->itemFollowUID() != 0);
 
 	entity->lastupdate = ticks;
 	entity->lastupdateserver = (Uint32)SDLNet_Read32(&net_packet->data[36]);
@@ -2034,7 +2034,7 @@ void clientActions(Entity* entity)
 				Uint32 specialFlags = (SDLNet_Read32(&net_packet->data[30]) >> 8) & 0xFFFFFF;
 				if ( (specialFlags & 0xFF) )
 				{
-					entity->monsterSpecialState = (specialFlags & 0xFF);
+					entity->monsterSpecialState() = (specialFlags & 0xFF);
 				}
 				if ( (specialFlags >> 8) & 0xFFFF )
 				{
@@ -2122,15 +2122,15 @@ void clientActions(Entity* entity)
 				default:
 					if ( static_cast<Uint8>(c & 0xFF) == 17 )
 					{
-						entity->arrowShotByWeapon = (c >> 8) & 0xFFF;
+						entity->arrowShotByWeapon() = (c >> 8) & 0xFFF;
 						int dropOffModifier = (c >> 20) & 0xF;
-						entity->arrowDropOffEquipmentModifier = dropOffModifier - 8;
+						entity->arrowDropOffEquipmentModifier() = dropOffModifier - 8;
 						entity->behavior = &actArrow;
 					}
 					else if ( static_cast<Uint8>(c & 0xFF) == 19 )
 					{
-						entity->particleTimerDuration = (c >> 8) & 0xFFF;
-						entity->particleTimerCountdownAction = (c >> 20) & 0xFF;
+						entity->particleTimerDuration() = (c >> 8) & 0xFFF;
+						entity->particleTimerCountdownAction() = (c >> 20) & 0xFF;
 						entity->behavior = &actParticleTimer;
 					}
 					else if ( static_cast<Uint8>(c & 0xFF) == 20 )
@@ -2171,8 +2171,8 @@ void clientActions(Entity* entity)
 						entity->behavior = &actColliderDecoration;
 						entity->skill[2] = c;
 						entity->flags[NOUPDATE] = true;
-						entity->colliderDamageTypes = (c >> 8) & 0xFF;
-						entity->colliderSpellEvent = (c >> 16) & 0xFF;
+						entity->colliderDamageTypes() = (c >> 8) & 0xFF;
+						entity->colliderSpellEvent() = (c >> 16) & 0xFF;
 						Entity::colliderAssignProperties(entity, false, &map);
 					}
 					else if ( static_cast<Uint8>(c & 0xFF) == 26 )
@@ -2483,7 +2483,7 @@ static void changeLevel() {
 
 	if ( !died )
 	{
-		if ( stats[clientnum]->type == MYCONID && stats[clientnum]->playerRace == RACE_MYCONID && stats[clientnum]->stat_appearance == 0
+		if ( stats[clientnum]->type == MYCONID && stats[clientnum]->playerRace() == RACE_MYCONID && stats[clientnum]->stat_appearance == 0
 			&& stats[clientnum]->helmet && gameStatistics[STATISTICS_NO_CAP] >= 0 )
 		{
 			gameStatistics[STATISTICS_NO_CAP]++;
@@ -2493,8 +2493,8 @@ static void changeLevel() {
 			}
 		}
 		if ( stats[clientnum]->getEffectActive(EFF_GROWTH) >= 2
-			&& ((stats[clientnum]->type == MYCONID && stats[clientnum]->playerRace == RACE_MYCONID)
-				|| (stats[clientnum]->type == DRYAD && stats[clientnum]->playerRace == RACE_DRYAD)) && stats[clientnum]->stat_appearance == 0
+			&& ((stats[clientnum]->type == MYCONID && stats[clientnum]->playerRace() == RACE_MYCONID)
+				|| (stats[clientnum]->type == DRYAD && stats[clientnum]->playerRace() == RACE_DRYAD)) && stats[clientnum]->stat_appearance == 0
 			&& !stats[clientnum]->helmet && gameStatistics[STATISTICS_DONT_TOUCH_HAIR] >= 0 )
 		{
 			gameStatistics[STATISTICS_DONT_TOUCH_HAIR]++;
@@ -2503,7 +2503,7 @@ static void changeLevel() {
 				steamAchievement("BARONY_ACH_DONT_TOUCH_HAIR");
 			}
 		}
-		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
+		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace() == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
 			&& stats[clientnum]->getEffectActive(EFF_SALAMANDER_HEART) >= 3 && stats[clientnum]->getEffectActive(EFF_SALAMANDER_HEART) <= 4
 			&& gameStatistics[STATISTICS_GARGOYLES_QUEST] >= 0 )
 		{
@@ -2513,7 +2513,7 @@ static void changeLevel() {
 				steamAchievement("BARONY_ACH_GARGOYLES_QUEST");
 			}
 		}
-		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
+		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace() == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
 			&& stats[clientnum]->getEffectActive(EFF_SALAMANDER_HEART) >= 1 && stats[clientnum]->getEffectActive(EFF_SALAMANDER_HEART) <= 2
 			&& gameStatistics[STATISTICS_FIRE_FIGHTER] >= 0 )
 		{
@@ -2523,7 +2523,7 @@ static void changeLevel() {
 				steamAchievement("BARONY_ACH_FIRE_FIGHTER");
 			}
 		}
-		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
+		if ( stats[clientnum]->type == SALAMANDER && stats[clientnum]->playerRace() == RACE_SALAMANDER && stats[clientnum]->stat_appearance == 0
 			&& !stats[clientnum]->getEffectActive(EFF_SALAMANDER_HEART)
 			&& gameStatistics[STATISTICS_DISCIPLINE] >= 0 )
 		{
@@ -2655,7 +2655,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
     // sneaking
     {'SNEK', [](){
         const int player = std::min(net_packet->data[4], (Uint8)(MAXPLAYERS - 1));
-        stats[player]->sneaking = net_packet->data[5];
+        stats[player]->sneaking() = net_packet->data[5];
         return;
     }},
 
@@ -2911,7 +2911,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					}
 				}
 			}
-			entity->itemReceivedDetailsFromServer = 1;
+			entity->itemReceivedDetailsFromServer() = 1;
 		}
 	}},
 
@@ -2930,10 +2930,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					entity->vel_x = (0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 					entity->vel_y = (0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 					entity->vel_z = (-40 - local_rng.rand() % 5) * .01;
-					entity->itemContainer = 0;
+					entity->itemContainer() = 0;
 					entity->z = 0.0;
-					entity->itemNotMoving = 0;
-					entity->itemNotMovingClient = 0;
+					entity->itemNotMoving() = 0;
+					entity->itemNotMovingClient() = 0;
 					entity->flags[USERFLAG1] = false; // enable collision
 				}
 			}
@@ -2944,7 +2944,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					entity->vel_x = (0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 					entity->vel_y = (0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 					entity->vel_z = (-40 - local_rng.rand() % 10) * .01;
-					entity->goldBouncing = 0;
+					entity->goldBouncing() = 0;
 					entity->z = 0.0 - (local_rng.rand() % 3);
 					entity->flags[INVISIBLE] = false;
 				}
@@ -2979,10 +2979,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					entity->vel_x = 0.0; //(0.25 + .025 * (local_rng.rand() % 11)) * cos(entity->yaw);
 					entity->vel_y = 0.0; //(0.25 + .025 * (local_rng.rand() % 11)) * sin(entity->yaw);
 					entity->vel_z = (-2 - local_rng.rand() % 5) * .01;
-					entity->itemContainer = 0;
+					entity->itemContainer() = 0;
 					entity->z = -16;
-					entity->itemNotMoving = 0;
-					entity->itemNotMovingClient = 0;
+					entity->itemNotMoving() = 0;
+					entity->itemNotMovingClient() = 0;
 					entity->flags[USERFLAG1] = false; // enable collision
 				}
 			}
@@ -2994,7 +2994,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					entity->vel_x = 0.0;
 					entity->vel_y = 0.0;
 					entity->vel_z = (-2 - local_rng.rand() % 5) * .01;
-					entity->goldBouncing = 0;
+					entity->goldBouncing() = 0;
 					entity->z = -16;
 					entity->flags[INVISIBLE] = false;
 				}
@@ -3008,8 +3008,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		Entity* entity = uidToEntity(uid);
 		if ( entity )
 		{
-			entity->itemNotMoving = 0;
-			entity->itemNotMovingClient = 0;
+			entity->itemNotMoving() = 0;
+			entity->itemNotMovingClient() = 0;
 			entity->flags[USERFLAG1] = false; // enable collision
 
 			entity->x = ((Sint16)SDLNet_Read16(&net_packet->data[8])) / 32.0;
@@ -3028,20 +3028,20 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		Entity* entity = uidToEntity(uid);
 		if ( entity )
 		{
-			entity->itemNotMoving = 0;
-			entity->itemNotMovingClient = 0;
+			entity->itemNotMoving() = 0;
+			entity->itemNotMovingClient() = 0;
 			entity->flags[USERFLAG1] = false; // enable collision
 			entity->flags[UPDATENEEDED] = true;
 			entity->flags[NOUPDATE] = false;
 
-			entity->itemFollowUID = ((Uint32)SDLNet_Read32(&net_packet->data[20]));
+			entity->itemFollowUID() = ((Uint32)SDLNet_Read32(&net_packet->data[20]));
 
 			entity->x = ((Sint16)SDLNet_Read16(&net_packet->data[8])) / 32.0;
 			entity->y = ((Sint16)SDLNet_Read16(&net_packet->data[10])) / 32.0;
 			entity->z = ((Sint16)SDLNet_Read16(&net_packet->data[12])) / 32.0;
 			entity->new_z = entity->z;
-			entity->itemLevitate = 1.0;
-			entity->itemLevitateStartZ = entity->z;
+			entity->itemLevitate() = 1.0;
+			entity->itemLevitateStartZ() = entity->z;
 
 			entity->vel_x = ((Sint16)SDLNet_Read16(&net_packet->data[14])) / 32.0;
 			entity->vel_y = ((Sint16)SDLNet_Read16(&net_packet->data[16])) / 32.0;
@@ -3161,47 +3161,47 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				case PARTICLE_EFFECT_INCUBUS_TELEPORT_STEAL:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 80, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
-					spellTimer->particleTimerPreDelay = 40;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
+					spellTimer->particleTimerPreDelay() = 40;
 				}
 				break;
 				case PARTICLE_EFFECT_INCUBUS_TELEPORT_TARGET:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 40, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
 				}
 				break;
 				case PARTICLE_EFFECT_SHADOW_TELEPORT:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 40, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
 				}
 				break;
 				case PARTICLE_EFFECT_SHRINE_TELEPORT:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 200, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
-					spellTimer->particleTimerPreDelay = 0;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
+					spellTimer->particleTimerPreDelay() = 0;
 				}
 				break;
 				case PARTICLE_EFFECT_DESTINY_TELEPORT:
 				{
 					Uint32 duration = SDLNet_Read32(&net_packet->data[11]);
 					Entity* spellTimer = createParticleTimer(entity, duration, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
-					spellTimer->particleTimerPreDelay = 0;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
+					spellTimer->particleTimerPreDelay() = 0;
 				}
 				break;
 				case PARTICLE_EFFECT_TELEPORT_PULL:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 40, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
 				}
 				break;
 				case PARTICLE_EFFECT_ERUPT:
@@ -3264,7 +3264,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 						fx1->skill[3] = 0;
 						if ( i != 0 )
 						{
-							fx1->actmagicNoLight = 1;
+							fx1->actmagicNoLight() = 1;
 						}
 					}
 					break;
@@ -3357,9 +3357,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				case PARTICLE_EFFECT_PORTAL_SPAWN:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 100, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
-					spellTimer->particleTimerCountdownSprite = 174;
-					spellTimer->particleTimerEndAction = PARTICLE_EFFECT_PORTAL_SPAWN;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPAWN_PORTAL;
+					spellTimer->particleTimerCountdownSprite() = 174;
+					spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_PORTAL_SPAWN;
 				}
 				break;
 				case PARTICLE_EFFECT_LICHFIRE_TELEPORT_STATIONARY:
@@ -3367,15 +3367,15 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				case PARTICLE_EFFECT_LICH_TELEPORT_ROAMING:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 40, sprite);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
-					spellTimer->particleTimerCountdownSprite = sprite;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
+					spellTimer->particleTimerCountdownSprite() = sprite;
 				}
 				break;
 				case PARTICLE_EFFECT_SLIME_SPRAY:
 				{
 					Entity* spellTimer = createParticleTimer(entity, 30, -1);
-					spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_MAGIC_SPRAY;
-					spellTimer->particleTimerCountdownSprite = sprite;
+					spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_MAGIC_SPRAY;
+					spellTimer->particleTimerCountdownSprite() = sprite;
 				}
 				break;
 				case PARTICLE_EFFECT_PLAYER_AUTOMATON_DEATH:
@@ -3384,11 +3384,11 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					{
 						if ( entity->getMonsterTypeFromSprite() == AUTOMATON )
 						{
-							entity->playerAutomatonDeathCounter = 1;
+							entity->playerAutomatonDeathCounter() = 1;
 							if ( entity->skill[2] == clientnum )
 							{
 								// this is me dying, setup the deathcam.
-								entity->playerCreatedDeathCam = 1;
+								entity->playerCreatedDeathCam() = 1;
 								Entity* entity = newEntity(-1, 1, map.entities, nullptr);
 								entity->x = cameras[clientnum].x * 16;
 								entity->y = cameras[clientnum].y * 16;
@@ -3424,8 +3424,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				{
 					Entity* fx = createParticleAestheticOrbit(entity, sprite, 2 * TICKS_PER_SECOND, PARTICLE_EFFECT_STATIC_ORBIT);
 					fx->z = 7.5;
-					fx->actmagicOrbitDist = 20;
-					fx->actmagicNoLight = 1;
+					fx->actmagicOrbitDist() = 20;
+					fx->actmagicNoLight() = 1;
 					break;
 				}
 				case PARTICLE_EFFECT_STATIC_MAXIMISE:
@@ -3437,9 +3437,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 						fx->scalex = 1.0;
 						fx->scaley = 1.0;
 						fx->scalez = 1.0;
-						fx->actmagicOrbitDist = 20;
+						fx->actmagicOrbitDist() = 20;
 						fx->yaw += i * 2 * PI / 3;
-						fx->actmagicNoLight = (i == 0 ? 0 : 1);
+						fx->actmagicNoLight() = (i == 0 ? 0 : 1);
 					}
 					break;
 				}
@@ -3467,10 +3467,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 						fx->fskill[0] = fx->x;
 						fx->fskill[1] = fx->y;
 						fx->vel_z = -0.05;
-						fx->actmagicOrbitDist = 2;
+						fx->actmagicOrbitDist() = 2;
 						fx->fskill[2] = entity->yaw + (local_rng.rand() % 8) * PI / 4.0;
 						fx->yaw = fx->fskill[2];
-						fx->actmagicNoLight = 1;
+						fx->actmagicNoLight() = 1;
 					}
 					break;
 				}
@@ -3489,14 +3489,14 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 							fx->fskill[0] = fx->x;
 							fx->fskill[1] = fx->y;
 							fx->vel_z = -0.5;
-							fx->actmagicOrbitDist = 5;
+							fx->actmagicOrbitDist() = 5;
 							fx->fskill[2] = entity->yaw + PI / 4.0 + i * PI;
 							fx->yaw = fx->fskill[2];
 							fx->fskill[4] = 0.25;
 							if ( particle == 1 )
 							{
 								fx->lightBonus = vec4{ 0.f, 0.f, 0.f, 0.f };
-								fx->actmagicNoLight = 1;
+								fx->actmagicNoLight() = 1;
 							}
 						}
 					}
@@ -3516,10 +3516,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 							fx->fskill[1] = fx->y;
 							fx->z = -7.5;
 							fx->vel_z = 0.25;
-							fx->actmagicOrbitDist = 4;
+							fx->actmagicOrbitDist() = 4;
 							fx->fskill[2] = entity->yaw + (i) * 2 * PI / 3.0;
 							fx->yaw = fx->fskill[2];
-							fx->actmagicNoLight = 1;
+							fx->actmagicNoLight() = 1;
 
 						}
 					}
@@ -3550,9 +3550,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			case PARTICLE_EFFECT_SUMMON_MONSTER:
 			{
 				Entity* spellTimer = createParticleTimer(nullptr, 70, sprite);
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SUMMON_MONSTER;
-				spellTimer->particleTimerCountdownSprite = 174;
-				spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SUMMON_MONSTER;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SUMMON_MONSTER;
+				spellTimer->particleTimerCountdownSprite() = 174;
+				spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SUMMON_MONSTER;
 				spellTimer->x = particle_x * 16.0 + 8;
 				spellTimer->y = particle_y * 16.0 + 8;
 				spellTimer->z = particle_z;
@@ -3561,9 +3561,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			case PARTICLE_EFFECT_DEVIL_SUMMON_MONSTER:
 			{
 				Entity* spellTimer = createParticleTimer(nullptr, 70, sprite);
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_DEVIL_SUMMON_MONSTER;
-				spellTimer->particleTimerCountdownSprite = 174;
-				spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SUMMON_MONSTER;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_DEVIL_SUMMON_MONSTER;
+				spellTimer->particleTimerCountdownSprite() = 174;
+				spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SUMMON_MONSTER;
 				spellTimer->x = particle_x * 16.0 + 8;
 				spellTimer->y = particle_y * 16.0 + 8;
 				spellTimer->z = particle_z;
@@ -3572,10 +3572,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			case PARTICLE_EFFECT_SPELL_SUMMON:
 			{
 				Entity* spellTimer = createParticleTimer(nullptr, 55, sprite);
-				spellTimer->particleTimerCountdownSprite = 791;
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPELL_SUMMON;
-				spellTimer->particleTimerPreDelay = 40;
-				spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SPELL_SUMMON;
+				spellTimer->particleTimerCountdownSprite() = 791;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPELL_SUMMON;
+				spellTimer->particleTimerPreDelay() = 40;
+				spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SPELL_SUMMON;
 				spellTimer->x = particle_x * 16.0 + 8;
 				spellTimer->y = particle_y * 16.0 + 8;
 				spellTimer->z = particle_z;
@@ -3584,8 +3584,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			case PARTICLE_EFFECT_TELEPORT_PULL_TARGET_LOCATION:
 			{
 				Entity* spellTimer = createParticleTimer(nullptr, 40, 593);
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_TELEPORT_PULL_TARGET_LOCATION;
-				spellTimer->particleTimerCountdownSprite = 593;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_TELEPORT_PULL_TARGET_LOCATION;
+				spellTimer->particleTimerCountdownSprite() = 593;
 				spellTimer->x = particle_x * 16.0 + 8;
 				spellTimer->y = particle_y * 16.0 + 8;
 				spellTimer->z = particle_z;
@@ -3627,9 +3627,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 					fx->scalex = 0.0125;
 					fx->scaley = fx->scalex;
 					fx->scalez = fx->scalex;
-					fx->actmagicOrbitDist = 2;
-					fx->actmagicOrbitStationaryX = particle_x;
-					fx->actmagicOrbitStationaryY = particle_y;
+					fx->actmagicOrbitDist() = 2;
+					fx->actmagicOrbitStationaryX() = particle_x;
+					fx->actmagicOrbitStationaryY() = particle_y;
 				}
 				break;
 			}
@@ -3670,8 +3670,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				fx->z = particle_z;
 				Sint32 dir = SDLNet_Read32(&net_packet->data[17]);
 				fx->yaw = dir / 256.0;
-				fx->actmagicOrbitDist = 0;
-				fx->actmagicNoLight = 0;
+				fx->actmagicOrbitDist() = 0;
+				fx->actmagicNoLight() = 0;
 				break;
 			}
 			case PARTICLE_EFFECT_AREA_EFFECT:
@@ -3686,7 +3686,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				spellTimer->x = particle_x;
 				spellTimer->y = particle_y;
 				spellTimer->z = particle_z;
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_DIE;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_DIE;
 				break;
 			}
 			case PARTICLE_EFFECT_DUCK_SPAWN_FEATHER:
@@ -3700,7 +3700,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				spellTimer->x = particle_x;
 				spellTimer->y = particle_y;
 				spellTimer->z = particle_z;
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_TRAP_SABOTAGED;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_TRAP_SABOTAGED;
 				break;
 			}
 			case PARTICLE_EFFECT_EARTH_ELEMENTAL_SUMMON_AOE:
@@ -3709,8 +3709,8 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				Uint32 color = SDLNet_Read32(&net_packet->data[17]);
 				if ( Entity* fx = createParticleAOEIndicator(nullptr, particle_x, particle_y, 0.0, TICKS_PER_SECOND, radius) )
 				{
-					fx->actSpriteFollowUID = 0;
-					fx->actSpriteCheckParentExists = 0;
+					fx->actSpriteFollowUID() = 0;
+					fx->actSpriteCheckParentExists() = 0;
 					if ( auto indicator = AOEIndicators_t::getIndicator(fx->skill[10]) )
 					{
 						indicator->indicatorColor = color;
@@ -4610,7 +4610,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			else if ( pickedUp && pickedUp->type == TOOL_DUCK && !stats[clientnum]->shield )
 			{
 				bool shapeshifted = false;
-				if ( players[clientnum] && players[clientnum]->entity && players[clientnum]->entity->effectShapeshift != NOTHING )
+				if ( players[clientnum] && players[clientnum]->entity && players[clientnum]->entity->effectShapeshift() != NOTHING )
 				{
 					shapeshifted = true;
 				}
@@ -4792,7 +4792,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		    stats[clientnum]->killer_item = item;
 		}
 
-		if ( players[clientnum] && players[clientnum]->entity && players[clientnum]->entity->playerCreatedDeathCam != 0 )
+		if ( players[clientnum] && players[clientnum]->entity && players[clientnum]->entity->playerCreatedDeathCam() != 0 )
 		{
 			// don't spawn deathcam
 		}
@@ -4905,9 +4905,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			Entity* mapCreature = (Entity*)mapNode->element;
 			if ( mapCreature )
 			{
-				if ( mapCreature->monsterEntityRenderAsTelepath == 1 )
+				if ( mapCreature->monsterEntityRenderAsTelepath() == 1 )
 				{
-					mapCreature->monsterEntityRenderAsTelepath = 0; // do a final pass to undo any telepath rendering.
+					mapCreature->monsterEntityRenderAsTelepath() = 0; // do a final pass to undo any telepath rendering.
 				}
 			}
 		}
@@ -5637,12 +5637,12 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 	{'SUMS', [](){
 		if ( stats[clientnum] )
 		{
-			stats[clientnum]->playerSummonLVLHP = (Sint32)SDLNet_Read32(&net_packet->data[4]);
-			stats[clientnum]->playerSummonSTRDEXCONINT = (Sint32)SDLNet_Read32(&net_packet->data[8]);
-			stats[clientnum]->playerSummonPERCHR = (Sint32)SDLNet_Read32(&net_packet->data[12]);
-			stats[clientnum]->playerSummon2LVLHP = (Sint32)SDLNet_Read32(&net_packet->data[16]);
-			stats[clientnum]->playerSummon2STRDEXCONINT = (Sint32)SDLNet_Read32(&net_packet->data[20]);
-			stats[clientnum]->playerSummon2PERCHR = (Sint32)SDLNet_Read32(&net_packet->data[24]);
+			stats[clientnum]->playerSummonLVLHP() = (Sint32)SDLNet_Read32(&net_packet->data[4]);
+			stats[clientnum]->playerSummonSTRDEXCONINT() = (Sint32)SDLNet_Read32(&net_packet->data[8]);
+			stats[clientnum]->playerSummonPERCHR() = (Sint32)SDLNet_Read32(&net_packet->data[12]);
+			stats[clientnum]->playerSummon2LVLHP() = (Sint32)SDLNet_Read32(&net_packet->data[16]);
+			stats[clientnum]->playerSummon2STRDEXCONINT() = (Sint32)SDLNet_Read32(&net_packet->data[20]);
+			stats[clientnum]->playerSummon2PERCHR() = (Sint32)SDLNet_Read32(&net_packet->data[24]);
 		}
 	}},
 
@@ -5823,7 +5823,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 			{
 				if ( entity->behavior == &actPedestalBase )
 				{
-					entity->pedestalInit = 1;
+					entity->pedestalInit() = 1;
 				}
 			}
 		}
@@ -5869,9 +5869,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 
 		int victoryType;
 		int race = RACE_HUMAN;
-		if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+		if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 		{
-			race = stats[clientnum]->playerRace;
+			race = stats[clientnum]->playerRace();
 		}
 
 		switch ( race ) {
@@ -6004,9 +6004,9 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 	// mid game cutscene
 	{'MIDG', [](){
 		int race = RACE_HUMAN;
-		if ( stats[clientnum]->playerRace != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
+		if ( stats[clientnum]->playerRace() != RACE_HUMAN && stats[clientnum]->stat_appearance == 0 )
 		{
-			race = stats[clientnum]->playerRace;
+			race = stats[clientnum]->playerRace();
 		}
 	    if (net_packet->data[4] == 0) { // herx midpoint
 	        switch ( race ) {
@@ -6102,11 +6102,11 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 		if ( players[clientnum] && players[clientnum]->entity && stats[clientnum] )
 		{
 			real_t vel = sqrt(pow(players[clientnum]->entity->vel_y, 2) + pow(players[clientnum]->entity->vel_x, 2));
-			players[clientnum]->entity->monsterKnockbackVelocity = std::min(2.25, std::max(1.0, vel));
-			players[clientnum]->entity->monsterKnockbackTangentDir = atan2(players[clientnum]->entity->vel_y, players[clientnum]->entity->vel_x);
+			players[clientnum]->entity->monsterKnockbackVelocity() = std::min(2.25, std::max(1.0, vel));
+			players[clientnum]->entity->monsterKnockbackTangentDir() = atan2(players[clientnum]->entity->vel_y, players[clientnum]->entity->vel_x);
 			if ( vel < 0.01 )
 			{
-				players[clientnum]->entity->monsterKnockbackTangentDir = players[clientnum]->entity->yaw + PI;
+				players[clientnum]->entity->monsterKnockbackTangentDir() = players[clientnum]->entity->yaw + PI;
 			}
 		}
 	}},
@@ -6122,10 +6122,10 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 	if ( players[clientnum] && players[clientnum]->entity && stats[clientnum] )
 	{
 		real_t vel = sqrt(pow(players[clientnum]->entity->vel_y, 2) + pow(players[clientnum]->entity->vel_x, 2));
-		players[clientnum]->entity->monsterKnockbackVelocity = std::min(2.25, std::max(1.0, vel));
+		players[clientnum]->entity->monsterKnockbackVelocity() = std::min(2.25, std::max(1.0, vel));
 
 		real_t dir = (SDLNet_Read32(&net_packet->data[4]) / 256.0);
-		players[clientnum]->entity->monsterKnockbackTangentDir = dir;
+		players[clientnum]->entity->monsterKnockbackTangentDir() = dir;
 	}
 } },
 
@@ -7290,7 +7290,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 				// auto salvage this item.
 				if ( players[player] && players[player]->entity )
 				{
-					entity->itemAutoSalvageByPlayer = static_cast<Sint32>(players[player]->entity->getUID());
+					entity->itemAutoSalvageByPlayer() = static_cast<Sint32>(players[player]->entity->getUID());
 				}
 			}
 			client_selected[player] = entity;
@@ -7310,13 +7310,13 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 			{
 				client_selected[player] = entity;
 				inrange[player] = true;
-				if ( entity->wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
+				if ( entity->wallLockState() == Entity::WallLockStates::LOCK_NO_KEY )
 				{
-					if ( entity->wallLockPlayerInteracting == 0 )
+					if ( entity->wallLockPlayerInteracting() == 0 )
 					{
-						entity->wallLockPlayerInteracting = players[player]->entity->getUID();
+						entity->wallLockPlayerInteracting() = players[player]->entity->getUID();
 					}
-					else if ( entity->wallLockPlayerInteracting == players[player]->entity->getUID() )
+					else if ( entity->wallLockPlayerInteracting() == players[player]->entity->getUID() )
 					{
 						// client has already queued up an action, drop this interaction
 						client_selected[player] = nullptr;
@@ -7339,9 +7339,9 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 			{
 				client_selected[player] = entity;
 				inrange[player] = true;
-				if ( entity->wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
+				if ( entity->wallLockState() == Entity::WallLockStates::LOCK_NO_KEY )
 				{
-					if ( entity->wallLockPlayerInteracting == players[player]->entity->getUID() )
+					if ( entity->wallLockPlayerInteracting() == players[player]->entity->getUID() )
 					{
 						// client has already queued up an action, drop this interaction
 						client_selected[player] = nullptr;
@@ -7360,7 +7360,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 		Entity* entity = uidToEntity(uid);
 		if ( entity && entity->behavior == &actWallLock )
 		{
-			if ( entity->wallLockState == Entity::WallLockStates::LOCK_NO_KEY && net_packet->data[9] != 0 ) // success from client
+			if ( entity->wallLockState() == Entity::WallLockStates::LOCK_NO_KEY && net_packet->data[9] != 0 ) // success from client
 			{
 				Uint16 key = SDLNet_Read16(&net_packet->data[10]);
 				if ( key >= WOODEN_SHIELD && key < NUMITEMS )
@@ -7389,16 +7389,16 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 					}
 				}
 
-				entity->wallLockState = Entity::WallLockStates::LOCK_KEY_START;
+				entity->wallLockState() = Entity::WallLockStates::LOCK_KEY_START;
 				serverUpdateEntitySkill(entity, 0);
 			}
-			else if ( entity->wallLockState == Entity::WallLockStates::LOCK_NO_KEY && net_packet->data[9] == 0 )
+			else if ( entity->wallLockState() == Entity::WallLockStates::LOCK_NO_KEY && net_packet->data[9] == 0 )
 			{
 				messagePlayer(player, MESSAGE_INTERACTION, Language::get(6379));
 				playSoundEntity(entity, 152, 64);
 			}
-			entity->wallLockClientInteractDelay = 0;
-			entity->wallLockPlayerInteracting = 0;
+			entity->wallLockClientInteractDelay() = 0;
+			entity->wallLockPlayerInteracting() = 0;
 		}
 	}},
 
@@ -7721,7 +7721,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 	// sneaking
 	{'SNEK', [](){
 		const int player = std::min(net_packet->data[4], (Uint8)(MAXPLAYERS - 1));
-		stats[player]->sneaking = net_packet->data[5];
+		stats[player]->sneaking() = net_packet->data[5];
         for (int c = 1; c < MAXPLAYERS; ++c) {
             // relay packet to other players
             if (client_disconnected[c] || c == player) {
@@ -8454,7 +8454,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 				bool shapeshifted = false;
 				if ( stats[player]->type != HUMAN )
 				{
-					if ( players[player]->entity->effectShapeshift != NOTHING )
+					if ( players[player]->entity->effectShapeshift() != NOTHING )
 					{
 						shapeshifted = true;
 					}
@@ -8808,15 +8808,15 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 			entity->sizey = 4;
 			entity->x = players[player]->entity->x;
 			entity->y = players[player]->entity->y;
-			entity->goldAmount = amount; // amount
+			entity->goldAmount() = amount; // amount
 			entity->z = 0;
 			entity->vel_z = (-40 - local_rng.rand() % 5) * .01;
-			entity->goldBouncing = 0;
+			entity->goldBouncing() = 0;
 			entity->yaw = (local_rng.rand() % 360) * PI / 180.0;
 			entity->flags[PASSABLE] = true;
 			entity->flags[UPDATENEEDED] = true;
 			entity->behavior = &actGoldBag;
-			entity->goldDroppedByPlayer = player + 1;
+			entity->goldDroppedByPlayer() = player + 1;
 		}
 	}},
 
@@ -8890,12 +8890,12 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 		if ( players[player] && players[player]->entity && stats[player] )
 		{
 			if ( client_classes[player] == CLASS_ACCURSED &&
-				stats[player]->getEffectActive(EFF_VAMPIRICAURA) && players[player]->entity->playerVampireCurse == 1 )
+				stats[player]->getEffectActive(EFF_VAMPIRICAURA) && players[player]->entity->playerVampireCurse() == 1 )
 			{
 				players[player]->entity->setEffect(EFF_VAMPIRICAURA, true, 1, true);
 				messagePlayerColor(player, MESSAGE_STATUS, uint32ColorGreen, Language::get(3241));
 				messagePlayerColor(player, MESSAGE_HINT, uint32ColorGreen, Language::get(3242));
-				players[player]->entity->playerVampireCurse = 2; // cured.
+				players[player]->entity->playerVampireCurse() = 2; // cured.
 				serverUpdateEntitySkill(players[player]->entity, 51);
 				steamAchievementClient(player, "BARONY_ACH_REVERSE_THIS_CURSE");
 				playSoundEntity(players[player]->entity, 402, 128);
@@ -8919,7 +8919,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 				Uint32 interactUid = SDLNet_Read32(&net_packet->data[12]);
 				entity->monsterAllySendCommand(allyCmd, net_packet->data[6], net_packet->data[7], interactUid);
 				//messagePlayer(0, "received UID of target: %d, applying...", uid);
-				entity->monsterAllyInteractTarget = interactUid;
+				entity->monsterAllyInteractTarget() = interactUid;
 			}
 			else
 			{
@@ -9017,7 +9017,7 @@ static std::unordered_map<Uint32, void(*)()> serverPacketHandlers = {
 				entity->skill[14] = item->appearance;
 				entity->skill[15] = item->identified;
 				entity->parent = 0;
-				entity->itemOriginalOwner = 0;
+				entity->itemOriginalOwner() = 0;
 
 				playSoundPos(players[player]->player_last_x, players[player]->player_last_y, 47 + local_rng.rand() % 3, 64);
 			}

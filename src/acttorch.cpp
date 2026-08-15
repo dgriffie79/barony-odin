@@ -115,10 +115,10 @@ void actTorch(Entity* my)
 				if (inrange[i])
 				{
 					bool trySalvage = false;
-					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer) == players[i]->entity->getUID() )
+					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer()) == players[i]->entity->getUID() )
 					{
 						trySalvage = true;
-						my->itemAutoSalvageByPlayer = 0; // clear interact flag.
+						my->itemAutoSalvageByPlayer() = 0; // clear interact flag.
 					}
 
 					Item* item = newItem(TOOL_TORCH, WORN, 0, 1, 0, true, NULL);
@@ -174,7 +174,7 @@ void actTorch(Entity* my)
 		if ( my->isInteractWithMonster() )
 		{
 			list_RemoveNode(my->light->node);
-			Entity* monster = uidToEntity(my->interactedByMonster);
+			Entity* monster = uidToEntity(my->interactedByMonster());
 			my->clearMonsterInteract();
 			if ( monster )
 			{
@@ -268,10 +268,10 @@ void actCrystalShard(Entity* my)
 				if ( inrange[i] )
 				{
 					bool trySalvage = false;
-					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer) == players[i]->entity->getUID() )
+					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer()) == players[i]->entity->getUID() )
 					{
 						trySalvage = true;
-						my->itemAutoSalvageByPlayer = 0; // clear interact flag.
+						my->itemAutoSalvageByPlayer() = 0; // clear interact flag.
 					}
 
 					Item* item = newItem(TOOL_CRYSTALSHARD, WORN, 0, 1, 0, true, NULL);
@@ -345,9 +345,9 @@ void Entity::actLightSource()
 {
 	if ( multiplayer != CLIENT )
 	{
-		if ( lightSourceDelay > 0 && lightSourceDelayCounter == 0 )
+		if ( lightSourceDelay() > 0 && lightSourceDelayCounter() == 0 )
 		{
-			lightSourceDelayCounter = lightSourceDelay;
+			lightSourceDelayCounter() = lightSourceDelay();
 		}
 	}
 
@@ -356,14 +356,14 @@ void Entity::actLightSource()
 		// lighting
 		if ( !LIGHTSOURCE_LIGHT )
 		{
-            const auto color = lightSourceBrightness / 255.f;
-			float r = (color / 255.f) * (float)((lightSourceRGB & 0xFF));
-			float g = (color / 255.f) * (float)((lightSourceRGB >> 8) & 0xFF);
-			float b = (color / 255.f) * (float)((lightSourceRGB >> 16) & 0xFF);
-			light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius, r, g, b, 0.f, 0.5f);
+            const auto color = lightSourceBrightness() / 255.f;
+			float r = (color / 255.f) * (float)((lightSourceRGB() & 0xFF));
+			float g = (color / 255.f) * (float)((lightSourceRGB() >> 8) & 0xFF);
+			float b = (color / 255.f) * (float)((lightSourceRGB() >> 16) & 0xFF);
+			light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius(), r, g, b, 0.f, 0.5f);
 			LIGHTSOURCE_LIGHT = 1;
 		}
-		if ( lightSourceFlicker && flickerLights )
+		if ( lightSourceFlicker() && flickerLights )
 		{
 			--LIGHTSOURCE_FLICKER;
 		}
@@ -372,11 +372,11 @@ void Entity::actLightSource()
 			LIGHTSOURCE_LIGHT = 1;
 			if ( !light )
 			{
-                const auto color = lightSourceBrightness / 255.f;
-				float r = (color / 255.f) * (float)((lightSourceRGB & 0xFF));
-				float g = (color / 255.f) * (float)((lightSourceRGB >> 8) & 0xFF);
-				float b = (color / 255.f) * (float)((lightSourceRGB >> 16) & 0xFF);
-                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius, r, g, b, 0.f, 0.5f);
+                const auto color = lightSourceBrightness() / 255.f;
+				float r = (color / 255.f) * (float)((lightSourceRGB() & 0xFF));
+				float g = (color / 255.f) * (float)((lightSourceRGB() >> 8) & 0xFF);
+				float b = (color / 255.f) * (float)((lightSourceRGB() >> 16) & 0xFF);
+                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius(), r, g, b, 0.f, 0.5f);
 			}
 		}
 
@@ -387,49 +387,49 @@ void Entity::actLightSource()
 			if ( LIGHTSOURCE_LIGHT == 1 )
 			{
 				removeLightField();
-                const auto color = lightSourceBrightness / 255.f;
-				float r = (color / 255.f) * (float)((lightSourceRGB & 0xFF));
-				float g = (color / 255.f) * (float)((lightSourceRGB >> 8) & 0xFF);
-				float b = (color / 255.f) * (float)((lightSourceRGB >> 16) & 0xFF);
-                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius, r, g, b, 0.f, 0.5f);
+                const auto color = lightSourceBrightness() / 255.f;
+				float r = (color / 255.f) * (float)((lightSourceRGB() & 0xFF));
+				float g = (color / 255.f) * (float)((lightSourceRGB() >> 8) & 0xFF);
+				float b = (color / 255.f) * (float)((lightSourceRGB() >> 16) & 0xFF);
+                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius(), r, g, b, 0.f, 0.5f);
 			}
 			else
 			{
 				removeLightField();
-                const auto brightness = std::max(lightSourceBrightness - 16, 0);
+                const auto brightness = std::max(lightSourceBrightness() - 16, 0);
                 const auto color = brightness / 255.f;
-				float r = (color / 255.f) * (float)((lightSourceRGB & 0xFF));
-				float g = (color / 255.f) * (float)((lightSourceRGB >> 8) & 0xFF);
-				float b = (color / 255.f) * (float)((lightSourceRGB >> 16) & 0xFF);
-                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius, r, g, b, 0.f, 0.5f);
+				float r = (color / 255.f) * (float)((lightSourceRGB() & 0xFF));
+				float g = (color / 255.f) * (float)((lightSourceRGB() >> 8) & 0xFF);
+				float b = (color / 255.f) * (float)((lightSourceRGB() >> 16) & 0xFF);
+                light = lightSphereShadow(0, x / 16, y / 16, lightSourceRadius(), r, g, b, 0.f, 0.5f);
 			}
 			LIGHTSOURCE_FLICKER = 2 + local_rng.rand() % 7;
 		}
 
 		if ( multiplayer != CLIENT )
 		{
-			if ( (!lightSourceAlwaysOn && (circuit_status == CIRCUIT_OFF && !lightSourceInvertPower))
-				|| (circuit_status == CIRCUIT_ON && lightSourceInvertPower == 1) )
+			if ( (!lightSourceAlwaysOn() && (circuit_status() == CIRCUIT_OFF && !lightSourceInvertPower()))
+				|| (circuit_status() == CIRCUIT_ON && lightSourceInvertPower() == 1) )
 			{
-				if ( LIGHTSOURCE_ENABLED == 1 && lightSourceLatchOn < 2 + lightSourceInvertPower )
+				if ( LIGHTSOURCE_ENABLED == 1 && lightSourceLatchOn() < 2 + lightSourceInvertPower() )
 				{
-					if ( lightSourceInvertPower == 1 && lightSourceDelayCounter > 0 )
+					if ( lightSourceInvertPower() == 1 && lightSourceDelayCounter() > 0 )
 					{
-						--lightSourceDelayCounter;
-						if ( lightSourceDelayCounter != 0 )
+						--lightSourceDelayCounter();
+						if ( lightSourceDelayCounter() != 0 )
 						{
 							return;
 						}
 					}
-					else if ( lightSourceInvertPower == 0 && lightSourceDelay > 0 )
+					else if ( lightSourceInvertPower() == 0 && lightSourceDelay() > 0 )
 					{
-						lightSourceDelayCounter = lightSourceDelay;
+						lightSourceDelayCounter() = lightSourceDelay();
 					}
 					LIGHTSOURCE_ENABLED = 0;
 					serverUpdateEntitySkill(this, 10);
-					if ( lightSourceLatchOn > 0 )
+					if ( lightSourceLatchOn() > 0 )
 					{
-						++lightSourceLatchOn;
+						++lightSourceLatchOn();
 					}
 				}
 			}
@@ -443,28 +443,28 @@ void Entity::actLightSource()
 			return;
 		}
 
-		if ( lightSourceAlwaysOn == 1 || (circuit_status == CIRCUIT_ON && !lightSourceInvertPower)
-			|| (circuit_status == CIRCUIT_OFF && lightSourceInvertPower == 1) )
+		if ( lightSourceAlwaysOn() == 1 || (circuit_status() == CIRCUIT_ON && !lightSourceInvertPower())
+			|| (circuit_status() == CIRCUIT_OFF && lightSourceInvertPower() == 1) )
 		{
-			if ( LIGHTSOURCE_ENABLED == 0 && lightSourceLatchOn < 2 + lightSourceInvertPower )
+			if ( LIGHTSOURCE_ENABLED == 0 && lightSourceLatchOn() < 2 + lightSourceInvertPower() )
 			{
-				if ( lightSourceInvertPower == 0 && lightSourceDelayCounter > 0 )
+				if ( lightSourceInvertPower() == 0 && lightSourceDelayCounter() > 0 )
 				{
-					--lightSourceDelayCounter;
-					if ( lightSourceDelayCounter != 0 )
+					--lightSourceDelayCounter();
+					if ( lightSourceDelayCounter() != 0 )
 					{
 						return;
 					}
 				}
-				else if ( lightSourceInvertPower == 1 && lightSourceDelay > 0 )
+				else if ( lightSourceInvertPower() == 1 && lightSourceDelay() > 0 )
 				{
-					lightSourceDelayCounter = lightSourceDelay;
+					lightSourceDelayCounter() = lightSourceDelay();
 				}
 				LIGHTSOURCE_ENABLED = 1;
 				serverUpdateEntitySkill(this, 10);
-				if ( lightSourceLatchOn > 0 )
+				if ( lightSourceLatchOn() > 0 )
 				{
-					++lightSourceLatchOn;
+					++lightSourceLatchOn();
 				}
 			}
 		}

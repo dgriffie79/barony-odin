@@ -44,12 +44,12 @@ void actMagicTrapCeiling(Entity* my)
 
 void Entity::actMagicTrapCeiling()
 {
-	if ( actTrapSabotaged == 0 )
+	if ( actTrapSabotaged() == 0 )
 	{
-		spellTrapAmbience--;
-		if ( spellTrapAmbience <= 0 )
+		spellTrapAmbience()--;
+		if ( spellTrapAmbience() <= 0 )
 		{
-			spellTrapAmbience = TICKS_PER_SECOND * 30;
+			spellTrapAmbience() = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(this, 149, 16);
 		}
 	}
@@ -63,59 +63,59 @@ void Entity::actMagicTrapCeiling()
 		flags[NOUPDATE] = true;
 		return;
 	}
-	if ( circuit_status != CIRCUIT_ON )
+	if ( circuit_status() != CIRCUIT_ON )
 	{
-		spellTrapReset = 0;
-		spellTrapCounter = spellTrapRefireRate; //shoost instantly!
+		spellTrapReset() = 0;
+		spellTrapCounter() = spellTrapRefireRate(); //shoost instantly!
 		return;
 	}
 
-	if ( !spellTrapInit )
+	if ( !spellTrapInit() )
 	{
-		spellTrapInit = 1;
+		spellTrapInit() = 1;
 		auto& rng = entity_rng ? *entity_rng : local_rng;
-		if ( spellTrapType == -1 )
+		if ( spellTrapType() == -1 )
 		{
 			switch ( rng.rand() % 8 )
 			{
 				case 0:
-					spellTrapType = SPELL_FORCEBOLT;
+					spellTrapType() = SPELL_FORCEBOLT;
 					break;
 				case 1:
-					spellTrapType = SPELL_MAGICMISSILE;
+					spellTrapType() = SPELL_MAGICMISSILE;
 					break;
 				case 2:
-					spellTrapType = SPELL_COLD;
+					spellTrapType() = SPELL_COLD;
 					break;
 				case 3:
-					spellTrapType = SPELL_FIREBALL;
+					spellTrapType() = SPELL_FIREBALL;
 					break;
 				case 4:
-					spellTrapType = SPELL_LIGHTNING;
+					spellTrapType() = SPELL_LIGHTNING;
 					break;
 				case 5:
-					spellTrapType = SPELL_SLEEP;
-					spellTrapRefireRate = 275; // stop getting stuck forever!
+					spellTrapType() = SPELL_SLEEP;
+					spellTrapRefireRate() = 275; // stop getting stuck forever!
 					break;
 				case 6:
-					spellTrapType = SPELL_CONFUSE;
+					spellTrapType() = SPELL_CONFUSE;
 					break;
 				case 7:
-					spellTrapType = SPELL_SLOW;
+					spellTrapType() = SPELL_SLOW;
 					break;
 				default:
-					spellTrapType = SPELL_MAGICMISSILE;
+					spellTrapType() = SPELL_MAGICMISSILE;
 					break;
 			}
 		}
 	}
 
-	++spellTrapCounter;
+	++spellTrapCounter();
 
 	node_t* node = children.first;
 	Entity* ceilingModel = (Entity*)(node->element);
 	int triggerSprite = 0;
-	switch ( spellTrapType )
+	switch ( spellTrapType() )
 	{
 		case SPELL_FORCEBOLT:
 		case SPELL_MAGICMISSILE:
@@ -138,19 +138,19 @@ void Entity::actMagicTrapCeiling()
 			break;
 	}
 
-	if ( spellTrapCounter > spellTrapRefireRate )
+	if ( spellTrapCounter() > spellTrapRefireRate() )
 	{
-		spellTrapCounter = 0; // reset timer.
-		if ( spellTrapReset == 0 )
+		spellTrapCounter() = 0; // reset timer.
+		if ( spellTrapReset() == 0 )
 		{
 			// once off magic particles. reset once power is cut.
 			spawnMagicEffectParticles(x, y, z, triggerSprite);
 			playSoundEntity(this, 252, 128);
-			spellTrapReset = 1;
+			spellTrapReset() = 1;
 			/*spellTrapCounter = spellTrapRefireRate - 5; // delay?
 			return;*/
 		}
-		Entity* entity = castSpell(getUID(), getSpellFromID(spellTrapType), false, true);
+		Entity* entity = castSpell(getUID(), getSpellFromID(spellTrapType()), false, true);
 		if ( ceilingModel && entity )
 		{
 			entity->x = x;
@@ -161,7 +161,7 @@ void Entity::actMagicTrapCeiling()
 			entity->vel_y = 0.0;
 			entity->vel_z = 0.5 * (missile_speed);
 			entity->pitch = PI / 2;
-			entity->actmagicIsVertical = MAGIC_ISVERTICAL_Z;
+			entity->actmagicIsVertical() = MAGIC_ISVERTICAL_Z;
 		}
 	}
 }
@@ -229,7 +229,7 @@ void actMagicTrap(Entity* my)
 		return;
 	}
 
-	if ( my->actTrapSabotaged > 0 )
+	if ( my->actTrapSabotaged() > 0 )
 	{
 		my->removeLightField();
 		return;
@@ -307,16 +307,16 @@ void Entity::actTeleportShrine()
 	}
 
 	this->removeLightField();
-	if ( shrineActivateDelay == 0 )
+	if ( shrineActivateDelay() == 0 )
 	{
 		this->light = addLight(this->x / 16, this->y / 16, "teleport_shrine");
 		spawnAmbientParticles(80, 576, 10 + local_rng.rand() % 40, 1.0, false);
 	}
 
-	shrineAmbience--;
-	if ( shrineAmbience <= 0 )
+	shrineAmbience()--;
+	if ( shrineAmbience() <= 0 )
 	{
-		shrineAmbience = TICKS_PER_SECOND * 30;
+		shrineAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
 
@@ -326,16 +326,16 @@ void Entity::actTeleportShrine()
 	}
 
 
-	if ( !shrineInit )
+	if ( !shrineInit() )
 	{
-		shrineInit = 1;
-		shrineSpellEffect = SPELL_TELEPORTATION;
+		shrineInit() = 1;
+		shrineSpellEffect() = SPELL_TELEPORTATION;
 	}
 
-	if ( shrineActivateDelay > 0 )
+	if ( shrineActivateDelay() > 0 )
 	{
-		--shrineActivateDelay;
-		if ( shrineActivateDelay == 0 )
+		--shrineActivateDelay();
+		if ( shrineActivateDelay() == 0 )
 		{
 			serverUpdateEntitySkill(this, 7);
 		}
@@ -344,10 +344,10 @@ void Entity::actTeleportShrine()
 	// using
 	if ( this->isInteractWithMonster() )
 	{
-		Entity* monsterInteracting = uidToEntity(this->interactedByMonster);
+		Entity* monsterInteracting = uidToEntity(this->interactedByMonster());
 		if ( monsterInteracting )
 		{
-			if ( shrineActivateDelay == 0 )
+			if ( shrineActivateDelay() == 0 )
 			{
 				std::vector<std::pair<Entity*, std::pair<int, int>>> allShrines;
 				for ( node_t* node = map.entities->first; node; node = node->next )
@@ -389,19 +389,19 @@ void Entity::actTeleportShrine()
 					}
 
 					Entity* spellTimer = createParticleTimer(this, 200, 625);
-					spellTimer->particleTimerPreDelay = 0; // wait x ticks before animation.
-					spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SHRINE_TELEPORT; // teleport behavior of timer.
-					spellTimer->particleTimerEndSprite = 625; // sprite to use for end of timer function.
-					spellTimer->particleTimerCountdownAction = 1;
-					spellTimer->particleTimerCountdownSprite = 625;
-					spellTimer->particleTimerTarget = static_cast<Sint32>(selectedShrine->getUID()); // get the target to teleport around.
-					spellTimer->particleTimerVariable1 = 1; // distance of teleport in tiles
-					spellTimer->particleTimerVariable2 = monsterInteracting->getUID(); // which player to teleport
+					spellTimer->particleTimerPreDelay() = 0; // wait x ticks before animation.
+					spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SHRINE_TELEPORT; // teleport behavior of timer.
+					spellTimer->particleTimerEndSprite() = 625; // sprite to use for end of timer function.
+					spellTimer->particleTimerCountdownAction() = 1;
+					spellTimer->particleTimerCountdownSprite() = 625;
+					spellTimer->particleTimerTarget() = static_cast<Sint32>(selectedShrine->getUID()); // get the target to teleport around.
+					spellTimer->particleTimerVariable1() = 1; // distance of teleport in tiles
+					spellTimer->particleTimerVariable2() = monsterInteracting->getUID(); // which player to teleport
 					if ( multiplayer == SERVER )
 					{
 						serverSpawnMiscParticles(this, PARTICLE_EFFECT_SHRINE_TELEPORT, 625);
 					}
-					shrineActivateDelay = 250;
+					shrineActivateDelay() = 250;
 					serverUpdateEntitySkill(this, 7);
 				}
 			}
@@ -416,7 +416,7 @@ void Entity::actTeleportShrine()
 		{
 			if ( inrange[i] && Player::getPlayerInteractEntity(i) )
 			{
-				if ( shrineActivateDelay > 0 )
+				if ( shrineActivateDelay() > 0 )
 				{
 					messagePlayer(i, MESSAGE_INTERACTION, Language::get(4300));
 					break;
@@ -459,19 +459,19 @@ void Entity::actTeleportShrine()
 					Compendium_t::Events_t::eventUpdateWorld(i, Compendium_t::CPDM_OBELISK_USES, "obelisk", 1);
 
 					Entity* spellTimer = createParticleTimer(this, 200, 625);
-					spellTimer->particleTimerPreDelay = 0; // wait x ticks before animation.
-					spellTimer->particleTimerEndAction = PARTICLE_EFFECT_SHRINE_TELEPORT; // teleport behavior of timer.
-					spellTimer->particleTimerEndSprite = 625; // sprite to use for end of timer function.
-					spellTimer->particleTimerCountdownAction = 1;
-					spellTimer->particleTimerCountdownSprite = 625;
-					spellTimer->particleTimerTarget = static_cast<Sint32>(selectedShrine->getUID()); // get the target to teleport around.
-					spellTimer->particleTimerVariable1 = 1; // distance of teleport in tiles
-					spellTimer->particleTimerVariable2 = Player::getPlayerInteractEntity(i)->getUID(); // which player to teleport
+					spellTimer->particleTimerPreDelay() = 0; // wait x ticks before animation.
+					spellTimer->particleTimerEndAction() = PARTICLE_EFFECT_SHRINE_TELEPORT; // teleport behavior of timer.
+					spellTimer->particleTimerEndSprite() = 625; // sprite to use for end of timer function.
+					spellTimer->particleTimerCountdownAction() = 1;
+					spellTimer->particleTimerCountdownSprite() = 625;
+					spellTimer->particleTimerTarget() = static_cast<Sint32>(selectedShrine->getUID()); // get the target to teleport around.
+					spellTimer->particleTimerVariable1() = 1; // distance of teleport in tiles
+					spellTimer->particleTimerVariable2() = Player::getPlayerInteractEntity(i)->getUID(); // which player to teleport
 					if ( multiplayer == SERVER )
 					{
 						serverSpawnMiscParticles(this, PARTICLE_EFFECT_SHRINE_TELEPORT, 625);
 					}
-					shrineActivateDelay = 250;
+					shrineActivateDelay() = 250;
 					serverUpdateEntitySkill(this, 7);
 				}
 
@@ -517,7 +517,7 @@ void daedalusShrineInteract(Entity* my, Entity* touched)
 		}
 	}
 
-	if ( my->shrineDaedalusState == 0 ) // default
+	if ( my->shrineDaedalusState() == 0 ) // default
 	{
 		if ( multiplayer != CLIENT )
 		{
@@ -536,7 +536,7 @@ void daedalusShrineInteract(Entity* my, Entity* touched)
 					exitEntity = entity;
 					break;
 				}
-				if ( entity->behavior == &actPortal && entity->portalNotSecret == 1 )
+				if ( entity->behavior == &actPortal && entity->portalNotSecret() == 1 )
 				{
 					exitEntity = entity;
 					break;
@@ -567,10 +567,10 @@ void daedalusShrineInteract(Entity* my, Entity* touched)
 			SHRINE_DAEDALUS_EXIT_UID = exitEntity->getUID();
 			SHRINE_START_DIR = my->yaw;
 			playSoundEntityLocal(my, 248, 128);
-			my->shrineDaedalusState = 1;
+			my->shrineDaedalusState() = 1;
 		}
 	}
-	else if ( my->shrineDaedalusState == 2 )
+	else if ( my->shrineDaedalusState() == 2 )
 	{
 		shrineDaedalusRevealMap(*my);
 
@@ -624,30 +624,30 @@ void Entity::actDaedalusShrine()
 	}
 
 	this->removeLightField();
-	if ( shrineActivateDelay == 0 )
+	if ( shrineActivateDelay() == 0 )
 	{
 		this->light = addLight(this->x / 16, this->y / 16, "teleport_shrine");
 		spawnAmbientParticles(80, 576, 10 + local_rng.rand() % 40, 1.0, false);
 	}
 
-	shrineAmbience--;
-	if ( shrineAmbience <= 0 )
+	shrineAmbience()--;
+	if ( shrineAmbience() <= 0 )
 	{
-		shrineAmbience = TICKS_PER_SECOND * 30;
+		shrineAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
 
-	if ( !shrineInit )
+	if ( !shrineInit() )
 	{
-		shrineInit = 1;
-		shrineSpellEffect = SPELL_SPEED;
+		shrineInit() = 1;
+		shrineSpellEffect() = SPELL_SPEED;
 	}
 
 
-	if ( shrineActivateDelay > 0 )
+	if ( shrineActivateDelay() > 0 )
 	{
-		--shrineActivateDelay;
-		if ( shrineActivateDelay == 0 )
+		--shrineActivateDelay();
+		if ( shrineActivateDelay() == 0 )
 		{
 			if ( multiplayer != CLIENT )
 			{
@@ -656,7 +656,7 @@ void Entity::actDaedalusShrine()
 		}
 	}
 
-	if ( shrineDaedalusState == 1 )
+	if ( shrineDaedalusState() == 1 )
 	{
 		// point to exit
 		int dir = 0;
@@ -686,7 +686,7 @@ void Entity::actDaedalusShrine()
 
 		if ( limbAnimateToLimit(this, ANIMATE_YAW, speed, targetDir, false, 0.0) )
 		{
-			shrineDaedalusState = 2;
+			shrineDaedalusState() = 2;
 			shrineDaedalusRevealMap(*this);
 
 			if ( multiplayer != CLIENT )
@@ -815,7 +815,7 @@ void Entity::actDaedalusShrine()
 		{
 			if ( inrange[i] && Player::getPlayerInteractEntity(i) )
 			{
-				if ( shrineActivateDelay > 0 )
+				if ( shrineActivateDelay() > 0 )
 				{
 					messagePlayer(i, MESSAGE_INTERACTION, Language::get(4300));
 					break;
@@ -823,7 +823,7 @@ void Entity::actDaedalusShrine()
 
 				daedalusShrineInteract(this, Player::getPlayerInteractEntity(i));
 				Compendium_t::Events_t::eventUpdateWorld(i, Compendium_t::CPDM_DAED_USES, "daedalus", 1);
-				shrineActivateDelay = TICKS_PER_SECOND * 5;
+				shrineActivateDelay() = TICKS_PER_SECOND * 5;
 				serverUpdateEntitySkill(this, 7);
 				break;
 			}
@@ -849,16 +849,16 @@ void Entity::actAssistShrine()
 	}
 
 	this->removeLightField();
-	shrineAmbience--;
-	if ( shrineAmbience <= 0 )
+	shrineAmbience()--;
+	if ( shrineAmbience() <= 0 )
 	{
-		shrineAmbience = TICKS_PER_SECOND * 30;
+		shrineAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 16);
 	}
 
-	if ( !shrineInit )
+	if ( !shrineInit() )
 	{
-		shrineInit = 1;
+		shrineInit() = 1;
 	}
 
 	Sint32& shrineInteracting = this->skill[0];

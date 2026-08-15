@@ -2174,9 +2174,9 @@ void drawEntities3D(view_t* camera, int mode)
 					}
 				}
 			}
-			else if ( (entity->behavior == &actGib && entity->actGibDisableDrawForLocalPlayer > 0) )
+			else if ( (entity->behavior == &actGib && entity->actGibDisableDrawForLocalPlayer() > 0) )
 			{
-				if ( (entity->actGibDisableDrawForLocalPlayer - 1) == currentPlayerViewport )
+				if ( (entity->actGibDisableDrawForLocalPlayer() - 1) == currentPlayerViewport )
 				{
 					if ( !players[currentPlayerViewport]->entity
 						|| (players[currentPlayerViewport]->entity && !players[currentPlayerViewport]->entity->skill[3]) )
@@ -2201,14 +2201,14 @@ void drawEntities3D(view_t* camera, int mode)
                 if (x >= 0 && y >= 0 && x < map.width && y < map.height)
                 {
                     if ( !camera->vismap[y + x * map.height] 
-						&& entity->monsterEntityRenderAsTelepath == 0
+						&& entity->monsterEntityRenderAsTelepath() == 0
 #ifndef EDITOR
-						&& !(!intro && entity->goldTelepathy > 0 && entity->behavior == &actGoldBag 
+						&& !(!intro && entity->goldTelepathy() > 0 && entity->behavior == &actGoldBag 
 							&& currentPlayerViewport >= 0 && currentPlayerViewport < MAXPLAYERS
-							&& entity->goldTelepathy & (1 << currentPlayerViewport))
-						&& !(!intro && entity->colliderTelepathy > 0 && entity->behavior == &actColliderDecoration
+							&& entity->goldTelepathy() & (1 << currentPlayerViewport))
+						&& !(!intro && entity->colliderTelepathy() > 0 && entity->behavior == &actColliderDecoration
 							&& currentPlayerViewport >= 0 && currentPlayerViewport < MAXPLAYERS
-							&& entity->colliderTelepathy & (1 << currentPlayerViewport))
+							&& entity->colliderTelepathy() & (1 << currentPlayerViewport))
 #endif
 						&& !(entity->behavior == &actSpriteNametag && entity->ditheringDisabled) )
                     {
@@ -2247,7 +2247,7 @@ void drawEntities3D(view_t* camera, int mode)
 							dither.value + 1;
 #endif
 					}
-					else if ( entity->mistformGLRender >= 0.45 )
+					else if ( entity->mistformGLRender() >= 0.45 )
 					{
 #ifndef EDITOR
 						static CvarInt cvar_dither_mistform("/dither_mistform", 6);
@@ -2376,7 +2376,7 @@ void drawEntities3D(view_t* camera, int mode)
                         auto stats = parent->behavior == &actPlayer ?
                             parent->getStats() : (parent->clientsHaveItsStats ? parent->clientStats : nullptr);
                         if (stats && stats->name[0]) {
-							if ( parent->behavior == &actMonster && entity->skill[0] == clientnum && (!players[clientnum]->entity || parent->monsterAllyIndex != clientnum) )
+							if ( parent->behavior == &actMonster && entity->skill[0] == clientnum && (!players[clientnum]->entity || parent->monsterAllyIndex() != clientnum) )
 							{
 								// previous ally but we are dead (lost the ally) or someone stole our mon
 							}
@@ -2598,7 +2598,7 @@ void drawEntities2D(long camx, long camy)
 				{
 					pos.y += sprites[entity->sprite]->h / 2;
 					pos.x += sprites[entity->sprite]->w / 2;
-					switch ( entity->signalInputDirection )
+					switch ( entity->signalInputDirection() )
 					{
 						case 0:
 							pos.x -= pos.w;
@@ -2622,7 +2622,7 @@ void drawEntities2D(long camx, long camy)
 				{
 					pos.y += sprites[entity->sprite]->h / 2;
 					pos.x += sprites[entity->sprite]->w / 2;
-					switch ( entity->signalInputDirection )
+					switch ( entity->signalInputDirection() )
 					{
 					case 0:
 						pos.x -= pos.w;
@@ -2651,9 +2651,9 @@ void drawEntities2D(long camx, long camy)
 						box.x = pos.x + 16;
 						box.y = pos.y + 4;
 						drawRect(&box, makeColorRGB(
-							(entity->lightSourceRGB >> 0) & 0xFF,
-							(entity->lightSourceRGB >> 8) & 0xFF,
-							(entity->lightSourceRGB >> 16) & 0xFF), 255);
+							(entity->lightSourceRGB() >> 0) & 0xFF,
+							(entity->lightSourceRGB() >> 8) & 0xFF,
+							(entity->lightSourceRGB() >> 16) & 0xFF), 255);
 					}
 
 					// draw sprite normally from sprites list
@@ -2753,9 +2753,9 @@ void drawEntities2D(long camx, long camy)
 							ttfPrintText(ttf8, padx, pady, tmpStr);
 
 							snprintf(tmpStr, sizeof(tmpStr), "R: %d G: %d B: %d",
-								(selectedEntity[0]->lightSourceRGB >> 0) & 0xFF,
-								(selectedEntity[0]->lightSourceRGB >> 8) & 0xFF,
-								(selectedEntity[0]->lightSourceRGB >> 16) & 0xFF);
+								(selectedEntity[0]->lightSourceRGB() >> 0) & 0xFF,
+								(selectedEntity[0]->lightSourceRGB() >> 8) & 0xFF,
+								(selectedEntity[0]->lightSourceRGB() >> 16) & 0xFF);
 							ttfPrintText(ttf8, padx, pady + 10, tmpStr);
 							break;
 						case 2: //chest
@@ -2823,23 +2823,23 @@ void drawEntities2D(long camx, long camy)
 							pady += 5;
 							strcpy(tmpStr, dynarray_pget<const char*>(spriteEditorNameStrings, selectedEntity[0]->sprite));
 							ttfPrintText(ttf8, padx, pady - 10, tmpStr);
-							int model = selectedEntity[0]->colliderDecorationModel;
-							if ( EditorEntityData_t::colliderData.find(selectedEntity[0]->colliderDamageTypes)
+							int model = selectedEntity[0]->colliderDecorationModel();
+							if ( EditorEntityData_t::colliderData.find(selectedEntity[0]->colliderDamageTypes())
 								!= EditorEntityData_t::colliderData.end() )
 							{
-								if ( EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes].hasOverride("model") )
+								if ( EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes()].hasOverride("model") )
 								{
-									model = EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes].getOverride("model");
+									model = EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes()].getOverride("model");
 								}
 							}
 							snprintf(tmpStr, sizeof(tmpStr), "Model: %s", modelFileNames[model].c_str());
 							ttfPrintTextColor(ttf8, padx, pady, makeColorRGB(0, 255, 0), true, tmpStr);
 
-							if ( EditorEntityData_t::colliderData.find(selectedEntity[0]->colliderDamageTypes)
+							if ( EditorEntityData_t::colliderData.find(selectedEntity[0]->colliderDamageTypes())
 								!= EditorEntityData_t::colliderData.end() )
 							{
 
-								auto& colliderData = EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes];
+								auto& colliderData = EditorEntityData_t::colliderData[selectedEntity[0]->colliderDamageTypes()];
 								snprintf(tmpStr, sizeof(tmpStr), "Collider Type: %s", colliderData.name.c_str());
 							}
 							else
@@ -3026,14 +3026,14 @@ void drawEntities2D(long camx, long camy)
 							strcpy(tmpStr, "Nodes: ");
 							offsetx = (int)strlen(tmpStr) * 8 - 8;
 							ttfPrintTextColor(ttf8, padx, pady + offsety, colorWhite, 1, tmpStr);
-							snprintf(tmpStr2, 10, "%d", selectedEntity[0]->crystalNumElectricityNodes);
+							snprintf(tmpStr2, 10, "%d", selectedEntity[0]->crystalNumElectricityNodes());
 							ttfPrintText(ttf8, padx + offsetx, pady + offsety, tmpStr2);
 
 							offsety += 10;
 							strcpy(tmpStr, "Rotation: ");
 							offsetx = (int)strlen(tmpStr) * 8 - 8;
 							ttfPrintTextColor(ttf8, padx, pady + offsety, colorWhite, 1, tmpStr);
-							switch ( (int)entity->crystalTurnReverse )
+							switch ( (int)entity->crystalTurnReverse() )
 							{
 								case 0:
 									strcpy(tmpStr2, "Clockwise");
@@ -3052,7 +3052,7 @@ void drawEntities2D(long camx, long camy)
 							strcpy(tmpStr, "Spell to Activate: ");
 							offsetx = (int)strlen(tmpStr) * 8 - 8;
 							ttfPrintTextColor(ttf8, padx, pady + offsety, colorWhite, 1, tmpStr);
-							switch ( (int)entity->crystalSpellToActivate )
+							switch ( (int)entity->crystalSpellToActivate() )
 							{
 								case 0:
 									strcpy(tmpStr2, "No");
@@ -3147,9 +3147,9 @@ void drawEntities2D(long camx, long camy)
 
 							if ( spriteType == 13 )
 							{
-								if ( modelFileNames.find(selectedEntity[0]->floorDecorationModel) != modelFileNames.end() )
+								if ( modelFileNames.find(selectedEntity[0]->floorDecorationModel()) != modelFileNames.end() )
 								{
-									snprintf(tmpStr, sizeof(tmpStr), "Model: %s", modelFileNames[selectedEntity[0]->floorDecorationModel].c_str());
+									snprintf(tmpStr, sizeof(tmpStr), "Model: %s", modelFileNames[selectedEntity[0]->floorDecorationModel()].c_str());
 									if ( lines.size() > 1 )
 									{
 										ttfPrintTextColor(ttf8, padx + offsetx, tooltip.y - 16, makeColorRGB(0, 255, 0), true, tmpStr);

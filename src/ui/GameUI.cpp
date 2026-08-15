@@ -460,7 +460,7 @@ std::string EnemyBarSettings_t::getEnemyBarSpriteName(Entity* entity)
 	}
 	else if ( entity->isDamageableCollider() )
 	{
-		auto& colliderData = EditorEntityData_t::colliderData[entity->colliderDamageTypes];
+		auto& colliderData = EditorEntityData_t::colliderData[entity->colliderDamageTypes()];
 		return colliderData.hpbarLookupName;
 	}
 	else if ( entity->behavior == &::actAssistShrine )
@@ -469,7 +469,7 @@ std::string EnemyBarSettings_t::getEnemyBarSpriteName(Entity* entity)
 	}
 	else if ( entity->behavior == &actFurniture )
 	{
-		switch ( entity->furnitureType )
+		switch ( entity->furnitureType() )
 		{
 			case FURNITURE_TABLE:
 			case FURNITURE_PODIUM:
@@ -573,11 +573,11 @@ struct MPBarPaths_t
 			}*/
 			return automatonSTBars;
 		}
-		else if ( stats[player]->type == SALAMANDER || (stats[player]->playerRace == RACE_SALAMANDER && stats[player]->stat_appearance == 0) )
+		else if ( stats[player]->type == SALAMANDER || (stats[player]->playerRace() == RACE_SALAMANDER && stats[player]->stat_appearance == 0) )
 		{
 			return automatonHTBars;
 		}
-		else if ( stats[player]->playerRace == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
 		{
 			return insectoidENBars;
 		}
@@ -7258,13 +7258,13 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 					int variation = 2;
 					if ( players[player] && players[player]->entity )
 					{
-						if ( players[player]->entity->creatureShadowTaggedThisUid != 0
-							&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
+						if ( players[player]->entity->creatureShadowTaggedThisUid() != 0
+							&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid()) )
 						{
 							variation = 1;
 							DynamicString formatString = definition.getName(variation).c_str();
 							char buf[256] = "";
-							Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid);
+							Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid());
 							if ( tagged->behavior == &actMonster )
 							{
 								int type = tagged->getMonsterTypeFromSprite();
@@ -7317,7 +7317,7 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 				{
 					if ( players[player] && players[player]->entity )
 					{
-						switch ( players[player]->entity->effectShapeshift )
+						switch ( players[player]->entity->effectShapeshift() )
 						{
 							case RAT:
 								variation = 0;
@@ -8113,15 +8113,15 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 		if ( eff >= kSpellEffectOffset && (eff - kSpellEffectOffset) == SPELL_SHADOW_TAG )
 		{
 			if ( players[player] && players[player]->entity
-				&& players[player]->entity->creatureShadowTaggedThisUid != 0
-				&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
+				&& players[player]->entity->creatureShadowTaggedThisUid() != 0
+				&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid()) )
 			{
 				// shadow tag still active, check uid
 				for ( auto it = effectQueue.rbegin(); it != effectQueue.rend(); ++it )
 				{
 					if ( (*it).effect == kSpellEffectOffset + SPELL_SHADOW_TAG )
 					{
-						if ( (*it).customVariable != players[player]->entity->creatureShadowTaggedThisUid )
+						if ( (*it).customVariable != players[player]->entity->creatureShadowTaggedThisUid() )
 						{
 							deleteEffect(eff);
 							break;
@@ -8147,13 +8147,13 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 		{
 			if ( players[player] && players[player]->entity )
 			{
-				if ( players[player]->entity->creatureShadowTaggedThisUid != 0
-					&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
+				if ( players[player]->entity->creatureShadowTaggedThisUid() != 0
+					&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid()) )
 				{
 					if ( insertEffect(-1, SPELL_SHADOW_TAG) )
 					{
-						effectQueue.back().customVariable = players[player]->entity->creatureShadowTaggedThisUid;
-						notificationQueue.back().customVariable = players[player]->entity->creatureShadowTaggedThisUid;
+						effectQueue.back().customVariable = players[player]->entity->creatureShadowTaggedThisUid();
+						notificationQueue.back().customVariable = players[player]->entity->creatureShadowTaggedThisUid();
 					}
 				}
 			}
@@ -8188,10 +8188,10 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 			}
 			else if ( i == EFF_INVISIBLE && !effectActive && players[player]->entity )
 			{
-				bool oldSneaking = stats[player]->sneaking;
-				stats[player]->sneaking = false;
+				bool oldSneaking = stats[player]->sneaking();
+				stats[player]->sneaking() = false;
 				bool activeWithoutSneak = players[player]->entity->isInvisible();
-				stats[player]->sneaking = oldSneaking;
+				stats[player]->sneaking() = oldSneaking;
 				effectActive = players[player]->entity->isInvisible();
 				if ( !activeWithoutSneak )
 				{
@@ -8413,7 +8413,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 				miscEffects[kEffectLesserWarning] = true;
 			}
 			if ( stats[player]->shoes && stats[player]->shoes->type == CLEAT_BOOTS
-				&& players[player]->entity && players[player]->entity->effectShapeshift == NOTHING )
+				&& players[player]->entity && players[player]->entity->effectShapeshift() == NOTHING )
 			{
 				miscEffects[kEffectStability] = true;
 			}
@@ -8498,12 +8498,12 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 				miscEffects[kEffectWaterWalking] = true;
 			}
 			if ( (stats[player]->amulet && stats[player]->amulet->type == AMULET_LIFESAVING)
-				|| (((stats[player]->playerRace == RACE_SKELETON && stats[player]->stat_appearance == 0) 
+				|| (((stats[player]->playerRace() == RACE_SKELETON && stats[player]->stat_appearance == 0) 
 					|| stats[player]->type == SKELETON) && stats[player]->MP >= 75) )
 			{
 				miscEffects[kEffectLifesaving] = true;
 			}
-			if ( stats[player]->sneaking == 1 && !stats[player]->defending && !skillCapstoneUnlocked(player, PRO_STEALTH) )
+			if ( stats[player]->sneaking() == 1 && !stats[player]->defending && !skillCapstoneUnlocked(player, PRO_STEALTH) )
 			{
 				miscEffects[kEffectSneak] = true;
 			}
@@ -8720,12 +8720,12 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 							notificationTxt->setText("");
 							if ( players[player] && players[player]->entity )
 							{
-								if ( players[player]->entity->creatureShadowTaggedThisUid != 0
-									&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid) )
+								if ( players[player]->entity->creatureShadowTaggedThisUid() != 0
+									&& uidToEntity(players[player]->entity->creatureShadowTaggedThisUid()) )
 								{
 									DynamicString formatString = definition.getName(variation).c_str();
 									char buf[256] = "";
-									Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid);
+									Entity* tagged = uidToEntity(players[player]->entity->creatureShadowTaggedThisUid());
 									if ( tagged->behavior == &actMonster )
 									{
 										int type = tagged->getMonsterTypeFromSprite();
@@ -8768,7 +8768,7 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 						{
 							if ( players[player] && players[player]->entity )
 							{
-								switch ( players[player]->entity->effectShapeshift )
+								switch ( players[player]->entity->effectShapeshift() )
 								{
 									case RAT:
 										variation = 0;
@@ -9327,7 +9327,7 @@ void StatusEffectQueue_t::updateEntryImage(StatusEffectQueueEntry_t& entry, Fram
 					{
 						if ( players[player] && players[player]->entity )
 						{
-							switch ( players[player]->entity->effectShapeshift )
+							switch ( players[player]->entity->effectShapeshift() )
 							{
 								case RAT:
 									variation = 0;
@@ -10042,7 +10042,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 				usingTinkeringKit = true;
 			}
 		}
-		if ( stats[player.playernum]->sneaking ) {
+		if ( stats[player.playernum]->sneaking() ) {
 			useBracketsReticle = true;
 			useSneakingReticle = true;
 		}
@@ -10503,7 +10503,7 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 			}
 			else if ( target->behavior == &::actFurniture )
 			{
-				switch ( target->furnitureType )
+				switch ( target->furnitureType() )
 				{
 				case FURNITURE_CHAIR:
 					interactText += Language::get(677);
@@ -11814,7 +11814,7 @@ void Player::HUD_t::updateActionPrompts()
 			{
 				if ( promptInfo.promptType == ACTION_PROMPT_SNEAK )
 				{
-					if ( !(!stats[player.playernum]->defending && stats[player.playernum]->sneaking) )
+					if ( !(!stats[player.playernum]->defending && stats[player.playernum]->sneaking()) )
 					{
 						//glyph->disabled = true;
 						img->color = iconFadedColor;
@@ -17077,7 +17077,7 @@ real_t getDisplayedMPRegen(Entity* my, Stat& myStats, Uint32* outColor, char buf
 				}
 			}
 		}
-		else if ( myStats.playerRace == RACE_INSECTOID && myStats.stat_appearance == 0 )
+		else if ( myStats.playerRace() == RACE_INSECTOID && myStats.stat_appearance == 0 )
 		{
 			isInsectoid = true;
 			if ( !(svFlags & SV_FLAG_HUNGER) )
@@ -17223,7 +17223,7 @@ struct CharacterSheetTooltipCache_t
 		if ( modifiedPER != statGetPER(stats[player], players[player]->entity) ) { return true; }
 		if ( modifiedCHR != statGetCHR(stats[player], players[player]->entity) ) { return true; }
 
-		if ( playerRace != stats[player]->playerRace ) { return true; }
+		if ( playerRace != stats[player]->playerRace() ) { return true; }
 		if ( hungerEnabled != (svFlags & SV_FLAG_HUNGER) ) { return true; }
 		if ( ac != AC(stats[player]) ) { return true; }
 		if ( weapontype != getWeaponSkill(stats[player]->weapon) ) { return true; }
@@ -17264,7 +17264,7 @@ struct CharacterSheetTooltipCache_t
 		modifiedPER = statGetPER(stats[player], players[player]->entity);
 		modifiedCHR = statGetCHR(stats[player], players[player]->entity);
 
-		playerRace = stats[player]->playerRace;
+		playerRace = stats[player]->playerRace();
 		playerRaceType = getMonsterFromPlayerRace(playerRace);
 		type = stats[player]->type;
 		classnum = client_classes[player];
@@ -18412,7 +18412,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 //#endif // !NDEBUG
 
 		bool isAutomatonHTRegen = stats[player.playernum]->type == AUTOMATON;
-		bool isInsectoidENRegen = (stats[player.playernum]->playerRace == RACE_INSECTOID && stats[player.playernum]->stat_appearance == 0);
+		bool isInsectoidENRegen = (stats[player.playernum]->playerRace() == RACE_INSECTOID && stats[player.playernum]->stat_appearance == 0);
 
 		auto tooltipTopLeft = tooltipFrame->findImage(Player::GUI_t::tooltipEffectBackgroundImages[Player::GUI_t::TOP_LEFT].c_str());
 		tooltipTopLeft->path = "*#images/ui/CharSheet/HUD_CharSheet_Tooltip_TL_Blue_00.png";
@@ -19253,13 +19253,13 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 					bool aestheticOnly = false;
 					if ( player.entity )
 					{
-						if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+						if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 						{
 							if ( stats[player.playernum]->stat_appearance != 0 )
 							{
 								aestheticOnly = true;
 								appearance = Language::get(4068);
-								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 							}
 						}
 					}
@@ -19278,12 +19278,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 					bool aestheticOnly = false;
 					if ( player.entity )
 					{
-						if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+						if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 						{
 							if ( stats[player.playernum]->stat_appearance != 0 )
 							{
 								aestheticOnly = true;
-								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 							}
 						}
 					}
@@ -19372,12 +19372,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						bool aestheticOnly = false;
 						if ( player.entity )
 						{
-							if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+							if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 							{
 								if ( stats[player.playernum]->stat_appearance != 0 )
 								{
 									aestheticOnly = true;
-									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 								}
 							}
 						}
@@ -19587,12 +19587,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 					bool aestheticOnly = false;
 					if ( player.entity )
 					{
-						if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+						if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 						{
 							if ( stats[player.playernum]->stat_appearance != 0 )
 							{
 								aestheticOnly = true;
-								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+								type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 							}
 						}
 					}
@@ -19673,12 +19673,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						bool aestheticOnly = false;
 						if ( player.entity )
 						{
-							if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+							if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 							{
 								if ( stats[player.playernum]->stat_appearance != 0 )
 								{
 									aestheticOnly = true;
-									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 								}
 							}
 						}
@@ -19916,12 +19916,12 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 						bool aestheticOnly = false;
 						if ( player.entity )
 						{
-							if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+							if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 							{
 								if ( stats[player.playernum]->stat_appearance != 0 )
 								{
 									aestheticOnly = true;
-									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+									type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 								}
 							}
 						}
@@ -20652,9 +20652,9 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 
 		Monster race = HUMAN;
-		if ( stats[player.playernum]->stat_appearance == 0 && stats[player.playernum]->playerRace != RACE_HUMAN )
+		if ( stats[player.playernum]->stat_appearance == 0 && stats[player.playernum]->playerRace() != RACE_HUMAN )
 		{
-			race = getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+			race = getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 		}
 		Monster modifiedRace = stats[player.playernum]->type;
 		if ( arachnophobia_filter )
@@ -20672,7 +20672,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		DynamicString titleText = getHoverTextString("race_title_normal");
 		if ( players[player.playernum]->entity )
 		{
-			if ( players[player.playernum]->entity->effectShapeshift != NOTHING )
+			if ( players[player.playernum]->entity->effectShapeshift() != NOTHING )
 			{
 				titleText = getHoverTextString("race_title_shapeshift");
 			}
@@ -20808,9 +20808,9 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 		SDL_Rect tooltipPos = SDL_Rect{ 400, 0, maxWidth, 100 };
 
 		Monster race = HUMAN;
-		if ( stats[player.playernum]->stat_appearance == 0 && stats[player.playernum]->playerRace != RACE_HUMAN )
+		if ( stats[player.playernum]->stat_appearance == 0 && stats[player.playernum]->playerRace() != RACE_HUMAN )
 		{
-			race = getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+			race = getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 		}
 		Monster modifiedRace = stats[player.playernum]->type;
 		if ( arachnophobia_filter )
@@ -20825,7 +20825,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 			}
 		}
 
-		if ( player.entity && player.entity->effectShapeshift != 0 )
+		if ( player.entity && player.entity->effectShapeshift() != 0 )
 		{
 			txt->setText(getHoverTextString("class_title_shapeshift").c_str());
 		}
@@ -20864,7 +20864,7 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 			auto statGrowths = classTooltip->findFrame("stat growths");
 			if ( player.entity )
 			{
-				MainMenu::ClassDescriptions::update_stat_growths(*statGrowths, client_classes[player.playernum], player.entity->effectShapeshift);
+				MainMenu::ClassDescriptions::update_stat_growths(*statGrowths, client_classes[player.playernum], player.entity->effectShapeshift());
 			}
 			else
 			{
@@ -21132,13 +21132,13 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 		bool aestheticOnly = false;
 		if ( player.entity )
 		{
-			if ( player.entity->effectPolymorph == NOTHING && stats[player.playernum]->playerRace > RACE_HUMAN )
+			if ( player.entity->effectPolymorph() == NOTHING && stats[player.playernum]->playerRace() > RACE_HUMAN )
 			{
 				if ( stats[player.playernum]->stat_appearance != 0 )
 				{
 					aestheticOnly = true;
 					appearance = Language::get(4068);
-					type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
+					type = player.entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
 				}
 			}
 		}
@@ -22825,7 +22825,7 @@ void updateSlotFrameFromItem(Frame* slotFrame, void* itemPtr, bool forceUnusable
 		}
 		else if ( !disableBackgrounds )
 		{
-			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 			{
 				// shape shifted, disable some items
 				if ( !item->usableWhileShapeshifted(stats[player]) )
@@ -28560,7 +28560,7 @@ void Player::Inventory_t::activateItemContextMenuOption(Item* item, ItemContextM
 	bool disableItemUsage = false;
 	if ( players[player] && players[player]->entity )
 	{
-		if ( players[player]->entity->effectShapeshift != NOTHING )
+		if ( players[player]->entity->effectShapeshift() != NOTHING )
 		{
 			// shape shifted, disable some items
 			if ( !item->usableWhileShapeshifted(stats[player]) )
@@ -31563,7 +31563,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					{
 						if ( entity && entity->behavior == &actPlayer )
 						{
-							switch ( entity->effectShapeshift )
+							switch ( entity->effectShapeshift() )
 							{
 								case RAT:
 									variation = 0;
@@ -31625,7 +31625,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					{
 						if ( entity && entity->behavior == &actPlayer )
 						{
-							switch ( entity->effectShapeshift )
+							switch ( entity->effectShapeshift() )
 							{
 								case RAT:
 									variation = 0;
@@ -31687,7 +31687,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					{
 						if ( entity && entity->behavior == &actPlayer )
 						{
-							switch ( entity->effectShapeshift )
+							switch ( entity->effectShapeshift() )
 							{
 							case RAT:
 								variation = 0;
@@ -31749,7 +31749,7 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 					{
 						if ( entity && entity->behavior == &actPlayer )
 						{
-							switch ( entity->effectShapeshift )
+							switch ( entity->effectShapeshift() )
 							{
 							case RAT:
 								variation = 0;
@@ -36482,7 +36482,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		if ( tag == "CASTING_MP_REGEN" )
 		{
-			if ( (stats[playernum])->playerRace == RACE_INSECTOID && (stats[playernum])->stat_appearance == 0 )
+			if ( (stats[playernum])->playerRace() == RACE_INSECTOID && (stats[playernum])->stat_appearance == 0 )
 			{
 				return Language::get(4066);
 			}
@@ -36498,7 +36498,7 @@ std::string formatSkillSheetEffects(int playernum, int proficiency, const std::s
 		}
 		else if ( tag == "CASTING_MP_REGEN_SKILL_MULTIPLIER" )
 		{
-			if ( (stats[playernum])->playerRace == RACE_INSECTOID && (stats[playernum])->stat_appearance == 0 )
+			if ( (stats[playernum])->playerRace() == RACE_INSECTOID && (stats[playernum])->stat_appearance == 0 )
 			{
 				return Language::get(4066);
 			}

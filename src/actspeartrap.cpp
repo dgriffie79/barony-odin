@@ -37,7 +37,7 @@
 
 void actSpearTrap(Entity* my)
 {
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
 		SPEARTRAP_AMBIENCE--;
 		if ( SPEARTRAP_AMBIENCE <= 0 )
@@ -58,7 +58,7 @@ void actSpearTrap(Entity* my)
 			return;
 		}
 
-		if (my->skill[28] == 2 && my->actTrapSabotaged == 0 )
+		if (my->skill[28] == 2 && my->actTrapSabotaged() == 0 )
 		{
 			// shoot out the spears
 			if (!SPEARTRAP_STATUS )
@@ -134,7 +134,7 @@ void actSpearTrap(Entity* my)
 						{
 							if ( stats->type == DUCK_SMALL && entityInsideEntity(my, entity) )
 							{
-								if ( entity->monsterAttack == 0 )
+								if ( entity->monsterAttack() == 0 )
 								{
 									entity->attack(local_rng.rand() % 2 ? MONSTER_POSE_MELEE_WINDUP2 : MONSTER_POSE_MELEE_WINDUP3, 0, nullptr);
 								}
@@ -209,7 +209,7 @@ void actSpearTrap(Entity* my)
 										{
 											if ( auto leader = entity->monsterAllyGetPlayerLeader() )
 											{
-												Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex, Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "spike trap", 1);
+												Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex(), Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "spike trap", 1);
 											}
 										}
 									}
@@ -218,7 +218,7 @@ void actSpearTrap(Entity* my)
 									{
 										if ( stats->type == AUTOMATON && entity->behavior == &actPlayer )
 										{
-											entity->playerAutomatonDeathCounter = TICKS_PER_SECOND * 5; // set the death timer to immediately pop for players.
+											entity->playerAutomatonDeathCounter() = TICKS_PER_SECOND * 5; // set the death timer to immediately pop for players.
 										}
 									}
 									// set obituary

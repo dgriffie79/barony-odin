@@ -382,7 +382,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		}
 		else
 		{
-			if ( MONSTER_ATTACK != MONSTER_POSE_MAGIC_WINDUP2 && MONSTER_ATTACK != MONSTER_POSE_MELEE_WINDUP3 && my->monsterAnimationLimbOvershoot == ANIMATE_OVERSHOOT_NONE )
+			if ( MONSTER_ATTACK != MONSTER_POSE_MAGIC_WINDUP2 && MONSTER_ATTACK != MONSTER_POSE_MELEE_WINDUP3 && my->monsterAnimationLimbOvershoot() == ANIMATE_OVERSHOOT_NONE )
 			{
 				my->pitch = 0; // dont adjust head when attacking
 			}
@@ -402,13 +402,13 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			{
 				if ( MONSTER_ATTACK == MONSTER_POSE_MAGIC_WINDUP2 )
 				{
-					if ( my->monsterAnimationLimbOvershoot >= ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() >= ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// handle z movement on windup
-						if ( abs(my->creatureHoverZ) > 0.01 )
+						if ( abs(my->creatureHoverZ()) > 0.01 )
 						{
 							my->z = -4.5;
-							my->creatureHoverZ = 0.0;
+							my->creatureHoverZ() = 0.0;
 						}
 						limbAnimateWithOvershoot(my, ANIMATE_Z, 0.2, -3.5, 0.05, -5.5, ANIMATE_DIR_POSITIVE); // default z is -4.5 in actmonster.cpp
 					}
@@ -425,10 +425,10 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 					else
 					{
-						if ( abs(my->creatureHoverZ) > 0.01 )
+						if ( abs(my->creatureHoverZ()) > 0.01 )
 						{
 							my->z = -4.5;
-							my->creatureHoverZ = 0.0;
+							my->creatureHoverZ() = 0.0;
 						}
 						my->z = std::min(my->z, -4.5);
 						limbAnimateToLimit(my, ANIMATE_Z, 0.2, -4.5, false, 0);
@@ -609,7 +609,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 								//playSoundEntityLocal(my, 79, 128);
 								if ( multiplayer != CLIENT )
 								{
-									my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+									my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 									my->attack(MONSTER_POSE_COCKATRICE_DOUBLEATTACK, 0, nullptr);
 								}
 							}
@@ -660,7 +660,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						createParticleDot(my);
 						if ( multiplayer != CLIENT )
 						{
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							// cockatrice can't be paralyzed, use EFF_STUNNED instead.
 							myStats->setEffectActive(EFF_STUNNED, 1);
 							myStats->EFFECTS_TIMERS[EFF_STUNNED] = 50;
@@ -668,7 +668,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 
 					// only do the following during 2nd + end stage of overshoot animation.
-					if ( my->monsterAnimationLimbOvershoot != ANIMATE_OVERSHOOT_TO_SETPOINT )
+					if ( my->monsterAnimationLimbOvershoot() != ANIMATE_OVERSHOOT_TO_SETPOINT )
 					{
 						// move the head.
 						limbAnimateToLimit(my, ANIMATE_PITCH, -0.1, 11 * PI / 6, true, 0.05);
@@ -686,7 +686,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						if ( multiplayer != CLIENT )
 						{
 							// set overshoot for head animation
-							my->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+							my->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 							my->attack(3, 0, nullptr);
 						}
 					}
@@ -756,7 +756,7 @@ void cockatriceMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 						limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 6 * PI / 4, false, 0);
 						limbAnimateToLimit(entity, ANIMATE_ROLL, -0.1, 31 * PI / 16, false, 0);
-						entity->monsterAnimationLimbOvershoot = ANIMATE_OVERSHOOT_TO_SETPOINT;
+						entity->monsterAnimationLimbOvershoot() = ANIMATE_OVERSHOOT_TO_SETPOINT;
 
 						if ( MONSTER_ATTACKTIME >= ANIMATE_DURATION_WINDUP )
 						{

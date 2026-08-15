@@ -246,7 +246,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SUCCUBUS][6][0]; // 
 	entity->focaly = limbs[SUCCUBUS][6][1]; // 
 	entity->focalz = limbs[SUCCUBUS][6][2]; // 
@@ -267,7 +267,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SUCCUBUS][7][0]; // 
 	entity->focaly = limbs[SUCCUBUS][7][1]; // 
 	entity->focalz = limbs[SUCCUBUS][7][2]; // 
@@ -291,7 +291,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SUCCUBUS][8][0]; // 0
 	entity->focaly = limbs[SUCCUBUS][8][1]; // 0
 	entity->focalz = limbs[SUCCUBUS][8][2]; // 4
@@ -315,7 +315,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SUCCUBUS][9][0]; // 0
 	entity->focaly = limbs[SUCCUBUS][9][1]; // 0
 	entity->focalz = limbs[SUCCUBUS][9][2]; // -2
@@ -336,7 +336,7 @@ void initSuccubus(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SUCCUBUS][10][0]; // 0
 	entity->focaly = limbs[SUCCUBUS][10][1]; // 0
 	entity->focalz = limbs[SUCCUBUS][10][2]; // .5
@@ -503,10 +503,10 @@ void succubusMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(weaponarm);
-					if ( my->monsterAttack != MONSTER_POSE_MELEE_WINDUP2 && my->monsterAttack != 2 )
+					if ( my->monsterAttack() != MONSTER_POSE_MELEE_WINDUP2 && my->monsterAttack() != 2 )
 					{
 						// flare out the weapon arm to match neutral arm position. 
 						// breaks the horizontal chop attack animation so we skip it.
@@ -619,14 +619,14 @@ void succubusMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack == 0) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack() == 0) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SUCCUBUS][4][0] - 0.25; // 0
 						entity->focaly = limbs[SUCCUBUS][4][1] - 0.25; // 0
 						entity->focalz = limbs[SUCCUBUS][4][2]; // 2
 						entity->sprite = my->sprite == 1126 ? 1124 : 193;
-						if ( my->monsterAttack == 0 )
+						if ( my->monsterAttack() == 0 )
 						{
 							entity->roll = -PI / 16;
 						}
@@ -671,7 +671,7 @@ void succubusMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, SUCCUBUS, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1042,12 +1042,12 @@ void Entity::succubusChooseWeapon(const Entity* target, double dist)
 		return;
 	}
 
-	if ( monsterSpecialState != 0 && monsterSpecialTimer != 0 )
+	if ( monsterSpecialState() != 0 && monsterSpecialTimer() != 0 )
 	{
 		return;
 	}
 
-	if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 )
+	if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 )
 	{
 		Stat* targetStats = target->getStats();
 		if ( !targetStats )
@@ -1083,7 +1083,7 @@ void Entity::succubusChooseWeapon(const Entity* target, double dist)
 			if ( node != nullptr )
 			{
 				swapMonsterWeaponWithInventoryItem(this, myStats, node, true, true);
-				monsterSpecialState = SUCCUBUS_CHARM;
+				monsterSpecialState() = SUCCUBUS_CHARM;
 				return;
 			}
 		}

@@ -682,7 +682,7 @@ void revenantSkullAnimate(Entity* my, Stat* myStats, double dist)
 								{
 									pick = MONSTER_POSE_RANGED_WINDUP3;
 								}
-								else if ( my->monsterState != MONSTER_STATE_WAIT )
+								else if ( my->monsterState() != MONSTER_STATE_WAIT )
 								{
 									pick = MONSTER_POSE_RANGED_WINDUP3;
 								}
@@ -821,14 +821,14 @@ void revenantSkullAnimate(Entity* my, Stat* myStats, double dist)
 										real_t tangent = my->yaw;
 										my->vel_x = cos(tangent) * pushbackMultiplier;
 										my->vel_y = sin(tangent) * pushbackMultiplier;
-										my->monsterKnockbackVelocity = 0.025;
-										my->monsterKnockbackUID = 0;
-										my->monsterKnockbackTangentDir = tangent;
+										my->monsterKnockbackVelocity() = 0.025;
+										my->monsterKnockbackUID() = 0;
+										my->monsterKnockbackTangentDir() = tangent;
 
 										if ( multiplayer != CLIENT )
 										{
 											Entity* spellTimer = createParticleTimer(my, 25, -1);
-											spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPIRIT_WEAPON_ATTACK;
+											spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPIRIT_WEAPON_ATTACK;
 
 											playSoundEntity(my, 23 + local_rng.rand() % 5, 128); // whoosh noise
 										}
@@ -1226,7 +1226,7 @@ void revenantSkullAnimate(Entity* my, Stat* myStats, double dist)
 						fx->skill[0] = 1;
 						fx->skill[1] = 12;
 						fx->skill[2] = 4;
-						fx->actSpriteVelXY = 1;
+						fx->actSpriteVelXY() = 1;
 					}
 
 					const real_t squishRate = dist < 0.1 ? 1.5 : 3.0;
@@ -1351,7 +1351,7 @@ void initHologram(Entity* my, Stat* myStats)
 		dynarray_push<Entity*>(my->bodyparts, entity);
 	}
 
-	my->mistformGLRender = 2.0;
+	my->mistformGLRender() = 2.0;
 }
 
 void hologramAnimate(Entity* my, Stat* myStats, double dist)
@@ -1359,12 +1359,12 @@ void hologramAnimate(Entity* my, Stat* myStats, double dist)
 	my->flags[INVISIBLE] = true; // hide the "AI" bodypart
 	my->sizex = 4;
 	my->sizey = 4;
-	my->mistformGLRender = 2.0;
+	my->mistformGLRender() = 2.0;
 
 	Entity* hologramParent = nullptr;
-	if ( my->monsterSpecialState != 0 )
+	if ( my->monsterSpecialState() != 0 )
 	{
-		hologramParent = uidToEntity(my->monsterSpecialState);
+		hologramParent = uidToEntity(my->monsterSpecialState());
 	}
 	if ( multiplayer != CLIENT )
 	{
@@ -1392,7 +1392,7 @@ void hologramAnimate(Entity* my, Stat* myStats, double dist)
 		{
 			entity->flags[INVISIBLE] = true;
 			entity->flags[INVISIBLE_DITHER] = false;
-			entity->mistformGLRender = my->mistformGLRender;
+			entity->mistformGLRender() = my->mistformGLRender();
 			myLimbs.push_back(entity);
 		}
 	}
@@ -1532,7 +1532,7 @@ void earthElementalDie(Entity* my)
 	spellTimer->x = my->x;
 	spellTimer->y = my->y;
 	spellTimer->z = my->z;
-	spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_DIE;
+	spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_DIE;
 	serverSpawnMiscParticlesAtLocation(spellTimer->x, spellTimer->y, spellTimer->z, PARTICLE_EFFECT_EARTH_ELEMENTAL_DIE, 0);
 
 	playSoundEntity(my, 798, 64);
@@ -1835,7 +1835,7 @@ void earthElementalAnimate(Entity* my, Stat* myStats, double dist)
 		if ( keystatus[SDLK_KP_5] )
 		{
 			my->yaw += 0.05;
-			my->monsterLookDir = my->yaw;
+			my->monsterLookDir() = my->yaw;
 		}
 		if ( keystatus[SDLK_KP_4] )
 		{
@@ -2014,7 +2014,7 @@ void earthElementalAnimate(Entity* my, Stat* myStats, double dist)
 					if ( multiplayer != CLIENT )
 					{
 						Entity* spellTimer = createParticleTimer(my, 35, -1);
-						spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_ROLL;
+						spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_EARTH_ELEMENTAL_ROLL;
 					}
 				}
 				else 
@@ -2030,7 +2030,7 @@ void earthElementalAnimate(Entity* my, Stat* myStats, double dist)
 				}
 			}
 
-			if ( !my->monsterDefend || MONSTER_ATTACK != 0 )
+			if ( !my->monsterDefend() || MONSTER_ATTACK != 0 )
 			{
 				if ( EARTH_DEFEND > 0.0 )
 				{

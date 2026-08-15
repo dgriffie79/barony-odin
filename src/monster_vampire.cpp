@@ -341,7 +341,7 @@ void initVampire(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[VAMPIRE][6][0]; // 1.5
 	entity->focaly = limbs[VAMPIRE][6][1]; // 0
 	entity->focalz = limbs[VAMPIRE][6][2]; // -.5
@@ -362,7 +362,7 @@ void initVampire(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[VAMPIRE][7][0]; // 2
 	entity->focaly = limbs[VAMPIRE][7][1]; // 0
 	entity->focalz = limbs[VAMPIRE][7][2]; // 0
@@ -385,7 +385,7 @@ void initVampire(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[VAMPIRE][8][0]; // 0
 	entity->focaly = limbs[VAMPIRE][8][1]; // 0
 	entity->focalz = limbs[VAMPIRE][8][2]; // 4
@@ -408,7 +408,7 @@ void initVampire(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[VAMPIRE][9][0]; // 0
 	entity->focaly = limbs[VAMPIRE][9][1]; // 0
 	entity->focalz = limbs[VAMPIRE][9][2]; // -1.75
@@ -431,7 +431,7 @@ void initVampire(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[VAMPIRE][10][0]; // 0
 	entity->focaly = limbs[VAMPIRE][10][1]; // 0
 	entity->focalz = limbs[VAMPIRE][10][2]; // .5
@@ -560,7 +560,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		else
 		{
 			my->z = -1;
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				my->pitch = 0;
 			}
@@ -585,8 +585,8 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			// post-swing head animation. client doesn't need to adjust the entity pitch, server will handle.
 			if ( multiplayer != CLIENT && bodypart == 1 )
 			{
-				if ( my->monsterAttack != MONSTER_POSE_VAMPIRE_DRAIN 
-					&& my->monsterAttack != MONSTER_POSE_VAMPIRE_AURA_CHARGE )
+				if ( my->monsterAttack() != MONSTER_POSE_VAMPIRE_DRAIN 
+					&& my->monsterAttack() != MONSTER_POSE_VAMPIRE_AURA_CHARGE )
 				{
 					limbAnimateToLimit(my, ANIMATE_PITCH, 0.1, 0, false, 0.0);
 				}
@@ -608,8 +608,8 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		if ( bodypart == LIMB_HUMANOID_RIGHTLEG || bodypart == LIMB_HUMANOID_LEFTARM )
 		{
 			if ( bodypart == LIMB_HUMANOID_LEFTARM 
-				&& ((my->monsterSpecialState == VAMPIRE_CAST_DRAIN || my->monsterSpecialState == VAMPIRE_CAST_AURA )
-				&& my->monsterAttack != 0) )
+				&& ((my->monsterSpecialState() == VAMPIRE_CAST_DRAIN || my->monsterSpecialState() == VAMPIRE_CAST_AURA )
+				&& my->monsterAttack() != 0) )
 			{
 				// leftarm follows the right arm during special attack
 				// will not work when shield is visible
@@ -651,7 +651,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					Entity* rightbody = nullptr;
 					// set rightbody to left leg.
@@ -676,14 +676,14 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						return;
 					}
 
-					if ( my->monsterAttack == MONSTER_POSE_VAMPIRE_DRAIN )
+					if ( my->monsterAttack() == MONSTER_POSE_VAMPIRE_DRAIN )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							createParticleDot(my);
@@ -701,7 +701,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							limbAnimateToLimit(my, ANIMATE_WEAPON_YAW, 0.25, 2 * PI / 8, false, 0.0);
 						}
 
-						if ( my->monsterAttackTime >= 2 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 2 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -709,18 +709,18 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 								my->attack(MONSTER_POSE_MELEE_WINDUP1, 0, nullptr);
 							}
 						}
-						++my->monsterAttackTime;
+						++my->monsterAttackTime();
 					}
-					else if ( my->monsterAttack == MONSTER_POSE_VAMPIRE_AURA_CHARGE )
+					else if ( my->monsterAttack() == MONSTER_POSE_VAMPIRE_AURA_CHARGE )
 					{
 
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 6 * PI / 4;
 							leftarm->pitch = 6 * PI / 4;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							createParticleDot(my);
@@ -743,14 +743,14 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							limbAnimateToLimit(my, ANIMATE_PITCH, -0.1, 14 * PI / 8, true, 0.1);
 						}
 
-						if ( my->monsterAttackTime >= 6 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 6 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							// reset the limbs
 							weaponarm->skill[0] = rightbody->skill[0];
-							my->monsterWeaponYaw = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->pitch = rightbody->pitch;
 							weaponarm->roll = 0;
-							my->monsterArmbended = 0;
+							my->monsterArmbended() = 0;
 							leftarm->roll = 0;
 							leftarm->pitch = 0;
 							if ( multiplayer != CLIENT )
@@ -758,9 +758,9 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 								my->attack(MONSTER_POSE_VAMPIRE_AURA_CAST, 0, nullptr);
 							}
 						}
-						++my->monsterAttackTime;
+						++my->monsterAttackTime();
 					}
-					else if ( my->monsterAttack == MONSTER_POSE_VAMPIRE_AURA_CAST )
+					else if ( my->monsterAttack() == MONSTER_POSE_VAMPIRE_AURA_CAST )
 					{
 						weaponarm->roll = 0;
 						leftarm->roll = 0;
@@ -953,7 +953,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( tempNode )
 				{
 					Entity* weapon = (Entity*)tempNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[VAMPIRE][4][0]; // 0
@@ -1026,7 +1026,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( tempNode )
 				{
 					Entity* shield = (Entity*)tempNode->element;
-					if ( shield->flags[INVISIBLE] && (my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( shield->flags[INVISIBLE] && (my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if shield invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[VAMPIRE][5][0]; // 0
@@ -1040,14 +1040,14 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						entity->focaly = limbs[VAMPIRE][5][1];
 						entity->focalz = limbs[VAMPIRE][5][2] - 0.75;
 						entity->sprite += 2;
-						if ( my->monsterSpecialState == VAMPIRE_CAST_DRAIN || my->monsterSpecialState == VAMPIRE_CAST_AURA )
+						if ( my->monsterSpecialState() == VAMPIRE_CAST_DRAIN || my->monsterSpecialState() == VAMPIRE_CAST_AURA )
 						{
 							entity->yaw -= MONSTER_WEAPONYAW;
 						}
 					}
 				}
 				my->setHumanoidLimbOffset(entity, VAMPIRE, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1403,7 +1403,7 @@ void vampireMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 void Entity::vampireChooseWeapon(const Entity* target, double dist)
 {
-	if ( monsterSpecialState != 0 )
+	if ( monsterSpecialState() != 0 )
 	{
 		return;
 	}
@@ -1417,7 +1417,7 @@ void Entity::vampireChooseWeapon(const Entity* target, double dist)
 	int specialRoll = -1;
 	int bonusFromHP = 0;
 
-	if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 )
+	if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 )
 	{
 		Stat* targetStats = target->getStats();
 		if ( !targetStats )
@@ -1475,9 +1475,9 @@ void Entity::vampireChooseWeapon(const Entity* target, double dist)
 				if ( node != nullptr )
 				{
 					swapMonsterWeaponWithInventoryItem(this, myStats, node, true, true);
-					monsterSpecialState = VAMPIRE_CAST_AURA;
+					monsterSpecialState() = VAMPIRE_CAST_AURA;
 					serverUpdateEntitySkill(this, 33); // for clients to keep track of animation
-					monsterHitTime = HITRATE * 2; // force immediate attack
+					monsterHitTime() = HITRATE * 2; // force immediate attack
 					return;
 				}
 			}
@@ -1487,9 +1487,9 @@ void Entity::vampireChooseWeapon(const Entity* target, double dist)
 				if ( node != nullptr )
 				{
 					swapMonsterWeaponWithInventoryItem(this, myStats, node, true, true);
-					monsterSpecialState = VAMPIRE_CAST_DRAIN;
+					monsterSpecialState() = VAMPIRE_CAST_DRAIN;
 					serverUpdateEntitySkill(this, 33); // for clients to keep track of animation
-					monsterHitTime = HITRATE * 2; // force immediate attack
+					monsterHitTime() = HITRATE * 2; // force immediate attack
 					return;
 				}
 			}

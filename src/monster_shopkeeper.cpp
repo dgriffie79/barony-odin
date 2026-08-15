@@ -158,9 +158,9 @@ void initShopkeeper(Entity* my, Stat* myStats)
 
 		my->createPathBoundariesNPC();
 
-		for ( int x = my->monsterPathBoundaryXStart - 16; x <= my->monsterPathBoundaryXEnd + 16; x += 16 )
+		for ( int x = my->monsterPathBoundaryXStart() - 16; x <= my->monsterPathBoundaryXEnd() + 16; x += 16 )
 		{
-			for ( int y = my->monsterPathBoundaryYStart - 16; y <= my->monsterPathBoundaryYEnd + 16; y += 16 )
+			for ( int y = my->monsterPathBoundaryYStart() - 16; y <= my->monsterPathBoundaryYEnd() + 16; y += 16 )
 			{
 				if ( x / 16 >= 0 && x / 16 < map.width && y / 16 >= 0 && y / 16 < map.height )
 				{
@@ -255,19 +255,19 @@ void initShopkeeper(Entity* my, Stat* myStats)
 			if ( myStats->MISC_FLAGS[STAT_FLAG_NPC] == 14 )
 			{
 				myStats->MISC_FLAGS[STAT_FLAG_MYSTERIOUS_SHOPKEEP] = 1;
-				my->monsterStoreType = 10;
+				my->monsterStoreType() = 10;
 			}
 			else if ( myStats->MISC_FLAGS[STAT_FLAG_NPC] > 0 )
 			{
-				my->monsterStoreType = myStats->MISC_FLAGS[STAT_FLAG_NPC] - 1;
-				if ( my->monsterStoreType > 9 )
+				my->monsterStoreType() = myStats->MISC_FLAGS[STAT_FLAG_NPC] - 1;
+				if ( my->monsterStoreType() > 9 )
 				{
-					my->monsterStoreType = rng.rand() % 10;
+					my->monsterStoreType() = rng.rand() % 10;
 				}
 			}
 			else
 			{
-				my->monsterStoreType = rng.rand() % 10;
+				my->monsterStoreType() = rng.rand() % 10;
 			}
 			int numitems = 10 + rng.rand() % 5;
 			int blessedShopkeeper = 1; // bless important pieces of gear like armor, jewelry, weapons..
@@ -309,7 +309,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 			}
 
 			int customShopkeeperInUse = ((myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] >> 12) & 0xF);
-			int oldMonsterStoreType = my->monsterStoreType;
+			int oldMonsterStoreType = my->monsterStoreType();
 			if ( customShopkeeperInUse == MonsterStatCustomManager::StatEntry::ShopkeeperCustomFlags::ENABLE_GEN_ITEMS )
 			{
 				if ( (myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] & 0xFF) > 1 )
@@ -323,7 +323,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 			}
 			else if ( customShopkeeperInUse == MonsterStatCustomManager::StatEntry::ShopkeeperCustomFlags::DISABLE_GEN_ITEMS )
 			{
-				my->monsterStoreType = -1;
+				my->monsterStoreType() = -1;
 			}
 
 			bool sellVampireBlood = false;
@@ -351,10 +351,10 @@ void initShopkeeper(Entity* my, Stat* myStats)
 			}
 			bool doneFeather = false;
 			int doneHardwareHat = 0;
-			switch ( my->monsterStoreType )
+			switch ( my->monsterStoreType() )
 			{
 				case -1:
-					my->monsterStoreType = oldMonsterStoreType; // don't generate any items.
+					my->monsterStoreType() = oldMonsterStoreType; // don't generate any items.
 					break;
 				case 0:
 					// arms & armor store
@@ -1062,7 +1062,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 
 		node_t* nextnode;
 		// sort items into slots
-		if ( my->monsterStoreType != 10 )
+		if ( my->monsterStoreType() != 10 )
 		{
 			std::vector<std::pair<int, Item*>> priceAndItems;
 			for ( node_t* node = myStats->inventory.first; node != nullptr; node = nextnode )
@@ -1101,7 +1101,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 
 			slotx = Player::ShopGUI_t::MAX_SHOP_X - 1;
 			sloty = Player::ShopGUI_t::MAX_SHOP_Y - 1;
-			auto generatedItems = generateShopkeeperConsumables(*my, *myStats, my->monsterStoreType);
+			auto generatedItems = generateShopkeeperConsumables(*my, *myStats, my->monsterStoreType());
 			for ( auto it = generatedItems.rbegin(); it != generatedItems.rend(); ++it )
 			{
 				if ( takenSlots.find(slotx + sloty * 100) != takenSlots.end() )
@@ -1246,7 +1246,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHOPKEEPER][6][0]; // 1.5
 	entity->focaly = limbs[SHOPKEEPER][6][1]; // 0
 	entity->focalz = limbs[SHOPKEEPER][6][2]; // -.5
@@ -1267,7 +1267,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHOPKEEPER][7][0]; // 2
 	entity->focaly = limbs[SHOPKEEPER][7][1]; // 0
 	entity->focalz = limbs[SHOPKEEPER][7][2]; // 0
@@ -1290,7 +1290,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHOPKEEPER][8][0]; // 0
 	entity->focaly = limbs[SHOPKEEPER][8][1]; // 0
 	entity->focalz = limbs[SHOPKEEPER][8][2]; // 4
@@ -1313,7 +1313,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHOPKEEPER][9][0]; // 0
 	entity->focaly = limbs[SHOPKEEPER][9][1]; // 0
 	entity->focalz = limbs[SHOPKEEPER][9][2]; // -1.75
@@ -1336,7 +1336,7 @@ void initShopkeeper(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SHOPKEEPER][10][0]; // 0
 	entity->focaly = limbs[SHOPKEEPER][10][1]; // 0
 	entity->focalz = limbs[SHOPKEEPER][10][2]; // .5
@@ -1531,7 +1531,7 @@ void shopkeeperMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(weaponarm);
 				}
@@ -1678,7 +1678,7 @@ void shopkeeperMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SHOPKEEPER][4][0]; // 0
@@ -1712,7 +1712,7 @@ void shopkeeperMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && (my->monsterState != MONSTER_STATE_ATTACK) )
+					if ( shield->flags[INVISIBLE] && (my->monsterState() != MONSTER_STATE_ATTACK) )
 					{
 						// if shield invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SHOPKEEPER][5][0]; // 0

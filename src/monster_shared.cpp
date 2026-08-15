@@ -109,158 +109,158 @@ void Entity::initMonster(int mySprite)
 	switch ( monsterType )
 	{
 		case GNOME:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_SMALL_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_SMALL_HUMANOID;
 			break;
 		case KOBOLD:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_SMALL_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_SMALL_HUMANOID;
 			break;
 		case HUMAN:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case RAT:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case GOBLIN:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SLIME:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case TROLL:
-			monsterFootstepType = MONSTER_FOOTSTEP_STOMP;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_STOMP;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case BAT_SMALL:
 			// unused
 			break;
 		case SPIDER:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case GHOUL:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case SKELETON:
-			monsterFootstepType = MONSTER_FOOTSTEP_SKELETON;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_SKELETON;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SCORPION:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case CREATURE_IMP:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case CRAB:
 			// unused
 			break;
 		case DEMON:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case SUCCUBUS:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case MIMIC:
 		case MINIMIMIC:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case LICH:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case MINOTAUR:
-			monsterFootstepType = MONSTER_FOOTSTEP_STOMP;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_STOMP;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case DEVIL:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case SHOPKEEPER:
-			monsterFootstepType = MONSTER_FOOTSTEP_LEATHER;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_LEATHER;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SCARAB:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case CRYSTALGOLEM:
-			monsterFootstepType = MONSTER_FOOTSTEP_STOMP;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_STOMP;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case INCUBUS:
-			monsterFootstepType = MONSTER_FOOTSTEP_LEATHER;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_LEATHER;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case VAMPIRE:
-			monsterFootstepType = MONSTER_FOOTSTEP_LEATHER;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_LEATHER;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SHADOW:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case COCKATRICE:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case INSECTOID:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case GOATMAN:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case AUTOMATON:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case LICH_ICE:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case LICH_FIRE:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SENTRYBOT:
 		case SPELLBOT:
 		case GYROBOT:
 		case DUMMYBOT:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case BUGBEAR:
-			monsterFootstepType = MONSTER_FOOTSTEP_STOMP;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_STOMP;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 		case DRYAD:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case MYCONID:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case SALAMANDER:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case GREMLIN:
-			monsterFootstepType = MONSTER_FOOTSTEP_USE_BOOTS;
-			monsterSpellAnimation = MONSTER_SPELLCAST_HUMANOID;
+			monsterFootstepType() = MONSTER_FOOTSTEP_USE_BOOTS;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_HUMANOID;
 			break;
 		case REVENANT_SKULL:
 		case MONSTER_ADORCISED_WEAPON:
@@ -275,8 +275,8 @@ void Entity::initMonster(int mySprite)
 			// unused
 			break;
 		default:
-			monsterFootstepType = MONSTER_FOOTSTEP_NONE;
-			monsterSpellAnimation = MONSTER_SPELLCAST_NONE;
+			monsterFootstepType() = MONSTER_FOOTSTEP_NONE;
+			monsterSpellAnimation() = MONSTER_SPELLCAST_NONE;
 			break;
 	}
 	return;
@@ -385,13 +385,13 @@ void Entity::actMonsterLimb(bool processLight)
 		}
 	}
 
-	if ( parentEnt && parentEnt->behavior == &actMonster && parentEnt->monsterEntityRenderAsTelepath != 0 )
+	if ( parentEnt && parentEnt->behavior == &actMonster && parentEnt->monsterEntityRenderAsTelepath() != 0 )
 	{
-		monsterEntityRenderAsTelepath = parentEnt->monsterEntityRenderAsTelepath;
+		monsterEntityRenderAsTelepath() = parentEnt->monsterEntityRenderAsTelepath();
 	}
 	else
 	{
-		monsterEntityRenderAsTelepath = 0;
+		monsterEntityRenderAsTelepath() = 0;
 	}
 }
 

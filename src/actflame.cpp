@@ -133,10 +133,10 @@ Entity* spawnFlameSprites(Entity* parentent, Sint32 sprite)
 		fx->fskill[0] = fx->x;
 		fx->fskill[1] = fx->y;
 		fx->vel_z = -0.25;
-		fx->actmagicOrbitDist = 0;
+		fx->actmagicOrbitDist() = 0;
 		fx->fskill[2] = parentent->yaw + (local_rng.rand() % 8) * PI / 4.0;
 		fx->yaw = fx->fskill[2];
-		fx->actmagicNoLight = 1;
+		fx->actmagicNoLight() = 1;
 		return fx;
 	}
 	return nullptr;

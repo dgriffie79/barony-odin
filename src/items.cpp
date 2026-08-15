@@ -49,7 +49,7 @@ bool autoHotbarSoftReserveItem(Item& item)
 
 void autoHotbarTryAdd(const int player, Item& item)
 {
-	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+	if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 	{
 		if ( !item.usableWhileShapeshifted(stats[player]) )
 		{
@@ -334,7 +334,7 @@ ItemType itemLevelCurveEntity(Entity& my, Category cat, int minLevel, int maxLev
 	if ( my.behavior == &actMonster && (my.getMonsterTypeFromSprite() == SHOPKEEPER || my.monsterCanTradeWith(-1)) )
 	{
 		itemLevelCurveType = ITEM_LEVEL_CURVE_TYPE_SHOP;
-		itemLevelCurveShop = my.monsterStoreType;
+		itemLevelCurveShop = my.monsterStoreType();
 	}
 	else if ( my.behavior == &actChest )
 	{
@@ -361,7 +361,7 @@ bool itemLevelCurvePostProcess(Entity* my, Item* item, BaronyRNG& rng, int itemL
 		if ( my->behavior == &actMonster && (my->getMonsterTypeFromSprite() == SHOPKEEPER || my->monsterCanTradeWith(-1)) )
 		{
 			itemLevelCurveType = ITEM_LEVEL_CURVE_TYPE_SHOP;
-			itemLevelCurveShop = my->monsterStoreType;
+			itemLevelCurveShop = my->monsterStoreType();
 		}
 		else if ( my->behavior == &actChest )
 		{
@@ -1650,7 +1650,7 @@ bool playerGreasyDropItem(const int player, Item* const item)
 			if ( !players[player]->entity ) { return false; }
 			bool canDrop = false;
 			bool shapeshifted = false;
-			if ( players[player]->entity->effectShapeshift != NOTHING )
+			if ( players[player]->entity->effectShapeshift() != NOTHING )
 			{
 				shapeshifted = true;
 			}
@@ -1733,7 +1733,7 @@ bool playerGreasyDropItem(const int player, Item* const item)
 		entity->skill[14] = item->appearance;
 		entity->skill[15] = item->identified;
 		entity->parent = players[player]->entity->getUID();
-		entity->itemOriginalOwner = entity->parent;
+		entity->itemOriginalOwner() = entity->parent;
 
 		// play sound - not in the same tick
 		if ( ticks - dropItemSfxTicks[player] > 1 )
@@ -1921,7 +1921,7 @@ bool dropItem(Item* const item, const int player, const bool notifyMessage, cons
 		entity->skill[14] = item->appearance;
 		entity->skill[15] = item->identified;
 		entity->parent = players[player]->entity->getUID();
-		entity->itemOriginalOwner = entity->parent;
+		entity->itemOriginalOwner() = entity->parent;
 
 		// play sound - not in the same tick
 		if ( ticks - dropItemSfxTicks[player] > 1 )
@@ -2017,11 +2017,11 @@ Entity* dropItemMonster(Item* const item, Entity* const monster, Stat* const mon
 	}*/
 	if ( monsterStats )
 	{
-		if ( monsterStats->monsterNoDropItems == 1 )
+		if ( monsterStats->monsterNoDropItems() == 1 )
 		{
 			itemDroppable = false;
 		}
-		if ( monsterStats->type == SKELETON && monster->behavior == &actMonster && monster->monsterAllySummonRank != 0 )
+		if ( monsterStats->type == SKELETON && monster->behavior == &actMonster && monster->monsterAllySummonRank() != 0 )
 		{
 			itemDroppable = false;
 		}
@@ -2149,7 +2149,7 @@ Entity* dropItemMonster(Item* const item, Entity* const monster, Stat* const mon
 		entity->skill[13] = count;
 		entity->skill[14] = item->appearance;
 		entity->skill[15] = item->identified;
-		entity->itemOriginalOwner = item->ownerUid;
+		entity->itemOriginalOwner() = item->ownerUid;
 		entity->parent = monster->getUID();
 
 		if ( monsterStats )
@@ -2161,9 +2161,9 @@ Entity* dropItemMonster(Item* const item, Entity* const monster, Stat* const mon
 				{
 					if ( players[c] && players[c]->entity )
 					{
-						if ( entity->itemOriginalOwner == players[c]->entity->getUID() )
+						if ( entity->itemOriginalOwner() == players[c]->entity->getUID() )
 						{
-							entity->itemStolen = 1;
+							entity->itemStolen() = 1;
 							break;
 						}
 					}
@@ -3094,7 +3094,7 @@ void useItem(Item* item, const int player, Entity* usedBy, bool unequipForDroppi
 					const Uint32 color = makeColorRGB(255, 128, 0);
 					messagePlayerColor(player, MESSAGE_STATUS, color, Language::get(3699)); // superheats
 					serverUpdateHunger(player);
-					if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+					if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 					{
 						steamStatisticUpdateClient(player, STEAM_STAT_SPICY, STEAM_STAT_INT, 1);
 						steamStatisticUpdateClient(player, STEAM_STAT_FASCIST, STEAM_STAT_INT, 1);
@@ -4067,7 +4067,7 @@ Item* itemPickup(const int player, Item* const item, Item* addToSpecificInventor
 		if ( item2->type == TOOL_DUCK && !stats[player]->shield )
 		{
 			bool shapeshifted = false;
-			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 			{
 				shapeshifted = true;
 			}
@@ -4465,8 +4465,8 @@ Item* newItemFromEntity(const Entity* const entity, bool discardUid)
 		--itemuids;
 		item->uid = 0;
 	}
-	item->ownerUid = static_cast<Uint32>(entity->itemOriginalOwner);
-	item->interactNPCUid = static_cast<Uint32>(entity->interactedByMonster);
+	item->ownerUid = static_cast<Uint32>(entity->itemOriginalOwner());
+	item->interactNPCUid = static_cast<Uint32>(entity->interactedByMonster());
 	return item;
 }
 
@@ -4613,7 +4613,7 @@ Sint32 Item::weaponGetAttack(const Stat* const wielder) const
 				}
 			}
 		}
-		if ( wielder->type == INCUBUS && wielder->playerRace == 0 && !strncmp(wielder->name, "inner demon", strlen("inner demon")) )
+		if ( wielder->type == INCUBUS && wielder->playerRace() == 0 && !strncmp(wielder->name, "inner demon", strlen("inner demon")) )
 		{
 			return -9999;
 		}
@@ -6168,7 +6168,7 @@ void Item::applyLockpickToWall(const int player, const int x, const int y) const
 				{
 					const int skill = std::max(1, stats[player]->getModifiedProficiency(PRO_LOCKPICKING) / 10);
 					bool failed = false;
-					if ( entity->actTrapSabotaged == 0 )
+					if ( entity->actTrapSabotaged() == 0 )
 					{
 						if ( skill < 2 || local_rng.rand() % skill == 0 ) // 20 skill requirement.
 						{
@@ -6828,7 +6828,7 @@ bool Item::isThisABetterArmor(const Item& newArmor, const Item* const armorAlrea
 	{
 		if ( FollowerMenu[i].entityToInteractWith )
 		{
-			if ( newArmor.interactNPCUid == FollowerMenu[i].entityToInteractWith->interactedByMonster )
+			if ( newArmor.interactNPCUid == FollowerMenu[i].entityToInteractWith->interactedByMonster() )
 			{
 				return true;
 			}

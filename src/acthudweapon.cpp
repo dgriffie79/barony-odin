@@ -121,29 +121,29 @@ void actHudArm(Entity* my)
 	my->y = parent->y;
 	my->z = parent->z - 2.5;
 
-	my->mistformGLRender = players[HUDARM_PLAYERNUM]->entity->mistformGLRender > 0.9 ? players[HUDARM_PLAYERNUM]->entity->mistformGLRender
+	my->mistformGLRender() = players[HUDARM_PLAYERNUM]->entity->mistformGLRender() > 0.9 ? players[HUDARM_PLAYERNUM]->entity->mistformGLRender()
 		: 0.0;
 
-	Monster playerRace = players[HUDARM_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDARM_PLAYERNUM]->playerRace);
+	Monster playerRace = players[HUDARM_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDARM_PLAYERNUM]->playerRace());
 	int playerAppearance = stats[HUDARM_PLAYERNUM]->stat_appearance;
-	if ( players[HUDARM_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+	if ( players[HUDARM_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 	{
-		playerRace = static_cast<Monster>(players[HUDARM_PLAYERNUM]->entity->effectShapeshift);
+		playerRace = static_cast<Monster>(players[HUDARM_PLAYERNUM]->entity->effectShapeshift());
 		if ( playerRace == RAT || playerRace == SPIDER )
 		{
 			HUD_SHAPESHIFT_HIDE = 1;
 		}
 	}
-	else if ( players[HUDARM_PLAYERNUM]->entity->effectPolymorph != NOTHING )
+	else if ( players[HUDARM_PLAYERNUM]->entity->effectPolymorph() != NOTHING )
 	{
-		if ( players[HUDARM_PLAYERNUM]->entity->effectPolymorph > NUMMONSTERS )
+		if ( players[HUDARM_PLAYERNUM]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			playerRace = HUMAN;
-			playerAppearance = players[HUDARM_PLAYERNUM]->entity->effectPolymorph - 100;
+			playerAppearance = players[HUDARM_PLAYERNUM]->entity->effectPolymorph() - 100;
 		}
 		else
 		{
-			playerRace = static_cast<Monster>(players[HUDARM_PLAYERNUM]->entity->effectPolymorph);
+			playerRace = static_cast<Monster>(players[HUDARM_PLAYERNUM]->entity->effectPolymorph());
 		}
 	}
 
@@ -492,14 +492,14 @@ void actHudWeapon(Entity* my)
 	}
 
 	if ( players[HUDWEAPON_PLAYERNUM] == nullptr || players[HUDWEAPON_PLAYERNUM]->entity == nullptr
-		|| (players[HUDWEAPON_PLAYERNUM]->entity && players[HUDWEAPON_PLAYERNUM]->entity->playerCreatedDeathCam != 0) )
+		|| (players[HUDWEAPON_PLAYERNUM]->entity && players[HUDWEAPON_PLAYERNUM]->entity->playerCreatedDeathCam() != 0) )
 	{
 		playerHud.weapon = nullptr; //PLAYER DEAD. NULLIFY THIS.
 		list_RemoveNode(my->mynode);
 		return;
 	}
 
-	my->mistformGLRender = players[HUDWEAPON_PLAYERNUM]->entity->mistformGLRender > 0.9 ? players[HUDWEAPON_PLAYERNUM]->entity->mistformGLRender
+	my->mistformGLRender() = players[HUDWEAPON_PLAYERNUM]->entity->mistformGLRender() > 0.9 ? players[HUDWEAPON_PLAYERNUM]->entity->mistformGLRender()
 		: 0.0;
 
 	// reduce throwGimpTimer (allows player to throw items again)
@@ -537,22 +537,22 @@ void actHudWeapon(Entity* my)
 		}
 	}
 
-	Monster playerRace = players[HUDWEAPON_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDWEAPON_PLAYERNUM]->playerRace);
+	Monster playerRace = players[HUDWEAPON_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDWEAPON_PLAYERNUM]->playerRace());
 	int playerAppearance = stats[HUDWEAPON_PLAYERNUM]->stat_appearance;
-	if ( players[HUDWEAPON_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+	if ( players[HUDWEAPON_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 	{
-		playerRace = static_cast<Monster>(players[HUDWEAPON_PLAYERNUM]->entity->effectShapeshift);
+		playerRace = static_cast<Monster>(players[HUDWEAPON_PLAYERNUM]->entity->effectShapeshift());
 	}
-	else if ( players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph != NOTHING )
+	else if ( players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph() != NOTHING )
 	{
-		if ( players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph > NUMMONSTERS )
+		if ( players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			playerRace = HUMAN;
-			playerAppearance = players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph - 100;
+			playerAppearance = players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph() - 100;
 		}
 		else
 		{
-			playerRace = static_cast<Monster>(players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph);
+			playerRace = static_cast<Monster>(players[HUDWEAPON_PLAYERNUM]->entity->effectPolymorph());
 		}
 	}
 
@@ -1413,8 +1413,8 @@ void actHudWeapon(Entity* my)
 
 									if ( heavyCrossbow )
 									{
-										players[HUDWEAPON_PLAYERNUM]->entity->playerStrafeVelocity = 0.3;
-										players[HUDWEAPON_PLAYERNUM]->entity->playerStrafeDir = players[HUDWEAPON_PLAYERNUM]->entity->yaw + PI;
+										players[HUDWEAPON_PLAYERNUM]->entity->playerStrafeVelocity() = 0.3;
+										players[HUDWEAPON_PLAYERNUM]->entity->playerStrafeDir() = players[HUDWEAPON_PLAYERNUM]->entity->yaw + PI;
 										if ( multiplayer != CLIENT )
 										{
 											players[HUDWEAPON_PLAYERNUM]->entity->setEffect(EFF_KNOCKBACK, true, 30, false);
@@ -4136,50 +4136,50 @@ void actHudShield(Entity* my)
 		return;
 	}
 
-	Monster playerRace = players[HUDSHIELD_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDSHIELD_PLAYERNUM]->playerRace);
-	if ( players[HUDSHIELD_PLAYERNUM]->entity->effectShapeshift != NOTHING )
+	Monster playerRace = players[HUDSHIELD_PLAYERNUM]->entity->getMonsterFromPlayerRace(stats[HUDSHIELD_PLAYERNUM]->playerRace());
+	if ( players[HUDSHIELD_PLAYERNUM]->entity->effectShapeshift() != NOTHING )
 	{
-		playerRace = static_cast<Monster>(players[HUDSHIELD_PLAYERNUM]->entity->effectShapeshift);
+		playerRace = static_cast<Monster>(players[HUDSHIELD_PLAYERNUM]->entity->effectShapeshift());
 		if ( playerRace == RAT || playerRace == SPIDER )
 		{
 			HUD_SHAPESHIFT_HIDE = 1;
 		}
 	}
-	else if ( players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph != NOTHING )
+	else if ( players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph() != NOTHING )
 	{
-		if ( players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph > NUMMONSTERS )
+		if ( players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			playerRace = HUMAN;
 		}
 		else
 		{
-			playerRace = static_cast<Monster>(players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph);
+			playerRace = static_cast<Monster>(players[HUDSHIELD_PLAYERNUM]->entity->effectPolymorph());
 		}
 	}
 
-	my->mistformGLRender = 0.0;
+	my->mistformGLRender() = 0.0;
 	if ( playerRace != SPIDER )
 	{
-		if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender > 0.05 )
+		if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender() > 0.05 )
 		{
-			real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender, 1.0);
+			real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender(), 1.0);
 			if ( modulus >= 0.05 && modulus < 0.15 ) // force shield
 			{
-				my->mistformGLRender = 0.5;
+				my->mistformGLRender() = 0.5;
 			}
 			else if ( modulus >= 0.15 && modulus < 0.25 ) // reflector shield
 			{
-				my->mistformGLRender = 0.6;
+				my->mistformGLRender() = 0.6;
 			}
 			else
 			{
-				my->mistformGLRender = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender;
+				my->mistformGLRender() = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender();
 			}
 		}
 	}
 	else if ( playerRace == SPIDER )
 	{
-		my->mistformGLRender = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender > 0.9 ? players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender
+		my->mistformGLRender() = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender() > 0.9 ? players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender()
 			: 0.0;
 	}
 
@@ -4436,11 +4436,11 @@ void actHudShield(Entity* my)
 	}
 	if ( sneaking && (!defending && !wouldBeDefending) )
 	{
-		stats[HUDSHIELD_PLAYERNUM]->sneaking = true;
+		stats[HUDSHIELD_PLAYERNUM]->sneaking() = true;
 	}
 	else
 	{
-		stats[HUDSHIELD_PLAYERNUM]->sneaking = false;
+		stats[HUDSHIELD_PLAYERNUM]->sneaking() = false;
 	}
 
 	if (multiplayer == CLIENT)
@@ -5218,7 +5218,7 @@ void actHudAdditional2(Entity* my)
 		hudFlail.needsInit = false;
 	}
 
-	my->mistformGLRender = weaponLimb->mistformGLRender;
+	my->mistformGLRender() = weaponLimb->mistformGLRender();
 	my->sprite = 1922;
 	//my->flags[OVERDRAW] = false;
 	my->x = weaponLimb->x;
@@ -5438,21 +5438,21 @@ void actHudAdditional(Entity* my)
 		return;
 	}
 
-	my->mistformGLRender = 0.0;
-	if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender > 0.05 )
+	my->mistformGLRender() = 0.0;
+	if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender() > 0.05 )
 	{
-		real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender, 1.0);
+		real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender(), 1.0);
 		if ( modulus >= 0.05 && modulus < 0.15 ) // force shield
 		{
-			my->mistformGLRender = 0.5;
+			my->mistformGLRender() = 0.5;
 		}
 		else if ( modulus >= 0.15 && modulus < 0.25 ) // reflector shield
 		{
-			my->mistformGLRender = 0.6;
+			my->mistformGLRender() = 0.6;
 		}
 		else
 		{
-			my->mistformGLRender = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender;
+			my->mistformGLRender() = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender();
 		}
 	}
 
@@ -5746,21 +5746,21 @@ void actHudArrowModel(Entity* my)
 		return;
 	}
 
-	my->mistformGLRender = 0.0;
-	if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender > 0.05 )
+	my->mistformGLRender() = 0.0;
+	if ( players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender() > 0.05 )
 	{
-		real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender, 1.0);
+		real_t modulus = fmod(players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender(), 1.0);
 		if ( modulus >= 0.05 && modulus < 0.15 ) // force shield
 		{
-			my->mistformGLRender = 0.5;
+			my->mistformGLRender() = 0.5;
 		}
 		else if ( modulus >= 0.15 && modulus < 0.25 ) // reflector shield
 		{
-			my->mistformGLRender = 0.6;
+			my->mistformGLRender() = 0.6;
 		}
 		else
 		{
-			my->mistformGLRender = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender;
+			my->mistformGLRender() = players[HUDSHIELD_PLAYERNUM]->entity->mistformGLRender();
 		}
 	}
 

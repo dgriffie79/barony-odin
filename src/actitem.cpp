@@ -49,7 +49,7 @@
 
 bool itemProcessReturnItemEffect(Entity* my, bool fallingIntoVoid)
 {
-	if ( Entity* returnToParent = uidToEntity(my->itemReturnUID) )
+	if ( Entity* returnToParent = uidToEntity(my->itemReturnUID()) )
 	{
 		int returnTime = std::max(10, std::max(getSpellDamageSecondaryFromID(SPELL_RETURN_ITEMS, returnToParent, nullptr, returnToParent, 0.0, false),
 			getSpellDamageFromID(SPELL_RETURN_ITEMS, returnToParent, nullptr, returnToParent, 0.0, false)));
@@ -73,7 +73,7 @@ bool itemProcessReturnItemEffect(Entity* my, bool fallingIntoVoid)
 					messagePlayerColor(returnToParent->skill[2], MESSAGE_COMBAT, makeColorRGB(255, 0, 0), Language::get(6813), item->getName());
 					free(item);
 				}
-				my->itemReturnUID = 0;
+				my->itemReturnUID() = 0;
 			}
 			else
 			{
@@ -139,7 +139,7 @@ void onItemPickedUp(Entity& who, Uint32 itemUid)
 					}
 				}
 			}
-			else if ( who.behavior == &actMonster && who.monsterAllyIndex >= 0 && who.monsterAllyIndex < MAXPLAYERS && who.getStats() )
+			else if ( who.behavior == &actMonster && who.monsterAllyIndex() >= 0 && who.monsterAllyIndex() < MAXPLAYERS && who.getStats() )
 			{
 				std::string allyName = who.getStats()->name;
 				if ( allyName == "" )
@@ -147,13 +147,13 @@ void onItemPickedUp(Entity& who, Uint32 itemUid)
 					allyName = getMonsterLocalizedName(who.getStats()->type);
 				}
 
-				messagePlayerColor(who.monsterAllyIndex, MESSAGE_HINT, makeColorRGB(255, 255, 0), Language::get(6944), allyName.c_str()); // your ally %s discovered a gift
+				messagePlayerColor(who.monsterAllyIndex(), MESSAGE_HINT, makeColorRGB(255, 255, 0), Language::get(6944), allyName.c_str()); // your ally %s discovered a gift
 
 				for ( int player2 = 0; player2 < MAXPLAYERS; ++player2 ) // relay to other players
 				{
-					if ( player2 != who.monsterAllyIndex && !client_disconnected[player2] )
+					if ( player2 != who.monsterAllyIndex() && !client_disconnected[player2] )
 					{
-						messagePlayerColor(player2, MESSAGE_HINT, makeColorRGB(255, 255, 0), Language::get(6945), stats[who.monsterAllyIndex]->name, allyName.c_str()); // %s's ally %s discovered a gift
+						messagePlayerColor(player2, MESSAGE_HINT, makeColorRGB(255, 255, 0), Language::get(6945), stats[who.monsterAllyIndex()]->name, allyName.c_str()); // %s's ally %s discovered a gift
 					}
 				}
 			}
@@ -296,7 +296,7 @@ bool jewelItemRecruit(Entity* parent, Entity* entity, int itemStatus, const char
 			messagePlayerMonsterEvent(parent->skill[2], makeColorRGB(0, 255, 0), *entitystats, Language::get(6954), Language::get(6955), MSG_COMBAT);
 			Compendium_t::Events_t::eventUpdateMonster(parent->skill[2], Compendium_t::CPDM_RECRUITED, entity, 1);
 
-			if ( stats[parent->skill[2]]->playerRace == RACE_GNOME && stats[parent->skill[2]]->stat_appearance == 0 )
+			if ( stats[parent->skill[2]]->playerRace() == RACE_GNOME && stats[parent->skill[2]]->stat_appearance == 0 )
 			{
 				steamStatisticUpdateClient(parent->skill[2], STEAM_STAT_MERCENARY_ARMY, STEAM_STAT_INT, 1);
 			}
@@ -323,14 +323,14 @@ bool jewelItemRecruit(Entity* parent, Entity* entity, int itemStatus, const char
 			{
 				Compendium_t::Events_t::eventUpdateWorld(parent->skill[2], Compendium_t::CPDM_MERLINS, "magicians guild", 1);
 			}
-			entity->monsterAllyIndex = parent->skill[2];
+			entity->monsterAllyIndex() = parent->skill[2];
 			if ( multiplayer == SERVER )
 			{
 				serverUpdateEntitySkill(entity, 42); // update monsterAllyIndex for clients.
 			}
 		}
 
-		if ( entity->monsterTarget == parent->getUID() )
+		if ( entity->monsterTarget() == parent->getUID() )
 		{
 			entity->monsterReleaseAttackTarget();
 		}
@@ -459,7 +459,7 @@ void actItem(Entity* my)
 			net_packet->len = 9;
 			sendPacketSafe(net_sock, -1, net_packet, 0);
 		}
-		else if ( my->skill[10] == 0 && my->itemReceivedDetailsFromServer == 0 && players[clientnum] )
+		else if ( my->skill[10] == 0 && my->itemReceivedDetailsFromServer() == 0 && players[clientnum] )
 		{
 			// request itemtype and beatitude
 			bool requestUpdate = false;
@@ -497,7 +497,7 @@ void actItem(Entity* my)
 	{
 		// select appropriate model
 		my->skill[2] = -5;
-		if ( my->itemSokobanReward != 1 && my->itemContainer == 0 )
+		if ( my->itemSokobanReward() != 1 && my->itemContainer() == 0 )
 		{
 			my->flags[INVISIBLE] = false;
 		}
@@ -604,7 +604,7 @@ void actItem(Entity* my)
 		Uint32 myUid = my->getUID();
 		if ( my->isInteractWithMonster() )
 		{
-			Entity* monsterInteracting = uidToEntity(my->interactedByMonster);
+			Entity* monsterInteracting = uidToEntity(my->interactedByMonster());
 			if ( monsterInteracting )
 			{
 				if ( my->skill[10] >= 0 && my->skill[10] < NUMITEMS )
@@ -616,7 +616,7 @@ void actItem(Entity* my)
 							if ( monsterInteracting->monsterAllyGetPlayerLeader() )
 							{
 								// "can't carry anymore!"
-								messagePlayer(monsterInteracting->monsterAllyIndex, MESSAGE_HINT, Language::get(3637));
+								messagePlayer(monsterInteracting->monsterAllyIndex(), MESSAGE_HINT, Language::get(3637));
 							}
 						}
 						else
@@ -648,7 +648,7 @@ void actItem(Entity* my)
 								if ( monsterInteracting->monsterAllyGetPlayerLeader() )
 								{
 									// "can't carry anymore!"
-									messagePlayer(monsterInteracting->monsterAllyIndex, MESSAGE_HINT, Language::get(3637));
+									messagePlayer(monsterInteracting->monsterAllyIndex(), MESSAGE_HINT, Language::get(3637));
 								}
 							}
 							else
@@ -656,34 +656,34 @@ void actItem(Entity* my)
 								Entity* leader = monsterInteracting->monsterAllyGetPlayerLeader();
 								if ( leader )
 								{
-									achievementObserver.playerAchievements[monsterInteracting->monsterAllyIndex].checkPathBetweenObjects(leader, copyOfItem, AchievementObserver::BARONY_ACH_LEVITANT_LACKEY);
+									achievementObserver.playerAchievements[monsterInteracting->monsterAllyIndex()].checkPathBetweenObjects(leader, copyOfItem, AchievementObserver::BARONY_ACH_LEVITANT_LACKEY);
 								}
 							}
 							list_RemoveNode(copyOfItem->mynode);
 							copyOfItem = nullptr;
-							if ( pickedUpItem && monsterInteracting->monsterAllyIndex >= 0 )
+							if ( pickedUpItem && monsterInteracting->monsterAllyIndex() >= 0 )
 							{
 								onItemPickedUp(*monsterInteracting, myUid);
-								FollowerMenu[monsterInteracting->monsterAllyIndex].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
+								FollowerMenu[monsterInteracting->monsterAllyIndex()].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
 								return;
 							}
 						}
 					}
 					else if ( items[my->skill[10]].category == Category::FOOD && monsterInteracting->getMonsterTypeFromSprite() != SLIME )
 					{
-						if ( monsterInteracting->monsterConsumeFoodEntity(my, monsterInteracting->getStats()) && monsterInteracting->monsterAllyIndex >= 0 )
+						if ( monsterInteracting->monsterConsumeFoodEntity(my, monsterInteracting->getStats()) && monsterInteracting->monsterAllyIndex() >= 0 )
 						{
 							onItemPickedUp(*monsterInteracting, myUid);
-							FollowerMenu[monsterInteracting->monsterAllyIndex].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
+							FollowerMenu[monsterInteracting->monsterAllyIndex()].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
 							return;
 						}
 					}
 					else
 					{
-						if ( monsterInteracting->monsterAddNearbyItemToInventory(monsterInteracting->getStats(), 24, 9, my) && monsterInteracting->monsterAllyIndex >= 0 )
+						if ( monsterInteracting->monsterAddNearbyItemToInventory(monsterInteracting->getStats(), 24, 9, my) && monsterInteracting->monsterAllyIndex() >= 0 )
 						{
 							onItemPickedUp(*monsterInteracting, myUid);
-							FollowerMenu[monsterInteracting->monsterAllyIndex].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
+							FollowerMenu[monsterInteracting->monsterAllyIndex()].entityToInteractWith = nullptr; // in lieu of my->clearMonsterInteract, my might have been deleted.
 							return;
 						}
 					}
@@ -694,7 +694,7 @@ void actItem(Entity* my)
 			my->clearMonsterInteract();
 		}
 
-		if ( my->itemReturnUID != 0 )
+		if ( my->itemReturnUID() != 0 )
 		{
 			if ( itemProcessReturnItemEffect(my, false) )
 			{
@@ -713,8 +713,8 @@ void actItem(Entity* my)
 					my->vel_y += 1.0 * sin(players[i]->ghost.my->yaw);
 					my->z = std::max(my->z - 0.1, 0.0);
 					my->vel_z = 2 * (-10 - local_rng.rand() % 20) * .01;
-					my->itemNotMoving = 0;
-					my->itemNotMovingClient = 0;
+					my->itemNotMoving() = 0;
+					my->itemNotMovingClient() = 0;
 					my->flags[USERFLAG1] = false; // enable collision
 					if ( multiplayer == SERVER )
 					{
@@ -742,27 +742,27 @@ void actItem(Entity* my)
 				else if ( inrange[i] && players[i] && players[i]->entity )
 				{
 					bool trySalvage = false;
-					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer) == players[i]->entity->getUID() )
+					if ( static_cast<Uint32>(my->itemAutoSalvageByPlayer()) == players[i]->entity->getUID() )
 					{
 						trySalvage = true;
-						my->itemAutoSalvageByPlayer = 0; // clear interact flag.
+						my->itemAutoSalvageByPlayer() = 0; // clear interact flag.
 					}
 					if ( !trySalvage )
 					{
 						playSoundEntity( players[i]->entity, 35 + local_rng.rand() % 3, 64 );
 					}
 					Item* item2 = newItemFromEntity(my);
-					if ( my->itemStolen == 1 && item2 && (static_cast<Uint32>(item2->ownerUid) == players[i]->entity->getUID()) )
+					if ( my->itemStolen() == 1 && item2 && (static_cast<Uint32>(item2->ownerUid) == players[i]->entity->getUID()) )
 					{
 						steamAchievementClient(i, "BARONY_ACH_REPOSSESSION");
 					}
-					if ( my->itemGerminateResult == 1 )
+					if ( my->itemGerminateResult() == 1 )
 					{
 						if ( item2->type == FOOD_NUT || item2->type == FOOD_SHROOM )
 						{
-							if ( achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner) >= 0 )
+							if ( achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner()) >= 0 )
 							{
-								int owner = achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner);
+								int owner = achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner());
 								achievementObserver.playerAchievements[owner].eatMe++;
 							}
 						}
@@ -770,8 +770,8 @@ void actItem(Entity* my)
 					if ( GenericGUI[i].isItemRation(item2->type)
 						&& stats[i]->HUNGER <= getEntityHungerInterval(i, nullptr, stats[i], HUNGER_INTERVAL_HUNGRY) )
 					{
-						if ( achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner) >= 0
-							&& achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner) != i )
+						if ( achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner()) >= 0
+							&& achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner()) != i )
 						{
 							steamAchievementClient(i, "BARONY_ACH_SECOND_BREAKFAST");
 						}
@@ -822,7 +822,7 @@ void actItem(Entity* my)
 									item->count = pickedUpCount;
 									messagePlayer(i, MESSAGE_INTERACTION | MESSAGE_INVENTORY, Language::get(504), item->description());
 									item->count = oldcount;
-									if ( itemCategory(item) == FOOD && my->itemShowOnMap != 0
+									if ( itemCategory(item) == FOOD && my->itemShowOnMap() != 0
 										&& stats[i] && stats[i]->type == RAT )
 									{
 										Entity* parent = uidToEntity(my->parent);
@@ -931,11 +931,11 @@ void actItem(Entity* my)
 
 	bool levitating = false;
 	Entity* leader = nullptr;
-	if ( my->itemFollowUID != 0 )
+	if ( my->itemFollowUID() != 0 )
 	{
 		if ( multiplayer != CLIENT )
 		{
-			if ( leader = uidToEntity(my->itemFollowUID) )
+			if ( leader = uidToEntity(my->itemFollowUID()) )
 			{
 				Stat* leaderStats = leader->getStats();
 				real_t dist = entityDist(leader, my);
@@ -944,7 +944,7 @@ void actItem(Entity* my)
 					getSpellDamageFromID(SPELL_ATTRACT_ITEMS, leader, nullptr, leader)));
 				if ( dist > maxDist + 4.0 || (leaderStats && !leaderStats->getEffectActive(EFF_ATTRACT_ITEMS)) )
 				{
-					my->itemFollowUID = 0;
+					my->itemFollowUID() = 0;
 					serverUpdateEntitySkill(my, 30);
 					leader = nullptr;
 				}
@@ -969,8 +969,8 @@ void actItem(Entity* my)
 		else
 		{
 			levitating = true;
-			my->itemNotMoving = 0;
-			my->itemNotMovingClient = 0;
+			my->itemNotMoving() = 0;
+			my->itemNotMovingClient() = 0;
 			my->flags[UPDATENEEDED] = true;
 			my->flags[NOUPDATE] = false;
 		}
@@ -991,7 +991,7 @@ void actItem(Entity* my)
 		}
 	}
 
-	if ( my->itemNotMoving )
+	if ( my->itemNotMoving() )
 	{
 		switch ( my->sprite )
 		{
@@ -1013,7 +1013,7 @@ void actItem(Entity* my)
 		if ( multiplayer == CLIENT )
 		{
 			// let the client process some more gravity and make sure it isn't stopping early at an awkward angle.
-			if ( my->itemNotMovingClient == 1 )
+			if ( my->itemNotMovingClient() == 1 )
 			{
 				return;
 			}
@@ -1069,13 +1069,13 @@ void actItem(Entity* my)
 		/*ITEM_VELZ += 0.04;
 		ITEM_VELZ = std::min(0.0, ITEM_VELZ);
 		my->z += ITEM_VELZ;*/
-		my->z = my->itemLevitateStartZ * my->itemLevitate;
+		my->z = my->itemLevitateStartZ() * my->itemLevitate();
 		my->z = std::min(groundheight - 0.1, my->z);
 		my->z = std::max(my->z, -7.5);
 		my->vel_z = 0.0;
 		
-		real_t diff = std::max(0.025, my->itemLevitate / 10.0);
-		my->itemLevitate = std::max(0.0, my->itemLevitate - diff);
+		real_t diff = std::max(0.025, my->itemLevitate() / 10.0);
+		my->itemLevitate() = std::max(0.0, my->itemLevitate() - diff);
 
 		my->yaw += PI / (TICKS_PER_SECOND * 10);
 		my->new_yaw = my->yaw;
@@ -1250,7 +1250,7 @@ void actItem(Entity* my)
 	{
 		if ( multiplayer != CLIENT )
 		{
-			int playerOwner = achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner);
+			int playerOwner = achievementObserver.checkUidIsFromPlayer(my->itemOriginalOwner());
 			if ( (my->flags[BURNING] && my->z > 12) )
 			{
 				if ( playerOwner >= 0 )
@@ -1269,7 +1269,7 @@ void actItem(Entity* my)
 					}
 				}
 			}
-			if ( my->itemReturnUID != 0 )
+			if ( my->itemReturnUID() != 0 )
 			{
 				if ( itemProcessReturnItemEffect(my, true) )
 				{
@@ -1291,7 +1291,7 @@ void actItem(Entity* my)
 		my->z > groundheight - .0001 && my->z < groundheight + .0001 &&
 		fabs(ITEM_VELX) < 0.02 && fabs(ITEM_VELY) < 0.02)
 	{
-		my->itemNotMoving = 1;
+		my->itemNotMoving() = 1;
 		my->flags[UPDATENEEDED] = false;
 		if ( multiplayer != CLIENT )
 		{
@@ -1299,7 +1299,7 @@ void actItem(Entity* my)
 		}
 		else
 		{
-			my->itemNotMovingClient = 1;
+			my->itemNotMovingClient() = 1;
 		}
 		return;
 	}
@@ -1354,22 +1354,22 @@ void actItem(Entity* my)
 static Uint32 lastAttractTick = 0;
 void Entity::attractItem(Entity& itemEntity)
 {
-	if ( itemEntity.itemFollowUID != getUID() && itemEntity.z < 16.0 && itemEntity.ticks > TICKS_PER_SECOND )
+	if ( itemEntity.itemFollowUID() != getUID() && itemEntity.z < 16.0 && itemEntity.ticks > TICKS_PER_SECOND )
 	{
 		if ( lastAttractTick != ::ticks )
 		{
 			spawnMagicEffectParticles(itemEntity.x, itemEntity.y, itemEntity.z, 170);
 			lastAttractTick = ::ticks;
 		}
-		itemEntity.itemFollowUID = getUID();
+		itemEntity.itemFollowUID() = getUID();
 
 		itemEntity.flags[USERFLAG1] = false;
-		itemEntity.itemNotMoving = 0;
-		itemEntity.itemNotMovingClient = 0;
+		itemEntity.itemNotMoving() = 0;
+		itemEntity.itemNotMovingClient() = 0;
 		itemEntity.z = std::max(itemEntity.z - 0.1, 0.0);
 		itemEntity.vel_z = -0.75;
-		itemEntity.itemLevitate = 1.0;
-		itemEntity.itemLevitateStartZ = itemEntity.z;
+		itemEntity.itemLevitate() = 1.0;
+		itemEntity.itemLevitateStartZ() = itemEntity.z;
 		itemEntity.flags[UPDATENEEDED] = true;
 		itemEntity.flags[NOUPDATE] = false;
 		if ( multiplayer == SERVER )

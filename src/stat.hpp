@@ -405,26 +405,46 @@ public:
 	Sint32 EFFECTS_TIMERS[NUMEFFECTS];
 	bool defending;
 	Uint32 parrying = 0;
-	Sint32& sneaking; // MISC_FLAGS[1]
-	Sint32& allyItemPickup; // MISC_FLAGS[2]
-	Sint32& allyClass; // MISC_FLAGS[3]
-	Sint32& playerRace; // MISC_FLAGS[4]
-	Sint32& playerPolymorphStorage; // MISC_FLAGS[5]
-	Sint32& playerSummonLVLHP; // MISC_FLAGS[6]
-	Sint32& playerSummonSTRDEXCONINT; // MISC_FLAGS[7]
-	Sint32& playerSummonPERCHR; // MISC_FLAGS[8]
-	Sint32& playerSummon2LVLHP; // MISC_FLAGS[9]
-	Sint32& playerSummon2STRDEXCONINT; // MISC_FLAGS[10]
-	Sint32& playerSummon2PERCHR; // MISC_FLAGS[11]
-	Sint32& monsterIsCharmed; // MISC_FLAGS[12]
-	Sint32& playerShapeshiftStorage; // MISC_FLAGS[13]
-	Sint32& monsterTinkeringStatus; // MISC_FLAGS[14]
-	Sint32& monsterMimicLockedBy; // MISC_FLAGS[14]
-	Sint32& monsterDemonHasBeenExorcised; // MISC_FLAGS[15]
-	Sint32& bleedInflictedBy; // MISC_FLAGS[17]
-	Sint32& burningInflictedBy; // MISC_FLAGS[18]
-	Sint32& monsterNoDropItems; // MISC_FLAGS[19]
-	Sint32& monsterForceAllegiance; // MISC_FLAGS[20]
+	inline int& sneaking() { return MISC_FLAGS[1]; }
+	inline const int& sneaking() const { return MISC_FLAGS[1]; } // MISC_FLAGS[1]
+	inline int& allyItemPickup() { return MISC_FLAGS[2]; }
+	inline const int& allyItemPickup() const { return MISC_FLAGS[2]; } // MISC_FLAGS[2]
+	inline int& allyClass() { return MISC_FLAGS[3]; }
+	inline const int& allyClass() const { return MISC_FLAGS[3]; } // MISC_FLAGS[3]
+	inline int& playerRace() { return MISC_FLAGS[4]; }
+	inline const int& playerRace() const { return MISC_FLAGS[4]; } // MISC_FLAGS[4]
+	inline int& playerPolymorphStorage() { return MISC_FLAGS[5]; }
+	inline const int& playerPolymorphStorage() const { return MISC_FLAGS[5]; } // MISC_FLAGS[5]
+	inline int& playerSummonLVLHP() { return MISC_FLAGS[6]; }
+	inline const int& playerSummonLVLHP() const { return MISC_FLAGS[6]; } // MISC_FLAGS[6]
+	inline int& playerSummonSTRDEXCONINT() { return MISC_FLAGS[7]; }
+	inline const int& playerSummonSTRDEXCONINT() const { return MISC_FLAGS[7]; } // MISC_FLAGS[7]
+	inline int& playerSummonPERCHR() { return MISC_FLAGS[8]; }
+	inline const int& playerSummonPERCHR() const { return MISC_FLAGS[8]; } // MISC_FLAGS[8]
+	inline int& playerSummon2LVLHP() { return MISC_FLAGS[9]; }
+	inline const int& playerSummon2LVLHP() const { return MISC_FLAGS[9]; } // MISC_FLAGS[9]
+	inline int& playerSummon2STRDEXCONINT() { return MISC_FLAGS[10]; }
+	inline const int& playerSummon2STRDEXCONINT() const { return MISC_FLAGS[10]; } // MISC_FLAGS[10]
+	inline int& playerSummon2PERCHR() { return MISC_FLAGS[11]; }
+	inline const int& playerSummon2PERCHR() const { return MISC_FLAGS[11]; } // MISC_FLAGS[11]
+	inline int& monsterIsCharmed() { return MISC_FLAGS[12]; }
+	inline const int& monsterIsCharmed() const { return MISC_FLAGS[12]; } // MISC_FLAGS[12]
+	inline int& playerShapeshiftStorage() { return MISC_FLAGS[13]; }
+	inline const int& playerShapeshiftStorage() const { return MISC_FLAGS[13]; } // MISC_FLAGS[13]
+	inline int& monsterTinkeringStatus() { return MISC_FLAGS[14]; }
+	inline const int& monsterTinkeringStatus() const { return MISC_FLAGS[14]; } // MISC_FLAGS[14]
+	inline int& monsterMimicLockedBy() { return MISC_FLAGS[14]; }
+	inline const int& monsterMimicLockedBy() const { return MISC_FLAGS[14]; } // MISC_FLAGS[14]
+	inline int& monsterDemonHasBeenExorcised() { return MISC_FLAGS[15]; }
+	inline const int& monsterDemonHasBeenExorcised() const { return MISC_FLAGS[15]; } // MISC_FLAGS[15]
+	inline int& bleedInflictedBy() { return MISC_FLAGS[17]; }
+	inline const int& bleedInflictedBy() const { return MISC_FLAGS[17]; } // MISC_FLAGS[17]
+	inline int& burningInflictedBy() { return MISC_FLAGS[18]; }
+	inline const int& burningInflictedBy() const { return MISC_FLAGS[18]; } // MISC_FLAGS[18]
+	inline int& monsterNoDropItems() { return MISC_FLAGS[19]; }
+	inline const int& monsterNoDropItems() const { return MISC_FLAGS[19]; } // MISC_FLAGS[19]
+	inline int& monsterForceAllegiance() { return MISC_FLAGS[20]; }
+	inline const int& monsterForceAllegiance() const { return MISC_FLAGS[20]; } // MISC_FLAGS[20]
 
 	// group think
 	Uint32 leader_uid;

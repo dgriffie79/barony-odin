@@ -436,24 +436,24 @@ void minotaurMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			if ( bodypart == 6 )
 			{
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					// vertical chop windup
-					if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP1 )
+					if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP1 )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							entity->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							entity->roll = 0;
 							entity->skill[1] = 0;
 						}
 
 						limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 5 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -462,31 +462,31 @@ void minotaurMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 					}
 					// ceiling buster chop windup
-					if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2 )
+					if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2 )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							entity->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							entity->roll = 0;
 							entity->skill[1] = 0;
 						}
 
 						limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 5 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
-							my->monsterAttack = 1;
+							my->monsterAttack() = 1;
 						}
 					}
 					// vertical chop attack
-					else if ( my->monsterAttack == 1 )
+					else if ( my->monsterAttack() == 1 )
 					{
 						if ( entity->pitch >= 3 * PI / 2 )
 						{
-							my->monsterArmbended = 1;
+							my->monsterArmbended() = 1;
 						}
 
 						if ( entity->skill[1] == 0 )
@@ -503,11 +503,11 @@ void minotaurMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							if ( limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 7 * PI / 4, false, 0.0) )
 							{
 								entity->skill[0] = rightbody->skill[0];
-								my->monsterWeaponYaw = 0;
+								my->monsterWeaponYaw() = 0;
 								entity->pitch = rightbody->pitch;
 								entity->roll = 0;
-								my->monsterArmbended = 0;
-								my->monsterAttack = 0;
+								my->monsterArmbended() = 0;
+								my->monsterAttack() = 0;
 							}
 						}
 					}
@@ -865,7 +865,7 @@ void actMinotaurCeilingBuster(Entity* my)
 				int index = (MAPLAYERS - 1) + ((int)floor(y / 16)) * MAPLAYERS + ((int)floor(x / 16)) * MAPLAYERS * map.height;
 				if ( map.tiles[index] )
 				{
-					if ( my->monsterAttack == 0 )
+					if ( my->monsterAttack() == 0 )
 					{
 						if ( multiplayer != CLIENT )
 						{
@@ -873,7 +873,7 @@ void actMinotaurCeilingBuster(Entity* my)
 						}
 						return;
 					}
-					else if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP2 )
+					else if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP2 )
 					{
 						return;
 					}
@@ -975,10 +975,10 @@ void actMinotaurCeilingBuster(Entity* my)
 							{
 								if ( multiplayer != CLIENT )
 								{
-									entity->doorHealth = 0; // destroy the door
+									entity->doorHealth() = 0; // destroy the door
 								}
 							}
-							else if ( entity->behavior == &actCeilingTile && entity->ceilingTileBreakable != 0 )
+							else if ( entity->behavior == &actCeilingTile && entity->ceilingTileBreakable() != 0 )
 							{
 								Entity *childEntity = nullptr;
 								if ( multiplayer == SERVER )
@@ -1013,8 +1013,8 @@ void actMinotaurCeilingBuster(Entity* my)
 							{
 								if ( multiplayer != CLIENT )
 								{
-									entity->colliderCurrentHP = 0;
-									entity->colliderKillerUid = 0;
+									entity->colliderCurrentHP() = 0;
+									entity->colliderKillerUid() = 0;
 								}
 							}
 							else if ( entity->behavior == &actBell )

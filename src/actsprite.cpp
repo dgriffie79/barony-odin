@@ -46,9 +46,9 @@ void actSprite(Entity* my)
 	{
 		if ( !uidToEntity(SPRITE_CHECK_PARENT_EXISTS) )
 		{
-			if ( my->actSpriteUseCustomSurface != 0 )
+			if ( my->actSpriteUseCustomSurface() != 0 )
 			{
-				if ( auto fx = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface) )
+				if ( auto fx = AOEIndicators_t::getIndicator(my->actSpriteUseCustomSurface()) )
 				{
 					fx->expired = true;
 				}
@@ -59,18 +59,18 @@ void actSprite(Entity* my)
 			return;
 		}
 	}
-	if ( my->actSpriteFollowUID > 0 )
+	if ( my->actSpriteFollowUID() > 0 )
 	{
-		if ( Entity* parent = uidToEntity(my->actSpriteFollowUID) )
+		if ( Entity* parent = uidToEntity(my->actSpriteFollowUID()) )
 		{
 			my->x = parent->x;
 			my->y = parent->y;
 		}
 	}
 
-	if ( !my->actSpriteHasLightInit && SPRITE_LIT )
+	if ( !my->actSpriteHasLightInit() && SPRITE_LIT )
 	{
-		my->actSpriteHasLightInit = 1;
+		my->actSpriteHasLightInit() = 1;
 		my->light = addLight(my->x / 16, my->y / 16, "explosion");
 	}
 	else if ( !SPRITE_LIT )
@@ -100,9 +100,9 @@ void actSprite(Entity* my)
 	{
 		my->yaw += SPRITE_ROTATE;
 	}
-	if ( my->actSpritePitchRotate > 0.0001 )
+	if ( my->actSpritePitchRotate() > 0.0001 )
 	{
-		my->pitch += my->actSpritePitchRotate;
+		my->pitch += my->actSpritePitchRotate();
 	}
 	if ( SPRITE_ALPHA_VAR > 0.0001 )
 	{
@@ -112,7 +112,7 @@ void actSprite(Entity* my)
 	{
 		my->z += my->vel_z;
 	}
-	if ( my->actSpriteVelXY != 0 )
+	if ( my->actSpriteVelXY() != 0 )
 	{
 		my->x += my->vel_x;
 		my->y += my->vel_y;
@@ -145,7 +145,7 @@ void actSpriteNametag(Entity* my)
 		if ( parent->getMonsterTypeFromSprite() == SLIME )
 		{
 			my->z -= 3.0;
-			if ( parent->monsterAttack == MONSTER_POSE_MAGIC_WINDUP2 )
+			if ( parent->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP2 )
 			{
 				my->z += parent->focalz / 2;
 			}
@@ -172,7 +172,7 @@ void actSpriteWorldTooltip(Entity* my)
 		{
 			if ( parent->flags[PASSABLE] )
 			{
-				if ( parent->doorStartAng == 0 )
+				if ( parent->doorStartAng() == 0 )
 				{
 					my->y -= 5;
 				}
@@ -188,11 +188,11 @@ void actSpriteWorldTooltip(Entity* my)
 			my->y += parent->focalx * sin(parent->yaw) + parent->focaly * sin(parent->yaw + PI / 2);
 		}
 
-		bool inrange = (my->worldTooltipActive == 1);
+		bool inrange = (my->worldTooltipActive() == 1);
 		bool skipUpdating = true;
-		if ( players[my->worldTooltipPlayer]->worldUI.bTooltipActiveForPlayer(*my) )
+		if ( players[my->worldTooltipPlayer()]->worldUI.bTooltipActiveForPlayer(*my) )
 		{
-			if ( players[my->worldTooltipPlayer]->worldUI.gimpDisplayTimer == 0 )
+			if ( players[my->worldTooltipPlayer()]->worldUI.gimpDisplayTimer == 0 )
 			{
 				skipUpdating = false;
 			}
@@ -205,25 +205,25 @@ void actSpriteWorldTooltip(Entity* my)
 
 		if ( inrange && !skipUpdating )
 		{
-			my->worldTooltipAlpha = std::min(1.0, my->worldTooltipAlpha + .15);
-			if ( my->worldTooltipInit == 0 )
+			my->worldTooltipAlpha() = std::min(1.0, my->worldTooltipAlpha() + .15);
+			if ( my->worldTooltipInit() == 0 )
 			{
-				my->worldTooltipInit = 1;
-				my->worldTooltipZ = 1.5;
+				my->worldTooltipInit() = 1;
+				my->worldTooltipZ() = 1.5;
 			}
 			else
 			{
-				my->worldTooltipZ -= my->worldTooltipZ * 0.25;
-				my->worldTooltipZ = std::max(0.1, my->worldTooltipZ);
+				my->worldTooltipZ() -= my->worldTooltipZ() * 0.25;
+				my->worldTooltipZ() = std::max(0.1, my->worldTooltipZ());
 			}
 
-			if ( players[my->worldTooltipPlayer]->worldUI.bTooltipActiveForPlayer(*my) )
+			if ( players[my->worldTooltipPlayer()]->worldUI.bTooltipActiveForPlayer(*my) )
 			{
 				// in range of player
-				my->worldTooltipFadeDelay = 25; // tick draw time, so when inrange = false it'll still be drawn as it fades
+				my->worldTooltipFadeDelay() = 25; // tick draw time, so when inrange = false it'll still be drawn as it fades
 			}
 			//messagePlayer(0, "%.2f", my->worldTooltipZ);
-			if ( my->worldTooltipZ <= 0.15 ) // wait until animation before being able to be clicked on.
+			if ( my->worldTooltipZ() <= 0.15 ) // wait until animation before being able to be clicked on.
 			{
 				my->flags[UNCLICKABLE] = false;
 			}
@@ -231,32 +231,32 @@ void actSpriteWorldTooltip(Entity* my)
 		}
 		else
 		{
-			my->worldTooltipAlpha = std::max(0.0, my->worldTooltipAlpha - .12);
-			if ( my->worldTooltipInit == 1 )
+			my->worldTooltipAlpha() = std::max(0.0, my->worldTooltipAlpha() - .12);
+			if ( my->worldTooltipInit() == 1 )
 			{
-				my->worldTooltipInit = 0;
-				my->worldTooltipZ = 0.1;
+				my->worldTooltipInit() = 0;
+				my->worldTooltipZ() = 0.1;
 			}
 			else
 			{
-				my->worldTooltipZ -= 0.05;
-				my->worldTooltipZ = std::max(-1.0, my->worldTooltipZ);
+				my->worldTooltipZ() -= 0.05;
+				my->worldTooltipZ() = std::max(-1.0, my->worldTooltipZ());
 			}
 		
-			--my->worldTooltipFadeDelay; // decrement fade timer
-			my->worldTooltipFadeDelay = std::max(0, my->worldTooltipFadeDelay);
+			--my->worldTooltipFadeDelay(); // decrement fade timer
+			my->worldTooltipFadeDelay() = std::max(0, my->worldTooltipFadeDelay());
 
-			if ( my->worldTooltipAlpha <= 0.01 )
+			if ( my->worldTooltipAlpha() <= 0.01 )
 			{
 				my->flags[INVISIBLE] = true;
 			}
 			my->flags[UNCLICKABLE] = true;
 		}
-		my->z = -.75 + std::max(0.0, parent->z - 7.75) - my->worldTooltipZ + Player::WorldUI_t::tooltipHeightOffsetZ;
+		my->z = -.75 + std::max(0.0, parent->z - 7.75) - my->worldTooltipZ() + Player::WorldUI_t::tooltipHeightOffsetZ;
 		if ( parent->behavior == &actItem && parent->z < 4.0 )
 		{
-			if ( (multiplayer != CLIENT && parent->itemNotMoving)
-				|| (multiplayer == CLIENT && parent->itemNotMovingClient) )
+			if ( (multiplayer != CLIENT && parent->itemNotMoving())
+				|| (multiplayer == CLIENT && parent->itemNotMovingClient()) )
 			{
 				my->z -= 3;
 			}

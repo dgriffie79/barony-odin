@@ -138,7 +138,7 @@ void startTradingServer(Entity* entity, int player)
 		shopkeeper[player] = entity->getUID();
 		shoptimer[player] = ticks - 1;
 		shopspeech[player] = Language::get(194 + local_rng.rand() % 3);
-		shopkeepertype[player] = entity->monsterStoreType;
+		shopkeepertype[player] = entity->monsterStoreType();
 		shopkeepername[player] = stats->name;
 
 		players[player]->shopGUI.openShop();
@@ -149,7 +149,7 @@ void startTradingServer(Entity* entity, int player)
 		Stat* entitystats = entity->getStats();
 		strcpy((char*)net_packet->data, "SHOP");
 		SDLNet_Write32((Uint32)entity->getUID(), &net_packet->data[4]);
-		net_packet->data[8] = entity->monsterStoreType;
+		net_packet->data[8] = entity->monsterStoreType();
 		strcpy((char*)(&net_packet->data[9]), entitystats->name);
 		net_packet->data[9 + strlen(entitystats->name)] = 0;
 		net_packet->address.host = net_clients[player - 1].host;
@@ -257,7 +257,7 @@ bool buyItemFromShop(const int player, Item* item, bool& bOutConsumedEntireStack
 			Compendium_t::Events_t::eventUpdateWorld(player, Compendium_t::CPDM_SHOP_SPENT, "shop", item->buyValue(player));
 		}
 
-		if ( stats[player]->playerRace > 0 && players[player] && players[player]->entity->effectPolymorph > NUMMONSTERS )
+		if ( stats[player]->playerRace() > 0 && players[player] && players[player]->entity->effectPolymorph() > NUMMONSTERS )
 		{
 			steamStatisticUpdate(STEAM_STAT_ALTER_EGO, STEAM_STAT_INT, item->buyValue(player));
 		}
@@ -689,7 +689,7 @@ bool sellItemToShop(const int player, Item* item)
 		}
 	}
 
-	if ( stats[player]->playerRace > 0 && players[player] && players[player]->entity->effectPolymorph > NUMMONSTERS )
+	if ( stats[player]->playerRace() > 0 && players[player] && players[player]->entity->effectPolymorph() > NUMMONSTERS )
 	{
 		steamStatisticUpdate(STEAM_STAT_ALTER_EGO, STEAM_STAT_INT, item->sellValue(player));
 	}
@@ -771,7 +771,7 @@ bool shopIsMysteriousShopkeeper(Entity* entity)
 	{
 		return false;
 	}
-	if ( entity->monsterStoreType == 10 )
+	if ( entity->monsterStoreType() == 10 )
 	{
 		return true;
 	}

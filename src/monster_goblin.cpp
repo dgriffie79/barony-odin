@@ -411,7 +411,7 @@ void initGoblin(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOBLIN][6][0]; // 1.5
 	entity->focaly = limbs[GOBLIN][6][1]; // 0
 	entity->focalz = limbs[GOBLIN][6][2]; // -.5
@@ -432,7 +432,7 @@ void initGoblin(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOBLIN][7][0]; // 2
 	entity->focaly = limbs[GOBLIN][7][1]; // 0
 	entity->focalz = limbs[GOBLIN][7][2]; // 0
@@ -452,7 +452,7 @@ void initGoblin(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOBLIN][8][0]; // 0
 	entity->focaly = limbs[GOBLIN][8][1]; // 0
 	entity->focalz = limbs[GOBLIN][8][2]; // 4
@@ -475,7 +475,7 @@ void initGoblin(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOBLIN][9][0]; // 0
 	entity->focaly = limbs[GOBLIN][9][1]; // 0
 	entity->focalz = limbs[GOBLIN][9][2]; // -2
@@ -495,7 +495,7 @@ void initGoblin(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOBLIN][10][0]; // 0
 	entity->focaly = limbs[GOBLIN][10][1]; // 0
 	entity->focalz = limbs[GOBLIN][10][2]; // .25
@@ -625,7 +625,7 @@ void goblinMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		else
 		{
 			my->z = 0;
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				my->pitch = 0;
 			}
@@ -666,7 +666,7 @@ void goblinMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(entity);
 				}
@@ -814,7 +814,7 @@ void goblinMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[GOBLIN][4][0]; // 0
@@ -843,7 +843,7 @@ void goblinMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						entity->focalx = limbs[GOBLIN][5][0]; // 0
 						entity->focaly = limbs[GOBLIN][5][1]; // 0
@@ -859,7 +859,7 @@ void goblinMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, GOBLIN, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1227,7 +1227,7 @@ bool Entity::goblinCanWieldItem(const Item& item) const
 		return false;
 	}
 
-	if ( monsterAllyIndex >= 0 && (monsterAllyClass != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
+	if ( monsterAllyIndex() >= 0 && (monsterAllyClass() != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
 	{
 		return monsterAllyEquipmentInClass(item);
 	}

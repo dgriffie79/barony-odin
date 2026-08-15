@@ -711,7 +711,7 @@ void initClass(const int player)
 	}
 
 	bool curseItems = false;
-	if ( (stats[player]->playerRace == RACE_SUCCUBUS || stats[player]->playerRace == RACE_INCUBUS)
+	if ( (stats[player]->playerRace() == RACE_SUCCUBUS || stats[player]->playerRace() == RACE_INCUBUS)
 		&& stats[player]->stat_appearance == 0 )
 	{
 		curseItems = true;
@@ -2856,7 +2856,7 @@ void initClass(const int player)
 			hotbar[6].item = item2->uid;
 			free(item);
 
-			if ( stats[player]->playerRace != RACE_AUTOMATON )
+			if ( stats[player]->playerRace() != RACE_AUTOMATON )
 			{
 				item = newItem(FOOD_APPLE, EXCELLENT, 0, 2, 0, true, nullptr);
 				item2 = itemPickup(player, item);
@@ -3354,7 +3354,7 @@ void initClass(const int player)
 
 	stats[player]->OLDHP = stats[player]->HP;
 
-	if ( stats[player]->stat_appearance == 0 && stats[player]->playerRace == RACE_GOATMAN )
+	if ( stats[player]->stat_appearance == 0 && stats[player]->playerRace() == RACE_GOATMAN )
 	{
 		stats[player]->setEffectActive(EFF_ASLEEP, 1);
 		stats[player]->EFFECTS_TIMERS[EFF_ASLEEP] = -1;
@@ -3373,7 +3373,7 @@ void initClass(const int player)
 	}
 
 	if ( stats[player]->stat_appearance == 0 
-		&& (stats[player]->playerRace == RACE_DRYAD || stats[player]->playerRace == RACE_MYCONID)
+		&& (stats[player]->playerRace() == RACE_DRYAD || stats[player]->playerRace() == RACE_MYCONID)
 		&& !stats[player]->helmet )
 	{
 		stats[player]->setEffectActive(EFF_GROWTH, 3);
@@ -3385,22 +3385,22 @@ void initClass(const int player)
 		stats[player]->EFFECTS_TIMERS[EFF_GROWTH] = 0;
 	}
 
-	if ( stats[player]->stat_appearance == 0 && stats[player]->playerRace == RACE_AUTOMATON )
+	if ( stats[player]->stat_appearance == 0 && stats[player]->playerRace() == RACE_AUTOMATON )
 	{
 		//stats[player]->HUNGER = 150;
 	}
 
 	if ( stats[player]->stat_appearance == 0 
 		&& client_classes[player] <= CLASS_MONK 
-		&& stats[player]->playerRace != RACE_HUMAN )
+		&& stats[player]->playerRace() != RACE_HUMAN )
 	{
 		if ( isLocalPlayer )
 		{
 			// bonus polymorph potions
-			if ( stats[player]->playerRace == RACE_DRYAD
-				|| stats[player]->playerRace == RACE_MYCONID
-				|| stats[player]->playerRace == RACE_GNOME
-				|| stats[player]->playerRace == RACE_SALAMANDER )
+			if ( stats[player]->playerRace() == RACE_DRYAD
+				|| stats[player]->playerRace() == RACE_MYCONID
+				|| stats[player]->playerRace() == RACE_GNOME
+				|| stats[player]->playerRace() == RACE_SALAMANDER )
 			{
 				/*item = newItem(POTION_POLYMORPH, EXCELLENT, 0, 1, 0, true, nullptr);
 				item2 = itemPickup(player, item);
@@ -3417,14 +3417,14 @@ void initClass(const int player)
 	if ( stats[player]->stat_appearance == 0 
 		&& (client_classes[player] >= CLASS_CONJURER 
 			&& client_classes[player] <= CLASS_PALADIN)
-		&& stats[player]->playerRace != RACE_HUMAN )
+		&& stats[player]->playerRace() != RACE_HUMAN )
 	{
 		if ( isLocalPlayer )
 		{
-			if ( stats[player]->playerRace == RACE_DRYAD
-				|| stats[player]->playerRace == RACE_MYCONID
-				|| stats[player]->playerRace == RACE_GNOME
-				|| stats[player]->playerRace == RACE_SALAMANDER )
+			if ( stats[player]->playerRace() == RACE_DRYAD
+				|| stats[player]->playerRace() == RACE_MYCONID
+				|| stats[player]->playerRace() == RACE_GNOME
+				|| stats[player]->playerRace() == RACE_SALAMANDER )
 			{
 				/*item = newItem(POTION_POLYMORPH, EXCELLENT, 0, 1, 0, true, nullptr);
 				item2 = itemPickup(player, item);
@@ -3446,7 +3446,7 @@ void initClass(const int player)
 		dynarray_pair_push<std::pair<int, int>>(players[player]->mechanics.ducksInARow, std::make_pair(((uniqueGameKey + player) % MAXPLAYERS), 0));
 	}
 
-	if ( stats[player]->playerRace == RACE_SALAMANDER && stats[player]->stat_appearance == 0 )
+	if ( stats[player]->playerRace() == RACE_SALAMANDER && stats[player]->stat_appearance == 0 )
 	{
 		stats[player]->MP = stats[player]->MAXMP / 2;
 	}
@@ -3481,50 +3481,50 @@ void initClass(const int player)
 	}
 	if ( isLocalPlayer )
 	{
-		if ( stats[player]->playerRace == RACE_VAMPIRE && stats[player]->stat_appearance == 0 )
+		if ( stats[player]->playerRace() == RACE_VAMPIRE && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_LEVITATION, player, true);
 			addSpell(SPELL_BLEED, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_SUCCUBUS && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_SUCCUBUS && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_TELEPORTATION, player, true);
 			addSpell(SPELL_SELF_POLYMORPH, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_INSECTOID && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_FLUTTER, player, true);
 			addSpell(SPELL_DASH, player, true);
 			addSpell(SPELL_ACID_SPRAY, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_INCUBUS && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_INCUBUS && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_TELEPORTATION, player, true);
 			addSpell(SPELL_SHADOW_TAG, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_AUTOMATON && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_SALVAGE, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_DRYAD && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_DRYAD && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_THORNS, player, true);
 			addSpell(SPELL_SHRUB, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_MYCONID && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_MYCONID && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_SPORES, player, true);
 			addSpell(SPELL_MUSHROOM, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_GREMLIN && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_GREMLIN && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_DEFACE, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_SALAMANDER && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_SALAMANDER && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_BREATHE_FIRE, player, true);
 		}
-		else if ( stats[player]->playerRace == RACE_GNOME && stats[player]->stat_appearance == 0 )
+		else if ( stats[player]->playerRace() == RACE_GNOME && stats[player]->stat_appearance == 0 )
 		{
 			addSpell(SPELL_FORGE_JEWEL, player, true);
 		}

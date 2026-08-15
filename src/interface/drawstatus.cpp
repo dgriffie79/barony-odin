@@ -79,17 +79,17 @@ void updateEnemyBar(Entity* source, Entity* target, const char* name, Sint32 hp,
 				player = parent->skill[2]; // don't update enemy bar if attacking leader.
 			}
 		}
-		else if ( source->behavior == &actMonster && source->monsterAllySummonRank != 0
+		else if ( source->behavior == &actMonster && source->monsterAllySummonRank() != 0
 			&& (target->behavior == &actMonster || target->behavior == &actPlayer || target->behavior == &actDoor || target->behavior == &actIronDoor
 				|| target->behavior == &actChest || target->behavior == &actFurniture || target->behavior == &actColliderDecoration) )
 		{
-			player = source->monsterAllyIndex;
+			player = source->monsterAllyIndex();
 			if ( source->monsterAllyGetPlayerLeader() && source->monsterAllyGetPlayerLeader() == target )
 			{
 				player = -1; // don't update enemy bar if attacking leader.
 			}
 		}
-		else if ( source->behavior == &actMonster && source->monsterIllusionTauntingThisUid != 0 )
+		else if ( source->behavior == &actMonster && source->monsterIllusionTauntingThisUid() != 0 )
 		{
 			Entity* parent = uidToEntity(source->parent);
 			if ( parent && parent->behavior == &actPlayer && parent != target )
@@ -97,11 +97,11 @@ void updateEnemyBar(Entity* source, Entity* target, const char* name, Sint32 hp,
 				player = parent->skill[2]; // don't update enemy bar if attacking leader.
 			}
 		}
-		else if ( source->behavior == &actMonster && source->monsterAllyIndex >= 0/*monsterIsImmobileTurret(source, nullptr)*/
+		else if ( source->behavior == &actMonster && source->monsterAllyIndex() >= 0/*monsterIsImmobileTurret(source, nullptr)*/
 			&& (target->behavior == &actMonster || target->behavior == &actPlayer || target->behavior == &actDoor || target->behavior == &actIronDoor
 				|| target->behavior == &actChest || target->behavior == &actFurniture || target->behavior == &actColliderDecoration) )
 		{
-			player = source->monsterAllyIndex;
+			player = source->monsterAllyIndex();
 			if ( source->monsterAllyGetPlayerLeader() && source->monsterAllyGetPlayerLeader() == target )
 			{
 				player = -1; // don't update enemy bar if attacking leader.
@@ -154,19 +154,19 @@ void updateEnemyBar(Entity* source, Entity* target, const char* name, Sint32 hp,
 	{
 		if ( target->behavior == &actDoor || target->behavior == &actIronDoor )
 		{
-			oldhp = target->doorOldHealth;
+			oldhp = target->doorOldHealth();
 		}
 		else if ( target->behavior == &actFurniture )
 		{
-			oldhp = target->furnitureOldHealth;
+			oldhp = target->furnitureOldHealth();
 		}
 		else if ( target->behavior == &actChest )
 		{
-			oldhp = target->chestOldHealth;
+			oldhp = target->chestOldHealth();
 		}
 		else if ( target->isDamageableCollider() )
 		{
-			oldhp = target->colliderOldHP;
+			oldhp = target->colliderOldHP();
 		}
 		else
 		{
@@ -2143,7 +2143,7 @@ void drawStatusNew(const int player)
 			bool used = false;
 			bool disableItemUsage = false;
 
-			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+			if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 			{
 				// shape shifted, disable some items
 				if ( !item->usableWhileShapeshifted(stats[player]) )
@@ -3325,7 +3325,7 @@ void drawStatusNew(const int player)
 			if ( itemCategory(item) == SPELLBOOK && stats[player] )
 			{
 				if ( stats[player]->type == GOBLIN || stats[player]->type == CREATURE_IMP
-					|| (stats[player]->playerRace == RACE_GOBLIN && stats[player]->stat_appearance == 0) )
+					|| (stats[player]->playerRace() == RACE_GOBLIN && stats[player]->stat_appearance == 0) )
 				{
 					learnedSpell = true; // goblinos can't learn spells but always equip books.
 				}
@@ -3334,7 +3334,7 @@ void drawStatusNew(const int player)
 			bool disableItemUsage = false;
 			if ( players[player] && players[player]->entity )
 			{
-				if ( players[player]->entity->effectShapeshift != NOTHING )
+				if ( players[player]->entity->effectShapeshift() != NOTHING )
 				{
 					if ( !item->usableWhileShapeshifted(stats[player]) )
 					{

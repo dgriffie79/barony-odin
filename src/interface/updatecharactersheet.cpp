@@ -35,10 +35,10 @@ Sint32 displayAttackPower(const int player, AttackHoverText_t& output)
 		if ( stats[player] )
 		{
 			bool shapeshiftUseMeleeAttack = false;
-			if ( entity && entity->effectShapeshift != NOTHING )
+			if ( entity && entity->effectShapeshift() != NOTHING )
 			{
 				shapeshiftUseMeleeAttack = true;
-				if ( entity && entity->effectShapeshift == CREATURE_IMP
+				if ( entity && entity->effectShapeshift() == CREATURE_IMP
 					&& stats[player]->weapon && itemCategory(stats[player]->weapon) == MAGICSTAFF )
 				{
 					shapeshiftUseMeleeAttack = false;

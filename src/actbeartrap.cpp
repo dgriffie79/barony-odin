@@ -89,8 +89,8 @@ void actBeartrap(Entity* my)
 				entity->skill[13] = 1;
 				entity->skill[14] = BEARTRAP_APPEARANCE;
 				entity->skill[15] = BEARTRAP_IDENTIFIED;
-				entity->itemNotMoving = 1;
-				entity->itemNotMovingClient = 1;
+				entity->itemNotMoving() = 1;
+				entity->itemNotMovingClient() = 1;
 				messagePlayer(i, MESSAGE_INTERACTION, Language::get(1300));
 				list_RemoveNode(my->mynode);
 				return;
@@ -177,7 +177,7 @@ void actBeartrap(Entity* my)
 					int damage = 10 + 3 * (BEARTRAP_STATUS + BEARTRAP_BEATITUDE);
 					if ( parent )
 					{
-						stat->bleedInflictedBy = static_cast<Sint32>(parent->getUID());
+						stat->bleedInflictedBy() = static_cast<Sint32>(parent->getUID());
 						//damage += trapperStat->PROFICIENCIES[PRO_LOCKPICKING] / 20;
 					}
 					int oldHP = stat->HP;
@@ -575,12 +575,12 @@ void bombDoEffect(Entity* my, Entity* triggered, real_t entityDistance, bool spa
 				spell->vel_x = speed * cos(spell->yaw);
 				spell->vel_y = speed * sin(spell->yaw);
 				spell->pitch = atan2(spell->vel_z, speed);
-				spell->actmagicIsVertical = MAGIC_ISVERTICAL_XYZ;
+				spell->actmagicIsVertical() = MAGIC_ISVERTICAL_XYZ;
 			}
-			spell->actmagicCastByTinkerTrap = 1;
+			spell->actmagicCastByTinkerTrap() = 1;
 			if ( BOMB_TRIGGER_TYPE == Item::ItemBombTriggerType::BOMB_TRIGGER_ALL )
 			{
-				spell->actmagicTinkerTrapFriendlyFire = 1;
+				spell->actmagicTinkerTrapFriendlyFire() = 1;
 				if ( triggered == parent )
 				{
 					spell->parent = 0;
@@ -790,15 +790,15 @@ void actBomb(Entity* my)
 				if ( BOMB_PLACEMENT == Item::ItemBombPlacement::BOMB_FLOOR )
 				{
 					// don't fall down
-					entity->itemNotMoving = 1;
-					entity->itemNotMovingClient = 1;
+					entity->itemNotMoving() = 1;
+					entity->itemNotMovingClient() = 1;
 					serverUpdateEntitySkill(entity, 18); //update both the above flags.
 					serverUpdateEntitySkill(entity, 19);
 				}
 				else
 				{
-					entity->itemNotMoving = 0;
-					entity->itemNotMovingClient = 0;
+					entity->itemNotMoving() = 0;
+					entity->itemNotMovingClient() = 0;
 				}
 				messagePlayer(i, MESSAGE_INTERACTION, Language::get(3600), items[BOMB_ITEMTYPE].getIdentifiedName());
 				list_RemoveNode(my->mynode);
@@ -809,7 +809,7 @@ void actBomb(Entity* my)
 
 	if ( my->isInteractWithMonster() )
 	{
-		Entity* monsterInteracting = uidToEntity(my->interactedByMonster);
+		Entity* monsterInteracting = uidToEntity(my->interactedByMonster());
 		if ( monsterInteracting && monsterInteracting->getMonsterTypeFromSprite() == GYROBOT )
 		{
 			if ( monsterInteracting->monsterAllyGetPlayerLeader() )
@@ -817,7 +817,7 @@ void actBomb(Entity* my)
 				Item* tmp = newItemFromEntity(my);
 				if ( tmp )
 				{
-					tmp->applyLockpick(monsterInteracting->monsterAllyIndex, *my);
+					tmp->applyLockpick(monsterInteracting->monsterAllyIndex(), *my);
 					free(tmp);
 				}
 			}
@@ -924,10 +924,10 @@ void actBomb(Entity* my)
 		{
 			if ( onEntity->behavior == &actDoor || onEntity->behavior == &actIronDoor )
 			{
-				if ( onEntity->doorHealth < BOMB_ENTITY_ATTACHED_START_HP || onEntity->flags[PASSABLE] || cursedExplode
+				if ( onEntity->doorHealth() < BOMB_ENTITY_ATTACHED_START_HP || onEntity->flags[PASSABLE] || cursedExplode
 					|| BOMB_HIT_BY_PROJECTILE == 1 )
 				{
-					if ( onEntity->doorHealth > 0 )
+					if ( onEntity->doorHealth() > 0 )
 					{
 						onEntity->doorHandleDamageMagic(50, *my, uidToEntity(my->parent));
 					}
@@ -967,11 +967,11 @@ void actBomb(Entity* my)
 			}
 			else if ( onEntity->behavior == &actColliderDecoration )
 			{
-				if ( onEntity->colliderCurrentHP < BOMB_ENTITY_ATTACHED_START_HP
+				if ( onEntity->colliderCurrentHP() < BOMB_ENTITY_ATTACHED_START_HP
 					|| cursedExplode
 					|| BOMB_HIT_BY_PROJECTILE == 1 )
 				{
-					if ( onEntity->colliderCurrentHP > 0 )
+					if ( onEntity->colliderCurrentHP() > 0 )
 					{
 						if ( BOMB_ITEMTYPE == TOOL_BOMB ) // fire bomb do more.
 						{
@@ -1244,13 +1244,13 @@ bool Entity::entityCheckIfTriggeredWallButton()
 						sizey = std::max(sizey, 2);
 						if ( entityInsideEntity(this, entity) )
 						{
-							entity->wallLockPlayerInteracting = MAXPLAYERS + 1;
+							entity->wallLockPlayerInteracting() = MAXPLAYERS + 1;
 							foundButton = true;
 							if ( Entity* parent = uidToEntity(this->parent) )
 							{
 								if ( parent->behavior == &actPlayer )
 								{
-									entity->wallLockPlayerInteracting = 1 + parent->skill[2];
+									entity->wallLockPlayerInteracting() = 1 + parent->skill[2];
 								}
 							}
 						}
@@ -1376,8 +1376,8 @@ void actDecoyBox(Entity* my)
 				if ( parent && entity && entity->behavior == &actMonster
 					&& parent->checkEnemy(entity) && entity->isMobile() )
 				{
-					if ( (entity->monsterState == MONSTER_STATE_WAIT || entity->monsterTarget == 0) 
-						|| (entityDist(entity,my) < 2 * TOUCHRANGE && (Uint32)(entity->monsterLastDistractedByNoisemaker) != my->getUID()) )
+					if ( (entity->monsterState() == MONSTER_STATE_WAIT || entity->monsterTarget() == 0) 
+						|| (entityDist(entity,my) < 2 * TOUCHRANGE && (Uint32)(entity->monsterLastDistractedByNoisemaker()) != my->getUID()) )
 					{
 						Stat* myStats = entity->getStats();
 						if ( !entity->isBossMonster() && !entity->monsterIsTinkeringCreation()
@@ -1404,7 +1404,7 @@ void actDecoyBox(Entity* my)
 									}
 								}
 							}
-							if ( (Uint32)(entity->monsterLastDistractedByNoisemaker) == my->getUID() )
+							if ( (Uint32)(entity->monsterLastDistractedByNoisemaker()) == my->getUID() )
 							{
 								// ignore pathing to this noisemaker as we're already distracted by it.
 								if ( entityDist(entity, my) < TOUCHRANGE 
@@ -1420,7 +1420,7 @@ void actDecoyBox(Entity* my)
 									if ( hit.entity == entity )
 									{
 										// set disoriented and start a cooldown on being distracted.
-										if ( entity->monsterState == MONSTER_STATE_WAIT || entity->monsterTarget == 0 )
+										if ( entity->monsterState() == MONSTER_STATE_WAIT || entity->monsterTarget() == 0 )
 										{
 											// not attacking, duration longer.
 											entity->setEffect(EFF_DISORIENTED, true, TICKS_PER_SECOND * 3, false);
@@ -1447,9 +1447,9 @@ void actDecoyBox(Entity* my)
 									GeneratePathTypes::GENERATE_PATH_DEFAULT) && entity->children.first )
 							{
 								// path only if we're not on cooldown
-								entity->monsterLastDistractedByNoisemaker = my->getUID();
-								entity->monsterTarget = my->getUID();
-								entity->monsterState = MONSTER_STATE_HUNT; // hunt state
+								entity->monsterLastDistractedByNoisemaker() = my->getUID();
+								entity->monsterTarget() = my->getUID();
+								entity->monsterState() = MONSTER_STATE_HUNT; // hunt state
 								serverUpdateEntitySkill(entity, 0);
 								detected = true;
 								++lured;
@@ -1466,7 +1466,7 @@ void actDecoyBox(Entity* my)
 									if ( hit.entity == entity )
 									{
 										// set disoriented and start a cooldown on being distracted.
-										if ( entity->monsterState == MONSTER_STATE_WAIT || entity->monsterTarget == 0 )
+										if ( entity->monsterState() == MONSTER_STATE_WAIT || entity->monsterTarget() == 0 )
 										{
 											// not attacking, duration longer.
 											entity->setEffect(EFF_DISORIENTED, true, TICKS_PER_SECOND * 3, false);

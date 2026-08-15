@@ -402,16 +402,16 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			}
 			if ( bodypart == LIMB_HUMANOID_LEFTARM )
 			{
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					// vertical chop windup
-					if ( my->monsterAttack == MONSTER_POSE_MELEE_WINDUP1 )
+					if ( my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP1 )
 					{
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							entity->pitch = 0;
-							my->monsterArmbended = 0;
+							my->monsterArmbended() = 0;
 							//my->monsterWeaponYaw = 0; // keep the arms outstretched.
 							entity->roll = 0;
 							entity->skill[1] = 0;
@@ -419,7 +419,7 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 						limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 5 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -428,12 +428,12 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 					}
 					// vertical chop attack
-					else if ( my->monsterAttack == 1 )
+					else if ( my->monsterAttack() == 1 )
 					{
-						my->monsterWeaponYaw = 0;
+						my->monsterWeaponYaw() = 0;
 						if ( entity->pitch >= 3 * PI / 2 )
 						{
-							my->monsterArmbended = 1;
+							my->monsterArmbended() = 1;
 						}
 
 						if ( entity->skill[1] == 0 )
@@ -446,22 +446,22 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						}
 						else if ( entity->skill[1] == 1 )
 						{
-							my->monsterWeaponYaw = -PI / 16.0;
+							my->monsterWeaponYaw() = -PI / 16.0;
 							// return to neutral
 							if ( limbAnimateToLimit(entity, ANIMATE_PITCH, -0.25, 25 * PI / 16, false, 0.0) )
 							{
 								entity->skill[0] = rightbody->skill[0];
 								entity->pitch = rightbody->pitch;
 								entity->roll = 0;
-								my->monsterArmbended = 0;
-								my->monsterAttack = 0;
+								my->monsterArmbended() = 0;
+								my->monsterAttack() = 0;
 							}
 						}
 					}
 				}
 				else
 				{
-					my->monsterWeaponYaw = -PI / 16.0;
+					my->monsterWeaponYaw() = -PI / 16.0;
 					entity->pitch = -7 * PI / 16;
 					entity->roll = 0;
 				}
@@ -512,12 +512,12 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		{
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					 //vertical chop
 					 //get leftarm from bodypart 6 element if ready to attack
 					Entity* leftarm = (Entity*)node->next->element;
-					if ( my->monsterAttack == 1 || my->monsterAttack == MONSTER_POSE_MELEE_WINDUP1 )
+					if ( my->monsterAttack() == 1 || my->monsterAttack() == MONSTER_POSE_MELEE_WINDUP1 )
 					{
 						if ( leftarm != nullptr )
 						{
@@ -606,14 +606,14 @@ void ghoulMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				entity->x += 1 * cos(my->yaw) + 2 * cos(my->yaw + PI / 2);
 				entity->y += 1 * sin(my->yaw) + 2 * sin(my->yaw + PI / 2);
 				entity->z -= 1;
-				entity->yaw -= my->monsterWeaponYaw;
+				entity->yaw -= my->monsterWeaponYaw();
 				break;
 			// left arm
 			case LIMB_HUMANOID_LEFTARM:
 				entity->x += 1 * cos(my->yaw) - 2 * cos(my->yaw + PI / 2);
 				entity->y += 1 * sin(my->yaw) - 2 * sin(my->yaw + PI / 2);
 				entity->z -= 1;
-				entity->yaw += my->monsterWeaponYaw;
+				entity->yaw += my->monsterWeaponYaw();
 				break;
 		}
 	}

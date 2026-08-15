@@ -620,7 +620,7 @@ void initGoatman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOATMAN][6][0]; // 1.5
 	entity->focaly = limbs[GOATMAN][6][1]; // 0
 	entity->focalz = limbs[GOATMAN][6][2]; // -.5
@@ -641,7 +641,7 @@ void initGoatman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOATMAN][7][0]; // 2
 	entity->focaly = limbs[GOATMAN][7][1]; // 0
 	entity->focalz = limbs[GOATMAN][7][2]; // 0
@@ -661,7 +661,7 @@ void initGoatman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOATMAN][8][0]; // 0
 	entity->focaly = limbs[GOATMAN][8][1]; // 0
 	entity->focalz = limbs[GOATMAN][8][2]; // 4
@@ -684,7 +684,7 @@ void initGoatman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOATMAN][9][0]; // 0
 	entity->focaly = limbs[GOATMAN][9][1]; // 0
 	entity->focalz = limbs[GOATMAN][9][2]; // -2
@@ -704,7 +704,7 @@ void initGoatman(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[GOATMAN][10][0]; // 0
 	entity->focaly = limbs[GOATMAN][10][1]; // 0
 	entity->focalz = limbs[GOATMAN][10][2]; // .25
@@ -834,7 +834,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		else
 		{
 			my->z = 0;
-			if ( my->monsterAttack == 0 )
+			if ( my->monsterAttack() == 0 )
 			{
 				my->pitch = 0;
 			}
@@ -851,7 +851,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 		if ( bodypart < LIMB_HUMANOID_TORSO )
 		{
 			// post-swing head animation. client doesn't need to adjust the entity pitch, server will handle.
-			if ( my->monsterAttack != MONSTER_POSE_RANGED_WINDUP3 && bodypart == 1 && multiplayer != CLIENT )
+			if ( my->monsterAttack() != MONSTER_POSE_RANGED_WINDUP3 && bodypart == 1 && multiplayer != CLIENT )
 			{
 				limbAnimateToLimit(my, ANIMATE_PITCH, 0.1, 0, false, 0.0);
 			}
@@ -882,7 +882,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				weaponarm = entity;
 				if ( MONSTER_ATTACK > 0 )
 				{
-					if ( my->monsterAttack == MONSTER_POSE_RANGED_WINDUP3 )
+					if ( my->monsterAttack() == MONSTER_POSE_RANGED_WINDUP3 )
 					{
 						Entity* rightbody = nullptr;
 						// set rightbody to left leg.
@@ -896,12 +896,12 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 							return;
 						}
 
-						if ( my->monsterAttackTime == 0 )
+						if ( my->monsterAttackTime() == 0 )
 						{
 							// init rotations
 							weaponarm->pitch = 0;
-							my->monsterArmbended = 0;
-							my->monsterWeaponYaw = 0;
+							my->monsterArmbended() = 0;
+							my->monsterWeaponYaw() = 0;
 							weaponarm->roll = 0;
 							weaponarm->skill[1] = 0;
 							if ( multiplayer != CLIENT )
@@ -919,7 +919,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 						limbAnimateToLimit(weaponarm, ANIMATE_PITCH, -0.25, 7 * PI / 4, true, 0.0);
 						//limbAnimateToLimit(weaponarm, ANIMATE_ROLL, -0.25, 7 * PI / 4, false, 0.0);
 
-						if ( my->monsterAttackTime >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
+						if ( my->monsterAttackTime() >= 4 * ANIMATE_DURATION_WINDUP / (monsterGlobalAnimationMultiplier / 10.0) )
 						{
 							if ( multiplayer != CLIENT )
 							{
@@ -1072,7 +1072,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[GOATMAN][4][0]; // 0
@@ -1101,7 +1101,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						entity->focalx = limbs[GOATMAN][5][0]; // 0
 						entity->focaly = limbs[GOATMAN][5][1]; // 0
@@ -1117,7 +1117,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, GOATMAN, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
@@ -1472,7 +1472,7 @@ void goatmanMoveBodyparts(Entity* my, Stat* myStats, double dist)
 
 void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 {
-	if ( monsterSpecialState != 0 )
+	if ( monsterSpecialState() != 0 )
 	{
 		//Holding a weapon assigned from the special attack. Don't switch weapons.
 		//messagePlayer()
@@ -1508,7 +1508,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 	node_t* hasPotion = nullptr;
 	bool isHealingPotion = false;
 
-	if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 )
+	if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 )
 	{
 		//messagePlayer(clientnum, "Cooldown done!");
 		specialRoll = local_rng.rand()%10;
@@ -1533,7 +1533,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 						}
 						else
 						{
-							monsterSpecialState = GOATMAN_POTION;
+							monsterSpecialState() = GOATMAN_POTION;
 							//monsterHitTime = 2 * HITRATE;
 							return;
 						}
@@ -1550,7 +1550,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 					}
 					else
 					{
-						monsterSpecialState = GOATMAN_POTION;
+						monsterSpecialState() = GOATMAN_POTION;
 						//monsterHitTime = 2 * HITRATE;
 						return;
 					}
@@ -1572,7 +1572,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 					}
 					else
 					{
-						monsterSpecialState = GOATMAN_POTION;
+						monsterSpecialState() = GOATMAN_POTION;
 						//monsterHitTime = 2 * HITRATE;
 						return;
 					}
@@ -1585,7 +1585,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 
 	if ( inMeleeRange )
 	{
-		if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 && specialRoll == 0 )
+		if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 && specialRoll == 0 )
 		{
 			bool tryChakram = true;
 			if ( hasPotion && local_rng.rand()%10 )
@@ -1607,7 +1607,7 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 					}
 					else
 					{
-						monsterSpecialState = GOATMAN_THROW;
+						monsterSpecialState() = GOATMAN_THROW;
 						return;
 					}
 				}
@@ -1664,14 +1664,14 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 	{
 		//First search the inventory for a THROWN weapon.
 		node_t *weaponNode = nullptr;
-		if ( monsterSpecialTimer == 0 && (ticks % 10 == 0) && monsterAttack == 0 && local_rng.rand() % 10 == 0 )
+		if ( monsterSpecialTimer() == 0 && (ticks % 10 == 0) && monsterAttack() == 0 && local_rng.rand() % 10 == 0 )
 		{
 			weaponNode = itemNodeInInventory(myStats, -1, THROWN);
 			if ( weaponNode )
 			{
 				if ( swapMonsterWeaponWithInventoryItem(this, myStats, weaponNode, false, false) )
 				{
-					monsterSpecialState = GOATMAN_THROW;
+					monsterSpecialState() = GOATMAN_THROW;
 					return;
 				}
 			}
@@ -1697,7 +1697,7 @@ bool Entity::goatmanCanWieldItem(const Item& item) const
 		return false;
 	}
 
-	if ( monsterAllyIndex >= 0 && (monsterAllyClass != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
+	if ( monsterAllyIndex() >= 0 && (monsterAllyClass() != ALLY_CLASS_MIXED || item.interactNPCUid == getUID()) )
 	{
 		return monsterAllyEquipmentInClass(item);
 	}

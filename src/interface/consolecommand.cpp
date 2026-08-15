@@ -2133,7 +2133,7 @@ namespace ConsoleCommands {
 				stats[i]->stat_appearance = local_rng.rand() % 18;
 				stats[i]->clearStats();
 				client_classes[i] = local_rng.rand() % (CLASS_MONK + 1);//NUMCLASSES;
-				stats[i]->playerRace = RACE_HUMAN;
+				stats[i]->playerRace() = RACE_HUMAN;
 				if (enabledDLCPack1 || enabledDLCPack2 || enabledDLCPack3)
 				{
 					std::vector<unsigned int> chances;
@@ -2162,17 +2162,17 @@ namespace ConsoleCommands {
 						chances[RACE_SALAMANDER] = 1;
 					}
 
-					stats[i]->playerRace = local_rng.discrete(chances.data(), chances.size());
-					if (stats[i]->playerRace == RACE_INCUBUS)
+					stats[i]->playerRace() = local_rng.discrete(chances.data(), chances.size());
+					if (stats[i]->playerRace() == RACE_INCUBUS)
 					{
 						stats[i]->sex = MALE;
 					}
-					else if (stats[i]->playerRace == RACE_SUCCUBUS)
+					else if (stats[i]->playerRace() == RACE_SUCCUBUS)
 					{
 						stats[i]->sex = FEMALE;
 					}
 
-					if (stats[i]->playerRace == RACE_HUMAN)
+					if (stats[i]->playerRace() == RACE_HUMAN)
 					{
 						client_classes[i] = local_rng.rand() % (NUMCLASSES);
 						while ( 
@@ -2192,14 +2192,14 @@ namespace ConsoleCommands {
 						client_classes[i] = local_rng.rand() % (CLASS_MONK + 2);
 						if (client_classes[i] > CLASS_MONK)
 						{
-							client_classes[i] = CLASS_MONK + stats[i]->playerRace; // monster specific classes.
+							client_classes[i] = CLASS_MONK + stats[i]->playerRace(); // monster specific classes.
 						}
 						stats[i]->stat_appearance = 0;
 					}
 				}
 				else
 				{
-					stats[i]->playerRace = RACE_HUMAN;
+					stats[i]->playerRace() = RACE_HUMAN;
 					stats[i]->stat_appearance = local_rng.rand() % 18;
 				}
 				strcpy(stats[i]->name, randomPlayerNamesFemale.at(local_rng.rand() % randomPlayerNamesFemale.size()).c_str());
@@ -2428,19 +2428,19 @@ namespace ConsoleCommands {
 			{
 				playSoundEntity(players[player]->entity, 242 + local_rng.rand() % 4, 64);
 				auto entity = newEntity(amount < 5 ? 1379 : 130, 0, map.entities, nullptr); // 130 = goldbag model
-				entity->goldAmount = amount; // amount
+				entity->goldAmount() = amount; // amount
 				entity->sizex = 4;
 				entity->sizey = 4;
 				entity->x = players[player]->entity->x;
 				entity->y = players[player]->entity->y;
 				entity->z = 0;
 				entity->vel_z = (-40 - local_rng.rand() % 5) * .01;
-				entity->goldBouncing = 0;
+				entity->goldBouncing() = 0;
 				entity->yaw = (local_rng.rand() % 360) * PI / 180.0;
 				entity->flags[PASSABLE] = true;
 				entity->flags[UPDATENEEDED] = true;
 				entity->behavior = &actGoldBag;
-				entity->goldDroppedByPlayer = player + 1;
+				entity->goldDroppedByPlayer() = player + 1;
 			}
 			messagePlayer(player, MESSAGE_INVENTORY, Language::get(2594), amount);
 		}
@@ -2980,7 +2980,7 @@ namespace ConsoleCommands {
 		for (node_t* node = map.creatures->first; node != nullptr; node = node->next)
 		{
 			Entity* entity = (Entity*)node->element;
-			if (entity && entity->behavior == &actMonster && entity->monsterAllySummonRank != 0)
+			if (entity && entity->behavior == &actMonster && entity->monsterAllySummonRank() != 0)
 			{
 				Stat* entityStats = entity->getStats();
 				if (entityStats)
@@ -4448,7 +4448,7 @@ namespace ConsoleCommands {
 			if ( argc > 1 )
 			{
 				int type = std::min(NUMMONSTERS - 1, std::max((int)HUMAN, atoi(argv[1])));
-				players[clientnum]->entity->effectPolymorph = type;
+				players[clientnum]->entity->effectPolymorph() = type;
 			}
 		}
 #else
@@ -4718,7 +4718,7 @@ namespace ConsoleCommands {
 			{
 				if (forceFollower(*players[clientnum]->entity, *monster))
 				{
-					monster->monsterAllyIndex = clientnum;
+					monster->monsterAllyIndex() = clientnum;
 					monster->flags[USERFLAG2] = true;
 				}
 			}
@@ -4799,7 +4799,7 @@ namespace ConsoleCommands {
 				{
 					if (forceFollower(*players[clientnum]->entity, *monster))
 					{
-						monster->monsterAllyIndex = clientnum;
+						monster->monsterAllyIndex() = clientnum;
 						monster->flags[USERFLAG2] = true;
 					}
 				}
@@ -5101,13 +5101,13 @@ namespace ConsoleCommands {
 					{
 						if ( entity->sprite == 217 || entity->sprite == 218 )
 						{
-							printlog("Map: %s Iron door: Lockpick state: %d, opening: %d", f.c_str(), entity->doorDisableLockpicks, entity->doorDisableOpening);
+							printlog("Map: %s Iron door: Lockpick state: %d, opening: %d", f.c_str(), entity->doorDisableLockpicks(), entity->doorDisableOpening());
 						}
 						else if ( entity->sprite == 208 || entity->sprite == 209
 							|| entity->sprite == 210 || entity->sprite == 211 )
 						{
-							printlog("Map: %s Wall lock: Material: %s, pickable: %d, skeleton key: %d, auto gen key: %d", f.c_str(), Language::get(6383 + entity->wallLockMaterial), entity->wallLockPickable,
-								entity->wallLockPickableSkeletonKey, entity->wallLockAutoGenKey);
+							printlog("Map: %s Wall lock: Material: %s, pickable: %d, skeleton key: %d, auto gen key: %d", f.c_str(), Language::get(6383 + entity->wallLockMaterial()), entity->wallLockPickable(),
+								entity->wallLockPickableSkeletonKey(), entity->wallLockAutoGenKey());
 						}
 					}
 				}
@@ -5138,7 +5138,7 @@ namespace ConsoleCommands {
 				{
 					if ( Entity* entity = (Entity*)node->element )
 					{
-						if ( entity->sprite == 127 && entity->floorDecorationInteractText1 != 0 )
+						if ( entity->sprite == 127 && entity->floorDecorationInteractText1() != 0 )
 						{
 							char buf[256] = "";
 							int totalChars = 0;
@@ -5205,7 +5205,7 @@ namespace ConsoleCommands {
 
 						if ( entity->sprite == 21 )
 						{
-							printlog("Map: %s Chest: Locked: %d Mimic: %d", f.c_str(), entity->chestLocked, entity->chestMimicChance);
+							printlog("Map: %s Chest: Locked: %d Mimic: %d", f.c_str(), entity->chestLocked(), entity->chestMimicChance());
 						}
 						else if ( entity->sprite == 9 )
 						{
@@ -5355,7 +5355,7 @@ namespace ConsoleCommands {
 					stat->CON = 0;
 					stat->LVL = 50;
 					stat->setAttribute("dummy_target", "0");
-					stat->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ENEMY;
+					stat->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ENEMY;
 					serverUpdateEntityStatFlag(monster, 20);
 				}
 			}
@@ -5386,7 +5386,7 @@ namespace ConsoleCommands {
 					stat->LVL = 50;
 					stat->setEffectActive(EFF_STUNNED, 1);
 					stat->setAttribute("dummy_target", "0");
-					stat->monsterForceAllegiance = Stat::MONSTER_FORCE_PLAYER_ENEMY;
+					stat->monsterForceAllegiance() = Stat::MONSTER_FORCE_PLAYER_ENEMY;
 					serverUpdateEntityStatFlag(monster, 20);
 					stat->EDITOR_ITEMS[ITEM_SLOT_HELM] = 0;
 					stat->EDITOR_ITEMS[ITEM_SLOT_WEAPON] = 0;
@@ -5416,7 +5416,7 @@ namespace ConsoleCommands {
 			tmpEnt = (Entity*)tmpNode->element;
 			if ( tmpEnt->behavior == &actColliderDecoration )
 			{
-				if ( tmpEnt->colliderHasCollision != 0 )
+				if ( tmpEnt->colliderHasCollision() != 0 )
 				{
 					messagePlayer(clientnum, MESSAGE_DEBUG, "Collider: %d | z: %4.2f | pos: x: %d y: %d", 
 						tmpEnt->sprite, tmpEnt->z, (int)tmpEnt->x / 16, (int)tmpEnt->y / 16);
@@ -5679,38 +5679,38 @@ namespace ConsoleCommands {
 						{
 							int x = (int)(entity->x) / 16;
 							int y = (int)(entity->y) / 16;
-							if ( entity->colliderDecorationModel == 1203
-								|| entity->colliderDecorationModel == 1204 )
+							if ( entity->colliderDecorationModel() == 1203
+								|| entity->colliderDecorationModel() == 1204 )
 							{
-								real_t z = entity->z = 7.5 - entity->colliderDecorationHeightOffset * 0.25;
+								real_t z = entity->z = 7.5 - entity->colliderDecorationHeightOffset() * 0.25;
 								if ( z > -8.51 && z < -8.49 )
 								{
-									if ( entity->colliderHasCollision == 0 )
+									if ( entity->colliderHasCollision() == 0 )
 									{
 										printlog("[Collider Verify]: x: %d y: %d has no collision in map %s", x, y, f.c_str());
 									}
 								}
 							}
-							else if ( entity->colliderDecorationModel == 1197
-								|| entity->colliderDecorationModel == 1198 )
+							else if ( entity->colliderDecorationModel() == 1197
+								|| entity->colliderDecorationModel() == 1198 )
 							{
-								real_t z = entity->z = 7.5 - entity->colliderDecorationHeightOffset * 0.25;
+								real_t z = entity->z = 7.5 - entity->colliderDecorationHeightOffset() * 0.25;
 								if ( z > 7.49 || z < 7.51 )
 								{
-									if ( entity->colliderHasCollision == 0 )
+									if ( entity->colliderHasCollision() == 0 )
 									{
 										printlog("[Collider Verify]: x: %d y: %d has no collision in map %s", x, y, f.c_str());
 									}
 								}
 							}
-							else if ( entity->colliderDecorationModel > 1206 )
+							else if ( entity->colliderDecorationModel() > 1206 )
 							{
-								printlog("[Collider Verify]: x: %d y: %d has wrong mesh: %d in map %s", x, y, entity->colliderDecorationModel, f.c_str());
+								printlog("[Collider Verify]: x: %d y: %d has wrong mesh: %d in map %s", x, y, entity->colliderDecorationModel(), f.c_str());
 							}
-							if ( entity->colliderHasCollision != 0 && (entity->colliderSizeX == 0 || entity->colliderSizeY == 0) )
+							if ( entity->colliderHasCollision() != 0 && (entity->colliderSizeX() == 0 || entity->colliderSizeY() == 0) )
 							{
 								printlog("[Collider Verify]: x: %d y: %d has 0 collision size (x: %d, y: %d), mesh: %d in map %s", 
-									x, y, entity->colliderSizeX, entity->colliderSizeY, entity->colliderDecorationModel, f.c_str());
+									x, y, entity->colliderSizeX(), entity->colliderSizeY(), entity->colliderDecorationModel(), f.c_str());
 							}
 						}
 					}

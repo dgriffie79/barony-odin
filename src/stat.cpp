@@ -1676,7 +1676,7 @@ bool Stat::statusEffectRemovedByCureAilment(const int effect, Entity* my)
 		case EFF_DRUNK:
 			if ( this->type == GOATMAN
 				|| (my && my->behavior == &actPlayer 
-					&& playerRace == RACE_GOATMAN && stat_appearance == 0) )
+					&& playerRace() == RACE_GOATMAN && stat_appearance == 0) )
 			{
 				return false;
 			}

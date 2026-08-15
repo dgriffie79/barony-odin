@@ -34,14 +34,14 @@
 void actGoldBag(Entity* my)
 {
 	int i;
-	my->goldTelepathy = 0;
+	my->goldTelepathy() = 0;
 
 	if ( my->ticks == 1 )
 	{
 		my->createWorldUITooltip();
 	}
 
-	if ( my->flags[INVISIBLE] && my->goldSokoban == 1 )
+	if ( my->flags[INVISIBLE] && my->goldSokoban() == 1 )
 	{
 		if ( multiplayer != CLIENT )
 		{
@@ -70,10 +70,10 @@ void actGoldBag(Entity* my)
 		}
 	}
 
-	my->goldAmbience--;
-	if ( my->goldAmbience <= 0 )
+	my->goldAmbience()--;
+	if ( my->goldAmbience() <= 0 )
 	{
-		my->goldAmbience = TICKS_PER_SECOND * 30;
+		my->goldAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal( my, 149, 16 );
 	}
 
@@ -85,7 +85,7 @@ void actGoldBag(Entity* my)
 			{
 				if ( stats[i]->type == GNOME )
 				{
-					my->goldTelepathy |= (1 << i);
+					my->goldTelepathy() |= (1 << i);
 				}
 			}
 		}
@@ -111,10 +111,10 @@ void actGoldBag(Entity* my)
 					}
 					if ( stats[i]->type == GNOME )
 					{
-						my->goldAmount += my->goldAmountBonus;
-						my->goldAmountBonus = 0;
+						my->goldAmount() += my->goldAmountBonus();
+						my->goldAmountBonus() = 0;
 					}
-					stats[i]->GOLD += my->goldAmount;
+					stats[i]->GOLD += my->goldAmount();
 					if ( multiplayer == SERVER && i > 0 && !players[i]->isLocalPlayer() )
 					{
 						// send the client info on the gold it picked up
@@ -127,13 +127,13 @@ void actGoldBag(Entity* my)
 					}
 
 					// message for item pickup
-					if ( my->goldAmount == 1 )
+					if ( my->goldAmount() == 1 )
 					{
 						messagePlayer(i, MESSAGE_INTERACTION | MESSAGE_INVENTORY, Language::get(483));
 					}
 					else
 					{
-						messagePlayer(i, MESSAGE_INTERACTION | MESSAGE_INVENTORY, Language::get(484), my->goldAmount);
+						messagePlayer(i, MESSAGE_INTERACTION | MESSAGE_INVENTORY, Language::get(484), my->goldAmount());
 					}
 
 					for ( int player = 0; player < MAXPLAYERS; ++player )
@@ -155,10 +155,10 @@ void actGoldBag(Entity* my)
 						}
 					}
 
-					if ( my->goldDroppedByPlayer == 0 )
+					if ( my->goldDroppedByPlayer() == 0 )
 					{
-						Compendium_t::Events_t::eventUpdateCodex(i, Compendium_t::CPDM_GOLD_COLLECTED, "gold", my->goldAmount);
-						Compendium_t::Events_t::eventUpdateCodex(i, Compendium_t::CPDM_GOLD_COLLECTED_RUN, "gold", my->goldAmount);
+						Compendium_t::Events_t::eventUpdateCodex(i, Compendium_t::CPDM_GOLD_COLLECTED, "gold", my->goldAmount());
+						Compendium_t::Events_t::eventUpdateCodex(i, Compendium_t::CPDM_GOLD_COLLECTED_RUN, "gold", my->goldAmount());
 					}
 
 					// remove gold entity
@@ -180,7 +180,7 @@ void actGoldBag(Entity* my)
 	my->flags[BURNING] = false;
 	my->flags[NOCLIP_CREATURES] = true;
 
-	if ( my->goldBouncing == 0 )
+	if ( my->goldBouncing() == 0 )
 	{
 		if ( my->z < groundheight )
 		{
@@ -240,7 +240,7 @@ void actGoldBag(Entity* my)
 			my->z > groundheight - .0001 && my->z < groundheight + .0001 &&
 			fabs(my->vel_x) < 0.02 && fabs(my->vel_y) < 0.02 )
 		{
-			my->goldBouncing = 1;
+			my->goldBouncing() = 1;
 			return;
 		}
 

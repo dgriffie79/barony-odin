@@ -109,7 +109,7 @@ void actSink(Entity* my)
 						if ( stats[i]->getEffectActive(EFF_POLYMORPH) )
 						{
 							players[i]->entity->setEffect(EFF_POLYMORPH, false, 0, true);
-							players[i]->entity->effectPolymorph = 0;
+							players[i]->entity->effectPolymorph() = 0;
 							serverUpdateEntitySkill(players[i]->entity, 50);
 							messagePlayer(i, MESSAGE_INTERACTION, Language::get(3192));
 							if ( !stats[i]->getEffectActive(EFF_SHAPESHIFT) )
@@ -211,7 +211,7 @@ void actSink(Entity* my)
 								playSoundEntity(players[i]->entity, 52, 64);
 								if ( stats[i]->type != SKELETON )
 								{
-									if ( !((svFlags & SV_FLAG_HUNGER) && stats[i]->playerRace == RACE_INSECTOID && stats[i]->stat_appearance == 0) )
+									if ( !((svFlags & SV_FLAG_HUNGER) && stats[i]->playerRace() == RACE_INSECTOID && stats[i]->stat_appearance == 0) )
 									{
 										stats[i]->HUNGER += 50; //Less nutrition than the refreshing fountain.
 										serverUpdateHunger(i);

@@ -59,9 +59,9 @@ void initDevil(Entity* my, Stat* myStats)
 
 		if (players[0] && players[0]->entity)
 		{
-			my->monsterTarget = players[0]->entity->getUID();
-			my->monsterTargetX = players[0]->entity->x;
-			my->monsterTargetY = players[0]->entity->y;
+			my->monsterTarget() = players[0]->entity->getUID();
+			my->monsterTargetX() = players[0]->entity->x;
+			my->monsterTargetY() = players[0]->entity->y;
 		}
 
 		my->setHardcoreStats(*myStats);
@@ -687,14 +687,14 @@ bool Entity::devilSummonMonster(Entity* summonOnEntity, Monster creature, int ra
 		timer->x = chosen.first * 16.0 + 8;
 		timer->y = chosen.second * 16.0 + 8;
 		timer->z = 0;
-		timer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_DEVIL_SUMMON_MONSTER;
-		timer->particleTimerCountdownSprite = 174;
-		timer->particleTimerEndAction = PARTICLE_EFFECT_DEVIL_SUMMON_MONSTER;
-		timer->particleTimerVariable1 = creature;
-		timer->particleTimerVariable2 = playerToTarget;
+		timer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_DEVIL_SUMMON_MONSTER;
+		timer->particleTimerCountdownSprite() = 174;
+		timer->particleTimerEndAction() = PARTICLE_EFFECT_DEVIL_SUMMON_MONSTER;
+		timer->particleTimerVariable1() = creature;
+		timer->particleTimerVariable2() = playerToTarget;
 		serverSpawnMiscParticlesAtLocation(static_cast<Sint16>(chosen.first), static_cast<Sint16>(chosen.second), 0, PARTICLE_EFFECT_DEVIL_SUMMON_MONSTER, 174);
 
-		monsterDevilNumSummons++;
+		monsterDevilNumSummons()++;
 		return true;
 	}
 	return false;

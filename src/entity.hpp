@@ -48,25 +48,36 @@ struct spell_t;
 // entity class
 class Entity
 {
-	Sint32& circuit_status;	// Use CIRCUIT_OFF and CIRCUIT_ON.
-	Sint32& switch_power;	// Switch/mechanism power status.
-	Sint32& chanceToPutOutFire; // skill[37] - Value between 5 and 10, with 10 being the default starting chance, and 5 being absolute minimum
+	inline int& circuit_status() { return skill[28]; }
+	inline const int& circuit_status() const { return skill[28]; }	// Use CIRCUIT_OFF and CIRCUIT_ON.
+	inline int& switch_power() { return skill[0]; }
+	inline const int& switch_power() const { return skill[0]; }	// Switch/mechanism power status.
+	inline int& chanceToPutOutFire() { return skill[37]; }
+	inline const int& chanceToPutOutFire() const { return skill[37]; } // skill[37] - Value between 5 and 10, with 10 being the default starting chance, and 5 being absolute minimum
 
 	// Power crystal skills
-	Sint32& crystalInitialised; // 1 if init, else 0 skill[1]
-	Sint32& crystalTurning; // 1 if currently rotating, else 0 skill[3]
-	Sint32& crystalTurnStartDir; // when rotating, the previous facing direction stored here 0-3 skill[4]
-
-	Sint32& crystalGeneratedElectricityNodes; // 1 if electricity nodes generated previously, else 0 skill[5]
-	Sint32& crystalHoverDirection; // animation, waiting/up/down floating state skill[7]
-	Sint32& crystalHoverWaitTimer; // animation, if waiting state, then wait this many ticks before moving to next state skill[8]
+	inline int& crystalInitialised() { return skill[1]; }
+	inline const int& crystalInitialised() const { return skill[1]; } // 1 if init, else 0 skill[1]
+	inline int& crystalTurning() { return skill[3]; }
+	inline const int& crystalTurning() const { return skill[3]; } // 1 if currently rotating, else 0 skill[3]
+	inline int& crystalTurnStartDir() { return skill[4]; }
+	inline const int& crystalTurnStartDir() const { return skill[4]; } // when rotating, the previous facing direction stored here 0-3 skill[4]
+	inline int& crystalGeneratedElectricityNodes() { return skill[5]; }
+	inline const int& crystalGeneratedElectricityNodes() const { return skill[5]; } // 1 if electricity nodes generated previously, else 0 skill[5]
+	inline int& crystalHoverDirection() { return skill[7]; }
+	inline const int& crystalHoverDirection() const { return skill[7]; } // animation, waiting/up/down floating state skill[7]
+	inline int& crystalHoverWaitTimer() { return skill[8]; }
+	inline const int& crystalHoverWaitTimer() const { return skill[8]; } // animation, if waiting state, then wait this many ticks before moving to next state skill[8]
 
 	// Pedestal Orb skills
-	Sint32& orbInitialised; // 1 if init, else 0 skill[1]
-	Sint32& orbHoverDirection; // animation, waiting/up/down floating state skill[7]
-	Sint32& orbHoverWaitTimer; // animation, if waiting state, then wait this many ticks before moving to next state skill[8]
-
-	Sint32& entityShowOnMap; //skill[59]
+	inline int& orbInitialised() { return skill[1]; }
+	inline const int& orbInitialised() const { return skill[1]; } // 1 if init, else 0 skill[1]
+	inline int& orbHoverDirection() { return skill[7]; }
+	inline const int& orbHoverDirection() const { return skill[7]; } // animation, waiting/up/down floating state skill[7]
+	inline int& orbHoverWaitTimer() { return skill[8]; }
+	inline const int& orbHoverWaitTimer() const { return skill[8]; } // animation, if waiting state, then wait this many ticks before moving to next state skill[8]
+	inline int& entityShowOnMap() { return skill[59]; }
+	inline const int& entityShowOnMap() const { return skill[59]; } //skill[59]
 
 	//### Begin - Private Entity Constants for BURNING Status Effect
 	static const Sint32 MIN_TICKS_ON_FIRE		= TICKS_TO_PROCESS_FIRE *  4; // Minimum time an Entity can be on fire is  4 cycles (120 ticks)
@@ -177,30 +188,39 @@ public:
 
 	//Chest skills.
 	//skill[0]
-	Sint32& chestInit;
+	inline int& chestInit() { return skill[0]; }
+	inline const int& chestInit() const { return skill[0]; }
 	//skill[1]
 	//0 = closed. 1 = open.
 	//0 = closed. 1 = open.
-	Sint32& chestStatus;
+	inline int& chestStatus() { return skill[1]; }
+	inline const int& chestStatus() const { return skill[1]; }
 	//skill[2] is reserved for all entities.
 	//skill[3]
-	Sint32& chestHealth;
+	inline int& chestHealth() { return skill[3]; }
+	inline const int& chestHealth() const { return skill[3]; }
 	//skill[5]
 	//Index of the player the chest was opened by.
-	Sint32& chestOpener;
+	inline int& chestOpener() { return skill[5]; }
+	inline const int& chestOpener() const { return skill[5]; }
 	//skill[6]
-	Sint32& chestLidClicked;
+	inline int& chestLidClicked() { return skill[6]; }
+	inline const int& chestLidClicked() const { return skill[6]; }
 	//skill[7]
-	Sint32& chestAmbience;
+	inline int& chestAmbience() { return skill[7]; }
+	inline const int& chestAmbience() const { return skill[7]; }
 	//skill[8]
-	Sint32& chestMaxHealth;
+	inline int& chestMaxHealth() { return skill[8]; }
+	inline const int& chestMaxHealth() const { return skill[8]; }
 	//skill[9]
 	//field to be set if the chest sprite is 75-81 in the editor, otherwise should stay at value 0
-	Sint32& chestType;
+	inline int& chestType() { return skill[9]; }
+	inline const int& chestType() const { return skill[9]; }
 
 	//skill[4]
 	//0 = unlocked. 1 = locked.
-	Sint32& chestLocked;
+	inline int& chestLocked() { return skill[4]; }
+	inline const int& chestLocked() const { return skill[4]; }
 	/*
 	 * skill[10]
 	 * 1 = chest already has been unlocked, or spawned in unlocked (prevent spell exploit)
@@ -209,337 +229,604 @@ public:
 	 * Also doesn't spawn gold for chests that didn't spawn locked
 	 * (e.g. you locked a chest with a spell...sorry, no gold for you)
 	 */
-	Sint32& chestPreventLockpickCapstoneExploit;
-	Sint32& chestHasVampireBook; // skill[11]
-	Sint32& chestLockpickHealth; // skill[12]
-	Sint32& chestOldHealth; //skill[15]
-	Sint32& chestMimicChance; //skill[16]
-	Sint32& chestVoidState = skill[17];
-
-	Sint32& char_gonnavomit; // skill[26]
-	Sint32& char_heal; // skill[22]
-	Sint32& char_energize; // skill[23]
-	Sint32& char_drunk; // skill[24]
-	Sint32& char_torchtime; // skill[25]
-	Sint32& char_poison; // skill[21]
-	Sint32& char_fire;		// skill[36] - Counter for how many ticks Entity will be on fire
+	inline int& chestPreventLockpickCapstoneExploit() { return skill[10]; }
+	inline const int& chestPreventLockpickCapstoneExploit() const { return skill[10]; }
+	inline int& chestHasVampireBook() { return skill[11]; }
+	inline const int& chestHasVampireBook() const { return skill[11]; } // skill[11]
+	inline int& chestLockpickHealth() { return skill[12]; }
+	inline const int& chestLockpickHealth() const { return skill[12]; } // skill[12]
+	inline int& chestOldHealth() { return skill[15]; }
+	inline const int& chestOldHealth() const { return skill[15]; } //skill[15]
+	inline int& chestMimicChance() { return skill[16]; }
+	inline const int& chestMimicChance() const { return skill[16]; } //skill[16]
+	inline int& chestVoidState() { return skill[17]; }
+	inline const int& chestVoidState() const { return skill[17]; }
+	inline int& char_gonnavomit() { return skill[26]; }
+	inline const int& char_gonnavomit() const { return skill[26]; } // skill[26]
+	inline int& char_heal() { return skill[22]; }
+	inline const int& char_heal() const { return skill[22]; } // skill[22]
+	inline int& char_energize() { return skill[23]; }
+	inline const int& char_energize() const { return skill[23]; } // skill[23]
+	inline int& char_drunk() { return skill[24]; }
+	inline const int& char_drunk() const { return skill[24]; } // skill[24]
+	inline int& char_torchtime() { return skill[25]; }
+	inline const int& char_torchtime() const { return skill[25]; } // skill[25]
+	inline int& char_poison() { return skill[21]; }
+	inline const int& char_poison() const { return skill[21]; } // skill[21]
+	inline int& char_fire() { return skill[36]; }
+	inline const int& char_fire() const { return skill[36]; }		// skill[36] - Counter for how many ticks Entity will be on fire
 
 	//--PUBLIC MONSTER SKILLS--
-	Sint32& monsterState; //skill[0]
-	Sint32& monsterTarget; //skill[1]
-	real_t& monsterTargetX; //fskill[2]
-	real_t& monsterTargetY; //fskill[3]
-	Sint32& monsterSpecialTimer; //skill[29]
+	inline int& monsterState() { return skill[0]; }
+	inline const int& monsterState() const { return skill[0]; } //skill[0]
+	inline int& monsterTarget() { return skill[1]; }
+	inline const int& monsterTarget() const { return skill[1]; } //skill[1]
+	inline real_t& monsterTargetX() { return fskill[2]; }
+	inline const real_t& monsterTargetX() const { return fskill[2]; } //fskill[2]
+	inline real_t& monsterTargetY() { return fskill[3]; }
+	inline const real_t& monsterTargetY() const { return fskill[3]; } //fskill[3]
+	inline int& monsterSpecialTimer() { return skill[29]; }
+	inline const int& monsterSpecialTimer() const { return skill[29]; } //skill[29]
 	//Only used by goatman.
-	Sint32& monsterSpecialState; //skill[33]
-	Sint32& monsterSpellAnimation; //skill[31]
-	Sint32& monsterFootstepType; //skill[32]
-	Sint32& monsterLookTime; //skill[4]
-	Sint32& monsterAttack; //skill[8]
-	Sint32& monsterAttackTime; //skill[9]
-	Sint32& monsterArmbended; //skill[10]
-	real_t& monsterWeaponYaw; //fskill[5]
-	Sint32& monsterMoveTime; //skill[6]
-	Sint32& monsterHitTime; //skill[7]
-	Sint32& monsterPathBoundaryXStart; //skill[14]
-	Sint32& monsterPathBoundaryYStart; //skill[15]
-	Sint32& monsterPathBoundaryXEnd; //skill[16]
-	Sint32& monsterPathBoundaryYEnd; //skill[17]
-	Sint32& monsterStoreType; //skill[18]
-	Sint32& monsterDevilNumSummons; //skill[18]
-	Sint32& monsterStrafeDirection; //skill[39]
-	Sint32& monsterPathCount; //skill[38]
-	real_t& monsterLookDir; //fskill[4]
-	Sint32& monsterEntityRenderAsTelepath; //skill[41]
-	Sint32& monsterAllyIndex; //skill[42] If monster is an ally of a player, assign number 0-3 to it for the players to track on the map.
-	Sint32& monsterAllyState; //skill[43]
-	Sint32& monsterAllyPickupItems; //skill[44]
-	Sint32& monsterAllyInteractTarget; //skill[45]
-	Sint32& monsterAllyClass; //skill[46]
-	Sint32& monsterDefend; //skill[47]
-	Sint32& monsterAllySpecial; //skill[48]
-	Sint32& monsterAllySpecialCooldown; //skill[49]
-	Sint32& monsterAllySummonRank; //skill[50]
-	real_t& monsterKnockbackVelocity; //fskill[9]
-	Sint32& monsterKnockbackUID; //skill[51]
-	Sint32& creatureWebbedSlowCount; //skill[52]
-	Sint32& monsterFearfulOfUid; //skill[53]
-	Sint32& creatureShadowTaggedThisUid; //skill[54]
-	Sint32& monsterIllusionTauntingThisUid; //skill[55]
-	Sint32& monsterLastDistractedByNoisemaker;//skill[55] shared with above as above only is for inner demons.
-	Sint32& monsterExtraReflexTick; //skill[56]
-	real_t& monsterSentrybotLookDir; //fskill[10]
-	real_t& monsterKnockbackTangentDir; //fskill[11]
-	real_t& playerStrafeVelocity; //fskill[12]
-	real_t& playerStrafeDir; //fskill[13]
-	real_t& monsterSpecialAttackUnequipSafeguard; //fskill[14]
-	real_t& creatureWindDir; //fskill[15]
-	real_t& creatureWindVelocity; //fskill[16]
-	real_t& creatureHoverZ; //fskill[17]
+	inline int& monsterSpecialState() { return skill[33]; }
+	inline const int& monsterSpecialState() const { return skill[33]; } //skill[33]
+	inline int& monsterSpellAnimation() { return skill[31]; }
+	inline const int& monsterSpellAnimation() const { return skill[31]; } //skill[31]
+	inline int& monsterFootstepType() { return skill[32]; }
+	inline const int& monsterFootstepType() const { return skill[32]; } //skill[32]
+	inline int& monsterLookTime() { return skill[4]; }
+	inline const int& monsterLookTime() const { return skill[4]; } //skill[4]
+	inline int& monsterAttack() { return skill[8]; }
+	inline const int& monsterAttack() const { return skill[8]; } //skill[8]
+	inline int& monsterAttackTime() { return skill[9]; }
+	inline const int& monsterAttackTime() const { return skill[9]; } //skill[9]
+	inline int& monsterArmbended() { return skill[10]; }
+	inline const int& monsterArmbended() const { return skill[10]; } //skill[10]
+	inline real_t& monsterWeaponYaw() { return fskill[5]; }
+	inline const real_t& monsterWeaponYaw() const { return fskill[5]; } //fskill[5]
+	inline int& monsterMoveTime() { return skill[6]; }
+	inline const int& monsterMoveTime() const { return skill[6]; } //skill[6]
+	inline int& monsterHitTime() { return skill[7]; }
+	inline const int& monsterHitTime() const { return skill[7]; } //skill[7]
+	inline int& monsterPathBoundaryXStart() { return skill[14]; }
+	inline const int& monsterPathBoundaryXStart() const { return skill[14]; } //skill[14]
+	inline int& monsterPathBoundaryYStart() { return skill[15]; }
+	inline const int& monsterPathBoundaryYStart() const { return skill[15]; } //skill[15]
+	inline int& monsterPathBoundaryXEnd() { return skill[16]; }
+	inline const int& monsterPathBoundaryXEnd() const { return skill[16]; } //skill[16]
+	inline int& monsterPathBoundaryYEnd() { return skill[17]; }
+	inline const int& monsterPathBoundaryYEnd() const { return skill[17]; } //skill[17]
+	inline int& monsterStoreType() { return skill[18]; }
+	inline const int& monsterStoreType() const { return skill[18]; } //skill[18]
+	inline int& monsterDevilNumSummons() { return skill[18]; }
+	inline const int& monsterDevilNumSummons() const { return skill[18]; } //skill[18]
+	inline int& monsterStrafeDirection() { return skill[39]; }
+	inline const int& monsterStrafeDirection() const { return skill[39]; } //skill[39]
+	inline int& monsterPathCount() { return skill[38]; }
+	inline const int& monsterPathCount() const { return skill[38]; } //skill[38]
+	inline real_t& monsterLookDir() { return fskill[4]; }
+	inline const real_t& monsterLookDir() const { return fskill[4]; } //fskill[4]
+	inline int& monsterEntityRenderAsTelepath() { return skill[41]; }
+	inline const int& monsterEntityRenderAsTelepath() const { return skill[41]; } //skill[41]
+	inline int& monsterAllyIndex() { return skill[42]; }
+	inline const int& monsterAllyIndex() const { return skill[42]; } //skill[42] If monster is an ally of a player, assign number 0-3 to it for the players to track on the map.
+	inline int& monsterAllyState() { return skill[43]; }
+	inline const int& monsterAllyState() const { return skill[43]; } //skill[43]
+	inline int& monsterAllyPickupItems() { return skill[44]; }
+	inline const int& monsterAllyPickupItems() const { return skill[44]; } //skill[44]
+	inline int& monsterAllyInteractTarget() { return skill[45]; }
+	inline const int& monsterAllyInteractTarget() const { return skill[45]; } //skill[45]
+	inline int& monsterAllyClass() { return skill[46]; }
+	inline const int& monsterAllyClass() const { return skill[46]; } //skill[46]
+	inline int& monsterDefend() { return skill[47]; }
+	inline const int& monsterDefend() const { return skill[47]; } //skill[47]
+	inline int& monsterAllySpecial() { return skill[48]; }
+	inline const int& monsterAllySpecial() const { return skill[48]; } //skill[48]
+	inline int& monsterAllySpecialCooldown() { return skill[49]; }
+	inline const int& monsterAllySpecialCooldown() const { return skill[49]; } //skill[49]
+	inline int& monsterAllySummonRank() { return skill[50]; }
+	inline const int& monsterAllySummonRank() const { return skill[50]; } //skill[50]
+	inline real_t& monsterKnockbackVelocity() { return fskill[9]; }
+	inline const real_t& monsterKnockbackVelocity() const { return fskill[9]; } //fskill[9]
+	inline int& monsterKnockbackUID() { return skill[51]; }
+	inline const int& monsterKnockbackUID() const { return skill[51]; } //skill[51]
+	inline int& creatureWebbedSlowCount() { return skill[52]; }
+	inline const int& creatureWebbedSlowCount() const { return skill[52]; } //skill[52]
+	inline int& monsterFearfulOfUid() { return skill[53]; }
+	inline const int& monsterFearfulOfUid() const { return skill[53]; } //skill[53]
+	inline int& creatureShadowTaggedThisUid() { return skill[54]; }
+	inline const int& creatureShadowTaggedThisUid() const { return skill[54]; } //skill[54]
+	inline int& monsterIllusionTauntingThisUid() { return skill[55]; }
+	inline const int& monsterIllusionTauntingThisUid() const { return skill[55]; } //skill[55]
+	inline int& monsterLastDistractedByNoisemaker() { return skill[55]; }
+	inline const int& monsterLastDistractedByNoisemaker() const { return skill[55]; }//skill[55] shared with above as above only is for inner demons.
+	inline int& monsterExtraReflexTick() { return skill[56]; }
+	inline const int& monsterExtraReflexTick() const { return skill[56]; } //skill[56]
+	inline real_t& monsterSentrybotLookDir() { return fskill[10]; }
+	inline const real_t& monsterSentrybotLookDir() const { return fskill[10]; } //fskill[10]
+	inline real_t& monsterKnockbackTangentDir() { return fskill[11]; }
+	inline const real_t& monsterKnockbackTangentDir() const { return fskill[11]; } //fskill[11]
+	inline real_t& playerStrafeVelocity() { return fskill[12]; }
+	inline const real_t& playerStrafeVelocity() const { return fskill[12]; } //fskill[12]
+	inline real_t& playerStrafeDir() { return fskill[13]; }
+	inline const real_t& playerStrafeDir() const { return fskill[13]; } //fskill[13]
+	inline real_t& monsterSpecialAttackUnequipSafeguard() { return fskill[14]; }
+	inline const real_t& monsterSpecialAttackUnequipSafeguard() const { return fskill[14]; } //fskill[14]
+	inline real_t& creatureWindDir() { return fskill[15]; }
+	inline const real_t& creatureWindDir() const { return fskill[15]; } //fskill[15]
+	inline real_t& creatureWindVelocity() { return fskill[16]; }
+	inline const real_t& creatureWindVelocity() const { return fskill[16]; } //fskill[16]
+	inline real_t& creatureHoverZ() { return fskill[17]; }
+	inline const real_t& creatureHoverZ() const { return fskill[17]; } //fskill[17]
 
 	//--EFFECTS--
-	Sint32& effectPolymorph; // skill[50]
-	Sint32& effectShapeshift; // skill[53]
+	inline int& effectPolymorph() { return skill[50]; }
+	inline const int& effectPolymorph() const { return skill[50]; } // skill[50]
+	inline int& effectShapeshift() { return skill[53]; }
+	inline const int& effectShapeshift() const { return skill[53]; } // skill[53]
 
 	//--PUBLIC GENERAL ENTITY STUFF--
-	Sint32& interactedByMonster; //skill[47] for use with monsterAllyInteractTarget
-	real_t& highlightForUI; //fskill[29] for highlighting interactibles
-	real_t& highlightForUIGlow; //fskill[28] for highlighting animation
-	real_t& grayscaleGLRender; //fskill[27] for grayscale rendering
-	real_t& noColorChangeAllyLimb; // fskill[26] for ignoring recolor of follower limbs
-	real_t& mistformGLRender = fskill[22];
+	inline int& interactedByMonster() { return skill[47]; }
+	inline const int& interactedByMonster() const { return skill[47]; } //skill[47] for use with monsterAllyInteractTarget
+	inline real_t& highlightForUI() { return fskill[29]; }
+	inline const real_t& highlightForUI() const { return fskill[29]; } //fskill[29] for highlighting interactibles
+	inline real_t& highlightForUIGlow() { return fskill[28]; }
+	inline const real_t& highlightForUIGlow() const { return fskill[28]; } //fskill[28] for highlighting animation
+	inline real_t& grayscaleGLRender() { return fskill[27]; }
+	inline const real_t& grayscaleGLRender() const { return fskill[27]; } //fskill[27] for grayscale rendering
+	inline real_t& noColorChangeAllyLimb() { return fskill[26]; }
+	inline const real_t& noColorChangeAllyLimb() const { return fskill[26]; } // fskill[26] for ignoring recolor of follower limbs
+	inline real_t& mistformGLRender() { return fskill[22]; }
+	inline const real_t& mistformGLRender() const { return fskill[22]; }
 
 	//--PUBLIC PLAYER SKILLS--
-	Sint32& playerLevelEntrySpeech; //skill[18]
-	Sint32& playerAliveTime; //skill[12]
-	Sint32& playerVampireCurse; //skill[51]
-	Sint32& playerAutomatonDeathCounter; //skill[15] - 0 if unused, > 0 if counting to death
-	Sint32& playerCreatedDeathCam; //skill[16] - if we triggered actDeathCam already.
-	Sint32& playerCastTimeAnim = skill[17]; // how many ticks we're casting for in the current animation
+	inline int& playerLevelEntrySpeech() { return skill[18]; }
+	inline const int& playerLevelEntrySpeech() const { return skill[18]; } //skill[18]
+	inline int& playerAliveTime() { return skill[12]; }
+	inline const int& playerAliveTime() const { return skill[12]; } //skill[12]
+	inline int& playerVampireCurse() { return skill[51]; }
+	inline const int& playerVampireCurse() const { return skill[51]; } //skill[51]
+	inline int& playerAutomatonDeathCounter() { return skill[15]; }
+	inline const int& playerAutomatonDeathCounter() const { return skill[15]; } //skill[15] - 0 if unused, > 0 if counting to death
+	inline int& playerCreatedDeathCam() { return skill[16]; }
+	inline const int& playerCreatedDeathCam() const { return skill[16]; } //skill[16] - if we triggered actDeathCam already.
+	inline int& playerCastTimeAnim() { return skill[17]; }
+	inline const int& playerCastTimeAnim() const { return skill[17]; } // how many ticks we're casting for in the current animation
 
 	//--PUBLIC MONSTER ANIMATION SKILLS--
-	Sint32& monsterAnimationLimbDirection;  //skill[20]
-	Sint32& monsterAnimationLimbOvershoot; //skill[30]
+	inline int& monsterAnimationLimbDirection() { return skill[20]; }
+	inline const int& monsterAnimationLimbDirection() const { return skill[20]; }  //skill[20]
+	inline int& monsterAnimationLimbOvershoot() { return skill[30]; }
+	inline const int& monsterAnimationLimbOvershoot() const { return skill[30]; } //skill[30]
 
 	//--PUBLIC MONSTER SHADOW SKILLS--
-	Sint32& monsterShadowInitialMimic; //skill[34]. 0 = false, 1 = true.
-	Sint32& monsterShadowDontChangeName; //skill[35]. 0 = false, 1 = true. Doesn't change name in its mimic if = 1.
+	inline int& monsterShadowInitialMimic() { return skill[34]; }
+	inline const int& monsterShadowInitialMimic() const { return skill[34]; } //skill[34]. 0 = false, 1 = true.
+	inline int& monsterShadowDontChangeName() { return skill[35]; }
+	inline const int& monsterShadowDontChangeName() const { return skill[35]; } //skill[35]. 0 = false, 1 = true. Doesn't change name in its mimic if = 1.
 
 	//--PUBLIC MONSTER SLIME SKILLS--
-	Sint32& monsterSlimeLastAttack; // skill[34]
+	inline int& monsterSlimeLastAttack() { return skill[34]; }
+	inline const int& monsterSlimeLastAttack() const { return skill[34]; } // skill[34]
 
 	//--PUBLIC MONSTER LICH SKILLS--
-	Sint32& monsterLichFireMeleeSeq; //skill[34]
-	Sint32& monsterLichFireMeleePrev; //skill[35]
-	Sint32& monsterLichIceCastSeq; //skill[34]
-	Sint32& monsterLichIceCastPrev; //skill[35]
-	Sint32& monsterLichMagicCastCount; //skill[37] count the basic spell attacks in the seq and switch things up if too many in a row.
-	Sint32& monsterLichMeleeSwingCount; //skill[38] count the 'regular' attacks in the seq and switch things up if too many in a row.
-	Sint32& monsterLichBattleState; //skill[27] used to track hp/battle progress
-	Sint32& monsterLichTeleportTimer; //skill[40] used to track conditions to teleport away.
-	Sint32& monsterLichAllyStatus; //skill[18] used to track if allies are alive.
-	Sint32& monsterLichAllyUID; //skill[17] used to track lich ally uid.
+	inline int& monsterLichFireMeleeSeq() { return skill[34]; }
+	inline const int& monsterLichFireMeleeSeq() const { return skill[34]; } //skill[34]
+	inline int& monsterLichFireMeleePrev() { return skill[35]; }
+	inline const int& monsterLichFireMeleePrev() const { return skill[35]; } //skill[35]
+	inline int& monsterLichIceCastSeq() { return skill[34]; }
+	inline const int& monsterLichIceCastSeq() const { return skill[34]; } //skill[34]
+	inline int& monsterLichIceCastPrev() { return skill[35]; }
+	inline const int& monsterLichIceCastPrev() const { return skill[35]; } //skill[35]
+	inline int& monsterLichMagicCastCount() { return skill[37]; }
+	inline const int& monsterLichMagicCastCount() const { return skill[37]; } //skill[37] count the basic spell attacks in the seq and switch things up if too many in a row.
+	inline int& monsterLichMeleeSwingCount() { return skill[38]; }
+	inline const int& monsterLichMeleeSwingCount() const { return skill[38]; } //skill[38] count the 'regular' attacks in the seq and switch things up if too many in a row.
+	inline int& monsterLichBattleState() { return skill[27]; }
+	inline const int& monsterLichBattleState() const { return skill[27]; } //skill[27] used to track hp/battle progress
+	inline int& monsterLichTeleportTimer() { return skill[40]; }
+	inline const int& monsterLichTeleportTimer() const { return skill[40]; } //skill[40] used to track conditions to teleport away.
+	inline int& monsterLichAllyStatus() { return skill[18]; }
+	inline const int& monsterLichAllyStatus() const { return skill[18]; } //skill[18] used to track if allies are alive.
+	inline int& monsterLichAllyUID() { return skill[17]; }
+	inline const int& monsterLichAllyUID() const { return skill[17]; } //skill[17] used to track lich ally uid.
 
 	//--PUBLIC POWER CRYSTAL SKILLS--
-	Sint32& crystalTurnReverse; // skill[9] 0 Clockwise, 1 Anti-Clockwise
-	Sint32& crystalNumElectricityNodes; // skill[6] how many nodes to spawn in the facing dir
-	Sint32& crystalSpellToActivate; // skill[10] If 1, must be hit by unlocking spell to start generating electricity.
-
-	real_t& crystalStartZ; // fskill[0] mid point of animation, starting height.
-	real_t& crystalMaxZVelocity; // fskill[1] 
-	real_t& crystalMinZVelocity; // fskill[2] 
-	real_t& crystalTurnVelocity; // fskill[3] how fast to turn on click.
+	inline int& crystalTurnReverse() { return skill[9]; }
+	inline const int& crystalTurnReverse() const { return skill[9]; } // skill[9] 0 Clockwise, 1 Anti-Clockwise
+	inline int& crystalNumElectricityNodes() { return skill[6]; }
+	inline const int& crystalNumElectricityNodes() const { return skill[6]; } // skill[6] how many nodes to spawn in the facing dir
+	inline int& crystalSpellToActivate() { return skill[10]; }
+	inline const int& crystalSpellToActivate() const { return skill[10]; } // skill[10] If 1, must be hit by unlocking spell to start generating electricity.
+	inline real_t& crystalStartZ() { return fskill[0]; }
+	inline const real_t& crystalStartZ() const { return fskill[0]; } // fskill[0] mid point of animation, starting height.
+	inline real_t& crystalMaxZVelocity() { return fskill[1]; }
+	inline const real_t& crystalMaxZVelocity() const { return fskill[1]; } // fskill[1] 
+	inline real_t& crystalMinZVelocity() { return fskill[2]; }
+	inline const real_t& crystalMinZVelocity() const { return fskill[2]; } // fskill[2] 
+	inline real_t& crystalTurnVelocity() { return fskill[3]; }
+	inline const real_t& crystalTurnVelocity() const { return fskill[3]; } // fskill[3] how fast to turn on click.
 
 	//--PUBLIC GATE SKILLS--
-	Sint32& gateInit; //skill[1]
-	Sint32& gateStatus; //skill[3]
-	Sint32& gateRattle; //skill[4]
-	real_t& gateStartHeight; //fskill[0]
-	real_t& gateVelZ; //vel_z
-	Sint32& gateInverted; //skill[5]
-	Sint32& gateDisableOpening; //skill[6]
+	inline int& gateInit() { return skill[1]; }
+	inline const int& gateInit() const { return skill[1]; } //skill[1]
+	inline int& gateStatus() { return skill[3]; }
+	inline const int& gateStatus() const { return skill[3]; } //skill[3]
+	inline int& gateRattle() { return skill[4]; }
+	inline const int& gateRattle() const { return skill[4]; } //skill[4]
+	inline real_t& gateStartHeight() { return fskill[0]; }
+	inline const real_t& gateStartHeight() const { return fskill[0]; } //fskill[0]
+	inline real_t& gateVelZ() { return vel_z; }
+	inline const real_t& gateVelZ() const { return vel_z; } //vel_z
+	inline int& gateInverted() { return skill[5]; }
+	inline const int& gateInverted() const { return skill[5]; } //skill[5]
+	inline int& gateDisableOpening() { return skill[6]; }
+	inline const int& gateDisableOpening() const { return skill[6]; } //skill[6]
 
 	//--PUBLIC LEVER SKILLS--
-	Sint32& leverTimerTicks;//skill[1]
-	Sint32& leverStatus;//skill[3]
+	inline int& leverTimerTicks() { return skill[3]; }
+	inline const int& leverTimerTicks() const { return skill[3]; }//skill[1]
+	inline int& leverStatus() { return skill[1]; }
+	inline const int& leverStatus() const { return skill[1]; }//skill[3]
 
 	//--PUBLIC BOULDER TRAP SKILLS--
-	Sint32& boulderTrapRefireAmount; //skill[1]
-	Sint32& boulderTrapRefireDelay; //skill[3]
-	Sint32& boulderTrapAmbience; //skill[6]
-	Sint32& boulderTrapFired; //skill[0]
-	Sint32& boulderTrapRefireCounter; //skill[4]
-	Sint32& boulderTrapPreDelay; //skill[5]
-	Sint32& boulderTrapRocksToSpawn; //skill[7] bitwise storage. 
-
-	Sint32& boulderShatterEarthSpell = skill[16];
-	Sint32& boulderShatterEarthDamage = skill[17];
+	inline int& boulderTrapRefireAmount() { return skill[1]; }
+	inline const int& boulderTrapRefireAmount() const { return skill[1]; } //skill[1]
+	inline int& boulderTrapRefireDelay() { return skill[3]; }
+	inline const int& boulderTrapRefireDelay() const { return skill[3]; } //skill[3]
+	inline int& boulderTrapAmbience() { return skill[6]; }
+	inline const int& boulderTrapAmbience() const { return skill[6]; } //skill[6]
+	inline int& boulderTrapFired() { return skill[0]; }
+	inline const int& boulderTrapFired() const { return skill[0]; } //skill[0]
+	inline int& boulderTrapRefireCounter() { return skill[4]; }
+	inline const int& boulderTrapRefireCounter() const { return skill[4]; } //skill[4]
+	inline int& boulderTrapPreDelay() { return skill[5]; }
+	inline const int& boulderTrapPreDelay() const { return skill[5]; } //skill[5]
+	inline int& boulderTrapRocksToSpawn() { return skill[7]; }
+	inline const int& boulderTrapRocksToSpawn() const { return skill[7]; } //skill[7] bitwise storage. 
+	inline int& boulderShatterEarthSpell() { return skill[16]; }
+	inline const int& boulderShatterEarthSpell() const { return skill[16]; }
+	inline int& boulderShatterEarthDamage() { return skill[17]; }
+	inline const int& boulderShatterEarthDamage() const { return skill[17]; }
 
 	//--PUBLIC AMBIENT PARTICLE EFFECT SKILLS--
-	Sint32& particleDuration; //skill[0]
-	Sint32& particleShrink; //skill[1]
+	inline int& particleDuration() { return skill[0]; }
+	inline const int& particleDuration() const { return skill[0]; } //skill[0]
+	inline int& particleShrink() { return skill[1]; }
+	inline const int& particleShrink() const { return skill[1]; } //skill[1]
 
 	//--PUBLIC PARTICLE TIMER EFFECT SKILLS--
-	Sint32& particleTimerDuration; //skill[0]
-	Sint32& particleTimerEndAction; //skill[1]
-	Sint32& particleTimerEndSprite; //skill[3]
-	Sint32& particleTimerCountdownAction; //skill[4]
-	Sint32& particleTimerCountdownSprite; //skill[5]
-	Sint32& particleTimerTarget; //skill[6]
-	Sint32& particleTimerPreDelay; //skill[7]
-	Sint32& particleTimerVariable1; //skill[8]
-	Sint32& particleTimerVariable2; //skill[9]
-	Sint32& particleTimerEffectLifetime = skill[10];
-	Sint32& particleTimerVariable3 = skill[11];
-	Sint32& particleTimerVariable4 = skill[12];
+	inline int& particleTimerDuration() { return skill[0]; }
+	inline const int& particleTimerDuration() const { return skill[0]; } //skill[0]
+	inline int& particleTimerEndAction() { return skill[1]; }
+	inline const int& particleTimerEndAction() const { return skill[1]; } //skill[1]
+	inline int& particleTimerEndSprite() { return skill[3]; }
+	inline const int& particleTimerEndSprite() const { return skill[3]; } //skill[3]
+	inline int& particleTimerCountdownAction() { return skill[4]; }
+	inline const int& particleTimerCountdownAction() const { return skill[4]; } //skill[4]
+	inline int& particleTimerCountdownSprite() { return skill[5]; }
+	inline const int& particleTimerCountdownSprite() const { return skill[5]; } //skill[5]
+	inline int& particleTimerTarget() { return skill[6]; }
+	inline const int& particleTimerTarget() const { return skill[6]; } //skill[6]
+	inline int& particleTimerPreDelay() { return skill[7]; }
+	inline const int& particleTimerPreDelay() const { return skill[7]; } //skill[7]
+	inline int& particleTimerVariable1() { return skill[8]; }
+	inline const int& particleTimerVariable1() const { return skill[8]; } //skill[8]
+	inline int& particleTimerVariable2() { return skill[9]; }
+	inline const int& particleTimerVariable2() const { return skill[9]; } //skill[9]
+	inline int& particleTimerEffectLifetime() { return skill[10]; }
+	inline const int& particleTimerEffectLifetime() const { return skill[10]; }
+	inline int& particleTimerVariable3() { return skill[11]; }
+	inline const int& particleTimerVariable3() const { return skill[11]; }
+	inline int& particleTimerVariable4() { return skill[12]; }
+	inline const int& particleTimerVariable4() const { return skill[12]; }
 
 	//--PUBLIC DOOR SKILLS--
-	Sint32& doorDir; //skill[0]
-	Sint32& doorInit; //skill[1]
-	Sint32& doorStatus; //skill[3]
-	Sint32& doorHealth; //skill[4]
-	Sint32& doorLocked; //skill[5]
-	Sint32& doorSmacked; //skill[6]
-	Sint32& doorTimer; //skill[7]
-	Sint32& doorOldStatus; //skill[8]
-	Sint32& doorMaxHealth; //skill[9]
-	real_t& doorStartAng; //fskill[0]
-	Sint32& doorPreventLockpickExploit; //skill[10]
-	Sint32& doorForceLockedUnlocked; //skill[11]
-	Sint32& doorDisableLockpicks; //skill[12]
-	Sint32& doorDisableOpening; //skill[13]
-	Sint32& doorLockpickHealth; //skill[14]
-	Sint32& doorOldHealth; //skill[15]
-	Sint32& doorUnlockWhenPowered; //skill[16]
+	inline int& doorDir() { return skill[0]; }
+	inline const int& doorDir() const { return skill[0]; } //skill[0]
+	inline int& doorInit() { return skill[1]; }
+	inline const int& doorInit() const { return skill[1]; } //skill[1]
+	inline int& doorStatus() { return skill[3]; }
+	inline const int& doorStatus() const { return skill[3]; } //skill[3]
+	inline int& doorHealth() { return skill[4]; }
+	inline const int& doorHealth() const { return skill[4]; } //skill[4]
+	inline int& doorLocked() { return skill[5]; }
+	inline const int& doorLocked() const { return skill[5]; } //skill[5]
+	inline int& doorSmacked() { return skill[6]; }
+	inline const int& doorSmacked() const { return skill[6]; } //skill[6]
+	inline int& doorTimer() { return skill[7]; }
+	inline const int& doorTimer() const { return skill[7]; } //skill[7]
+	inline int& doorOldStatus() { return skill[8]; }
+	inline const int& doorOldStatus() const { return skill[8]; } //skill[8]
+	inline int& doorMaxHealth() { return skill[9]; }
+	inline const int& doorMaxHealth() const { return skill[9]; } //skill[9]
+	inline real_t& doorStartAng() { return fskill[0]; }
+	inline const real_t& doorStartAng() const { return fskill[0]; } //fskill[0]
+	inline int& doorPreventLockpickExploit() { return skill[10]; }
+	inline const int& doorPreventLockpickExploit() const { return skill[10]; } //skill[10]
+	inline int& doorForceLockedUnlocked() { return skill[11]; }
+	inline const int& doorForceLockedUnlocked() const { return skill[11]; } //skill[11]
+	inline int& doorDisableLockpicks() { return skill[12]; }
+	inline const int& doorDisableLockpicks() const { return skill[12]; } //skill[12]
+	inline int& doorDisableOpening() { return skill[13]; }
+	inline const int& doorDisableOpening() const { return skill[13]; } //skill[13]
+	inline int& doorLockpickHealth() { return skill[14]; }
+	inline const int& doorLockpickHealth() const { return skill[14]; } //skill[14]
+	inline int& doorOldHealth() { return skill[15]; }
+	inline const int& doorOldHealth() const { return skill[15]; } //skill[15]
+	inline int& doorUnlockWhenPowered() { return skill[16]; }
+	inline const int& doorUnlockWhenPowered() const { return skill[16]; } //skill[16]
 
 	//--PUBLIC PEDESTAL SKILLS--
-	Sint32& pedestalHasOrb; //skill[0]
-	Sint32& pedestalOrbType;  //skill[1]
-	Sint32& pedestalInvertedPower; //skill[3]
-	Sint32& pedestalInGround; //skill[4]
-	Sint32& pedestalInit; //skill[5]
-	Sint32& pedestalAmbience; //skill[6]
-	Sint32& pedestalLockOrb; //skill[7]
-	Sint32& pedestalPowerStatus; //skill[8]
-
-	real_t& orbStartZ; // fskill[0] mid point of animation, starting height.
-	real_t& orbMaxZVelocity; //fskill[1]
-	real_t& orbMinZVelocity; //fskill[2]
-	real_t& orbTurnVelocity; //fskill[3] how fast to turn.
+	inline int& pedestalHasOrb() { return skill[0]; }
+	inline const int& pedestalHasOrb() const { return skill[0]; } //skill[0]
+	inline int& pedestalOrbType() { return skill[1]; }
+	inline const int& pedestalOrbType() const { return skill[1]; }  //skill[1]
+	inline int& pedestalInvertedPower() { return skill[3]; }
+	inline const int& pedestalInvertedPower() const { return skill[3]; } //skill[3]
+	inline int& pedestalInGround() { return skill[4]; }
+	inline const int& pedestalInGround() const { return skill[4]; } //skill[4]
+	inline int& pedestalInit() { return skill[5]; }
+	inline const int& pedestalInit() const { return skill[5]; } //skill[5]
+	inline int& pedestalAmbience() { return skill[6]; }
+	inline const int& pedestalAmbience() const { return skill[6]; } //skill[6]
+	inline int& pedestalLockOrb() { return skill[7]; }
+	inline const int& pedestalLockOrb() const { return skill[7]; } //skill[7]
+	inline int& pedestalPowerStatus() { return skill[8]; }
+	inline const int& pedestalPowerStatus() const { return skill[8]; } //skill[8]
+	inline real_t& orbStartZ() { return fskill[0]; }
+	inline const real_t& orbStartZ() const { return fskill[0]; } // fskill[0] mid point of animation, starting height.
+	inline real_t& orbMaxZVelocity() { return fskill[1]; }
+	inline const real_t& orbMaxZVelocity() const { return fskill[1]; } //fskill[1]
+	inline real_t& orbMinZVelocity() { return fskill[2]; }
+	inline const real_t& orbMinZVelocity() const { return fskill[2]; } //fskill[2]
+	inline real_t& orbTurnVelocity() { return fskill[3]; }
+	inline const real_t& orbTurnVelocity() const { return fskill[3]; } //fskill[3] how fast to turn.
 
 	//--PUBLIC PORTAL SKILLS--
-	Sint32& portalAmbience; //skill[0]
-	Sint32& portalInit; //skill[1]
-	Sint32& portalNotSecret; //skill[3]
-	Sint32& portalVictoryType; //skill[4]
-	Sint32& portalFireAnimation; //skill[5]
-	Sint32& portalCustomLevelsToJump; //skill[6]
-	Sint32& portalCustomRequiresPower; //skill[7]
-	Sint32& portalCustomSprite; //skill[8]
-	Sint32& portalCustomSpriteAnimationFrames; //skill[9]
-	Sint32& portalCustomZOffset; //skill[10]
-	Sint32& portalCustomLevelText1; //skill[11]
-	Sint32& portalCustomLevelText2; //skill[12]
-	Sint32& portalCustomLevelText3; //skill[13]
-	Sint32& portalCustomLevelText4; //skill[14]
-	Sint32& portalCustomLevelText5; //skill[15]
-	Sint32& portalCustomLevelText6; //skill[16]
-	Sint32& portalCustomLevelText7; //skill[17]
-	Sint32& portalCustomLevelText8; //skill[18]
+	inline int& portalAmbience() { return skill[0]; }
+	inline const int& portalAmbience() const { return skill[0]; } //skill[0]
+	inline int& portalInit() { return skill[1]; }
+	inline const int& portalInit() const { return skill[1]; } //skill[1]
+	inline int& portalNotSecret() { return skill[3]; }
+	inline const int& portalNotSecret() const { return skill[3]; } //skill[3]
+	inline int& portalVictoryType() { return skill[4]; }
+	inline const int& portalVictoryType() const { return skill[4]; } //skill[4]
+	inline int& portalFireAnimation() { return skill[5]; }
+	inline const int& portalFireAnimation() const { return skill[5]; } //skill[5]
+	inline int& portalCustomLevelsToJump() { return skill[6]; }
+	inline const int& portalCustomLevelsToJump() const { return skill[6]; } //skill[6]
+	inline int& portalCustomRequiresPower() { return skill[7]; }
+	inline const int& portalCustomRequiresPower() const { return skill[7]; } //skill[7]
+	inline int& portalCustomSprite() { return skill[8]; }
+	inline const int& portalCustomSprite() const { return skill[8]; } //skill[8]
+	inline int& portalCustomSpriteAnimationFrames() { return skill[9]; }
+	inline const int& portalCustomSpriteAnimationFrames() const { return skill[9]; } //skill[9]
+	inline int& portalCustomZOffset() { return skill[10]; }
+	inline const int& portalCustomZOffset() const { return skill[10]; } //skill[10]
+	inline int& portalCustomLevelText1() { return skill[11]; }
+	inline const int& portalCustomLevelText1() const { return skill[11]; } //skill[11]
+	inline int& portalCustomLevelText2() { return skill[12]; }
+	inline const int& portalCustomLevelText2() const { return skill[12]; } //skill[12]
+	inline int& portalCustomLevelText3() { return skill[13]; }
+	inline const int& portalCustomLevelText3() const { return skill[13]; } //skill[13]
+	inline int& portalCustomLevelText4() { return skill[14]; }
+	inline const int& portalCustomLevelText4() const { return skill[14]; } //skill[14]
+	inline int& portalCustomLevelText5() { return skill[15]; }
+	inline const int& portalCustomLevelText5() const { return skill[15]; } //skill[15]
+	inline int& portalCustomLevelText6() { return skill[16]; }
+	inline const int& portalCustomLevelText6() const { return skill[16]; } //skill[16]
+	inline int& portalCustomLevelText7() { return skill[17]; }
+	inline const int& portalCustomLevelText7() const { return skill[17]; } //skill[17]
+	inline int& portalCustomLevelText8() { return skill[18]; }
+	inline const int& portalCustomLevelText8() const { return skill[18]; } //skill[18]
 
 	//--PUBLIC TELEPORTER SKILLS--
-	Sint32& teleporterX; //skill[0]
-	Sint32& teleporterY; //skill[1]
-	Sint32& teleporterType; //skill[3]
-	Sint32& teleporterAmbience; //skill[4]
-	Sint32& teleporterStartFrame = skill[5];
-	Sint32& teleporterCurrentFrame = skill[6];
-	Sint32& teleporterNumFrames = skill[7];
-	Sint32& teleporterDuration = skill[8];
+	inline int& teleporterX() { return skill[0]; }
+	inline const int& teleporterX() const { return skill[0]; } //skill[0]
+	inline int& teleporterY() { return skill[1]; }
+	inline const int& teleporterY() const { return skill[1]; } //skill[1]
+	inline int& teleporterType() { return skill[3]; }
+	inline const int& teleporterType() const { return skill[3]; } //skill[3]
+	inline int& teleporterAmbience() { return skill[4]; }
+	inline const int& teleporterAmbience() const { return skill[4]; } //skill[4]
+	inline int& teleporterStartFrame() { return skill[5]; }
+	inline const int& teleporterStartFrame() const { return skill[5]; }
+	inline int& teleporterCurrentFrame() { return skill[6]; }
+	inline const int& teleporterCurrentFrame() const { return skill[6]; }
+	inline int& teleporterNumFrames() { return skill[7]; }
+	inline const int& teleporterNumFrames() const { return skill[7]; }
+	inline int& teleporterDuration() { return skill[8]; }
+	inline const int& teleporterDuration() const { return skill[8]; }
 
 	//--PUBLIC CEILING TILE SKILLS--
-	Sint32& ceilingTileModel; //skill[0]
-	Sint32& ceilingTileDir; //skill[1]
-	Sint32& ceilingTileAllowTrap; //skill[3]
-	Sint32& ceilingTileBreakable; //skill[4]
+	inline int& ceilingTileModel() { return skill[0]; }
+	inline const int& ceilingTileModel() const { return skill[0]; } //skill[0]
+	inline int& ceilingTileDir() { return skill[1]; }
+	inline const int& ceilingTileDir() const { return skill[1]; } //skill[1]
+	inline int& ceilingTileAllowTrap() { return skill[3]; }
+	inline const int& ceilingTileAllowTrap() const { return skill[3]; } //skill[3]
+	inline int& ceilingTileBreakable() { return skill[4]; }
+	inline const int& ceilingTileBreakable() const { return skill[4]; } //skill[4]
 
 	//--PUBLIC FLOOR DECORATION MODELS--
-	Sint32& floorDecorationModel; //skill[0]
-	Sint32& floorDecorationRotation; //skill[1]
-	Sint32& floorDecorationHeightOffset; //skill[3] positive numbers will lift the model higher
-	Sint32& floorDecorationXOffset; //skill[4]
-	Sint32& floorDecorationYOffset; //skill[5]
-	Sint32& floorDecorationDestroyIfNoWall; //skill[6]
-	Sint32& floorDecorationDialogueProgress = skill[7]; // for players interacting with a dialogue bubble progress on clicking, unused
-	Sint32& floorDecorationInteractText1; //skill[8]
-	Sint32& floorDecorationInteractText2; //skill[9]
-	Sint32& floorDecorationInteractText3; //skill[10]
-	Sint32& floorDecorationInteractText4; //skill[11]
-	Sint32& floorDecorationInteractText5; //skill[12]
-	Sint32& floorDecorationInteractText6; //skill[13]
-	Sint32& floorDecorationInteractText7; //skill[14]
-	Sint32& floorDecorationInteractText8; //skill[15]
+	inline int& floorDecorationModel() { return skill[0]; }
+	inline const int& floorDecorationModel() const { return skill[0]; } //skill[0]
+	inline int& floorDecorationRotation() { return skill[1]; }
+	inline const int& floorDecorationRotation() const { return skill[1]; } //skill[1]
+	inline int& floorDecorationHeightOffset() { return skill[3]; }
+	inline const int& floorDecorationHeightOffset() const { return skill[3]; } //skill[3] positive numbers will lift the model higher
+	inline int& floorDecorationXOffset() { return skill[4]; }
+	inline const int& floorDecorationXOffset() const { return skill[4]; } //skill[4]
+	inline int& floorDecorationYOffset() { return skill[5]; }
+	inline const int& floorDecorationYOffset() const { return skill[5]; } //skill[5]
+	inline int& floorDecorationDestroyIfNoWall() { return skill[6]; }
+	inline const int& floorDecorationDestroyIfNoWall() const { return skill[6]; } //skill[6]
+	inline int& floorDecorationDialogueProgress() { return skill[7]; }
+	inline const int& floorDecorationDialogueProgress() const { return skill[7]; } // for players interacting with a dialogue bubble progress on clicking, unused
+	inline int& floorDecorationInteractText1() { return skill[8]; }
+	inline const int& floorDecorationInteractText1() const { return skill[8]; } //skill[8]
+	inline int& floorDecorationInteractText2() { return skill[9]; }
+	inline const int& floorDecorationInteractText2() const { return skill[9]; } //skill[9]
+	inline int& floorDecorationInteractText3() { return skill[10]; }
+	inline const int& floorDecorationInteractText3() const { return skill[10]; } //skill[10]
+	inline int& floorDecorationInteractText4() { return skill[11]; }
+	inline const int& floorDecorationInteractText4() const { return skill[11]; } //skill[11]
+	inline int& floorDecorationInteractText5() { return skill[12]; }
+	inline const int& floorDecorationInteractText5() const { return skill[12]; } //skill[12]
+	inline int& floorDecorationInteractText6() { return skill[13]; }
+	inline const int& floorDecorationInteractText6() const { return skill[13]; } //skill[13]
+	inline int& floorDecorationInteractText7() { return skill[14]; }
+	inline const int& floorDecorationInteractText7() const { return skill[14]; } //skill[14]
+	inline int& floorDecorationInteractText8() { return skill[15]; }
+	inline const int& floorDecorationInteractText8() const { return skill[15]; } //skill[15]
 
 	//--PUBLIC COLLISION DECORATION MODELS--
-	Sint32& colliderDecorationModel; //skill[0]
-	Sint32& colliderDecorationRotation; //skill[1]
-	Sint32& colliderDecorationHeightOffset; //skill[3] positive numbers will lift the model higher
-	Sint32& colliderDecorationXOffset; //skill[4]
-	Sint32& colliderDecorationYOffset; //skill[5]
-	Sint32& colliderHasCollision; //skill[6]
-	Sint32& colliderSizeX; //skill[7]
-	Sint32& colliderSizeY; //skill[8]
-	Sint32& colliderMaxHP; //skill[9]
-	Sint32& colliderDiggable; //skill[10]
-	Sint32& colliderDamageTypes; //skill[11]
-	Sint32& colliderCurrentHP; //skill[12]
-	Sint32& colliderOldHP; //skill[13]
-	Sint32& colliderInit; //skill[14]
-	Sint32& colliderContainedEntity; //skill[15]
-	Sint32& colliderHideMonster; //skill[16]
-	Sint32& colliderKillerUid; //skill[17]
-	Sint32& colliderSpellEvent = skill[18];
-	Sint32& colliderSpellEventCooldown = skill[19];
-	Sint32& colliderCreatedParent = skill[20];
-	Sint32& colliderSpellEventTrigger = skill[21];
-	Sint32& colliderIsMapGenerated = skill[22];
-	Sint32& colliderSpellTarget = skill[23];
-	Sint32& colliderTelepathy = skill[24];
-	Sint32& colliderDropVariable = skill[25]; // store germinate drop qtys
+	inline int& colliderDecorationModel() { return skill[0]; }
+	inline const int& colliderDecorationModel() const { return skill[0]; } //skill[0]
+	inline int& colliderDecorationRotation() { return skill[1]; }
+	inline const int& colliderDecorationRotation() const { return skill[1]; } //skill[1]
+	inline int& colliderDecorationHeightOffset() { return skill[3]; }
+	inline const int& colliderDecorationHeightOffset() const { return skill[3]; } //skill[3] positive numbers will lift the model higher
+	inline int& colliderDecorationXOffset() { return skill[4]; }
+	inline const int& colliderDecorationXOffset() const { return skill[4]; } //skill[4]
+	inline int& colliderDecorationYOffset() { return skill[5]; }
+	inline const int& colliderDecorationYOffset() const { return skill[5]; } //skill[5]
+	inline int& colliderHasCollision() { return skill[6]; }
+	inline const int& colliderHasCollision() const { return skill[6]; } //skill[6]
+	inline int& colliderSizeX() { return skill[7]; }
+	inline const int& colliderSizeX() const { return skill[7]; } //skill[7]
+	inline int& colliderSizeY() { return skill[8]; }
+	inline const int& colliderSizeY() const { return skill[8]; } //skill[8]
+	inline int& colliderMaxHP() { return skill[9]; }
+	inline const int& colliderMaxHP() const { return skill[9]; } //skill[9]
+	inline int& colliderDiggable() { return skill[10]; }
+	inline const int& colliderDiggable() const { return skill[10]; } //skill[10]
+	inline int& colliderDamageTypes() { return skill[11]; }
+	inline const int& colliderDamageTypes() const { return skill[11]; } //skill[11]
+	inline int& colliderCurrentHP() { return skill[12]; }
+	inline const int& colliderCurrentHP() const { return skill[12]; } //skill[12]
+	inline int& colliderOldHP() { return skill[13]; }
+	inline const int& colliderOldHP() const { return skill[13]; } //skill[13]
+	inline int& colliderInit() { return skill[14]; }
+	inline const int& colliderInit() const { return skill[14]; } //skill[14]
+	inline int& colliderContainedEntity() { return skill[15]; }
+	inline const int& colliderContainedEntity() const { return skill[15]; } //skill[15]
+	inline int& colliderHideMonster() { return skill[16]; }
+	inline const int& colliderHideMonster() const { return skill[16]; } //skill[16]
+	inline int& colliderKillerUid() { return skill[17]; }
+	inline const int& colliderKillerUid() const { return skill[17]; } //skill[17]
+	inline int& colliderSpellEvent() { return skill[18]; }
+	inline const int& colliderSpellEvent() const { return skill[18]; }
+	inline int& colliderSpellEventCooldown() { return skill[19]; }
+	inline const int& colliderSpellEventCooldown() const { return skill[19]; }
+	inline int& colliderCreatedParent() { return skill[20]; }
+	inline const int& colliderCreatedParent() const { return skill[20]; }
+	inline int& colliderSpellEventTrigger() { return skill[21]; }
+	inline const int& colliderSpellEventTrigger() const { return skill[21]; }
+	inline int& colliderIsMapGenerated() { return skill[22]; }
+	inline const int& colliderIsMapGenerated() const { return skill[22]; }
+	inline int& colliderSpellTarget() { return skill[23]; }
+	inline const int& colliderSpellTarget() const { return skill[23]; }
+	inline int& colliderTelepathy() { return skill[24]; }
+	inline const int& colliderTelepathy() const { return skill[24]; }
+	inline int& colliderDropVariable() { return skill[25]; }
+	inline const int& colliderDropVariable() const { return skill[25]; } // store germinate drop qtys
 	static void colliderAssignProperties(Entity* entity, bool mapGeneration, map_t* whichMap);
 	static Entity* createBreakableCollider(int colliderDamageType, real_t _x, real_t _y, Entity* parent);
 	void colliderSetServerSkillOnSpawned();
 
 	//--PUBLIC SPELL TRAP SKILLS--
-	Sint32& spellTrapType; //skill[0]
-	Sint32& spellTrapRefire; //skill[1]
-	Sint32& spellTrapLatchPower; //skill[3]
-	Sint32& spellTrapFloorTile; //skill[4]
-	Sint32& spellTrapRefireRate; //skill[5]
-	Sint32& spellTrapAmbience; //skill[6]
-	Sint32& spellTrapInit; //skill[7]
-	Sint32& spellTrapCounter; //skill[8]
-	Sint32& spellTrapReset; //skill[9]
+	inline int& spellTrapType() { return skill[0]; }
+	inline const int& spellTrapType() const { return skill[0]; } //skill[0]
+	inline int& spellTrapRefire() { return skill[1]; }
+	inline const int& spellTrapRefire() const { return skill[1]; } //skill[1]
+	inline int& spellTrapLatchPower() { return skill[3]; }
+	inline const int& spellTrapLatchPower() const { return skill[3]; } //skill[3]
+	inline int& spellTrapFloorTile() { return skill[4]; }
+	inline const int& spellTrapFloorTile() const { return skill[4]; } //skill[4]
+	inline int& spellTrapRefireRate() { return skill[5]; }
+	inline const int& spellTrapRefireRate() const { return skill[5]; } //skill[5]
+	inline int& spellTrapAmbience() { return skill[6]; }
+	inline const int& spellTrapAmbience() const { return skill[6]; } //skill[6]
+	inline int& spellTrapInit() { return skill[7]; }
+	inline const int& spellTrapInit() const { return skill[7]; } //skill[7]
+	inline int& spellTrapCounter() { return skill[8]; }
+	inline const int& spellTrapCounter() const { return skill[8]; } //skill[8]
+	inline int& spellTrapReset() { return skill[9]; }
+	inline const int& spellTrapReset() const { return skill[9]; } //skill[9]
 
 	//--PUBLIC SPELL SHRINE SKILLS--
-	Sint32& shrineSpellEffect; //skill[0]
-	Sint32& shrineRefire1; //skill[1]
-	Sint32& shrineRefire2; //skill[3]
-	Sint32& shrineDir; //skill[4]
-	Sint32& shrineAmbience; //skill[5]
-	Sint32& shrineInit; //skill[6]
-	Sint32& shrineActivateDelay; //skill[7]
-	Sint32& shrineZ; //skill[8]
-	Sint32& shrineDestXOffset; //skill[9]
-	Sint32& shrineDestYOffset; //skill[10]
-	Sint32& shrineDaedalusState; // skill[11]
+	inline int& shrineSpellEffect() { return skill[0]; }
+	inline const int& shrineSpellEffect() const { return skill[0]; } //skill[0]
+	inline int& shrineRefire1() { return skill[1]; }
+	inline const int& shrineRefire1() const { return skill[1]; } //skill[1]
+	inline int& shrineRefire2() { return skill[3]; }
+	inline const int& shrineRefire2() const { return skill[3]; } //skill[3]
+	inline int& shrineDir() { return skill[4]; }
+	inline const int& shrineDir() const { return skill[4]; } //skill[4]
+	inline int& shrineAmbience() { return skill[5]; }
+	inline const int& shrineAmbience() const { return skill[5]; } //skill[5]
+	inline int& shrineInit() { return skill[6]; }
+	inline const int& shrineInit() const { return skill[6]; } //skill[6]
+	inline int& shrineActivateDelay() { return skill[7]; }
+	inline const int& shrineActivateDelay() const { return skill[7]; } //skill[7]
+	inline int& shrineZ() { return skill[8]; }
+	inline const int& shrineZ() const { return skill[8]; } //skill[8]
+	inline int& shrineDestXOffset() { return skill[9]; }
+	inline const int& shrineDestXOffset() const { return skill[9]; } //skill[9]
+	inline int& shrineDestYOffset() { return skill[10]; }
+	inline const int& shrineDestYOffset() const { return skill[10]; } //skill[10]
+	inline int& shrineDaedalusState() { return skill[11]; }
+	inline const int& shrineDaedalusState() const { return skill[11]; } // skill[11]
 	
 	//--PUBLIC FURNITURE SKILLS--
-	Sint32& furnitureType; //skill[0]
-	Sint32& furnitureInit; //skill[1]
-	Sint32& furnitureDir; //skill[3]
-	Sint32& furnitureHealth; //skill[4]
-	Sint32& furnitureMaxHealth; //skill[9]
-	Sint32& furnitureTableRandomItemChance; //skill[10]
-	Sint32& furnitureTableSpawnChairs; //skill[11]
-	Sint32& furnitureOldHealth; //skill[15]
+	inline int& furnitureType() { return skill[0]; }
+	inline const int& furnitureType() const { return skill[0]; } //skill[0]
+	inline int& furnitureInit() { return skill[1]; }
+	inline const int& furnitureInit() const { return skill[1]; } //skill[1]
+	inline int& furnitureDir() { return skill[3]; }
+	inline const int& furnitureDir() const { return skill[3]; } //skill[3]
+	inline int& furnitureHealth() { return skill[4]; }
+	inline const int& furnitureHealth() const { return skill[4]; } //skill[4]
+	inline int& furnitureMaxHealth() { return skill[9]; }
+	inline const int& furnitureMaxHealth() const { return skill[9]; } //skill[9]
+	inline int& furnitureTableRandomItemChance() { return skill[10]; }
+	inline const int& furnitureTableRandomItemChance() const { return skill[10]; } //skill[10]
+	inline int& furnitureTableSpawnChairs() { return skill[11]; }
+	inline const int& furnitureTableSpawnChairs() const { return skill[11]; } //skill[11]
+	inline int& furnitureOldHealth() { return skill[15]; }
+	inline const int& furnitureOldHealth() const { return skill[15]; } //skill[15]
 
 	//--PUBLIC PISTON SKILLS--
-	Sint32& pistonCamDir; //skill[0]
-	Sint32& pistonCamTimer; //skill[1]
-	real_t& pistonCamRotateSpeed; //fskill[0]
+	inline int& pistonCamDir() { return skill[0]; }
+	inline const int& pistonCamDir() const { return skill[0]; } //skill[0]
+	inline int& pistonCamTimer() { return skill[1]; }
+	inline const int& pistonCamTimer() const { return skill[1]; } //skill[1]
+	inline real_t& pistonCamRotateSpeed() { return fskill[0]; }
+	inline const real_t& pistonCamRotateSpeed() const { return fskill[0]; } //fskill[0]
 
 	//--PUBLIC ARROW/PROJECTILE SKILLS--
-	Sint32& arrowPower; //skill[3]
-	Sint32& arrowPoisonTime; //skill[4]
-	Sint32& arrowArmorPierce; //skill[5]
-	real_t& arrowSpeed; //fskill[4]
-	real_t& arrowFallSpeed; //fskill[5]
-	Sint32& arrowBoltDropOffRange; //skill[6]
-	Sint32& arrowShotByWeapon; //skill[7]
-	Sint32& arrowQuiverType; //skill[8]
-	Sint32& arrowShotByParent; //skill[9]
-	Sint32& arrowDropOffEquipmentModifier; //skill[14]
+	inline int& arrowPower() { return skill[3]; }
+	inline const int& arrowPower() const { return skill[3]; } //skill[3]
+	inline int& arrowPoisonTime() { return skill[4]; }
+	inline const int& arrowPoisonTime() const { return skill[4]; } //skill[4]
+	inline int& arrowArmorPierce() { return skill[5]; }
+	inline const int& arrowArmorPierce() const { return skill[5]; } //skill[5]
+	inline real_t& arrowSpeed() { return fskill[4]; }
+	inline const real_t& arrowSpeed() const { return fskill[4]; } //fskill[4]
+	inline real_t& arrowFallSpeed() { return fskill[5]; }
+	inline const real_t& arrowFallSpeed() const { return fskill[5]; } //fskill[5]
+	inline int& arrowBoltDropOffRange() { return skill[6]; }
+	inline const int& arrowBoltDropOffRange() const { return skill[6]; } //skill[6]
+	inline int& arrowShotByWeapon() { return skill[7]; }
+	inline const int& arrowShotByWeapon() const { return skill[7]; } //skill[7]
+	inline int& arrowQuiverType() { return skill[8]; }
+	inline const int& arrowQuiverType() const { return skill[8]; } //skill[8]
+	inline int& arrowShotByParent() { return skill[9]; }
+	inline const int& arrowShotByParent() const { return skill[9]; } //skill[9]
+	inline int& arrowDropOffEquipmentModifier() { return skill[14]; }
+	inline const int& arrowDropOffEquipmentModifier() const { return skill[14]; } //skill[14]
 	enum arrowShotBy : int
 	{
 		ARROW_SHOT_BY_TRAP,
@@ -548,154 +835,276 @@ public:
 	};
 
 	//--PUBLIC ITEM SKILLS--
-	Sint32& itemNotMoving; // skill[18]
-	Sint32& itemNotMovingClient; // skill[19]
-	Sint32& itemSokobanReward; // skill[20]
-	Sint32& itemOriginalOwner; // skill[21]
-	Sint32& itemStolen; // skill[22]
-	Sint32& itemShowOnMap; //skill[23]
-	Sint32& itemDelayMonsterPickingUp; //skill[24]
-	Sint32& itemReceivedDetailsFromServer; //skill[25]
-	Sint32& itemAutoSalvageByPlayer; //skill[26]
-	Sint32& itemSplooshed; //skill[27]
-	Sint32& itemContainer; //skill[29]
-	Sint32& itemFollowUID = skill[30];
-	Sint32& itemReturnUID = skill[31];
-	Sint32& itemGerminateResult = skill[32];
-	real_t& itemWaterBob; //fskill[2]
-	real_t& itemLevitate = fskill[3];
-	real_t& itemLevitateStartZ = fskill[4];
+	inline int& itemNotMoving() { return skill[18]; }
+	inline const int& itemNotMoving() const { return skill[18]; } // skill[18]
+	inline int& itemNotMovingClient() { return skill[19]; }
+	inline const int& itemNotMovingClient() const { return skill[19]; } // skill[19]
+	inline int& itemSokobanReward() { return skill[20]; }
+	inline const int& itemSokobanReward() const { return skill[20]; } // skill[20]
+	inline int& itemOriginalOwner() { return skill[21]; }
+	inline const int& itemOriginalOwner() const { return skill[21]; } // skill[21]
+	inline int& itemStolen() { return skill[22]; }
+	inline const int& itemStolen() const { return skill[22]; } // skill[22]
+	inline int& itemShowOnMap() { return skill[23]; }
+	inline const int& itemShowOnMap() const { return skill[23]; } //skill[23]
+	inline int& itemDelayMonsterPickingUp() { return skill[24]; }
+	inline const int& itemDelayMonsterPickingUp() const { return skill[24]; } //skill[24]
+	inline int& itemReceivedDetailsFromServer() { return skill[25]; }
+	inline const int& itemReceivedDetailsFromServer() const { return skill[25]; } //skill[25]
+	inline int& itemAutoSalvageByPlayer() { return skill[26]; }
+	inline const int& itemAutoSalvageByPlayer() const { return skill[26]; } //skill[26]
+	inline int& itemSplooshed() { return skill[27]; }
+	inline const int& itemSplooshed() const { return skill[27]; } //skill[27]
+	inline int& itemContainer() { return skill[29]; }
+	inline const int& itemContainer() const { return skill[29]; } //skill[29]
+	inline int& itemFollowUID() { return skill[30]; }
+	inline const int& itemFollowUID() const { return skill[30]; }
+	inline int& itemReturnUID() { return skill[31]; }
+	inline const int& itemReturnUID() const { return skill[31]; }
+	inline int& itemGerminateResult() { return skill[32]; }
+	inline const int& itemGerminateResult() const { return skill[32]; }
+	inline real_t& itemWaterBob() { return fskill[2]; }
+	inline const real_t& itemWaterBob() const { return fskill[2]; } //fskill[2]
+	inline real_t& itemLevitate() { return fskill[3]; }
+	inline const real_t& itemLevitate() const { return fskill[3]; }
+	inline real_t& itemLevitateStartZ() { return fskill[4]; }
+	inline const real_t& itemLevitateStartZ() const { return fskill[4]; }
 
 	//--PUBLIC ACTMAGIC SKILLS (Standard projectiles)--
-	Sint32& actmagicIsVertical; //skill[6]
-	Sint32& actmagicIsOrbiting; //skill[7]
-	Sint32& actmagicOrbitDist; //skill[8]
-	Sint32&	actmagicOrbitVerticalDirection; //skill[9]
-	Sint32&	actmagicOrbitLifetime; //skill[10]
-	Sint32& actmagicMirrorReflected; //skill[24] -- skill[11] IS LIGHTBALL_FLICKER!!
-	Sint32& actmagicMirrorReflectedCaster; //skill[12]
-	Sint32& actmagicCastByMagicstaff; //skill[13]
-	Sint32& actmagicSpellbookBonus; //skill[21]
-	real_t& actmagicOrbitVerticalSpeed; //fskill[2]
-	real_t& actmagicOrbitStartZ; //fskill[3]
-	real_t& actmagicOrbitStationaryX; // fskill[4]
-	real_t& actmagicOrbitStationaryY; // fskill[5]
-	real_t& actmagicOrbitStationaryCurrentDist; // fskill[6]
-	real_t& actmagicSprayGravity; // fskill[7]
-	real_t& actmagicVelXStore; // fskill[8]
-	real_t& actmagicVelYStore; // fskill[9]
-	real_t& actmagicVelZStore; // fskill[10]
-	Sint32& actmagicOrbitStationaryHitTarget; // skill[14]
-	Sint32& actmagicOrbitHitTargetUID1; // skill[15]
-	Sint32& actmagicOrbitHitTargetUID2; // skill[16]
-	Sint32& actmagicOrbitHitTargetUID3; // skill[17]
-	Sint32& actmagicOrbitHitTargetUID4; // skill[18]
-	Sint32& actmagicProjectileArc; // skill[19]
-	Sint32& actmagicOrbitCastFromSpell; // skill[20]
-	Sint32& actmagicCastByTinkerTrap; // skill[22]
-	Sint32& actmagicTinkerTrapFriendlyFire; // skill[23]
-	Sint32& actmagicReflectionCount; // skill[25]
-	Sint32& actmagicFromSpellbook; // skill[26]
-	Sint32& actmagicSpray; // skill[27]
-	Sint32& actmagicEmitter; // skill[29]
-	Sint32& actmagicDelayMove; // skill[30]
-	Sint32& actmagicNoHitMessage; // skill[31]
-	Sint32& actmagicNoParticle; // skill[32]
-	Sint32& actmagicNoLight; // skill[33]
-	Sint32& actmagicUpdateOLDHPOnHit = skill[34];
-	Sint32& actmagicAllowFriendlyFireHit = skill[35];
-	Sint32& actmagicAdditionalDamage = skill[38]; // extra damage bonus from external sources like windgate
-
-	Sint32& actfloorMagicType = skill[3];
-	Sint32& actfloorMagicClientReceived = skill[4];
-
-	Sint32& actRadiusMagicID = skill[1];
-	Sint32& actRadiusMagicInit = skill[3];
-	Sint32& actRadiusMagicDist = skill[4];
-	Sint32& actRadiusMagicFollowUID = skill[5];
-	Sint32& actRadiusMagicDoPulseTick = skill[6];
-	Sint32& actRadiusMagicAutoPulseTick = skill[7];
-	Sint32& actRadiusMagicEffectPower = skill[8];
-
-	Sint32& actParticleWaveStartFrame = skill[4];
-	Sint32& actParticleWaveLight = skill[7];
-	Sint32& actParticleWaveMagicType = skill[9];
-	Sint32& actParticleWaveClientReceived = skill[10];
-	Sint32& actParticleWaveVariable1 = skill[11];
+	inline int& actmagicIsVertical() { return skill[6]; }
+	inline const int& actmagicIsVertical() const { return skill[6]; } //skill[6]
+	inline int& actmagicIsOrbiting() { return skill[7]; }
+	inline const int& actmagicIsOrbiting() const { return skill[7]; } //skill[7]
+	inline int& actmagicOrbitDist() { return skill[8]; }
+	inline const int& actmagicOrbitDist() const { return skill[8]; } //skill[8]
+	inline int& actmagicOrbitVerticalDirection() { return skill[9]; }
+	inline const int& actmagicOrbitVerticalDirection() const { return skill[9]; } //skill[9]
+	inline int& actmagicOrbitLifetime() { return skill[10]; }
+	inline const int& actmagicOrbitLifetime() const { return skill[10]; } //skill[10]
+	inline int& actmagicMirrorReflected() { return skill[24]; }
+	inline const int& actmagicMirrorReflected() const { return skill[24]; } //skill[24] -- skill[11] IS LIGHTBALL_FLICKER!!
+	inline int& actmagicMirrorReflectedCaster() { return skill[12]; }
+	inline const int& actmagicMirrorReflectedCaster() const { return skill[12]; } //skill[12]
+	inline int& actmagicCastByMagicstaff() { return skill[13]; }
+	inline const int& actmagicCastByMagicstaff() const { return skill[13]; } //skill[13]
+	inline int& actmagicSpellbookBonus() { return skill[21]; }
+	inline const int& actmagicSpellbookBonus() const { return skill[21]; } //skill[21]
+	inline real_t& actmagicOrbitVerticalSpeed() { return fskill[2]; }
+	inline const real_t& actmagicOrbitVerticalSpeed() const { return fskill[2]; } //fskill[2]
+	inline real_t& actmagicOrbitStartZ() { return fskill[3]; }
+	inline const real_t& actmagicOrbitStartZ() const { return fskill[3]; } //fskill[3]
+	inline real_t& actmagicOrbitStationaryX() { return fskill[4]; }
+	inline const real_t& actmagicOrbitStationaryX() const { return fskill[4]; } // fskill[4]
+	inline real_t& actmagicOrbitStationaryY() { return fskill[5]; }
+	inline const real_t& actmagicOrbitStationaryY() const { return fskill[5]; } // fskill[5]
+	inline real_t& actmagicOrbitStationaryCurrentDist() { return fskill[6]; }
+	inline const real_t& actmagicOrbitStationaryCurrentDist() const { return fskill[6]; } // fskill[6]
+	inline real_t& actmagicSprayGravity() { return fskill[7]; }
+	inline const real_t& actmagicSprayGravity() const { return fskill[7]; } // fskill[7]
+	inline real_t& actmagicVelXStore() { return fskill[8]; }
+	inline const real_t& actmagicVelXStore() const { return fskill[8]; } // fskill[8]
+	inline real_t& actmagicVelYStore() { return fskill[9]; }
+	inline const real_t& actmagicVelYStore() const { return fskill[9]; } // fskill[9]
+	inline real_t& actmagicVelZStore() { return fskill[10]; }
+	inline const real_t& actmagicVelZStore() const { return fskill[10]; } // fskill[10]
+	inline int& actmagicOrbitStationaryHitTarget() { return skill[14]; }
+	inline const int& actmagicOrbitStationaryHitTarget() const { return skill[14]; } // skill[14]
+	inline int& actmagicOrbitHitTargetUID1() { return skill[15]; }
+	inline const int& actmagicOrbitHitTargetUID1() const { return skill[15]; } // skill[15]
+	inline int& actmagicOrbitHitTargetUID2() { return skill[16]; }
+	inline const int& actmagicOrbitHitTargetUID2() const { return skill[16]; } // skill[16]
+	inline int& actmagicOrbitHitTargetUID3() { return skill[17]; }
+	inline const int& actmagicOrbitHitTargetUID3() const { return skill[17]; } // skill[17]
+	inline int& actmagicOrbitHitTargetUID4() { return skill[18]; }
+	inline const int& actmagicOrbitHitTargetUID4() const { return skill[18]; } // skill[18]
+	inline int& actmagicProjectileArc() { return skill[19]; }
+	inline const int& actmagicProjectileArc() const { return skill[19]; } // skill[19]
+	inline int& actmagicOrbitCastFromSpell() { return skill[20]; }
+	inline const int& actmagicOrbitCastFromSpell() const { return skill[20]; } // skill[20]
+	inline int& actmagicCastByTinkerTrap() { return skill[22]; }
+	inline const int& actmagicCastByTinkerTrap() const { return skill[22]; } // skill[22]
+	inline int& actmagicTinkerTrapFriendlyFire() { return skill[23]; }
+	inline const int& actmagicTinkerTrapFriendlyFire() const { return skill[23]; } // skill[23]
+	inline int& actmagicReflectionCount() { return skill[25]; }
+	inline const int& actmagicReflectionCount() const { return skill[25]; } // skill[25]
+	inline int& actmagicFromSpellbook() { return skill[26]; }
+	inline const int& actmagicFromSpellbook() const { return skill[26]; } // skill[26]
+	inline int& actmagicSpray() { return skill[27]; }
+	inline const int& actmagicSpray() const { return skill[27]; } // skill[27]
+	inline int& actmagicEmitter() { return skill[29]; }
+	inline const int& actmagicEmitter() const { return skill[29]; } // skill[29]
+	inline int& actmagicDelayMove() { return skill[30]; }
+	inline const int& actmagicDelayMove() const { return skill[30]; } // skill[30]
+	inline int& actmagicNoHitMessage() { return skill[31]; }
+	inline const int& actmagicNoHitMessage() const { return skill[31]; } // skill[31]
+	inline int& actmagicNoParticle() { return skill[32]; }
+	inline const int& actmagicNoParticle() const { return skill[32]; } // skill[32]
+	inline int& actmagicNoLight() { return skill[33]; }
+	inline const int& actmagicNoLight() const { return skill[33]; } // skill[33]
+	inline int& actmagicUpdateOLDHPOnHit() { return skill[34]; }
+	inline const int& actmagicUpdateOLDHPOnHit() const { return skill[34]; }
+	inline int& actmagicAllowFriendlyFireHit() { return skill[35]; }
+	inline const int& actmagicAllowFriendlyFireHit() const { return skill[35]; }
+	inline int& actmagicAdditionalDamage() { return skill[38]; }
+	inline const int& actmagicAdditionalDamage() const { return skill[38]; } // extra damage bonus from external sources like windgate
+	inline int& actfloorMagicType() { return skill[3]; }
+	inline const int& actfloorMagicType() const { return skill[3]; }
+	inline int& actfloorMagicClientReceived() { return skill[4]; }
+	inline const int& actfloorMagicClientReceived() const { return skill[4]; }
+	inline int& actRadiusMagicID() { return skill[1]; }
+	inline const int& actRadiusMagicID() const { return skill[1]; }
+	inline int& actRadiusMagicInit() { return skill[3]; }
+	inline const int& actRadiusMagicInit() const { return skill[3]; }
+	inline int& actRadiusMagicDist() { return skill[4]; }
+	inline const int& actRadiusMagicDist() const { return skill[4]; }
+	inline int& actRadiusMagicFollowUID() { return skill[5]; }
+	inline const int& actRadiusMagicFollowUID() const { return skill[5]; }
+	inline int& actRadiusMagicDoPulseTick() { return skill[6]; }
+	inline const int& actRadiusMagicDoPulseTick() const { return skill[6]; }
+	inline int& actRadiusMagicAutoPulseTick() { return skill[7]; }
+	inline const int& actRadiusMagicAutoPulseTick() const { return skill[7]; }
+	inline int& actRadiusMagicEffectPower() { return skill[8]; }
+	inline const int& actRadiusMagicEffectPower() const { return skill[8]; }
+	inline int& actParticleWaveStartFrame() { return skill[4]; }
+	inline const int& actParticleWaveStartFrame() const { return skill[4]; }
+	inline int& actParticleWaveLight() { return skill[7]; }
+	inline const int& actParticleWaveLight() const { return skill[7]; }
+	inline int& actParticleWaveMagicType() { return skill[9]; }
+	inline const int& actParticleWaveMagicType() const { return skill[9]; }
+	inline int& actParticleWaveClientReceived() { return skill[10]; }
+	inline const int& actParticleWaveClientReceived() const { return skill[10]; }
+	inline int& actParticleWaveVariable1() { return skill[11]; }
+	inline const int& actParticleWaveVariable1() const { return skill[11]; }
 	
 	//--PUBLIC GOLD SKILLS--
-	Sint32& goldAmount; //skill[0]
-	Sint32& goldAmbience; //skill[1]
-	Sint32& goldSokoban; //skill[2]
-	Sint32& goldBouncing; //skill[3]
-	Sint32& goldInContainer; //skill[4]
-	Sint32& goldTelepathy = skill[5];
-	Sint32& goldAmountBonus = skill[6];
-	Sint32& goldDroppedByPlayer = skill[7];
+	inline int& goldAmount() { return skill[0]; }
+	inline const int& goldAmount() const { return skill[0]; } //skill[0]
+	inline int& goldAmbience() { return skill[1]; }
+	inline const int& goldAmbience() const { return skill[1]; } //skill[1]
+	inline int& goldSokoban() { return skill[2]; }
+	inline const int& goldSokoban() const { return skill[2]; } //skill[2]
+	inline int& goldBouncing() { return skill[3]; }
+	inline const int& goldBouncing() const { return skill[3]; } //skill[3]
+	inline int& goldInContainer() { return skill[4]; }
+	inline const int& goldInContainer() const { return skill[4]; } //skill[4]
+	inline int& goldTelepathy() { return skill[5]; }
+	inline const int& goldTelepathy() const { return skill[5]; }
+	inline int& goldAmountBonus() { return skill[6]; }
+	inline const int& goldAmountBonus() const { return skill[6]; }
+	inline int& goldDroppedByPlayer() { return skill[7]; }
+	inline const int& goldDroppedByPlayer() const { return skill[7]; }
 
 	//--PUBLIC SOUND SOURCE SKILLS--
-	Sint32& soundSourceFired; //skill[0]
-	Sint32& soundSourceToPlay; //skill[1]
-	Sint32& soundSourceVolume; //skill[2]
-	Sint32& soundSourceLatchOn; //skill[3]
-	Sint32& soundSourceDelay; //skill[4]
-	Sint32& soundSourceDelayCounter;//skill[5]
-	Sint32& soundSourceOrigin;//skill[6]
+	inline int& soundSourceFired() { return skill[0]; }
+	inline const int& soundSourceFired() const { return skill[0]; } //skill[0]
+	inline int& soundSourceToPlay() { return skill[1]; }
+	inline const int& soundSourceToPlay() const { return skill[1]; } //skill[1]
+	inline int& soundSourceVolume() { return skill[2]; }
+	inline const int& soundSourceVolume() const { return skill[2]; } //skill[2]
+	inline int& soundSourceLatchOn() { return skill[3]; }
+	inline const int& soundSourceLatchOn() const { return skill[3]; } //skill[3]
+	inline int& soundSourceDelay() { return skill[4]; }
+	inline const int& soundSourceDelay() const { return skill[4]; } //skill[4]
+	inline int& soundSourceDelayCounter() { return skill[5]; }
+	inline const int& soundSourceDelayCounter() const { return skill[5]; }//skill[5]
+	inline int& soundSourceOrigin() { return skill[6]; }
+	inline const int& soundSourceOrigin() const { return skill[6]; }//skill[6]
 
 	//--PUBLIC LIGHT SOURCE SKILLS--
-	Sint32& lightSourceBrightness; //skill[0]
-	Sint32& lightSourceAlwaysOn; //skill[1]
-	Sint32& lightSourceInvertPower; //skill[2]
-	Sint32& lightSourceLatchOn; //skill[3]
-	Sint32& lightSourceRadius; //skill[4]
-	Sint32& lightSourceFlicker; //skill[5]
-	Sint32& lightSourceDelay; //skill[6]
-	Sint32& lightSourceDelayCounter;//skill[7]
-	Sint32& lightSourceRGB;//skill[11]
+	inline int& lightSourceBrightness() { return skill[0]; }
+	inline const int& lightSourceBrightness() const { return skill[0]; } //skill[0]
+	inline int& lightSourceAlwaysOn() { return skill[1]; }
+	inline const int& lightSourceAlwaysOn() const { return skill[1]; } //skill[1]
+	inline int& lightSourceInvertPower() { return skill[2]; }
+	inline const int& lightSourceInvertPower() const { return skill[2]; } //skill[2]
+	inline int& lightSourceLatchOn() { return skill[3]; }
+	inline const int& lightSourceLatchOn() const { return skill[3]; } //skill[3]
+	inline int& lightSourceRadius() { return skill[4]; }
+	inline const int& lightSourceRadius() const { return skill[4]; } //skill[4]
+	inline int& lightSourceFlicker() { return skill[5]; }
+	inline const int& lightSourceFlicker() const { return skill[5]; } //skill[5]
+	inline int& lightSourceDelay() { return skill[6]; }
+	inline const int& lightSourceDelay() const { return skill[6]; } //skill[6]
+	inline int& lightSourceDelayCounter() { return skill[7]; }
+	inline const int& lightSourceDelayCounter() const { return skill[7]; }//skill[7]
+	inline int& lightSourceRGB() { return skill[11]; }
+	inline const int& lightSourceRGB() const { return skill[11]; }//skill[11]
 
 	//--PUBLIC TEXT SOURCE SKILLS--
-	Sint32& textSourceColorRGB; //skill[0]
-	Sint32& textSourceVariables4W; //skill[1]
-	Sint32& textSourceDelay; //skill[2]
-	Sint32& textSourceIsScript; //skill[3]
-	Sint32& textSourceBegin; //skill[4]
+	inline int& textSourceColorRGB() { return skill[0]; }
+	inline const int& textSourceColorRGB() const { return skill[0]; } //skill[0]
+	inline int& textSourceVariables4W() { return skill[1]; }
+	inline const int& textSourceVariables4W() const { return skill[1]; } //skill[1]
+	inline int& textSourceDelay() { return skill[2]; }
+	inline const int& textSourceDelay() const { return skill[2]; } //skill[2]
+	inline int& textSourceIsScript() { return skill[3]; }
+	inline const int& textSourceIsScript() const { return skill[3]; } //skill[3]
+	inline int& textSourceBegin() { return skill[4]; }
+	inline const int& textSourceBegin() const { return skill[4]; } //skill[4]
 
 	//--PUBLIC SIGNAL SKILLS--
-	Sint32& signalActivateDelay; //skill[1]
-	Sint32& signalTimerInterval; //skill[2]
-	Sint32& signalTimerRepeatCount; //skill[3]
-	Sint32& signalTimerLatchInput; //skill[4]
-	Sint32& signalInputDirection; //skill[5]
-	Sint32& signalGateANDPowerCount; //skill[9]
-	Sint32& signalInvertOutput; //skill[10]
+	inline int& signalActivateDelay() { return skill[1]; }
+	inline const int& signalActivateDelay() const { return skill[1]; } //skill[1]
+	inline int& signalTimerInterval() { return skill[2]; }
+	inline const int& signalTimerInterval() const { return skill[2]; } //skill[2]
+	inline int& signalTimerRepeatCount() { return skill[3]; }
+	inline const int& signalTimerRepeatCount() const { return skill[3]; } //skill[3]
+	inline int& signalTimerLatchInput() { return skill[4]; }
+	inline const int& signalTimerLatchInput() const { return skill[4]; } //skill[4]
+	inline int& signalInputDirection() { return skill[5]; }
+	inline const int& signalInputDirection() const { return skill[5]; } //skill[5]
+	inline int& signalGateANDPowerCount() { return skill[9]; }
+	inline const int& signalGateANDPowerCount() const { return skill[9]; } //skill[9]
+	inline int& signalInvertOutput() { return skill[10]; }
+	inline const int& signalInvertOutput() const { return skill[10]; } //skill[10]
 
 	//--PUBLIC LOCK SKILLS--
-	Sint32& wallLockState; //skill[0]
-	Sint32& wallLockInvertPower; //skill[1]
-	Sint32& wallLockTurnable; //skill[3]
-	Sint32& wallLockMaterial; //skill[4]
-	Sint32& wallLockDir; //skill[5]
-	Sint32& wallLockClientInteractDelay; //skill[6]
-	Sint32& wallLockPlayerInteracting; //skill[7]
-	Sint32& wallLockPower; //skill[8]
-	Sint32& wallLockInit; //skill[9]
-	Sint32& wallLockTimer; //skill[10]
-	Sint32& wallLockPickable; //skill[11]
-	Sint32& wallLockPickHealth; //skill[12]
-	Sint32& wallLockPickableSkeletonKey; //skill[13]
-	Sint32& wallLockPreventLockpickExploit; //skill[14]
-	Sint32& wallLockAutoGenKey; //skill[15]
+	inline int& wallLockState() { return skill[0]; }
+	inline const int& wallLockState() const { return skill[0]; } //skill[0]
+	inline int& wallLockInvertPower() { return skill[1]; }
+	inline const int& wallLockInvertPower() const { return skill[1]; } //skill[1]
+	inline int& wallLockTurnable() { return skill[3]; }
+	inline const int& wallLockTurnable() const { return skill[3]; } //skill[3]
+	inline int& wallLockMaterial() { return skill[4]; }
+	inline const int& wallLockMaterial() const { return skill[4]; } //skill[4]
+	inline int& wallLockDir() { return skill[5]; }
+	inline const int& wallLockDir() const { return skill[5]; } //skill[5]
+	inline int& wallLockClientInteractDelay() { return skill[6]; }
+	inline const int& wallLockClientInteractDelay() const { return skill[6]; } //skill[6]
+	inline int& wallLockPlayerInteracting() { return skill[7]; }
+	inline const int& wallLockPlayerInteracting() const { return skill[7]; } //skill[7]
+	inline int& wallLockPower() { return skill[8]; }
+	inline const int& wallLockPower() const { return skill[8]; } //skill[8]
+	inline int& wallLockInit() { return skill[9]; }
+	inline const int& wallLockInit() const { return skill[9]; } //skill[9]
+	inline int& wallLockTimer() { return skill[10]; }
+	inline const int& wallLockTimer() const { return skill[10]; } //skill[10]
+	inline int& wallLockPickable() { return skill[11]; }
+	inline const int& wallLockPickable() const { return skill[11]; } //skill[11]
+	inline int& wallLockPickHealth() { return skill[12]; }
+	inline const int& wallLockPickHealth() const { return skill[12]; } //skill[12]
+	inline int& wallLockPickableSkeletonKey() { return skill[13]; }
+	inline const int& wallLockPickableSkeletonKey() const { return skill[13]; } //skill[13]
+	inline int& wallLockPreventLockpickExploit() { return skill[14]; }
+	inline const int& wallLockPreventLockpickExploit() const { return skill[14]; } //skill[14]
+	inline int& wallLockAutoGenKey() { return skill[15]; }
+	inline const int& wallLockAutoGenKey() const { return skill[15]; } //skill[15]
 
 	//--THROWN PROJECTILE--
-	Sint32& thrownProjectilePower; //skill[19]
-	Sint32& thrownProjectileCharge; //skill[20]
-	Sint32& thrownProjectileParticleTimerUID = skill[9];
+	inline int& thrownProjectilePower() { return skill[19]; }
+	inline const int& thrownProjectilePower() const { return skill[19]; } //skill[19]
+	inline int& thrownProjectileCharge() { return skill[20]; }
+	inline const int& thrownProjectileCharge() const { return skill[20]; } //skill[20]
+	inline int& thrownProjectileParticleTimerUID() { return skill[9]; }
+	inline const int& thrownProjectileParticleTimerUID() const { return skill[9]; }
 
 	//--PLAYER SPAWN POINT--
-	Sint32& playerStartDir; //skill[1]
+	inline int& playerStartDir() { return skill[1]; }
+	inline const int& playerStartDir() const { return skill[1]; } //skill[1]
 
 	//--ACTTRAP/PERMANENT
-	Sint32& pressurePlateTriggerType; //skill[3]
+	inline int& pressurePlateTriggerType() { return skill[3]; }
+	inline const int& pressurePlateTriggerType() const { return skill[3]; } //skill[3]
 
 	enum PressurePlateTriggerTypes : int
 	{
@@ -732,9 +1141,9 @@ public:
 	};
 	void setEntityShowOnMap(EntityShowMapSource source, int duration)
 	{
-		entityShowOnMap = 0;
-		entityShowOnMap |= ((int)source & 0xFF) << 24;
-		entityShowOnMap |= duration & 0xFFFFFF;
+		entityShowOnMap() = 0;
+		entityShowOnMap() |= ((int)source & 0xFF) << 24;
+		entityShowOnMap() |= duration & 0xFFFFFF;
 	}
 	void entityShowOnMapTickDuration()
 	{
@@ -746,7 +1155,7 @@ public:
 		}
 		if ( duration == 0 )
 		{
-			entityShowOnMap = 0;
+			entityShowOnMap() = 0;
 		}
 		else
 		{
@@ -755,54 +1164,81 @@ public:
 	}
 	int getEntityShowOnMapDuration()
 	{
-		return (EntityShowMapSource)(entityShowOnMap & 0xFFFFFF);
+		return (EntityShowMapSource)(entityShowOnMap() & 0xFFFFFF);
 	}
 	EntityShowMapSource getEntityShowOnMapSource()
 	{
-		return (EntityShowMapSource)((entityShowOnMap >> 24) & 0xFF);
+		return (EntityShowMapSource)((entityShowOnMap() >> 24) & 0xFF);
 	}
 
 	//--WORLDTOOLTIP--
-	real_t& worldTooltipAlpha; //fskill[0]
-	real_t& worldTooltipZ; //fskill[1]
-	Sint32& worldTooltipActive; //skill[0]
-	Sint32& worldTooltipPlayer;  //skill[1]
-	Sint32& worldTooltipInit; //skill[3]
-	Sint32& worldTooltipFadeDelay; //skill[4]
-	Sint32& worldTooltipIgnoreDrawing; //skill[5]
-	Sint32& worldTooltipRequiresButtonHeld; //skill[6]
+	inline real_t& worldTooltipAlpha() { return fskill[0]; }
+	inline const real_t& worldTooltipAlpha() const { return fskill[0]; } //fskill[0]
+	inline real_t& worldTooltipZ() { return fskill[1]; }
+	inline const real_t& worldTooltipZ() const { return fskill[1]; } //fskill[1]
+	inline int& worldTooltipActive() { return skill[0]; }
+	inline const int& worldTooltipActive() const { return skill[0]; } //skill[0]
+	inline int& worldTooltipPlayer() { return skill[1]; }
+	inline const int& worldTooltipPlayer() const { return skill[1]; }  //skill[1]
+	inline int& worldTooltipInit() { return skill[3]; }
+	inline const int& worldTooltipInit() const { return skill[3]; } //skill[3]
+	inline int& worldTooltipFadeDelay() { return skill[4]; }
+	inline const int& worldTooltipFadeDelay() const { return skill[4]; } //skill[4]
+	inline int& worldTooltipIgnoreDrawing() { return skill[5]; }
+	inline const int& worldTooltipIgnoreDrawing() const { return skill[5]; } //skill[5]
+	inline int& worldTooltipRequiresButtonHeld() { return skill[6]; }
+	inline const int& worldTooltipRequiresButtonHeld() const { return skill[6]; } //skill[6]
 
 	//--STATUES--
-	Sint32& statueInit; //skill[0]
-	Sint32& statueDir; //skill[1]
-	Sint32& statueId; //skill[3]
+	inline int& statueInit() { return skill[0]; }
+	inline const int& statueInit() const { return skill[0]; } //skill[0]
+	inline int& statueDir() { return skill[1]; }
+	inline const int& statueDir() const { return skill[1]; } //skill[1]
+	inline int& statueId() { return skill[3]; }
+	inline const int& statueId() const { return skill[3]; } //skill[3]
 
 	// new references, just set the skill here
 
 	// actSprite
-	Sint32& actSpriteUseAlpha = skill[6];
-	Sint32& actSpriteNoBillboard = skill[7];
-	Sint32& actSpriteCheckParentExists = skill[8];
+	inline int& actSpriteUseAlpha() { return skill[6]; }
+	inline const int& actSpriteUseAlpha() const { return skill[6]; }
+	inline int& actSpriteNoBillboard() { return skill[7]; }
+	inline const int& actSpriteNoBillboard() const { return skill[7]; }
+	inline int& actSpriteCheckParentExists() { return skill[8]; }
+	inline const int& actSpriteCheckParentExists() const { return skill[8]; }
 	//Sint32& actSpriteAlwaysDraw = skill[9];
-	Sint32& actSpriteUseCustomSurface = skill[10];
-	Sint32& actSpriteFollowUID = skill[11];
-	Sint32& actSpriteHasLightInit = skill[12];
-	Sint32& actSpriteVelXY = skill[13];
-	real_t& actSpritePitchRotate = fskill[4];
+	inline int& actSpriteUseCustomSurface() { return skill[10]; }
+	inline const int& actSpriteUseCustomSurface() const { return skill[10]; }
+	inline int& actSpriteFollowUID() { return skill[11]; }
+	inline const int& actSpriteFollowUID() const { return skill[11]; }
+	inline int& actSpriteHasLightInit() { return skill[12]; }
+	inline const int& actSpriteHasLightInit() const { return skill[12]; }
+	inline int& actSpriteVelXY() { return skill[13]; }
+	inline const int& actSpriteVelXY() const { return skill[13]; }
+	inline real_t& actSpritePitchRotate() { return fskill[4]; }
+	inline const real_t& actSpritePitchRotate() const { return fskill[4]; }
 
 	// actGib
-	Sint32& actGibHitGroundEvent = skill[10];
-	Sint32& actGibMagicParticle = skill[12]; // skill[11] is player hud denote
-	Sint32& actGibDisableDrawForLocalPlayer = skill[13]; // set to 1 + playernum, won't draw for that playernum
+	inline int& actGibHitGroundEvent() { return skill[10]; }
+	inline const int& actGibHitGroundEvent() const { return skill[10]; }
+	inline int& actGibMagicParticle() { return skill[12]; }
+	inline const int& actGibMagicParticle() const { return skill[12]; } // skill[11] is player hud denote
+	inline int& actGibDisableDrawForLocalPlayer() { return skill[13]; }
+	inline const int& actGibDisableDrawForLocalPlayer() const { return skill[13]; } // set to 1 + playernum, won't draw for that playernum
 
 	// actWind
-	Sint32& actWindParticleEffect = skill[1];
-	Sint32& actWindEffectsProjectiles = skill[3];
-	Sint32& actWindLifetime = skill[4];
-	real_t& actWindStrength = fskill[0];
-	Sint32& actWindTileBonusLength = skill[5];
-
-	Sint32& actTrapSabotaged = skill[30];
+	inline int& actWindParticleEffect() { return skill[1]; }
+	inline const int& actWindParticleEffect() const { return skill[1]; }
+	inline int& actWindEffectsProjectiles() { return skill[3]; }
+	inline const int& actWindEffectsProjectiles() const { return skill[3]; }
+	inline int& actWindLifetime() { return skill[4]; }
+	inline const int& actWindLifetime() const { return skill[4]; }
+	inline real_t& actWindStrength() { return fskill[0]; }
+	inline const real_t& actWindStrength() const { return fskill[0]; }
+	inline int& actWindTileBonusLength() { return skill[5]; }
+	inline const int& actWindTileBonusLength() const { return skill[5]; }
+	inline int& actTrapSabotaged() { return skill[30]; }
+	inline const int& actTrapSabotaged() const { return skill[30]; }
 
 	void pedestalOrbInit(); // init orb properties
 

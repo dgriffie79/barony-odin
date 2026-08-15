@@ -397,7 +397,7 @@ void mothAnimate(Entity* my, Stat* myStats, double dist)
 		if ( keystatus[SDLK_KP_5] )
 		{
 			my->yaw += 0.05;
-			my->monsterLookDir = my->yaw;
+			my->monsterLookDir() = my->yaw;
 		}
 		if ( keystatus[SDLK_g] )
 		{
@@ -414,10 +414,10 @@ void mothAnimate(Entity* my, Stat* myStats, double dist)
 		}
 	}
 
-	my->mistformGLRender = 0.0;
+	my->mistformGLRender() = 0.0;
 	if ( myStats && myStats->getEffectActive(EFF_MIST_FORM) )
 	{
-		my->mistformGLRender = 1.0;
+		my->mistformGLRender() = 1.0;
 	}
 
 	bool fireSprite = my->sprite == 1822;
@@ -618,7 +618,7 @@ void mothAnimate(Entity* my, Stat* myStats, double dist)
 		entity->x = my->x;
 		entity->y = my->y;
 		entity->z = my->z;
-		entity->mistformGLRender = my->mistformGLRender;
+		entity->mistformGLRender() = my->mistformGLRender();
 		if ( (bodypart - MOTH_BODY) % 3 == 0 ) // bodies
 		{
 			body = entity;
@@ -697,7 +697,7 @@ void mothAnimate(Entity* my, Stat* myStats, double dist)
 						if ( multiplayer != CLIENT )
 						{
 							real_t prevYaw = my->yaw;
-							if ( Entity* target = uidToEntity(my->monsterTarget) )
+							if ( Entity* target = uidToEntity(my->monsterTarget()) )
 							{
 								my->yaw = atan2(target->y - my->y, target->x - my->x);
 							}
@@ -1200,14 +1200,14 @@ void Entity::mothChooseWeapon(const Entity* target, double dist)
 		return;
 	}
 
-	if ( monsterSpecialState != 0 && monsterSpecialTimer != 0 )
+	if ( monsterSpecialState() != 0 && monsterSpecialTimer() != 0 )
 	{
 		return;
 	}
 
-	if ( monsterSpecialTimer == 0
+	if ( monsterSpecialTimer() == 0
 		&& (ticks % 10 == 0)
-		&& (monsterAttack == 0 || ((monsterAttack == 1) && monsterAttackTime >= 25))
+		&& (monsterAttack() == 0 || ((monsterAttack() == 1) && monsterAttackTime() >= 25))
 		&& dist < 128 )
 	{
 		Stat* targetStats = target->getStats();
@@ -1243,7 +1243,7 @@ void Entity::mothChooseWeapon(const Entity* target, double dist)
 
 		if ( specialRoll < requiredRoll )
 		{
-			monsterSpecialState = MOTH_CAST;
+			monsterSpecialState() = MOTH_CAST;
 		}
 	}
 }

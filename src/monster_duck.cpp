@@ -322,7 +322,7 @@ void duckSpawnFeather(int sprite, real_t x, real_t y, real_t z, Entity* my)
 			if ( my )
 			{
 				leaf->ditheringOverride = my->ditheringOverride;
-				leaf->mistformGLRender = my->mistformGLRender;
+				leaf->mistformGLRender() = my->mistformGLRender();
 			}
 		}
 	}
@@ -524,7 +524,7 @@ bool duckAreaQuck(Entity* my)
 		{
 			if ( target->monsterIsTargetable() && entityDist(target, my) < 2 * TOUCHRANGE )
 			{
-				if ( caster->checkEnemy(target) || (my->behavior == &actMonster && target->getUID() == my->monsterTarget) )
+				if ( caster->checkEnemy(target) || (my->behavior == &actMonster && target->getUID() == my->monsterTarget()) )
 				{
 					//if ( Entity* target = uidToEntity(monsterTarget) )
 					{
@@ -577,9 +577,9 @@ bool duckAreaQuck(Entity* my)
 		if ( target->monsterSetPathToLocation(my->x / 16, my->y / 16, 2,
 			GeneratePathTypes::GENERATE_PATH_DEFAULT) && target->children.first )
 		{
-			target->monsterLastDistractedByNoisemaker = my->getUID();
-			target->monsterTarget = my->getUID();
-			target->monsterState = MONSTER_STATE_HUNT; // hunt state
+			target->monsterLastDistractedByNoisemaker() = my->getUID();
+			target->monsterTarget() = my->getUID();
+			target->monsterState() = MONSTER_STATE_HUNT; // hunt state
 			serverUpdateEntitySkill(target, 0);
 
 
@@ -677,7 +677,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 						ghostActive = true;
 					}
 				}
-				if ( my->monsterSpecialState != DUCK_DIVE && !ghostActive )
+				if ( my->monsterSpecialState() != DUCK_DIVE && !ghostActive )
 				{
 					--lifetime;
 					if ( !uidToEntity(myStats->leader_uid) )
@@ -689,9 +689,9 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				myStats->setAttribute("duck_time", std::to_string(lifetime));
 				if ( lifetime <= 0 )
 				{
-					if ( my->monsterSpecialState != DUCK_RETURN )
+					if ( my->monsterSpecialState() != DUCK_RETURN )
 					{
-						my->monsterSpecialState = DUCK_RETURN;
+						my->monsterSpecialState() = DUCK_RETURN;
 						serverUpdateEntitySkill(my, 33);
 						myStats->setEffectActive(EFF_STUNNED, 1);
 						myStats->EFFECTS_TIMERS[EFF_STUNNED] = 0;
@@ -711,7 +711,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 			keystatus[SDLK_KP_5] = 0;
 			static real_t dir = 0.0;
 			my->yaw = dir;
-			my->monsterLookDir = my->yaw;
+			my->monsterLookDir() = my->yaw;
 			if ( keystatus[SDLK_LSHIFT] )
 			{
 				dir += PI / 2;
@@ -727,37 +727,37 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 		if ( keystatus[SDLK_g] )
 		{
 			keystatus[SDLK_g] = 0;
-			if ( my->monsterSpecialState == 0 )
+			if ( my->monsterSpecialState() == 0 )
 			{
 				if ( keystatus[SDLK_LSHIFT] )
 				{
-					my->monsterSpecialState = DUCK_DIVE;
+					my->monsterSpecialState() = DUCK_DIVE;
 				}
 				else
 				{
-					my->monsterSpecialState = DUCK_INERT;
+					my->monsterSpecialState() = DUCK_INERT;
 				}
 			}
-			else if ( my->monsterSpecialState == 2 )
+			else if ( my->monsterSpecialState() == 2 )
 			{
 				if ( keystatus[SDLK_LSHIFT] )
 				{
-					my->monsterSpecialState = 0;
+					my->monsterSpecialState() = 0;
 				}
 				else
 				{
-					my->monsterSpecialState = DUCK_DIVE;
+					my->monsterSpecialState() = DUCK_DIVE;
 				}
 			}
 			else
 			{
 				if ( keystatus[SDLK_LSHIFT] )
 				{
-					my->monsterSpecialState = 0;
+					my->monsterSpecialState() = 0;
 				}
 				else
 				{
-					my->monsterSpecialState = DUCK_INERT;
+					my->monsterSpecialState() = DUCK_INERT;
 				}
 			}
 			//my->monsterSpecialState = 1;
@@ -832,21 +832,21 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 
 	if ( multiplayer != CLIENT )
 	{
-		if ( !waterTile && my->monsterSpecialState == DUCK_DIVE )
+		if ( !waterTile && my->monsterSpecialState() == DUCK_DIVE )
 		{
-			my->monsterSpecialState = 0;
+			my->monsterSpecialState() = 0;
 			serverUpdateEntitySkill(my, 33);
 		}
 		if ( (lavaTile || noFloor) && !waterTile )
 		{
-			if ( my->monsterSpecialState == DUCK_DIVE || my->monsterSpecialState == DUCK_INERT )
+			if ( my->monsterSpecialState() == DUCK_DIVE || my->monsterSpecialState() == DUCK_INERT )
 			{
-				my->monsterSpecialState = 0;
+				my->monsterSpecialState() = 0;
 				serverUpdateEntitySkill(my, 33);
 			}
 		}
 
-		if ( spiritDuck && my->monsterSpecialState == DUCK_INERT )
+		if ( spiritDuck && my->monsterSpecialState() == DUCK_INERT )
 		{
 			if ( my->skill[2] >= 0 && my->skill[2] < MAXPLAYERS )
 			{
@@ -854,7 +854,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				{
 					if ( players[my->skill[2]]->ghost.my && players[my->skill[2]]->ghost.my->skill[11] == 1 ) // high profile
 					{
-						my->monsterSpecialState = 0;
+						my->monsterSpecialState() = 0;
 						serverUpdateEntitySkill(my, 33);
 					}
 				}
@@ -863,14 +863,14 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 
 		if ( safeTile && body && my->isMobile() )
 		{
-			if ( my->monsterSpecialTimer == 0 )
+			if ( my->monsterSpecialTimer() == 0 )
 			{
-				my->monsterSpecialTimer = spiritDuck ? 0 : 2 * TICKS_PER_SECOND;
-				if ( my->monsterSpecialState == DUCK_INERT && waterTile && !spiritDuck )
+				my->monsterSpecialTimer() = spiritDuck ? 0 : 2 * TICKS_PER_SECOND;
+				if ( my->monsterSpecialState() == DUCK_INERT && waterTile && !spiritDuck )
 				{
 					if ( DUCK_INERT_ANIM_COMPLETE >= 0.95 )
 					{
-						if ( my->monsterTarget == 0 || !uidToEntity(my->monsterTarget) )
+						if ( my->monsterTarget() == 0 || !uidToEntity(my->monsterTarget()) )
 						{
 							if ( !spiritDuck )
 							{
@@ -878,7 +878,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 								{
 									if ( leader->behavior == &actPlayer && players[leader->skill[2]]->mechanics.numFishingCaught < 3 )
 									{
-										my->monsterSpecialState = DUCK_DIVE;
+										my->monsterSpecialState() = DUCK_DIVE;
 										serverUpdateEntitySkill(my, 33);
 										playSoundEntity(my, 794 + local_rng.rand() % 2, 128);
 										playSoundEntity(my, 786 + local_rng.rand() % 3, 128);
@@ -888,7 +888,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				if ( my->monsterSpecialState == 0 )
+				if ( my->monsterSpecialState() == 0 )
 				{
 					if ( spiritDuck )
 					{
@@ -898,7 +898,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 							{
 								if ( players[my->skill[2]]->ghost.my && players[my->skill[2]]->ghost.my->skill[11] == 0 ) // low profile
 								{
-									my->monsterSpecialState = DUCK_INERT;
+									my->monsterSpecialState() = DUCK_INERT;
 									serverUpdateEntitySkill(my, 33);
 								}
 							}
@@ -906,8 +906,8 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 					}
 					else
 					{
-						my->monsterSpecialTimer += 3 * TICKS_PER_SECOND;
-						my->monsterSpecialState = DUCK_INERT;
+						my->monsterSpecialTimer() += 3 * TICKS_PER_SECOND;
+						my->monsterSpecialState() = DUCK_INERT;
 						serverUpdateEntitySkill(my, 33);
 					}
 				}
@@ -916,9 +916,9 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 			{
 				if ( spiritDuck )
 				{
-					if ( my->monsterSpecialTimer > 0 )
+					if ( my->monsterSpecialTimer() > 0 )
 					{
-						--my->monsterSpecialTimer;
+						--my->monsterSpecialTimer();
 					}
 				}
 			}
@@ -949,7 +949,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 	{
 		if ( waterTile )
 		{
-			if ( (my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN) && abs(DUCK_FLOAT_ATK) < 0.05
+			if ( (my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN) && abs(DUCK_FLOAT_ATK) < 0.05
 				&& DUCK_INERT_ANIM_COMPLETE >= 0.01 && abs(DUCK_FLOAT_ATK_DIVE - inertHeight) < 0.01 )
 			{
 				inWater = true;
@@ -960,7 +960,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 		DUCK_WALK_CYCLE2 *= 0.8;
 		if ( dist > 0.05 && !DUCK_INWATER )
 		{
-			if ( my->monsterSpecialState == DUCK_RETURN )
+			if ( my->monsterSpecialState() == DUCK_RETURN )
 			{
 				DUCK_WALK_CYCLE = 1.0;
 			}
@@ -970,12 +970,12 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 			}
 		}
 
-		if ( my->monsterSpecialState != DUCK_LAST_SPECIAL_STATE )
+		if ( my->monsterSpecialState() != DUCK_LAST_SPECIAL_STATE )
 		{
 			DUCK_SPECIAL_TIMER = 0;
 		}
-		DUCK_LAST_SPECIAL_STATE = my->monsterSpecialState;
-		if ( my->monsterSpecialState )
+		DUCK_LAST_SPECIAL_STATE = my->monsterSpecialState();
+		if ( my->monsterSpecialState() )
 		{
 			++DUCK_SPECIAL_TIMER;
 		}
@@ -1002,7 +1002,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 	if ( spiritDuck )
 	{
 		my->ditheringOverride = 6;
-		my->mistformGLRender = 1.0;
+		my->mistformGLRender() = 1.0;
 	}
 
 	//Move bodyparts
@@ -1025,7 +1025,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 		if ( spiritDuck )
 		{
 			entity->ditheringOverride = my->ditheringOverride;
-			entity->mistformGLRender = my->mistformGLRender;
+			entity->mistformGLRender() = my->mistformGLRender();
 		}
 
 		real_t dodgeSpinDir = DUCK_FLOAT_ATK >= 0.0 ? (PI / 8) : -PI / 8;
@@ -1033,7 +1033,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 		
 		if ( bodypart == DUCK_HEAD )
 		{
-			if ( body && (my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN) && abs(DUCK_FLOAT_ATK) < 0.05
+			if ( body && (my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN) && abs(DUCK_FLOAT_ATK) < 0.05
 				&& DUCK_INERT_ANIM_COMPLETE >= 0.01 && abs(DUCK_FLOAT_ATK_DIVE - inertHeight) < 0.01 )
 			{
 				entity->flags[INVISIBLE] = false;
@@ -1079,12 +1079,12 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				DUCK_FLOAT_ATK *= 0.8;
 			}
 
-			if ( my->monsterSpecialState == DUCK_DIVE )
+			if ( my->monsterSpecialState() == DUCK_DIVE )
 			{
 				DUCK_INERT_ANIM *= 0.95;
 				DUCK_INERT_ANIM_COMPLETE *= 0.95;
 			}
-			else if ( my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN )
+			else if ( my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN )
 			{
 				body->fskill[0] *= 0.8;
 				DUCK_DIVE_ANIM *= 0.8;
@@ -1099,7 +1099,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				DUCK_INERT_ANIM_COMPLETE *= 0.95;
 			}
 
-			if ( MONSTER_ATTACK > 0 && (my->monsterSpecialState == DUCK_DIVE || my->monsterSpecialState == DUCK_RETURN) )
+			if ( MONSTER_ATTACK > 0 && (my->monsterSpecialState() == DUCK_DIVE || my->monsterSpecialState() == DUCK_RETURN) )
 			{
 				MONSTER_ATTACK = 0;
 				MONSTER_ATTACKTIME = 0;
@@ -1163,7 +1163,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				}
 			}
 
-			if ( my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN )
+			if ( my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN )
 			{
 				real_t start = -5;
 				real_t end = 15.5;
@@ -1183,7 +1183,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 						DUCK_INERT_ANIM_COMPLETE = std::min(1.0, DUCK_INERT_ANIM_COMPLETE) * (1.0 - abs(DUCK_FLOAT_ATK));
 						entity->fskill[1] += 0.2 * abs(DUCK_FLOAT_ATK);
 
-						if ( my->monsterSpecialState == DUCK_RETURN )
+						if ( my->monsterSpecialState() == DUCK_RETURN )
 						{
 							if ( my->ticks % 4 == 0 )
 							{
@@ -1237,7 +1237,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 					playSoundEntityLocal(my, 779 + local_rng.rand() % 5, 32);
 				}
 			}
-			else if ( my->monsterSpecialState == DUCK_DIVE )
+			else if ( my->monsterSpecialState() == DUCK_DIVE )
 			{
 				int interval = 15;
 				int interval2 = 50;
@@ -1358,7 +1358,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 						{
 							if ( spiritDuck && !waterTile )
 							{
-								my->monsterSpecialState = 0;
+								my->monsterSpecialState() = 0;
 								serverUpdateEntitySkill(my, 33);
 							}
 							else if ( multiplayer != CLIENT )
@@ -1434,12 +1434,12 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 										free(item);
 									}
 									playSoundEntity(my, 789 + local_rng.rand() % 5, 128);
-									my->monsterSpecialState = 0;
+									my->monsterSpecialState() = 0;
 									serverUpdateEntitySkill(my, 33);
 								}
 								else if ( currentTick >= (2 * huntInterval) * 3 )
 								{
-									my->monsterSpecialState = 0;
+									my->monsterSpecialState() = 0;
 									serverUpdateEntitySkill(my, 33);
 								}
 							}
@@ -1509,7 +1509,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			entity->pitch = entity->fskill[0];
 			entity->pitch += DUCK_WALK_CYCLE * PI / 8;
-			if ( my->monsterState != MONSTER_STATE_WAIT )
+			if ( my->monsterState() != MONSTER_STATE_WAIT )
 			{
 				entity->pitch += DUCK_WALK_CYCLE2 * PI / 16;
 			}
@@ -1525,7 +1525,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 			}
 			entity->roll = DUCK_INERT_ANIM_COMPLETE * DUCK_WALK_CYCLE * 0.25 * (sin(DUCK_WALK_CYCLE_ANIM));
 
-			if ( my->monsterSpecialState == DUCK_DIVE || my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN )
+			if ( my->monsterSpecialState() == DUCK_DIVE || my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN )
 			{
 				//entity->fskill[1] += 0.25;
 			}
@@ -1632,7 +1632,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				else
 				{
 
-					if ( my->monsterState == MONSTER_STATE_ATTACK )
+					if ( my->monsterState() == MONSTER_STATE_ATTACK )
 					{
 						entity->fskill[1] += 0.1;
 						entity->fskill[1] = std::min(1.0, entity->fskill[1]);
@@ -1703,7 +1703,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				real_t minRot = -1.3;
 				real_t maxRot = 0.8;
 
-				if ( my->monsterSpecialState == DUCK_INERT || my->monsterSpecialState == DUCK_RETURN )
+				if ( my->monsterSpecialState() == DUCK_INERT || my->monsterSpecialState() == DUCK_RETURN )
 				{
 					minRot = 0.0;
 					maxRot = 0.8;
@@ -1807,7 +1807,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				entity->focalx = limbs[DUCK_SMALL][20][0];
 				entity->focaly = limbs[DUCK_SMALL][20][1];
 				entity->focalz = limbs[DUCK_SMALL][20][2];
-				bool webFoot = (head && !head->flags[INVISIBLE]) && (my->monsterSpecialState != DUCK_RETURN);
+				bool webFoot = (head && !head->flags[INVISIBLE]) && (my->monsterSpecialState() != DUCK_RETURN);
 				if ( webFoot )
 				{
 					entity->focalz -= 0.25;
@@ -1885,7 +1885,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				leftLeg = entity;
 
 				entity->fskill[0] = -leftWing->roll * (1.0 - DUCK_INERT_ANIM_COMPLETE);
-				if ( my->monsterSpecialState == DUCK_DIVE )
+				if ( my->monsterSpecialState() == DUCK_DIVE )
 				{
 					real_t minRot = -1.3;
 					real_t maxRot = 0.8;
@@ -1908,7 +1908,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 				entity->focaly = limbs[DUCK_SMALL][22][1];
 				entity->focalz = limbs[DUCK_SMALL][22][2];
 
-				bool webFoot = (head && !head->flags[INVISIBLE]) && (my->monsterSpecialState != DUCK_RETURN);
+				bool webFoot = (head && !head->flags[INVISIBLE]) && (my->monsterSpecialState() != DUCK_RETURN);
 				if ( webFoot )
 				{
 					entity->focalz -= 0.25;
@@ -1985,7 +1985,7 @@ void duckAnimate(Entity* my, Stat* myStats, double dist)
 
 				if ( leftLeg && body )
 				{
-					if ( my->monsterSpecialState == 0 )
+					if ( my->monsterSpecialState() == 0 )
 					{
 						entity->pitch = leftLeg->fskill[0]; // swing same
 					}

@@ -3055,7 +3055,7 @@ void releaseChestItem(const int player)
 				bool disableItemUsage = false;
 				if ( players[player] && players[player]->entity )
 				{
-					if ( players[player]->entity->effectShapeshift != NOTHING )
+					if ( players[player]->entity->effectShapeshift() != NOTHING )
 					{
 						// shape shifted, disable some items
 						if ( !selectedItem->usableWhileShapeshifted(stats[player]) )
@@ -5403,7 +5403,7 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
                         int skillLVL = std::min(100, stats[player]->getModifiedProficiency(spell->skillID) + statGetINT(stats[player], players[player]->entity));
                         bool isGoblin = (stats[player]
                                          && (stats[player]->type == GOBLIN
-                                             || (stats[player]->playerRace == RACE_GOBLIN && stats[player]->stat_appearance == 0)));
+                                             || (stats[player]->playerRace() == RACE_GOBLIN && stats[player]->stat_appearance == 0)));
                         if ( icon.conditionalAttribute == "SPELLBOOK_CAST_BONUS" )
                         {
                             if ( !items[item->type].hasAttribute(icon.conditionalAttribute) )
@@ -7969,7 +7969,7 @@ int Player::Inventory_t::getKeyAmountForWallLock(Entity& entity) const
 {
 	int num = 0;
 	ItemType key = WOODEN_SHIELD;
-	switch ( entity.wallLockMaterial )
+	switch ( entity.wallLockMaterial() )
 	{
 	case 0:
 		key = KEY_STONE;
@@ -8016,7 +8016,7 @@ int Player::Inventory_t::getKeyAmountForWallLock(Entity& entity) const
 Item* Player::Inventory_t::hasKeyForWallLock(Entity& entity) const
 {
 	ItemType key = WOODEN_SHIELD;
-	switch ( entity.wallLockMaterial )
+	switch ( entity.wallLockMaterial() )
 	{
 	case 0:
 		key = KEY_STONE;
@@ -10496,7 +10496,7 @@ void Player::Inventory_t::updateInventory()
 				bool disableItemUsage = false;
 				if ( item )
 				{
-					if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift != NOTHING )
+					if ( players[player] && players[player]->entity && players[player]->entity->effectShapeshift() != NOTHING )
 					{
 						// shape shifted, disable some items
 						if ( !item->usableWhileShapeshifted(stats[player]) )
@@ -10711,7 +10711,7 @@ void Player::Inventory_t::updateInventory()
 
 				bool numkey_quick_add = playerSettings[multiplayer ? 0 : player].hotbar_numkey_quick_add && inputs.bPlayerUsingKeyboardControl(player);
 				if ( item && itemCategory(item) == SPELL_CAT && item->appearance >= 1000 &&
-					players[player] && players[player]->entity && players[player]->entity->effectShapeshift )
+					players[player] && players[player]->entity && players[player]->entity->effectShapeshift() )
 				{
 					if ( canUseShapeshiftSpellInCurrentForm(player, *item) != 1 )
 					{
@@ -11609,14 +11609,14 @@ DynamicArrayS32 getContextMenuOptionsForItem(const int player, Item* item)
 		}
 		else if ( stats[player] 
 			&& (stats[player]->type == GOBLIN
-				|| (stats[player]->playerRace == RACE_GOBLIN && stats[player]->stat_appearance == 0)) )
+				|| (stats[player]->playerRace() == RACE_GOBLIN && stats[player]->stat_appearance == 0)) )
 		{
 			// goblinos can't learn spells but always equip books.
 			learnedSpell = true; 
 		}
 		else if ( players[player] && players[player]->entity )
 		{
-			if ( players[player]->entity->effectShapeshift == CREATURE_IMP )
+			if ( players[player]->entity->effectShapeshift() == CREATURE_IMP )
 			{
 				learnedSpell = true; // imps can't learn spells but always equip books.
 			}

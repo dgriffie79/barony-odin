@@ -183,7 +183,7 @@ bool doesEntityStopBoulder(Entity* entity)
 	{
 		return true;
 	}
-	else if ( entity->behavior == &actColliderDecoration && entity->colliderHasCollision != 0 && !(entity->isColliderWeakToBoulders()) )
+	else if ( entity->behavior == &actColliderDecoration && entity->colliderHasCollision() != 0 && !(entity->isColliderWeakToBoulders()) )
 	{
 		return true;
 	}
@@ -239,7 +239,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 			{
 				if ( stats->type == DUCK_SMALL )
 				{
-					if ( entity->monsterAttack == 0 )
+					if ( entity->monsterAttack() == 0 )
 					{
 						entity->attack(local_rng.rand() % 2 ? MONSTER_POSE_MELEE_WINDUP2 : MONSTER_POSE_MELEE_WINDUP3, 0, nullptr);
 					}
@@ -285,9 +285,9 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 				{
 					damage = 80;
 				}
-				if ( my->boulderShatterEarthSpell > 0 )
+				if ( my->boulderShatterEarthSpell() > 0 )
 				{
-					damage = my->boulderShatterEarthDamage;
+					damage = my->boulderShatterEarthDamage();
 				}
 
 				int trapResist = entity->getEntityBonusTrapResist();
@@ -308,7 +308,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 				}
 				else if ( stats->helmet )
 				{
-					bool shapeshifted = (entity->behavior == &actPlayer && entity->effectShapeshift != NOTHING);
+					bool shapeshifted = (entity->behavior == &actPlayer && entity->effectShapeshift() != NOTHING);
 
 					if ( !shapeshifted 
 						&& (stats->helmet->type == HELM_MINING || stats->helmet->type == HAT_TOPHAT) )
@@ -415,9 +415,9 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 				}
 				else
 				{
-					if ( my->boulderShatterEarthSpell > 0 )
+					if ( my->boulderShatterEarthSpell() > 0 )
 					{
-						Entity* caster = uidToEntity(my->boulderShatterEarthSpell);
+						Entity* caster = uidToEntity(my->boulderShatterEarthSpell());
 						applyGenericMagicDamage(caster, entity, *my, SPELL_SHATTER_EARTH, damage, true);
 					}
 					else if ( BOULDER_PLAYERPUSHED >= MAXPLAYERS )
@@ -462,7 +462,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 					{
 						if ( stats->type == AUTOMATON )
 						{
-							entity->playerAutomatonDeathCounter = TICKS_PER_SECOND * 5; // set the death timer to immediately pop for players.
+							entity->playerAutomatonDeathCounter() = TICKS_PER_SECOND * 5; // set the death timer to immediately pop for players.
 						}
 						steamAchievementClient(entity->skill[2], "BARONY_ACH_THROW_ME_THE_WHIP");
 						if ( BOULDER_PLAYERPUSHED >= 0 && entity->skill[2] != (BOULDER_PLAYERPUSHED % MAXPLAYERS) )
@@ -493,7 +493,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 				if ( !lifeSaving )
 				{
 					if ( stats->HP <= 0 && entity->behavior == &actPlayer 
-						&& ((stats->playerRace == RACE_SKELETON && stats->stat_appearance == 0) || stats->type == SKELETON) )
+						&& ((stats->playerRace() == RACE_SKELETON && stats->stat_appearance == 0) || stats->type == SKELETON) )
 					{
 						if ( stats->MP >= 75 )
 						{
@@ -513,7 +513,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 								{
 									mySummon = uidToEntity(*c);
 								}
-								if ( mySummon && mySummon->monsterAllySummonRank != 0 )
+								if ( mySummon && mySummon->monsterAllySummonRank() != 0 )
 								{
 									Stat* mySummonStats = mySummon->getStats();
 									if ( mySummonStats && mySummonStats->type == SKELETON )
@@ -558,7 +558,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 					{
 						i = 0;
 					}
-					if ( my->boulderShatterEarthSpell > 0 )
+					if ( my->boulderShatterEarthSpell() > 0 )
 					{
 						i = 0;
 						createParticleRock(entity, 78);
@@ -637,25 +637,25 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 					{
 						if ( my->sprite == BOULDER_LAVA_SPRITE )
 						{
-							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex, Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "brimstone boulder", 1);
+							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex(), Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "brimstone boulder", 1);
 						}
 						else if ( my->sprite == BOULDER_ARCANE_SPRITE )
 						{
-							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex, Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "arcane boulder", 1);
+							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex(), Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "arcane boulder", 1);
 						}
 						else
 						{
-							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex, Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "boulder trap", 1);
+							Compendium_t::Events_t::eventUpdateWorld(entity->monsterAllyIndex(), Compendium_t::CPDM_TRAP_FOLLOWERS_KILLED, "boulder trap", 1);
 						}
 						if ( stats->type == GYROBOT )
 						{
-							Compendium_t::Events_t::eventUpdate(entity->monsterAllyIndex, Compendium_t::CPDM_GYROBOT_BOULDERS, TOOL_GYROBOT, 1);
+							Compendium_t::Events_t::eventUpdate(entity->monsterAllyIndex(), Compendium_t::CPDM_GYROBOT_BOULDERS, TOOL_GYROBOT, 1);
 							real_t tangent = atan2(leader->y - entity->y, leader->x - entity->x);
 							Entity* ohitentity = hit.entity;
 							lineTraceTarget(entity, entity->x, entity->y, tangent, 1024, 0, false, leader);
 							if ( hit.entity == leader )
 							{
-								steamAchievementClient(entity->monsterAllyIndex, "BARONY_ACH_GOODNIGHT_SWEET_PRINCE");
+								steamAchievementClient(entity->monsterAllyIndex(), "BARONY_ACH_GOODNIGHT_SWEET_PRINCE");
 							}
 							hit.entity = ohitentity;
 						}
@@ -689,7 +689,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 		{
 			if ( ignoreInsideEntity || entityInsideEntity( my, entity ) )
 			{
-				if ( my->boulderShatterEarthSpell > 0 )
+				if ( my->boulderShatterEarthSpell() > 0 )
 				{
 					createParticleRock(entity, 78);
 					if ( multiplayer == SERVER )
@@ -725,14 +725,14 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 		if ( ignoreInsideEntity || entityInsideEntity( my, entity ) )
 		{
 			playSoundEntity(entity, 28, 64);
-			entity->doorHealth = 0;
-			if ( !entity->doorDir )
+			entity->doorHealth() = 0;
+			if ( !entity->doorDir() )
 			{
-				entity->doorSmacked = (my->x > entity->x);
+				entity->doorSmacked() = (my->x > entity->x);
 			}
 			else
 			{
-				entity->doorSmacked = (my->y < entity->y);
+				entity->doorSmacked() = (my->y < entity->y);
 			}
 			playSoundEntity(my, 181, 128);
 		}
@@ -742,7 +742,7 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 		if ( ignoreInsideEntity || entityInsideEntity(my, entity) )
 		{
 			playSoundEntity(entity, 28, 64);
-			entity->furnitureHealth = 0;
+			entity->furnitureHealth() = 0;
 			playSoundEntity(my, 181, 128);
 		}
 	}
@@ -751,8 +751,8 @@ int boulderCheckAgainstEntity(Entity* my, Entity* entity, bool ignoreInsideEntit
 		if ( ignoreInsideEntity || entityInsideEntity(my, entity) )
 		{
 			playSoundEntity(entity, 28, 64);
-			entity->colliderCurrentHP = 0;
-			entity->colliderKillerUid = 0;
+			entity->colliderCurrentHP() = 0;
+			entity->colliderKillerUid() = 0;
 			playSoundEntity(my, 181, 128);
 		}
 	}
@@ -839,7 +839,7 @@ void actBoulder(Entity* my)
 	}
 
 	real_t boulderModifier = 1.0;
-	if ( my->boulderShatterEarthSpell == 0 )
+	if ( my->boulderShatterEarthSpell() == 0 )
 	{
 		if ( gameModeManager.currentSession.challengeRun.isActive(GameModeManager_t::CurrentSession_t::ChallengeRun_t::CHEVENT_STRONG_TRAPS) )
 		{
@@ -856,7 +856,7 @@ void actBoulder(Entity* my)
 			BOULDER_NOGROUND = true;
 		}
 	}
-	if ( my->boulderShatterEarthSpell > 0 )
+	if ( my->boulderShatterEarthSpell() > 0 )
 	{
 		if ( my->z >= 0 && fabs(my->vel_z) > 1 && fabs(my->vel_z) < 2 )
 		{
@@ -880,7 +880,7 @@ void actBoulder(Entity* my)
 			return;
 		}
 
-		if ( !noground && my->boulderShatterEarthSpell > 0 && my->z >= 4.0 )
+		if ( !noground && my->boulderShatterEarthSpell() > 0 && my->z >= 4.0 )
 		{
 			createParticleRock(my, 78);
 			if ( multiplayer == SERVER )
@@ -1684,7 +1684,7 @@ void actBoulderTrap(Entity* my)
 	int x, y;
 	int c;
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
 		BOULDERTRAP_AMBIENCE--;
 		if ( BOULDERTRAP_AMBIENCE <= 0 )
@@ -1712,7 +1712,7 @@ void actBoulderTrap(Entity* my)
 			BOULDERTRAP_FIRED = 1;
 			for ( c = 0; c < 4; c++ )
 			{
-				if ( my->boulderTrapRocksToSpawn & (1 << c) )
+				if ( my->boulderTrapRocksToSpawn() & (1 << c) )
 				{
 					switch ( c )
 					{
@@ -1805,12 +1805,12 @@ void actBoulderTrapEast(Entity* my)
 	int x, y;
 	int c;
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
-		my->boulderTrapAmbience--;
-		if ( my->boulderTrapAmbience <= 0 )
+		my->boulderTrapAmbience()--;
+		if ( my->boulderTrapAmbience() <= 0 )
 		{
-			my->boulderTrapAmbience = TICKS_PER_SECOND * 30;
+			my->boulderTrapAmbience() = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(my, 149, 64);
 		}
 	}
@@ -1819,13 +1819,13 @@ void actBoulderTrapEast(Entity* my)
 		return;
 	}
 
-	if ( my->boulderTrapRefireCounter > 0 )
+	if ( my->boulderTrapRefireCounter() > 0 )
 	{
-		--my->boulderTrapRefireCounter;
-		if ( my->boulderTrapRefireCounter <= 0 )
+		--my->boulderTrapRefireCounter();
+		if ( my->boulderTrapRefireCounter() <= 0 )
 		{
-			my->boulderTrapFired = 0;
-			my->boulderTrapRefireCounter = 0;
+			my->boulderTrapFired() = 0;
+			my->boulderTrapRefireCounter() = 0;
 		}
 	}
 
@@ -1837,11 +1837,11 @@ void actBoulderTrapEast(Entity* my)
 	// received on signal
 	if ( my->skill[28] == 2 )
 	{
-		if ( !my->boulderTrapFired )
+		if ( !my->boulderTrapFired() )
 		{
-			if ( my->boulderTrapPreDelay > 0 )
+			if ( my->boulderTrapPreDelay() > 0 )
 			{
-				--my->boulderTrapPreDelay;
+				--my->boulderTrapPreDelay();
 				return;
 			}
 			playSoundEntity(my, 150, 128);
@@ -1853,7 +1853,7 @@ void actBoulderTrapEast(Entity* my)
 					playSoundPlayer(c, 150, 64);
 				}
 			}
-			my->boulderTrapFired = 1;
+			my->boulderTrapFired() = 1;
 
 			c = 0; // direction
 			x = ((int)(my->x)) >> 4;
@@ -1885,15 +1885,15 @@ void actBoulderTrapEast(Entity* my)
 				entity->flags[PASSABLE] = true;
 			}
 
-			if ( my->boulderTrapRefireAmount > 0 )
+			if ( my->boulderTrapRefireAmount() > 0 )
 			{
-				--my->boulderTrapRefireAmount;
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				--my->boulderTrapRefireAmount();
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
-			else if ( my->boulderTrapRefireAmount == -1 )
+			else if ( my->boulderTrapRefireAmount() == -1 )
 			{
 				// infinite boulders.
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -1904,12 +1904,12 @@ void actBoulderTrapSouth(Entity* my)
 	int x, y;
 	int c;
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
-		my->boulderTrapAmbience--;
-		if ( my->boulderTrapAmbience <= 0 )
+		my->boulderTrapAmbience()--;
+		if ( my->boulderTrapAmbience() <= 0 )
 		{
-			my->boulderTrapAmbience = TICKS_PER_SECOND * 30;
+			my->boulderTrapAmbience() = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(my, 149, 64);
 		}
 	}
@@ -1918,13 +1918,13 @@ void actBoulderTrapSouth(Entity* my)
 		return;
 	}
 
-	if ( my->boulderTrapRefireCounter > 0 )
+	if ( my->boulderTrapRefireCounter() > 0 )
 	{
-		--my->boulderTrapRefireCounter;
-		if ( my->boulderTrapRefireCounter <= 0 )
+		--my->boulderTrapRefireCounter();
+		if ( my->boulderTrapRefireCounter() <= 0 )
 		{
-			my->boulderTrapFired = 0;
-			my->boulderTrapRefireCounter = 0;
+			my->boulderTrapFired() = 0;
+			my->boulderTrapRefireCounter() = 0;
 		}
 	}
 
@@ -1936,11 +1936,11 @@ void actBoulderTrapSouth(Entity* my)
 	// received on signal
 	if ( my->skill[28] == 2 )
 	{
-		if ( !my->boulderTrapFired )
+		if ( !my->boulderTrapFired() )
 		{
-			if ( my->boulderTrapPreDelay > 0 )
+			if ( my->boulderTrapPreDelay() > 0 )
 			{
-				--my->boulderTrapPreDelay;
+				--my->boulderTrapPreDelay();
 				return;
 			}
 			playSoundEntity(my, 150, 128);
@@ -1952,7 +1952,7 @@ void actBoulderTrapSouth(Entity* my)
 					playSoundPlayer(c, 150, 64);
 				}
 			}
-			my->boulderTrapFired = 1;
+			my->boulderTrapFired() = 1;
 
 			c = 1; // direction
 			x = ((int)(my->x)) >> 4;
@@ -1984,15 +1984,15 @@ void actBoulderTrapSouth(Entity* my)
 				entity->flags[PASSABLE] = true;
 			}
 
-			if ( my->boulderTrapRefireAmount > 0 )
+			if ( my->boulderTrapRefireAmount() > 0 )
 			{
-				--my->boulderTrapRefireAmount;
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				--my->boulderTrapRefireAmount();
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
-			else if ( my->boulderTrapRefireAmount == -1 )
+			else if ( my->boulderTrapRefireAmount() == -1 )
 			{
 				// infinite boulders.
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -2003,12 +2003,12 @@ void actBoulderTrapWest(Entity* my)
 	int x, y;
 	int c;
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
-		my->boulderTrapAmbience--;
-		if ( my->boulderTrapAmbience <= 0 )
+		my->boulderTrapAmbience()--;
+		if ( my->boulderTrapAmbience() <= 0 )
 		{
-			my->boulderTrapAmbience = TICKS_PER_SECOND * 30;
+			my->boulderTrapAmbience() = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(my, 149, 64);
 		}
 	}
@@ -2017,13 +2017,13 @@ void actBoulderTrapWest(Entity* my)
 		return;
 	}
 
-	if ( my->boulderTrapRefireCounter > 0 )
+	if ( my->boulderTrapRefireCounter() > 0 )
 	{
-		--my->boulderTrapRefireCounter;
-		if ( my->boulderTrapRefireCounter <= 0 )
+		--my->boulderTrapRefireCounter();
+		if ( my->boulderTrapRefireCounter() <= 0 )
 		{
-			my->boulderTrapFired = 0;
-			my->boulderTrapRefireCounter = 0;
+			my->boulderTrapFired() = 0;
+			my->boulderTrapRefireCounter() = 0;
 		}
 	}
 
@@ -2035,11 +2035,11 @@ void actBoulderTrapWest(Entity* my)
 	// received on signal
 	if ( my->skill[28] == 2 )
 	{
-		if ( !my->boulderTrapFired )
+		if ( !my->boulderTrapFired() )
 		{
-			if ( my->boulderTrapPreDelay > 0 )
+			if ( my->boulderTrapPreDelay() > 0 )
 			{
-				--my->boulderTrapPreDelay;
+				--my->boulderTrapPreDelay();
 				return;
 			}
 			playSoundEntity(my, 150, 128);
@@ -2051,7 +2051,7 @@ void actBoulderTrapWest(Entity* my)
 					playSoundPlayer(c, 150, 64);
 				}
 			}
-			my->boulderTrapFired = 1;
+			my->boulderTrapFired() = 1;
 
 			c = 2; // direction
 			x = ((int)(my->x)) >> 4;
@@ -2083,15 +2083,15 @@ void actBoulderTrapWest(Entity* my)
 				entity->flags[PASSABLE] = true;
 			}
 
-			if ( my->boulderTrapRefireAmount > 0 )
+			if ( my->boulderTrapRefireAmount() > 0 )
 			{
-				--my->boulderTrapRefireAmount;
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				--my->boulderTrapRefireAmount();
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
-			else if ( my->boulderTrapRefireAmount == -1 )
+			else if ( my->boulderTrapRefireAmount() == -1 )
 			{
 				// infinite boulders.
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -2102,12 +2102,12 @@ void actBoulderTrapNorth(Entity* my)
 	int x, y;
 	int c;
 
-	if ( my->actTrapSabotaged == 0 )
+	if ( my->actTrapSabotaged() == 0 )
 	{
-		my->boulderTrapAmbience--;
-		if ( my->boulderTrapAmbience <= 0 )
+		my->boulderTrapAmbience()--;
+		if ( my->boulderTrapAmbience() <= 0 )
 		{
-			my->boulderTrapAmbience = TICKS_PER_SECOND * 30;
+			my->boulderTrapAmbience() = TICKS_PER_SECOND * 30;
 			playSoundEntityLocal(my, 149, 64);
 		}
 	}
@@ -2116,13 +2116,13 @@ void actBoulderTrapNorth(Entity* my)
 		return;
 	}
 
-	if ( my->boulderTrapRefireCounter > 0 )
+	if ( my->boulderTrapRefireCounter() > 0 )
 	{
-		--my->boulderTrapRefireCounter;
-		if ( my->boulderTrapRefireCounter <= 0 )
+		--my->boulderTrapRefireCounter();
+		if ( my->boulderTrapRefireCounter() <= 0 )
 		{
-			my->boulderTrapFired = 0;
-			my->boulderTrapRefireCounter = 0;
+			my->boulderTrapFired() = 0;
+			my->boulderTrapRefireCounter() = 0;
 		}
 	}
 
@@ -2134,11 +2134,11 @@ void actBoulderTrapNorth(Entity* my)
 	// received on signal
 	if ( my->skill[28] == 2 )
 	{
-		if ( !my->boulderTrapFired )
+		if ( !my->boulderTrapFired() )
 		{
-			if ( my->boulderTrapPreDelay > 0 )
+			if ( my->boulderTrapPreDelay() > 0 )
 			{
-				--my->boulderTrapPreDelay;
+				--my->boulderTrapPreDelay();
 				return;
 			}
 			playSoundEntity(my, 150, 128);
@@ -2150,7 +2150,7 @@ void actBoulderTrapNorth(Entity* my)
 					playSoundPlayer(c, 150, 64);
 				}
 			}
-			my->boulderTrapFired = 1;
+			my->boulderTrapFired() = 1;
 
 			c = 3; // direction
 			x = ((int)(my->x)) >> 4;
@@ -2182,15 +2182,15 @@ void actBoulderTrapNorth(Entity* my)
 				entity->flags[PASSABLE] = true;
 			}
 
-			if ( my->boulderTrapRefireAmount > 0 )
+			if ( my->boulderTrapRefireAmount() > 0 )
 			{
-				--my->boulderTrapRefireAmount;
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				--my->boulderTrapRefireAmount();
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
-			else if ( my->boulderTrapRefireAmount == -1 )
+			else if ( my->boulderTrapRefireAmount() == -1 )
 			{
 				// infinite boulders.
-				my->boulderTrapRefireCounter = my->boulderTrapRefireDelay * TICKS_PER_SECOND;
+				my->boulderTrapRefireCounter() = my->boulderTrapRefireDelay() * TICKS_PER_SECOND;
 			}
 		}
 	}
@@ -2215,7 +2215,7 @@ void boulderSokobanOnDestroy(bool pushedOffLedge)
 			node = node->next;
 			if ( entity )
 			{
-				if ( entity->behavior == &actGoldBag && entity->goldSokoban == 1 && goldToDestroy > 0 )
+				if ( entity->behavior == &actGoldBag && entity->goldSokoban() == 1 && goldToDestroy > 0 )
 				{
 					if ( entity->mynode )
 					{
@@ -2249,11 +2249,11 @@ void boulderSokobanOnDestroy(bool pushedOffLedge)
 			Entity* entity = (Entity*)node->element;
 			if ( entity )
 			{
-				if ( entity->behavior == &actGoldBag && entity->goldSokoban == 1 )
+				if ( entity->behavior == &actGoldBag && entity->goldSokoban() == 1 )
 				{
 					++goldCount;
 				}
-				if ( entity->behavior == &actItem && entity->itemSokobanReward == 1 ) // artifact gloves.
+				if ( entity->behavior == &actItem && entity->itemSokobanReward() == 1 ) // artifact gloves.
 				{
 					sokobanItemReward = entity;
 				}

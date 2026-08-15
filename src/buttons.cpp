@@ -1922,8 +1922,8 @@ void buttonSpriteProperties(button_t* my)
 			case 2: //chests
 				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->yaw));
 				snprintf(spriteProperties[1], 4, "%d", selectedEntity[0]->skill[9]);
-				snprintf(spriteProperties[2], 4, "%d", selectedEntity[0]->chestLocked);
-				snprintf(spriteProperties[3], 4, "%d", selectedEntity[0]->chestMimicChance);
+				snprintf(spriteProperties[2], 4, "%d", selectedEntity[0]->chestLocked());
+				snprintf(spriteProperties[3], 4, "%d", selectedEntity[0]->chestMimicChance());
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -1983,9 +1983,9 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			case 5:
 				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->yaw)); //Orientation
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->crystalNumElectricityNodes)); //Powered Distance
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->crystalTurnReverse)); //Rotation direction
-				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->crystalSpellToActivate)); //Spell to activate
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->crystalNumElectricityNodes())); //Powered Distance
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->crystalTurnReverse())); //Rotation direction
+				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->crystalSpellToActivate())); //Spell to activate
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -1998,7 +1998,7 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Power Crystal Properties:");
 				break;
 			case 6:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->leverTimerTicks));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->leverTimerTicks()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2011,9 +2011,9 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Lever Timer Properties:");
 				break;
 			case 7:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapRefireAmount));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapRefireDelay));
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapPreDelay));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapRefireAmount()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapRefireDelay()));
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->boulderTrapPreDelay()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2026,11 +2026,11 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Boulder Trap Properties:");
 				break;
 			case 8:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalOrbType));
-				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalHasOrb));
-				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalInvertedPower));
-				snprintf(spriteProperties[3], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalInGround));
-				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalLockOrb));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalOrbType()));
+				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalHasOrb()));
+				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalInvertedPower()));
+				snprintf(spriteProperties[3], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalInGround()));
+				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->pedestalLockOrb()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2043,9 +2043,9 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Pedestal Properties:");
 				break;
 			case 9:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->teleporterX));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->teleporterY));
-				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->teleporterType));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->teleporterX()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->teleporterY()));
+				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->teleporterType()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2058,10 +2058,10 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Teleporter Properties:");
 				break;
 			case 10:
-				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileModel));
-				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileDir));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileAllowTrap));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileBreakable));
+				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileModel()));
+				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileDir()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileAllowTrap()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->ceilingTileBreakable()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2074,11 +2074,11 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Ceiling Tile Properties:");
 				break;
 			case 11:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapType));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapRefire));
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapLatchPower));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->spellTrapFloorTile));
-				snprintf(spriteProperties[4], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapRefireRate));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapType()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapRefire()));
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapLatchPower()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->spellTrapFloorTile()));
+				snprintf(spriteProperties[4], 4, "%d", static_cast<int>(selectedEntity[0]->spellTrapRefireRate()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2091,7 +2091,7 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Spell Trap Properties:");
 				break;
 			case 12:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->furnitureDir));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->furnitureDir()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2105,12 +2105,12 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			case 13:
 			{
-				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationModel));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->floorDecorationRotation));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationHeightOffset));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationXOffset));
-				snprintf(spriteProperties[4], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationYOffset));
-				snprintf(spriteProperties[5], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationDestroyIfNoWall));
+				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationModel()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->floorDecorationRotation()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationHeightOffset()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationXOffset()));
+				snprintf(spriteProperties[4], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationYOffset()));
+				snprintf(spriteProperties[5], 5, "%d", static_cast<int>(selectedEntity[0]->floorDecorationDestroyIfNoWall()));
 				char buf[256] = "";
 				int totalChars = 0;
 				for ( int i = 8; i < 60; ++i )
@@ -2153,11 +2153,11 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			}
 			case 14:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->soundSourceToPlay));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->soundSourceVolume));
-				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->soundSourceLatchOn));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->soundSourceDelay));
-				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->soundSourceOrigin));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->soundSourceToPlay()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->soundSourceVolume()));
+				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->soundSourceLatchOn()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->soundSourceDelay()));
+				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->soundSourceOrigin()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2170,16 +2170,16 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Sound Source Properties:");
 				break;
 			case 15:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceAlwaysOn));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->lightSourceBrightness));
-				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceInvertPower));
-				snprintf(spriteProperties[3], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceLatchOn));
-				snprintf(spriteProperties[4], 3, "%d", static_cast<int>(selectedEntity[0]->lightSourceRadius));
-				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceFlicker));
-				snprintf(spriteProperties[6], 5, "%d", static_cast<int>(selectedEntity[0]->lightSourceDelay));
-				snprintf(spriteProperties[7], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB & 0xFF)));
-				snprintf(spriteProperties[8], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB >> 8) & 0xFF));
-				snprintf(spriteProperties[9], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB >> 16) & 0xFF));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceAlwaysOn()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->lightSourceBrightness()));
+				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceInvertPower()));
+				snprintf(spriteProperties[3], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceLatchOn()));
+				snprintf(spriteProperties[4], 3, "%d", static_cast<int>(selectedEntity[0]->lightSourceRadius()));
+				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->lightSourceFlicker()));
+				snprintf(spriteProperties[6], 5, "%d", static_cast<int>(selectedEntity[0]->lightSourceDelay()));
+				snprintf(spriteProperties[7], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB() & 0xFF)));
+				snprintf(spriteProperties[8], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB() >> 8) & 0xFF));
+				snprintf(spriteProperties[9], 4, "%d", static_cast<int>((selectedEntity[0]->lightSourceRGB() >> 16) & 0xFF));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2193,9 +2193,9 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			case 16:
 			{
-				Uint32 r = (Uint32)(selectedEntity[0]->textSourceColorRGB >> 16) & 0xFF;
-				Uint32 g = (Uint32)(selectedEntity[0]->textSourceColorRGB >> 8) & 0xFF;
-				Uint32 b = (Uint32)(selectedEntity[0]->textSourceColorRGB >> 0) & 0xFF;
+				Uint32 r = (Uint32)(selectedEntity[0]->textSourceColorRGB() >> 16) & 0xFF;
+				Uint32 g = (Uint32)(selectedEntity[0]->textSourceColorRGB() >> 8) & 0xFF;
+				Uint32 b = (Uint32)(selectedEntity[0]->textSourceColorRGB() >> 0) & 0xFF;
 				snprintf(spriteProperties[0], 4, "%d", r);
 				snprintf(spriteProperties[1], 4, "%d", g);
 				snprintf(spriteProperties[2], 4, "%d", b);
@@ -2229,8 +2229,8 @@ void buttonSpriteProperties(button_t* my)
 				strncpy(spriteProperties[5], buf + 96, 48);
 				strncpy(spriteProperties[6], buf + 144, 48);
 				strncpy(spriteProperties[7], buf + 192, 48);
-				snprintf(spriteProperties[8], 5, "%d", static_cast<int>(selectedEntity[0]->textSourceDelay));
-				snprintf(spriteProperties[9], 2, "%d", static_cast<int>((selectedEntity[0]->textSourceVariables4W >> 8) & 0xFF));
+				snprintf(spriteProperties[8], 5, "%d", static_cast<int>(selectedEntity[0]->textSourceDelay()));
+				snprintf(spriteProperties[9], 2, "%d", static_cast<int>((selectedEntity[0]->textSourceVariables4W() >> 8) & 0xFF));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2244,12 +2244,12 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			}
 			case 17:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->signalInputDirection));
-				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->signalActivateDelay));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerInterval));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerRepeatCount));
-				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->signalTimerLatchInput));
-				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->signalInvertOutput));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->signalInputDirection()));
+				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->signalActivateDelay()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerInterval()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerRepeatCount()));
+				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->signalTimerLatchInput()));
+				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->signalInvertOutput()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2263,12 +2263,12 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			case 18: // custom portal
 			{
-				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->portalCustomSprite));
-				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->portalCustomSpriteAnimationFrames));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->portalCustomZOffset));
-				snprintf(spriteProperties[3], 3, "%d", static_cast<int>(selectedEntity[0]->portalCustomLevelsToJump));
-				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->portalCustomRequiresPower));
-				snprintf(spriteProperties[6], 2, "%d", static_cast<int>((selectedEntity[0]->portalNotSecret ? 0 : 1)));
+				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->portalCustomSprite()));
+				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->portalCustomSpriteAnimationFrames()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->portalCustomZOffset()));
+				snprintf(spriteProperties[3], 3, "%d", static_cast<int>(selectedEntity[0]->portalCustomLevelsToJump()));
+				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->portalCustomRequiresPower()));
+				snprintf(spriteProperties[6], 2, "%d", static_cast<int>((selectedEntity[0]->portalNotSecret() ? 0 : 1)));
 
 				char buf[64] = "";
 				int totalChars = 0;
@@ -2310,9 +2310,9 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			}
 			case 19: // tables
-				snprintf(spriteProperties[0], 3, "%d", static_cast<int>(selectedEntity[0]->furnitureDir));
-				snprintf(spriteProperties[1], 3, "%d", static_cast<int>(selectedEntity[0]->furnitureTableSpawnChairs));
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->furnitureTableRandomItemChance));
+				snprintf(spriteProperties[0], 3, "%d", static_cast<int>(selectedEntity[0]->furnitureDir()));
+				snprintf(spriteProperties[1], 3, "%d", static_cast<int>(selectedEntity[0]->furnitureTableSpawnChairs()));
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->furnitureTableRandomItemChance()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2376,9 +2376,9 @@ void buttonSpriteProperties(button_t* my)
 			}
 				break;
 			case 21:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->doorForceLockedUnlocked));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableLockpicks));
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableOpening));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->doorForceLockedUnlocked()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableLockpicks()));
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableOpening()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2391,10 +2391,10 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Door Properties:");
 				break;
 			case 32:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->doorUnlockWhenPowered));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableLockpicks));
-				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableOpening));
-				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->doorForceLockedUnlocked));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->doorUnlockWhenPowered()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableLockpicks()));
+				snprintf(spriteProperties[2], 4, "%d", static_cast<int>(selectedEntity[0]->doorDisableOpening()));
+				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->doorForceLockedUnlocked()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2407,7 +2407,7 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Iron Door Properties:");
 				break;
 			case 22:
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->gateDisableOpening));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->gateDisableOpening()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2420,7 +2420,7 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Gate Properties:");
 				break;
 			case 23: // player spawn
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->playerStartDir));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->playerStartDir()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2433,8 +2433,8 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Player Spawn Properties:");
 				break;
 			case 24: // statue
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->statueDir));
-				snprintf(spriteProperties[1], 32, "%d", static_cast<int>(selectedEntity[0]->statueId));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->statueDir()));
+				snprintf(spriteProperties[1], 32, "%d", static_cast<int>(selectedEntity[0]->statueId()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2447,10 +2447,10 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Statue Properties:");
 				break;
 			case 25: // teleport shrine
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->shrineDir));
-				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->shrineZ));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->shrineDestXOffset));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->shrineDestYOffset));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->shrineDir()));
+				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->shrineZ()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->shrineDestXOffset()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->shrineDestYOffset()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2463,8 +2463,8 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Teleport Shrine Properties:");
 				break;
 			case 26: // spell shrine
-				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->shrineDir));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->shrineZ));
+				snprintf(spriteProperties[0], 4, "%d", static_cast<int>(selectedEntity[0]->shrineDir()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->shrineZ()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2478,17 +2478,17 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			case 27:
 			{
-				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationModel));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationRotation));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationHeightOffset));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationXOffset));
-				snprintf(spriteProperties[4], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationYOffset));
-				snprintf(spriteProperties[5], 5, "%d", static_cast<int>(selectedEntity[0]->colliderHasCollision));
-				snprintf(spriteProperties[6], 4, "%d", static_cast<int>(selectedEntity[0]->colliderSizeX));
-				snprintf(spriteProperties[7], 4, "%d", static_cast<int>(selectedEntity[0]->colliderSizeY));
-				snprintf(spriteProperties[8], 5, "%d", static_cast<int>(selectedEntity[0]->colliderMaxHP));
-				snprintf(spriteProperties[9], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDiggable));
-				snprintf(spriteProperties[10], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDamageTypes));
+				snprintf(spriteProperties[0], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationModel()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationRotation()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationHeightOffset()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationXOffset()));
+				snprintf(spriteProperties[4], 5, "%d", static_cast<int>(selectedEntity[0]->colliderDecorationYOffset()));
+				snprintf(spriteProperties[5], 5, "%d", static_cast<int>(selectedEntity[0]->colliderHasCollision()));
+				snprintf(spriteProperties[6], 4, "%d", static_cast<int>(selectedEntity[0]->colliderSizeX()));
+				snprintf(spriteProperties[7], 4, "%d", static_cast<int>(selectedEntity[0]->colliderSizeY()));
+				snprintf(spriteProperties[8], 5, "%d", static_cast<int>(selectedEntity[0]->colliderMaxHP()));
+				snprintf(spriteProperties[9], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDiggable()));
+				snprintf(spriteProperties[10], 4, "%d", static_cast<int>(selectedEntity[0]->colliderDamageTypes()));
 
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
@@ -2503,12 +2503,12 @@ void buttonSpriteProperties(button_t* my)
 				break;
 			}
 			case 28:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->signalInputDirection));
-				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->signalActivateDelay));
-				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerInterval));
-				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerRepeatCount));
-				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->signalTimerLatchInput));
-				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->signalInvertOutput));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->signalInputDirection()));
+				snprintf(spriteProperties[1], 5, "%d", static_cast<int>(selectedEntity[0]->signalActivateDelay()));
+				snprintf(spriteProperties[2], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerInterval()));
+				snprintf(spriteProperties[3], 5, "%d", static_cast<int>(selectedEntity[0]->signalTimerRepeatCount()));
+				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->signalTimerLatchInput()));
+				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->signalInvertOutput()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2521,7 +2521,7 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "AND Gate Properties:");
 				break;
 			case 29:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->pressurePlateTriggerType));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->pressurePlateTriggerType()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2534,12 +2534,12 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Pressure Plate Properties:");
 				break;
 			case 30:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockMaterial));
-				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockInvertPower));
-				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockTurnable));
-				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->wallLockPickable));
-				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockPickableSkeletonKey));
-				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockAutoGenKey));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockMaterial()));
+				snprintf(spriteProperties[1], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockInvertPower()));
+				snprintf(spriteProperties[2], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockTurnable()));
+				snprintf(spriteProperties[3], 4, "%d", static_cast<int>(selectedEntity[0]->wallLockPickable()));
+				snprintf(spriteProperties[4], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockPickableSkeletonKey()));
+				snprintf(spriteProperties[5], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockAutoGenKey()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -2552,8 +2552,8 @@ void buttonSpriteProperties(button_t* my)
 				strcpy(subtext, "Wall Lock Properties:");
 				break;
 			case 31:
-				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockInvertPower));
-				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->wallLockTimer));
+				snprintf(spriteProperties[0], 2, "%d", static_cast<int>(selectedEntity[0]->wallLockInvertPower()));
+				snprintf(spriteProperties[1], 4, "%d", static_cast<int>(selectedEntity[0]->wallLockTimer()));
 				inputstr = spriteProperties[0];
 				cursorflash = ticks;
 				menuVisible = 0;
@@ -3301,8 +3301,8 @@ void buttonSpritePropertiesConfirm(button_t* my)
 			case 2: //chest
 				selectedEntity[0]->yaw = (real_t)atoi(spriteProperties[0]);
 				selectedEntity[0]->skill[9] = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->chestLocked = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->chestMimicChance = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->chestLocked() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->chestMimicChance() = (Sint32)atoi(spriteProperties[3]);
 				break;
 			case 3: //items
 				if ( strcmp(spriteProperties[0], "0") == 0 )
@@ -3373,75 +3373,75 @@ void buttonSpritePropertiesConfirm(button_t* my)
 				break;
 			case 5: //power crystal
 				selectedEntity[0]->yaw = (real_t)atoi(spriteProperties[0]);
-				selectedEntity[0]->crystalNumElectricityNodes = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->crystalTurnReverse = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->crystalSpellToActivate = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->crystalNumElectricityNodes() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->crystalTurnReverse() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->crystalSpellToActivate() = (Sint32)atoi(spriteProperties[3]);
 				break;
 			case 6: //lever timer
 				if ( (Sint32)atoi(spriteProperties[0]) == 0 )
 				{
-					selectedEntity[0]->leverTimerTicks = 1;
+					selectedEntity[0]->leverTimerTicks() = 1;
 				}
 				else
 				{
-					selectedEntity[0]->leverTimerTicks = (Sint32)atoi(spriteProperties[0]);
+					selectedEntity[0]->leverTimerTicks() = (Sint32)atoi(spriteProperties[0]);
 				}
 				break;
 			case 7: //boulder trap
-				selectedEntity[0]->boulderTrapRefireAmount = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->boulderTrapRefireAmount() = (Sint32)atoi(spriteProperties[0]);
 				if ( (Sint32)atoi(spriteProperties[1]) < 2 )
 				{
-					selectedEntity[0]->boulderTrapRefireDelay = 2;
+					selectedEntity[0]->boulderTrapRefireDelay() = 2;
 				}
 				else
 				{
-					selectedEntity[0]->boulderTrapRefireDelay = (Sint32)atoi(spriteProperties[1]);
+					selectedEntity[0]->boulderTrapRefireDelay() = (Sint32)atoi(spriteProperties[1]);
 				}
 				if ( (Sint32)atoi(spriteProperties[2]) < 0 )
 				{
-					selectedEntity[0]->boulderTrapPreDelay = 0;
+					selectedEntity[0]->boulderTrapPreDelay() = 0;
 				}
 				else
 				{
-					selectedEntity[0]->boulderTrapPreDelay = (Sint32)atoi(spriteProperties[2]);
+					selectedEntity[0]->boulderTrapPreDelay() = (Sint32)atoi(spriteProperties[2]);
 				}
 				break;
 			case 8: //pedestal
-				selectedEntity[0]->pedestalOrbType = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->pedestalHasOrb = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->pedestalInvertedPower = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->pedestalInGround = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->pedestalLockOrb = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->pedestalOrbType() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->pedestalHasOrb() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->pedestalInvertedPower() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->pedestalInGround() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->pedestalLockOrb() = (Sint32)atoi(spriteProperties[4]);
 				break;
 			case 9: //teleporter
-				selectedEntity[0]->teleporterX = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->teleporterY = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->teleporterType = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->teleporterX() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->teleporterY() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->teleporterType() = (Sint32)atoi(spriteProperties[2]);
 				break;
 			case 10: //ceiling tile model
-				selectedEntity[0]->ceilingTileModel = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->ceilingTileDir = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->ceilingTileAllowTrap = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->ceilingTileBreakable = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->ceilingTileModel() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->ceilingTileDir() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->ceilingTileAllowTrap() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->ceilingTileBreakable() = (Sint32)atoi(spriteProperties[3]);
 				break;
 			case 11: //spell trap ceiling
-				selectedEntity[0]->spellTrapType = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->spellTrapRefire = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->spellTrapLatchPower = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->spellTrapFloorTile = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->spellTrapRefireRate = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->spellTrapType() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->spellTrapRefire() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->spellTrapLatchPower() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->spellTrapFloorTile() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->spellTrapRefireRate() = (Sint32)atoi(spriteProperties[4]);
 				break;
 			case 12: //furniture
-				selectedEntity[0]->furnitureDir = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->furnitureDir() = (Sint32)atoi(spriteProperties[0]);
 				break;
 			case 13: //floor decoration
 			{
-				selectedEntity[0]->floorDecorationModel = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->floorDecorationRotation = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->floorDecorationHeightOffset = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->floorDecorationXOffset = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->floorDecorationYOffset = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->floorDecorationDestroyIfNoWall = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->floorDecorationModel() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->floorDecorationRotation() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->floorDecorationHeightOffset() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->floorDecorationXOffset() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->floorDecorationYOffset() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->floorDecorationDestroyIfNoWall() = (Sint32)atoi(spriteProperties[5]);
 
 				int totalChars = 0;
 				char checkChr = 'a';
@@ -3491,37 +3491,37 @@ void buttonSpritePropertiesConfirm(button_t* my)
 			}
 				break;
 			case 14: //sound source
-				selectedEntity[0]->soundSourceToPlay = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->soundSourceVolume = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->soundSourceLatchOn = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->soundSourceDelay = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->soundSourceOrigin = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->soundSourceToPlay() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->soundSourceVolume() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->soundSourceLatchOn() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->soundSourceDelay() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->soundSourceOrigin() = (Sint32)atoi(spriteProperties[4]);
 				break;
 			case 15: //light source
-				selectedEntity[0]->lightSourceAlwaysOn = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->lightSourceBrightness = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->lightSourceInvertPower = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->lightSourceLatchOn = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->lightSourceRadius = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->lightSourceFlicker = (Sint32)atoi(spriteProperties[5]);
-				selectedEntity[0]->lightSourceDelay = (Sint32)atoi(spriteProperties[6]);
-				selectedEntity[0]->lightSourceRGB = 0;
-				selectedEntity[0]->lightSourceRGB |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[7])));
-				selectedEntity[0]->lightSourceRGB |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[8]))) << 8;
-				selectedEntity[0]->lightSourceRGB |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[9]))) << 16;
+				selectedEntity[0]->lightSourceAlwaysOn() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->lightSourceBrightness() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->lightSourceInvertPower() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->lightSourceLatchOn() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->lightSourceRadius() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->lightSourceFlicker() = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->lightSourceDelay() = (Sint32)atoi(spriteProperties[6]);
+				selectedEntity[0]->lightSourceRGB() = 0;
+				selectedEntity[0]->lightSourceRGB() |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[7])));
+				selectedEntity[0]->lightSourceRGB() |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[8]))) << 8;
+				selectedEntity[0]->lightSourceRGB() |= std::max(0, std::min(255, (Sint32)atoi(spriteProperties[9]))) << 16;
 				break;
 			case 16: // text source
 			{
 				Uint32 r = (Uint32)atoi(spriteProperties[0]);
 				Uint32 g = (Uint32)atoi(spriteProperties[1]);
 				Uint32 b = (Uint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->textSourceColorRGB = 0;
-				selectedEntity[0]->textSourceColorRGB |= (r << 16);
-				selectedEntity[0]->textSourceColorRGB |= (g << 8);
-				selectedEntity[0]->textSourceColorRGB |= (b << 0);
-				selectedEntity[0]->textSourceDelay = (Sint32)atoi(spriteProperties[8]);
-				selectedEntity[0]->textSourceVariables4W = 0;
-				selectedEntity[0]->textSourceVariables4W |= ((Sint32)atoi(spriteProperties[9]) & 0xFF) << 8;
+				selectedEntity[0]->textSourceColorRGB() = 0;
+				selectedEntity[0]->textSourceColorRGB() |= (r << 16);
+				selectedEntity[0]->textSourceColorRGB() |= (g << 8);
+				selectedEntity[0]->textSourceColorRGB() |= (b << 0);
+				selectedEntity[0]->textSourceDelay() = (Sint32)atoi(spriteProperties[8]);
+				selectedEntity[0]->textSourceVariables4W() = 0;
+				selectedEntity[0]->textSourceVariables4W() |= ((Sint32)atoi(spriteProperties[9]) & 0xFF) << 8;
 				int totalChars = 0;
 				char checkChr = 'a';
 				const int kMaxCharacters = 220; //55 skills, starting at 4 ending at 59, skipping 28. storing 4 chars each.
@@ -3575,22 +3575,22 @@ void buttonSpritePropertiesConfirm(button_t* my)
 				break;
 			}
 			case 17:
-				selectedEntity[0]->signalInputDirection = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->signalActivateDelay = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->signalTimerInterval = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->signalTimerRepeatCount = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->signalTimerLatchInput = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->signalInvertOutput = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->signalInputDirection() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->signalActivateDelay() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->signalTimerInterval() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->signalTimerRepeatCount() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->signalTimerLatchInput() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->signalInvertOutput() = (Sint32)atoi(spriteProperties[5]);
 				break;
 			case 18: // custom portal
 			{
-				selectedEntity[0]->portalCustomSprite = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->portalCustomSpriteAnimationFrames = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->portalCustomZOffset = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->portalCustomLevelsToJump = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->portalCustomRequiresPower = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->portalCustomSprite() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->portalCustomSpriteAnimationFrames() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->portalCustomZOffset() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->portalCustomLevelsToJump() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->portalCustomRequiresPower() = (Sint32)atoi(spriteProperties[5]);
 				int isSecret = (Sint32)atoi(spriteProperties[6]);
-				selectedEntity[0]->portalNotSecret = isSecret ? 0 : 1;
+				selectedEntity[0]->portalNotSecret() = isSecret ? 0 : 1;
 
 				int totalChars = 0;
 				char checkChr = 'a';
@@ -3615,9 +3615,9 @@ void buttonSpritePropertiesConfirm(button_t* my)
 			}
 				break;
 			case 19: // tables
-				selectedEntity[0]->furnitureDir = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->furnitureTableSpawnChairs = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->furnitureTableRandomItemChance = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->furnitureDir() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->furnitureTableSpawnChairs() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->furnitureTableRandomItemChance() = (Sint32)atoi(spriteProperties[2]);
 				break;
 			case 20: // readablebook
 			{
@@ -3654,71 +3654,71 @@ void buttonSpritePropertiesConfirm(button_t* my)
 			}
 				break;
 			case 21: // doors
-				selectedEntity[0]->doorForceLockedUnlocked = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->doorDisableLockpicks = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->doorDisableOpening = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->doorForceLockedUnlocked() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->doorDisableLockpicks() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->doorDisableOpening() = (Sint32)atoi(spriteProperties[2]);
 				break;
 			case 32:
-				selectedEntity[0]->doorUnlockWhenPowered = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->doorDisableLockpicks = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->doorDisableOpening = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->doorForceLockedUnlocked = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->doorUnlockWhenPowered() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->doorDisableLockpicks() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->doorDisableOpening() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->doorForceLockedUnlocked() = (Sint32)atoi(spriteProperties[3]);
 				break;
 			case 22: // gates
-				selectedEntity[0]->gateDisableOpening = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->gateDisableOpening() = (Sint32)atoi(spriteProperties[0]);
 				break;
 			case 23: // player spawn
-				selectedEntity[0]->playerStartDir = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->playerStartDir() = (Sint32)atoi(spriteProperties[0]);
 				break;
 			case 24: // statue
-				selectedEntity[0]->statueDir = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->statueId = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->statueDir() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->statueId() = (Sint32)atoi(spriteProperties[1]);
 				break;
 			case 25: // teleport shrine
-				selectedEntity[0]->shrineDir = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->shrineZ = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->shrineDestXOffset = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->shrineDestYOffset = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->shrineDir() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->shrineZ() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->shrineDestXOffset() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->shrineDestYOffset() = (Sint32)atoi(spriteProperties[3]);
 				break;
 			case 26: // spell shrine
-				selectedEntity[0]->shrineDir = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->shrineZ = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->shrineDir() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->shrineZ() = (Sint32)atoi(spriteProperties[1]);
 				break;
 			case 27:
-				selectedEntity[0]->colliderDecorationModel = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->colliderDecorationRotation = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->colliderDecorationHeightOffset = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->colliderDecorationXOffset = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->colliderDecorationYOffset = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->colliderHasCollision = (Sint32)atoi(spriteProperties[5]);
-				selectedEntity[0]->colliderSizeX = (Sint32)atoi(spriteProperties[6]);
-				selectedEntity[0]->colliderSizeY = (Sint32)atoi(spriteProperties[7]);
-				selectedEntity[0]->colliderMaxHP = (Sint32)atoi(spriteProperties[8]);
-				selectedEntity[0]->colliderDiggable = (Sint32)atoi(spriteProperties[9]);
-				selectedEntity[0]->colliderDamageTypes = (Sint32)atoi(spriteProperties[10]);
+				selectedEntity[0]->colliderDecorationModel() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->colliderDecorationRotation() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->colliderDecorationHeightOffset() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->colliderDecorationXOffset() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->colliderDecorationYOffset() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->colliderHasCollision() = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->colliderSizeX() = (Sint32)atoi(spriteProperties[6]);
+				selectedEntity[0]->colliderSizeY() = (Sint32)atoi(spriteProperties[7]);
+				selectedEntity[0]->colliderMaxHP() = (Sint32)atoi(spriteProperties[8]);
+				selectedEntity[0]->colliderDiggable() = (Sint32)atoi(spriteProperties[9]);
+				selectedEntity[0]->colliderDamageTypes() = (Sint32)atoi(spriteProperties[10]);
 				break;
 			case 28:
-				selectedEntity[0]->signalInputDirection = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->signalActivateDelay = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->signalTimerInterval = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->signalTimerRepeatCount = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->signalTimerLatchInput = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->signalInvertOutput = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->signalInputDirection() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->signalActivateDelay() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->signalTimerInterval() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->signalTimerRepeatCount() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->signalTimerLatchInput() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->signalInvertOutput() = (Sint32)atoi(spriteProperties[5]);
 				break;
 			case 29: // pressure plate
-				selectedEntity[0]->pressurePlateTriggerType = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->pressurePlateTriggerType() = (Sint32)atoi(spriteProperties[0]);
 				break;
 			case 30:
-				selectedEntity[0]->wallLockMaterial = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->wallLockInvertPower = (Sint32)atoi(spriteProperties[1]);
-				selectedEntity[0]->wallLockTurnable = (Sint32)atoi(spriteProperties[2]);
-				selectedEntity[0]->wallLockPickable = (Sint32)atoi(spriteProperties[3]);
-				selectedEntity[0]->wallLockPickableSkeletonKey = (Sint32)atoi(spriteProperties[4]);
-				selectedEntity[0]->wallLockAutoGenKey = (Sint32)atoi(spriteProperties[5]);
+				selectedEntity[0]->wallLockMaterial() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->wallLockInvertPower() = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->wallLockTurnable() = (Sint32)atoi(spriteProperties[2]);
+				selectedEntity[0]->wallLockPickable() = (Sint32)atoi(spriteProperties[3]);
+				selectedEntity[0]->wallLockPickableSkeletonKey() = (Sint32)atoi(spriteProperties[4]);
+				selectedEntity[0]->wallLockAutoGenKey() = (Sint32)atoi(spriteProperties[5]);
 				break;
 			case 31:
-				selectedEntity[0]->wallLockInvertPower = (Sint32)atoi(spriteProperties[0]);
-				selectedEntity[0]->wallLockTimer = (Sint32)atoi(spriteProperties[1]);
+				selectedEntity[0]->wallLockInvertPower() = (Sint32)atoi(spriteProperties[0]);
+				selectedEntity[0]->wallLockTimer() = (Sint32)atoi(spriteProperties[1]);
 				break;
 			case 33:
 				selectedEntity[0]->skill[0] = (Sint32)atoi(spriteProperties[0]);

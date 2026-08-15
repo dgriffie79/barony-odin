@@ -2066,7 +2066,7 @@ std::vector<Entity*> getAllOtherFollowersForSendAllCommand(const int gui_player,
 	if ( optionSelected == ALLY_CMD_ATTACK_CONFIRM )
 	{
 		// only send commands if we're trying to attack
-		Entity* target = uidToEntity(followerToCommand->monsterAllyInteractTarget);
+		Entity* target = uidToEntity(followerToCommand->monsterAllyInteractTarget());
 		if ( target )
 		{
 			if ( target->behavior != &actMonster && target->behavior != &actPlayer )
@@ -2110,7 +2110,7 @@ std::vector<Entity*> getAllOtherFollowersForSendAllCommand(const int gui_player,
 
 				if ( optionSelected == ALLY_CMD_FOLLOW )
 				{
-					if ( !(follower2->monsterAllyState == ALLY_STATE_DEFEND || follower2->monsterAllyState == ALLY_STATE_MOVETO) )
+					if ( !(follower2->monsterAllyState() == ALLY_STATE_DEFEND || follower2->monsterAllyState() == ALLY_STATE_MOVETO) )
 					{
 						continue;
 					}
@@ -2122,7 +2122,7 @@ std::vector<Entity*> getAllOtherFollowersForSendAllCommand(const int gui_player,
 				}
 				else if ( optionSelected == ALLY_CMD_DEFEND )
 				{
-					if ( follower2->monsterAllyState == ALLY_STATE_DEFEND || follower2->monsterAllyState == ALLY_STATE_MOVETO )
+					if ( follower2->monsterAllyState() == ALLY_STATE_DEFEND || follower2->monsterAllyState() == ALLY_STATE_MOVETO )
 					{
 						continue;
 					}
@@ -2138,7 +2138,7 @@ std::vector<Entity*> getAllOtherFollowersForSendAllCommand(const int gui_player,
 				{
 					skillLVL2 = stats[gui_player]->getModifiedProficiency(PRO_LOCKPICKING) + statGetPER(stats[gui_player], players[gui_player]->entity);
 				}
-				if ( follower2->monsterAllySummonRank != 0 )
+				if ( follower2->monsterAllySummonRank() != 0 )
 				{
 					skillLVL2 = SKILL_LEVEL_LEGENDARY;
 				}
@@ -2185,7 +2185,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 
 		if ( followerToCommand )
 		{
-			if ( followerToCommand->monsterAllyIndex < 0 && followerToCommand->getStats() && 
+			if ( followerToCommand->monsterAllyIndex() < 0 && followerToCommand->getStats() && 
 				(!followerToCommand->getStats()->getEffectActive(EFF_COMMAND)
 					|| followerToCommand->getStats()->getEffectActive(EFF_COMMAND) - 1 != gui_player) )
 			{
@@ -2224,7 +2224,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 
 	if ( recentEntity )
 	{
-		if ( recentEntity->monsterAllyIndex != gui_player ) // our ally left our service by charm or otherwise
+		if ( recentEntity->monsterAllyIndex() != gui_player ) // our ally left our service by charm or otherwise
 		{
 			recentEntity = nullptr;
 			if ( followerToCommand == recentEntity )
@@ -2284,7 +2284,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 		}
 
 		if ( players[gui_player] && players[gui_player]->entity
-			&& followerToCommand->monsterTarget == players[gui_player]->entity->getUID() )
+			&& followerToCommand->monsterTarget() == players[gui_player]->entity->getUID() )
 		{
 			players[gui_player]->closeAllGUIs(CLOSEGUI_ENABLE_SHOOTMODE, CLOSEGUI_CLOSE_ALL);
 			return;
@@ -2296,7 +2296,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 			closeFollowerMenuGUI();
 			return;
 		}
-		if ( followerToCommand->monsterAllyIndex < 0 && 
+		if ( followerToCommand->monsterAllyIndex() < 0 && 
 			(!followerStats->getEffectActive(EFF_COMMAND)
 				|| followerStats->getEffectActive(EFF_COMMAND) - 1 != gui_player))
 		{
@@ -2322,7 +2322,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 				}
 				else if ( optionPrevious == ALLY_CMD_FOLLOW || optionPrevious == ALLY_CMD_DEFEND )
 				{
-					if ( followerToCommand->monsterAllyState == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState == ALLY_STATE_MOVETO )
+					if ( followerToCommand->monsterAllyState() == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState() == ALLY_STATE_MOVETO )
 					{
 						optionPrevious = ALLY_CMD_FOLLOW;
 					}
@@ -2340,7 +2340,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 				{
 					skillLVL = stats[gui_player]->getModifiedProficiency(PRO_LOCKPICKING) + statGetPER(stats[gui_player], players[gui_player]->entity);
 				}
-				if ( followerToCommand->monsterAllySummonRank != 0 )
+				if ( followerToCommand->monsterAllySummonRank() != 0 )
 				{
 					skillLVL = SKILL_LEVEL_LEGENDARY;
 				}
@@ -2420,7 +2420,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 					optionSelected = ALLY_CMD_DUMMYBOT_RETURN;
 				}
 			}
-			else if ( (followerToCommand->monsterAllySummonRank != 0 
+			else if ( (followerToCommand->monsterAllySummonRank() != 0 
 				|| followerStats->type == MONSTER_ADORCISED_WEAPON
 				|| followerStats->type == FLAME_ELEMENTAL) && optionSelected == ALLY_CMD_CLASS_TOGGLE )
 			{
@@ -2524,7 +2524,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 						}
 
 						if ( optionSelected == ALLY_CMD_DEFEND &&
-							(followerToCommand->monsterAllyState == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState == ALLY_STATE_MOVETO) )
+							(followerToCommand->monsterAllyState() == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState() == ALLY_STATE_MOVETO) )
 						{
 							optionSelected = ALLY_CMD_FOLLOW;
 						}
@@ -2532,19 +2532,19 @@ void FollowerRadialMenu::drawFollowerMenu()
 						{
 							if ( optionSelected == ALLY_CMD_ATTACK_CONFIRM )
 							{
-								Uint32 olduid = followerToCommand->monsterAllyInteractTarget;
-								sendAllyCommandClient(gui_player, followerToCommand->getUID(), optionSelected, 0, 0, followerToCommand->monsterAllyInteractTarget);
-								Uint32 newuid = followerToCommand->monsterAllyInteractTarget;
+								Uint32 olduid = followerToCommand->monsterAllyInteractTarget();
+								sendAllyCommandClient(gui_player, followerToCommand->getUID(), optionSelected, 0, 0, followerToCommand->monsterAllyInteractTarget());
+								Uint32 newuid = followerToCommand->monsterAllyInteractTarget();
 								if ( modifierPressed )
 								{
-									followerToCommand->monsterAllyInteractTarget = olduid;
+									followerToCommand->monsterAllyInteractTarget() = olduid;
 									auto repeatCommandToFollowers = getAllOtherFollowersForSendAllCommand(gui_player, followerToCommand, followerStats->type, optionSelected);
 									for ( auto f : repeatCommandToFollowers )
 									{
-										f->monsterAllyInteractTarget = olduid;
-										sendAllyCommandClient(gui_player, f->getUID(), optionSelected, 0, 0, f->monsterAllyInteractTarget);
+										f->monsterAllyInteractTarget() = olduid;
+										sendAllyCommandClient(gui_player, f->getUID(), optionSelected, 0, 0, f->monsterAllyInteractTarget());
 									}
-									followerToCommand->monsterAllyInteractTarget = newuid;
+									followerToCommand->monsterAllyInteractTarget() = newuid;
 								}
 							}
 							else if ( optionSelected == ALLY_CMD_MOVETO_CONFIRM )
@@ -2574,19 +2574,19 @@ void FollowerRadialMenu::drawFollowerMenu()
 						}
 						else
 						{
-							Uint32 olduid = followerToCommand->monsterAllyInteractTarget;
-							followerToCommand->monsterAllySendCommand(optionSelected, moveToX, moveToY, followerToCommand->monsterAllyInteractTarget);
-							Uint32 newuid = followerToCommand->monsterAllyInteractTarget;
+							Uint32 olduid = followerToCommand->monsterAllyInteractTarget();
+							followerToCommand->monsterAllySendCommand(optionSelected, moveToX, moveToY, followerToCommand->monsterAllyInteractTarget());
+							Uint32 newuid = followerToCommand->monsterAllyInteractTarget();
 							if ( modifierPressed )
 							{
-								followerToCommand->monsterAllyInteractTarget = olduid;
+								followerToCommand->monsterAllyInteractTarget() = olduid;
 								auto repeatCommandToFollowers = getAllOtherFollowersForSendAllCommand(gui_player, followerToCommand, followerStats->type, optionSelected);
 								for ( auto f : repeatCommandToFollowers )
 								{
-									f->monsterAllyInteractTarget = olduid;
-									f->monsterAllySendCommand(optionSelected, moveToX, moveToY, f->monsterAllyInteractTarget);
+									f->monsterAllyInteractTarget() = olduid;
+									f->monsterAllySendCommand(optionSelected, moveToX, moveToY, f->monsterAllyInteractTarget());
 								}
-								followerToCommand->monsterAllyInteractTarget = newuid;
+								followerToCommand->monsterAllyInteractTarget() = newuid;
 							}
 						}
 					}
@@ -2701,7 +2701,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 			{
 				skillLVL = stats[gui_player]->getModifiedProficiency(PRO_LOCKPICKING) + statGetPER(stats[gui_player], players[gui_player]->entity);
 			}
-			else if ( followerToCommand->monsterAllySummonRank != 0 )
+			else if ( followerToCommand->monsterAllySummonRank() != 0 )
 			{
 				skillLVL = SKILL_LEVEL_LEGENDARY;
 			}
@@ -2918,7 +2918,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 				lockedOption = true;
 			}
 			else if ( i == ALLY_CMD_DEFEND
-				&& (followerToCommand->monsterAllyState == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState == ALLY_STATE_MOVETO) )
+				&& (followerToCommand->monsterAllyState() == ALLY_STATE_DEFEND || followerToCommand->monsterAllyState() == ALLY_STATE_MOVETO) )
 			{
 				if ( followerStats->type == SENTRYBOT || followerStats->type == SPELLBOT )
 				{
@@ -2993,7 +2993,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 			{
 				getSizeOfText(ttf12, Language::get(3037 + i), &width, nullptr);
 				if ( i == ALLY_CMD_DEFEND 
-					&& followerToCommand->monsterAllyState == ALLY_STATE_DEFAULT
+					&& followerToCommand->monsterAllyState() == ALLY_STATE_DEFAULT
 					&& (followerStats->type == SENTRYBOT || followerStats->type == SPELLBOT) )
 				{
 					getSizeOfText(ttf12, Language::get(3674), &width, nullptr);
@@ -3023,9 +3023,9 @@ void FollowerRadialMenu::drawFollowerMenu()
 						// draw higher.
 						getSizeOfText(ttf12, Language::get(3619), &width, nullptr);
 						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y - 12, Language::get(3619)) : SDL_Rect{};
-						getSizeOfText(ttf12, Language::get(3620 + followerToCommand->monsterAllyClass), &width, nullptr);
-						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3620 + followerToCommand->monsterAllyClass)) : SDL_Rect{};
-						switch ( followerToCommand->monsterAllyClass )
+						getSizeOfText(ttf12, Language::get(3620 + followerToCommand->monsterAllyClass()), &width, nullptr);
+						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3620 + followerToCommand->monsterAllyClass())) : SDL_Rect{};
+						switch ( followerToCommand->monsterAllyClass() )
 						{
 							case ALLY_GYRO_LIGHT_FAINT:
 								if ( i == highlight )
@@ -3064,7 +3064,7 @@ void FollowerRadialMenu::drawFollowerMenu()
 						}
 					}
 					else if ( followerToCommand 
-						&& (followerToCommand->monsterAllySummonRank != 0 
+						&& (followerToCommand->monsterAllySummonRank() != 0 
 							|| followerStats->type == MONSTER_ADORCISED_WEAPON
 							|| followerStats->type == FLAME_ELEMENTAL) )
 					{
@@ -3084,9 +3084,9 @@ void FollowerRadialMenu::drawFollowerMenu()
 					{
 						// draw higher.
 						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y - 12, Language::get(3037 + i)) : SDL_Rect{};
-						getSizeOfText(ttf12, Language::get(3053 + followerToCommand->monsterAllyClass), &width, nullptr);
-						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3053 + followerToCommand->monsterAllyClass)) : SDL_Rect{};
-						switch ( followerToCommand->monsterAllyClass )
+						getSizeOfText(ttf12, Language::get(3053 + followerToCommand->monsterAllyClass()), &width, nullptr);
+						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3053 + followerToCommand->monsterAllyClass())) : SDL_Rect{};
+						switch ( followerToCommand->monsterAllyClass() )
 						{
 							case ALLY_CLASS_MELEE:
 								if ( i == highlight )
@@ -3129,23 +3129,23 @@ void FollowerRadialMenu::drawFollowerMenu()
 				{
 					if ( followerStats->type == GYROBOT )
 					{
-						if ( followerToCommand->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_METAL
-							|| followerToCommand->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_MAGIC
-							|| followerToCommand->monsterAllyPickupItems == ALLY_GYRO_DETECT_ITEMS_VALUABLE )
+						if ( followerToCommand->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_METAL
+							|| followerToCommand->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_MAGIC
+							|| followerToCommand->monsterAllyPickupItems() == ALLY_GYRO_DETECT_ITEMS_VALUABLE )
 						{
 							getSizeOfText(ttf12, "Detect", &width, nullptr);
 							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y - 24, Language::get(3636)) : SDL_Rect{};
-							getSizeOfText(ttf12, Language::get(3624 + followerToCommand->monsterAllyPickupItems), &width, nullptr);
-							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 12, Language::get(3624 + followerToCommand->monsterAllyPickupItems)) : SDL_Rect{};
+							getSizeOfText(ttf12, Language::get(3624 + followerToCommand->monsterAllyPickupItems()), &width, nullptr);
+							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 12, Language::get(3624 + followerToCommand->monsterAllyPickupItems())) : SDL_Rect{};
 						}
 						else
 						{
 							getSizeOfText(ttf12, Language::get(3623), &width, nullptr);
 							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y - 12, Language::get(3623)) : SDL_Rect{};
-							getSizeOfText(ttf12, Language::get(3624 + followerToCommand->monsterAllyPickupItems), &width, nullptr);
-							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3624 + followerToCommand->monsterAllyPickupItems)) : SDL_Rect{};
+							getSizeOfText(ttf12, Language::get(3624 + followerToCommand->monsterAllyPickupItems()), &width, nullptr);
+							(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 4, Language::get(3624 + followerToCommand->monsterAllyPickupItems())) : SDL_Rect{};
 						}
-						switch ( followerToCommand->monsterAllyPickupItems )
+						switch ( followerToCommand->monsterAllyPickupItems() )
 						{
 							case ALLY_GYRO_DETECT_ITEMS_METAL:
 								if ( i == highlight )
@@ -3232,9 +3232,9 @@ void FollowerRadialMenu::drawFollowerMenu()
 						// draw higher.
 						getSizeOfText(ttf12, "Pickup", &width, nullptr);
 						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y - 24, Language::get(3037 + i)) : SDL_Rect{};
-						getSizeOfText(ttf12, Language::get(3056 + followerToCommand->monsterAllyPickupItems), &width, nullptr);
-						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 12, Language::get(3056 + followerToCommand->monsterAllyPickupItems)) : SDL_Rect{};
-						switch ( followerToCommand->monsterAllyPickupItems )
+						getSizeOfText(ttf12, Language::get(3056 + followerToCommand->monsterAllyPickupItems()), &width, nullptr);
+						(*cvar_showoldwheel) ? ttfPrintText(ttf12, txt.x - width / 2, txt.y + 12, Language::get(3056 + followerToCommand->monsterAllyPickupItems())) : SDL_Rect{};
+						switch ( followerToCommand->monsterAllyPickupItems() )
 						{
 							case ALLY_PICKUP_ALL:
 								if ( i == highlight )
@@ -4247,7 +4247,7 @@ bool FollowerRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool upda
 	{
 		skillLVL = stats[gui_player]->getModifiedProficiency(PRO_LOCKPICKING) + statGetPER(stats[gui_player], players[gui_player]->entity);
 	}
-	if ( followerToCommand->monsterAllySummonRank != 0 )
+	if ( followerToCommand->monsterAllySummonRank() != 0 )
 	{
 		skillLVL = SKILL_LEVEL_LEGENDARY;
 	}
@@ -4325,7 +4325,7 @@ bool FollowerRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool upda
 	{
 		if ( updateInteractText )
 		{
-			switch ( selectedEntity.teleporterType )
+			switch ( selectedEntity.teleporterType() )
 			{
 				case 0:
 				case 1:
@@ -4579,7 +4579,7 @@ int FollowerRadialMenu::optionDisabledForCreature(int playerSkillLVL, int monste
 	}
 
 	if ( option == ALLY_CMD_SPECIAL
-		&& follower->monsterAllySpecialCooldown != 0 )
+		&& follower->monsterAllySpecialCooldown() != 0 )
 	{
 		return -2; // disabled due to cooldown.
 	}
@@ -4634,7 +4634,7 @@ int FollowerRadialMenu::optionDisabledForCreature(int playerSkillLVL, int monste
 			break;
 
 		case ALLY_CMD_DROP_EQUIP:
-			if ( follower && follower->monsterAllySummonRank != 0 )
+			if ( follower && follower->monsterAllySummonRank() != 0 )
 			{
 				return -1;
 			}
@@ -4714,7 +4714,7 @@ int FollowerRadialMenu::optionDisabledForCreature(int playerSkillLVL, int monste
 			break;
 
 		case ALLY_CMD_CLASS_TOGGLE:
-			if ( follower && (follower->monsterAllySummonRank != 0 
+			if ( follower && (follower->monsterAllySummonRank() != 0 
 				|| monsterType == MONSTER_ADORCISED_WEAPON
 				|| monsterType == FLAME_ELEMENTAL) )
 			{
@@ -4908,7 +4908,7 @@ bool FollowerRadialMenu::allowedInteractItems(int monsterType)
 		case VAMPIRE:
 		case SLIME:
 		case GYROBOT:
-			if ( followerToCommand && followerToCommand->monsterAllySummonRank != 0 )
+			if ( followerToCommand && followerToCommand->monsterAllySummonRank() != 0 )
 			{
 				return false;
 			}
@@ -9353,7 +9353,7 @@ void GenericGUIMenu::alchemyCookCombination()
 	//			bool shapeshifted = false;
 	//			if ( stats[gui_player]->type != HUMAN )
 	//			{
-	//				if ( players[gui_player]->entity->effectShapeshift != NOTHING )
+	//				if ( players[gui_player]->entity->effectShapeshift() != NOTHING )
 	//				{
 	//					shapeshifted = true;
 	//				}
@@ -10117,7 +10117,7 @@ void GenericGUIMenu::alchemyCombinePotions()
 				bool shapeshifted = false;
 				if ( stats[gui_player]->type != HUMAN )
 				{
-					if ( players[gui_player]->entity->effectShapeshift != NOTHING )
+					if ( players[gui_player]->entity->effectShapeshift() != NOTHING )
 					{
 						shapeshifted = true;
 					}
@@ -13695,7 +13695,7 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 		}
 		if ( (entity->behavior == &actDoor || entity->behavior == &actIronDoor) && entity->flags[PASSABLE] )
 		{
-			if ( entity->doorStartAng == 0 )
+			if ( entity->doorStartAng() == 0 )
 			{
 				worldY -= 5;
 			}
@@ -13705,7 +13705,7 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 			}
 		}
 		if ( entity->behavior == &actMonster 
-			&& entity->monsterAttack == MONSTER_POSE_MAGIC_WINDUP2
+			&& entity->monsterAttack() == MONSTER_POSE_MAGIC_WINDUP2
 			&& entity->getMonsterTypeFromSprite() == SLIME )
 		{
 			worldZ += entity->focalz / 2;
@@ -28316,12 +28316,12 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 		{
 			return key;
 		}
-		int wallLockMaterial = entity->wallLockMaterial;
+		int wallLockMaterial = entity->wallLockMaterial();
 		if ( entity->sprite >= 1585 && entity->sprite <= 1592 )
 		{
 			if ( Entity* parent = uidToEntity(entity->parent) )
 			{
-				wallLockMaterial = parent->wallLockMaterial;
+				wallLockMaterial = parent->wallLockMaterial();
 			}
 		}
 
@@ -28353,7 +28353,7 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	case CALLOUT_TYPE_ITEM:
 	{
 		DynamicString itemName;
-		if ( entity && (multiplayer != CLIENT || (multiplayer == CLIENT && entity->itemReceivedDetailsFromServer == 1)) )
+		if ( entity && (multiplayer != CLIENT || (multiplayer == CLIENT && entity->itemReceivedDetailsFromServer() == 1)) )
 		{
 			if ( Item* item = newItemFromEntity(entity, true) )
 			{
@@ -29164,12 +29164,12 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForEntity(const 
 	else if ( parent->behavior == &::actWallLock
 		|| (parent->sprite >= 1585 && parent->sprite <= 1592) )
 	{
-		int wallLockState = parent->wallLockState;
+		int wallLockState = parent->wallLockState();
 		if ( parent->sprite >= 1585 && parent->sprite <= 1592 )
 		{
 			if ( Entity* lock = uidToEntity(parent->parent) )
 			{
-				wallLockState = lock->wallLockState;
+				wallLockState = lock->wallLockState();
 			}
 		}
 		if ( wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
@@ -29195,13 +29195,13 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForEntity(const 
 		|| parent->sprite == 1151
 		|| parent->sprite == 1152 )
 	{
-		int wallLockState = parent->wallLockState;
+		int wallLockState = parent->wallLockState();
 		if ( parent->sprite == 1151
 			|| parent->sprite == 1152 )
 		{
 			if ( Entity* lock = uidToEntity(parent->parent) )
 			{
-				wallLockState = lock->wallLockState;
+				wallLockState = lock->wallLockState();
 			}
 		}
 		if ( wallLockState == 0 )
@@ -29299,7 +29299,7 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForEntity(const 
 		}
 		else
 		{
-			if ( parent->portalCustomSpriteAnimationFrames > 0 )
+			if ( parent->portalCustomSpriteAnimationFrames() > 0 )
 			{
 				type = CALLOUT_TYPE_EXIT;
 			}
@@ -29316,15 +29316,15 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForEntity(const 
 	}
 	else if ( parent->behavior == &actTeleporter )
 	{
-		if ( parent->teleporterType == 2 || parent->teleporterType == 3 ) // portal
+		if ( parent->teleporterType() == 2 || parent->teleporterType() == 3 ) // portal
 		{
 			type = CALLOUT_TYPE_TELEPORTER_PORTAL;
 		}
-		else if ( parent->teleporterType == 1 ) // down ladder
+		else if ( parent->teleporterType() == 1 ) // down ladder
 		{
 			type = CALLOUT_TYPE_TELEPORTER_LADDER_DOWN;
 		}
-		else if ( parent->teleporterType == 0 ) // up ladder
+		else if ( parent->teleporterType() == 0 ) // up ladder
 		{
 			type = CALLOUT_TYPE_TELEPORTER_LADDER_UP;
 		}
@@ -31505,14 +31505,14 @@ bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updat
 	else if ( (selectedEntity.behavior == &::actWallLock
 		|| (selectedEntity.sprite >= 1585 && selectedEntity.sprite <= 1592)) && interactWorld )
 	{
-		int wallLockState = selectedEntity.wallLockState;
-		int wallLockMaterial = selectedEntity.wallLockMaterial;
+		int wallLockState = selectedEntity.wallLockState();
+		int wallLockMaterial = selectedEntity.wallLockMaterial();
 		if ( selectedEntity.sprite >= 1585 && selectedEntity.sprite <= 1592 )
 		{
 			if ( Entity* parent = uidToEntity(selectedEntity.parent) )
 			{
-				wallLockState = parent->wallLockState;
-				wallLockMaterial = parent->wallLockMaterial;
+				wallLockState = parent->wallLockState();
+				wallLockMaterial = parent->wallLockMaterial();
 			}
 		}
 		if ( wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
@@ -31557,7 +31557,7 @@ bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updat
 	{
 		if ( updateInteractText )
 		{
-			switch ( selectedEntity.teleporterType )
+			switch ( selectedEntity.teleporterType() )
 			{
 			case 0:
 			case 1:
@@ -31646,7 +31646,7 @@ bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updat
 			}
 			else
 			{
-				if ( selectedEntity.portalCustomSpriteAnimationFrames > 0 )
+				if ( selectedEntity.portalCustomSpriteAnimationFrames() > 0 )
 				{
 					strcat(interactText, Language::get(4361)); // "level exit"
 				}
@@ -31911,7 +31911,7 @@ void GenericGUIMenu::AssistShrineGUI_t::changeCurrentView(GenericGUIMenu::Assist
 	int y = 0;
 	for ( int i = 0; i < NUMCLASSES; ++i )
 	{
-		int playerRace = stats[parentGUI.gui_player]->playerRace;
+		int playerRace = stats[parentGUI.gui_player]->playerRace();
 		int appearance = stats[parentGUI.gui_player]->stat_appearance;
 		if ( savedRace >= RACE_HUMAN )
 		{
@@ -31974,7 +31974,7 @@ void GenericGUIMenu::AssistShrineGUI_t::changeCurrentView(GenericGUIMenu::Assist
 		for ( auto race : raceSlots )
 		{
 			++index;
-			if ( (selectedRace == -1 && (savedRace == -1 && race == stats[parentGUI.gui_player]->playerRace))
+			if ( (selectedRace == -1 && (savedRace == -1 && race == stats[parentGUI.gui_player]->playerRace()))
 				|| (savedRace >= 0 && race == savedRace)
 				|| (selectedRace >= 0 && race == selectedRace) )
 			{
@@ -32103,7 +32103,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateRaceSlots()
 				auto slotTxt = slotFrame->findField("race");
 				if ( slotBg && slotFg )
 				{
-					bool selected = (selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace == race)
+					bool selected = (selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace() == race)
 						|| (savedRace >= 0 && savedRace == race && selectedRace == -1)
 						|| (selectedRace >= 0 && selectedRace == race);
 					bool highlighted = false;
@@ -33257,9 +33257,9 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				gui.savedClass = gui.selectedClass >= 0 ? gui.selectedClass
 					: (gui.savedClass == -1 ? client_classes[button.getOwner()] : gui.savedClass);
 
-				int prevRace = gui.savedRace == -1 ? stats[button.getOwner()]->playerRace : gui.savedRace;
+				int prevRace = gui.savedRace == -1 ? stats[button.getOwner()]->playerRace() : gui.savedRace;
 				gui.savedRace = gui.selectedRace >= 0 ? gui.selectedRace
-					: (gui.savedRace == -1 ? stats[button.getOwner()]->playerRace : gui.savedRace);
+					: (gui.savedRace == -1 ? stats[button.getOwner()]->playerRace() : gui.savedRace);
 
 				gui.savedSex = gui.selectedSex >= 0 ? gui.selectedSex
 					: (gui.savedSex == -1 ? stats[button.getOwner()]->sex : gui.savedSex);
@@ -33439,9 +33439,9 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				}
 				Player::soundActivate();
 
-				int prevRace = gui.savedRace == -1 ? stats[button.getOwner()]->playerRace : gui.savedRace;
+				int prevRace = gui.savedRace == -1 ? stats[button.getOwner()]->playerRace() : gui.savedRace;
 				gui.savedRace = gui.selectedRace >= 0 ? gui.selectedRace 
-					: (gui.savedRace == -1 ? stats[button.getOwner()]->playerRace : gui.savedRace);
+					: (gui.savedRace == -1 ? stats[button.getOwner()]->playerRace() : gui.savedRace);
 
 				gui.savedSex = gui.selectedSex >= 0 ? gui.selectedSex
 					: (gui.savedSex == -1 ? stats[button.getOwner()]->sex : gui.savedSex);
@@ -33532,7 +33532,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				auto button = parent->findButton("race ability btn"); assert(button);
 				const auto player = widget.getOwner();
 				auto& gui = GenericGUI[player].assistShrineGUI;
-				if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace == RACE_HUMAN)
+				if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace() == RACE_HUMAN)
 					|| (gui.savedRace == RACE_HUMAN && gui.selectedRace == -1)
 					|| gui.selectedRace == RACE_HUMAN )
 				{
@@ -33566,7 +33566,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				const auto player = button.getOwner();
 				auto& gui = GenericGUI[player].assistShrineGUI;
 				gui.selectedDisableAbilities = -1;
-				if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[player]->playerRace == RACE_HUMAN)
+				if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[player]->playerRace() == RACE_HUMAN)
 					|| (gui.savedRace == RACE_HUMAN && gui.selectedRace == -1)
 					|| gui.selectedRace == RACE_HUMAN )
 				{
@@ -33675,7 +33675,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				sexBtn->setCallback([](Button& button) {
 					auto& gui = GenericGUI[button.getOwner()].assistShrineGUI;
 					gui.selectedSex = -1;
-					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[button.getOwner()]->playerRace == RACE_SUCCUBUS)
+					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[button.getOwner()]->playerRace() == RACE_SUCCUBUS)
 						|| (gui.savedRace == RACE_SUCCUBUS && gui.selectedRace == -1)
 						|| gui.selectedRace == RACE_SUCCUBUS )
 					{
@@ -33683,7 +33683,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 						button.setPressed(true);
 						return;
 					}
-					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[button.getOwner()]->playerRace == RACE_INCUBUS)
+					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[button.getOwner()]->playerRace() == RACE_INCUBUS)
 						|| (gui.savedRace == RACE_INCUBUS && gui.selectedRace == -1)
 						|| gui.selectedRace == RACE_INCUBUS )
 					{
@@ -33703,7 +33703,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 					auto& gui = GenericGUI[widget.getOwner()].assistShrineGUI;
 					auto button = const_cast<Button*>((Button*)(&widget));
 					pos.y += 2;
-					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace == RACE_AUTOMATON)
+					if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace() == RACE_AUTOMATON)
 						|| (gui.savedRace == RACE_AUTOMATON && gui.selectedRace == -1)
 						|| gui.selectedRace == RACE_AUTOMATON )
 					{
@@ -33727,7 +33727,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 								widget.isPressed() ? makeColorRGB(255, 255, 255) : makeColorRGB(128, 128, 128));
 						}
 					}
-					else if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace == RACE_MYCONID)
+					else if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace() == RACE_MYCONID)
 						|| (gui.savedRace == RACE_MYCONID && gui.selectedRace == -1)
 						|| gui.selectedRace == RACE_MYCONID)
 					{
@@ -33751,7 +33751,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 								widget.isPressed() ? makeColorRGB(255, 255, 255) : makeColorRGB(128, 128, 128));
 						}
 					}
-					else if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace == RACE_DRYAD)
+					else if ( (gui.selectedRace == -1 && gui.savedRace == -1 && stats[widget.getOwner()]->playerRace() == RACE_DRYAD)
 						|| (gui.savedRace == RACE_DRYAD && gui.selectedRace == -1)
 						|| gui.selectedRace == RACE_DRYAD )
 					{
@@ -33821,7 +33821,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 			//	sexBtn->setHideSelectors(true);
 			//	sexBtn->setStyle(Button::style_t::STYLE_RADIO);
 			//	sexBtn->setMenuConfirmControlType(0);
-			//	if ( (selectedRace == -1 && stats[parentGUI.getPlayer()]->playerRace == RACE_AUTOMATON)
+			//	if ( (selectedRace == -1 && stats[parentGUI.getPlayer()]->playerRace() == RACE_AUTOMATON)
 			//		|| selectedRace == RACE_AUTOMATON )
 			//	{
 			//		sexBtn->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoOn_00.png");
@@ -33839,7 +33839,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 			//	sexBtn->setCallback([](Button& button) {
 			//		if ( gameModeManager.currentSession.challengeRun.isActive()
 			//			&& gameModeManager.currentSession.challengeRun.race == RACE_SUCCUBUS
-			//			&& stats[button.getOwner()]->playerRace == RACE_SUCCUBUS )
+			//			&& stats[button.getOwner()]->playerRace() == RACE_SUCCUBUS )
 			//		{
 			//			//soundError();
 			//			button.setPressed(false);
@@ -33871,7 +33871,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 			//	sexBtn->setHideSelectors(true);
 			//	sexBtn->setStyle(Button::style_t::STYLE_RADIO);
 			//	sexBtn->setMenuConfirmControlType(0);
-			//	if ( (selectedRace == -1 && stats[parentGUI.getPlayer()]->playerRace == RACE_AUTOMATON)
+			//	if ( (selectedRace == -1 && stats[parentGUI.getPlayer()]->playerRace() == RACE_AUTOMATON)
 			//		|| selectedRace == RACE_AUTOMATON )
 			//	{
 			//		sexBtn->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoOn_00.png");
@@ -33889,7 +33889,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 			//	sexBtn->setCallback([](Button& button) {
 			//		if ( gameModeManager.currentSession.challengeRun.isActive()
 			//		&& gameModeManager.currentSession.challengeRun.race == RACE_INCUBUS
-			//			&& stats[button.getOwner()]->playerRace == RACE_INCUBUS )
+			//			&& stats[button.getOwner()]->playerRace() == RACE_INCUBUS )
 			//		{
 			//			//soundError();
 			//			button.setPressed(false);
@@ -34503,13 +34503,13 @@ bool GenericGUIMenu::AssistShrineGUI_t::raceHasChanged()
 		{
 			return true;
 		}
-		else if ( savedRace == -1 && stats[parentGUI.gui_player]->playerRace != selectedRace )
+		else if ( savedRace == -1 && stats[parentGUI.gui_player]->playerRace() != selectedRace )
 		{
 			return true;
 		}
 	}
 	if ( selectedDisableAbilities >= 0 
-		&& ((selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace != RACE_HUMAN)
+		&& ((selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace() != RACE_HUMAN)
 			|| (savedRace != RACE_HUMAN && selectedRace == -1)
 			|| selectedRace != RACE_HUMAN) )
 	{
@@ -34526,7 +34526,7 @@ bool GenericGUIMenu::AssistShrineGUI_t::raceHasChanged()
 		}
 	}
 	if ( selectedAppearance >= 0 
-		&& ((selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace == RACE_HUMAN)
+		&& ((selectedRace == -1 && savedRace == -1 && stats[parentGUI.gui_player]->playerRace() == RACE_HUMAN)
 		|| (savedRace == RACE_HUMAN && selectedRace == -1)
 		|| selectedRace == RACE_HUMAN) )
 	{
@@ -34734,7 +34734,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onGameStart()
 	}
 	if ( savedRace >= 0 )
 	{
-		stats[parentGUI.gui_player]->playerRace = savedRace;
+		stats[parentGUI.gui_player]->playerRace() = savedRace;
 	}
 	if ( savedSex >= 0 )
 	{
@@ -34743,7 +34743,7 @@ void GenericGUIMenu::AssistShrineGUI_t::onGameStart()
 	if ( savedAppearance >= 0 )
 	{
 		stats[parentGUI.gui_player]->stat_appearance = savedAppearance;
-		if ( stats[parentGUI.gui_player]->playerRace == RACE_HUMAN )
+		if ( stats[parentGUI.gui_player]->playerRace() == RACE_HUMAN )
 		{
 			stats[parentGUI.gui_player]->stat_appearance = stats[parentGUI.gui_player]->stat_appearance % NUMAPPEARANCES;
 		}
@@ -35512,7 +35512,7 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 			if ( savedRace == -1 )
 			{
 				txt = Language::get(6320);
-				race = stats[parentGUI.gui_player]->playerRace;
+				race = stats[parentGUI.gui_player]->playerRace();
 			}
 			else
 			{

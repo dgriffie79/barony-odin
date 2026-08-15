@@ -382,7 +382,7 @@ void initKobold(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[KOBOLD][6][0]; // 2
 	entity->focaly = limbs[KOBOLD][6][1]; // 0
 	entity->focalz = limbs[KOBOLD][6][2]; // -.5
@@ -404,7 +404,7 @@ void initKobold(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[KOBOLD][7][0]; // 0
 	entity->focaly = limbs[KOBOLD][7][1]; // 0
 	entity->focalz = limbs[KOBOLD][7][2]; // 1.5
@@ -428,7 +428,7 @@ void initKobold(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[KOBOLD][8][0]; // 0
 	entity->focaly = limbs[KOBOLD][8][1]; // 0
 	entity->focalz = limbs[KOBOLD][8][2]; // 4
@@ -451,7 +451,7 @@ void initKobold(Entity* my, Stat* myStats)
 	entity->flags[PASSABLE] = true;
 	entity->flags[NOUPDATE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[KOBOLD][9][0]; // 0
 	entity->focaly = limbs[KOBOLD][9][1]; // 0
 	entity->focalz = limbs[KOBOLD][9][2]; // -2
@@ -618,7 +618,7 @@ void koboldMoveBodyparts(Entity* my, Stat* myStats, double dist)
 			if ( bodypart == LIMB_HUMANOID_RIGHTARM )
 			{
 				weaponarm = entity;
-				if ( my->monsterAttack > 0 )
+				if ( my->monsterAttack() > 0 )
 				{
 					my->handleWeaponArmAttack(entity);
 				}
@@ -738,7 +738,7 @@ void koboldMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( my->monsterArmbended || (weapon->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT) )
+					if ( my->monsterArmbended() || (weapon->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT) )
 					{
 						// if weapon invisible and I'm not moving, relax arm.
 						entity->focalx = limbs[KOBOLD][4][0]; // 0
@@ -773,7 +773,7 @@ void koboldMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( shieldNode )
 				{
 					Entity* shield = (Entity*)shieldNode->element;
-					if ( shield->flags[INVISIBLE] && my->monsterState == MONSTER_STATE_WAIT )
+					if ( shield->flags[INVISIBLE] && my->monsterState() == MONSTER_STATE_WAIT )
 					{
 						// if shield invisible and I'm not moving, relax arm.
 						entity->focalx = limbs[KOBOLD][5][0]; // 0
@@ -797,7 +797,7 @@ void koboldMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				{
 					entity->pitch = 0;
 				}
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}

@@ -494,16 +494,16 @@ void actThrown(Entity* my)
 			{
 				Uint32 lifetime = TICKS_PER_SECOND * 3;
 				Entity* spellTimer = createParticleTimer(my->parent == 0 ? nullptr : uidToEntity(my->parent), lifetime + TICKS_PER_SECOND, -1);
-				spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SPORES_TRAIL;
-				spellTimer->particleTimerCountdownSprite = 248;
+				spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_SPORES_TRAIL;
+				spellTimer->particleTimerCountdownSprite() = 248;
 				spellTimer->yaw = 0.0;
 				spellTimer->x = my->x;
 				spellTimer->y = my->y;
-				spellTimer->particleTimerVariable1 = 0;
-				spellTimer->particleTimerVariable2 = SPELL_MYCELIUM_SPORES;
-				spellTimer->particleTimerVariable4 = my->getUID();
+				spellTimer->particleTimerVariable1() = 0;
+				spellTimer->particleTimerVariable2() = SPELL_MYCELIUM_SPORES;
+				spellTimer->particleTimerVariable4() = my->getUID();
 
-				my->thrownProjectileParticleTimerUID = spellTimer->getUID();
+				my->thrownProjectileParticleTimerUID() = spellTimer->getUID();
 				particleTimerEffects.put(spellTimer->getUID(), ParticleTimerEffect_t());
 			}
 			if ( Entity* fx = spawnMagicParticleCustom(my, 1886, 1.0, 1.0) )
@@ -777,7 +777,7 @@ void actThrown(Entity* my)
 							{
 								if ( parentStats->getEffectActive(EFF_RETURN_ITEM) )
 								{
-									entity->itemReturnUID = parent->getUID();
+									entity->itemReturnUID() = parent->getUID();
 								}
 							}
 						}
@@ -969,7 +969,7 @@ void actThrown(Entity* my)
 							entity->skill[13] = item->count;
 							entity->skill[14] = item->appearance;
 							entity->skill[15] = item->identified;
-							entity->itemReturnUID = parent->getUID();
+							entity->itemReturnUID() = parent->getUID();
 
 							free(item);
 						}
@@ -1223,11 +1223,11 @@ void actThrown(Entity* my)
 							|| item->type == GREASE_BALL) )
 						{
 							int enemyAC = AC(hitstats);
-							damage = my->thrownProjectilePower;
-							if ( my->thrownProjectileCharge >= 1 )
+							damage = my->thrownProjectilePower();
+							if ( my->thrownProjectileCharge() >= 1 )
 							{
-								damage += my->thrownProjectileCharge / 5; //0-3 base +damage
-								real_t bypassArmor = 1 - my->thrownProjectileCharge * 0.05; //100-25% of armor taken into account
+								damage += my->thrownProjectileCharge() / 5; //0-3 base +damage
+								real_t bypassArmor = 1 - my->thrownProjectileCharge() * 0.05; //100-25% of armor taken into account
 								enemyAC *= bypassArmor;
 							}
 							else
@@ -1244,10 +1244,10 @@ void actThrown(Entity* my)
 						}
 						else
 						{
-							damage = my->thrownProjectilePower;
-							if ( my->thrownProjectileCharge >= 1 )
+							damage = my->thrownProjectilePower();
+							if ( my->thrownProjectileCharge() >= 1 )
 							{
-								damage += my->thrownProjectileCharge / 5;
+								damage += my->thrownProjectileCharge() / 5;
 							}
 							damage -= (AC(hit.entity->getStats()) * .5);
 						}
@@ -1408,7 +1408,7 @@ void actThrown(Entity* my)
 				bool wasPotion = itemCategory(item) == POTION;
 				ItemType itemType = item->type;
 				bool wasConfused = (hitstats && hitstats->getEffectActive(EFF_CONFUSED));
-				Uint32 prevTarget = hit.entity->behavior == &actMonster ? hit.entity->monsterTarget : 0;
+				Uint32 prevTarget = hit.entity->behavior == &actMonster ? hit.entity->monsterTarget() : 0;
 				bool healingPotion = false;
 
 				if ( hitstats )
@@ -1470,7 +1470,7 @@ void actThrown(Entity* my)
 
 						if ( hitstats->mask && hitstats->mask->type == MASK_HAZARD_GOGGLES )
 						{
-							if ( !(hit.entity->behavior == &actPlayer && hit.entity->effectShapeshift != NOTHING) )
+							if ( !(hit.entity->behavior == &actPlayer && hit.entity->effectShapeshift() != NOTHING) )
 							{
 								if ( itemCategory(item) == POTION && item->doesPotionHarmAlliesOnThrown() )
 								{
@@ -1511,7 +1511,7 @@ void actThrown(Entity* my)
 												parent->increaseSkill(PRO_LEADERSHIP);
 												messagePlayerMonsterEvent(parent->skill[2], makeColorRGB(0, 255, 0), 
 													*hitstats, Language::get(3252), Language::get(3251), MSG_COMBAT);
-												if ( hit.entity->monsterAllyIndex != parent->skill[2] )
+												if ( hit.entity->monsterAllyIndex() != parent->skill[2] )
 												{
 													Compendium_t::Events_t::eventUpdateMonster(parent->skill[2], Compendium_t::CPDM_RECRUITED, hit.entity, 1);
 													Compendium_t::Events_t::eventUpdateCodex(parent->skill[2], Compendium_t::CPDM_RACE_RECRUITS, "races", 1);
@@ -1520,13 +1520,13 @@ void actThrown(Entity* my)
 														Compendium_t::Events_t::eventUpdateWorld(parent->skill[2], Compendium_t::CPDM_MERLINS, "magicians guild", 1);
 													}
 												}
-												hit.entity->monsterAllyIndex = parent->skill[2];
+												hit.entity->monsterAllyIndex() = parent->skill[2];
 												if ( multiplayer == SERVER )
 												{
 													serverUpdateEntitySkill(hit.entity, 42); // update monsterAllyIndex for clients.
 												}
 
-												if ( hit.entity->monsterTarget == parent->getUID() )
+												if ( hit.entity->monsterTarget() == parent->getUID() )
 												{
 													hit.entity->monsterReleaseAttackTarget();
 												}
@@ -1720,7 +1720,7 @@ void actThrown(Entity* my)
 									duration = std::max(1 * TICKS_PER_SECOND, duration);
 									if ( parent->behavior == &actPlayer )
 									{
-										real_t charge = my->thrownProjectileCharge / 15.0; // 0-1
+										real_t charge = my->thrownProjectileCharge() / 15.0; // 0-1
 										duration *= (0.25 + 1.25 * charge); // 0.25-1.5
 									}
 								}
@@ -1758,9 +1758,9 @@ void actThrown(Entity* my)
 								{
 									if ( hit.entity->monsterReleaseAttackTarget() )
 									{
-										hit.entity->monsterLookDir = hit.entity->yaw;
-										hit.entity->monsterLookDir += (PI - PI / 4 + (local_rng.rand() % 10) * PI / 40);
-										if ( hit.entity->monsterState == MONSTER_STATE_WAIT || hit.entity->monsterTarget == 0 )
+										hit.entity->monsterLookDir() = hit.entity->yaw;
+										hit.entity->monsterLookDir() += (PI - PI / 4 + (local_rng.rand() % 10) * PI / 40);
+										if ( hit.entity->monsterState() == MONSTER_STATE_WAIT || hit.entity->monsterTarget() == 0 )
 										{
 											// not attacking, duration longer.
 											hit.entity->setEffect(EFF_DISORIENTED, true, TICKS_PER_SECOND * 2, false);
@@ -1811,7 +1811,7 @@ void actThrown(Entity* my)
 									{
 										if ( hitstats->mask && hitstats->mask->type == MASK_HAZARD_GOGGLES )
 										{
-											if ( !(hit.entity->behavior == &actPlayer && hit.entity->effectShapeshift != NOTHING) )
+											if ( !(hit.entity->behavior == &actPlayer && hit.entity->effectShapeshift() != NOTHING) )
 											{
 												messagePlayerColor(hit.entity->skill[2], MESSAGE_STATUS, makeColorRGB(0, 255, 0), Language::get(6088));
 											}
@@ -1955,7 +1955,7 @@ void actThrown(Entity* my)
 								{
 									if ( parentStats->getEffectActive(EFF_RETURN_ITEM) )
 									{
-										entity->itemReturnUID = parent->getUID();
+										entity->itemReturnUID() = parent->getUID();
 									}
 								}
 							}
@@ -2091,7 +2091,7 @@ void actThrown(Entity* my)
 				if ( !wasConfused && hitstats && hitstats->getEffectActive(EFF_CONFUSED) && hit.entity->behavior == &actMonster && parent )
 				{
 					doAlert = false;
-					if ( hit.entity->monsterTarget == parent->getUID() || prevTarget == parent->getUID() )
+					if ( hit.entity->monsterTarget() == parent->getUID() || prevTarget == parent->getUID() )
 					{
 						hit.entity->monsterReleaseAttackTarget();
 					}
@@ -2112,7 +2112,7 @@ void actThrown(Entity* my)
 						}
 					}
 
-					if ( alertTarget && hit.entity->monsterState != MONSTER_STATE_ATTACK && (hitstats->type < LICH || hitstats->type >= SHOPKEEPER) )
+					if ( alertTarget && hit.entity->monsterState() != MONSTER_STATE_ATTACK && (hitstats->type < LICH || hitstats->type >= SHOPKEEPER) )
 					{
 						if ( polymorphedTarget && hitstats->leader_uid == parent->getUID() )
 						{
@@ -2131,9 +2131,9 @@ void actThrown(Entity* my)
 					}
 
 					bool alertAllies = true;
-					if ( parent->behavior == &actPlayer || parent->monsterAllyIndex != -1 )
+					if ( parent->behavior == &actPlayer || parent->monsterAllyIndex() != -1 )
 					{
-						if ( hit.entity->behavior == &actPlayer || (hit.entity->behavior == &actMonster && hit.entity->monsterAllyIndex != -1) )
+						if ( hit.entity->behavior == &actPlayer || (hit.entity->behavior == &actMonster && hit.entity->monsterAllyIndex() != -1) )
 						{
 							// if a player ally + hit another ally or player, don't alert other allies.
 							alertAllies = false;
@@ -2269,7 +2269,7 @@ void actThrown(Entity* my)
 								}
 								else
 								{
-									updateEnemyBar(parent, hit.entity, Language::get(675), hit.entity->chestHealth, hit.entity->chestMaxHealth,
+									updateEnemyBar(parent, hit.entity, Language::get(675), hit.entity->chestHealth(), hit.entity->chestMaxHealth(),
 										false, DamageGib::DMG_WEAKEST);
 								}
 							}
@@ -2295,12 +2295,12 @@ void actThrown(Entity* my)
 								axe = std::min(axe, 9);
 							}
 							damage += axe;
-							if ( my->thrownProjectileCharge >= 1 )
+							if ( my->thrownProjectileCharge() >= 1 )
 							{
-								damage += my->thrownProjectileCharge / 5;
+								damage += my->thrownProjectileCharge() / 5;
 							}
 
-							int& entityHP = hit.entity->colliderCurrentHP;
+							int& entityHP = hit.entity->colliderCurrentHP();
 							int oldHP = entityHP;
 							entityHP -= damage;
 
@@ -2323,7 +2323,7 @@ void actThrown(Entity* my)
 							{
 								entityHP = 0;
 
-								hit.entity->colliderKillerUid = parent ? parent->getUID() : 0;
+								hit.entity->colliderKillerUid() = parent ? parent->getUID() : 0;
 								if ( parent && parent->behavior == &actPlayer )
 								{
 									if ( hit.entity->getColliderOnBreakLangEntry() != 0 )
@@ -2340,7 +2340,7 @@ void actThrown(Entity* my)
 
 							if ( parent )
 							{
-								updateEnemyBar(parent, hit.entity, Language::get(hit.entity->getColliderLangName()), entityHP, hit.entity->colliderMaxHP, false,
+								updateEnemyBar(parent, hit.entity, Language::get(hit.entity->getColliderLangName()), entityHP, hit.entity->colliderMaxHP(), false,
 									DamageGib::DMG_DEFAULT);
 							}
 						}
@@ -2577,7 +2577,7 @@ void actThrown(Entity* my)
 						{
 							if ( parentStats->getEffectActive(EFF_RETURN_ITEM) )
 							{
-								entity->itemReturnUID = parent->getUID();
+								entity->itemReturnUID() = parent->getUID();
 							}
 						}
 					}
@@ -2637,8 +2637,8 @@ void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y)
 {
 	if ( my.sprite == items[DUST_BALL].index )
 	{
-		auto& findEffects = particleTimerEffects[my.thrownProjectileParticleTimerUID];
-		if ( auto spellTimer = uidToEntity(my.thrownProjectileParticleTimerUID) )
+		auto& findEffects = particleTimerEffects[my.thrownProjectileParticleTimerUID()];
+		if ( auto spellTimer = uidToEntity(my.thrownProjectileParticleTimerUID()) )
 		{
 				int x = static_cast<int>(_x) / 16;
 				int y = static_cast<int>(_y) / 16;
@@ -2660,7 +2660,7 @@ void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y)
 					{
 						effect.firstEffect = true;
 					}
-					int spellID = spellTimer->particleTimerVariable2;
+					int spellID = spellTimer->particleTimerVariable2();
 					auto particleEffectType = (spellID == SPELL_MYCELIUM_BOMB || spellID == SPELL_MYCELIUM_SPORES)
 						? ParticleTimerEffect_t::EffectType::EFFECT_MYCELIUM
 						: ParticleTimerEffect_t::EffectType::EFFECT_SPORES;

@@ -55,19 +55,19 @@ void Entity::actPedestalBase()
 {
 	node_t* node = children.first;
 	Entity* orbEntity = (Entity*)(node->element);
-	if ( pedestalInit == 0 )
+	if ( pedestalInit() == 0 )
 	{
-		pedestalPowerStatus = -1;
+		pedestalPowerStatus() = -1;
 	}
-	if ( pedestalInit == 0 && !pedestalInGround )
+	if ( pedestalInit() == 0 && !pedestalInGround() )
 	{
-		pedestalInit = 1;
+		pedestalInit() = 1;
 	}
 
-	pedestalAmbience--;
-	if ( pedestalAmbience <= 0 )
+	pedestalAmbience()--;
+	if ( pedestalAmbience() <= 0 )
 	{
-		pedestalAmbience = TICKS_PER_SECOND * 30;
+		pedestalAmbience() = TICKS_PER_SECOND * 30;
 		playSoundEntityLocal(this, 149, 64);
 	}
 
@@ -81,9 +81,9 @@ void Entity::actPedestalBase()
 		this->createWorldUITooltip();
 	}
 
-	if ( pedestalInGround )
+	if ( pedestalInGround() )
 	{
-		if ( pedestalInit == 0 )
+		if ( pedestalInit() == 0 )
 		{
 			if ( this->ticks < 50 )
 			{
@@ -108,7 +108,7 @@ void Entity::actPedestalBase()
 						}
 					}
 				}
-				pedestalInit = 1;
+				pedestalInit() = 1;
 				serverUpdateEntitySkill(this, 5);
 			}
 			return;
@@ -149,7 +149,7 @@ void Entity::actPedestalBase()
 			orbEntity->z = -2;
 			vel_z = 0;
 			orbEntity->vel_z = 0;
-			pedestalInGround = 0;
+			pedestalInGround() = 0;
 			if ( multiplayer != CLIENT )
 			{
 				serverUpdateEntitySkill(this, 4);
@@ -162,29 +162,29 @@ void Entity::actPedestalBase()
 		return;
 	}
 
-	if ( pedestalPowerStatus < SWITCH_UNPOWERED )
+	if ( pedestalPowerStatus() < SWITCH_UNPOWERED )
 	{
 		// set the entity to be a circuit if not already set.
-		if ( !pedestalInvertedPower )
+		if ( !pedestalInvertedPower() )
 		{
-			pedestalPowerStatus = SWITCH_UNPOWERED;
+			pedestalPowerStatus() = SWITCH_UNPOWERED;
 		}
 		else
 		{
-			pedestalPowerStatus = SWITCH_POWERED;
+			pedestalPowerStatus() = SWITCH_POWERED;
 		}
 	}
 
-	if ( pedestalPowerStatus == SWITCH_POWERED )
+	if ( pedestalPowerStatus() == SWITCH_POWERED )
 	{
 		switchUpdateNeighbors();
 	}
 
-	if ( pedestalHasOrb == pedestalOrbType )
+	if ( pedestalHasOrb() == pedestalOrbType() )
 	{
 		bool applyAura = false;
 		// power on/off the circuit if it hasn't updated
-		if ( pedestalPowerStatus == SWITCH_UNPOWERED && !pedestalInvertedPower )
+		if ( pedestalPowerStatus() == SWITCH_UNPOWERED && !pedestalInvertedPower() )
 		{
 			//mechanismPowerOn();
 			//updateCircuitNeighbors();
@@ -194,14 +194,14 @@ void Entity::actPedestalBase()
 				applyAura = true;
 			}
 		}
-		else if ( pedestalPowerStatus == SWITCH_POWERED && pedestalInvertedPower )
+		else if ( pedestalPowerStatus() == SWITCH_POWERED && pedestalInvertedPower() )
 		{
 			//mechanismPowerOff();
 			//updateCircuitNeighbors();
 			toggleSwitch(8);
 		}
 
-		if ( (applyAura || ticks % 400 == 0) && pedestalOrbType != 3 && !strncmp(map.name, "Boss", 4) )
+		if ( (applyAura || ticks % 400 == 0) && pedestalOrbType() != 3 && !strncmp(map.name, "Boss", 4) )
 		{
 			for ( int i = 0; i < MAXPLAYERS; ++i )
 			{
@@ -209,7 +209,7 @@ void Entity::actPedestalBase()
 				{
 					if ( players[i] && players[i]->entity )
 					{
-						switch ( pedestalOrbType )
+						switch ( pedestalOrbType() )
 						{
 							case 1: // blue
 								if ( stats[i] && !stats[i]->getEffectActive(EFF_SHRINE_BLUE_BUFF) )
@@ -243,7 +243,7 @@ void Entity::actPedestalBase()
 		}
 	}
 
-	if ( flags[PASSABLE] && pedestalInGround == 0 )
+	if ( flags[PASSABLE] && pedestalInGround() == 0 )
 	{
 		// see if any entity is currently inside, otherwise set PASSABLE to false
 		bool somebodyInside = false;
@@ -278,34 +278,34 @@ void Entity::actPedestalBase()
 			{
 				if ( players[i] && players[i]->entity )
 				{
-					if ( orbEntity && pedestalHasOrb > 0 )
+					if ( orbEntity && pedestalHasOrb() > 0 )
 					{
-						if ( pedestalHasOrb == pedestalOrbType && pedestalLockOrb == 1 )
+						if ( pedestalHasOrb() == pedestalOrbType() && pedestalLockOrb() == 1 )
 						{
 							// if orb locked, then can't retreive.
 							messagePlayer(i, MESSAGE_INTERACTION, Language::get(2367));
 						}
 						else
 						{
-							Item* itemOrb = newItem(static_cast<ItemType>(ARTIFACT_ORB_BLUE + pedestalHasOrb - 1), EXCELLENT, 0, 1, local_rng.rand(), true, nullptr);
+							Item* itemOrb = newItem(static_cast<ItemType>(ARTIFACT_ORB_BLUE + pedestalHasOrb() - 1), EXCELLENT, 0, 1, local_rng.rand(), true, nullptr);
 							itemPickup(i, itemOrb);
-							if ( pedestalHasOrb == pedestalOrbType )
+							if ( pedestalHasOrb() == pedestalOrbType() )
 							{
 								// only update power when right orb is in place.
-								if ( !pedestalInvertedPower && pedestalPowerStatus == SWITCH_POWERED )
+								if ( !pedestalInvertedPower() && pedestalPowerStatus() == SWITCH_POWERED )
 								{
 									//mechanismPowerOff();
 									//updateCircuitNeighbors();
 									toggleSwitch(8);
 								}
-								else if ( pedestalInvertedPower && pedestalPowerStatus == SWITCH_UNPOWERED )
+								else if ( pedestalInvertedPower() && pedestalPowerStatus() == SWITCH_UNPOWERED )
 								{
 									//mechanismPowerOn();
 									//updateCircuitNeighbors();
 									toggleSwitch(8);
 								}
 							}
-							pedestalHasOrb = 0;
+							pedestalHasOrb() = 0;
 							serverUpdateEntitySkill(this, 0); // update orb status.
 							messagePlayer(i, MESSAGE_INTERACTION, Language::get(2374), itemOrb->getName());
 						}
@@ -340,8 +340,8 @@ void Entity::actPedestalBase()
 
 void Entity::actPedestalOrb()
 {
-	real_t upper_z = orbStartZ - 0.4;
-	real_t lower_z = orbStartZ + 0.4;
+	real_t upper_z = orbStartZ() - 0.4;
+	real_t lower_z = orbStartZ() + 0.4;
 	int i = 0;
 
 	real_t acceleration = 0.95;
@@ -352,23 +352,23 @@ void Entity::actPedestalOrb()
 		return;
 	}
 
-	if ( !parent->pedestalInGround )
+	if ( !parent->pedestalInGround() )
 	{
 		pedestalOrbInit();
 	}
 
-	if ( parent->pedestalHasOrb == 0 )
+	if ( parent->pedestalHasOrb() == 0 )
 	{
 		flags[INVISIBLE] = true;
 		flags[UNCLICKABLE] = true;
 		flags[PASSABLE] = true;
-		orbTurnVelocity = 0.5; // reset the speed of the orb.
+		orbTurnVelocity() = 0.5; // reset the speed of the orb.
 		removeLightField();
 		return;
 	}
-	else if ( orbInitialised )
+	else if ( orbInitialised() )
 	{
-		sprite = parent->pedestalHasOrb + 602 - 1;
+		sprite = parent->pedestalHasOrb() + 602 - 1;
 
 		// handle player interaction
 		if ( multiplayer != CLIENT )
@@ -381,34 +381,34 @@ void Entity::actPedestalOrb()
 					{
 						if ( players[i] && players[i]->entity )
 						{
-							if ( parent->pedestalHasOrb > 0 )
+							if ( parent->pedestalHasOrb() > 0 )
 							{
-								if ( parent->pedestalHasOrb == parent->pedestalOrbType && parent->pedestalLockOrb == 1 )
+								if ( parent->pedestalHasOrb() == parent->pedestalOrbType() && parent->pedestalLockOrb() == 1 )
 								{
 									// if orb locked, then can't retreive.
 									messagePlayer(i, MESSAGE_INTERACTION, Language::get(2367));
 								}
 								else
 								{
-									Item* itemOrb = newItem(static_cast<ItemType>(ARTIFACT_ORB_BLUE + parent->pedestalHasOrb - 1), EXCELLENT, 0, 1, local_rng.rand(), true, nullptr);
+									Item* itemOrb = newItem(static_cast<ItemType>(ARTIFACT_ORB_BLUE + parent->pedestalHasOrb() - 1), EXCELLENT, 0, 1, local_rng.rand(), true, nullptr);
 									itemPickup(i, itemOrb);
-									if ( parent->pedestalHasOrb == parent->pedestalOrbType )
+									if ( parent->pedestalHasOrb() == parent->pedestalOrbType() )
 									{
 										// only update power when right orb is in place.
-										if ( !parent->pedestalInvertedPower && parent->pedestalPowerStatus == SWITCH_POWERED )
+										if ( !parent->pedestalInvertedPower() && parent->pedestalPowerStatus() == SWITCH_POWERED )
 										{
 											//mechanismPowerOff();
 											//updateCircuitNeighbors();
 											parent->toggleSwitch(8);
 										}
-										else if ( parent->pedestalInvertedPower && parent->pedestalPowerStatus == SWITCH_UNPOWERED )
+										else if ( parent->pedestalInvertedPower() && parent->pedestalPowerStatus() == SWITCH_UNPOWERED )
 										{
 											//mechanismPowerOn();
 											//updateCircuitNeighbors();
 											parent->toggleSwitch(8);
 										}
 									}
-									parent->pedestalHasOrb = 0;
+									parent->pedestalHasOrb() = 0;
 									serverUpdateEntitySkill(parent, 0); // update orb status 
 									messagePlayer(i, MESSAGE_INTERACTION | MESSAGE_INVENTORY, Language::get(2374), itemOrb->getName());
 								}
@@ -419,7 +419,7 @@ void Entity::actPedestalOrb()
 			}
 		}
 
-		if ( parent->pedestalHasOrb != parent->pedestalOrbType )
+		if ( parent->pedestalHasOrb() != parent->pedestalOrbType() )
 		{
 			// not properly activated - return early, no animate.
 			flags[INVISIBLE] = false;
@@ -427,14 +427,14 @@ void Entity::actPedestalOrb()
 			flags[PASSABLE] = false;
 			return;
 		}
-		else if ( parent->pedestalHasOrb == parent->pedestalOrbType )
+		else if ( parent->pedestalHasOrb() == parent->pedestalOrbType() )
 		{
 			flags[INVISIBLE] = false;
 			flags[UNCLICKABLE] = false;
 			flags[PASSABLE] = false;
 			if ( !light )
 			{
-                switch (parent->pedestalOrbType) {
+                switch (parent->pedestalOrbType()) {
                 default:
                 case 1: light = addLight(x / 16, y / 16, "orb_blue"); break;
                 case 2: light = addLight(x / 16, y / 16, "orb_red"); break;
@@ -449,73 +449,73 @@ void Entity::actPedestalOrb()
 		return;
 	}
 
-	if ( orbHoverDirection == CRYSTAL_HOVER_UP ) //rise state
+	if ( orbHoverDirection() == CRYSTAL_HOVER_UP ) //rise state
 	{
 		z -= vel_z;
 
 		if ( z < upper_z )
 		{
 			z = upper_z;
-			orbHoverDirection = CRYSTAL_HOVER_UP_WAIT;
+			orbHoverDirection() = CRYSTAL_HOVER_UP_WAIT;
 		}
 
-		if ( z < orbStartZ ) //higher than mid point
+		if ( z < orbStartZ() ) //higher than mid point
 		{
-			vel_z = std::max(vel_z * acceleration, orbMinZVelocity);
+			vel_z = std::max(vel_z * acceleration, orbMinZVelocity());
 		}
-		else if ( z > orbStartZ ) //lower than midpoint
+		else if ( z > orbStartZ() ) //lower than midpoint
 		{
-			vel_z = std::min(vel_z * (1 / acceleration), orbMaxZVelocity);
+			vel_z = std::min(vel_z * (1 / acceleration), orbMaxZVelocity());
 		}
 	}
-	else if ( orbHoverDirection == CRYSTAL_HOVER_UP_WAIT ) // wait state
+	else if ( orbHoverDirection() == CRYSTAL_HOVER_UP_WAIT ) // wait state
 	{
-		orbHoverWaitTimer++;
-		if ( orbHoverWaitTimer >= 1 )
+		orbHoverWaitTimer()++;
+		if ( orbHoverWaitTimer() >= 1 )
 		{
-			orbHoverDirection = CRYSTAL_HOVER_DOWN; // advance state
-			orbHoverWaitTimer = 0; // reset timer
+			orbHoverDirection() = CRYSTAL_HOVER_DOWN; // advance state
+			orbHoverWaitTimer() = 0; // reset timer
 		}
 	}
-	else if ( orbHoverDirection == CRYSTAL_HOVER_DOWN ) //fall state
+	else if ( orbHoverDirection() == CRYSTAL_HOVER_DOWN ) //fall state
 	{
 		z += vel_z;
 
 		if ( z > lower_z )
 		{
 			z = lower_z;
-			orbHoverDirection = CRYSTAL_HOVER_DOWN_WAIT;
+			orbHoverDirection() = CRYSTAL_HOVER_DOWN_WAIT;
 		}
 
-		if ( z < orbStartZ ) //higher than mid point, start accelerating
+		if ( z < orbStartZ() ) //higher than mid point, start accelerating
 		{
-			vel_z = std::min(vel_z * (1 / acceleration), orbMaxZVelocity);
+			vel_z = std::min(vel_z * (1 / acceleration), orbMaxZVelocity());
 		}
-		else if ( z > orbStartZ ) //lower than midpoint, start decelerating
+		else if ( z > orbStartZ() ) //lower than midpoint, start decelerating
 		{
-			vel_z = std::max(vel_z * acceleration, orbMinZVelocity);
+			vel_z = std::max(vel_z * acceleration, orbMinZVelocity());
 		}
 	}
-	else if ( orbHoverDirection == CRYSTAL_HOVER_DOWN_WAIT ) // wait state
+	else if ( orbHoverDirection() == CRYSTAL_HOVER_DOWN_WAIT ) // wait state
 	{
-		orbHoverWaitTimer++;
-		if ( orbHoverWaitTimer >= 1 )
+		orbHoverWaitTimer()++;
+		if ( orbHoverWaitTimer() >= 1 )
 		{
-			orbHoverDirection = CRYSTAL_HOVER_UP; // advance state
-			orbHoverWaitTimer = 0; // reset timer
+			orbHoverDirection() = CRYSTAL_HOVER_UP; // advance state
+			orbHoverWaitTimer() = 0; // reset timer
 		}
 	}
 
 
-	if ( z <= orbStartZ + orbMaxZVelocity && z >= orbStartZ - orbMaxZVelocity )
+	if ( z <= orbStartZ() + orbMaxZVelocity() && z >= orbStartZ() - orbMaxZVelocity() )
 	{
-		vel_z = orbMaxZVelocity; // reset velocity at the mid point of animation
+		vel_z = orbMaxZVelocity(); // reset velocity at the mid point of animation
 	}
 
-	yaw += (orbTurnVelocity * abs((vel_z / orbMaxZVelocity)) + orbTurnVelocity);
-	if ( orbTurnVelocity > 0.04 )
+	yaw += (orbTurnVelocity() * abs((vel_z / orbMaxZVelocity())) + orbTurnVelocity());
+	if ( orbTurnVelocity() > 0.04 )
 	{
-		orbTurnVelocity -= 0.01;
+		orbTurnVelocity() -= 0.01;
 	}
 
 	int particleSprite = 606;
@@ -544,14 +544,14 @@ void Entity::pedestalOrbInit()
 		return;
 	}
 
-	if ( !orbInitialised && !parent->pedestalInGround )
+	if ( !orbInitialised() && !parent->pedestalInGround() )
 	{
 		x = parent->x;
 		y = parent->y;
 		z = -2;
 		sizex = 2;
 		sizey = 2;
-		if ( parent->pedestalHasOrb == parent->pedestalOrbType )
+		if ( parent->pedestalHasOrb() == parent->pedestalOrbType() )
 		{
 			flags[UNCLICKABLE] = false;
 			flags[INVISIBLE] = false;
@@ -562,16 +562,16 @@ void Entity::pedestalOrbInit()
 			flags[INVISIBLE] = true;
 		}
 		flags[PASSABLE] = true;
-		if ( orbStartZ != z )
+		if ( orbStartZ() != z )
 		{
-			orbStartZ = z;
-			z = orbStartZ - 0.4 + ((local_rng.rand() % 8) * 0.1); // start the height randomly
+			orbStartZ() = z;
+			z = orbStartZ() - 0.4 + ((local_rng.rand() % 8) * 0.1); // start the height randomly
 		}
-		orbMaxZVelocity = 0.02; //max velocity
-		orbMinZVelocity = 0.001; //min velocity
-		vel_z = crystalMaxZVelocity * ((local_rng.rand() % 100) * 0.01); // start the velocity randomly
-		orbTurnVelocity = 0.5;
-		orbInitialised = 1;
+		orbMaxZVelocity() = 0.02; //max velocity
+		orbMinZVelocity() = 0.001; //min velocity
+		vel_z = crystalMaxZVelocity() * ((local_rng.rand() % 100) * 0.01); // start the velocity randomly
+		orbTurnVelocity() = 0.5;
+		orbInitialised() = 1;
 		if ( multiplayer != CLIENT )
 		{
 			serverUpdateEntitySkill(parent, 0);

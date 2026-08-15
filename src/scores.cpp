@@ -101,8 +101,8 @@ score_t* scoreConstructor(int player)
 	score->stats->type = stats[player]->type;
 	score->stats->sex = stats[player]->sex;
 	score->stats->stat_appearance = stats[player]->stat_appearance;
-	score->stats->playerRace = stats[player]->playerRace;
-	//score->stats->appearance |= stats[player]->playerRace << 8;
+	score->stats->playerRace() = stats[player]->playerRace();
+	//score->stats->appearance |= stats[player]->playerRace() << 8;
 	strcpy(score->stats->name, stats[player]->name);
 	strcpy(score->stats->obituary, stats[player]->obituary);
 	score->stats->killer = stats[player]->killer;
@@ -471,7 +471,7 @@ void loadScore(score_t* score)
 	stats[0]->type = score->stats->type;
 	stats[0]->sex = score->stats->sex;
 	stats[0]->stat_appearance = score->stats->stat_appearance;
-	stats[0]->playerRace = score->stats->playerRace;
+	stats[0]->playerRace() = score->stats->playerRace();
 	//((stats[0]->appearance & 0xFF00) >> 8);
 	//stats[0]->appearance = (stats[0]->appearance & 0xFF);
 	strcpy(stats[0]->name, score->stats->name);
@@ -693,7 +693,7 @@ void saveAllScoresJSON(const std::string& scoresfilename)
 		entry.AddMember("name", JsonValue::Str(score->stats->name));
 		entry.AddMember("type", score->stats->type);
 		entry.AddMember("sex", score->stats->sex);
-		entry.AddMember("race", score->stats->playerRace);
+		entry.AddMember("race", score->stats->playerRace());
 		entry.AddMember("appearance", score->stats->stat_appearance);
 
 		entry.AddMember("classnum", score->classnum);
@@ -1050,7 +1050,7 @@ void saveAllScores(const DynamicString& scoresfilename)
 		fp->write(&score->stats->type, sizeof(Monster), 1);
 		fp->write(&score->stats->sex, sizeof(sex_t), 1);
 		Uint32 raceAndAppearance = 0;
-		raceAndAppearance |= (score->stats->playerRace << 8);
+		raceAndAppearance |= (score->stats->playerRace() << 8);
 		raceAndAppearance |= (score->stats->stat_appearance);
 		fp->write(&raceAndAppearance, sizeof(Uint32), 1);
 		fp->write(score->stats->name, sizeof(char), 32);
@@ -1285,7 +1285,7 @@ bool verifyScoreStruct(score_t* score, score_t* score2)
 	assert(score->stats->type == score2->stats->type);
 	assert(score->stats->sex == score2->stats->sex);
 	assert(score->stats->stat_appearance == score2->stats->stat_appearance);
-	assert(score->stats->playerRace == score2->stats->playerRace);
+	assert(score->stats->playerRace() == score2->stats->playerRace());
 	DynamicString name1 = score->stats->name;
 	DynamicString name2 = score2->stats->name;
 	assert(name1 == name2);
@@ -1608,7 +1608,7 @@ void loadAllScoresJSON(const std::string& scoresfilename)
 		score->conductIlliterate = jsonGetBool(*itr, "conductIlliterate");
 		score->stats->type = (Monster)jsonGetInt(*itr, "type");
 		score->stats->sex = (sex_t)jsonGetInt(*itr, "sex");
-		score->stats->playerRace = jsonGetInt(*itr, "race");
+		score->stats->playerRace() = jsonGetInt(*itr, "race");
 		score->stats->stat_appearance = (Uint32)jsonGetInt(*itr, "appearance");
 		const char* name = jsonGetStr(*itr, "name");
 		stringCopy(score->stats->name, name, 32, strlen(name));
@@ -2108,7 +2108,7 @@ void loadAllScores(const DynamicString& scoresfilename)
 		fp->read(&score->stats->stat_appearance, sizeof(Uint32), 1);
 		if ( versionNumber >= 323 )
 		{
-			score->stats->playerRace = ((score->stats->stat_appearance & 0xFF00) >> 8);
+			score->stats->playerRace() = ((score->stats->stat_appearance & 0xFF00) >> 8);
 			score->stats->stat_appearance = (score->stats->stat_appearance & 0xFF);
 		}
 		fp->read(&score->stats->name, sizeof(char), 32);
@@ -3060,7 +3060,7 @@ void updateGameplayStatisticsInMainLoop()
 		int badAndBeautiful = -1;
 		if ( stats[clientnum]->stat_appearance == 0 && (stats[clientnum]->type == INCUBUS || stats[clientnum]->type == SUCCUBUS) )
 		{
-			if ( stats[clientnum]->playerRace == RACE_INCUBUS || stats[clientnum]->playerRace == RACE_SUCCUBUS )
+			if ( stats[clientnum]->playerRace() == RACE_INCUBUS || stats[clientnum]->playerRace() == RACE_SUCCUBUS )
 			{
 				badAndBeautiful = 0;
 			}
@@ -3420,12 +3420,12 @@ void updateAchievementBaitAndSwitch(int player, bool isTeleporting)
 	{
 		return;
 	}
-	if ( !stats[player] || stats[player]->playerRace != RACE_SUCCUBUS || achievementStatusBaitAndSwitch[player] || multiplayer == CLIENT )
+	if ( !stats[player] || stats[player]->playerRace() != RACE_SUCCUBUS || achievementStatusBaitAndSwitch[player] || multiplayer == CLIENT )
 	{
 		return;
 	}
 
-	if ( stats[player]->playerRace == RACE_SUCCUBUS && stats[player]->stat_appearance != 0 )
+	if ( stats[player]->playerRace() == RACE_SUCCUBUS && stats[player]->stat_appearance != 0 )
 	{
 		return;
 	}
@@ -4217,14 +4217,14 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 			{
 				if ( !client_disconnected[i] )
 				{
-					if ( stats[i] && stats[i]->playerRace != RACE_HUMAN && stats[i]->stat_appearance == 0 )
+					if ( stats[i] && stats[i]->playerRace() != RACE_HUMAN && stats[i]->stat_appearance == 0 )
 					{
-						races.insert(stats[i]->playerRace);
+						races.insert(stats[i]->playerRace());
 
-						if ( stats[i]->playerRace == RACE_GNOME
-							|| stats[i]->playerRace == RACE_GREMLIN
-							|| (stats[i]->playerRace == RACE_DRYAD && stats[i]->sex == FEMALE)
-							|| (stats[i]->playerRace == RACE_MYCONID && stats[i]->sex == MALE) )
+						if ( stats[i]->playerRace() == RACE_GNOME
+							|| stats[i]->playerRace() == RACE_GREMLIN
+							|| (stats[i]->playerRace() == RACE_DRYAD && stats[i]->sex == FEMALE)
+							|| (stats[i]->playerRace() == RACE_MYCONID && stats[i]->sex == MALE) )
 						{
 							++shortRaces;
 						}
@@ -5039,7 +5039,7 @@ int SaveGameInfo::populateFromSession(const int playernum)
 		if ( info->players_connected[c] ) {
 			auto& player = info->players[c];
 			player.char_class = client_classes[c];
-			player.race = stats[c]->playerRace;
+			player.race = stats[c]->playerRace();
 
 			// the following player info is shared by all players currently
 			player.kills.resize(NUMMONSTERS);
@@ -5873,7 +5873,7 @@ int loadGame(int player, const SaveGameInfo& info) {
 
 	// load player data
 	client_classes[statsPlayer] = info.players[player].char_class;
-	stats[statsPlayer]->playerRace = info.players[player].race;
+	stats[statsPlayer]->playerRace() = info.players[player].race;
 	for ( int c = 0; c < NUMMONSTERS; ++c )
 	{
 		kills[c] = 0;

@@ -324,8 +324,8 @@ void slimeSprayAttack(Entity* my)
 			particle = 184;
 		}
 		spellTimer = createParticleTimer(my, 30, -1);
-		spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_MAGIC_SPRAY;
-		spellTimer->particleTimerCountdownSprite = particle;
+		spellTimer->particleTimerCountdownAction() = PARTICLE_TIMER_ACTION_MAGIC_SPRAY;
+		spellTimer->particleTimerCountdownSprite() = particle;
 	}
 	else
 	{
@@ -353,8 +353,8 @@ void slimeSprayAttack(Entity* my)
 
 	if ( spellTimer )
 	{
-		spellTimer->particleTimerPreDelay = slimeSprayDelay;
-		spellTimer->particleTimerDuration += slimeSprayDelay;
+		spellTimer->particleTimerPreDelay() = slimeSprayDelay;
+		spellTimer->particleTimerDuration() += slimeSprayDelay;
 
 		createParticleDot(my);
 
@@ -372,14 +372,14 @@ void slimeAnimate(Entity* my, Stat* myStats, double dist)
 
 	if ( multiplayer == CLIENT )
 	{
-		if ( my->monsterSlimeLastAttack != 0 )
+		if ( my->monsterSlimeLastAttack() != 0 )
 		{
-			if ( MONSTER_ATTACK != my->monsterSlimeLastAttack )
+			if ( MONSTER_ATTACK != my->monsterSlimeLastAttack() )
 			{
 				MONSTER_ATTACKTIME = 0;
 			}
 		}
-		my->monsterSlimeLastAttack = MONSTER_ATTACK;
+		my->monsterSlimeLastAttack() = MONSTER_ATTACK;
 	}
 
 	my->z = 6;
@@ -716,14 +716,14 @@ void Entity::slimeChooseWeapon(const Entity* target, double dist)
 		return;
 	}
 
-	if ( monsterSpecialState != 0 && monsterSpecialTimer != 0 )
+	if ( monsterSpecialState() != 0 && monsterSpecialTimer() != 0 )
 	{
 		return;
 	}
 
-	if ( monsterSpecialTimer == 0 
+	if ( monsterSpecialTimer() == 0 
 		&& (ticks % 10 == 0) 
-		&& (monsterAttack == 0 || ((monsterAttack == 1) && monsterAttackTime >= 25))
+		&& (monsterAttack() == 0 || ((monsterAttack() == 1) && monsterAttackTime() >= 25))
 		&& dist < 48 )
 	{
 		Stat* targetStats = target->getStats();
@@ -754,7 +754,7 @@ void Entity::slimeChooseWeapon(const Entity* target, double dist)
 
 		if ( specialRoll < requiredRoll )
 		{
-			monsterSpecialState = SLIME_CAST;
+			monsterSpecialState() = SLIME_CAST;
 		}
 	}
 }

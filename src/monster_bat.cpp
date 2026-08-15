@@ -231,12 +231,12 @@ void batDie(Entity* my)
 
 bool Entity::disturbBat(Entity* touched, bool takenDamage, bool doMessage)
 {
-	if ( monsterSpecialState == BAT_REST )
+	if ( monsterSpecialState() == BAT_REST )
 	{
-		monsterSpecialState = BAT_REST_DISTURBED;
+		monsterSpecialState() = BAT_REST_DISTURBED;
 		serverUpdateEntitySkill(this, 33);
 
-		monsterHitTime = HITRATE;
+		monsterHitTime() = HITRATE;
 
 		setEffect(EFF_STUNNED, true, 10, false);
 		if ( dynarray_psize<Entity*>(bodyparts) >= 1 )
@@ -255,7 +255,7 @@ bool Entity::disturbBat(Entity* touched, bool takenDamage, bool doMessage)
 		if ( touched )
 		{
 			lookAtEntity(*touched);
-			if ( !uidToEntity(monsterTarget) )
+			if ( !uidToEntity(monsterTarget()) )
 			{
 				if ( checkEnemy(touched) )
 				{
@@ -332,8 +332,8 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 		if ( keystatus[SDLK_j] )
 		{
 			keystatus[SDLK_j] = 0;
-			my->monsterSpecialState = my->monsterSpecialState == 0 ? BAT_REST : 0;
-			if ( my->monsterSpecialState == BAT_REST )
+			my->monsterSpecialState() = my->monsterSpecialState() == 0 ? BAT_REST : 0;
+			if ( my->monsterSpecialState() == BAT_REST )
 			{
 				my->monsterReleaseAttackTarget();
 			}
@@ -372,7 +372,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 			{
 				entity->fskill[0] += 2 * PI;
 			}
-			if ( my->monsterSpecialState == BAT_REST && BAT_REST_STATE == 1 )
+			if ( my->monsterSpecialState() == BAT_REST && BAT_REST_STATE == 1 )
 			{
 				entity->fskill[0] = std::max(body->fskill[0], entity->fskill[0]);
 				real_t speed = 0.2;
@@ -423,7 +423,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 				BAT_FLOAT_ATK = 0.0;
 			}
 
-			if ( my->monsterSpecialState == BAT_REST && BAT_REST_STATE == 1 )
+			if ( my->monsterSpecialState() == BAT_REST && BAT_REST_STATE == 1 )
 			{
 				real_t speed = 0.2;
 				if ( limbAngleWithinRange(entity->fskill[0], speed, PI / 2) )
@@ -544,7 +544,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 				entity->fskill[0] += 2 * PI;
 			}
 
-			if ( my->monsterSpecialState == BAT_REST )
+			if ( my->monsterSpecialState() == BAT_REST )
 			{
 				{
 					real_t speed = -0.1;
@@ -683,7 +683,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 		{
 			case BAT_BODY:
 			{
-				if ( my->monsterSpecialState == BAT_REST && BAT_REST_STATE == 1 )
+				if ( my->monsterSpecialState() == BAT_REST && BAT_REST_STATE == 1 )
 				{
 					real_t diff = std::max(0.002, (1.0 - BAT_REST_ROTATE) / 20.0);
 					BAT_REST_ROTATE += diff;
@@ -730,7 +730,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 					entity->fskill[1] += 0.1;
 				}
 
-				if ( my->monsterSpecialState == BAT_REST )
+				if ( my->monsterSpecialState() == BAT_REST )
 				{
 					BAT_FLOAT_X = 0.0;
 					BAT_FLOAT_Y = 0.0;
@@ -776,9 +776,9 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 
 					if ( multiplayer != CLIENT )
 					{
-						if ( my->monsterSpecialState == BAT_REST_DISTURBED )
+						if ( my->monsterSpecialState() == BAT_REST_DISTURBED )
 						{
-							my->monsterSpecialState = 0;
+							my->monsterSpecialState() = 0;
 						}
 					}
 
@@ -871,7 +871,7 @@ void batAnimate(Entity* my, Stat* myStats, double dist)
 					}
 				}
 
-				if ( (entity->skill[3] == 0) && MONSTER_ATTACK == 0 && !(my->monsterSpecialState == BAT_REST && BAT_REST_STATE == 1) )
+				if ( (entity->skill[3] == 0) && MONSTER_ATTACK == 0 && !(my->monsterSpecialState() == BAT_REST && BAT_REST_STATE == 1) )
 				{
 					if ( entity->fskill[1] >= 0.8 )
 					{

@@ -799,9 +799,9 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
         if (remap) {
             bool doGrayScale = false;
             real_t grayScaleFactor = 0.0;
-            if (entity->grayscaleGLRender > 0.001) {
+            if (entity->grayscaleGLRender() > 0.001) {
                 doGrayScale = true;
-                grayScaleFactor = entity->grayscaleGLRender;
+                grayScaleFactor = entity->grayscaleGLRender();
             }
             
             mat4x4_t remap(1.f);
@@ -832,12 +832,12 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
             }
 
 #ifndef EDITOR
-            if ( entity->mistformGLRender >= 0.45 )
+            if ( entity->mistformGLRender() >= 0.45 )
             {
-                auto& whichColor = (entity->mistformGLRender > 1.9) ? cvar_color_hologram
-                    : (entity->mistformGLRender > 0.9) ? cvar_color_mist_form
-                    : ((entity->mistformGLRender >= 0.4 && entity->mistformGLRender <= 0.6) ? cvar_color_reflector_shield
-                    : (entity->mistformGLRender >= 0.2 && entity->mistformGLRender <= 0.4) ? cvar_color_force_shield
+                auto& whichColor = (entity->mistformGLRender() > 1.9) ? cvar_color_hologram
+                    : (entity->mistformGLRender() > 0.9) ? cvar_color_mist_form
+                    : ((entity->mistformGLRender() >= 0.4 && entity->mistformGLRender() <= 0.6) ? cvar_color_reflector_shield
+                    : (entity->mistformGLRender() >= 0.2 && entity->mistformGLRender() <= 0.4) ? cvar_color_force_shield
                     : cvar_color_mist_form);
                 vec4_t hsv;
                 hsv.y = 100.f; // saturation
@@ -906,13 +906,13 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
 #else
             /*(entity->monsterEntityRenderAsTelepath == 2 && player >= 0 && player < MAXPLAYERS)
             || */
-            (entity->monsterEntityRenderAsTelepath && player >= 0 && player < MAXPLAYERS
+            (entity->monsterEntityRenderAsTelepath() && player >= 0 && player < MAXPLAYERS
             && players[player] && players[player]->entity
             && stats[player]->mask && stats[player]->mask->type == TOOL_BLINDFOLD_TELEPATHY);
 
         if ( !intro && player >= 0 && player < MAXPLAYERS && players[player] && players[player]->entity
-            && (entity->goldTelepathy > 0 && entity->behavior == &actGoldBag && entity->goldTelepathy & (1 << player)
-                || (entity->colliderTelepathy > 0 && entity->behavior == &actColliderDecoration && entity->colliderTelepathy & (1 << player))) )
+            && (entity->goldTelepathy() > 0 && entity->behavior == &actGoldBag && entity->goldTelepathy() & (1 << player)
+                || (entity->colliderTelepathy() > 0 && entity->behavior == &actColliderDecoration && entity->colliderTelepathy() & (1 << player))) )
         {
             telepathy = true;
         }
@@ -950,12 +950,12 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
 #ifndef EDITOR
                 if ( parent->isInertMimic() )
                 {
-                    entity->highlightForUIGlow = (0.05 * (entity->ticks % 41));
+                    entity->highlightForUIGlow() = (0.05 * (entity->ticks % 41));
                 }
                 else
 #endif
                 {
-                    entity->highlightForUIGlow = parent->highlightForUIGlow;
+                    entity->highlightForUIGlow() = parent->highlightForUIGlow();
                 }
                 highlightEntityFromParent = true;
                 highlightEntity = highlightEntityFromParent;
@@ -963,9 +963,9 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
         }
         if (highlightEntity) {
             if (!highlightEntityFromParent) {
-                entity->highlightForUIGlow = (0.05 * (entity->ticks % 41));
+                entity->highlightForUIGlow() = (0.05 * (entity->ticks % 41));
             }
-            float highlight = entity->highlightForUIGlow;
+            float highlight = entity->highlightForUIGlow();
             if (highlight > 1.f) {
                 highlight = 1.f - (highlight - 1.f);
             }
@@ -1344,13 +1344,13 @@ void glDrawVoxel(view_t* camera, Entity* entity, int mode) {
 #else
         /*(entity->monsterEntityRenderAsTelepath == 2 && !intro)
         || */
-        ((entity->monsterEntityRenderAsTelepath == 1 && !intro 
+        ((entity->monsterEntityRenderAsTelepath() == 1 && !intro 
             && player >= 0 && player < MAXPLAYERS && players[player] && players[player]->entity
             && stats[player]->mask && stats[player]->mask->type == TOOL_BLINDFOLD_TELEPATHY));
 
         if ( !intro && player >= 0 && player < MAXPLAYERS && players[player] && players[player]->entity
-            && (entity->goldTelepathy > 0 && entity->behavior == &actGoldBag && entity->goldTelepathy & (1 << player)
-                || (entity->colliderTelepathy > 0 && entity->behavior == &actColliderDecoration && entity->colliderTelepathy & (1 << player))) )
+            && (entity->goldTelepathy() > 0 && entity->behavior == &actGoldBag && entity->goldTelepathy() & (1 << player)
+                || (entity->colliderTelepathy() > 0 && entity->behavior == &actColliderDecoration && entity->colliderTelepathy() & (1 << player))) )
         {
             telepath = true;
         }
@@ -1371,7 +1371,7 @@ void glDrawVoxel(view_t* camera, Entity* entity, int mode) {
     auto& shader = !entity->flags[BRIGHT] && !telepath ?
         (dither.value < Entity::Dither::MAX ? voxelDitheredShader : voxelShader) :
         ((((entity->flags[INVISIBLE] && entity->flags[INVISIBLE_DITHER])
-            || entity->mistformGLRender >= 0.45
+            || entity->mistformGLRender() >= 0.45
             || entity->flags[INVISIBLE_DITHER])
             && dither.value < Entity::Dither::MAX) 
                 ? voxelBrightDitheredShader : voxelBrightShader);
@@ -1430,13 +1430,13 @@ void glDrawVoxel(view_t* camera, Entity* entity, int mode) {
     // upload light variables
     if (entity->flags[BRIGHT]) {
         mat4x4_t remap(1.f);
-        if ( entity->mistformGLRender >= 0.45 )
+        if ( entity->mistformGLRender() >= 0.45 )
         {
 #ifndef EDITOR
-            auto& whichColor = (entity->mistformGLRender > 1.9) ? cvar_color_hologram
-                : (entity->mistformGLRender > 0.9) ? cvar_color_mist_form
-                : ((entity->mistformGLRender >= 0.4 && entity->mistformGLRender <= 0.6) ? cvar_color_reflector_shield
-                    : (entity->mistformGLRender >= 0.2 && entity->mistformGLRender <= 0.4) ? cvar_color_force_shield
+            auto& whichColor = (entity->mistformGLRender() > 1.9) ? cvar_color_hologram
+                : (entity->mistformGLRender() > 0.9) ? cvar_color_mist_form
+                : ((entity->mistformGLRender() >= 0.4 && entity->mistformGLRender() <= 0.6) ? cvar_color_reflector_shield
+                    : (entity->mistformGLRender() >= 0.2 && entity->mistformGLRender() <= 0.4) ? cvar_color_force_shield
                     : cvar_color_mist_form);
             vec4_t hsv;
             hsv.y = 100.f; // saturation
@@ -1787,7 +1787,7 @@ void glDrawWorldUISprite(view_t* camera, Entity* entity, int mode)
     // find player that this UI sprite is drawing for
 	int player = -1;
 	if ( entity->behavior == &actSpriteWorldTooltip ) {
-		if ( entity->worldTooltipIgnoreDrawing != 0 ) {
+		if ( entity->worldTooltipIgnoreDrawing() != 0 ) {
 			return;
 		}
 		for (player = 0; player < MAXPLAYERS; ++player) {
@@ -1806,10 +1806,10 @@ void glDrawWorldUISprite(view_t* camera, Entity* entity, int mode)
             //        return; // too far, ignore drawing
             //    }
             //}
-			if (entity->worldTooltipPlayer != player) {
+			if (entity->worldTooltipPlayer() != player) {
 				return;
 			}
-			if (entity->worldTooltipActive == 0 && entity->worldTooltipFadeDelay == 0) {
+			if (entity->worldTooltipActive() == 0 && entity->worldTooltipFadeDelay() == 0) {
 				return;
 			}
 		} else {
@@ -1827,7 +1827,7 @@ void glDrawWorldUISprite(view_t* camera, Entity* entity, int mode)
 	{
 		Entity* parent = uidToEntity(entity->parent);
 		if (parent && parent->behavior == &actItem && (multiplayer != CLIENT
-            || (multiplayer == CLIENT && (parent->itemReceivedDetailsFromServer != 0 || parent->skill[10] != 0))))
+            || (multiplayer == CLIENT && (parent->itemReceivedDetailsFromServer() != 0 || parent->skill[10] != 0))))
 		{
 			Item* item = newItemFromEntity(uidToEntity(entity->parent), true);
 			if (!item) {
@@ -1899,7 +1899,7 @@ void glDrawWorldUISprite(view_t* camera, Entity* entity, int mode)
         // standard levels
         std::max(*MainMenu::cvar_hdrEnabled ? *cvar_ulight_factor_min : 1.f, camera->luminance * *cvar_ulight_factor_mult);
 
-    const GLfloat factor[4] = { 1.f, 1.f, 1.f, (float)entity->worldTooltipAlpha };
+    const GLfloat factor[4] = { 1.f, 1.f, 1.f, (float)entity->worldTooltipAlpha() };
     GL_CHECK_ERR(glUniform4fv(shader.uniform("uLightFactor"), 1, factor));
     const GLfloat light[4] = { b, b, b, 1.f };
     GL_CHECK_ERR(glUniform4fv(shader.uniform("uLightColor"), 1, light));
@@ -1945,14 +1945,14 @@ void glDrawSprite(view_t* camera, Entity* entity, int mode)
     bool transparentDisableDepthBuffer = false;
 #ifndef EDITOR
     if ( entity->behavior == &actMagicRangefinder || 
-        (entity->behavior == &actSprite && entity->actSpriteUseCustomSurface > 0 && (entity->entityHasString("aoe_indicator"))) )
+        (entity->behavior == &actSprite && entity->actSpriteUseCustomSurface() > 0 && (entity->entityHasString("aoe_indicator"))) )
     {
-        sprite = AOEIndicators_t::getSurface(entity->actSpriteUseCustomSurface);
+        sprite = AOEIndicators_t::getSurface(entity->actSpriteUseCustomSurface());
         if ( !sprite )
         {
             return;
         }
-        if ( auto tex = AOEIndicators_t::getTexture(entity->actSpriteUseCustomSurface) )
+        if ( auto tex = AOEIndicators_t::getTexture(entity->actSpriteUseCustomSurface()) )
         {
             GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, tex->texid));
             transparentDisableDepthBuffer = true;
@@ -2015,7 +2015,7 @@ void glDrawSprite(view_t* camera, Entity* entity, int mode)
     v = vec4(entity->x * 2.f, -entity->z * 2.f - 1, entity->y * 2.f, 0.f);
     (void)translate_mat(&m, &t, &v); t = m;
 
-    if ( (entity->actSpriteNoBillboard != 0 && entity->behavior == &actSprite) || entity->behavior == &actMagicRangefinder )
+    if ( (entity->actSpriteNoBillboard() != 0 && entity->behavior == &actSprite) || entity->behavior == &actMagicRangefinder )
     {
         // dont draw billboard
         const float rotx = entity->roll * 180.0 / PI; // roll
@@ -2053,7 +2053,7 @@ void glDrawSprite(view_t* camera, Entity* entity, int mode)
 #endif
         const GLfloat factor[4] = { 1.f, 1.f, 1.f, 1.f };
         GL_CHECK_ERR(glUniform4fv(shader.uniform("uLightFactor"), 1, factor));
-        if ( entity->actSpriteUseAlpha != 0 && entity->behavior == &actSprite )
+        if ( entity->actSpriteUseAlpha() != 0 && entity->behavior == &actSprite )
         {
             // use alpha
             const GLfloat light[4] = { b, b, b, (float)entity->fskill[1]};

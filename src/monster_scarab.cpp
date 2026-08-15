@@ -353,7 +353,7 @@ void scarabAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterState == 1 )
+				else if ( my->monsterState() == 1 )
 				{
 					if ( entity->pitch < 0.5 )
 					{
@@ -373,7 +373,7 @@ void scarabAnimate(Entity* my, Stat* myStats, double dist)
 						entity->roll = -0.2;
 					}
 				}
-				else if ( my->monsterState == 0 )
+				else if ( my->monsterState() == 0 )
 				{
 					if ( entity->pitch > 0 )
 					{
@@ -462,7 +462,7 @@ void scarabAnimate(Entity* my, Stat* myStats, double dist)
 						}
 					}
 				}
-				else if ( my->monsterState == 1 )
+				else if ( my->monsterState() == 1 )
 				{
 					if ( entity->pitch < 0.5 )
 					{
@@ -482,7 +482,7 @@ void scarabAnimate(Entity* my, Stat* myStats, double dist)
 						entity->roll = 0.2;
 					}
 				}
-				else if ( my->monsterState == 0 )
+				else if ( my->monsterState() == 0 )
 				{
 					if ( entity->pitch > 0 )
 					{

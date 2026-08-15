@@ -7664,7 +7664,7 @@ bind_failed:
             assert(character_title);
             snprintf(buf, sizeof(buf), Language::get(5298),
                 score->stats->LVL,
-                Language::get(getLangEntryForPlayerRaceName(score->stats->playerRace)),
+                Language::get(getLangEntryForPlayerRaceName(score->stats->playerRace())),
                 playerClassLangEntry(score->classnum, 0));
             character_title->setText(buf);
 
@@ -9139,7 +9139,7 @@ bind_failed:
 					{
 						LastCreatedCharacterSettings.characterAppearance[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = stats[clientnum]->stat_appearance;
 						LastCreatedCharacterSettings.characterSex[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = stats[clientnum]->sex;
-						LastCreatedCharacterSettings.characterRace[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = stats[clientnum]->playerRace;
+						LastCreatedCharacterSettings.characterRace[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = stats[clientnum]->playerRace();
 						LastCreatedCharacterSettings.characterClass[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = client_classes[clientnum];
 						LastCreatedCharacterSettings.characterName[LastCreatedCharacter::LASTCHAR_LAN_PERSONA_INDEX] = stats[clientnum]->name;
 					}
@@ -9147,7 +9147,7 @@ bind_failed:
 					{
 						LastCreatedCharacterSettings.characterAppearance[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = stats[clientnum]->stat_appearance;
 						LastCreatedCharacterSettings.characterSex[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = stats[clientnum]->sex;
-						LastCreatedCharacterSettings.characterRace[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = stats[clientnum]->playerRace;
+						LastCreatedCharacterSettings.characterRace[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = stats[clientnum]->playerRace();
 						LastCreatedCharacterSettings.characterClass[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = client_classes[clientnum];
 						LastCreatedCharacterSettings.characterName[LastCreatedCharacter::LASTCHAR_ONLINE_PERSONA_INDEX] = stats[clientnum]->name;
 					}
@@ -9157,7 +9157,7 @@ bind_failed:
 			{
 				LastCreatedCharacterSettings.characterAppearance[index] = stats[index]->stat_appearance;
 				LastCreatedCharacterSettings.characterSex[index] = stats[index]->sex;
-				LastCreatedCharacterSettings.characterRace[index] = stats[index]->playerRace;
+				LastCreatedCharacterSettings.characterRace[index] = stats[index]->playerRace();
 				LastCreatedCharacterSettings.characterClass[index] = client_classes[index];
 				LastCreatedCharacterSettings.characterName[index] = stats[index]->name;
 			}
@@ -9184,7 +9184,7 @@ bind_failed:
             SDLNet_Write32((Uint32)stats[player]->sex, &net_packet->data[41]);
             Uint32 raceAndAppearance =
                 ((stats[player]->stat_appearance & 0xff) << 8) |
-                (stats[player]->playerRace & 0xff);
+                (stats[player]->playerRace() & 0xff);
             SDLNet_Write32(raceAndAppearance, &net_packet->data[45]);
 
             // send packet
@@ -9511,7 +9511,7 @@ bind_failed:
 	        stats[player]->sex = static_cast<sex_t>((int)SDLNet_Read32(&net_packet->data[41]));
 	        Uint32 raceAndAppearance = SDLNet_Read32(&net_packet->data[45]);
 	        stats[player]->stat_appearance = (raceAndAppearance & 0xFF00) >> 8;
-	        stats[player]->playerRace = (raceAndAppearance & 0xFF);
+	        stats[player]->playerRace() = (raceAndAppearance & 0xFF);
 
 			if (!loadingsavegame) {
 				initClass(player);
@@ -9781,7 +9781,7 @@ bind_failed:
 		    client_classes[player] = net_packet->data[5];
 		    stats[player]->sex = static_cast<sex_t>(net_packet->data[6]);
 		    stats[player]->stat_appearance = net_packet->data[7];
-		    stats[player]->playerRace = net_packet->data[8];
+		    stats[player]->playerRace() = net_packet->data[8];
 		    stringCopy(stats[player]->name, (char*)(&net_packet->data[9]), sizeof(Stat::name), 32);
 
 		    /*char buf[1024];
@@ -9821,7 +9821,7 @@ bind_failed:
                 stats[player]->sex = static_cast<sex_t>((int)SDLNet_Read32(&net_packet->data[41]));
                 Uint32 raceAndAppearance = SDLNet_Read32(&net_packet->data[45]);
                 stats[player]->stat_appearance = (raceAndAppearance & 0xFF00) >> 8;
-                stats[player]->playerRace = (raceAndAppearance & 0xFF);
+                stats[player]->playerRace() = (raceAndAppearance & 0xFF);
 				if (!loadingsavegame) {
 					initClass(player);
 				}
@@ -9946,16 +9946,16 @@ bind_failed:
 					if ( gameModeManager.currentSession.challengeRun.race >= 0
 						&& gameModeManager.currentSession.challengeRun.race <= RACE_INSECTOID )
 					{
-						stats[clientnum]->playerRace = gameModeManager.currentSession.challengeRun.race;
-						if ( stats[clientnum]->playerRace != RACE_HUMAN )
+						stats[clientnum]->playerRace() = gameModeManager.currentSession.challengeRun.race;
+						if ( stats[clientnum]->playerRace() != RACE_HUMAN )
 						{
 							stats[clientnum]->stat_appearance = 0;
 						}
-						if ( stats[clientnum]->playerRace == RACE_INCUBUS )
+						if ( stats[clientnum]->playerRace() == RACE_INCUBUS )
 						{
 							stats[clientnum]->sex = sex_t::MALE;
 						}
-						else if ( stats[clientnum]->playerRace == RACE_SUCCUBUS )
+						else if ( stats[clientnum]->playerRace() == RACE_SUCCUBUS )
 						{
 							stats[clientnum]->sex = sex_t::FEMALE;
 						}
@@ -10071,7 +10071,7 @@ bind_failed:
 						client_classes[c] = net_packet->data[8 + c * chunk_size + 2]; // class
 						stats[c]->sex = static_cast<sex_t>(net_packet->data[8 + c * chunk_size + 3]); // sex
 						stats[c]->stat_appearance = net_packet->data[8 + c * chunk_size + 4]; // appearance
-						stats[c]->playerRace = net_packet->data[8 + c * chunk_size + 5]; // player race
+						stats[c]->playerRace() = net_packet->data[8 + c * chunk_size + 5]; // player race
 						stringCopy(stats[c]->name, (char*)(net_packet->data + 8 + c * chunk_size + 6), sizeof(Stat::name), 32); // name
 
 						if (loadingsavegame) {
@@ -10213,7 +10213,7 @@ bind_failed:
 	    SDLNet_Write32((Uint32)client_classes[index], &net_packet->data[36]);
 	    SDLNet_Write32((Uint32)stats[index]->sex, &net_packet->data[40]);
 	    Uint32 appearanceAndRace = ((Uint8)stats[index]->stat_appearance << 8); // store in bits 8 - 15
-	    appearanceAndRace |= (Uint8)stats[index]->playerRace; // store in bits 0 - 7
+	    appearanceAndRace |= (Uint8)stats[index]->playerRace(); // store in bits 0 - 7
 	    SDLNet_Write32(appearanceAndRace, &net_packet->data[44]);
 	    stringCopy((char*)net_packet->data + 48, VERSION, 8, sizeof(VERSION));
 	    net_packet->data[56] = index;
@@ -10886,9 +10886,9 @@ failed:
 	void RaceDescriptions::update_details_text(Frame& card, void* stats) 
 	{
 		Monster race = HUMAN;
-		if ( static_cast<Stat*>(stats)->stat_appearance == 0 && static_cast<Stat*>(stats)->playerRace != RACE_HUMAN )
+		if ( static_cast<Stat*>(stats)->stat_appearance == 0 && static_cast<Stat*>(stats)->playerRace() != RACE_HUMAN )
 		{
-			race = getMonsterFromPlayerRace(static_cast<Stat*>(stats)->playerRace);
+			race = getMonsterFromPlayerRace(static_cast<Stat*>(stats)->playerRace());
 		}
 		Monster modifiedRace = static_cast<Stat*>(stats)->type;
 		if ( ::arachnophobia_filter )
@@ -11002,7 +11002,7 @@ failed:
 
 	void RaceDescriptions::update_details_text(Frame& card) {
 		const int index = card.getOwner();
-		const int race = stats[index]->playerRace;
+		const int race = stats[index]->playerRace();
 
 	    // color title
 	    Uint32 color_race;
@@ -11194,7 +11194,7 @@ failed:
 
 	static void race_button_fn(Button& button, bool override_dlc) {
         const int index = button.getOwner();
-        const bool wasHuman = stats[index]->playerRace == RACE_HUMAN;
+        const bool wasHuman = stats[index]->playerRace() == RACE_HUMAN;
 		auto frame = static_cast<Frame*>(button.getParent()); assert(frame);
         bool success = false;
 		bool fixedRace = gameModeManager.currentSession.challengeRun.isActive()
@@ -11241,13 +11241,13 @@ failed:
 					{
 						pickedRace += 4;
 					}
-                    if (stats[index]->playerRace != pickedRace ) {
-                        stats[index]->playerRace = pickedRace;
+                    if (stats[index]->playerRace() != pickedRace ) {
+                        stats[index]->playerRace() = pickedRace;
                         if (!inputs.hasController(index)) {
                             soundToggle();
                         }
                     }
-					if (stats[index]->playerRace == RACE_SUCCUBUS) {
+					if (stats[index]->playerRace() == RACE_SUCCUBUS) {
                         if (wasHuman) {
                             stats[index]->stat_appearance = 0;
                         }
@@ -11263,7 +11263,7 @@ failed:
 						male->setColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 						male->setHighlightColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 					}
-					else if (stats[index]->playerRace == RACE_INCUBUS) {
+					else if (stats[index]->playerRace() == RACE_INCUBUS) {
                         if (wasHuman) {
                             stats[index]->stat_appearance = 0;
                         }
@@ -11279,7 +11279,7 @@ failed:
 						male->setColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 						male->setHighlightColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 					}
-					else if (stats[index]->playerRace == RACE_HUMAN) {
+					else if (stats[index]->playerRace() == RACE_HUMAN) {
                         auto appearances = frame->findFrame("appearances"); assert(appearances);
                         stats[index]->stat_appearance = std::max(0, appearances->getSelection());
                         if (appearances) {
@@ -11360,14 +11360,14 @@ failed:
 			female->setColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 			female->setHighlightColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		}
-		if (stats[index]->playerRace == RACE_SUCCUBUS) {
+		if (stats[index]->playerRace() == RACE_SUCCUBUS) {
 		    auto subframe = card->findFrame("subframe");
 		    auto succubus = subframe ? subframe->findButton("Succubus") : nullptr;
 			if (succubus) {
 				succubus->setPressed(false);
 			}
 			if (enabledDLCPack2) {
-			    stats[index]->playerRace = RACE_INCUBUS;
+			    stats[index]->playerRace() = RACE_INCUBUS;
 			    auto race = card->findButton("race");
 			    if (race) {
 				    race->setText(Language::get(5375));
@@ -11386,7 +11386,7 @@ failed:
 				    }
 			    }
 		    } else {
-			    stats[index]->playerRace = RACE_HUMAN;
+			    stats[index]->playerRace() = RACE_HUMAN;
 			    auto race = card->findButton("race");
 			    if (race) {
 				    race->setText(Language::get(5369)); // Human
@@ -11416,14 +11416,14 @@ failed:
 			male->setColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 			male->setHighlightColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		}
-		if (stats[index]->playerRace == RACE_INCUBUS) {
+		if (stats[index]->playerRace() == RACE_INCUBUS) {
 		    auto subframe = card->findFrame("subframe");
 			auto incubus = subframe ? subframe->findButton(Language::get(5375)) : nullptr;
 			if (incubus) {
 				incubus->setPressed(false);
 			}
 			if (enabledDLCPack1) {
-				stats[index]->playerRace = RACE_SUCCUBUS;
+				stats[index]->playerRace() = RACE_SUCCUBUS;
 				auto race = card->findButton("race");
 				if (race) {
 					race->setText(Language::get(5372));
@@ -11442,7 +11442,7 @@ failed:
 					}
 				}
 			} else {
-				stats[index]->playerRace = RACE_HUMAN;
+				stats[index]->playerRace() = RACE_HUMAN;
 				auto race = card->findButton("race");
 				if (race) {
 					race->setText(Language::get(5369));
@@ -12929,7 +12929,7 @@ failed:
             if (inputs.hasController(index)) {
                 client_classes[index] = old_classes[index];
                 stats[index]->stat_appearance = old_appearances[index];
-                stats[index]->playerRace = old_races[index];
+                stats[index]->playerRace() = old_races[index];
                 stats[index]->sex = old_sexes[index];
                 stats[index]->clearStats();
                 initClass(index);
@@ -13026,7 +13026,7 @@ failed:
 	    slider->setHideSelectors(true);
 
 		auto hover_image = subframe->addImage(
-			SDL_Rect{0, 4 + 36 * stats[index]->playerRace, 234, 30},
+			SDL_Rect{0, 4 + 36 * stats[index]->playerRace(), 234, 30},
 			0xffffffff,
 			"*#images/ui/Main Menus/Play/PlayerCreation/RaceSelection/sublist_item-hover.png",
 		    "hover");
@@ -13118,10 +13118,10 @@ failed:
 			{
 				pickedRace += 4;
 			}
-		    if (stats[index]->playerRace == pickedRace ) {
+		    if (stats[index]->playerRace() == pickedRace ) {
 			    race->setPressed(true);
 		    }
-		    if ((stats[index]->playerRace == pickedRace && selection == -1) ||
+		    if ((stats[index]->playerRace() == pickedRace && selection == -1) ||
 		        (selection >= 0 && selection == c)) {
 			    race->select();
 			    race->scrollParent();
@@ -13363,7 +13363,7 @@ failed:
 	    appearance_downarrow->addWidgetAction("MenuAlt2", "show_race_info");
 
 		static auto appearance_fn = [](Frame::entry_t& entry, int index){
-			if (stats[index]->playerRace != RACE_HUMAN) {
+			if (stats[index]->playerRace() != RACE_HUMAN) {
 				return;
 			}
 			stats[index]->stat_appearance = std::stoi(entry.name);
@@ -13383,7 +13383,7 @@ failed:
                 }
             };
 			//entry->selected = entry->click;
-			if (stats[index]->stat_appearance == c && stats[index]->playerRace == RACE_HUMAN) {
+			if (stats[index]->stat_appearance == c && stats[index]->playerRace() == RACE_HUMAN) {
 				appearances->setSelection(c);
 				appearances->scrollToSelection();
 			}
@@ -13415,7 +13415,7 @@ failed:
 				button->setDisabled(true);
 				button->setPressed(false);
 			}
-			else if (stats[player]->playerRace == RACE_HUMAN) {
+			else if (stats[player]->playerRace() == RACE_HUMAN) {
 				field->setTextColor(makeColor(127, 96, 81, 255));
 				button->setDisabled(true);
 				button->setPressed(false);
@@ -13441,7 +13441,7 @@ failed:
 		disable_abilities->setWidgetBack("back_button");
 		disable_abilities->setWidgetDown("show_race_info");
 		disable_abilities->setWidgetUp(Language::get(getLangEntryForMainMenuRaceName(num_races - 1)));
-		if (stats[index]->playerRace != RACE_HUMAN) {
+		if (stats[index]->playerRace() != RACE_HUMAN) {
 			disable_abilities->setPressed(stats[index]->stat_appearance != 0);
 		}
 		static auto disable_abilities_fn = [](Button& button, int index){
@@ -13454,7 +13454,7 @@ failed:
 				return;
 			}
 
-			if (stats[index]->playerRace == RACE_HUMAN) {
+			if (stats[index]->playerRace() == RACE_HUMAN) {
 				soundError();
 			} else {
 				stats[index]->stat_appearance = button.isPressed() ? 1 : 0;
@@ -13484,20 +13484,20 @@ failed:
 		male_button->setColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		male_button->setHighlightColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		male_button->setStyle(Button::style_t::STYLE_RADIO);
-		if (stats[index]->playerRace == RACE_AUTOMATON) {
+		if (stats[index]->playerRace() == RACE_AUTOMATON) {
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAuto_00.png");
 			male_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoHigh_00.png");
 			male_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_MYCONID )
+		else if ( stats[index]->playerRace() == RACE_MYCONID )
 		{
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
 			male_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortHigh_00.png");
 			male_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_DRYAD )
+		else if ( stats[index]->playerRace() == RACE_DRYAD )
 		{
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
@@ -13523,7 +13523,7 @@ failed:
 		male_button->setCallback([](Button& button){
 			if ( gameModeManager.currentSession.challengeRun.isActive()
 				&& gameModeManager.currentSession.challengeRun.race == RACE_SUCCUBUS
-				&& stats[button.getOwner()]->playerRace == RACE_SUCCUBUS)
+				&& stats[button.getOwner()]->playerRace() == RACE_SUCCUBUS)
 			{
 				//soundError();
 				button.setPressed(false);
@@ -13539,21 +13539,21 @@ failed:
 		male_button->setTickCallback([](Widget& widget){
 			const int index = widget.getOwner();
 			auto button = static_cast<Button*>(&widget); assert(button);
-			if (stats[index]->playerRace == RACE_AUTOMATON) 
+			if (stats[index]->playerRace() == RACE_AUTOMATON) 
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAuto_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_MYCONID )
+			else if ( stats[index]->playerRace() == RACE_MYCONID )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_DRYAD )
+			else if ( stats[index]->playerRace() == RACE_DRYAD )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
@@ -13574,20 +13574,20 @@ failed:
 		female_button->setColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		female_button->setHighlightColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		female_button->setStyle(Button::style_t::STYLE_RADIO);
-		if ( stats[index]->playerRace == RACE_AUTOMATON ) {
+		if ( stats[index]->playerRace() == RACE_AUTOMATON ) {
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAuto_00.png");
 			female_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoHigh_00.png");
 			female_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_MYCONID )
+		else if ( stats[index]->playerRace() == RACE_MYCONID )
 		{
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
 			female_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallHigh_00.png");
 			female_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_DRYAD )
+		else if ( stats[index]->playerRace() == RACE_DRYAD )
 		{
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
@@ -13614,7 +13614,7 @@ failed:
 		female_button->setCallback([](Button& button){
 			if ( gameModeManager.currentSession.challengeRun.isActive()
 				&& gameModeManager.currentSession.challengeRun.race == RACE_INCUBUS
-				&& stats[button.getOwner()]->playerRace == RACE_INCUBUS )
+				&& stats[button.getOwner()]->playerRace() == RACE_INCUBUS )
 			{
 				//soundError();
 				button.setPressed(false);
@@ -13630,20 +13630,20 @@ failed:
 		female_button->setTickCallback([](Widget& widget){
 			const int index = widget.getOwner();
 			auto button = static_cast<Button*>(&widget); assert(button);
-			if (stats[index]->playerRace == RACE_AUTOMATON) {
+			if (stats[index]->playerRace() == RACE_AUTOMATON) {
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAuto_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoPress_00.png");
 			} 
-			else if ( stats[index]->playerRace == RACE_MYCONID )
+			else if ( stats[index]->playerRace() == RACE_MYCONID )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_DRYAD )
+			else if ( stats[index]->playerRace() == RACE_DRYAD )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
@@ -14456,7 +14456,7 @@ failed:
         
         // make SURE this player is valid when the character card opens
         if (isCharacterValidFromDLC(*stats[index], client_classes[index]) != VALID_OK_CHARACTER) {
-            stats[index]->playerRace = RACE_HUMAN;
+            stats[index]->playerRace() = RACE_HUMAN;
             stats[index]->sex = static_cast<sex_t>(RNG.getU8() % 2);
             stats[index]->stat_appearance = RNG.uniform(0, NUMAPPEARANCES - 1);
             client_classes[index] = 0;
@@ -14473,16 +14473,16 @@ failed:
 				if ( gameModeManager.currentSession.challengeRun.race >= 0
 					&& gameModeManager.currentSession.challengeRun.race <= RACE_INSECTOID )
 				{
-					stats[index]->playerRace = gameModeManager.currentSession.challengeRun.race;
-					if ( stats[index]->playerRace != RACE_HUMAN )
+					stats[index]->playerRace() = gameModeManager.currentSession.challengeRun.race;
+					if ( stats[index]->playerRace() != RACE_HUMAN )
 					{
 						stats[index]->stat_appearance = 0;
 					}
-					if ( stats[index]->playerRace == RACE_INCUBUS )
+					if ( stats[index]->playerRace() == RACE_INCUBUS )
 					{
 						stats[index]->sex = sex_t::MALE;
 					}
-					else if ( stats[index]->playerRace == RACE_SUCCUBUS )
+					else if ( stats[index]->playerRace() == RACE_SUCCUBUS )
 					{
 						stats[index]->sex = sex_t::FEMALE;
 					}
@@ -14646,20 +14646,20 @@ failed:
 		male_button->setColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		male_button->setHighlightColor(stats[index]->sex == MALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		male_button->setStyle(Button::style_t::STYLE_RADIO);
-		if (stats[index]->playerRace == RACE_AUTOMATON) {
+		if (stats[index]->playerRace() == RACE_AUTOMATON) {
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAuto_00.png");
 			male_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoHigh_00.png");
 			male_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoPress_00.png");
 		} 
-		else if ( stats[index]->playerRace == RACE_MYCONID )
+		else if ( stats[index]->playerRace() == RACE_MYCONID )
 		{
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
 			male_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortHigh_00.png");
 			male_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_DRYAD )
+		else if ( stats[index]->playerRace() == RACE_DRYAD )
 		{
 			male_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 			male_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
@@ -14685,7 +14685,7 @@ failed:
 		male_button->setCallback([](Button& button){
 			if ( gameModeManager.currentSession.challengeRun.isActive()
 				&& gameModeManager.currentSession.challengeRun.race == RACE_SUCCUBUS
-				&& stats[button.getOwner()]->playerRace == RACE_SUCCUBUS )
+				&& stats[button.getOwner()]->playerRace() == RACE_SUCCUBUS )
 			{
 				//soundError();
 				button.setPressed(false);
@@ -14697,20 +14697,20 @@ failed:
 		male_button->setTickCallback([](Widget& widget){
 			const int index = widget.getOwner();
 			auto button = static_cast<Button*>(&widget); assert(button);
-			if (stats[index]->playerRace == RACE_AUTOMATON) {
+			if (stats[index]->playerRace() == RACE_AUTOMATON) {
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAuto_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonMAutoPress_00.png");
 			} 
-			else if ( stats[index]->playerRace == RACE_MYCONID )
+			else if ( stats[index]->playerRace() == RACE_MYCONID )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_DRYAD )
+			else if ( stats[index]->playerRace() == RACE_DRYAD )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
@@ -14731,20 +14731,20 @@ failed:
 		female_button->setColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		female_button->setHighlightColor(stats[index]->sex == FEMALE ? makeColorRGB(255, 255, 255) : makeColorRGB(127, 127, 127));
 		female_button->setStyle(Button::style_t::STYLE_RADIO);
-		if (stats[index]->playerRace == RACE_AUTOMATON) {
+		if (stats[index]->playerRace() == RACE_AUTOMATON) {
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAuto_00.png");
 			female_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoHigh_00.png");
 			female_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoPress_00.png");
 		} 
-		else if ( stats[index]->playerRace == RACE_MYCONID )
+		else if ( stats[index]->playerRace() == RACE_MYCONID )
 		{
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
 			female_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallHigh_00.png");
 			female_button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallPress_00.png");
 		}
-		else if ( stats[index]->playerRace == RACE_DRYAD )
+		else if ( stats[index]->playerRace() == RACE_DRYAD )
 		{
 			female_button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 			female_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
@@ -14771,7 +14771,7 @@ failed:
 		female_button->setCallback([](Button& button){
 			if ( gameModeManager.currentSession.challengeRun.isActive()
 				&& gameModeManager.currentSession.challengeRun.race == RACE_INCUBUS
-				&& stats[button.getOwner()]->playerRace == RACE_INCUBUS )
+				&& stats[button.getOwner()]->playerRace() == RACE_INCUBUS )
 			{
 				//soundError();
 				button.setPressed(false);
@@ -14783,20 +14783,20 @@ failed:
 		female_button->setTickCallback([](Widget& widget){
 			const int index = widget.getOwner();
 			auto button = static_cast<Button*>(&widget); assert(button);
-			if (stats[index]->playerRace == RACE_AUTOMATON) {
+			if (stats[index]->playerRace() == RACE_AUTOMATON) {
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAuto_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonFAutoPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_MYCONID )
+			else if ( stats[index]->playerRace() == RACE_MYCONID )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTall_00.png");
 				button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallHigh_00.png");
 				button->setBackgroundActivated("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteTallPress_00.png");
 			}
-			else if ( stats[index]->playerRace == RACE_DRYAD )
+			else if ( stats[index]->playerRace() == RACE_DRYAD )
 			{
 				button->setIcon("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShortOn_00.png");
 				button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/RaceSelection/UI_RaceSelection_ButtonDendriteShort_00.png");
@@ -14816,7 +14816,7 @@ failed:
 		race_button->setColor(makeColor(255, 255, 255, 255));
 		race_button->setHighlightColor(makeColor(255, 255, 255, 255));
 		race_button->setSize(SDL_Rect{166, 166, 108, 52});
-		race_button->setText(Language::get(getLangEntryForPlayerRaceName(stats[index]->playerRace)));
+		race_button->setText(Language::get(getLangEntryForPlayerRaceName(stats[index]->playerRace())));
 		race_button->setFont(smallfont_outline);
 		race_button->setBackground("*images/ui/Main Menus/Play/PlayerCreation/Finalize_Button_RaceBase_00.png");
 		race_button->setBackgroundHighlighted("*images/ui/Main Menus/Play/PlayerCreation/Finalize_Button_RaceBaseHigh_00.png");
@@ -14834,7 +14834,7 @@ failed:
             const int index = button.getOwner();
             old_classes[index] = client_classes[index];
             old_appearances[index] = stats[index]->stat_appearance;
-            old_races[index] = stats[index]->playerRace;
+            old_races[index] = stats[index]->playerRace();
             old_sexes[index] = stats[index]->sex;
             characterCardRaceMenu(button.getOwner(), false, -1);
             });
@@ -14866,7 +14866,7 @@ failed:
 				{
 					std::vector<unsigned int> chances;
 					chances.resize(NUMRACES);
-					auto oldRace = stats[index]->playerRace;
+					auto oldRace = stats[index]->playerRace();
 					Uint32 oldAppearance = stats[index]->stat_appearance;
 					stats[index]->stat_appearance = 0;
 
@@ -14878,7 +14878,7 @@ failed:
 							chances[race] = 0;
 							continue;
 						}
-						stats[index]->playerRace = race;
+						stats[index]->playerRace() = race;
 						chances[race] = 0;
 						if ( isCharacterValidFromDLC(*stats[index], index) == VALID_OK_CHARACTER )
 						{
@@ -14889,11 +14889,11 @@ failed:
 					stats[index]->stat_appearance = oldAppearance;
 					if ( !chanceFound )
 					{
-						stats[index]->playerRace = RACE_HUMAN;
+						stats[index]->playerRace() = RACE_HUMAN;
 					}
 					else
 					{
-						stats[index]->playerRace = RNG.discrete(chances.data(), chances.size());
+						stats[index]->playerRace() = RNG.discrete(chances.data(), chances.size());
 					}
 				}
 				else
@@ -14925,26 +14925,26 @@ failed:
 						chances[RACE_GNOME] = 1;
 						chances[RACE_SALAMANDER] = 1;
 					}
-					stats[index]->playerRace = RNG.discrete(chances.data(), chances.size());
+					stats[index]->playerRace() = RNG.discrete(chances.data(), chances.size());
 				}
 			}
 
 			auto race_button = card->findButton("race");
-			race_button->setText(Language::get(getLangEntryForPlayerRaceName(stats[index]->playerRace)));
+			race_button->setText(Language::get(getLangEntryForPlayerRaceName(stats[index]->playerRace())));
 
 			// choose a random appearance
 			const int appearance_choice = RNG.uniform(0, NUMAPPEARANCES - 1);
-			if (stats[index]->playerRace == RACE_HUMAN) {
+			if (stats[index]->playerRace() == RACE_HUMAN) {
 				stats[index]->stat_appearance = appearance_choice;
 			} else {
 				stats[index]->stat_appearance = 0;
 			}
 
 			// select a random sex (unless you're a succubus or an incubus)
-            if (stats[index]->playerRace == RACE_SUCCUBUS) {
+            if (stats[index]->playerRace() == RACE_SUCCUBUS) {
                 stats[index]->sex = sex_t::FEMALE;
             }
-            else if (stats[index]->playerRace == RACE_INCUBUS) {
+            else if (stats[index]->playerRace() == RACE_INCUBUS) {
                 stats[index]->sex = sex_t::MALE;
             }
             else {
@@ -16042,7 +16042,7 @@ failed:
 
 					if ( !replayedLastCharacter )
 					{
-						stats[c]->playerRace = RACE_HUMAN;
+						stats[c]->playerRace() = RACE_HUMAN;
 						stats[c]->sex = static_cast<sex_t>(RNG.getU8() % 2);
 						stats[c]->stat_appearance = RNG.uniform(0, NUMAPPEARANCES - 1);
 						client_classes[c] = 0;
@@ -16060,16 +16060,16 @@ failed:
 						if ( gameModeManager.currentSession.challengeRun.race >= 0
 							&& gameModeManager.currentSession.challengeRun.race <= RACE_INSECTOID )
 						{
-							stats[c]->playerRace = gameModeManager.currentSession.challengeRun.race;
-							if ( stats[c]->playerRace != RACE_HUMAN )
+							stats[c]->playerRace() = gameModeManager.currentSession.challengeRun.race;
+							if ( stats[c]->playerRace() != RACE_HUMAN )
 							{
 								stats[c]->stat_appearance = 0;
 							}
-							if ( stats[c]->playerRace == RACE_INCUBUS )
+							if ( stats[c]->playerRace() == RACE_INCUBUS )
 							{
 								stats[c]->sex = sex_t::MALE;
 							}
-							else if ( stats[c]->playerRace == RACE_SUCCUBUS )
+							else if ( stats[c]->playerRace() == RACE_SUCCUBUS )
 							{
 								stats[c]->sex = sex_t::FEMALE;
 							}

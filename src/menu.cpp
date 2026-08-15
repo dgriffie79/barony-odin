@@ -391,12 +391,12 @@ int isCharacterValidFromDLC(int player, int characterClass, int race, int appear
 		return INVALID_CHARACTER;
 	}
 	auto oldAppearance = stats[player]->stat_appearance;
-	auto oldRace = stats[player]->playerRace;
+	auto oldRace = stats[player]->playerRace();
 	stats[player]->stat_appearance = appearance;
-	stats[player]->playerRace = race;
+	stats[player]->playerRace() = race;
 	auto result = isCharacterValidFromDLC(*stats[player], characterClass);
 	stats[player]->stat_appearance = oldAppearance;
-	stats[player]->playerRace = oldRace;
+	stats[player]->playerRace() = oldRace;
 	return result;
 }
 
@@ -414,14 +414,14 @@ int isCharacterValidFromDLC(Stat& myStats, int characterClass)
 		if ( gameModeManager.currentSession.challengeRun.race >= 0
 			&& gameModeManager.currentSession.challengeRun.race <= RACE_INSECTOID )
 		{
-			challengeRace = (myStats.playerRace == gameModeManager.currentSession.challengeRun.race);
+			challengeRace = (myStats.playerRace() == gameModeManager.currentSession.challengeRun.race);
 		}
 	}
 
-	if ( myStats.playerRace == RACE_RAT 
-		|| myStats.playerRace == RACE_TROLL
-		|| myStats.playerRace == RACE_IMP
-		|| myStats.playerRace == RACE_SPIDER )
+	if ( myStats.playerRace() == RACE_RAT 
+		|| myStats.playerRace() == RACE_TROLL
+		|| myStats.playerRace() == RACE_IMP
+		|| myStats.playerRace() == RACE_SPIDER )
 	{
 		if ( !enabledDLCPack2 )
 		{
@@ -472,7 +472,7 @@ int isCharacterValidFromDLC(Stat& myStats, int characterClass)
 			break;
 	}
 
-	switch ( myStats.playerRace )
+	switch ( myStats.playerRace() )
 	{
 		case RACE_SKELETON:
 		case RACE_VAMPIRE:
@@ -515,11 +515,11 @@ int isCharacterValidFromDLC(Stat& myStats, int characterClass)
 			break;
 	}
 
-	if ( myStats.playerRace == RACE_HUMAN )
+	if ( myStats.playerRace() == RACE_HUMAN )
 	{
 		return VALID_OK_CHARACTER;
 	}
-	else if ( myStats.playerRace > RACE_HUMAN && myStats.stat_appearance == 1 )
+	else if ( myStats.playerRace() > RACE_HUMAN && myStats.stat_appearance == 1 )
 	{
 		return VALID_OK_CHARACTER; // aesthetic only option.
 	}
@@ -531,91 +531,91 @@ int isCharacterValidFromDLC(Stat& myStats, int characterClass)
 	switch ( characterClass )
 	{
 		case CLASS_CONJURER:
-			if ( myStats.playerRace == RACE_SKELETON )
+			if ( myStats.playerRace() == RACE_SKELETON )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_SKELETON) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_ACCURSED:
-			if ( myStats.playerRace == RACE_VAMPIRE )
+			if ( myStats.playerRace() == RACE_VAMPIRE )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_VAMPIRE) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_MESMER:
-			if ( myStats.playerRace == RACE_SUCCUBUS )
+			if ( myStats.playerRace() == RACE_SUCCUBUS )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_SUCCUBUS) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_BREWER:
-			if ( myStats.playerRace == RACE_GOATMAN )
+			if ( myStats.playerRace() == RACE_GOATMAN )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_GOATMAN) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_MACHINIST:
-			if ( myStats.playerRace == RACE_AUTOMATON )
+			if ( myStats.playerRace() == RACE_AUTOMATON )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_AUTOMATON) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_PUNISHER:
-			if ( myStats.playerRace == RACE_INCUBUS )
+			if ( myStats.playerRace() == RACE_INCUBUS )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_INCUBUS) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_SHAMAN:
-			if ( myStats.playerRace == RACE_GOBLIN )
+			if ( myStats.playerRace() == RACE_GOBLIN )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_GOBLIN) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_HUNTER:
-			if ( myStats.playerRace == RACE_INSECTOID )
+			if ( myStats.playerRace() == RACE_INSECTOID )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_INSECTOID) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_BARD:
-			if ( myStats.playerRace == RACE_GNOME )
+			if ( myStats.playerRace() == RACE_GNOME )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_GNOME) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_SAPPER:
-			if ( myStats.playerRace == RACE_GREMLIN )
+			if ( myStats.playerRace() == RACE_GREMLIN )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_GREMLIN) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_SCION:
-			if ( myStats.playerRace == RACE_DRYAD )
+			if ( myStats.playerRace() == RACE_DRYAD )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_DRYAD) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_HERMIT:
-			if ( myStats.playerRace == RACE_MYCONID )
+			if ( myStats.playerRace() == RACE_MYCONID )
 			{
 				return VALID_OK_CHARACTER;
 			}
 			return isAchievementUnlockedForClassUnlock(RACE_MYCONID) ? VALID_OK_CHARACTER : INVALID_REQUIRE_ACHIEVEMENT;
 			break;
 		case CLASS_PALADIN:
-			if ( myStats.playerRace == RACE_SALAMANDER )
+			if ( myStats.playerRace() == RACE_SALAMANDER )
 			{
 				return VALID_OK_CHARACTER;
 			}
@@ -7058,9 +7058,9 @@ void doNewGame(bool makeHighscore) {
 					setSpriteAttributes(portal, nullptr, nullptr);
 					portal->x = 6 * 16;
 					portal->y = 13 * 16;
-					portal->teleporterX = 6;
-					portal->teleporterY = 25;
-					portal->teleporterType = 2;
+					portal->teleporterX() = 6;
+					portal->teleporterY() = 25;
+					portal->teleporterType() = 2;
 				}
 			}
 		}
@@ -7122,21 +7122,21 @@ void doNewGame(bool makeHighscore) {
 			{
 				if ( players[c] && players[c]->entity && !client_disconnected[c] )
 				{
-					if ( stats[c] && stats[c]->getEffectActive(EFF_POLYMORPH) && stats[c]->playerPolymorphStorage != NOTHING )
+					if ( stats[c] && stats[c]->getEffectActive(EFF_POLYMORPH) && stats[c]->playerPolymorphStorage() != NOTHING )
 					{
-						players[c]->entity->effectPolymorph = stats[c]->playerPolymorphStorage;
+						players[c]->entity->effectPolymorph() = stats[c]->playerPolymorphStorage();
 						serverUpdateEntitySkill(players[c]->entity, 50); // update visual polymorph effect for clients.
 						serverUpdateEffects(c);
 					}
-					if ( stats[c] && stats[c]->getEffectActive(EFF_SHAPESHIFT) && stats[c]->playerShapeshiftStorage != NOTHING )
+					if ( stats[c] && stats[c]->getEffectActive(EFF_SHAPESHIFT) && stats[c]->playerShapeshiftStorage() != NOTHING )
 					{
-						players[c]->entity->effectShapeshift = stats[c]->playerShapeshiftStorage;
+						players[c]->entity->effectShapeshift() = stats[c]->playerShapeshiftStorage();
 						serverUpdateEntitySkill(players[c]->entity, 53); // update visual shapeshift effect for clients.
 						serverUpdateEffects(c);
 					}
 					if ( stats[c] && stats[c]->getEffectActive(EFF_VAMPIRICAURA) && stats[c]->EFFECTS_TIMERS[EFF_VAMPIRICAURA] == -2 )
 					{
-						players[c]->entity->playerVampireCurse = 1;
+						players[c]->entity->playerVampireCurse() = 1;
 						serverUpdateEntitySkill(players[c]->entity, 51); // update curse progression
 					}
 				}
@@ -7199,7 +7199,7 @@ void doNewGame(bool makeHighscore) {
 									Stat* monsterStats = (Stat*)newNode->element;
 									monsterStats->leader_uid = players[c]->entity->getUID();
 									monster->flags[USERFLAG2] = true;
-									monster->monsterAllyIndex = c;
+									monster->monsterAllyIndex() = c;
 									if ( multiplayer == SERVER )
 									{
 										serverUpdateEntitySkill(monster, 42); // update monsterAllyIndex for clients.
@@ -7207,19 +7207,19 @@ void doNewGame(bool makeHighscore) {
 
 									if ( multiplayer != CLIENT )
 									{
-										monster->monsterAllyClass = monsterStats->allyClass;
-										monster->monsterAllyPickupItems = monsterStats->allyItemPickup;
-										if ( stats[c]->playerSummonPERCHR != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton knight") )
+										monster->monsterAllyClass() = monsterStats->allyClass();
+										monster->monsterAllyPickupItems() = monsterStats->allyItemPickup();
+										if ( stats[c]->playerSummonPERCHR() != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton knight") )
 										{
-											monster->monsterAllySummonRank = (stats[c]->playerSummonPERCHR & 0x0000FF00) >> 8;
+											monster->monsterAllySummonRank() = (stats[c]->playerSummonPERCHR() & 0x0000FF00) >> 8;
 										}
-										else if ( stats[c]->playerSummon2PERCHR != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton sentinel") )
+										else if ( stats[c]->playerSummon2PERCHR() != 0 && MonsterData_t::nameMatchesSpecialNPCName(*monsterStats, "skeleton sentinel") )
 										{
-											monster->monsterAllySummonRank = (stats[c]->playerSummon2PERCHR & 0x0000FF00) >> 8;
+											monster->monsterAllySummonRank() = (stats[c]->playerSummon2PERCHR() & 0x0000FF00) >> 8;
 										}
 										else if ( monsterStats->getAttribute("SUMMONED_CREATURE") != "" )
 										{
-											monster->monsterAllySummonRank = std::stoi(monsterStats->getAttribute("SUMMONED_CREATURE"));
+											monster->monsterAllySummonRank() = std::stoi(monsterStats->getAttribute("SUMMONED_CREATURE"));
 										}
 										serverUpdateEntitySkill(monster, 46); // update monsterAllyClass
 										serverUpdateEntitySkill(monster, 44); // update monsterAllyPickupItems
@@ -7309,7 +7309,7 @@ void doNewGame(bool makeHighscore) {
 											int appearance = monsterTinkeringConvertHPToAppearance(tempStats);
 											if ( type != WOODEN_SHIELD )
 											{
-												Item* item = newItem(type, static_cast<Status>(tempStats->monsterTinkeringStatus), 
+												Item* item = newItem(type, static_cast<Status>(tempStats->monsterTinkeringStatus()), 
 													0, 1, appearance, true, &gyroStats->inventory);
 											}
 										}
@@ -7440,9 +7440,9 @@ void doNewGame(bool makeHighscore) {
 					setSpriteAttributes(portal, nullptr, nullptr);
 					portal->x = 6 * 16;
 					portal->y = 13 * 16;
-					portal->teleporterX = 6;
-					portal->teleporterY = 25;
-					portal->teleporterType = 2;
+					portal->teleporterX() = 6;
+					portal->teleporterY() = 25;
+					portal->teleporterType() = 2;
 				}
 			}
 		}
@@ -7497,10 +7497,10 @@ void doNewGame(bool makeHighscore) {
 		steamAchievement("BARONY_ACH_SPICE_OF_LIFE");
 	}
 
-	if ( (stats[clientnum]->playerRace >= 0 && stats[clientnum]->playerRace <= RACE_INSECTOID)
-		|| (stats[clientnum]->playerRace > RACE_IMP && stats[clientnum]->playerRace < RACE_ENUM_END) )
+	if ( (stats[clientnum]->playerRace() >= 0 && stats[clientnum]->playerRace() <= RACE_INSECTOID)
+		|| (stats[clientnum]->playerRace() > RACE_IMP && stats[clientnum]->playerRace() < RACE_ENUM_END) )
 	{
-		usedRace[stats[clientnum]->playerRace] = true;
+		usedRace[stats[clientnum]->playerRace()] = true;
 	}
 	// new achievement
 	usedAllClasses = true;
@@ -8074,7 +8074,7 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 
 						if ( stats[i] && stats[i]->stat_appearance == 0 )
 						{
-							switch ( stats[i]->playerRace )
+							switch ( stats[i]->playerRace() )
 							{
 							case RACE_SKELETON:
 								steamAchievement("BARONY_ACH_BONY_BARON");
@@ -8241,7 +8241,7 @@ void doEndgame(bool saveHighscore, bool onServerDisconnect) {
 		stats[c]->stat_appearance = 0;
 		strcpy(stats[c]->name, "");
 		stats[c]->type = HUMAN;
-		stats[c]->playerRace = RACE_HUMAN;
+		stats[c]->playerRace() = RACE_HUMAN;
 		stats[c]->clearStats();
 		if ( c == 0 )
 		{
@@ -9343,7 +9343,7 @@ void buttonOpenCharacterCreationWindow(button_t* my)
 	clientnum = 0;
 	stats[0]->sex = static_cast<sex_t>(0 + local_rng.rand() % 2);
 	stats[0]->stat_appearance = 0 + local_rng.rand() % NUMAPPEARANCES;
-	stats[0]->playerRace = RACE_HUMAN;
+	stats[0]->playerRace() = RACE_HUMAN;
 	strcpy(stats[0]->name, "");
 	stats[0]->type = HUMAN;
 	client_classes[0] = 0;
@@ -9578,7 +9578,7 @@ bool replayLastCharacter(const int index, int multiplayer)
 	if ( lastClass >= 0 && lastSex >= 0 && lastRace >= 0 && lastAppearance >= 0 && lastName != "" )
 	{
 		stats[index]->sex = static_cast<sex_t>(std::min(lastSex, (int)sex_t::FEMALE));
-		stats[index]->playerRace = std::min(std::max(static_cast<int>(RACE_HUMAN), lastRace), static_cast<int>(RACE_ENUM_END - 1));
+		stats[index]->playerRace() = std::min(std::max(static_cast<int>(RACE_HUMAN), lastRace), static_cast<int>(RACE_ENUM_END - 1));
 		stats[index]->stat_appearance = lastAppearance;
 		client_classes[index] = std::min(std::max(0, lastClass), static_cast<int>(NUMCLASSES - 1));
 
@@ -9591,9 +9591,9 @@ bool replayLastCharacter(const int index, int multiplayer)
 			case INVALID_REQUIREDLC2:
 			case INVALID_REQUIREDLC3:
 				// class or race invalid.
-				if ( stats[index]->playerRace > RACE_HUMAN )
+				if ( stats[index]->playerRace() > RACE_HUMAN )
 				{
-					stats[index]->playerRace = RACE_HUMAN;
+					stats[index]->playerRace() = RACE_HUMAN;
 				}
 				if ( client_classes[index] > CLASS_MONK )
 				{
@@ -9602,7 +9602,7 @@ bool replayLastCharacter(const int index, int multiplayer)
 				break;
 			case INVALID_CHARACTER:
 				// invalid for whatever reason, reset.
-				stats[index]->playerRace = RACE_HUMAN;
+				stats[index]->playerRace() = RACE_HUMAN;
 				client_classes[index] = CLASS_BARBARIAN;
 				break;
 			case INVALID_REQUIRE_ACHIEVEMENT:
@@ -9611,7 +9611,7 @@ bool replayLastCharacter(const int index, int multiplayer)
 				break;
 			default:
 				// invalid for whatever reason, reset.
-				stats[index]->playerRace = RACE_HUMAN;
+				stats[index]->playerRace() = RACE_HUMAN;
 				client_classes[index] = CLASS_BARBARIAN;
 				break;
 		}

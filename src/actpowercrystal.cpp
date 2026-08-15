@@ -53,8 +53,8 @@ void actPowerCrystal(Entity* my)
 void Entity::actPowerCrystal()
 {
 	//Entity* entity;
-	real_t upper_z = this->crystalStartZ - 0.4;
-	real_t lower_z = crystalStartZ + 0.4;
+	real_t upper_z = this->crystalStartZ() - 0.4;
+	real_t lower_z = crystalStartZ() + 0.4;
 	int i = 0;
 
 	real_t acceleration = 0.95;
@@ -64,97 +64,97 @@ void Entity::actPowerCrystal()
 		this->createWorldUITooltip();
 	}
 
-	if ( !crystalInitialised && !crystalSpellToActivate )
+	if ( !crystalInitialised() && !crystalSpellToActivate() )
 	{
-		if ( this->z > crystalStartZ )
+		if ( this->z > crystalStartZ() )
 		{
 			this->z -= this->vel_z * (1 / acceleration); // start levitating upwards.
 		}
 		else
 		{
-			this->z = crystalStartZ;
+			this->z = crystalStartZ();
 			this->powerCrystalCreateElectricityNodes();
-			crystalInitialised = 1;
+			crystalInitialised() = 1;
 		}
 	}
 
-	if ( crystalInitialised )
+	if ( crystalInitialised() )
 	{
-		if ( crystalHoverDirection == CRYSTAL_HOVER_UP ) //rise state
+		if ( crystalHoverDirection() == CRYSTAL_HOVER_UP ) //rise state
 		{
 			this->z -= this->vel_z;
 
 			if ( this->z < upper_z )
 			{
 				this->z = upper_z;
-				crystalHoverDirection = CRYSTAL_HOVER_UP_WAIT;
+				crystalHoverDirection() = CRYSTAL_HOVER_UP_WAIT;
 			}
 
-			if ( this->z < crystalStartZ ) //higher than mid point
+			if ( this->z < crystalStartZ() ) //higher than mid point
 			{
-				this->vel_z = std::max(this->vel_z * acceleration, crystalMinZVelocity);
+				this->vel_z = std::max(this->vel_z * acceleration, crystalMinZVelocity());
 			}
-			else if ( this->z > crystalStartZ ) //lower than midpoint
+			else if ( this->z > crystalStartZ() ) //lower than midpoint
 			{
-				this->vel_z = std::min(this->vel_z * (1 / acceleration), crystalMaxZVelocity);
+				this->vel_z = std::min(this->vel_z * (1 / acceleration), crystalMaxZVelocity());
 			}
 		}
-		else if ( crystalHoverDirection == CRYSTAL_HOVER_UP_WAIT ) // wait state
+		else if ( crystalHoverDirection() == CRYSTAL_HOVER_UP_WAIT ) // wait state
 		{
-			crystalHoverWaitTimer++;
-			if ( crystalHoverWaitTimer >= 1 )
+			crystalHoverWaitTimer()++;
+			if ( crystalHoverWaitTimer() >= 1 )
 			{
-				crystalHoverDirection = CRYSTAL_HOVER_DOWN; // advance state
-				crystalHoverWaitTimer = 0; // reset timer
+				crystalHoverDirection() = CRYSTAL_HOVER_DOWN; // advance state
+				crystalHoverWaitTimer() = 0; // reset timer
 			}
 		}
-		else if ( crystalHoverDirection == CRYSTAL_HOVER_DOWN ) //fall state
+		else if ( crystalHoverDirection() == CRYSTAL_HOVER_DOWN ) //fall state
 		{
 			this->z += this->vel_z;
 
 			if ( this->z > lower_z )
 			{
 				this->z = lower_z;
-				crystalHoverDirection = CRYSTAL_HOVER_DOWN_WAIT;
+				crystalHoverDirection() = CRYSTAL_HOVER_DOWN_WAIT;
 			}
 
-			if ( this->z < crystalStartZ ) //higher than mid point, start accelerating
+			if ( this->z < crystalStartZ() ) //higher than mid point, start accelerating
 			{
-				this->vel_z = std::min(this->vel_z * (1 / acceleration), crystalMaxZVelocity);
+				this->vel_z = std::min(this->vel_z * (1 / acceleration), crystalMaxZVelocity());
 			}
-			else if ( this->z > crystalStartZ ) //lower than midpoint, start decelerating
+			else if ( this->z > crystalStartZ() ) //lower than midpoint, start decelerating
 			{
-				this->vel_z = std::max(this->vel_z * acceleration, crystalMinZVelocity);
+				this->vel_z = std::max(this->vel_z * acceleration, crystalMinZVelocity());
 			}
 		}
-		else if ( crystalHoverDirection == CRYSTAL_HOVER_DOWN_WAIT ) // wait state
+		else if ( crystalHoverDirection() == CRYSTAL_HOVER_DOWN_WAIT ) // wait state
 		{
-			crystalHoverWaitTimer++;
-			if ( crystalHoverWaitTimer >= 1 )
+			crystalHoverWaitTimer()++;
+			if ( crystalHoverWaitTimer() >= 1 )
 			{
-				crystalHoverDirection = CRYSTAL_HOVER_UP; // advance state
-				crystalHoverWaitTimer = 0; // reset timer
+				crystalHoverDirection() = CRYSTAL_HOVER_UP; // advance state
+				crystalHoverWaitTimer() = 0; // reset timer
 			}
 		}
 
 
-		if ( this->z <= crystalStartZ + crystalMaxZVelocity && this->z >= crystalStartZ - crystalMaxZVelocity )
+		if ( this->z <= crystalStartZ() + crystalMaxZVelocity() && this->z >= crystalStartZ() - crystalMaxZVelocity() )
 		{
 			this->vel_z = this->fskill[1]; // reset velocity at the mid point of animation
 		}
 
 		spawnAmbientParticles(80, 579, 10 + local_rng.rand() % 40, 1.0, false);
 
-		if ( crystalTurning == 1 )
+		if ( crystalTurning() == 1 )
 		{
-			if ( !crystalTurnReverse )
+			if ( !crystalTurnReverse() )
 			{
-				this->yaw += crystalTurnVelocity; // reverse velocity if turnReverse is 1
+				this->yaw += crystalTurnVelocity(); // reverse velocity if turnReverse is 1
 
-				if ( (this->yaw >= (crystalTurnStartDir * (PI / 2)) + (PI / 2)) )
+				if ( (this->yaw >= (crystalTurnStartDir() * (PI / 2)) + (PI / 2)) )
 				{
-					this->yaw = crystalTurnStartDir * (PI / 2) + (PI / 2);
-					crystalTurning = 0;
+					this->yaw = crystalTurnStartDir() * (PI / 2) + (PI / 2);
+					crystalTurning() = 0;
 
 					if ( this->yaw >= 2 * PI )
 					{
@@ -165,12 +165,12 @@ void Entity::actPowerCrystal()
 			}
 			else
 			{
-				this->yaw -= crystalTurnVelocity;// reverse velocity if turnReverse is 1
+				this->yaw -= crystalTurnVelocity();// reverse velocity if turnReverse is 1
 
-				if ( (this->yaw <= (crystalTurnStartDir * (PI / 2)) - (PI / 2)) )
+				if ( (this->yaw <= (crystalTurnStartDir() * (PI / 2)) - (PI / 2)) )
 				{
-					this->yaw = crystalTurnStartDir * (PI / 2) - (PI / 2);
-					crystalTurning = 0;
+					this->yaw = crystalTurnStartDir() * (PI / 2) - (PI / 2);
+					crystalTurning() = 0;
 
 					if ( this->yaw < 0 )
 					{
@@ -191,20 +191,20 @@ void Entity::actPowerCrystal()
 
 	for ( i = 0; i < MAXPLAYERS; i++ )
 	{
-		if ( (client_selected[i] == this || selectedEntity[i] == this) && crystalTurning == 0 )
+		if ( (client_selected[i] == this || selectedEntity[i] == this) && crystalTurning() == 0 )
 		{
 			if ( inrange[i] )
 			{
-				if ( players[i] && Player::getPlayerInteractEntity(i) && crystalInitialised )
+				if ( players[i] && Player::getPlayerInteractEntity(i) && crystalInitialised() )
 				{
 					playSoundEntity(this, 151, 128);
-					crystalTurning = 1;
-					crystalTurnStartDir = static_cast<Sint32>(this->yaw / (PI / 2));
+					crystalTurning() = 1;
+					crystalTurnStartDir() = static_cast<Sint32>(this->yaw / (PI / 2));
 					serverUpdateEntitySkill(this, 3);
 					serverUpdateEntitySkill(this, 4);
 					messagePlayer(i, MESSAGE_INTERACTION, Language::get(2356));
 				}
-				else if ( !crystalInitialised )
+				else if ( !crystalInitialised() )
 				{
 					messagePlayer(i, MESSAGE_INTERACTION, Language::get(2357));
 				}
@@ -247,7 +247,7 @@ void Entity::powerCrystalCreateElectricityNodes()
 	
 	int i = 0;
 
-	if ( crystalGeneratedElectricityNodes )
+	if ( crystalGeneratedElectricityNodes() )
 	{
 		this->mechanismPowerOff(); // turn off my signal
 		this->updateCircuitNeighbors(); // update the old wires to depower
@@ -272,7 +272,7 @@ void Entity::powerCrystalCreateElectricityNodes()
 		}
 	}
 
-	for ( i = 1; i <= crystalNumElectricityNodes; i++ )
+	for ( i = 1; i <= crystalNumElectricityNodes(); i++ )
 	{
 		entity = newEntity(-1, 0, map.entities, nullptr); // electricity node
 		xtest = this->x + i * 16 * ((this->yaw == 0) - (this->yaw == PI)); // add/subtract x depending on direction.
@@ -293,7 +293,7 @@ void Entity::powerCrystalCreateElectricityNodes()
 		entity->flags[PASSABLE] = true;
 		entity->flags[INVISIBLE] = true;
 		entity->flags[NOUPDATE] = true;
-		entity->circuit_status = CIRCUIT_OFF; //It's a depowered powerable.
+		entity->circuit_status() = CIRCUIT_OFF; //It's a depowered powerable.
 
 		node = list_AddNodeLast(&this->children);
 		node->element = entity; // add the node to the children list.
@@ -302,7 +302,7 @@ void Entity::powerCrystalCreateElectricityNodes()
 
 		TileEntityList.addEntity(*entity); // make sure new nodes are added to the tile list to properly update neighbors.
 
-		this->crystalGeneratedElectricityNodes = 1;
+		this->crystalGeneratedElectricityNodes() = 1;
 	}
 	
 	this->mechanismPowerOn();

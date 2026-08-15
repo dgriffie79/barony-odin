@@ -306,7 +306,7 @@ int initGame()
 			stats[c]->stat_appearance = 0;
 			strcpy(stats[c]->name, "");
 			stats[c]->type = HUMAN;
-			stats[c]->playerRace = RACE_HUMAN;
+			stats[c]->playerRace() = RACE_HUMAN;
 			stats[c]->FOLLOWERS.first = nullptr;
 			stats[c]->FOLLOWERS.last = nullptr;
 			stats[c]->inventory.first = nullptr;

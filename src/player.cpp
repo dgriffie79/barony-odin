@@ -3461,7 +3461,7 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 	{
 		maxDist = TOUCHRANGE;
 	}
-	if ( parent && (parent->behavior == &actDoor || parent->behavior == &actIronDoor) && parent->doorStatus == 0 ) // min dist 0.0 when door closed, just in case we're stuck inside.
+	if ( parent && (parent->behavior == &actDoor || parent->behavior == &actIronDoor) && parent->doorStatus() == 0 ) // min dist 0.0 when door closed, just in case we're stuck inside.
 	{
 		minDist = 0.0;
 	}
@@ -3542,11 +3542,11 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 			{
 				return 0.0;
 			}
-			else if ( parent->behavior == &actTeleportShrine && parent->shrineActivateDelay > 0 )
+			else if ( parent->behavior == &actTeleportShrine && parent->shrineActivateDelay() > 0 )
 			{
 				return 0.0;
 			}
-			else if ( parent->behavior == &actDaedalusShrine && parent->shrineActivateDelay > 0 )
+			else if ( parent->behavior == &actDaedalusShrine && parent->shrineActivateDelay() > 0 )
 			{
 				return 0.0;
 			}
@@ -3556,8 +3556,8 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 			}
 			else if ( parent->behavior == &actWallLock )
 			{
-				if ( parent->wallLockState == Entity::WallLockStates::LOCK_KEY_START
-					|| parent->wallLockState == Entity::WallLockStates::LOCK_KEY_ENTER )
+				if ( parent->wallLockState() == Entity::WallLockStates::LOCK_KEY_START
+					|| parent->wallLockState() == Entity::WallLockStates::LOCK_KEY_ENTER )
 				{
 					return 0.0;
 				}
@@ -3634,9 +3634,9 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 			}
 			else if ( parent->behavior == &actFurniture )
 			{
-				if ( parent->furnitureType == FURNITURE_BED 
-					|| parent->furnitureType == FURNITURE_BUNKBED
-					|| parent->furnitureType == FURNITURE_TABLE )
+				if ( parent->furnitureType() == FURNITURE_BED 
+					|| parent->furnitureType() == FURNITURE_BUNKBED
+					|| parent->furnitureType() == FURNITURE_TABLE )
 				{
 					// wide angle
 				}
@@ -3940,7 +3940,7 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 {
 	tooltip.setUID(UID_TOOLTIP_ACTIVE);
-	tooltip.worldTooltipActive = 1;
+	tooltip.worldTooltipActive() = 1;
 	if ( uidToEntity(tooltip.parent) )
 	{
 		Entity* parent = uidToEntity(tooltip.parent);
@@ -3971,9 +3971,9 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 				return;
 			}
 		}
-		parent->highlightForUI = 1.0;
+		parent->highlightForUI() = 1.0;
 
-		if ( tooltip.worldTooltipRequiresButtonHeld == 1 && *MainMenu::cvar_hold_to_activate )
+		if ( tooltip.worldTooltipRequiresButtonHeld() == 1 && *MainMenu::cvar_hold_to_activate )
 		{
 			interactText = Language::get(3998); // "(Hold) ";
 		}
@@ -4117,7 +4117,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 		}
 		else if ( parent->behavior == &actDoor )
 		{
-			if ( parent->doorStatus != 0 )
+			if ( parent->doorStatus() != 0 )
 			{
 				interactText = Language::get(4015); // "Close door" 
 			}
@@ -4128,7 +4128,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 		}
 		else if ( parent->behavior == &actIronDoor )
 		{
-			if ( parent->doorStatus != 0 )
+			if ( parent->doorStatus() != 0 )
 			{
 				interactText = Language::get(6420); // "Close door" 
 			}
@@ -4162,7 +4162,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 		}
 		else if ( parent->behavior == &actPedestalBase )
 		{
-			if ( parent->pedestalHasOrb > 0 )
+			if ( parent->pedestalHasOrb() > 0 )
 			{
 				interactText = Language::get(4022); // "Take orb" 
 			}
@@ -4278,7 +4278,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 			}
 			else
 			{
-				if ( parent->portalCustomSpriteAnimationFrames > 0 )
+				if ( parent->portalCustomSpriteAnimationFrames() > 0 )
 				{
 					interactText += Language::get(4035); // "Enter portal";
 				}
@@ -4295,15 +4295,15 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 		}
 		else if ( parent->behavior == &actTeleporter )
 		{
-			if ( parent->teleporterType == 2 || parent->teleporterType == 3 ) // portal
+			if ( parent->teleporterType() == 2 || parent->teleporterType() == 3 ) // portal
 			{
 				interactText += Language::get(4035); // "Enter portal";
 			}
-			else if ( parent->teleporterType == 1 ) // down ladder
+			else if ( parent->teleporterType() == 1 ) // down ladder
 			{
 				interactText += Language::get(4037); // "Descend ladder";
 			}
-			else if ( parent->teleporterType == 0 ) // up ladder
+			else if ( parent->teleporterType() == 0 ) // up ladder
 			{
 				interactText += Language::get(4038); // "Climb ladder";
 			}
@@ -4323,10 +4323,10 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 		else if ( parent->behavior == &::actWallLock )
 		{
 			static char buf[256] = "";
-			int wallLockState = parent->wallLockState;
+			int wallLockState = parent->wallLockState();
 			if ( wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
 			{
-				snprintf(buf, sizeof(buf), Language::get(6397), Language::get(6383 + parent->wallLockMaterial));
+				snprintf(buf, sizeof(buf), Language::get(6397), Language::get(6383 + parent->wallLockMaterial()));
 				interactText = buf;
 				snprintf(buf, sizeof(buf), Language::get(6402), player.inventoryUI.getKeyAmountForWallLock(*parent));
 				interactText += buf;
@@ -4334,13 +4334,13 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 			else if ( wallLockState == Entity::WallLockStates::LOCK_KEY_ACTIVE_START
 				|| wallLockState == Entity::WallLockStates::LOCK_KEY_ACTIVE	)
 			{
-				snprintf(buf, sizeof(buf), Language::get(6399), Language::get(6383 + parent->wallLockMaterial));
+				snprintf(buf, sizeof(buf), Language::get(6399), Language::get(6383 + parent->wallLockMaterial()));
 				interactText = buf; // deactivate lock
 			}
 			else if ( wallLockState == Entity::WallLockStates::LOCK_KEY_INACTIVE_START
 				|| wallLockState == Entity::WallLockStates::LOCK_KEY_INACTIVE )
 			{
-				snprintf(buf, sizeof(buf), Language::get(6400), Language::get(6383 + parent->wallLockMaterial));
+				snprintf(buf, sizeof(buf), Language::get(6400), Language::get(6383 + parent->wallLockMaterial()));
 				interactText = buf; // deactivate lock
 			}
 		}
@@ -4367,7 +4367,7 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 void Player::WorldUI_t::setTooltipDisabled(Entity& tooltip)
 {
 	tooltip.setUID(UID_TOOLTIP_DISABLED);
-	tooltip.worldTooltipActive = 0;
+	tooltip.worldTooltipActive() = 0;
 	if ( tooltip.parent == uidForActiveTooltip )
 	{
 		uidForActiveTooltip = 0;
@@ -4375,7 +4375,7 @@ void Player::WorldUI_t::setTooltipDisabled(Entity& tooltip)
 }
 bool Player::WorldUI_t::bTooltipActiveForPlayer(Entity& tooltip)
 {
-	return (tooltip.worldTooltipActive == 1 && tooltip.worldTooltipPlayer == player.playernum);
+	return (tooltip.worldTooltipActive() == 1 && tooltip.worldTooltipPlayer() == player.playernum);
 }
 
 void Player::WorldUI_t::cycleToNextTooltip()
@@ -4735,7 +4735,7 @@ void Player::WorldUI_t::handleTooltips()
 				{
 					continue;
 				}
-				if ( tooltip->worldTooltipPlayer != player )
+				if ( tooltip->worldTooltipPlayer() != player )
 				{
 					continue;
 				}
@@ -4772,7 +4772,7 @@ void Player::WorldUI_t::handleTooltips()
 				{
 					continue;
 				}
-				if ( tooltip->worldTooltipPlayer != player )
+				if ( tooltip->worldTooltipPlayer() != player )
 				{
 					continue;
 				}
@@ -4989,18 +4989,18 @@ void Player::WorldUI_t::handleTooltips()
 							DynamicString wallLockStringActivate;
 							DynamicString wallLockStringDeactivate;
 							static char buf[256];
-							snprintf(buf, sizeof(buf), Language::get(6397), Language::get(6383 + parent->wallLockMaterial));
+							snprintf(buf, sizeof(buf), Language::get(6397), Language::get(6383 + parent->wallLockMaterial()));
 							wallLockStringNoKey = buf;
 							snprintf(buf, sizeof(buf), Language::get(6402), players[player]->inventoryUI.getKeyAmountForWallLock(*parent));
 							wallLockStringNoKey += buf;
 
-							snprintf(buf, sizeof(buf), Language::get(6400), Language::get(6383 + parent->wallLockMaterial));
+							snprintf(buf, sizeof(buf), Language::get(6400), Language::get(6383 + parent->wallLockMaterial()));
 							wallLockStringActivate = buf;
 
-							snprintf(buf, sizeof(buf), Language::get(6399), Language::get(6383 + parent->wallLockMaterial));
+							snprintf(buf, sizeof(buf), Language::get(6399), Language::get(6383 + parent->wallLockMaterial()));
 							wallLockStringDeactivate = buf;
 
-							int wallLockState = parent->wallLockState;
+							int wallLockState = parent->wallLockState();
 							if ( wallLockState == Entity::WallLockStates::LOCK_NO_KEY )
 							{
 								if ( players[player]->worldUI.interactText != wallLockStringNoKey )
@@ -5317,10 +5317,10 @@ const int Player::HUD_t::getActionIconForPlayer(ActionPrompts prompt, std::strin
 	
 	if ( players[player.playernum]->entity )
 	{
-		playerRace = players[player.playernum]->entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace);
-		if ( players[player.playernum]->entity->effectShapeshift != NOTHING )
+		playerRace = players[player.playernum]->entity->getMonsterFromPlayerRace(stats[player.playernum]->playerRace());
+		if ( players[player.playernum]->entity->effectShapeshift() != NOTHING )
 		{
-			playerRace = static_cast<Monster>(players[player.playernum]->entity->effectShapeshift);
+			playerRace = static_cast<Monster>(players[player.playernum]->entity->effectShapeshift());
 			shapeshifted = true;
 		}
 	}

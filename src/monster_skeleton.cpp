@@ -59,9 +59,9 @@ void initSkeleton(Entity* my, Stat* myStats)
 
 			// apply random stat increases if set in stat_shared.cpp or editor
 
-			if ( my->monsterAllySummonRank != 0 )
+			if ( my->monsterAllySummonRank() != 0 )
 			{
-				int rank = std::min(my->monsterAllySummonRank, 7);
+				int rank = std::min(my->monsterAllySummonRank(), 7);
 				bool secondarySummon = true;
 				if ( MonsterData_t::nameMatchesSpecialNPCName(*myStats, "skeleton knight") )
 				{
@@ -79,20 +79,20 @@ void initSkeleton(Entity* my, Stat* myStats)
 					{
 						if ( !secondarySummon )
 						{
-							if ( leaderStats->playerSummonLVLHP != 0 ) // first stat initialisation if equal to 0
+							if ( leaderStats->playerSummonLVLHP() != 0 ) // first stat initialisation if equal to 0
 							{
-								myStats->LVL = (leaderStats->playerSummonLVLHP & 0xFFFF0000) >> 16;
-								myStats->MAXHP = leaderStats->playerSummonLVLHP & 0x0000FFFF;
+								myStats->LVL = (leaderStats->playerSummonLVLHP() & 0xFFFF0000) >> 16;
+								myStats->MAXHP = leaderStats->playerSummonLVLHP() & 0x0000FFFF;
 								myStats->HP = myStats->MAXHP;
 								myStats->OLDHP = myStats->MAXHP;
 
-								myStats->STR = (leaderStats->playerSummonSTRDEXCONINT & 0xFF000000) >> 24;
-								myStats->DEX = (leaderStats->playerSummonSTRDEXCONINT & 0x00FF0000) >> 16;
-								myStats->CON = (leaderStats->playerSummonSTRDEXCONINT & 0x0000FF00) >> 8;
-								myStats->INT = (leaderStats->playerSummonSTRDEXCONINT & 0x000000FF) >> 0;
+								myStats->STR = (leaderStats->playerSummonSTRDEXCONINT() & 0xFF000000) >> 24;
+								myStats->DEX = (leaderStats->playerSummonSTRDEXCONINT() & 0x00FF0000) >> 16;
+								myStats->CON = (leaderStats->playerSummonSTRDEXCONINT() & 0x0000FF00) >> 8;
+								myStats->INT = (leaderStats->playerSummonSTRDEXCONINT() & 0x000000FF) >> 0;
 
-								myStats->PER = (leaderStats->playerSummonPERCHR & 0xFF000000) >> 24;
-								myStats->CHR = (leaderStats->playerSummonPERCHR & 0x00FF0000) >> 16;
+								myStats->PER = (leaderStats->playerSummonPERCHR() & 0xFF000000) >> 24;
+								myStats->CHR = (leaderStats->playerSummonPERCHR() & 0x00FF0000) >> 16;
 							}
 							else
 							{
@@ -101,8 +101,8 @@ void initSkeleton(Entity* my, Stat* myStats)
 								myStats->MAXHP = myStats->HP;
 								myStats->OLDHP = myStats->HP;
 
-								leaderStats->playerSummonLVLHP = (myStats->LVL << 16);
-								leaderStats->playerSummonLVLHP |= (myStats->MAXHP);
+								leaderStats->playerSummonLVLHP() = (myStats->LVL << 16);
+								leaderStats->playerSummonLVLHP() |= (myStats->MAXHP);
 
 								myStats->STR = std::max(1, myStats->STR);
 								myStats->DEX = std::max(2, myStats->DEX);
@@ -110,41 +110,41 @@ void initSkeleton(Entity* my, Stat* myStats)
 								myStats->INT = std::max(0, myStats->INT);
 								myStats->PER = std::max(0, myStats->PER);
 								myStats->CHR = std::max(0, myStats->CHR);
-								leaderStats->playerSummonSTRDEXCONINT = (myStats->STR << 24);
-								leaderStats->playerSummonSTRDEXCONINT |= (myStats->DEX << 16);
-								leaderStats->playerSummonSTRDEXCONINT |= (myStats->CON << 8);
-								leaderStats->playerSummonSTRDEXCONINT |= (myStats->INT);
+								leaderStats->playerSummonSTRDEXCONINT() = (myStats->STR << 24);
+								leaderStats->playerSummonSTRDEXCONINT() |= (myStats->DEX << 16);
+								leaderStats->playerSummonSTRDEXCONINT() |= (myStats->CON << 8);
+								leaderStats->playerSummonSTRDEXCONINT() |= (myStats->INT);
 
-								leaderStats->playerSummonPERCHR = (myStats->PER << 24);
-								leaderStats->playerSummonPERCHR |= (myStats->CHR << 16);
-								leaderStats->playerSummonPERCHR |= (my->monsterAllySummonRank << 8);
+								leaderStats->playerSummonPERCHR() = (myStats->PER << 24);
+								leaderStats->playerSummonPERCHR() |= (myStats->CHR << 16);
+								leaderStats->playerSummonPERCHR() |= (my->monsterAllySummonRank() << 8);
 							}
 						}
 						else
 						{
-							if ( leaderStats->playerSummon2LVLHP != 0 ) // first stat initialisation if equal to 0
+							if ( leaderStats->playerSummon2LVLHP() != 0 ) // first stat initialisation if equal to 0
 							{
-								myStats->LVL = (leaderStats->playerSummon2LVLHP & 0xFFFF0000) >> 16;
-								myStats->MAXHP = leaderStats->playerSummon2LVLHP & 0x0000FFFF;
+								myStats->LVL = (leaderStats->playerSummon2LVLHP() & 0xFFFF0000) >> 16;
+								myStats->MAXHP = leaderStats->playerSummon2LVLHP() & 0x0000FFFF;
 								myStats->HP = myStats->MAXHP;
 								myStats->OLDHP = myStats->MAXHP;
 
-								myStats->STR = (leaderStats->playerSummon2STRDEXCONINT & 0xFF000000) >> 24;
-								myStats->DEX = (leaderStats->playerSummon2STRDEXCONINT & 0x00FF0000) >> 16;
-								myStats->CON = (leaderStats->playerSummon2STRDEXCONINT & 0x0000FF00) >> 8;
-								myStats->INT = (leaderStats->playerSummon2STRDEXCONINT & 0x000000FF) >> 0;
+								myStats->STR = (leaderStats->playerSummon2STRDEXCONINT() & 0xFF000000) >> 24;
+								myStats->DEX = (leaderStats->playerSummon2STRDEXCONINT() & 0x00FF0000) >> 16;
+								myStats->CON = (leaderStats->playerSummon2STRDEXCONINT() & 0x0000FF00) >> 8;
+								myStats->INT = (leaderStats->playerSummon2STRDEXCONINT() & 0x000000FF) >> 0;
 
-								myStats->PER = (leaderStats->playerSummon2PERCHR & 0xFF000000) >> 24;
-								myStats->CHR = (leaderStats->playerSummon2PERCHR & 0x00FF0000) >> 16;
+								myStats->PER = (leaderStats->playerSummon2PERCHR() & 0xFF000000) >> 24;
+								myStats->CHR = (leaderStats->playerSummon2PERCHR() & 0x00FF0000) >> 16;
 							}
 							else
 							{
 								// set variables for first time cast
 								// make up level deficit from primary summon.
 								int levelUps = 0;
-								if ( leaderStats->playerSummonLVLHP > 0 )
+								if ( leaderStats->playerSummonLVLHP() > 0 )
 								{
-									levelUps = std::max(3, static_cast<int>((leaderStats->playerSummonLVLHP & 0xFFFF0000) >> 16) - 3);
+									levelUps = std::max(3, static_cast<int>((leaderStats->playerSummonLVLHP() & 0xFFFF0000) >> 16) - 3);
 								}
 								levelUps = std::max(0, levelUps - myStats->LVL);
 								int increasestat[3] = { 0, 0, 0 };
@@ -185,8 +185,8 @@ void initSkeleton(Entity* my, Stat* myStats)
 
 								my->skeletonSummonSetEquipment(myStats, std::min(7, 1 + (myStats->LVL / 5)));
 
-								leaderStats->playerSummon2LVLHP = (myStats->LVL << 16);
-								leaderStats->playerSummon2LVLHP |= (myStats->MAXHP);
+								leaderStats->playerSummon2LVLHP() = (myStats->LVL << 16);
+								leaderStats->playerSummon2LVLHP() |= (myStats->MAXHP);
 
 								myStats->STR = std::max(0, myStats->STR);
 								myStats->DEX = std::max(3, myStats->DEX);
@@ -194,14 +194,14 @@ void initSkeleton(Entity* my, Stat* myStats)
 								myStats->INT = std::max(0, myStats->INT);
 								myStats->PER = std::max(1, myStats->PER);
 								myStats->CHR = std::max(0, myStats->CHR);
-								leaderStats->playerSummon2STRDEXCONINT = (myStats->STR << 24);
-								leaderStats->playerSummon2STRDEXCONINT |= (myStats->DEX << 16);
-								leaderStats->playerSummon2STRDEXCONINT |= (myStats->CON << 8);
-								leaderStats->playerSummon2STRDEXCONINT |= (myStats->INT);
+								leaderStats->playerSummon2STRDEXCONINT() = (myStats->STR << 24);
+								leaderStats->playerSummon2STRDEXCONINT() |= (myStats->DEX << 16);
+								leaderStats->playerSummon2STRDEXCONINT() |= (myStats->CON << 8);
+								leaderStats->playerSummon2STRDEXCONINT() |= (myStats->INT);
 
-								leaderStats->playerSummon2PERCHR = (myStats->PER << 24);
-								leaderStats->playerSummon2PERCHR |= (myStats->CHR << 16);
-								leaderStats->playerSummon2PERCHR |= (my->monsterAllySummonRank << 8);
+								leaderStats->playerSummon2PERCHR() = (myStats->PER << 24);
+								leaderStats->playerSummon2PERCHR() |= (myStats->CHR << 16);
+								leaderStats->playerSummon2PERCHR() |= (my->monsterAllySummonRank() << 8);
 							}
 						}
 
@@ -504,7 +504,7 @@ void initSkeleton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SKELETON][6][0]; // 2.5
 	entity->focaly = limbs[SKELETON][6][1]; // 0
 	entity->focalz = limbs[SKELETON][6][2]; // 0
@@ -526,7 +526,7 @@ void initSkeleton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SKELETON][7][0]; // 2
 	entity->focaly = limbs[SKELETON][7][1]; // 0
 	entity->focalz = limbs[SKELETON][7][2]; // 0
@@ -550,7 +550,7 @@ void initSkeleton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SKELETON][8][0]; // 0
 	entity->focaly = limbs[SKELETON][8][1]; // 0
 	entity->focalz = limbs[SKELETON][8][2]; // 4
@@ -574,7 +574,7 @@ void initSkeleton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SKELETON][9][0]; // 0
 	entity->focaly = limbs[SKELETON][9][1]; // 0
 	entity->focalz = limbs[SKELETON][9][2]; // -2
@@ -595,7 +595,7 @@ void initSkeleton(Entity* my, Stat* myStats)
 	entity->flags[NOUPDATE] = true;
 	entity->flags[INVISIBLE] = true;
 	entity->flags[USERFLAG2] = my->flags[USERFLAG2];
-	entity->noColorChangeAllyLimb = 1.0;
+	entity->noColorChangeAllyLimb() = 1.0;
 	entity->focalx = limbs[SKELETON][10][0]; // 0
 	entity->focaly = limbs[SKELETON][10][1]; // 0
 	entity->focalz = limbs[SKELETON][10][2]; // .5
@@ -650,7 +650,7 @@ void actSkeletonLimb(Entity* my)
 
 void skeletonDie(Entity* my)
 {
-	if ( multiplayer != CLIENT && my->monsterAllySummonRank != 0 )
+	if ( multiplayer != CLIENT && my->monsterAllySummonRank() != 0 )
 	{
 		Stat* myStats = my->getStats();
 		Entity* leader = uidToEntity(myStats->leader_uid);
@@ -1120,7 +1120,7 @@ void skeletonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 				if ( weaponNode )
 				{
 					Entity* weapon = (Entity*)weaponNode->element;
-					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack == 0 ) )
+					if ( MONSTER_ARMBENDED || (weapon->flags[INVISIBLE] && my->monsterAttack() == 0 ) )
 					{
 						// if weapon invisible and I'm not attacking, relax arm.
 						entity->focalx = limbs[SKELETON][4][0]; // 0
@@ -1243,7 +1243,7 @@ void skeletonMoveBodyparts(Entity* my, Stat* myStats, double dist)
 					}
 				}
 				my->setHumanoidLimbOffset(entity, SKELETON, LIMB_HUMANOID_LEFTARM);
-				if ( my->monsterDefend && my->monsterAttack == 0 )
+				if ( my->monsterDefend() && my->monsterAttack() == 0 )
 				{
 					MONSTER_SHIELDYAW = PI / 5;
 				}
