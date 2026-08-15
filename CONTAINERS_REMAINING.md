@@ -57,13 +57,16 @@ their own section at the bottom (fixed-size, low priority).
 ### src/game.hpp (done — D3dg)
 - `networkPackets` → `DynamicMapI32T<NetworkPacket_t>` (`MK_NetworkPacket`)
 
-### src/interface/interface.hpp (2)
-- `scrolls` — `unordered_map<string, pair<int,bool>>`
-- `sortedScrolls` — `vector<pair<string,pair<int,bool>>>`
+### src/interface/interface.hpp (done — D3do)
+- `scrolls` → `DynamicMapScrollEntry` (`DynamicMapStrT<ScrollEntry_t>`, new
+  `MK_ScrollEntry`=79 POD)
+- `sortedScrolls` → `DynamicArraySortedScrollEntry`
+  (`DynamicArrayT<SortedScrollEntry_t>`, new `Kind_SortedScrollEntry`=41 owning)
 - (`systemResourceImages` is DONE in D3cz)
 
-### src/interface/ui.hpp (1)
-- `allNotifications` — `std::list<UIToastNotification>`
+### src/interface/ui.hpp (done — D3dp)
+- `allNotifications` → `DynamicArrayT<UIToastNotification>` (new
+  `Kind_UIToastNotification`=40 owning; frame cleanup explicit at erase site)
 
 ### src/magic/magic.hpp (3 — port-with-file)
 - `allGameSpells` — `extern map<int, spell_t*>` (order-dependent)
@@ -116,12 +119,12 @@ Voice-chat subsystem (port-with-file candidate; listed so it isn't missed):
 on the critical path for any file touching Player; they de-STL with their
 headers like everything else)
 - `Field::linesToColor` (`map<int,Uint32>`), `Field::individualLinePadding`
-  (`map<int,int>`), `Field::cache` (`vector<pair<string,Text*>>`)
-- `Widget::widgets` — `list<Widget*>`; `findSelectedWidgets(vector<Widget*>&)`
-- `MainMenu::survivalComplexity` (`vector<tuple<int,string,Uint32>>`),
-  `MainMenu::data` (`unordered_map<int, DescData_t>` + `unordered_map<string, DescData_t>`)
+  (`map<int,int>`), `Field::cache` (`vector<pair<string,Text*>>`) — DONE (D3d8)
+- `Widget::widgets` — `list<Widget*>`; `findSelectedWidgets(vector<Widget*>&)` — DONE (D3d9)
+- `MainMenu::survivalComplexity` (`vector<tuple<int,string,Uint32>>`) — DONE (D3dq)
+- `MainMenu::data` (`unordered_map<int, DescData_t>` + `unordered_map<string, DescData_t>`) — DONE (D3dq)
 - `draw(... const vector<const Widget*>& selectedWidgets/searchParents)` params
-  across Widget/Frame/Field/Button/Slider
+  across Widget/Frame/Field/Button/Slider — DONE (D3d9)
 
 ## std::array members — DONE (D3dl, `[N]T` C arrays)
 
