@@ -205,6 +205,11 @@ namespace MainMenu {
 		static void update_details_text(Frame& card, int race, int modified_race);
 	};
 
+	// Owning map value kinds: the Odin free/copy handlers (MK_ClassDescData /
+	// MK_RaceDescData) operate on the de-STL'd DescData_t layouts above.
+	template <> struct MapValueKindOf<ClassDescriptions::DescData_t> { static constexpr int value = MK_ClassDescData; };
+	template <> struct MapValueKindOf<RaceDescriptions::DescData_t> { static constexpr int value = MK_RaceDescData; };
+
 	struct MainMenuBanners_t
 	{
 		static DynamicString updateBannerImg;

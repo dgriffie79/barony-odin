@@ -689,8 +689,6 @@ template <> struct MapValueKindOf<ScrollEntry_t> { static constexpr int value = 
 // Array elem kind for vector<pair<string, pair<int,bool>>> (sortedScrolls).
 template <> struct DynamicArrayKindOf<SortedScrollEntry_t> { static constexpr int value = Kind_SortedScrollEntry; };
 template <> struct DynamicArrayKindOf<SurvivalComplexityEntry_t> { static constexpr int value = Kind_SurvivalComplexityEntry; };
-template <> struct MapValueKindOf<ClassDescData_t> { static constexpr int value = MK_ClassDescData; };
-template <> struct MapValueKindOf<RaceDescData_t> { static constexpr int value = MK_RaceDescData; };
 template <> struct MapValueKindOf<bool> { static constexpr int value = MK_Bool; };
 
 // 8-byte pointer values (Frame*, node_t*, image_t*, struct pointers) are POD in a u64 slot.

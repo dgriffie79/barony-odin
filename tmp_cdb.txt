@@ -1,0 +1,6 @@
+.sympath srv*C:\dev\symbols*https://msdl.microsoft.com/download/symbols
+.sympath+ C:\dev\barony-odin\builddir
+.reload
+!analyze -v
+kb 40
+q
