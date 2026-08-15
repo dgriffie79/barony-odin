@@ -22,9 +22,9 @@ CvarBool cvar_hideGlyphs("/hideprompts", false, "hide button glyphs and prompts"
 
 Widget::~Widget() {
 	if (parent) {
-		for (auto node = parent->widgets.begin(); node != parent->widgets.end(); ++node) {
-			if (*node == this) {
-				parent->widgets.erase(node);
+		for (int64_t i = 0; i < parent->widgets.size(); ++i) {
+			if (parent->widgets[i] == this) {
+				parent->widgets.erase(i);
 				break;
 			}
 		}
@@ -42,7 +42,8 @@ void Widget::deselectBase() {
 }
 
 bool Widget::removeBase(const char* name) {
-    for (auto widget : widgets) {
+    for (int64_t i = 0; i < widgets.size(); ++i) {
+        auto widget = widgets[i];
         if (strcmp(widget->getName(), name) == 0) {
             widget->removeSelf();
             return true;
@@ -55,7 +56,8 @@ void Widget::removeSelf() {
     toBeDeleted = true;
     
     // also mark children deleted so they don't get processed.
-    for (auto widget : widgets) {
+    for (int64_t i = 0; i < widgets.size(); ++i) {
+        auto widget = widgets[i];
         widget->removeSelf();
     }
 }
@@ -250,7 +252,8 @@ const Widget* Widget::findHead() const {
 
 Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType searchType) {
     if (searchType == Widget::SearchType::DEPTH_FIRST) {
-	    for (auto widget : widgets) {
+	    for (int64_t i = 0; i < widgets.size(); ++i) {
+        auto widget = widgets[i];
 			if (widget->toBeDeleted) {
 				continue;
 			}
@@ -271,7 +274,8 @@ Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType 
 		std::queue<Widget*> q;
 		auto widget = this;
 		do {
-			for (auto w : widget->widgets) {
+			for (int64_t i = 0; i < widget->widgets.size(); ++i) {
+				auto w = widget->widgets[i];
 				if (w->toBeDeleted) {
 					continue;
 				}
@@ -298,7 +302,8 @@ Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType 
 
 const Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType searchType) const {
     if (searchType == Widget::SearchType::DEPTH_FIRST) {
-	    for (auto widget : widgets) {
+	    for (int64_t i = 0; i < widgets.size(); ++i) {
+        auto widget = widgets[i];
 			if (widget->toBeDeleted) {
 				continue;
 			}
@@ -316,7 +321,8 @@ const Widget* Widget::findWidget(const char* name, bool recursive, Widget::Searc
 		std::queue<Widget*> q;
 		auto widget = this;
 		do {
-			for (auto w : widget->widgets) {
+			for (int64_t i = 0; i < widget->widgets.size(); ++i) {
+				auto w = widget->widgets[i];
 			    if (w->toBeDeleted) {
 				    continue;
 			    }
@@ -338,7 +344,7 @@ const Widget* Widget::findWidget(const char* name, bool recursive, Widget::Searc
 	return nullptr;
 }
 
-void Widget::findSelectedWidgets(std::vector<Widget*>& outResult) {
+void Widget::findSelectedWidgets(DynamicArrayT<Widget*>& outResult) {
 	for (int c = 0; c < MAXPLAYERS; ++c) {
 	    if (_selectedWidgets[c] && _selectedWidgets[c]->isChildOf(*this)) {
 	        outResult.push_back(_selectedWidgets[c]);
@@ -348,7 +354,7 @@ void Widget::findSelectedWidgets(std::vector<Widget*>& outResult) {
 	}
 }
 
-void Widget::findSelectedWidgets(std::vector<const Widget*>& outResult) const {
+void Widget::findSelectedWidgets(DynamicArrayT<Widget*>& outResult) const {
 	for (int c = 0; c < MAXPLAYERS; ++c) {
 	    if (_selectedWidgets[c] && _selectedWidgets[c]->isChildOf(*this)) {
 	        outResult.push_back(_selectedWidgets[c]);
@@ -359,7 +365,7 @@ void Widget::findSelectedWidgets(std::vector<const Widget*>& outResult) const {
 }
 
 Widget* Widget::findSelectedWidget(int owner) {
-    std::vector<Widget*> selectedWidgets;
+    DynamicArrayT<Widget*> selectedWidgets;
     findSelectedWidgets(selectedWidgets);
     for (auto widget : selectedWidgets) {
         if (widget && widget->owner == owner) {
@@ -383,9 +389,9 @@ bool Widget::isChildOf(const Widget& widget) const {
 
 void Widget::adoptWidget(Widget& widget) {
 	if (widget.parent) {
-		for (auto node = widget.parent->widgets.begin(); node != widget.parent->widgets.end(); ++node) {
-			if (*node == &widget) {
-				widget.parent->widgets.erase(node);
+		for (int64_t i = 0; i < widget.parent->widgets.size(); ++i) {
+			if (widget.parent->widgets[i] == &widget) {
+				widget.parent->widgets.erase(i);
 				break;
 			}
 		}
@@ -397,8 +403,8 @@ void Widget::adoptWidget(Widget& widget) {
 }
 
 void Widget::drawPost(const SDL_Rect size,
-    const std::vector<const Widget*>& selectedWidgets,
-    const std::vector<const Widget*>& searchParents) const {
+    const DynamicArrayT<Widget*>& selectedWidgets,
+    const DynamicArrayT<Widget*>& searchParents) const {
 	if (disabled) {
 		return;
 	}

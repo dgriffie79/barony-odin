@@ -65,7 +65,7 @@ static char* tokenize(char* str, const char* const delimiters) {
 	}
 }
 
-void Button::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const Widget*>& selectedWidgets) const {
+void Button::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget*>& selectedWidgets) const {
 	if (invisible) {
 		return;
 	}
@@ -320,8 +320,8 @@ next:
 }
 
 void Button::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
-    const std::vector<const Widget*>& selectedWidgets,
-    const std::vector<const Widget*>& searchParents) const {
+    const DynamicArrayT<Widget*>& selectedWidgets,
+    const DynamicArrayT<Widget*>& searchParents) const {
 	if (invisible) {
 		return;
 	}

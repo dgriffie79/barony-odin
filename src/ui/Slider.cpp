@@ -18,7 +18,7 @@ Slider::Slider(Frame& _parent) {
 	_parent.adoptWidget(*this);
 }
 
-void Slider::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const Widget*>& selectedWidgets) const {
+void Slider::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget*>& selectedWidgets) const {
 	if ( invisible || isDisabled() ) {
 		return;
 	}
@@ -135,8 +135,8 @@ void Slider::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const 
 }
 
 void Slider::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
-    const std::vector<const Widget*>& selectedWidgets,
-    const std::vector<const Widget*>& searchParents) const {
+    const DynamicArrayT<Widget*>& selectedWidgets,
+    const DynamicArrayT<Widget*>& searchParents) const {
 	if (invisible) {
 		return;
 	}

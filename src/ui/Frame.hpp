@@ -446,15 +446,15 @@ private:
 	//! @param _size real position of the frame onscreen
 	//! @param _actualSize offset into the frame space (scroll)
 	//! @param selectedWidgets the currently selected widgets, if any
-	void draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const Widget*>& selectedWidgets) const;
+	void draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget*>& selectedWidgets) const;
 
 	//! draws post elements in the frame and all of its subelements
 	//! @param _size real position of the frame onscreen
 	//! @param _actualSize offset into the frame space (scroll)
 	//! @param selectedWidgets the currently selected widgets, if any
 	void drawPost(SDL_Rect _size, SDL_Rect _actualSize,
-	    const std::vector<const Widget*>& selectedWidgets,
-	    const std::vector<const Widget*>& searchParents) const;
+	    const DynamicArrayT<Widget*>& selectedWidgets,
+	    const DynamicArrayT<Widget*>& searchParents) const;
 
 	//! handle clicks and other events
 	//! @param _size real position of the frame onscreen

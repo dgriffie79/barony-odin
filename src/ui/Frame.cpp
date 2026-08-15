@@ -349,8 +349,8 @@ void Frame::postdraw() {
 
 void Frame::draw() const {
 	auto _actualSize = allowScrolling ? actualSize : SDL_Rect{0, 0, size.w, size.h};
-	std::vector<const Widget*> selectedWidgets;
-	std::vector<const Widget*> searchParents;
+	DynamicArrayT<Widget*> selectedWidgets;
+	DynamicArrayT<Widget*> searchParents;
 	findSelectedWidgets(selectedWidgets);
 	for (auto widget : selectedWidgets) {
         if (widget) {
@@ -364,8 +364,8 @@ void Frame::draw() const {
 }
 
 void Frame::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
-    const std::vector<const Widget*>& selectedWidgets,
-    const std::vector<const Widget*>& searchParents) const {
+    const DynamicArrayT<Widget*>& selectedWidgets,
+    const DynamicArrayT<Widget*>& searchParents) const {
 	if (disabled || invisible)
 		return;
 
@@ -455,7 +455,7 @@ void frameDrawBlitSurface(const Frame* frame, SDL_Rect _size, SDL_Surface* surf,
 #endif
 }
 
-void Frame::draw(SDL_Rect _size, SDL_Rect _actualSize, const std::vector<const Widget*>& selectedWidgets) const {
+void Frame::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget*>& selectedWidgets) const {
 	if (disabled || invisible)
 		return;
 
@@ -1878,7 +1878,8 @@ Frame::entry_t* Frame::addEntry(const char* name, bool resizeFrame) {
 
 void Frame::clear() {
 	// delete widgets
-    for (auto widget : widgets) {
+    for (int64_t i = 0; i < widgets.size(); ++i) {
+        auto widget = widgets[i];
         widget->removeSelf();
     }
 

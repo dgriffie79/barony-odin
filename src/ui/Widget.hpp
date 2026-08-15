@@ -159,11 +159,11 @@ public:
 
     //! build a list of all the selected widgets amongst our children
     //! @param outResult a list containing all the selected widgets
-    void findSelectedWidgets(std::vector<Widget*>& outResult);
+    void findSelectedWidgets(DynamicArrayT<Widget*>& outResult);
 
     //! build a list of all the selected widgets amongst our children (const only)
     //! @param outResult a list containing all the selected widgets
-    void findSelectedWidgets(std::vector<const Widget*>& outResult) const;
+    void findSelectedWidgets(DynamicArrayT<Widget*>& outResult) const;
 
     //! find the widget selected by the specified owner/player
     //! @param owner the player who owns the widget
@@ -187,7 +187,7 @@ protected:
     bool removeBase(const char* name);
 
     Widget* parent = nullptr;                                       //!< parent widget
-    std::list<Widget*> widgets;                                     //!< widget children
+    DynamicArrayT<Widget*> widgets;                                 //!< widget children (std::list -> DynamicArrayT)
     DynamicString name;                                               //!< widget name
     bool pressed = false;							                //!< pressed state
     bool reallyPressed = false;						                //!< the "actual" pressed state, pre-mouse process
@@ -220,8 +220,8 @@ protected:
     DynamicString widgetSearchParent;                 //!< widget to search from for actions and movements
 
     void drawPost(const SDL_Rect size,
-        const std::vector<const Widget*>& selectedWidgets,
-        const std::vector<const Widget*>& searchParents) const;
+        const DynamicArrayT<Widget*>& selectedWidgets,
+        const DynamicArrayT<Widget*>& searchParents) const;
 };
 
 #ifndef EDITOR
