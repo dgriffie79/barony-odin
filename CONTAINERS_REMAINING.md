@@ -112,7 +112,9 @@ Voice-chat subsystem (port-with-file candidate; listed so it isn't missed):
 - `VoiceChat_t::PlayerChannels_t::audioQueue` — `vector<char>`
 - `VoiceChat_t::PlayerChannels_t::voiceDatagrams` — `priority_queue<pair<int, vector<char>>>`
 
-### src/ui/* (~20 — port last)
+### src/ui/* (~20 — not "port last": Player embeds these by value, so they're
+on the critical path for any file touching Player; they de-STL with their
+headers like everything else)
 - `Field::linesToColor` (`map<int,Uint32>`), `Field::individualLinePadding`
   (`map<int,int>`), `Field::cache` (`vector<pair<string,Text*>>`)
 - `Widget::widgets` — `list<Widget*>`; `findSelectedWidgets(vector<Widget*>&)`

@@ -111,8 +111,12 @@ first live members to leave std::string. ~25 call sites. Required:
 
 - Core structs barely use std::string: `Stat::name` is `char[128]`; the
   `Player.name` std::string is EOS-gated (dead); `Item.item_name_*` has 0 sites.
-- The 40 struct string members are ALL in the UI layer (MainMenu, Button,
-  Frame, Slider, Field, Widget, Font, Image, Text) — port last.
+- The 40 struct string members are in the UI widget structs (MainMenu,
+  Button, Frame, Slider, Field, Widget, Font, Image, Text). UI is NOT
+  "port last": Player and much of the game logic embed UI structs (Player
+  holds GUI_t/Inventory_t/HUD_t/Hotbar_t by value), so the UI widget types
+  are on the critical path for any file that touches Player. They mirror
+  with their headers like everything else.
 - `std::string` in non-UI game logic: ~1,336 occurrences (mod_tools 474,
   menu 109, actgeneral 102, input 98, files 87, ...).
 - `c_str()` = ~2,344 sites, mostly passing to C functions (printlog, SDL,
@@ -206,9 +210,10 @@ first live members to leave std::string. ~25 call sites. Required:
    explicit transforms needed: std::to_string() (225 sites) → a
    DynamicString-returning helper, and any std::string params/returns at
    boundaries. Use ast-grep (0.44.1), build-gated per batch, per-file order:
-   non-UI shared-struct owners first (mod_tools 106 members, input, files,
-   scores, player), UI layer (MainMenu 568, GameUI 349, Button/Frame/Field)
-   last since it ports last.
+   shared-struct owners first (mod_tools 106 members, input, files,
+   scores, player); the UI widget structs (MainMenu 568, GameUI 349,
+   Button/Frame/Field) are entangled with Player/game logic, so they port
+   alongside, not "last".
 3. **Bulk vector replacement** — rules for `std::vector<T>` → DynamicArray,
    `.push_back` → shim, range-for → index loop. (vector<string> converts in
    the string pass: element type becomes DynamicString.)
