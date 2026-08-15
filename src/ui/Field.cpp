@@ -193,20 +193,20 @@ void Field::buildCache() {
 		for ( char *nexttoken = buf, *token; (token = nexttoken) != nullptr;) {
 			nexttoken = tokenize(token, "\n");
 			auto line = Text::hash(token, font.c_str(), textColor, outlineColor);
-			cache.push_back(std::make_pair(token, new Text(line.second)));
+			cache.push_back({ token, new Text(line.second) });
 		}
 #else
 		if ( *cvar_enableFieldCache ) {
 			for ( char *nexttoken = buf, *token; (token = nexttoken) != nullptr;) {
 				nexttoken = tokenize(token, "\n");
 				auto line = Text::hash(token, font.c_str(), textColor, outlineColor);
-				cache.push_back(std::make_pair(token, new Text(line.second)));
+				cache.push_back({ token, new Text(line.second) });
 			}
 		}
 		else {
 			for ( char *nexttoken = buf, *token; (token = nexttoken) != nullptr;) {
 				nexttoken = tokenize(token, "\n");
-				cache.push_back(std::make_pair(token, nullptr));
+				cache.push_back({ token, nullptr });
 			}
 		}
 #endif
@@ -270,11 +270,11 @@ void Field::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widge
 
 	for ( int yoff = 0, currentLine = 0; currentLine < cache.size(); ++currentLine ) {
 #ifdef EDITOR
-		auto& text = cache[currentLine].second;
+		Text* text = (Text*)cache[currentLine].second;
 #else
 		Text* text;
 		if ( *cvar_enableFieldCache ) {
-			text = cache[currentLine].second;
+			text = (Text*)cache[currentLine].second;
 		}
 		else {
 			text = Text::get(cache[currentLine].first.c_str(),

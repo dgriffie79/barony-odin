@@ -218,6 +218,7 @@ Kind_HiscoreCompendiumPair   :: 33
 Kind_FollowerBarPair         :: 34
 Kind_StringPair               :: 35
 Kind_SurfacePtrStringPair      :: 36
+Kind_FieldCacheEntry           :: 39
 Kind_MonsterStringPair          :: 37
 Kind_SaveGameListEntry           :: 38
 Kind_I32Map          :: 13
@@ -1440,6 +1441,27 @@ surface_ptr_string_pair_copy :: proc(dst: rawptr, src: rawptr) {
 
 // MonsterStringPair_t — 24B (int + DynamicString). Value for
 // leadershipAllyTableSpecialRecruitment.
+// FieldCacheEntry_t - 24B (DynamicString + raw ptr). Value for
+// Field::cache (std::vector<pair<string,Text*>>). The string is owned; the
+// pointer (Text*) is copied verbatim and managed by the Field dtor.
+FieldCacheEntry_t :: struct {
+	first:  string,   // owned
+	second: rawptr,   // Text* (8B, not owned)
+}
+#assert(size_of(FieldCacheEntry_t) == 24)
+
+field_cache_entry_free :: proc(p: rawptr) {
+	v := (^FieldCacheEntry_t)(p)
+	dynamic_string_free_elem(rawptr(&v.first))
+}
+field_cache_entry_copy :: proc(dst: rawptr, src: rawptr) {
+	d := (^FieldCacheEntry_t)(dst)
+	s := (^FieldCacheEntry_t)(src)
+	d.first = s.first
+	dynamic_string_copy_elem(rawptr(&d.first), rawptr(&s.first))
+	d.second = s.second
+}
+
 MonsterStringPair_t :: struct {
 	first:  i32,
 	second: string,
@@ -1738,7 +1760,7 @@ Element_Ops :: struct {
 	copy: proc(dst: rawptr, src: rawptr),
 }
 
-element_ops := [39]Element_Ops{
+element_ops := [40]Element_Ops{
 	0 = { free = nil,                   copy = nil },
 	1 = { free = dynamic_string_free_elem, copy = dynamic_string_copy_elem },
 	2 = { free = icon_free,             copy = icon_copy },
@@ -1778,6 +1800,7 @@ element_ops := [39]Element_Ops{
 	36 = { free = surface_ptr_string_pair_free, copy = surface_ptr_string_pair_copy },
 	37 = { free = monster_string_pair_free, copy = monster_string_pair_copy },
 	38 = { free = save_game_list_entry_free, copy = save_game_list_entry_copy },
+	39 = { free = field_cache_entry_free, copy = field_cache_entry_copy },
 }
 
 @(export)

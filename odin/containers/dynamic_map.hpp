@@ -465,6 +465,14 @@ struct SurfacePtrStringPair_t {
     DynamicString second;
 };
 
+// FieldCacheEntry_t — 24B (DynamicString + raw ptr). Value for
+// Field::cache (std::vector<pair<string,Text*>>). The string is owned; the
+// pointer (Text*) is copied verbatim and managed by the Field dtor.
+struct FieldCacheEntry_t {
+    DynamicString first;
+    void* second = nullptr;
+};
+
 // NetworkPacket_t — 24B (DynamicString + int). Value for
 // DebugStatsClass::networkPackets.
 struct NetworkPacket_t {
@@ -610,6 +618,7 @@ template <> struct MapValueKindOf<DynamicStringPair_t> { static constexpr int va
 // Array elem kind for vector<pair<string,string>> (mountedFilepaths etc.).
 template <> struct DynamicArrayKindOf<DynamicStringPair_t> { static constexpr int value = Kind_StringPair; };
 template <> struct DynamicArrayKindOf<SurfacePtrStringPair_t> { static constexpr int value = Kind_SurfacePtrStringPair; };
+template <> struct DynamicArrayKindOf<FieldCacheEntry_t> { static constexpr int value = Kind_FieldCacheEntry; };
 template <> struct MapValueKindOf<DynamicArrayStr> { static constexpr int value = MK_DynArrayStr; };
 template <> struct MapValueKindOf<DynamicArrayS32> { static constexpr int value = MK_DynArrayS32; };
 template <> struct MapValueKindOf<DynamicSetI32> { static constexpr int value = MK_SetOfI32; };

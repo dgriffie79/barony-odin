@@ -186,10 +186,10 @@ private:
 	void (*callback)(Field&) = nullptr;					//!< the callback to use after text is entered
 	bool ontop = false;									//!< whether the field is drawn ontop of others
 	DynamicMapI32T<Uint32> wordsToHighlight;				//!< word indexes in the field matching the keys in the map will be colored with the mapped value
-	std::map<int, Uint32> linesToColor;                 //!< lines that have a particular color
+	DynamicMapI32T<Uint32> linesToColor;                 //!< lines that have a particular color
 	int paddingPerLine = 0;								//!< +/- pixel padding for multiple lines
-	std::map<int, int> individualLinePadding;			//!< lines that have a particular padding
+	DynamicMapI32T<int> individualLinePadding;			//!< lines that have a particular padding
 
 	void buildCache();
-	std::vector<std::pair<std::string,Text*>> cache;	//!< cached lines of text
+	DynamicArrayT<FieldCacheEntry_t> cache;			//!< cached lines of text
 };
