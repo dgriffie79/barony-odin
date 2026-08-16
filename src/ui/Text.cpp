@@ -446,3 +446,9 @@ static ConsoleCommand dump("/text_cache_dump", "dump text cache",
     messagePlayer(clientnum, MESSAGE_MISC, "dumped cache");
     });
 #endif
+
+const char*				Text::getName() const { return name.c_str(); }
+
+void Text::addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
+
+void Text::clearWordsToHighlight() { wordsToHighlight.clear(); }

@@ -118,3 +118,5 @@ static ConsoleCommand dump("/fonts_cache_dump", "dump font cache",
     messagePlayer(clientnum, MESSAGE_MISC, "dumped cache");
     });
 #endif
+
+const char*		Font::getName() const { return name.c_str(); }

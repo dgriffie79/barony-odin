@@ -509,24 +509,24 @@ private:
 	real_t duration2_mult = 0.0;
 	int channeledMana_duration = TICKS_PER_SECOND;
 public:
-	void setDamage(int _damage) { damage = _damage; }
+	void setDamage(int _damage);
 	int getDamage() { return damage; }
-	void setDamageSecondary(int _damage) { damage2 = _damage; }
+	void setDamageSecondary(int _damage);
 	int getDamageSecondary() { return damage2; }
-	void setDurationSecondary(int _duration) { duration2 = _duration; }
+	void setDurationSecondary(int _duration);
 	int getDurationSecondary() { return duration2; }
 	real_t getDamageMult() { return damage_mult; }
 	real_t getDamageSecondaryMult() { return damage2_mult; }
 	real_t getDurationMult() { return duration_mult; }
 	real_t getDurationSecondaryMult() { return duration2_mult; }
-	void setDamageMult(real_t _mult) { damage_mult = _mult; }
-	void setDamageSecondaryMult(real_t _mult) { damage2_mult = _mult; }
-	void setDurationMult(real_t _mult) { duration_mult = _mult; }
-	void setDurationSecondaryMult(real_t _mult) { duration2_mult = _mult; }
+	void setDamageMult(real_t _mult);
+	void setDamageSecondaryMult(real_t _mult);
+	void setDurationMult(real_t _mult);
+	void setDurationSecondaryMult(real_t _mult);
 	real_t getChanneledManaMult() { return channeledMana_mult; }
 	int getChanneledManaDuration() { return channeledMana_duration; }
-	void setChanneledManaDuration(int _duration) { channeledMana_duration = _duration; }
-	void setChanneledManaMult(real_t _mult) { channeledMana_mult = _mult; }
+	void setChanneledManaDuration(int _duration);
+	void setChanneledManaMult(real_t _mult);
 	int duration; // travel time if it's a missile element, duration for a light spell, duration for curses/enchants/traps/beams/rays/effects/what have you.
 	char element_internal_name[64];
 	int elementID = 0;
@@ -1308,33 +1308,9 @@ struct AOEIndicators_t
 	static void cleanup();
 	static std::map<Uint32, Indicator_t> indicators;
 
-	static TempTexture* getTexture(Uint32 uid)
-	{
-		auto find = indicators.find(uid);
-		if ( find != indicators.end() )
-		{
-			return find->second.texture;
-		}
-		return nullptr;
-	}
-	static SDL_Surface* getSurface(Uint32 uid)
-	{
-		auto find = indicators.find(uid);
-		if ( find != indicators.end() )
-		{
-			return find->second.surfaceOld;
-		}
-		return nullptr;
-	}
-	static Indicator_t* getIndicator(Uint32 uid)
-	{
-		auto find = indicators.find(uid);
-		if ( find != indicators.end() )
-		{
-			return &find->second;
-		}
-		return nullptr;
-	}
+	static TempTexture* getTexture(Uint32 uid);
+	static SDL_Surface* getSurface(Uint32 uid);
+	static Indicator_t* getIndicator(Uint32 uid);
 	static void update();
 	static Uint32 createIndicator(int _radiusMin, int _radiusMax, int _size, int _lifetime);
 };

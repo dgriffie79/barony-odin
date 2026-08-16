@@ -117,3 +117,5 @@ bool Shader::link() {
         return false;
     }
 }
+
+bool Shader::isInitialized() const { return program != 0; }

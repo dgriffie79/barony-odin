@@ -40899,3 +40899,71 @@ bool GenericGUIMenu::isItemMailable(const Item* item)
 
 	return true;
 }
+
+void GenericGUIMenu::setPlayer(const int p) { gui_player = p; }
+
+inline bool GenericGUIMenu::isNodeTinkeringCraftableItem(node_t* node) {
+		if ( !node )
+		{
+			return false;
+		}
+		return (node->list == &tinkeringTotalItems);
+	}
+
+inline bool GenericGUIMenu::isNodeScribingCraftableItem(node_t* node) {
+		if ( !node )
+		{
+			return false;
+		}
+		return (node->list == &scribingTotalItems);
+	}
+
+bool GenericGUIMenu::isItemUsedForCurrentGUI(const Item& item) {
+		if ( &item == scribingToolItem || &item == tinkeringKitItem || &item == alembicItem
+			|| &item == scribingBlankScrollTarget
+			|| &item == transmuteItemTarget
+			|| &item == basePotion || &item == secondaryPotion || &item == itemEffectScrollItem )
+		{
+			return true;
+		}
+		return false;
+	}
+
+void GenericGUIMenu::clearCurrentGUIFromItem(const Item& item) {
+		if ( &item == scribingToolItem )
+		{
+			scribingToolItem = nullptr;
+		}
+		if ( &item == transmuteItemTarget )
+		{
+			transmuteItemTarget = nullptr;
+		}
+		if ( &item == scribingBlankScrollTarget )
+		{
+			scribingBlankScrollTarget = nullptr;
+		}
+		if ( &item == tinkeringKitItem )
+		{
+			tinkeringKitItem = nullptr;
+		}
+		if ( &item == alembicItem )
+		{
+			alembicItem = nullptr;
+		}
+		if ( &item == basePotion )
+		{
+			basePotion = nullptr;
+		}
+		if ( &item == secondaryPotion )
+		{
+			secondaryPotion = nullptr;
+		}
+		if ( &item == itemEffectScrollItem )
+		{
+			itemEffectScrollItem = nullptr;
+		}
+	}
+
+void FollowerRadialMenu::setPlayer(const int p) { gui_player = p; }
+
+void CalloutRadialMenu::setPlayer(const int p) { gui_player = p; }

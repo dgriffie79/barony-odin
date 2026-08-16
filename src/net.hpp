@@ -157,18 +157,7 @@ struct PingNetworkStatus_t
 	Uint32 hudDisplayOKTicks = 0;
 	bool needsUpdate = true;
 	void saveDisplayMillis(bool forceUpdate = false);
-	void clear()
-	{
-		pings.clear();
-		needsUpdate = true;
-		hudDisplayOKTicks = 0;
-		lastPingtime = 0;
-		lastSequence = 0;
-		oldestSequenceTicks = 0;
-		displayMillis = 0;
-		sequence = 0;
-		displayMillisImmediate = 0;
-	}
+	void clear();
 	static bool bEnabled;
 	static int pingLimitGreen;
 	static int pingLimitYellow;

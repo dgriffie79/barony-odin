@@ -495,3 +495,13 @@ static ConsoleCommand dump("/images_cache_dump", "dump image cache",
     messagePlayer(clientnum, MESSAGE_MISC, "dumped cache");
     });
 #endif
+
+const char*				Image::getName() const { return name.c_str(); }
+
+const bool		Image::isStreamable() const { return true; }
+
+const void				Image::setOutlineSurf(SDL_Surface* toSet) { outlineSurf = toSet; }
+
+const unsigned int		Image::getWidth() const { return surf ? surf->w : 0U; }
+
+const unsigned int		Image::getHeight()	const { return surf ? surf->h : 0U; }

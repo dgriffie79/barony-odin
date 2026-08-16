@@ -73,10 +73,7 @@ struct PlayerSettings_t
 	bool spell_quickcast_controller = false;
 	Sint32 leftStickDeadzone = 8000;
 	Sint32 rightStickDeadzone = 8000;
-	void init(const int _player)
-	{
-		player = _player;
-	}
+	void init(const int _player);
 };
 extern PlayerSettings_t playerSettings[MAXPLAYERS];
 
@@ -361,24 +358,8 @@ class Inputs
 		VirtualMouse() {};
 		~VirtualMouse() {};
 
-		void warpMouseInCamera(const view_t& camera, const Sint32 newx, const Sint32 newy)
-		{
-			x = std::max(camera.winx, std::min(camera.winx + camera.winw, x + newx));
-			y = std::max(camera.winy, std::min(camera.winy + camera.winh, y + newy));
-			xrel += newx;
-			yrel += newy;
-			moved = true;
-		}
-		void warpMouseInScreen(SDL_Window*& window, const Sint32 newx, const Sint32 newy)
-		{
-			int w, h;
-			SDL_GetWindowSize(window, &w, &h);
-			x = std::max(0, std::min(w, x + newx));
-			y = std::max(0, std::min(h, y + newy));
-			xrel += newx;
-			yrel += newy;
-			moved = true;
-		}
+		void warpMouseInCamera(const view_t& camera, const Sint32 newx, const Sint32 newy);
+		void warpMouseInScreen(SDL_Window*& window, const Sint32 newx, const Sint32 newy);
 	};
 	VirtualMouse vmouse[MAXPLAYERS];
 
@@ -414,30 +395,9 @@ public:
 		}
 	};
 	~Inputs() {};
-	const void setPlayerIDAllowedKeyboard(const int player)
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			setPlayerIDAllowedKeyboard(0);
-			return;
-		}
-	    printlog("giving keyboard to player %d", player);
-		playerUsingKeyboardControl = player;
-	}
-	const int getPlayerIDAllowedKeyboard()
-	{
-		if (multiplayer != SINGLE)
-		{
-			return 0;
-		}
-		else
-		{
-	   		return playerUsingKeyboardControl;
-		}
-	}
-	const bool bPlayerUsingKeyboardControl(const int player) const
-	{
-		return player == playerUsingKeyboardControl || multiplayer != SINGLE;
-	}
+	const void setPlayerIDAllowedKeyboard(const int player);
+	const int getPlayerIDAllowedKeyboard();
+	const bool bPlayerUsingKeyboardControl(const int player) const;
 	void controllerHandleMouse(const int player);
 	const bool bControllerInputPressed(const int player, const unsigned controllerImpulse) const;
 	const bool bControllerInputHeld(int player, const unsigned controllerImpulse) const;
@@ -452,38 +412,9 @@ public:
 	const bool bMouseHeldRight(const int player) const;
 	const void mouseClearLeft(int player);
 	const void mouseClearRight(int player);
-	void removeControllerWithDeviceID(const int id)
-	{
-		for ( int i = 0; i < MAXPLAYERS; ++i )
-		{
-			if ( playerControllerIds[i] == id )
-			{
-				playerControllerIds[i] = -1;
-				printlog("[INPUTS]: Removed controller id %d from player index %d.", id, i);
-			}
-		}
-	}
-	VirtualMouse* getVirtualMouse(int player)
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			return getVirtualMouse(0);
-		}
-		if ( player < 0 || player >= MAXPLAYERS )
-		{
-			printlog("[INPUTS]: Warning: player index %d out of range.", player);
-			return nullptr;
-		}
-		return &vmouse[player];
-	}
-	UIStatus* getUIInteraction(int player)
-	{
-		if ( player < 0 || player >= MAXPLAYERS )
-		{
-			printlog("[INPUTS]: Warning: player index %d out of range.", player);
-			return nullptr;
-		}
-		return &uiStatus[player];
-	}
+	void removeControllerWithDeviceID(const int id);
+	VirtualMouse* getVirtualMouse(int player);
+	UIStatus* getUIInteraction(int player);
 	enum MouseInputs
 	{
 		OX,
@@ -502,13 +433,7 @@ public:
 	const Sint32 getMouse(const int player, MouseInputs input);
 	const real_t getMouseFloat(const int player, MouseInputs input);
 	void setMouse(const int player, MouseInputs input, Sint32 value);
-	void hideMouseCursors()
-	{
-		for ( int i = 0; i < MAXPLAYERS; ++i )
-		{
-			getVirtualMouse(i)->draw_cursor = false;
-		}
-	};
+	void hideMouseCursors();;
 	enum MouseWarpFlags : Uint32
 	{
 		UNSET_RELATIVE_MOUSE = 1,
@@ -517,117 +442,17 @@ public:
 		SET_CONTROLLER = 8
 	};
 	void warpMouse(const int player, const Sint32 x, const Sint32 y, Uint32 flags);
-	const int getControllerID(int player) const
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			return getControllerID(0);
-		}
-		if ( player < 0 || player >= MAXPLAYERS )
-		{
-			printlog("[INPUTS]: Warning: player index %d out of range.", player);
-			return -1;
-		}
-		return playerControllerIds[player];
-	}
+	const int getControllerID(int player) const;
 	GameController* getController(int player) const;
 
-	const bool hasController(int player) const 
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			return hasController(0);
-		}
-		if ( player < 0 || player >= MAXPLAYERS )
-		{
-			printlog("[INPUTS]: Warning: player index %d out of range.", player);
-			return false;
-		}
-		return playerControllerIds[player] != -1 && getController(player);
-	}
-	void setControllerID(int player, const int id) 
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			return setControllerID(0, id);
-		}
-		if ( player < 0 || player >= MAXPLAYERS )
-		{
-			printlog("[INPUTS]: Warning: player index %d out of range.", player);
-		}
-		playerControllerIds[player] = id;
-	}
+	const bool hasController(int player) const;
+	void setControllerID(int player, const int id);
 	const bool bPlayerIsControllable(int player) const;
-	void updateAllMouse()
-	{
-		for ( int i = 0; i < MAXPLAYERS; ++i )
-		{
-			controllerHandleMouse(i);
-		}
-	}
-	void updateAllOMouse()
-	{
-		for ( int i = 0; i < MAXPLAYERS; ++i )
-		{
-			if ( !bMouseLeft(i) )
-			{
-				vmouse[i].ox = vmouse[i].x;
-				vmouse[i].oy = vmouse[i].y;
-				vmouse[i].floatox = vmouse[i].floatx;
-				vmouse[i].floatoy = vmouse[i].floaty;
-				vmouse[i].moved = false;
-				vmouse[i].mouseLeftHeld = false;
-				vmouse[i].mouseLeftHeldTicks = 0;
-			}
-			else
-			{
-				if ( vmouse[i].mouseLeftHeldTicks == 0 )
-				{
-					vmouse[i].mouseLeftHeldTicks = ticks;
-				}
-				else if ( ticks - vmouse[i].mouseLeftHeldTicks > Inputs::VirtualMouse::MOUSE_HELD_TICKS )
-				{
-					vmouse[i].mouseLeftHeld = true;
-				}
-			}
-		}
-		/*messagePlayer(0, "x: %d | y: %d / x: %d | y: %d / x: %d | y: %d / x: %d | y: %d ", 
-			vmouse[0].ox, vmouse[0].oy,
-			vmouse[1].ox, vmouse[1].oy,
-			vmouse[2].ox, vmouse[2].oy,
-			vmouse[3].ox, vmouse[3].oy);*/
-	}
-	void updateAllRelMouse()
-	{
-		for ( int i = 0; i < MAXPLAYERS; ++i )
-		{
-			vmouse[i].xrel = 0;
-			vmouse[i].yrel = 0;
-			vmouse[i].floatxrel = 0.0;
-			vmouse[i].floatyrel = 0.0;
-		}
-	}
-	void rumble(const int player, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid)
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			rumble(0, pattern, smallMagnitude, largeMagnitude, length, srcEntityUid);
-			return;
-		}
-		if ( !hasController(player) )
-		{
-			return;
-		}
-		getController(player)->addRumble(pattern, smallMagnitude, largeMagnitude, length, srcEntityUid);
-	}
-	void rumbleStop(const int player)
-	{
-		if (multiplayer != SINGLE && player != 0) {
-			rumbleStop(0);
-			return;
-		}
-		if ( !hasController(player) )
-		{
-			return;
-		}
-		getController(player)->stopRumble();
-	}
+	void updateAllMouse();
+	void updateAllOMouse();
+	void updateAllRelMouse();
+	void rumble(const int player, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid);
+	void rumbleStop(const int player);
 	void addRumbleForPlayerHPLoss(const int player, Sint32 damageAmount);
 	SDL_Rect getGlyphRectForInput(const int player, bool pressed, const unsigned keyboardImpulse, const unsigned controllerImpulse);
 	void addRumbleForHapticType(const int player, Uint32 hapticType, Uint32 uid);
@@ -684,11 +509,11 @@ public:
 
 	const char* getAccountName() const;
 
-	view_t& camera() const { return *cam; }
+	view_t& camera() const;
 	const int camera_x1() const { return cam->winx; }
-	const int camera_x2() const { return cam->winx + cam->winw; }
+	const int camera_x2() const;
 	const int camera_y1() const { return cam->winy; }
-	const int camera_y2() const { return cam->winy + cam->winh; }
+	const int camera_y2() const;
 	const int camera_width() const { return cam->winw; }
 	const int camera_height() const { return cam->winh; }
 	const int camera_virtualx1() const { return cam->winx * ((float)Frame::virtualScreenX / xres); }
@@ -697,8 +522,8 @@ public:
 	const int camera_virtualy2() const { return (cam->winy + cam->winh) * ((float)Frame::virtualScreenY / yres); }
 	const int camera_virtualWidth() const { return cam->winw * ((float)Frame::virtualScreenX / xres); }
 	const int camera_virtualHeight() const { return cam->winh * ((float)Frame::virtualScreenY / yres); }
-	const int camera_midx() const { return camera_x1() + camera_width() / 2; }
-	const int camera_midy() const { return camera_y1() + camera_height() / 2; }
+	const int camera_midx() const;
+	const int camera_midy() const;
 	const bool isLocalPlayer() const;
 	const bool isLocalPlayerAlive() const;
 	const bool bUseCompactGUIWidth() const;
@@ -1013,27 +838,7 @@ public:
 			bool displayingShortFormTooltip = false;
 			bool displayingTitleOnlyTooltip = false;
 			ItemTooltipDisplay_t();
-			void reset()
-			{
-				type = WOODEN_SHIELD;
-				status = BROKEN;
-				beatitude = 0;
-				count = -1;
-				appearance = 0;
-				identified = false;
-				uid = 0;
-				wasAppraisalTarget = false;
-
-				playernum = -1;
-				playerLVL = -1;
-				playerEXP = -1;
-				playerSTR = -1;
-				playerDEX = -1;
-				playerCON = -1;
-				playerINT = -1;
-				playerPER = -1;
-				playerCHR = -1;
-			}
+			void reset();
 		};
 		ItemTooltipDisplay_t itemTooltipDisplay;
 		ItemTooltipDisplay_t compendiumItemTooltipDisplay;
@@ -1056,23 +861,23 @@ public:
 			sizey = DEFAULT_INVENTORY_SIZEY;
 		};
 		~Inventory_t() {};
-		const int getTotalSize() const { return sizex * sizey; }
+		const int getTotalSize() const;
 		const int getSizeX() const { return sizex; }
 		const int getSizeY() const { return sizey; }
-		const int getSlotSize() const { return 40; }
-		const int getItemSpriteSize() const { return 36; }
-		void setSizeY(int size) { sizey = size; }
-		void selectSlot(const int x, const int y) { selectedSlotX = x; selectedSlotY = y; }
+		const int getSlotSize() const;
+		const int getItemSpriteSize() const;
+		void setSizeY(int size);
+		void selectSlot(const int x, const int y);
 		const int getSelectedSlotX() const { return selectedSlotX; }
 		const int getSelectedSlotY() const { return selectedSlotY; }
-		void selectSpell(const int x, const int y) { selectedSpellX = x; selectedSpellY = y; }
+		void selectSpell(const int x, const int y);
 		const int getSelectedSpellX() const { return selectedSpellX; }
 		const int getSelectedSpellY() const { return selectedSpellY; }
 		void selectChestSlot(const int x, const int y);
 		const int getSelectedChestX() const { return chestGUI.selectedChestSlotX; }
 		const int getSelectedChestY() const { return chestGUI.selectedChestSlotY; }
 		const bool isItemFromChest(Item* item) const;
-		const bool selectedSlotInPaperDoll() const { return selectedSlotY < 0; }
+		const bool selectedSlotInPaperDoll() const;
 		bool warpMouseToSelectedItem(Item* snapToItem, Uint32 flags);
 		bool warpMouseToSelectedSpell(Item* snapToItem, Uint32 flags);
 		bool warpMouseToSelectedChestSlot(Item* snapToItem, Uint32 flags);
@@ -1090,38 +895,12 @@ public:
 		void cycleInventoryTab();
 		void activateItemContextMenuOption(Item* item, ItemContextMenuPrompts prompt);
 		bool moveItemToFreeInventorySlot(Item* item);
-		void resetInventory()
-		{
-			if ( bNewInventoryLayout )
-			{
-				DEFAULT_INVENTORY_SIZEX = 5;
-				DEFAULT_INVENTORY_SIZEY = 6;
-			}
-			else
-			{
-				DEFAULT_INVENTORY_SIZEX = 12;
-				DEFAULT_INVENTORY_SIZEY = 3;
-			}
-			sizex = DEFAULT_INVENTORY_SIZEX;
-			sizey = DEFAULT_INVENTORY_SIZEY;
-		}
-		const int freeVisibleInventorySlots() const
-		{
-			int x = getPlayerItemInventoryX();
-			int y = getPlayerItemInventoryY();
-			return x * y;
-		}
+		void resetInventory();
+		const int freeVisibleInventorySlots() const;
 		const bool bItemInventoryHasFreeSlot() const;
 		const int getPlayerItemInventoryX() const;
 		const int getPlayerItemInventoryY() const;
-		const int getPlayerBackpackBonusSizeY() const
-		{
-			if ( bNewInventoryLayout )
-			{
-				return 2;
-			}
-			return 1;
-		}
+		const int getPlayerBackpackBonusSizeY() const;
 		void updateSelectedSlotAnimation(int destx, int desty, int width, int height, bool usingMouse);
 		Frame* getInventorySlotFrame(int x, int y) const;
 		Frame* getSpellSlotFrame(int x, int y) const;
@@ -1398,25 +1177,9 @@ public:
 				DynamicString skillName = "";
 				DynamicString skillShortName = "";
 			public:
-				void setSkillName(std::string name)
-				{
-					skillName = name;
-				}
-				void setSkillShortName(std::string name)
-				{
-					skillShortName = name;
-				}
-				const char* getSkillName(bool shortName = false)
-				{
-					if ( shortName )
-					{
-						if ( skillShortName.len > 0 )
-						{
-							return skillShortName.c_str();
-						}
-					}
-					return skillName.c_str();
-				}
+				void setSkillName(std::string name);
+				void setSkillShortName(std::string name);
+				const char* getSkillName(bool shortName = false);
 				SkillEntry_t() {};
 				~SkillEntry_t() {};
 				int skillId = -1;
@@ -1682,19 +1445,7 @@ public:
 		{};
 		~HUD_t() {};
 
-		void reset()
-		{
-			swapWeaponGimpTimer = 0;
-			bowGimpTimer = 0;
-			throwGimpTimer = 0;
-			pickaxeGimpTimer = 0;
-			bowFire = false;
-			bowIsBeingDrawn = false;
-			bowStartDrawingTick = 0;
-			bowDrawBaseTicks = 50;
-			weaponSwitch = false;
-			shieldSwitch = false;
-		}
+		void reset();
 		bool bShowActionPrompts = true;
 		bool bShortHPMPForActionBars = false;
 		bool bOpenCalloutsMenuDisabled = false;
@@ -1746,7 +1497,7 @@ public:
 		void updateMinotaurWarning();
 		void updateStatusEffectFocusedWindow();
 		void updateCursorAnimation(int destx, int desty, int width, int height, bool usingMouse);
-		void setCursorDisabled(bool disabled) { if ( cursorFrame ) { cursorFrame->setDisabled(disabled); } };
+		void setCursorDisabled(bool disabled);;
 		const char* getCrosshairPath();
 	} hud;
 
@@ -1765,36 +1516,20 @@ public:
 		Uint32 noManaProcessedOnTick = 0;
 		Uint32 spellbookUidFromHotbarSlot = 0;
 		Uint32 telekinesisTarget = 0;
-		void flashNoMana()
-		{
-			noManaFeedbackTicks = 0;
-			noManaProcessedOnTick = ticks;
-		}
+		void flashNoMana();
 		Magic_t(Player& p) : player(p)
 		{
 			spellList.first = nullptr;
 			spellList.last = nullptr;
 		};
 		~Magic_t() {};
-		void clearSelectedSpells()
-		{
-			selected_spell = nullptr;
-			for ( int c = 0; c < NUM_HOTBAR_ALTERNATES; ++c )
-			{
-				selected_spell_alternate[c] = nullptr;
-			}
-			selected_spell_last_appearance = -1;
-			quick_cast_spell = nullptr;
-		}
-		void equipSpell(spell_t* spell) 
-		{ 
-			selected_spell = spell; 
-		}
+		void clearSelectedSpells();
+		void equipSpell(spell_t* spell);
 		void setQuickCastSpellFromInventory(Item* item);
 		void setQuickCastTomeFromInventory(Item* item);
-		bool doQuickCastSpell() { return quick_cast_spell != nullptr; }
-		void resetQuickCastSpell() { quick_cast_spell = nullptr; }
-		void resetQuickCastTome() { quick_cast_tome = 0; }
+		bool doQuickCastSpell();
+		void resetQuickCastSpell();
+		void resetQuickCastTome();
 		Uint32 quickCastTome() { return quick_cast_tome; }
 		bool doQuickCastTome();
 		spell_t* selectedSpell() const { return selected_spell; }
@@ -1964,7 +1699,7 @@ public:
 		Frame* logParentFrame = nullptr;
 		Frame* logWindow = nullptr;
 		void processLogFrame();
-		int fontSize() { return getHeightOfFont(font); }
+		int fontSize();
 	} messageZone;
 
 	class WorldUI_t
@@ -2125,11 +1860,8 @@ public:
 		bool bTooltipInView = false;
 		Uint32 uidForActiveTooltip = 0;
 		DynamicString interactText = "Interact";
-		void enable() { bEnabled = true; }
-		void disable() { 
-			bEnabled = false; 
-			reset();
-		}
+		void enable();
+		void disable();
 		bool isEnabled() const { return bEnabled; }
 		static void handleTooltips();
 		real_t tooltipInRange(Entity& tooltip); // returns distance of added tooltip, otherwise 0.
@@ -2176,27 +1908,12 @@ public:
 		};
 		PaperDollSlot_t dollSlots[kNumPaperDollSlots];
 		//const int getSlotSize() const;
-		void initSlots()
-		{
-			returningItemsToInventory.clear();
-			for ( int i = 0; i < kNumPaperDollSlots; ++i )
-			{
-				dollSlots[i].item = 0;
-				dollSlots[i].slotType = static_cast<PaperDollSlotType>(i);
-			}
-		}
-		void clear()
-		{
-			returningItemsToInventory.clear();
-			for ( int i = 0; i < kNumPaperDollSlots; ++i )
-			{
-				dollSlots[i].item = 0;
-			}
-		}
+		void initSlots();
+		void clear();
 		void drawSlots();
 		void updateSlots();
 		PaperDollSlotType getSlotForItem(const Item& item) const;
-		bool isItemOnDoll(const Item& item) const { return getSlotForItem(item) != SLOT_MAX; }
+		bool isItemOnDoll(const Item& item) const;
 		PaperDollSlotType paperDollSlotFromCoordinates(int x, int y) const;
 		void getCoordinatesFromSlotType(PaperDollSlotType slot, int& outx, int& outy) const;
 		void selectPaperDollCoordinatesFromSlotType(PaperDollSlotType slot) const;
@@ -2206,12 +1923,7 @@ public:
 		real_t portraitRotationInertia = 0.0;
 		real_t portraitRotationPercent = 0.0;
 		real_t portraitYaw = (330) * PI / 180;
-		void resetPortrait()
-		{
-			portraitRotationInertia = 0.0;
-			portraitRotationPercent = 0.0;
-			portraitYaw = (330) * PI / 180;
-		}
+		void resetPortrait();
 	} paperDoll;
 
 	class Hotbar_t {
@@ -2268,9 +1980,9 @@ public:
 		real_t animHide = 0.0;
 
 		SDL_Rect faceButtonPositions[NUM_HOTBAR_SLOTS];
-		const int getSlotSize() const { return 48; }
-		const int getHotbarStartY1() const { return -106; }
-		const int getHotbarStartY2() const { return -96; }
+		const int getSlotSize() const;
+		const int getHotbarStartY1() const;
+		const int getHotbarStartY2() const;
 
 		Hotbar_t(Player& p) : player(p)
 		{
@@ -2291,30 +2003,7 @@ public:
 			HOTBAR_IMP
 		};
 
-		void clear()
-		{
-			faceButtonTopYPosition = yres;
-			swapHotbarOnShapeshift = 0;
-			current_hotbar = 0;
-			//hotbarHasFocus = false;
-			magicBoomerangHotbarSlot = -1;
-			magicDuckHotbarSlot = -1;
-			hotbarTooltipLastGameTick = 0;
-			for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
-			{
-				hotbarShapeshiftInit[j] = false;
-			}
-			for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
-			{
-				hotbar[i].item = 0;
-				hotbar[i].resetLastItem();
-				for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
-				{
-					hotbar_alternate[j][i].item = 0;
-					hotbar_alternate[j][i].resetLastItem();
-				}
-			}
-		}
+		void clear();
 
 		auto& slots() { return hotbar; };
 		auto& slotsAlternate(int alternate) { return hotbar_alternate[alternate]; };

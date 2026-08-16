@@ -31543,17 +31543,7 @@ void Entity::alertAlliesOnBeingHit(Entity* attacker, DynamicArrayT<Entity*>* ski
 	hit.entity = ohitentity;
 }
 
-void Entity::seedEntityRNG(Uint32 seed)
-{
-	if ( !entity_rng )
-	{
-		entity_rng = new BaronyRNG();
-	}
-	if ( entity_rng )
-	{
-		entity_rng->seedBytes(&seed, sizeof(seed));
-	}
-}
+
 
 bool Entity::entityCanVomit() const
 {
@@ -32583,3 +32573,208 @@ real_t Entity::getHealingSpellPotionModifierFromEffects(bool processLevelup)
 
 	return result;
 }
+
+void Entity::stopEntitySound() {
+	}
+
+void Entity::setEntityString(const char* str) {
+		if ( string )
+		{
+			free(string);
+			string = nullptr;
+		}
+		if ( !str ) { return; }
+		size_t len = sizeof(char) * (strlen(str) + 1);
+		if ( string = (char*)malloc(len) )
+		{
+			memset(string, 0, len);
+			stringCopy(string, str, len, strlen(str));
+		}
+	}
+
+bool Entity::entityHasString(const char* str) {
+		if ( !string ) { return false; }
+		return (!strcmp(string, str) ? true : false);
+	}
+
+void Entity::setEntityShowOnMap(EntityShowMapSource source, int duration) {
+		entityShowOnMap() = 0;
+		entityShowOnMap() |= ((int)source & 0xFF) << 24;
+		entityShowOnMap() |= duration & 0xFFFFFF;
+	}
+
+void Entity::entityShowOnMapTickDuration() {
+		auto duration = getEntityShowOnMapDuration();
+		auto source = getEntityShowOnMapSource();
+		if ( duration > 0 )
+		{
+			--duration;
+		}
+		if ( duration == 0 )
+		{
+			entityShowOnMap() = 0;
+		}
+		else
+		{
+			setEntityShowOnMap(source, duration);
+		}
+	}
+
+Entity::EntityShowMapSource Entity::getEntityShowOnMapSource() {
+		return (EntityShowMapSource)((entityShowOnMap() >> 24) & 0xFF);
+	}
+
+Monster Entity::getRace() const {
+		Stat* myStats = getStats();
+
+		if ( !myStats )
+		{
+			return NOTHING;
+		}
+
+		return myStats->type;
+	}
+
+bool inline Entity::skillCapstoneUnlockedEntity(int proficiency) const {
+		if ( !getStats() )
+		{
+			return false;
+		}
+
+		return (getStats()->getModifiedProficiency(proficiency) >= CAPSTONE_UNLOCK_LEVEL[proficiency]);
+	}
+
+
+
+bool Entity::monsterInMeleeRange(const Entity* target, double dist) const {
+		return (dist < STRIKERANGE);
+	}
+
+bool TextSourceScript::containsOperator(char c) {
+		if ( c == '+' || c == '-' || c == '=' )
+		{
+			return true;
+		}
+		return false;
+	}
+
+void TextSourceScript::eraseTag(std::string& script, std::string& scriptTag, size_t tagIndex) {
+		if ( tagIndex + scriptTag.length() < script.length()
+			&& script.at(tagIndex + scriptTag.length()) == ' ' )
+		{
+			script.erase(tagIndex, strlen(scriptTag.c_str()) + 1);
+		}
+		else
+		{
+			script.erase(tagIndex, strlen(scriptTag.c_str()));
+		}
+	}
+
+int TextSourceScript::getScriptType(Sint32 skill) {
+		return (skill & 0xF);
+	}
+
+int TextSourceScript::getAttachedToEntityType(Sint32 skill) {
+		return ((skill & 0xFF0) >> 4);
+	}
+
+int TextSourceScript::getTriggerType(Sint32 skill) {
+		return ((skill & 0xF000) >> 12);
+	}
+
+void TextSourceScript::setScriptType(Sint32& skill, int setValue) {
+		skill &= 0xFFFFFFF0;
+		skill |= (setValue & 0xF);
+	}
+
+void TextSourceScript::setAttachedToEntityType(Sint32& skill, int setValue) {
+		skill &= 0xFFFFF00F;
+		skill |= ((setValue << 4) & 0xFF0);
+	}
+
+void TextSourceScript::setTriggerType(Sint32& skill, int setValue) {
+		skill &= 0xFFFF0FFF;
+		skill |= ((setValue << 12) & 0xF000);
+	}
+
+DynamicArrayT<Entity*> TextSourceScript::getScriptAttachedEntities(Entity& script) {
+		DynamicArrayT<Entity*> entities;
+		for ( node_t* node = script.children.first; node; node = node->next )
+		{
+			Uint32 entityUid = *((Uint32*)node->element);
+			Entity* child = uidToEntity(entityUid);
+			if ( child )
+			{
+				entities.push_back(child);
+			}
+		}
+		return entities;
+	}
+
+void Entity::chooseWeapon(const Entity* target, double dist) {
+		Stat* myStats = getStats();
+		if ( !myStats )
+		{
+			return;
+		}
+
+		if ( myStats->getEffectActive(EFF_FEAR) )
+		{
+			return; // don't change weapons while feared.
+		}
+
+		switch ( myStats->type )
+		{
+			case GOATMAN:
+				goatmanChooseWeapon(target, dist);
+				break;
+			case INSECTOID:
+				insectoidChooseWeapon(target, dist);
+				break;
+			case INCUBUS:
+				incubusChooseWeapon(target, dist);
+				break;
+			case VAMPIRE:
+				vampireChooseWeapon(target, dist);
+				break;
+			case SHADOW:
+				shadowChooseWeapon(target, dist);
+				break;
+			case SUCCUBUS:
+				succubusChooseWeapon(target, dist);
+				break;
+			case SLIME:
+				slimeChooseWeapon(target, dist);
+				break;
+			case MOTH_SMALL:
+				mothChooseWeapon(target, dist);
+				break;
+			case BUGBEAR:
+				bugbearChooseWeapon(target, dist);
+				break;
+			case DRYAD:
+				monsterDChooseWeapon(target, dist);
+				break;
+			case MYCONID:
+				monsterMChooseWeapon(target, dist);
+				break;
+			case GREMLIN:
+				monsterGChooseWeapon(target, dist);
+				break;
+			case SHOPKEEPER:
+				if ( target )
+				{
+					if ( Stat* targetStats = target->getStats() )
+					{
+						if ( targetStats->type == SHOPKEEPER && myStats->weapon && myStats->weapon->type == SPELLBOOK_DRAIN_SOUL )
+						{
+							// gentlemans agreement to shoot bleed
+							myStats->weapon->type = SPELLBOOK_BLEED;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}

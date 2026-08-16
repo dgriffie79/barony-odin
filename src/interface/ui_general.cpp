@@ -1002,3 +1002,130 @@ static ConsoleCommand ccmd_toastTest("/toast_test", "",
 		n->showHeight = 112;
 		n->setIdleSeconds(8);
 	});
+
+void UIToastNotification::resetUIPointers() {
+		frame = nullptr;
+		headerField = nullptr;
+		mainField = nullptr;
+		progressField = nullptr;
+		closeButton = nullptr;
+		actionButton = nullptr;
+		frameImage = nullptr;
+		progressBar = nullptr;
+		progressBarBackground = nullptr;
+	}
+
+void UIToastNotification::setMainText(const char* text) {
+		mainCardText = text;
+	}
+
+void UIToastNotification::setSecondaryText(const char* text) {
+		secondaryCardText = text;
+	}
+
+void UIToastNotification::setHeaderText(const char* text) {
+		headerCardText = text;
+	}
+
+void UIToastNotification::setActionText(const char* text) {
+		actionText = text;
+	}
+
+void UIToastNotification::setDisplayedText(const char* text) {
+		displayedText = text;
+	}
+
+void UIToastNotification::setIdleSeconds(Uint32 seconds) {
+		idleTicksToHide = seconds * TICKS_PER_SECOND;
+	}
+
+void UIToastNotification::setStatisticCurrentValue(int value) {
+		statisticUpdateCurrent = value;
+	}
+
+void UIToastNotification::setStatisticMaxValue(int value) {
+		statisticUpdateMax = value;
+	}
+
+void UIToastNotification::setAchievementName(const char* achName) {
+		achievementID = achName;
+	}
+
+const char* UIToastNotification::getMainText() { return mainCardText.c_str(); }
+
+bool UIToastNotification::matchesAchievementName(const char* achName) {
+		return (achievementID.compare(achName) == 0);
+	}
+
+const char* UIToastNotificationManager_t::getImage(const char* image) {
+		if ( image == nullptr )
+		{
+			return "#images/ui/Toasts/bell1.png";
+		}
+		return image;
+	}
+
+void UIToastNotificationManager_t::init() {
+		if (bIsInit) {
+			return;
+		}
+		bIsInit = true;
+		//communityLink1 = loadImage("images/system/CommunityLink1.png");
+		//promoLink1 = loadImage("images/system/Promo1.png");
+		frame = gui->addFrame("toasts");
+		frame->setHollow(true);
+		if (intro) {
+			achievementsCheck = true;
+		}
+	}
+
+void UIToastNotificationManager_t::term(const bool clearNotifications) {
+		if (!bIsInit) {
+			return;
+		}
+		bIsInit = false;
+		if ( clearNotifications )
+		{
+			allNotifications.clear();
+		}
+		else
+		{
+			for ( int64_t i = 0; i < allNotifications.size(); ++i )
+			{
+				auto& n = allNotifications[i];
+				n.isInit = false;
+				n.resetUIPointers();
+			}
+		}
+		if (frame) {
+			frame->removeSelf();
+			frame = nullptr;
+		}
+	}
+
+UIToastNotification* UIToastNotificationManager_t::getNotificationSingle(UIToastNotification::CardType cardType) {
+		for ( int64_t i = 0; i < allNotifications.size(); ++i )
+		{
+			auto& card = allNotifications[i];
+			if ( card.cardType == cardType )
+			{
+				return &card;
+			}
+		}
+		return nullptr;
+	}
+
+UIToastNotification* UIToastNotificationManager_t::getNotificationAchievementSingle(const char* achName) {
+		for ( int64_t i = 0; i < allNotifications.size(); ++i )
+		{
+			auto& card = allNotifications[i];
+			if ( card.cardType == UIToastNotification::CardType::UI_CARD_ACHIEVEMENT )
+			{
+				if ( card.matchesAchievementName(achName) )
+				{
+					return &card;
+				}
+			}
+		}
+		return nullptr;
+	}

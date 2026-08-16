@@ -1769,3 +1769,58 @@ void Stat::setAttribute(DynamicString key, DynamicString value)
 {
 	attributes[key] = value.c_str();
 }
+
+Sint32 Stat::getProficiency(int skill) const {
+		if ( skill >= 0 && skill < NUMPROFICIENCIES )
+		{
+			return PROFICIENCIES[skill];
+		}
+		return 0;
+	}
+void Stat::setProficiency(int skill, int value) {
+		if ( skill >= 0 && skill < NUMPROFICIENCIES )
+		{
+			PROFICIENCIES[skill] = std::min(std::max(0, value), 100);
+		}
+	}
+void Stat::setProficiencyUnsafe(int skill, int value) {
+		PROFICIENCIES[skill] = value;
+	}
+const Uint8& Stat::getEffectActive(int effect) const {
+		if ( effect >= 0 && effect < NUMEFFECTS )
+		{
+			return EFFECTS[effect];
+		}
+		return Stat::nullEffectValue;
+	}
+void Stat::clearEffect(int effect) {
+		if ( effect >= 0 && effect < NUMEFFECTS )
+		{
+			EFFECTS[effect] = 0;
+		}
+	}
+void Stat::setEffectActive(int effect, Uint8 effectStrength) {
+#ifndef EDITOR
+		assert(effectStrength > 0);
+#endif
+		if ( effect >= 0 && effect < NUMEFFECTS )
+		{
+			EFFECTS[effect] = std::max(EFFECTS[effect], effectStrength); // strongest value remains
+		}
+	}
+void Stat::setEffectValueUnsafe(int effect, Uint8 effectStrength) {
+		if ( effect >= 0 && effect < NUMEFFECTS )
+		{
+			EFFECTS[effect] = effectStrength;
+		}
+	}
+DynamicString Stat::getAttribute(DynamicString key) const { 
+		if ( attributes.contains(key) )
+		{
+			return attributes.at(key).c_str();
+		}
+		else
+		{
+			return "";
+		}
+	}

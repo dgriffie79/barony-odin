@@ -44,9 +44,9 @@ public:
 	auto& getSystemGamepadBindings() { return gamepad_system_bindings; }
 	auto& getJoystickBindings() { return joystick_bindings; }
 	auto& getSystemJoystickBindings() { return joystick_system_bindings; }
-	void setKeyboardBindings(DynamicMapStr& toSet) { kb_bindings = toSet; }
-	void setGamepadBindings(DynamicMapStr& toSet) { gamepad_bindings = toSet; }
-	void setJoystickBindings(DynamicMapStr& toSet) { joystick_bindings = toSet; }
+	void setKeyboardBindings(DynamicMapStr& toSet);
+	void setGamepadBindings(DynamicMapStr& toSet);
+	void setJoystickBindings(DynamicMapStr& toSet);
 
 	//! controller type
 	enum playerControlType_t {
@@ -59,7 +59,7 @@ public:
 	playerControlType_t getPlayerControlType();
 
 	//! disable all bindings temporarily
-	void setDisabled(bool _disabled) { disabled = _disabled; }
+	void setDisabled(bool _disabled);
 
 	//! get the status of disabled variable
 	auto isDisabled() const { return disabled; }

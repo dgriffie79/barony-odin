@@ -113,28 +113,7 @@ public:
 	}
 
 		// Serialize a DynamicArrayS32 (std::vector<int> replacement)
-	bool value(DynamicArrayS32& v, Uint32 maxLength = 0) {
-		Uint32 size = (Uint32)v.size();
-		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    bool result = true;
-		    if (isReading()) {
-		        v.clear();
-		        for (Uint32 index = 0; index < size; ++index) {
-			        int32_t elem = 0;
-			        result = value(elem) ? result : false;
-			        v.push_back(elem);
-		        }
-		    } else {
-		        for (Uint32 index = 0; index < size; ++index) {
-			        result = value(v[index]) ? result : false;
-		        }
-		    }
-		    endArray();
-		    return result;
-		} else {
-		    return false;
-		}
-	}
+	bool value(DynamicArrayS32& v, Uint32 maxLength = 0);
 
 
 	// Serialize a generic DynamicArrayT<T> (owning elements serialize via value())
@@ -163,40 +142,10 @@ public:
 	}
 
 	// Serialize a DynamicArrayU32 (std::vector<Uint32> replacement)
-	bool value(DynamicArrayU32& v, Uint32 maxLength = 0) {
-		Uint32 size = (Uint32)v.size();
-		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    bool result = true;
-		    if (isReading()) {
-		        v.clear();
-		        for (Uint32 index = 0; index < size; ++index) {
-			        uint32_t elem = 0;
-			        result = value(elem) ? result : false;
-			        v.push_back(elem);
-		        }
-		    } else {
-		        for (Uint32 index = 0; index < size; ++index) {
-			        result = value(v[index]) ? result : false;
-		        }
-		    }
-		    endArray();
-		    return result;
-		} else {
-		    return false;
-		}
-	}
+	bool value(DynamicArrayU32& v, Uint32 maxLength = 0);
 
 // Serialize a DynamicStringPair_t (pair<DynamicString,DynamicString> mirror)
-	bool value(DynamicStringPair_t& v) {
-	    bool result = false;
-	    if (beginObject()) {
-	        result = true;
-	        result = property("first", v.first) ? result : false;
-	        result = property("second", v.second) ? result : false;
-	        endObject();
-	    }
-	    return result;
-	}
+	bool value(DynamicStringPair_t& v);
 
 // Serialize a pair
 	// @param v the pair to serialize
@@ -233,35 +182,7 @@ public:
 	}
 
 		// Serialize a raw DynamicArray of recipe_t (pair<int,pair<int,int>>, 3 ints)
-	bool value(DynamicArray& v, Uint32 maxLength = 0) {
-		typedef std::pair<int, std::pair<int, int>> recipe_t;
-		Uint32 size = (Uint32)dynarray_size<recipe_t>(v);
-		if (beginArray(size) && (maxLength == 0 || size <= maxLength)) {
-		    bool result = true;
-		    if (isReading()) {
-		        v.len = 0;
-		        for (Uint32 index = 0; index < size; ++index) {
-			        int a = 0, b = 0, c2 = 0;
-			        result = value(a) ? result : false;
-			        result = value(b) ? result : false;
-			        result = value(c2) ? result : false;
-			        recipe_t r = std::make_pair(a, std::make_pair(b, c2));
-			        dynarray_push<recipe_t>(v, r);
-		        }
-		    } else {
-		        for (Uint32 index = 0; index < size; ++index) {
-			        recipe_t* r = dynarray_at<recipe_t>(v, index);
-			        result = value(r->first) ? result : false;
-			        result = value(r->second.first) ? result : false;
-			        result = value(r->second.second) ? result : false;
-		        }
-		    }
-		    endArray();
-		    return result;
-		} else {
-		    return false;
-		}
-	}
+	bool value(DynamicArray& v, Uint32 maxLength = 0);
 
 	// Serialize a raw DynamicArray as an array of T. The raw DynamicArray lost
 	// its element type in the vector<...> -> DynamicArray de-STL conversion, so

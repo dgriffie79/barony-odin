@@ -308,3 +308,26 @@ int Item::sellValue(const int player) const
 {
 	return 0;
 }
+
+const char* ItemGeneric::getIdentifiedName() const { return item_name_identified.c_str(); }
+
+const char* ItemGeneric::getUnidentifiedName() const { return item_name_unidentified.c_str(); }
+
+void ItemGeneric::setIdentifiedName(DynamicString name) { item_name_identified = name; }
+
+void ItemGeneric::setUnidentifiedName(DynamicString name) { item_name_unidentified = name; }
+
+bool ItemGeneric::hasAttribute(DynamicString attribute) {
+		if ( attributes.size() > 0 )
+		{
+			if ( attributes.contains(attribute) )
+			{
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			return false;
+		}
+	}

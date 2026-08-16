@@ -299,7 +299,7 @@ public:
 	//! scroll the parent frame (if any) to be within our bounds
 	void scrollParent();
 
-	const char*						getFont() const { return font.c_str(); }
+	const char*						getFont() const;
 	const int						getBorder() const { return border; }
 	const SDL_Rect&					getSize() const { return size; }
 	const SDL_Rect&					getActualSize() const { return actualSize; }
@@ -328,55 +328,44 @@ public:
 	SDL_Surface*					getBlitSurface() const { return blitSurface; }
 	TempTexture*					getBlitTexture() const { return blitTexture; }
 	void							setBlitChildren(bool _doBlit);
-	void							setBlitDirty(bool _bBlitDity) { bBlitDirty = _bBlitDity; }
-	void							setBlitToParent(bool _bBlitParent) { bBlitToParent = _bBlitParent; }
+	void							setBlitDirty(bool _bBlitDity);
+	void							setBlitToParent(bool _bBlitParent);
 	const bool						bIsDirtyBlit() const { return bBlitDirty; }
 	const bool						isBlitToParent() const { return bBlitToParent; }
 	const Uint32					getTicks() const { return ticks; }
 
-	void	setFont(const char* _font) { font = _font; }
-	void	setBorder(const int _border) { border = _border; }
-	void	setPos(const int x, const int y) { size.x = x; size.y = y; }
-	void	setSize(SDL_Rect _size) { size = _size; }
-	void	setBorderStyle(int _borderStyle) { borderStyle = static_cast<border_style_t>(_borderStyle); }
-	void	setHigh(bool b) { borderStyle = b ? BORDER_BEVEL_HIGH : BORDER_BEVEL_LOW; }
-	void	setColor(const Uint32& _color) { color = _color; }
-	void    setSelectedEntryColor(const Uint32& _color) { selectedEntryColor = _color; }
-	void    setActivatedEntryColor(const Uint32& _color) { activatedEntryColor = _color; }
-	void	setBorderColor(const Uint32& _color) { borderColor = _color; }
-	void    setSliderColor(const Uint32& _color) { sliderColor = _color; }
-	void	setDisabled(const bool _disabled) { disabled = _disabled; }
-	void	setHollow(const bool _hollow) { hollow = _hollow; }
-	void	setDropDown(const bool _dropDown) { dropDown = _dropDown; }
-	void	setScrollBarsEnabled(const bool _scrollbars) { scrollbars = _scrollbars; }
-	void	setAllowScrollBinds(const bool _allow) { allowScrollBinds = _allow; }
-	void	setListOffset(SDL_Rect _size) { listOffset = _size; }
-	void	setInheritParentFrameOpacity(const bool _inherit) { inheritParentFrameOpacity = _inherit; }
-	void	setOpacity(const real_t _opacity) { opacity = _opacity; }
-	void	setListJustify(justify_t _justify) { justify = _justify; }
-	void	setClickable(const bool _clickable) { clickable = _clickable; }
-	void    setDontTickChildren(const bool b) { dontTickChildren = b; }
-	void    setEntrySize(int _size) { entrySize = _size; }
-	void    setActivation(entry_t* entry) { activation = entry; }
-	void    setScrollWithLeftControls(const bool b) { scrollWithLeftControls = b; }
-    void    setAccelerationX(const float x) { scrollAccelerationX = x; }
-    void    setAccelerationY(const float y) { scrollAccelerationY = y; }
-	void	setListMenuCancelOverride(const bool b) { bListMenuListCancelOverride = b; }
-	void	setAllowScrollParent(const bool b) { allowScrollParent = b; }
-	void	setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }
+	void	setFont(const char* _font);
+	void	setBorder(const int _border);
+	void	setPos(const int x, const int y);
+	void	setSize(SDL_Rect _size);
+	void	setBorderStyle(int _borderStyle);
+	void	setHigh(bool b);
+	void	setColor(const Uint32& _color);
+	void    setSelectedEntryColor(const Uint32& _color);
+	void    setActivatedEntryColor(const Uint32& _color);
+	void	setBorderColor(const Uint32& _color);
+	void    setSliderColor(const Uint32& _color);
+	void	setDisabled(const bool _disabled);
+	void	setHollow(const bool _hollow);
+	void	setDropDown(const bool _dropDown);
+	void	setScrollBarsEnabled(const bool _scrollbars);
+	void	setAllowScrollBinds(const bool _allow);
+	void	setListOffset(SDL_Rect _size);
+	void	setInheritParentFrameOpacity(const bool _inherit);
+	void	setOpacity(const real_t _opacity);
+	void	setListJustify(justify_t _justify);
+	void	setClickable(const bool _clickable);
+	void    setDontTickChildren(const bool b);
+	void    setEntrySize(int _size);
+	void    setActivation(entry_t* entry);
+	void    setScrollWithLeftControls(const bool b);
+    void    setAccelerationX(const float x);
+    void    setAccelerationY(const float y);
+	void	setListMenuCancelOverride(const bool b);
+	void	setAllowScrollParent(const bool b);
+	void	setScrollParentOffset(const SDL_Rect& offset);
 
-	void setActualSize(SDL_Rect _actualSize) {
-		allowScrolling = true;
-		actualSize = _actualSize;
-		scrollX -= (int)scrollX;
-		scrollY -= (int)scrollY;
-		scrollX += actualSize.x;
-		scrollY += actualSize.y;
-		scrollVelocityX = 0.f;
-		scrollVelocityY = 0.f;
-		scrollAccelerationX = 0.f;
-		scrollAccelerationY = 0.f;
-	}
+	void setActualSize(SDL_Rect _actualSize);
 
 private:
 	Uint32 ticks = 0;									//!< number of engine ticks this frame has persisted

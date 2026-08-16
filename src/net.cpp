@@ -10052,3 +10052,15 @@ void PingNetworkStatus_t::update()
 		p.saveDisplayMillis();
 	}
 }
+
+void PingNetworkStatus_t::clear() {
+		pings.clear();
+		needsUpdate = true;
+		hudDisplayOKTicks = 0;
+		lastPingtime = 0;
+		lastSequence = 0;
+		oldestSequenceTicks = 0;
+		displayMillis = 0;
+		sequence = 0;
+		displayMillisImmediate = 0;
+	}

@@ -7943,3 +7943,393 @@ int Player::PlayerMechanics_t::getWealthTier()
 	}
 	return 0;
 }
+
+void PlayerSettings_t::init(const int _player) {
+		player = _player;
+	}
+
+const void Inputs::setPlayerIDAllowedKeyboard(const int player) {
+		if (multiplayer != SINGLE && player != 0) {
+			setPlayerIDAllowedKeyboard(0);
+			return;
+		}
+	    printlog("giving keyboard to player %d", player);
+		playerUsingKeyboardControl = player;
+	}
+
+const int Inputs::getPlayerIDAllowedKeyboard() {
+		if (multiplayer != SINGLE)
+		{
+			return 0;
+		}
+		else
+		{
+	   		return playerUsingKeyboardControl;
+		}
+	}
+
+const bool Inputs::bPlayerUsingKeyboardControl(const int player) const {
+		return player == playerUsingKeyboardControl || multiplayer != SINGLE;
+	}
+
+void Inputs::removeControllerWithDeviceID(const int id) {
+		for ( int i = 0; i < MAXPLAYERS; ++i )
+		{
+			if ( playerControllerIds[i] == id )
+			{
+				playerControllerIds[i] = -1;
+				printlog("[INPUTS]: Removed controller id %d from player index %d.", id, i);
+			}
+		}
+	}
+
+Inputs::VirtualMouse * Inputs::getVirtualMouse(int player) {
+		if (multiplayer != SINGLE && player != 0) {
+			return getVirtualMouse(0);
+		}
+		if ( player < 0 || player >= MAXPLAYERS )
+		{
+			printlog("[INPUTS]: Warning: player index %d out of range.", player);
+			return nullptr;
+		}
+		return &vmouse[player];
+	}
+
+Inputs::UIStatus * Inputs::getUIInteraction(int player) {
+		if ( player < 0 || player >= MAXPLAYERS )
+		{
+			printlog("[INPUTS]: Warning: player index %d out of range.", player);
+			return nullptr;
+		}
+		return &uiStatus[player];
+	}
+
+void Inputs::hideMouseCursors() {
+		for ( int i = 0; i < MAXPLAYERS; ++i )
+		{
+			getVirtualMouse(i)->draw_cursor = false;
+		}
+	}
+
+const int Inputs::getControllerID(int player) const {
+		if (multiplayer != SINGLE && player != 0) {
+			return getControllerID(0);
+		}
+		if ( player < 0 || player >= MAXPLAYERS )
+		{
+			printlog("[INPUTS]: Warning: player index %d out of range.", player);
+			return -1;
+		}
+		return playerControllerIds[player];
+	}
+
+const bool Inputs::hasController(int player) const {
+		if (multiplayer != SINGLE && player != 0) {
+			return hasController(0);
+		}
+		if ( player < 0 || player >= MAXPLAYERS )
+		{
+			printlog("[INPUTS]: Warning: player index %d out of range.", player);
+			return false;
+		}
+		return playerControllerIds[player] != -1 && getController(player);
+	}
+
+void Inputs::setControllerID(int player, const int id) {
+		if (multiplayer != SINGLE && player != 0) {
+			return setControllerID(0, id);
+		}
+		if ( player < 0 || player >= MAXPLAYERS )
+		{
+			printlog("[INPUTS]: Warning: player index %d out of range.", player);
+		}
+		playerControllerIds[player] = id;
+	}
+
+void Inputs::updateAllMouse() {
+		for ( int i = 0; i < MAXPLAYERS; ++i )
+		{
+			controllerHandleMouse(i);
+		}
+	}
+
+void Inputs::updateAllOMouse() {
+		for ( int i = 0; i < MAXPLAYERS; ++i )
+		{
+			if ( !bMouseLeft(i) )
+			{
+				vmouse[i].ox = vmouse[i].x;
+				vmouse[i].oy = vmouse[i].y;
+				vmouse[i].floatox = vmouse[i].floatx;
+				vmouse[i].floatoy = vmouse[i].floaty;
+				vmouse[i].moved = false;
+				vmouse[i].mouseLeftHeld = false;
+				vmouse[i].mouseLeftHeldTicks = 0;
+			}
+			else
+			{
+				if ( vmouse[i].mouseLeftHeldTicks == 0 )
+				{
+					vmouse[i].mouseLeftHeldTicks = ticks;
+				}
+				else if ( ticks - vmouse[i].mouseLeftHeldTicks > Inputs::VirtualMouse::MOUSE_HELD_TICKS )
+				{
+					vmouse[i].mouseLeftHeld = true;
+				}
+			}
+		}
+		/*messagePlayer(0, "x: %d | y: %d / x: %d | y: %d / x: %d | y: %d / x: %d | y: %d ", 
+			vmouse[0].ox, vmouse[0].oy,
+			vmouse[1].ox, vmouse[1].oy,
+			vmouse[2].ox, vmouse[2].oy,
+			vmouse[3].ox, vmouse[3].oy);*/
+	}
+
+void Inputs::updateAllRelMouse() {
+		for ( int i = 0; i < MAXPLAYERS; ++i )
+		{
+			vmouse[i].xrel = 0;
+			vmouse[i].yrel = 0;
+			vmouse[i].floatxrel = 0.0;
+			vmouse[i].floatyrel = 0.0;
+		}
+	}
+
+void Inputs::rumble(const int player, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid) {
+		if (multiplayer != SINGLE && player != 0) {
+			rumble(0, pattern, smallMagnitude, largeMagnitude, length, srcEntityUid);
+			return;
+		}
+		if ( !hasController(player) )
+		{
+			return;
+		}
+		getController(player)->addRumble(pattern, smallMagnitude, largeMagnitude, length, srcEntityUid);
+	}
+
+void Inputs::rumbleStop(const int player) {
+		if (multiplayer != SINGLE && player != 0) {
+			rumbleStop(0);
+			return;
+		}
+		if ( !hasController(player) )
+		{
+			return;
+		}
+		getController(player)->stopRumble();
+	}
+
+void Inputs::VirtualMouse::warpMouseInCamera(const view_t& camera, const Sint32 newx, const Sint32 newy) {
+			x = std::max(camera.winx, std::min(camera.winx + camera.winw, x + newx));
+			y = std::max(camera.winy, std::min(camera.winy + camera.winh, y + newy));
+			xrel += newx;
+			yrel += newy;
+			moved = true;
+		}
+
+void Inputs::VirtualMouse::warpMouseInScreen(SDL_Window*& window, const Sint32 newx, const Sint32 newy) {
+			int w, h;
+			SDL_GetWindowSize(window, &w, &h);
+			x = std::max(0, std::min(w, x + newx));
+			y = std::max(0, std::min(h, y + newy));
+			xrel += newx;
+			yrel += newy;
+			moved = true;
+		}
+
+view_t& Player::camera() const { return *cam; }
+
+const int Player::camera_x2() const { return cam->winx + cam->winw; }
+
+const int Player::camera_y2() const { return cam->winy + cam->winh; }
+
+const int Player::camera_midx() const { return camera_x1() + camera_width() / 2; }
+
+const int Player::camera_midy() const { return camera_y1() + camera_height() / 2; }
+
+const int Player::Inventory_t::getTotalSize() const { return sizex * sizey; }
+
+const int Player::Inventory_t::getSlotSize() const { return 40; }
+
+const int Player::Inventory_t::getItemSpriteSize() const { return 36; }
+
+void Player::Inventory_t::setSizeY(int size) { sizey = size; }
+
+void Player::Inventory_t::selectSlot(const int x, const int y) { selectedSlotX = x; selectedSlotY = y; }
+
+void Player::Inventory_t::selectSpell(const int x, const int y) { selectedSpellX = x; selectedSpellY = y; }
+
+const bool Player::Inventory_t::selectedSlotInPaperDoll() const { return selectedSlotY < 0; }
+
+void Player::Inventory_t::resetInventory() {
+			if ( bNewInventoryLayout )
+			{
+				DEFAULT_INVENTORY_SIZEX = 5;
+				DEFAULT_INVENTORY_SIZEY = 6;
+			}
+			else
+			{
+				DEFAULT_INVENTORY_SIZEX = 12;
+				DEFAULT_INVENTORY_SIZEY = 3;
+			}
+			sizex = DEFAULT_INVENTORY_SIZEX;
+			sizey = DEFAULT_INVENTORY_SIZEY;
+		}
+
+const int Player::Inventory_t::freeVisibleInventorySlots() const {
+			int x = getPlayerItemInventoryX();
+			int y = getPlayerItemInventoryY();
+			return x * y;
+		}
+
+const int Player::Inventory_t::getPlayerBackpackBonusSizeY() const {
+			if ( bNewInventoryLayout )
+			{
+				return 2;
+			}
+			return 1;
+		}
+
+void Player::Inventory_t::ItemTooltipDisplay_t::reset() {
+				type = WOODEN_SHIELD;
+				status = BROKEN;
+				beatitude = 0;
+				count = -1;
+				appearance = 0;
+				identified = false;
+				uid = 0;
+				wasAppraisalTarget = false;
+
+				playernum = -1;
+				playerLVL = -1;
+				playerEXP = -1;
+				playerSTR = -1;
+				playerDEX = -1;
+				playerCON = -1;
+				playerINT = -1;
+				playerPER = -1;
+				playerCHR = -1;
+			}
+
+void Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::setSkillName(std::string name) {
+					skillName = name;
+				}
+
+void Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::setSkillShortName(std::string name) {
+					skillShortName = name;
+				}
+
+const char* Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::getSkillName(bool shortName ) {
+					if ( shortName )
+					{
+						if ( skillShortName.len > 0 )
+						{
+							return skillShortName.c_str();
+						}
+					}
+					return skillName.c_str();
+				}
+
+void Player::HUD_t::reset() {
+			swapWeaponGimpTimer = 0;
+			bowGimpTimer = 0;
+			throwGimpTimer = 0;
+			pickaxeGimpTimer = 0;
+			bowFire = false;
+			bowIsBeingDrawn = false;
+			bowStartDrawingTick = 0;
+			bowDrawBaseTicks = 50;
+			weaponSwitch = false;
+			shieldSwitch = false;
+		}
+
+void Player::HUD_t::setCursorDisabled(bool disabled) { if ( cursorFrame ) { cursorFrame->setDisabled(disabled); } }
+
+void Player::Magic_t::flashNoMana() {
+			noManaFeedbackTicks = 0;
+			noManaProcessedOnTick = ticks;
+		}
+
+void Player::Magic_t::clearSelectedSpells() {
+			selected_spell = nullptr;
+			for ( int c = 0; c < NUM_HOTBAR_ALTERNATES; ++c )
+			{
+				selected_spell_alternate[c] = nullptr;
+			}
+			selected_spell_last_appearance = -1;
+			quick_cast_spell = nullptr;
+		}
+
+void Player::Magic_t::equipSpell(spell_t* spell) { 
+			selected_spell = spell; 
+		}
+
+bool Player::Magic_t::doQuickCastSpell() { return quick_cast_spell != nullptr; }
+
+void Player::Magic_t::resetQuickCastSpell() { quick_cast_spell = nullptr; }
+
+void Player::Magic_t::resetQuickCastTome() { quick_cast_tome = 0; }
+
+int Player::MessageZone_t::fontSize() { return getHeightOfFont(font); }
+
+void Player::WorldUI_t::enable() { bEnabled = true; }
+
+void Player::WorldUI_t::disable() { 
+			bEnabled = false; 
+			reset();
+		}
+
+void Player::PaperDoll_t::initSlots() {
+			returningItemsToInventory.clear();
+			for ( int i = 0; i < kNumPaperDollSlots; ++i )
+			{
+				dollSlots[i].item = 0;
+				dollSlots[i].slotType = static_cast<PaperDollSlotType>(i);
+			}
+		}
+
+void Player::PaperDoll_t::clear() {
+			returningItemsToInventory.clear();
+			for ( int i = 0; i < kNumPaperDollSlots; ++i )
+			{
+				dollSlots[i].item = 0;
+			}
+		}
+
+bool Player::PaperDoll_t::isItemOnDoll(const Item& item) const { return getSlotForItem(item) != SLOT_MAX; }
+
+void Player::PaperDoll_t::resetPortrait() {
+			portraitRotationInertia = 0.0;
+			portraitRotationPercent = 0.0;
+			portraitYaw = (330) * PI / 180;
+		}
+
+const int Player::Hotbar_t::getSlotSize() const { return 48; }
+
+const int Player::Hotbar_t::getHotbarStartY1() const { return -106; }
+
+const int Player::Hotbar_t::getHotbarStartY2() const { return -96; }
+
+void Player::Hotbar_t::clear() {
+			faceButtonTopYPosition = yres;
+			swapHotbarOnShapeshift = 0;
+			current_hotbar = 0;
+			//hotbarHasFocus = false;
+			magicBoomerangHotbarSlot = -1;
+			magicDuckHotbarSlot = -1;
+			hotbarTooltipLastGameTick = 0;
+			for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
+			{
+				hotbarShapeshiftInit[j] = false;
+			}
+			for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
+			{
+				hotbar[i].item = 0;
+				hotbar[i].resetLastItem();
+				for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
+				{
+					hotbar_alternate[j][i].item = 0;
+					hotbar_alternate[j][i].resetLastItem();
+				}
+			}
+		}

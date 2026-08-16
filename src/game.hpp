@@ -523,29 +523,7 @@ public:
 	DebugStatsClass()
 	{};
 
-	void inline storeOldTimePoints()
-	{
-		t1Stored = t1StartLoop;
-		t2Stored = t2PostEvents;
-		t21Stored = t21PostHandleMessages;
-		t3Stored = t3SteamCallbacks;
-		t4Stored = t4Music;
-		t5Stored = t5MainDraw;
-		t6Stored = t6Messages;
-		t7Stored = t7Inputs;
-		t8Stored = t8Status;
-		t9Stored = t9GUI;
-		t10Stored = t10FrameLimiter;
-		t11Stored = t11End;
-		eventsT1stored = eventsT1;
-		eventsT2stored = eventsT2;
-		eventsT3stored = eventsT3;
-		eventsT4stored = eventsT4;
-		eventsT5stored = eventsT5;
-		eventsT6stored = eventsT6;
-
-		messagesT1stored = messagesT1;
-	};
+	void inline storeOldTimePoints();;
 
 	void storeStats();
 
@@ -577,10 +555,7 @@ public:
 		using time_point = std::chrono::time_point<Clock>;
 		static constexpr bool is_steady = true;
 
-		static time_point now() noexcept
-		{
-			return time_point{ duration{ SDL_GetTicks() } };
-		}
+		static time_point now() noexcept;
 	};
 
 	struct State

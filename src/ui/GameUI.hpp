@@ -35,16 +35,8 @@ struct EnemyBarSettings_t
 	DynamicMapF32 heightOffsets;
 	DynamicMapF32 screenDistanceOffsets;
 	std::string getEnemyBarSpriteName(Entity* entity);
-	float getHeightOffset(Entity* entity)
-	{
-		if ( !entity ) { return 0.f; }
-		return heightOffsets[getEnemyBarSpriteName(entity)];
-	}
-	float getScreenDistanceOffset(Entity* entity)
-	{
-		if ( !entity ) { return 0.f; }
-		return screenDistanceOffsets[getEnemyBarSpriteName(entity)];
-	}
+	float getHeightOffset(Entity* entity);
+	float getScreenDistanceOffset(Entity* entity);
 };
 extern EnemyBarSettings_t enemyBarSettings;
 struct CustomColors_t
@@ -215,25 +207,8 @@ struct StatusEffectQueue_t
 	Frame* getStatusEffectFrame();
 	void handleNavigation(DynamicMapI32T<StatusEffectQueueEntry_t*>& grid, 
 		bool& tooltipShowing, const bool hungerEffectInEffectQueue);
-	void resetQueue()
-	{
-		requiresAnimUpdate = true;
-		effectQueue.clear();
-		notificationQueue.clear();
-	}
-	void deleteEffect(int effect)
-	{
-		for ( auto it = effectQueue.begin(); it != effectQueue.end(); )
-		{
-			if ( (*it).effect == effect )
-			{
-				requiresAnimUpdate = true;
-				it = effectQueue.erase(it);
-				continue;
-			}
-			++it;
-		}
-	}
+	void resetQueue();
+	void deleteEffect(int effect);
 	StatusEffectQueue_t(int _player) { player = _player; }
 	static void loadStatusEffectsJSON();
 	struct EffectDefinitionEntry_t
@@ -263,11 +238,7 @@ struct StatusEffectQueue_t
 		static Uint32 tooltipDescColor;
 		static Uint32 notificationTextColor;
 		static DynamicString notificationFont;
-		static void reset()
-		{
-			allEffects.clear();
-			allSustainedSpells.clear();
-		}
+		static void reset();
 		static bool effectDefinitionExists(int effectID)
 		{
 			return (allEffects.find(effectID) != allEffects.end());
@@ -276,14 +247,8 @@ struct StatusEffectQueue_t
 		{
 			return (allSustainedSpells.find(spellID) != allSustainedSpells.end());
 		}
-		static EffectDefinitionEntry_t& getEffect(int effectID)
-		{
-			return allEffects[effectID];
-		}
-		static EffectDefinitionEntry_t& getSustainedSpell(int spellID)
-		{
-			return allSustainedSpells[spellID];
-		}
+		static EffectDefinitionEntry_t& getEffect(int effectID);
+		static EffectDefinitionEntry_t& getSustainedSpell(int spellID);
 		static std::string getEffectImgPath(EffectDefinitionEntry_t& entry, int variation = -1);
 	};
 };

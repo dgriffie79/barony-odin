@@ -537,19 +537,7 @@ struct SaveGameInfo {
 				numKills = h.numKills;
 				numAccessories = h.numAccessories;
 			}
-			bool serialize(FileInterface* fp)
-			{
-				fp->property("wanted_level", wantedLevel);
-				fp->property("player_race", playerRace);
-				fp->property("equipment", equipment);
-				fp->property("type", type);
-				fp->property("sex", sex);
-				fp->property("player", player);
-				fp->property("num_aggressions", numAggressions);
-				fp->property("num_kills", numKills);
-				fp->property("num_accessories", numAccessories);
-				return true;
-			}
+			bool serialize(FileInterface* fp);
 		};
 		DynamicArray shopkeeperHostility;  // vector<pair<int,PlayerRaceHostility_t>> (POD)
 		DynamicArray compendium_item_events;  // vector<pair<DynamicString, DynamicArrayS32>>
@@ -600,17 +588,7 @@ struct SaveGameInfo {
 				bool identified = false;
 				int x = 0;
 				int y = 0;
-				bool serialize(FileInterface* fp) {
-					fp->property("type", type);
-					fp->property("status", status);
-					fp->property("appearance", appearance);
-					fp->property("beatitude", beatitude);
-					fp->property("count", count);
-					fp->property("identified", identified);
-					fp->property("x", x);
-					fp->property("y", y);
-					return true;
-				}
+				bool serialize(FileInterface* fp);
 				void computeHash(Uint32& hash, Uint32& shift);
 			};
 
@@ -637,14 +615,7 @@ struct SaveGameInfo {
 				bool spawnedOnGround = false;
 				bool looted = false;
 				DynamicArray items;  // vector<item_t> (POD)
-				bool serialize(FileInterface* fp) {
-					fp->property("spawn_x", spawn_x);
-					fp->property("spawn_y", spawn_y);
-					fp->property("looted", looted);
-					fp->property("spawned", spawnedOnGround);
-					fp->propertyName("items"); fp->valueArray<item_t>(items);
-					return true;
-				}
+				bool serialize(FileInterface* fp);
 			};
 
 			DynamicString name;
@@ -677,98 +648,13 @@ struct SaveGameInfo {
 			DynamicArray void_chest_inventory;  // vector<item_t> (POD)
 			DynamicArray player_lootbags;  // vector<pair<Uint32,lootbag_t>> (lootbag owns items)
 
-			bool serialize(FileInterface* fp) {
-				fp->property("name", name);
-				fp->property("type", type);
-				fp->property("sex", sex);
-				fp->property("appearance", statscore_appearance);
-				fp->property("HP", HP);
-				fp->property("maxHP", maxHP);
-				fp->property("MP", MP);
-				fp->property("maxMP", maxMP);
-				fp->property("STR", STR);
-				fp->property("DEX", DEX);
-				fp->property("CON", CON);
-				fp->property("INT", INT);
-				fp->property("PER", PER);
-				fp->property("CHR", CHR);
-				fp->property("EXP", EXP);
-				fp->property("LVL", LVL);
-				fp->property("GOLD", GOLD);
-				fp->property("HUNGER", HUNGER);
-				fp->property("PROFICIENCIES", PROFICIENCIES);
-				fp->property("EFFECTS", EFFECTS);
-				fp->property("EFFECTS_TIMERS", EFFECTS_TIMERS);
-				fp->property("EFFECTS_ACCRETION_TIME", EFFECTS_ACCRETION_TIME);
-				fp->property("MISC_FLAGS", MISC_FLAGS);
-				fp->propertyName("player_equipment"); fp->valueArray<std::pair<DynamicString, Uint32>>(player_equipment);
-				fp->propertyName("npc_equipment");     fp->valueArray<std::pair<DynamicString, item_t>>(npc_equipment);
-				fp->propertyName("inventory");         fp->valueArray<item_t>(inventory);
-				fp->propertyName("void_chest_inventory"); fp->valueArray<item_t>(void_chest_inventory);
-				fp->propertyName("attributes");        fp->valueArray<std::pair<DynamicString, DynamicString>>(attributes);
-				fp->propertyName("lootbags");          fp->valueArray<std::pair<Uint32, lootbag_t>>(player_lootbags);
-				return true;
-			}
+			bool serialize(FileInterface* fp);
 		};
 
 		stat_t stats;
 		DynamicArrayT<stat_t> followers;
 		
-		bool serialize(FileInterface* fp) {
-			fp->property("char_class", char_class);
-			fp->property("race", race);
-			fp->property("kills", kills);
-			fp->property("race", race);
-			fp->property("conduct_penniless", conductPenniless);
-			fp->property("conduct_foodless", conductFoodless);
-			fp->property("conduct_vegetarian", conductVegetarian);
-			fp->property("conduct_illiterate", conductIlliterate);
-			fp->property("additional_conducts", additionalConducts);
-			if ( fp->isReading() )
-			{
-				for ( int i = 0; i < NUM_HOTBAR_SLOTS; ++i )
-				{
-					hotbar[i] = UINT32_MAX;
-					for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
-					{
-						hotbar_alternate[j][i] = UINT32_MAX;
-					}
-				}
-				selected_spell = UINT32_MAX;
-				for ( int j = 0; j < NUM_HOTBAR_ALTERNATES; ++j )
-				{
-					selected_spell_alternate[j] = UINT32_MAX;
-				}
-			}
-			fp->property("hotbar", hotbar);
-			fp->property("hotbar_alternate", hotbar_alternate);
-			fp->property("selected_spell", selected_spell);
-			fp->property("selected_spell_alternate", selected_spell_alternate);
-			fp->property("selected_spell_last_appearance", selected_spell_last_appearance);
-			fp->property("spells", spells);
-			fp->property("recipes", known_recipes);
-			fp->property("scrolls", known_scrolls);
-			fp->property("stats", stats);
-			fp->property("followers", followers);
-			fp->property("game_statistics", gameStatistics);
-			fp->propertyName("shopkeeper_hostility"); fp->valueArray<std::pair<int, PlayerRaceHostility_t>>(shopkeeperHostility);
-			fp->propertyName("compendium_item_events"); fp->valueArray<std::pair<DynamicString, DynamicArrayS32>>(compendium_item_events);
-			fp->propertyName("item_degrade_rng"); fp->valueArray<std::pair<int, int>>(itemDegradeRNG);
-			fp->property("sustained_mp_used_sorcery", sustainedSpellMPUsedSorcery);
-			fp->property("sustained_mp_used_mysticism", sustainedSpellMPUsedMysticism);
-			fp->property("sustained_mp_used_thaumaturgy", sustainedSpellMPUsedThaumaturgy);
-			fp->property("base_mp_used_sorcery", baseSpellMPUsedSorcery);
-			fp->property("base_mp_used_mysticism", baseSpellMPUsedMysticism);
-			fp->property("base_mp_used_thaumaturgy", baseSpellMPUsedThaumaturgy);
-			fp->property("learned_spells", learnedSpells);
-			fp->propertyName("ducks_in_a_row"); fp->valueArray<std::pair<int, int>>(ducksInARow);
-			fp->propertyName("favorite_books_achievement"); fp->valueArray<std::pair<int, int>>(favoriteBooksAchievement);
-			fp->propertyName("sustained_spell_id_counters"); fp->valueArray<std::pair<int, int>>(sustainedSpellIDCounter);
-			fp->propertyName("escalating_rng_rolls"); fp->valueArray<std::pair<int, int>>(escalatingRngRolls);
-			fp->propertyName("escalating_spell_rng_rolls"); fp->valueArray<std::pair<int, int>>(escalatingSpellRngRolls);
-			fp->propertyName("appraisal_time_progress"); fp->valueArray<std::pair<int, int>>(appraisal_item_progress);
-			return true;
-		}
+		bool serialize(FileInterface* fp);
 
 		int isCharacterValidFromDLC();
 	};
@@ -776,29 +662,7 @@ struct SaveGameInfo {
 	DynamicArrayStringPair map_messages; // map modifiers "sound of pickaxes striking rock" "walls are fortified" etc
 	DynamicArrayStringPair additional_data;
 	
-	bool serialize(FileInterface* fp) {
-		fp->property("magic_cookie", magic_cookie);
-		fp->property("game_version", game_version);
-		fp->property("timestamp", timestamp);
-		fp->property("hash", hash);
-		fp->property("game_name", gamename);
-		fp->property("gamekey", gamekey);
-		fp->property("lobbykey", lobbykey);
-		fp->property("mapseed", mapseed);
-		fp->property("gametimer", gametimer);
-		fp->property("svflags", svflags);
-		fp->property("player_num", player_num);
-		fp->property("multiplayer_type", multiplayer_type);
-		fp->property("dungeon_lvl", dungeon_lvl);
-		fp->property("level_track", level_track);
-		fp->property("customseed", customseed);
-		fp->property("customseed_string", customseed_string);
-		fp->property("players_connected", players_connected);
-		fp->property("players", players);
-		fp->property("additional_data", additional_data);
-		fp->property("map_messages", map_messages);
-		return true;
-	}
+	bool serialize(FileInterface* fp);
 
 	void computeHash(const int playernum, Uint32& hash);
 };
@@ -906,54 +770,8 @@ public:
 		BY_THE_BOOK_BREW
 	};
 	void updatePlayerAchievement(int player, Achievement achievement, AchievementEvent achEvent);
-	bool bIsAchievementAllowedDuringTutorial(DynamicString achievementStr)
-	{
-		if ( !achievementStr.compare("BARONY_ACH_TEACHABLE_MOMENT") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_MASTER") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_FAST_LEARNER") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_BACK_TO_BASICS") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_EXPELLED") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_EXTRA_CREDIT") )
-		{
-			return true;
-		}
-		if ( !achievementStr.compare("BARONY_ACH_DIPLOMA") )
-		{
-			return true;
-		}
-		return false;
-	}
-	bool bIsStatisticAllowedDuringTutorial(SteamStatIndexes statistic)
-	{
-		switch ( statistic )
-		{
-			case STEAM_STAT_EXTRA_CREDIT:
-			case STEAM_STAT_EXTRA_CREDIT_LVLS:
-			case STEAM_STAT_DIPLOMA:
-			case STEAM_STAT_DIPLOMA_LVLS:
-			case STEAM_STAT_TUTORIAL_ENTERED:
-				return true;
-				break;
-			default:
-				return false;
-				break;
-		}
-	}
+	bool bIsAchievementAllowedDuringTutorial(DynamicString achievementStr);
+	bool bIsStatisticAllowedDuringTutorial(SteamStatIndexes statistic);
 	class PlayerAchievements
 	{
 	public:

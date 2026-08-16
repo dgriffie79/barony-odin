@@ -8017,3 +8017,30 @@ void DebugStatsClass::storeEventStats()
 		"Events1: %4.5fms\nEvents2: %4.5fms\nEvents3: %4.5fms\nEvents4: %4.5fms\nEvents5: %4.5fms\nMessagesT1: %4.5fms\nMessagesT2: %4.5fms\n",
 		out1, out2, out3, out4, out5, messages1, messages2);
 }
+
+void inline DebugStatsClass::storeOldTimePoints() {
+		t1Stored = t1StartLoop;
+		t2Stored = t2PostEvents;
+		t21Stored = t21PostHandleMessages;
+		t3Stored = t3SteamCallbacks;
+		t4Stored = t4Music;
+		t5Stored = t5MainDraw;
+		t6Stored = t6Messages;
+		t7Stored = t7Inputs;
+		t8Stored = t8Status;
+		t9Stored = t9GUI;
+		t10Stored = t10FrameLimiter;
+		t11Stored = t11End;
+		eventsT1stored = eventsT1;
+		eventsT2stored = eventsT2;
+		eventsT3stored = eventsT3;
+		eventsT4stored = eventsT4;
+		eventsT5stored = eventsT5;
+		eventsT6stored = eventsT6;
+
+		messagesT1stored = messagesT1;
+	}
+
+TimerExperiments::Clock::time_point TimerExperiments::Clock::now() noexcept {
+			return time_point{ duration{ SDL_GetTicks() } };
+		}

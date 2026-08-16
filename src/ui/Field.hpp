@@ -94,44 +94,44 @@ public:
 	//! add a key value pair to the highlighted word map
 	//! @param word the word 'index' in the sentence (first word is 0)
 	//! @param color the color to set the word to
-	void addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
+	void addWordToHighlight(int word, Uint32 color);
 
 	//! gets map for highlighted words
 	const DynamicMapI32T<Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
 
 	//! reset the highlighted word map
-	void clearWordsToHighlight() { wordsToHighlight.clear(); }
+	void clearWordsToHighlight();
 
 	//! add a key value pair to the colored line map
 	//! @param line the line number associated with the color
 	//! @param color the color to set the line to
-	void addColorToLine(int line, Uint32 color) { linesToColor[line] = color; }
+	void addColorToLine(int line, Uint32 color);
 
 	//! reset the line color map
-	void clearLinesToColor() { linesToColor.clear(); }
+	void clearLinesToColor();
 
 	//! reset the individual line padding
-	void clearIndividualLinePadding() { individualLinePadding.clear(); }
+	void clearIndividualLinePadding();
 
 	static const int TEXT_HIGHLIGHT_WORDS_PER_LINE = 10000;
 
 	const char*					getText() const { return text; }
 	const size_t                getTextLen() const { return textlen; }
-	const char*					getFont() const { return font.c_str(); }
+	const char*					getFont() const;
 	const Uint32				getColor() const { return color; }
 	const Uint32				getTextColor() const { return textColor; }
 	const Uint32				getOutlineColor() const { return outlineColor; }
 	const Uint32				getBackgroundColor() const { return backgroundColor; }
 	const Uint32				getBackgroundActivatedColor() const { return backgroundActivatedColor; }
 	const Uint32				getBackgroundSelectAllColor() const { return backgroundSelectAllColor; }
-	const SDL_Rect				getSize() const { return size; }
-	const int					getHJustify() const { return static_cast<int>(hjustify); }
-	const int					getVJustify() const { return static_cast<int>(vjustify); }
+	const SDL_Rect				getSize() const;
+	const int					getHJustify() const;
+	const int					getVJustify() const;
 	const bool					isEditable() const { return editable; }
 	const bool					isNumbersOnly() const { return numbersOnly; }
 	void						(*getCallback() const)(Field&) { return callback; }
-	const char*					getGuide() const { return guide.c_str(); }
-	const char*                 getTooltip() const { return tooltip.c_str(); }
+	const char*					getGuide() const;
+	const char*                 getTooltip() const;
 	const bool					isOntop() const { return ontop; }
 	const bool                  isActivated() const { return activated; }
 	const int					getPaddingPerLine() const { return paddingPerLine; }
@@ -139,29 +139,29 @@ public:
 	const Uint32				getlineToColor(const int line) const { return linesToColor.find(line) != linesToColor.end() ? linesToColor.at(line) : 0; }
 
 	void	setText(const char* _text);
-	void	setPos(const int x, const int y) { size.x = x; size.y = y; }
-	void	setSize(const SDL_Rect _size) { size = _size; }
-	void	setColor(const Uint32 _color) { color = _color; }
-	void	setTextColor(const Uint32 _color) { if (textColor != _color) { textColor = _color; dirty = true; } }
-	void	setOutlineColor(const Uint32 _color) { if (outlineColor != _color) { outlineColor = _color; dirty = true; } }
-	void	setBackgroundColor(const Uint32 _color) { backgroundColor = _color; }
-	void	setBackgroundActivatedColor(const Uint32 _color) { backgroundActivatedColor = _color; }
-	void	setBackgroundSelectAllColor(const Uint32 _color) { backgroundSelectAllColor = _color; }
-	void	setEditable(const bool _editable) { editable = _editable; }
-	void	setNumbersOnly(const bool _numbersOnly) { numbersOnly = _numbersOnly; }
-	void	setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
-	void	setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
-	void	setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
-	void	setScroll(const bool _scroll) { scroll = _scroll; }
-	void	setCallback(void (*const fn)(Field&)) { callback = fn; }
-	void	setFont(const char* _font) { if (font != _font) { font = _font; dirty = true; } }
-	void	setGuide(const char* _guide) { guide = _guide; }
-	void	setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+	void	setPos(const int x, const int y);
+	void	setSize(const SDL_Rect _size);
+	void	setColor(const Uint32 _color);
+	void	setTextColor(const Uint32 _color);
+	void	setOutlineColor(const Uint32 _color);
+	void	setBackgroundColor(const Uint32 _color);
+	void	setBackgroundActivatedColor(const Uint32 _color);
+	void	setBackgroundSelectAllColor(const Uint32 _color);
+	void	setEditable(const bool _editable);
+	void	setNumbersOnly(const bool _numbersOnly);
+	void	setJustify(const int _justify);
+	void	setHJustify(const int _justify);
+	void	setVJustify(const int _justify);
+	void	setScroll(const bool _scroll);
+	void	setCallback(void (*const fn)(Field&));
+	void	setFont(const char* _font);
+	void	setGuide(const char* _guide);
+	void	setTooltip(const char* _tooltip);
 	void    reflowTextToFit(const int characterOffset, bool check = true);
-	void	setOntop(const bool _ontop) { ontop = _ontop; }
+	void	setOntop(const bool _ontop);
 	static char* tokenize(char* str, const char* const delimiters);
-	void	setPaddingPerLine(const int _padding) {	paddingPerLine = _padding; }
-	void	setIndividualLinePadding(const int _line, const int _padding) { individualLinePadding[_line] = _padding; }
+	void	setPaddingPerLine(const int _padding);
+	void	setIndividualLinePadding(const int _line, const int _padding);
 
 private:
 	DynamicString font = Font::defaultFont;				//!< font to use for rendering the field

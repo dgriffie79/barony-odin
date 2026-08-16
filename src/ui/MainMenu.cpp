@@ -34719,3 +34719,40 @@ failed:
 		contents_activate_from_tab = false;
 	}
 }
+
+std::basic_string<char> MainMenu::RaceDescriptions::getRaceKey(int race) {
+			switch ( race )
+			{
+			case RACE_HUMAN:
+				return "human";
+			case RACE_SKELETON:
+				return "skeleton";
+			case RACE_VAMPIRE:
+				return "vampire";
+			case RACE_SUCCUBUS:
+				return "succubus";
+			case RACE_GOATMAN:
+				return "goatman";
+			case RACE_AUTOMATON:
+				return "automaton";
+			case RACE_INCUBUS:
+				return "incubus";
+			case RACE_GOBLIN:
+				return "goblin";
+			case RACE_INSECTOID:
+				return "insectoid";
+			case RACE_GREMLIN:
+				return "gremlin";
+			case RACE_DRYAD:
+				return "dryad";
+			case RACE_MYCONID:
+				return "myconid";
+			case RACE_SALAMANDER:
+				return "salamander";
+			case RACE_GNOME:
+				return "gnome";
+			default:
+				break;
+			}
+			return "";
+		}

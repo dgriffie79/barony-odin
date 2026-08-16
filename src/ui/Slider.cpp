@@ -400,3 +400,43 @@ SDL_Rect Slider::getAbsoluteSize() const
 	}
 	return _size;
 }
+
+const char*                 Slider::getTooltip() const { return tooltip.c_str(); }
+
+const char*                 Slider::getHandleImageActivated() const { return handleImageActivated.c_str(); }
+
+const char*                 Slider::getHandleImage() const { return handleImage.c_str(); }
+
+const char*                 Slider::getRailImage() const { return railImage.c_str(); }
+
+void    Slider::setOrientation(orientation_t o) { orientation = o; }
+
+void    Slider::setValue(float _value) { value = _value; }
+
+void    Slider::setMaxValue(float _value) { maxValue = _value; }
+
+void    Slider::setMinValue(float _value) { minValue = _value; }
+
+void    Slider::setValueSpeed(float _value) { valueSpeed = _value; }
+
+void    Slider::setBorder(int _border) { border = _border; }
+
+void    Slider::setHandleSize(const SDL_Rect rect) { handleSize = rect; }
+
+void    Slider::setRailSize(const SDL_Rect rect) { railSize = rect; }
+
+void    Slider::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+
+void    Slider::setColor(const Uint32& _color) { color = _color; }
+
+void    Slider::setHighlightColor(const Uint32& _color) { highlightColor = _color; }
+
+void	Slider::setCallback(void (*const fn)(Slider&)) { callback = fn; }
+
+void    Slider::setHandleImageActivated(const char* _image) { handleImageActivated = _image; }
+
+void    Slider::setHandleImage(const char* _image) { handleImage = _image; }
+
+void    Slider::setRailImage(const char* _image) { railImage = _image; }
+
+void	Slider::setOntop(const bool _ontop) { ontop = _ontop; }

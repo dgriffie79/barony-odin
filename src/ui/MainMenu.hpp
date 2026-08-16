@@ -160,43 +160,7 @@ namespace MainMenu {
 		};
 		static DynamicMapStrT<DescData_t> data;
 		static void readFromFile();
-		static std::string getRaceKey(int race)
-		{
-			switch ( race )
-			{
-			case RACE_HUMAN:
-				return "human";
-			case RACE_SKELETON:
-				return "skeleton";
-			case RACE_VAMPIRE:
-				return "vampire";
-			case RACE_SUCCUBUS:
-				return "succubus";
-			case RACE_GOATMAN:
-				return "goatman";
-			case RACE_AUTOMATON:
-				return "automaton";
-			case RACE_INCUBUS:
-				return "incubus";
-			case RACE_GOBLIN:
-				return "goblin";
-			case RACE_INSECTOID:
-				return "insectoid";
-			case RACE_GREMLIN:
-				return "gremlin";
-			case RACE_DRYAD:
-				return "dryad";
-			case RACE_MYCONID:
-				return "myconid";
-			case RACE_SALAMANDER:
-				return "salamander";
-			case RACE_GNOME:
-				return "gnome";
-			default:
-				break;
-			}
-			return "";
-		}
+		static std::string getRaceKey(int race);
 		static DescData_t& getRaceDescriptionData(int race) { return data[getRaceKey(race)]; }
 		static DescData_t& getMonsterDescriptionData(int type);
 		static bool init;

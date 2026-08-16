@@ -280,3 +280,32 @@ light_t* addLight(Sint32 x, Sint32 y, const char* name, int range_bonus, int ind
         return lightSphere(index, x, y, std::max(def.radius + range_bonus, 1), def.r, def.g, def.b, def.a, def.falloff_exp);
     }
 }
+
+bool DynamicMapLightDef::contains(const char* key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v, MK_LightDef); }
+
+bool DynamicMapLightDef::contains(const DynamicString& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), key, &v, MK_LightDef); }
+
+bool DynamicMapLightDef::contains(const std::string& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v, MK_LightDef); }
+
+bool DynamicMapLightDef::empty() const { return size() == 0; }
+
+void DynamicMapLightDef::clear() { barony_dynamic_map_str_clear(&raw, MK_LightDef); }
+
+DynamicMapLightDef::Iterator DynamicMapLightDef::find(const char* key) const {
+        Iterator it;
+        int32_t n = (int32_t)size();
+        if (n > 0) {
+            std::vector<void*> kp(n); std::vector<int32_t> kl(n); std::vector<LightDef> vv(n);
+            int32_t got = barony_dynamic_map_str_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), n, MK_LightDef);
+            for (int32_t i = 0; i < got; ++i) {
+                if (kl[i] == (int32_t)std::strlen(key) && std::memcmp(kp[i], key, kl[i]) == 0) {
+                    it.kv.first = (const char*)kp[i]; it.kv.second = vv[i]; it.valid = true; break;
+                }
+            }
+        }
+        return it;
+    }
+
+DynamicMapLightDef::Iterator DynamicMapLightDef::find(const std::string& key) const { return find(key.c_str()); }
+
+DynamicMapLightDef::Iterator DynamicMapLightDef::end() const { return Iterator{}; }

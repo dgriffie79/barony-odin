@@ -435,7 +435,7 @@ public:
 		scribingTotalItems.last = nullptr;
 	};
 
-	void setPlayer(const int p) { gui_player = p; }
+	void setPlayer(const int p);
 	const int getPlayer() { return gui_player;  }
 	void closeGUI();
 	void openGUI(int type, Item* effectItem, int effectBeatitude, int effectItemType, int usingSpellID);
@@ -541,68 +541,10 @@ public:
 	{
 		return guiActive;
 	};
-	inline bool isNodeTinkeringCraftableItem(node_t* node)
-	{
-		if ( !node )
-		{
-			return false;
-		}
-		return (node->list == &tinkeringTotalItems);
-	};
-	inline bool isNodeScribingCraftableItem(node_t* node)
-	{
-		if ( !node )
-		{
-			return false;
-		}
-		return (node->list == &scribingTotalItems);
-	};
-	inline bool isItemUsedForCurrentGUI(const Item& item)
-	{
-		if ( &item == scribingToolItem || &item == tinkeringKitItem || &item == alembicItem
-			|| &item == scribingBlankScrollTarget
-			|| &item == transmuteItemTarget
-			|| &item == basePotion || &item == secondaryPotion || &item == itemEffectScrollItem )
-		{
-			return true;
-		}
-		return false;
-	}
-	inline void clearCurrentGUIFromItem(const Item& item)
-	{
-		if ( &item == scribingToolItem )
-		{
-			scribingToolItem = nullptr;
-		}
-		if ( &item == transmuteItemTarget )
-		{
-			transmuteItemTarget = nullptr;
-		}
-		if ( &item == scribingBlankScrollTarget )
-		{
-			scribingBlankScrollTarget = nullptr;
-		}
-		if ( &item == tinkeringKitItem )
-		{
-			tinkeringKitItem = nullptr;
-		}
-		if ( &item == alembicItem )
-		{
-			alembicItem = nullptr;
-		}
-		if ( &item == basePotion )
-		{
-			basePotion = nullptr;
-		}
-		if ( &item == secondaryPotion )
-		{
-			secondaryPotion = nullptr;
-		}
-		if ( &item == itemEffectScrollItem )
-		{
-			itemEffectScrollItem = nullptr;
-		}
-	}
+	inline bool isNodeTinkeringCraftableItem(node_t* node);;
+	inline bool isNodeScribingCraftableItem(node_t* node);;
+	bool isItemUsedForCurrentGUI(const Item& item);
+	void clearCurrentGUIFromItem(const Item& item);
 	bool isNodeFromPlayerInventory(node_t* node);
 
 	struct TinkerGUI_t
@@ -1713,7 +1655,7 @@ public:
 	bool monsterGyroBotOnlyCommand(int option);
 	bool monsterGyroBotDisallowedCommands(int option);
 	bool isTinkeringFollower(int type);
-	void setPlayer(const int p) { gui_player = p; }
+	void setPlayer(const int p);
 	const int getPlayer() const { return gui_player; }
 };
 template <> struct DynamicArrayKindOf<FollowerRadialMenu::PanelEntry> { static constexpr int value = Kind_PanelEntry; };
@@ -1947,7 +1889,7 @@ struct CalloutRadialMenu
 	bool monsterGyroBotOnlyCommand(int option);
 	bool monsterGyroBotDisallowedCommands(int option);
 	bool isTinkeringFollower(int type);*/
-	void setPlayer(const int p) { gui_player = p; }
+	void setPlayer(const int p);
 	const int getPlayer() const { return gui_player; }
 	static bool uidMatchesPlayer(const int playernum, const Uint32 uid);
 	static Uint32 getPlayerUid(const int playernum);

@@ -132,3 +132,23 @@ void LobbyHandler_t::searchLobbyWithFilter(button_t* my)
 void LobbyHandler_t::drawLobbyFilters()
 {
 }
+
+LobbyHandler_t::LobbyServiceType LobbyHandler_t::setLobbyJoinTypeOfCurrentSelection() {
+		if ( getDisplayedResultLobbyType(selectedLobbyInList) != LOBBY_DISABLE )
+		{
+			joiningType = getDisplayedResultLobbyType(selectedLobbyInList);
+		}
+		return joiningType;
+	}
+
+void LobbyHandler_t::setHostingType(LobbyServiceType type) {
+		hostingType = type;
+	}
+
+void LobbyHandler_t::setLobbyJoinType(LobbyServiceType type) {
+	    joiningType = type;
+	}
+
+void LobbyHandler_t::setP2PType(LobbyServiceType type) {
+		P2PType = type;
+	}

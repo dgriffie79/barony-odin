@@ -34,130 +34,42 @@ public:
 	// @param size the size of each data element in bytes
 	// @param count the number of data elements to write
 	// @return the number of bytes written
-	size_t write(const void* src, size_t size, size_t count)
-	{
-		if (mode != FileMode::WRITE || nullptr == src)
-		{
-			return 0U;
-		}
-		const size_t writeSize = size * count;
-		if (pos + writeSize > (size_t)data.len) {
-		    barony_dynamic_array_resize(&data, 1, (int32_t)(pos + writeSize));
-		}
-		if (writeSize) {
-		    memmove((uint8_t*)data.data + pos + writeSize, (uint8_t*)data.data + pos, (size_t)data.len - pos - writeSize);
-		    memcpy((uint8_t*)data.data + pos, src, writeSize);
-		}
-		pos += writeSize;
-		return writeSize / size;
-	}
+	size_t write(const void* src, size_t size, size_t count);
 
 	// read data into the given buffer
 	// @param buffer the buffer to read into
 	// @param size the size of each data element in bytes
 	// @param count the number of data elements to read
 	// @return the number of bytes read
-	size_t read(void* buffer, size_t size, size_t count)
-	{
-		if (mode != FileMode::READ || nullptr == buffer)
-		{
-			return 0U;
-		}
-		size_t readSize = 0U;
-		size_t end = std::min(this->size(), pos + size * count);
-		uint8_t* buf = (uint8_t*)buffer;
-		for (size_t c = pos; c < end; ++c) {
-			*buf = ((uint8_t*)data.data)[c]; ++buf;
-			++readSize;
-		}
-		pos += readSize;
-		return readSize / size;
-	}
+	size_t read(void* buffer, size_t size, size_t count);
 
 	// get the size of the file
 	// @return the size in bytes
-	size_t size()
-	{
-		return (size_t)data.len;
-	}
+	size_t size();
 
 	// determine whether we have reached the end of the file or not
 	// @return true if we are at the end of the file, otherwise false
-	bool eof()
-	{
-		return pos >= size();
-	}
+	bool eof();
 
 	// read a string from the file, culling newlines
 	// @param buf the buffer to contain the read string
 	// @param size the maximum size of the string to read
 	// @return buf if successfully read a string, otherwise nullptr
-	char* gets2(char* buf, int size)
-	{
-		auto result = gets(buf, size);
-		for (int c = 0; c < size; ++c)
-		{
-			if (buf[c] == '\n' || buf[c] == '\r')
-			{
-				buf[c] = '\0';
-				return result;
-			}
-		}
-		return result;
-	}
+	char* gets2(char* buf, int size);
 
 	// read a string from the file
 	// @param buf the buffer to contain the read string
 	// @param size the maximum size of the string to read
 	// @return buf if successfully read a string, otherwise nullptr
-	char* gets(char* buf, int size)
-	{
-		char* result = buf;
-	    if (!buf) {
-		    return nullptr;
-	    }
-		for (int c = 0; c < size - 1; ++c) {
-			size_t bytesRead = read(buf, sizeof(char), 1);
-			if (bytesRead > 0U) {
-				if (*buf == '\0' || *buf == '\n') {
-					buf += bytesRead;
-					break;
-				}
-				buf += bytesRead;
-			} else {
-				*buf = '\0';
-				if (c == 0) {
-					return nullptr;
-				} else {
-					return result;
-				}
-			}
-		}
-		*(buf) = '\0';
-		return result;
-	}
+	char* gets(char* buf, int size);
 
 	// read an integer from the stream
 	// @return the read integer or possibly 0 if we failed to read one
-	int geti()
-	{
-		char field[64];
-		gets(field, 64);
-		long result = strtol(field, nullptr, 10);
-		return (int)result;
-	}
+	int geti();
 
 	// read 1 char from the stream
 	// @return the read char or possibly '\0' if we failed to read one
-	char getc()
-	{
-		char result = '\0';
-		if (read(&result, sizeof(char), 1) != 1)
-		{
-			return '\0';
-		}
-		return result;
-	}
+	char getc();
 
 	// write a formatted string to the file, printf style
 	// @param fmt the string to format
@@ -182,19 +94,12 @@ public:
 	// write the given string to the file
 	// @param str the string to write
 	// @return 0 on success, -1 on error
-	int puts(const char* str)
-	{
-		size_t size = strlen(str);
-		return write(str, sizeof(char), size) == size ? 0 : -1;
-	}
+	int puts(const char* str);
 
 	// write char to file
 	// @param c the char to write
 	// @return 0 on success, -1 on error
-	int putc(char c)
-	{
-		return write(&c, sizeof(char), 1) == 1 ? 0 : -1;
-	}
+	int putc(char c);
 
 	// seek mode associated with seek()
 	enum class SeekMode : Uint8
@@ -208,32 +113,14 @@ public:
 	// @param offset how much to move the stream, or where
 	// @param mode The seek mode
 	// @return 0 on success, non-zero on error
-	int seek(ptrdiff_t offset, SeekMode mode)
-	{
-		switch (mode) {
-		case SeekMode::SET: pos = offset; break;
-		case SeekMode::ADD: pos += offset; break;
-		case SeekMode::SETEND: pos = size() + offset; break;
-		}
-		if (eof()) {
-			return -1;
-		} else {
-			return 0;
-		}
-	}
+	int seek(ptrdiff_t offset, SeekMode mode);
 
 	// get the current offset into the stream
 	// @return the offset into the stream, in bytes
-	long int tell()
-	{
-		return (long int)pos;
-	}
+	long int tell();
 
 	// sets the file position back to the start of the file.
-	void rewind()
-	{
-		seek(0, File::SeekMode::SET);
-	}
+	void rewind();
 
 	// file mode
 	enum class FileMode : Uint8
@@ -244,29 +131,7 @@ public:
 	};
 
 	// close the file, after this point no ops are valid
-	void close()
-	{
-	    assert(fp);
-	    if (mode == FileMode::WRITE) {
-	        size_t c = 0u;
-	        size_t end = size();
-		    for (; c < end;) {
-		        size_t result = fwrite((uint8_t*)data.data, sizeof(uint8_t), end - c, fp);
-		        if (!result) {
-		            // failed to write, try to write just a chunk
-		            constexpr size_t chunk_size = 1024;
-		            size_t chunk = std::min(end - c, chunk_size);
-		            printlog("[FILES] failed to write %llu bytes to '%s', trying %llu bytes instead", end - c, path.c_str(), chunk);
-		            result = fwrite((uint8_t*)data.data, sizeof(uint8_t), chunk, fp);
-		            assert(result);
-		        }
-		        c += result;
-		    }
-	        assert(c == end);
-	    }
-		int result = fclose(fp);
-		assert(result == 0);
-	}
+	void close();
 
 private:
 	File(FILE* fp, FileMode mode, const char* path) :
@@ -319,46 +184,11 @@ public:
 	// open a new file
 	// @param path complete path to the file to open
 	// @param mode access mode (see fopen in stdio)
-	static File* open(const char* path, const char* mode)
-	{
-		if (!path || !mode)
-		{
-			return nullptr;
-		}
-
-		File::FileMode fileMode;
-		switch (mode[0])
-		{
-		case 'r': fileMode = File::FileMode::READ; break;
-		case 'w': fileMode = File::FileMode::WRITE; break;
-		default: fileMode = File::FileMode::INVALID; break;
-		}
-
-        // note: on PC, files are ALWAYS opened in binary mode
-		FILE* fp;
-		switch (fileMode) {
-		default: assert(0 && "invalid file open mode");
-		case File::FileMode::READ: fp = fopen(path, "rb"); break;
-		case File::FileMode::WRITE: fp = fopen(path, "wb"); break;
-		}
-		if (fp) {
-			return new File(fp, fileMode, path);
-		} else {
-			return nullptr;
-		}
-	}
+	static File* open(const char* path, const char* mode);
 
 	// close the given file
 	// @param file the file to close
-	static void close(File* file)
-	{
-		if (!file)
-		{
-			return;
-		}
-		file->close();
-		delete file;
-	}
+	static void close(File* file);
 };
 
 enum HolidayTheme {

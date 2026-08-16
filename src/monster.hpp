@@ -1422,7 +1422,7 @@ struct MonsterAllyFormation_t
 			}
 		}
 	}
-	void reset() { units.clear(); }
+	void reset();
 	int getFollowerChaseLeaderInterval(Entity& my, Stat& myStats);
 	int getFollowerPathingDelay(Entity& my, Stat& myStats);
 	int getFollowerTryExtendedPathSearch(Entity& my, Stat& myStats);

@@ -19,7 +19,7 @@ public:
 	//! built-in font
 	static const char* defaultFont;
 
-	const char*		getName() const { return name.c_str(); }
+	const char*		getName() const;
 	TTF_Font*		getTTF() { return font; }
 	int				getOutline() { return outlineSize; }
 

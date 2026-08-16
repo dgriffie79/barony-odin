@@ -896,3 +896,67 @@ Text* Field::getTextObject() const
 {
 	return Text::get(getText(), getFont(), getTextColor(), getOutlineColor());
 }
+
+void Field::addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
+
+void Field::clearWordsToHighlight() { wordsToHighlight.clear(); }
+
+void Field::addColorToLine(int line, Uint32 color) { linesToColor[line] = color; }
+
+void Field::clearLinesToColor() { linesToColor.clear(); }
+
+void Field::clearIndividualLinePadding() { individualLinePadding.clear(); }
+
+const char*					Field::getFont() const { return font.c_str(); }
+
+const SDL_Rect				Field::getSize() const { return size; }
+
+const int					Field::getHJustify() const { return static_cast<int>(hjustify); }
+
+const int					Field::getVJustify() const { return static_cast<int>(vjustify); }
+
+const char*					Field::getGuide() const { return guide.c_str(); }
+
+const char*                 Field::getTooltip() const { return tooltip.c_str(); }
+
+void	Field::setPos(const int x, const int y) { size.x = x; size.y = y; }
+
+void	Field::setSize(const SDL_Rect _size) { size = _size; }
+
+void	Field::setColor(const Uint32 _color) { color = _color; }
+
+void	Field::setTextColor(const Uint32 _color) { if (textColor != _color) { textColor = _color; dirty = true; } }
+
+void	Field::setOutlineColor(const Uint32 _color) { if (outlineColor != _color) { outlineColor = _color; dirty = true; } }
+
+void	Field::setBackgroundColor(const Uint32 _color) { backgroundColor = _color; }
+
+void	Field::setBackgroundActivatedColor(const Uint32 _color) { backgroundActivatedColor = _color; }
+
+void	Field::setBackgroundSelectAllColor(const Uint32 _color) { backgroundSelectAllColor = _color; }
+
+void	Field::setEditable(const bool _editable) { editable = _editable; }
+
+void	Field::setNumbersOnly(const bool _numbersOnly) { numbersOnly = _numbersOnly; }
+
+void	Field::setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
+
+void	Field::setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
+
+void	Field::setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
+
+void	Field::setScroll(const bool _scroll) { scroll = _scroll; }
+
+void	Field::setCallback(void (*const fn)(Field&)) { callback = fn; }
+
+void	Field::setFont(const char* _font) { if (font != _font) { font = _font; dirty = true; } }
+
+void	Field::setGuide(const char* _guide) { guide = _guide; }
+
+void	Field::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+
+void	Field::setOntop(const bool _ontop) { ontop = _ontop; }
+
+void	Field::setPaddingPerLine(const int _padding) {	paddingPerLine = _padding; }
+
+void	Field::setIndividualLinePadding(const int _line, const int _padding) { individualLinePadding[_line] = _padding; }

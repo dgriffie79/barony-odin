@@ -43585,3 +43585,45 @@ void updateSkillUpFrame(const int player)
 		skillUp.expired = true;
 	}
 }
+
+float EnemyBarSettings_t::getHeightOffset(Entity* entity) {
+		if ( !entity ) { return 0.f; }
+		return heightOffsets[getEnemyBarSpriteName(entity)];
+	}
+
+float EnemyBarSettings_t::getScreenDistanceOffset(Entity* entity) {
+		if ( !entity ) { return 0.f; }
+		return screenDistanceOffsets[getEnemyBarSpriteName(entity)];
+	}
+
+void StatusEffectQueue_t::resetQueue() {
+		requiresAnimUpdate = true;
+		effectQueue.clear();
+		notificationQueue.clear();
+	}
+
+void StatusEffectQueue_t::deleteEffect(int effect) {
+		for ( auto it = effectQueue.begin(); it != effectQueue.end(); )
+		{
+			if ( (*it).effect == effect )
+			{
+				requiresAnimUpdate = true;
+				it = effectQueue.erase(it);
+				continue;
+			}
+			++it;
+		}
+	}
+
+void StatusEffectQueue_t::StatusEffectDefinitions_t::reset() {
+			allEffects.clear();
+			allSustainedSpells.clear();
+		}
+
+StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(int effectID) {
+			return allEffects[effectID];
+		}
+
+StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectQueue_t::StatusEffectDefinitions_t::getSustainedSpell(int spellID) {
+			return allSustainedSpells[spellID];
+		}

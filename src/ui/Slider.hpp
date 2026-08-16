@@ -82,32 +82,32 @@ public:
     int                         getBorder() const { return border; }
     const SDL_Rect&             getHandleSize() const { return handleSize; }
     const SDL_Rect&             getRailSize() const { return railSize; }
-    const char*                 getTooltip() const { return tooltip.c_str(); }
+    const char*                 getTooltip() const;
     const Uint32&               getColor() const { return color; }
     const Uint32&               getHighlightColor() const { return highlightColor; }
     void						(*getCallback() const)(Slider&) { return callback; }
     bool                        isActivated() const { return activated; }
-    const char*                 getHandleImageActivated() const { return handleImageActivated.c_str(); }
-    const char*                 getHandleImage() const { return handleImage.c_str(); }
-    const char*                 getRailImage() const { return railImage.c_str(); }
+    const char*                 getHandleImageActivated() const;
+    const char*                 getHandleImage() const;
+    const char*                 getRailImage() const;
 	const bool					isOntop() const { return ontop; }
 
-    void    setOrientation(orientation_t o) { orientation = o; }
-    void    setValue(float _value) { value = _value; }
-    void    setMaxValue(float _value) { maxValue = _value; }
-    void    setMinValue(float _value) { minValue = _value; }
-    void    setValueSpeed(float _value) { valueSpeed = _value; }
-    void    setBorder(int _border) { border = _border; }
-    void    setHandleSize(const SDL_Rect rect) { handleSize = rect; }
-    void    setRailSize(const SDL_Rect rect) { railSize = rect; }
-    void    setTooltip(const char* _tooltip) { tooltip = _tooltip; }
-    void    setColor(const Uint32& _color) { color = _color; }
-    void    setHighlightColor(const Uint32& _color) { highlightColor = _color; }
-    void	setCallback(void (*const fn)(Slider&)) { callback = fn; }
-    void    setHandleImageActivated(const char* _image) { handleImageActivated = _image; }
-    void    setHandleImage(const char* _image) { handleImage = _image; }
-    void    setRailImage(const char* _image) { railImage = _image; }
-	void	setOntop(const bool _ontop) { ontop = _ontop; }
+    void    setOrientation(orientation_t o);
+    void    setValue(float _value);
+    void    setMaxValue(float _value);
+    void    setMinValue(float _value);
+    void    setValueSpeed(float _value);
+    void    setBorder(int _border);
+    void    setHandleSize(const SDL_Rect rect);
+    void    setRailSize(const SDL_Rect rect);
+    void    setTooltip(const char* _tooltip);
+    void    setColor(const Uint32& _color);
+    void    setHighlightColor(const Uint32& _color);
+    void	setCallback(void (*const fn)(Slider&));
+    void    setHandleImageActivated(const char* _image);
+    void    setHandleImage(const char* _image);
+    void    setRailImage(const char* _image);
+	void	setOntop(const bool _ontop);
 
 private:
     void (*callback)(Slider&) = nullptr;		    //!< native callback for clicking

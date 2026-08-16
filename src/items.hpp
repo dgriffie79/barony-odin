@@ -782,25 +782,11 @@ public:
 	DynamicMapI32 attributes;
 	DynamicString tooltip;  // "tooltip_default" default set at startup
 
-	const char* getIdentifiedName() const { return item_name_identified.c_str(); }
-	const char* getUnidentifiedName() const { return item_name_unidentified.c_str(); }
-	void setIdentifiedName(DynamicString name) { item_name_identified = name; }
-	void setUnidentifiedName(DynamicString name) { item_name_unidentified = name; }
-	bool hasAttribute(DynamicString attribute)
-	{
-		if ( attributes.size() > 0 )
-		{
-			if ( attributes.contains(attribute) )
-			{
-				return true;
-			}
-			return false;
-		}
-		else
-		{
-			return false;
-		}
-	}
+	const char* getIdentifiedName() const;
+	const char* getUnidentifiedName() const;
+	void setIdentifiedName(DynamicString name);
+	void setUnidentifiedName(DynamicString name);
+	bool hasAttribute(DynamicString attribute);
 };
 extern ItemGeneric items[NUMITEMS];
 

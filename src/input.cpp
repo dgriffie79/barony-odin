@@ -1282,3 +1282,11 @@ void Input::consumeBindingsSharedWithFaceHotbar()
 	}
 #endif
 }
+
+void Input::setKeyboardBindings(DynamicMapStr& toSet) { kb_bindings = toSet; }
+
+void Input::setGamepadBindings(DynamicMapStr& toSet) { gamepad_bindings = toSet; }
+
+void Input::setJoystickBindings(DynamicMapStr& toSet) { joystick_bindings = toSet; }
+
+void Input::setDisabled(bool _disabled) { disabled = _disabled; }

@@ -115,14 +115,14 @@ public:
 	//! dump engine's image cache
 	static void dumpCache();
 	
-	const char*				getName() const { return name.c_str(); }
-	virtual const bool		isStreamable() const { return true; }
+	const char*				getName() const;
+	virtual const bool		isStreamable() const;
 	const GLuint			getTexID() const { return texid; }
 	const SDL_Surface*		getSurf() const { return surf; }
 	const SDL_Surface*		getOutlineSurf() const { return outlineSurf; }
-	const void				setOutlineSurf(SDL_Surface* toSet) { outlineSurf = toSet; }
-	const unsigned int		getWidth() const { return surf ? surf->w : 0U; }
-	const unsigned int		getHeight()	const { return surf ? surf->h : 0U; }
+	const void				setOutlineSurf(SDL_Surface* toSet);
+	const unsigned int		getWidth() const;
+	const unsigned int		getHeight()	const;
 
 private:
 	DynamicString name;

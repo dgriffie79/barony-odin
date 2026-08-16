@@ -83,47 +83,47 @@ public:
 	//! activates the button
 	void activate();
 
-	const char*					getText() const { return text.c_str(); }
-	const char*					getFont() const { return font.c_str(); }
+	const char*					getText() const;
+	const char*					getFont() const;
 	int							getBorder() const { return border; }
 	const SDL_Rect&				getSize() const { return size; }
 	int							getStyle() const { return style; }
 	void						(*getCallback() const)(Button&) { return callback; }
-	const int					getHJustify() const { return static_cast<int>(hjustify); }
-	const int					getVJustify() const { return static_cast<int>(vjustify); }
-	const char*					getBackground() const { return background.c_str(); }
-	const char*					getBackgroundHighlighted() const { return backgroundHighlighted.c_str(); }
-	const char*					getBackgroundActivated() const { return backgroundActivated.c_str(); }
-	SDL_Rect                    getTextOffset() const { return textOffset; }
+	const int					getHJustify() const;
+	const int					getVJustify() const;
+	const char*					getBackground() const;
+	const char*					getBackgroundHighlighted() const;
+	const char*					getBackgroundActivated() const;
+	SDL_Rect                    getTextOffset() const;
 	Uint32						getColor() const { return color; }
 	Uint32						getTextColor() const { return textColor; }
 	const bool					isOntop() const { return ontop; }
 
-	void	setBorder(int _border) { border = _border; }
-	void	setPos(int x, int y) { size.x = x; size.y = y; }
-	void	setSize(SDL_Rect _size) { size = _size; }
-	void	setColor(const Uint32& _color) { color = _color; }
-	void	setTextColor(const Uint32& _color) { textColor = _color; }
-	void	setTextHighlightColor(const Uint32& _color) { textHighlightColor = _color; }
-	void	setBorderColor(const Uint32& _color) { borderColor = _color; }
-	void	setHighlightColor(const Uint32& _color) { highlightColor = _color; }
-	void	setText(const char* _text) { text = _text; }
-	void	setFont(const char* _font) { font = _font; }
+	void	setBorder(int _border);
+	void	setPos(int x, int y);
+	void	setSize(SDL_Rect _size);
+	void	setColor(const Uint32& _color);
+	void	setTextColor(const Uint32& _color);
+	void	setTextHighlightColor(const Uint32& _color);
+	void	setBorderColor(const Uint32& _color);
+	void	setHighlightColor(const Uint32& _color);
+	void	setText(const char* _text);
+	void	setFont(const char* _font);
 	void	setIcon(const char* _icon);
-	void    setIconColor(const Uint32& _color) { iconColor = _color; }
-	void	setTooltip(const char* _tooltip) { tooltip = _tooltip; }
-	void	setStyle(int _style) { style = static_cast<style_t>(_style); }
-	void	setCallback(void (*const fn)(Button&)) { callback = fn; }
-	void	setBackground(const char* image) { background = image; }
-	void	setBackgroundHighlighted(const char* image) { backgroundHighlighted = image; }
-	void	setBackgroundActivated(const char* image) { backgroundActivated = image; }
-	void	setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
-	void	setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
-	void	setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
-	void    setTextOffset(const SDL_Rect& offset) { textOffset = offset; }
-	void	setOntop(const bool _ontop) { ontop = _ontop; }
-	void	setPaddingPerTextLine(int padding) { paddingPerTextLine = padding; }
-	void	setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }
+	void    setIconColor(const Uint32& _color);
+	void	setTooltip(const char* _tooltip);
+	void	setStyle(int _style);
+	void	setCallback(void (*const fn)(Button&));
+	void	setBackground(const char* image);
+	void	setBackgroundHighlighted(const char* image);
+	void	setBackgroundActivated(const char* image);
+	void	setJustify(const int _justify);
+	void	setHJustify(const int _justify);
+	void	setVJustify(const int _justify);
+	void    setTextOffset(const SDL_Rect& offset);
+	void	setOntop(const bool _ontop);
+	void	setPaddingPerTextLine(int padding);
+	void	setScrollParentOffset(const SDL_Rect& offset);
 
 private:
 	void (*callback)(Button&) = nullptr;			//!< native callback for clicking

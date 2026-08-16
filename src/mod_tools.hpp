@@ -30,18 +30,9 @@ See LICENSE for details.
 class CustomHelpers
 {
 public:
-	static void addMemberToSubkey(JsonNode d, std::string subkey, std::string name, JsonNode value)
-	{
-		d[subkey.c_str()].AddMember(name.c_str(), value);
-	}
-	static void addMemberToRoot(JsonNode d, std::string name, JsonNode value)
-	{
-		d.AddMember(name.c_str(), value);
-	}
-	static void addArrayMemberToSubkey(JsonNode d, std::string subkey, JsonNode value)
-	{
-		d[subkey.c_str()].PushBack(value);
-	}
+	static void addMemberToSubkey(JsonNode d, std::string subkey, std::string name, JsonNode value);
+	static void addMemberToRoot(JsonNode d, std::string name, JsonNode value);
+	static void addArrayMemberToSubkey(JsonNode d, std::string subkey, JsonNode value);
 	static bool isLevelPartOfSet(int level, bool secret, std::pair<DynamicSetI32, DynamicSetI32>& pairOfSets)
 	{
 		if ( !secret )
@@ -70,50 +61,7 @@ public:
 	MonsterStatCustomManager() = default;
 	static BaronyRNG monster_stat_rng;
 
-	int getSlotFromKeyName(std::string keyName)
-	{
-		if ( keyName.compare("weapon") == 0 )
-		{
-			return ITEM_SLOT_WEAPON;
-		}
-		else if ( keyName.compare("shield") == 0 )
-		{
-			return ITEM_SLOT_SHIELD;
-		}
-		else if ( keyName.compare("helmet") == 0 )
-		{
-			return ITEM_SLOT_HELM;
-		}
-		else if ( keyName.compare("breastplate") == 0 )
-		{
-			return ITEM_SLOT_ARMOR;
-		}
-		else if ( keyName.compare("gloves") == 0 )
-		{
-			return ITEM_SLOT_GLOVES;
-		}
-		else if ( keyName.compare("shoes") == 0 )
-		{
-			return ITEM_SLOT_BOOTS;
-		}
-		else if ( keyName.compare("cloak") == 0 )
-		{
-			return ITEM_SLOT_CLOAK;
-		}
-		else if ( keyName.compare("ring") == 0 )
-		{
-			return ITEM_SLOT_RING;
-		}
-		else if ( keyName.compare("amulet") == 0 )
-		{
-			return ITEM_SLOT_AMULET;
-		}
-		else if ( keyName.compare("mask") == 0 )
-		{
-			return ITEM_SLOT_MASK;
-		}
-		return 0;
-	}
+	int getSlotFromKeyName(std::string keyName);
 
 	class ItemEntry
 	{
@@ -134,177 +82,13 @@ public:
 		{
 			readFromItem(itemToRead);
 		}
-		void readFromItem(const Item& itemToRead)
-		{
-			type = itemToRead.type;
-			status = itemToRead.status;
-			beatitude = itemToRead.beatitude;
-			count = itemToRead.count;
-			appearance = itemToRead.appearance;
-			identified = itemToRead.identified;
-			if ( itemToRead.appearance == MONSTER_ITEM_UNDROPPABLE_APPEARANCE )
-			{
-				dropItemOnDeath = false;
-			}
-		}
-		void setValueFromAttributes(JsonNode d, JsonNode outObject)
-		{
-			JsonNode key1("type");
-			JsonNode val1(itemNameStrings[type + 2]);
-			outObject.AddMember(key1, val1);
+		void readFromItem(const Item& itemToRead);
+		void setValueFromAttributes(JsonNode d, JsonNode outObject);
 
-			JsonNode key2("status");
-			JsonNode val2(itemStatusStrings.at(status).c_str());
-			outObject.AddMember(key2, val2);
+		const char* getRandomArrayStr(const JsonNode arr, const char* invalidEntry);
+		int getRandomArrayInt(const JsonNode arr, int invalidEntry);
 
-			outObject.AddMember("beatitude", JsonNode(beatitude));
-			outObject.AddMember("count", JsonNode(count));
-			outObject.AddMember("appearance", JsonNode(appearance));
-			outObject.AddMember("identified", JsonNode(identified));
-			outObject.AddMember("spawn_percent_chance", JsonNode(100));
-			outObject.AddMember("drop_percent_chance", JsonNode(dropItemOnDeath ? 100 : 0));
-			outObject.AddMember("slot_weighted_chance", JsonNode(1));
-		}
-
-		const char* getRandomArrayStr(const JsonNode arr, const char* invalidEntry)
-		{
-			if ( arr.Size() == 0 )
-			{
-				return invalidEntry;
-			}
-			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetString());
-		}
-		int getRandomArrayInt(const JsonNode arr, int invalidEntry)
-		{
-			if ( arr.Size() == 0 )
-			{
-				return invalidEntry;
-			}
-			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetInt());
-		}
-
-		bool readKeyToItemEntry(JsonMemberIt itr)
-		{
-			DynamicString name = itr->name.GetString();
-			if ( name.compare("type") == 0 )
-			{
-				DynamicString itemName = "empty";
-				if ( itr->value.IsArray() )
-				{
-					itemName = getRandomArrayStr(itr->value.GetArray(), "empty");
-				}
-				else if ( itr->value.IsString() )
-				{
-					itemName = itr->value.GetString();
-				}
-
-				if ( itemName.compare("empty") == 0 )
-				{
-					emptyItemEntry = true;
-					return true;
-				}
-				for ( int i = 0; i < NUMITEMS; ++i )
-				{
-					if ( itemName.compare(itemNameStrings[i + 2]) == 0 )
-					{
-						this->type = static_cast<ItemType>(i);
-						return true;
-					}
-				}
-			}
-			else if ( name.compare("status") == 0 )
-			{
-				DynamicString status = "broken";
-				if ( itr->value.IsArray() )
-				{
-					status = getRandomArrayStr(itr->value.GetArray(), "broken");
-				}
-				else if ( itr->value.IsString() )
-				{
-					status = itr->value.GetString();
-				}
-				for ( Uint32 i = 0; i < itemStatusStrings.size(); ++i )
-				{
-					if ( status.compare(itemStatusStrings.at(i)) == 0 )
-					{
-						this->status = static_cast<Status>(i);
-						return true;
-					}
-				}
-			}
-			else if ( name.compare("beatitude") == 0 )
-			{
-				if ( itr->value.IsArray() )
-				{
-					this->beatitude = static_cast<Sint16>(getRandomArrayInt(itr->value.GetArray(), 0));
-				}
-				else if ( itr->value.IsInt() )
-				{
-					this->beatitude = static_cast<Sint16>(itr->value.GetInt());
-				}
-				return true;
-			}
-			else if ( name.compare("count") == 0 )
-			{
-				if ( itr->value.IsArray() )
-				{
-					this->count = static_cast<Sint16>(getRandomArrayInt(itr->value.GetArray(), 1));
-				}
-				else if ( itr->value.IsInt() )
-				{
-					this->count = static_cast<Sint16>(itr->value.GetInt());
-				}
-				return true;
-			}
-			else if ( name.compare("appearance") == 0 )
-			{
-				if ( itr->value.IsArray() )
-				{
-					this->appearance = static_cast<Uint32>(getRandomArrayInt(itr->value.GetArray(), monster_stat_rng.rand()));
-				}
-				else if ( itr->value.IsInt() )
-				{
-					this->appearance = static_cast<Uint32>(itr->value.GetInt());
-				}
-				else if ( itr->value.IsString() )
-				{
-					DynamicString str = itr->value.GetString();
-					if ( str.compare("random") == 0 )
-					{
-						this->appearance = monster_stat_rng.rand();
-					}
-				}
-				return true;
-			}
-			else if ( name.compare("identified") == 0 )
-			{
-				this->identified = itr->value.GetBool();
-				return true;
-			}
-			else if ( name.compare("spawn_percent_chance") == 0 )
-			{
-				this->percentChance = itr->value.GetInt();
-				return true;
-			}
-			else if ( name.compare("drop_percent_chance") == 0 )
-			{
-				this->dropChance = itr->value.GetInt();
-				if ( monster_stat_rng.rand() % 100 >= this->dropChance )
-				{
-					this->dropItemOnDeath = false;
-				}
-				else
-				{
-					this->dropItemOnDeath = true;
-				}
-			}
-			else if ( name.compare("slot_weighted_chance") == 0 )
-			{
-				this->weightedChance = std::max(1, itr->value.GetInt());
-				return true;
-			}
-			return false;
-		}
+		bool readKeyToItemEntry(JsonMemberIt itr);
 	};
 
 	class StatEntry
@@ -391,952 +175,33 @@ public:
 			strcpy(name, "");
 		};
 
-		std::string getFollowerVariant()
-		{
-			if ( followerVariants.size() > 0 )
-			{
-				DynamicArrayU32 variantChances(followerVariants.size(), 0);
-				int index = 0;
-				for ( auto& pair : followerVariants )
-				{
-					variantChances.at(index) = pair.chance;
-					++index;
-				}
+		std::string getFollowerVariant();
 
-				int result = monster_stat_rng.discrete(variantChances.data(), variantChances.size());
-				return followerVariants.at(result).name.c_str();
-			}
-			return "none";
-		}
+		void readFromStats(const Stat* myStats);
 
-		void readFromStats(const Stat* myStats)
-		{
-			strcpy(name, myStats->name);
-			type = myStats->type;
-			sex = myStats->sex;
-			appearance = myStats->stat_appearance;
-			HP = myStats->HP;
-			MAXHP = myStats->MAXHP;
-			OLDHP = HP;
-			MP = myStats->MP;
-			MAXMP = myStats->MAXMP;
-			STR = myStats->STR;
-			DEX = myStats->DEX;
-			CON = myStats->CON;
-			INT = myStats->INT;
-			PER = myStats->PER;
-			CHR = myStats->CHR;
-			EXP = myStats->EXP;
-			LVL = myStats->LVL;
-			GOLD = myStats->GOLD;
+		void setStats(Stat* myStats);
 
-			RANDOM_STR = myStats->RANDOM_STR;
-			RANDOM_DEX = myStats->RANDOM_DEX;
-			RANDOM_CON = myStats->RANDOM_CON;
-			RANDOM_INT = myStats->RANDOM_INT;
-			RANDOM_PER = myStats->RANDOM_PER;
-			RANDOM_CHR = myStats->RANDOM_CHR;
-			RANDOM_MAXHP = myStats->RANDOM_MAXHP;
-			RANDOM_HP = myStats->RANDOM_HP;
-			RANDOM_MAXMP = myStats->RANDOM_MAXMP;
-			RANDOM_MP = myStats->RANDOM_MP;
-			RANDOM_LVL = myStats->RANDOM_LVL;
-			RANDOM_GOLD = myStats->RANDOM_GOLD;
+		void setItems(Stat* myStats);
 
-			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
-			{
-				PROFICIENCIES[i] = 0;
-			}
-			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
-			{
-				PROFICIENCIES[i] = myStats->getProficiency(i);
-			}
-		}
+		void setStatsAndEquipmentToMonster(Stat* myStats);
 
-		void setStats(Stat* myStats)
-		{
-			strcpy(myStats->name, name);
-			myStats->type = static_cast<Monster>(type);
-			myStats->sex = static_cast<sex_t>(sex);
-			myStats->stat_appearance = appearance;
-			myStats->HP = HP;
-			myStats->MAXHP = MAXHP;
-			myStats->OLDHP = myStats->HP;
-			myStats->MP = MP;
-			myStats->MAXMP = MAXMP;
-			myStats->STR = STR;
-			myStats->DEX = DEX;
-			myStats->CON = CON;
-			myStats->INT = INT;
-			myStats->PER = PER;
-			myStats->CHR = CHR;
-			myStats->EXP = EXP;
-			myStats->LVL = LVL;
-			myStats->GOLD = GOLD;
-
-			myStats->RANDOM_STR = RANDOM_STR;
-			myStats->RANDOM_DEX = RANDOM_DEX;
-			myStats->RANDOM_CON = RANDOM_CON;
-			myStats->RANDOM_INT = RANDOM_INT;
-			myStats->RANDOM_PER = RANDOM_PER;
-			myStats->RANDOM_CHR = RANDOM_CHR;
-			myStats->RANDOM_MAXHP = RANDOM_MAXHP;
-			myStats->RANDOM_HP = RANDOM_HP;
-			myStats->RANDOM_MAXMP = RANDOM_MAXMP;
-			myStats->RANDOM_MP = RANDOM_MP;
-			myStats->RANDOM_LVL = RANDOM_LVL;
-			myStats->RANDOM_GOLD = RANDOM_GOLD;
-
-			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
-			{
-				myStats->setProficiency(i, PROFICIENCIES[i]);
-			}
-		}
-
-		void setItems(Stat* myStats)
-		{
-			DynamicSetI32 equippedSlots;
-			for ( int64_t _ei = 0; _ei < dynarray_pair_size<std::pair<ItemEntry, int>>(equipped_items); ++_ei )
-			{
-				auto& it = *dynarray_pair_at<std::pair<ItemEntry, int>>(equipped_items, _ei);
-				equippedSlots.insert(it.second);
-				if ( it.first.percentChance < 100 )
-				{
-					if ( monster_stat_rng.rand() % 100 >= it.first.percentChance )
-					{
-						continue;
-					}
-				}
-				if ( it.first.emptyItemEntry )
-				{
-					continue;
-				}
-				switch ( it.second )
-				{
-					case ITEM_SLOT_WEAPON:
-						myStats->weapon = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->weapon )
-						{
-							myStats->weapon->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_SHIELD:
-						myStats->shield = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->shield )
-						{
-							myStats->shield->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_HELM:
-						myStats->helmet = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->helmet )
-						{
-							myStats->helmet->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_ARMOR:
-						myStats->breastplate = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->breastplate )
-						{
-							myStats->breastplate->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_GLOVES:
-						myStats->gloves = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->gloves )
-						{
-							myStats->gloves->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_BOOTS:
-						myStats->shoes = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->shoes )
-						{
-							myStats->shoes->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_CLOAK:
-						myStats->cloak = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->cloak )
-						{
-							myStats->cloak->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_RING:
-						myStats->ring = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->ring )
-						{
-							myStats->ring->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_AMULET:
-						myStats->amulet = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->amulet )
-						{
-							myStats->amulet->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					case ITEM_SLOT_MASK:
-						myStats->mask = newItem(it.first.type, it.first.status, it.first.beatitude, it.first.count, it.first.appearance, it.first.identified, nullptr);
-						if ( myStats->mask )
-						{
-							myStats->mask->isDroppable = it.first.dropItemOnDeath;
-						}
-						break;
-					default:
-						break;
-				}
-			}
-			for ( int equipSlots = 0; equipSlots < 10; ++equipSlots )
-			{
-				if ( !useDefaultEquipment )
-				{
-					// disable any default item slot spawning.
-					myStats->EDITOR_ITEMS[equipSlots * ITEM_SLOT_NUMPROPERTIES] = 0;
-				}
-				else
-				{
-					if ( equippedSlots.find(equipSlots * ITEM_SLOT_NUMPROPERTIES) != equippedSlots.end() )
-					{
-						// disable item slots we (attempted) to fill in.
-						myStats->EDITOR_ITEMS[equipSlots * ITEM_SLOT_NUMPROPERTIES] = 0;
-					}
-				}
-			}
-			for ( int64_t _ii = 0; _ii < dynarray_size<ItemEntry>(inventory_items); ++_ii )
-			{
-				auto& it = *dynarray_at<ItemEntry>(inventory_items, _ii);
-				if ( it.emptyItemEntry )
-				{
-					continue;
-				}
-				if ( it.percentChance < 100 )
-				{
-					if ( monster_stat_rng.rand() % 100 >= it.percentChance )
-					{
-						continue;
-					}
-				}
-				Item* item = newItem(it.type, it.status, it.beatitude, it.count, it.appearance, it.identified, &myStats->inventory);
-				if ( item )
-				{
-					item->isDroppable = it.dropItemOnDeath;
-				}
-			}
-			if ( !useDefaultInventoryItems )
-			{
-				for ( int invSlots = ITEM_SLOT_INV_1; invSlots <= ITEM_SLOT_INV_6; invSlots = invSlots + ITEM_SLOT_NUMPROPERTIES )
-				{
-					myStats->EDITOR_ITEMS[invSlots] = 0;
-				}
-			}
-		}
-
-		void setStatsAndEquipmentToMonster(Stat* myStats)
-		{
-			//myStats->clearStats();
-			setStats(myStats);
-			setItems(myStats);
-
-			if ( isMonsterNameGeneric )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_MONSTER_NAME_GENERIC] = 1;
-			}
-			if ( disableMiniboss )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_DISABLE_MINIBOSS] = 1;
-			}
-			if ( forceFriendlyToPlayer )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_FORCE_ALLEGIANCE_TO_PLAYER] = 
-					Stat::MonsterForceAllegiance::MONSTER_FORCE_PLAYER_ALLY;
-			}
-			if ( forceEnemyToPlayer )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_FORCE_ALLEGIANCE_TO_PLAYER] =
-					Stat::MonsterForceAllegiance::MONSTER_FORCE_PLAYER_ENEMY;
-			}
-			if ( forceRecruitableToPlayer )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_FORCE_ALLEGIANCE_TO_PLAYER] =
-					Stat::MonsterForceAllegiance::MONSTER_FORCE_PLAYER_RECRUITABLE;
-			}
-			if ( disableItemDrops )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_NO_DROP_ITEMS] = 1;
-			}
-			if ( xpAwardPercent != 100 )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_XP_PERCENT_AWARD] = 1 + std::min(std::max(0, xpAwardPercent), 100);
-			}
-			if ( castSpellbooksFromInventory )
-			{
-				myStats->MISC_FLAGS[STAT_FLAG_MONSTER_CAST_INVENTORY_SPELLBOOKS] = 1;
-				myStats->MISC_FLAGS[STAT_FLAG_MONSTER_CAST_INVENTORY_SPELLBOOKS] |= (spellbookCastCooldown << 4);
-			}
-			if ( myStats->type == SHOPKEEPER )
-			{
-				if ( chosenShopkeeperStore >= 0 )
-				{
-					myStats->MISC_FLAGS[STAT_FLAG_NPC] = chosenShopkeeperStore + 1;
-				}
-				Uint8 numItems = 0;
-				myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] = 0;
-				if ( shopkeeperGenDefaultItems )
-				{
-					if ( shopkeeperMinItems >= 0 && shopkeeperMaxItems >= 0 )
-					{
-						numItems = shopkeeperMinItems + monster_stat_rng.rand() % std::max(1, (shopkeeperMaxItems - shopkeeperMinItems + 1));
-						myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] |= numItems + 1;
-					}
-					if ( shopkeeperMaxGeneratedBlessing >= 0 )
-					{
-						myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] |= (static_cast<Uint8>(shopkeeperMaxGeneratedBlessing + 1) << 8);
-					}
-					myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] |= (ShopkeeperCustomFlags::ENABLE_GEN_ITEMS << 12); // indicate to use this property.
-				}
-				else
-				{
-					myStats->MISC_FLAGS[STAT_FLAG_SHOPKEEPER_CUSTOM_PROPERTIES] |= (ShopkeeperCustomFlags::DISABLE_GEN_ITEMS << 12); // indicate to disable gen items.
-				}
-			}
-		}
-
-		void setStatsAndEquipmentToPlayer(Stat* myStats, int player)
-		{
-			//if ( player == 0 )
-			//{
-			//	TextSourceScript tmpScript;
-			//	tmpScript.playerClearInventory(true);
-			//}
-			//else
-			//{
-			//	// other players
-			//	myStats->freePlayerEquipment();
-			//	myStats->clearStats();
-			//	TextSourceScript tmpScript;
-			//	tmpScript.updateClientInformation(player, true, true, TextSourceScript::CLIENT_UPDATE_ALL);
-			//}
-		}
+		void setStatsAndEquipmentToPlayer(Stat* myStats, int player);
 	};
 
-	void writeAllFromStats(Stat* myStats)
-	{
-		JsonNode d;
-		d.SetObject();
-		JsonNode version;
-		version.SetInt(1);
-		CustomHelpers::addMemberToRoot(d, "version", version);
-		readAttributesFromStats(myStats, d);
-		readItemsFromStats(myStats, d);
-		
-		// misc properties
-		JsonNode propsObject;
-		propsObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "properties", propsObject);
-		CustomHelpers::addMemberToSubkey(d, "properties", "monster_name_always_display_as_generic_species", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "populate_empty_equipped_items_with_default", JsonNode(true));
-		CustomHelpers::addMemberToSubkey(d, "properties", "populate_default_inventory", JsonNode(true));
-		CustomHelpers::addMemberToSubkey(d, "properties", "disable_miniboss_chance", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_recruitable", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_friendly", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "force_player_enemy", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "disable_item_drops", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "xp_award_percent", JsonNode(100));
-		CustomHelpers::addMemberToSubkey(d, "properties", "enable_casting_inventory_spellbooks", JsonNode(false));
-		CustomHelpers::addMemberToSubkey(d, "properties", "spellbook_cast_cooldown", JsonNode(250));
+	void writeAllFromStats(Stat* myStats);
 
-		if ( myStats->type == SHOPKEEPER )
-		{
-			// shop properties
-			CustomHelpers::addMemberToRoot(d, "shopkeeper_properties", propsObject);
+	void readItemsFromStats(Stat* myStats, JsonNode d);
 
-			JsonNode shopObject(ObjectTypeTag);
-			shopObject.SetObject();
+	void readAttributesFromStats(Stat* myStats, JsonNode d);
 
-			JsonNode storeTypesObject(ObjectTypeTag);
-			storeTypesObject.AddMember("equipment", JsonNode(1));
-			storeTypesObject.AddMember("hats", JsonNode(1));
-			storeTypesObject.AddMember("jewelry", JsonNode(1));
-			storeTypesObject.AddMember("books", JsonNode(1));
-			storeTypesObject.AddMember("apothecary", JsonNode(1));
-			storeTypesObject.AddMember("staffs", JsonNode(1));
-			storeTypesObject.AddMember("food", JsonNode(1));
-			storeTypesObject.AddMember("hardware", JsonNode(1));
-			storeTypesObject.AddMember("hunting", JsonNode(1));
-			storeTypesObject.AddMember("general", JsonNode(1));
+	bool readKeyToStatEntry(StatEntry& statEntry, JsonMemberIt itr);
 
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "store_type_chances", storeTypesObject);
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generate_default_shop_items", JsonNode(true));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_min", JsonNode(10));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "num_generated_items_max", JsonNode(15));
-			CustomHelpers::addMemberToSubkey(d, "shopkeeper_properties", "generated_item_blessing_max", JsonNode(0));
-		}
+	void addArrayMemberFromItem(JsonNode d, std::string rootKey, Item* item);
+	void addMemberFromItem(JsonNode d, std::string rootKey, std::string key, Item* item);
 
-		// follower details
-		JsonNode followersObject;
-		followersObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "followers", followersObject);
-		CustomHelpers::addMemberToSubkey(d, "followers", "num_followers", JsonNode(0));
-		JsonNode followerVariantsObject;
-		followerVariantsObject.SetObject();
-		CustomHelpers::addMemberToSubkey(d, "followers", "follower_variants", followerVariantsObject);
+	void writeToFile(JsonNode d, std::string monsterFileName);
 
-		writeToFile(d, monstertypename[myStats->type]);
-	}
-
-	void readItemsFromStats(Stat* myStats, JsonNode d)
-	{
-		JsonNode equippedItemsObject;
-		equippedItemsObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "equipped_items", equippedItemsObject);
-		addMemberFromItem(d, "equipped_items", "weapon", myStats->weapon);
-		addMemberFromItem(d, "equipped_items", "shield", myStats->shield);
-		addMemberFromItem(d, "equipped_items", "helmet", myStats->helmet);
-		addMemberFromItem(d, "equipped_items", "breastplate", myStats->breastplate);
-		addMemberFromItem(d, "equipped_items", "gloves", myStats->gloves);
-		addMemberFromItem(d, "equipped_items", "shoes", myStats->shoes);
-		addMemberFromItem(d, "equipped_items", "cloak", myStats->cloak);
-		addMemberFromItem(d, "equipped_items", "ring", myStats->ring);
-		addMemberFromItem(d, "equipped_items", "amulet", myStats->amulet);
-		addMemberFromItem(d, "equipped_items", "mask", myStats->mask);
-
-		JsonNode invItemsArray;
-		invItemsArray.SetArray();
-		CustomHelpers::addMemberToRoot(d, "inventory_items", invItemsArray);
-		for ( node_t* node = myStats->inventory.first; node; node = node->next )
-		{
-			Item* item = (Item*)node->element;
-			if ( item )
-			{
-				addArrayMemberFromItem(d, "inventory_items", item);
-			}
-		}
-	}
-
-	void readAttributesFromStats(Stat* myStats, JsonNode d)
-	{
-		JsonNode statsObject;
-		statsObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "stats", statsObject);
-
-		StatEntry statEntry(myStats);
-		CustomHelpers::addMemberToSubkey(d, "stats", "name", JsonNode(statEntry.name));
-		CustomHelpers::addMemberToSubkey(d, "stats", "type", JsonNode(monstertypename[statEntry.type]));
-		CustomHelpers::addMemberToSubkey(d, "stats", "sex", JsonNode(statEntry.sex));
-		CustomHelpers::addMemberToSubkey(d, "stats", "appearance", JsonNode(statEntry.appearance));
-		CustomHelpers::addMemberToSubkey(d, "stats", "HP", JsonNode(statEntry.HP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MAXHP", JsonNode(statEntry.MAXHP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MP", JsonNode(statEntry.MP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "MAXMP", JsonNode(statEntry.MAXMP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "STR", JsonNode(statEntry.STR));
-		CustomHelpers::addMemberToSubkey(d, "stats", "DEX", JsonNode(statEntry.DEX));
-		CustomHelpers::addMemberToSubkey(d, "stats", "CON", JsonNode(statEntry.CON));
-		CustomHelpers::addMemberToSubkey(d, "stats", "INT", JsonNode(statEntry.INT));
-		CustomHelpers::addMemberToSubkey(d, "stats", "PER", JsonNode(statEntry.PER));
-		CustomHelpers::addMemberToSubkey(d, "stats", "CHR", JsonNode(statEntry.CHR));
-		CustomHelpers::addMemberToSubkey(d, "stats", "EXP", JsonNode(statEntry.EXP));
-		CustomHelpers::addMemberToSubkey(d, "stats", "LVL", JsonNode(statEntry.LVL));
-		CustomHelpers::addMemberToSubkey(d, "stats", "GOLD", JsonNode(statEntry.GOLD));
-
-		JsonNode miscStatsObject;
-		miscStatsObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "misc_stats", miscStatsObject);
-
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_STR", JsonNode(statEntry.RANDOM_STR));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_DEX", JsonNode(statEntry.RANDOM_DEX));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CON", JsonNode(statEntry.RANDOM_CON));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_INT", JsonNode(statEntry.RANDOM_INT));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_PER", JsonNode(statEntry.RANDOM_PER));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_CHR", JsonNode(statEntry.RANDOM_CHR));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXHP", JsonNode(statEntry.RANDOM_MAXHP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_HP", JsonNode(statEntry.RANDOM_HP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MAXMP", JsonNode(statEntry.RANDOM_MAXMP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_MP", JsonNode(statEntry.RANDOM_MP));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_LVL", JsonNode(statEntry.RANDOM_LVL));
-		CustomHelpers::addMemberToSubkey(d, "misc_stats", "RANDOM_GOLD", JsonNode(statEntry.RANDOM_GOLD));
-
-		JsonNode profObject;
-		profObject.SetObject();
-		CustomHelpers::addMemberToRoot(d, "proficiencies", profObject);
-
-		for ( int i = 0; i < NUMPROFICIENCIES; ++i )
-		{
-			CustomHelpers::addMemberToSubkey(d, "proficiencies", getSkillLangEntry(i), JsonNode(statEntry.PROFICIENCIES[i]));
-		}
-	}
-
-	bool readKeyToStatEntry(StatEntry& statEntry, JsonMemberIt itr)
-	{
-		DynamicString name = itr->name.GetString();
-		if ( name.compare("name") == 0 )
-		{
-			strcpy(statEntry.name, itr->value.GetString());
-			return true;
-		}
-		else if ( name.compare("type") == 0 )
-		{
-			DynamicString val = itr->value.GetString();
-			for ( int i = 0; i < NUMMONSTERS; ++i )
-			{
-				if ( val.compare(monstertypename[i]) == 0 )
-				{
-					statEntry.type = i;
-					break;
-				}
-			}
-			return true;
-		}
-		else if ( name.compare("sex") == 0 )
-		{
-			statEntry.sex = static_cast<sex_t>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("appearance") == 0 )
-		{
-			statEntry.appearance = static_cast<Uint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("HP") == 0 )
-		{
-			statEntry.HP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("MAXHP") == 0 )
-		{
-			statEntry.MAXHP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("MP") == 0 )
-		{
-			statEntry.MP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("MAXMP") == 0 )
-		{
-			statEntry.MAXMP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("STR") == 0 )
-		{
-			statEntry.STR = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("DEX") == 0 )
-		{
-			statEntry.DEX = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("CON") == 0 )
-		{
-			statEntry.CON = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("INT") == 0 )
-		{
-			statEntry.INT = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("PER") == 0 )
-		{
-			statEntry.PER = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("CHR") == 0 )
-		{
-			statEntry.CHR = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("EXP") == 0 )
-		{
-			statEntry.EXP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("LVL") == 0 )
-		{
-			statEntry.LVL = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("GOLD") == 0 )
-		{
-			statEntry.GOLD = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_STR") == 0 )
-		{
-			statEntry.RANDOM_STR = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_DEX") == 0 )
-		{
-			statEntry.RANDOM_DEX = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_CON") == 0 )
-		{
-			statEntry.RANDOM_CON = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_INT") == 0 )
-		{
-			statEntry.RANDOM_INT = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_PER") == 0 )
-		{
-			statEntry.RANDOM_PER = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_CHR") == 0 )
-		{
-			statEntry.RANDOM_CHR = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_MAXHP") == 0 )
-		{
-			statEntry.RANDOM_MAXHP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_HP") == 0 )
-		{
-			statEntry.RANDOM_HP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_MAXMP") == 0 )
-		{
-			statEntry.RANDOM_MAXMP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_MP") == 0 )
-		{
-			statEntry.RANDOM_MP = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_LVL") == 0 )
-		{
-			statEntry.RANDOM_LVL = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else if ( name.compare("RANDOM_GOLD") == 0 )
-		{
-			statEntry.RANDOM_GOLD = static_cast<Sint32>(itr->value.GetInt());
-			return true;
-		}
-		else
-		{
-			for ( int i = 0; i < NUMPROFICIENCIES; ++i )
-			{
-				if ( name.compare(getSkillLangEntry(i)) == 0 )
-				{
-					statEntry.PROFICIENCIES[i] = static_cast<Sint32>(itr->value.GetInt());
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	void addArrayMemberFromItem(JsonNode d, std::string rootKey, Item* item)
-	{
-		if ( item )
-		{
-			JsonNode itemObject(ObjectTypeTag);
-			ItemEntry itemEntry(*item);
-			itemEntry.setValueFromAttributes(d, itemObject);
-			CustomHelpers::addArrayMemberToSubkey(d, rootKey, itemObject);
-		}
-	}
-	void addMemberFromItem(JsonNode d, std::string rootKey, std::string key, Item* item)
-	{
-		if ( item )
-		{
-			JsonNode itemObject(ObjectTypeTag);
-			ItemEntry itemEntry(*item);
-			itemEntry.setValueFromAttributes(d, itemObject);
-			CustomHelpers::addMemberToSubkey(d, rootKey, key.c_str(), itemObject);
-		}
-	}
-
-	void writeToFile(JsonNode d, std::string monsterFileName)
-	{
-		int filenum = 0;
-		DynamicString testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
-		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
-		{
-			++filenum;
-			testPath = "/data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
-		}
-		DynamicString outputPath = PHYSFS_getRealDir("/data/custom-monsters/");
-		outputPath.append(PHYSFS_getDirSeparator());
-		DynamicString fileName = "data/custom-monsters/monster_" + monsterFileName + "_export" + std::to_string(filenum) + ".json";
-		outputPath.append(fileName.c_str());
-
-
-		File* fp = FileIO::open(outputPath.c_str(), "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		const char* json = json_node_serialize(d.h, false);
-		fp->write(json, sizeof(char), strlen(json));
-		json_string_free(json);
-		FileIO::close(fp);
-	}
-
-	StatEntry* readFromFile(std::string monsterFileName)
-	{
-		DynamicString filePath = "/data/custom-monsters/";
-		filePath.append(monsterFileName);
-		if ( filePath.find(".json") == std::string::npos )
-		{
-			filePath.append(".json");
-		}
-		if ( PHYSFS_getRealDir(filePath.c_str()) )
-		{
-			DynamicString inputPath = PHYSFS_getRealDir(filePath.c_str());
-			inputPath.append(filePath);
-
-			File* fp = FileIO::open(inputPath.c_str(), "rb");
-			if ( !fp )
-			{
-				printlog("[JSON]: Error: Could not locate json file %s", inputPath.c_str());
-				return nullptr;
-			}
-			char buf[65536];
-			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
-			buf[count] = '\0';
-			FileIO::close(fp);
-
-			JsonDoc jd(buf);
-			if ( !jd.ok() ) { return nullptr; }
-			JsonNode d = jd.root;
-
-			if ( !d.HasMember("version") )
-			{
-				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
-				return nullptr;
-			}
-			StatEntry* statEntry = new StatEntry();
-			int version = d["version"].GetInt();
-			const JsonNode stats = d["stats"];
-			for ( JsonMemberIt stat_itr = stats.MemberBegin(); stat_itr != stats.MemberEnd(); ++stat_itr )
-			{
-				readKeyToStatEntry(*statEntry, stat_itr);
-			}
-			const JsonNode miscStats = d["misc_stats"];
-			for ( JsonMemberIt stat_itr = miscStats.MemberBegin(); stat_itr != miscStats.MemberEnd(); ++stat_itr )
-			{
-				readKeyToStatEntry(*statEntry, stat_itr);
-			}
-			const JsonNode proficiencies = d["proficiencies"];
-			for ( JsonMemberIt stat_itr = proficiencies.MemberBegin(); stat_itr != proficiencies.MemberEnd(); ++stat_itr )
-			{
-				readKeyToStatEntry(*statEntry, stat_itr);
-			}
-			const JsonNode equipped_items = d["equipped_items"];
-			for ( JsonMemberIt itemSlot_itr = equipped_items.MemberBegin(); itemSlot_itr != equipped_items.MemberEnd(); ++itemSlot_itr )
-			{
-				DynamicString slotName = itemSlot_itr->name.GetString();
-				if ( itemSlot_itr->value.IsArray() )
-				{
-					DynamicArray itemsToChoose;  // vector<pair<ItemEntry,int>>
-					// a selection of items in the slot. need to choose 1.
-					for ( JsonValueIt itemArray_itr = itemSlot_itr->value.Begin(); itemArray_itr != itemSlot_itr->value.End(); ++itemArray_itr )
-					{
-						ItemEntry item;
-						for ( JsonMemberIt item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
-						{
-							item.readKeyToItemEntry(item_itr);
-						}
-						dynarray_pair_push<std::pair<ItemEntry, int>>(itemsToChoose, std::make_pair(item, getSlotFromKeyName(slotName)));
-					}
-					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
-					{
-						DynamicArrayU32 itemChances((size_t)dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose), 0);
-						int index = 0;
-						for ( int64_t _pi = 0; _pi < dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose); ++_pi )
-						{
-							itemChances.at(index) = dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, _pi)->first.weightedChance;
-							++index;
-						}
-
-						int result = monster_stat_rng.discrete(itemChances.data(), itemChances.size());
-						dynarray_pair_push<std::pair<ItemEntry, int>>(statEntry->equipped_items, std::make_pair(dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, result)->first, dynarray_pair_at<std::pair<ItemEntry, int>>(itemsToChoose, result)->second));
-					}
-				}
-				else if ( itemSlot_itr->value.MemberCount() > 0 )
-				{
-					ItemEntry item;
-					for ( JsonMemberIt item_itr = itemSlot_itr->value.MemberBegin(); item_itr != itemSlot_itr->value.MemberEnd(); ++item_itr )
-					{
-						item.readKeyToItemEntry(item_itr);
-					}
-					dynarray_pair_push<std::pair<ItemEntry, int>>(statEntry->equipped_items, std::make_pair(item, getSlotFromKeyName(slotName)));
-				}
-			}
-			const JsonNode inventory_items = d["inventory_items"];
-			for ( JsonValueIt itemSlot_itr = inventory_items.Begin(); itemSlot_itr != inventory_items.End(); ++itemSlot_itr )
-			{
-				if ( itemSlot_itr->IsArray() )
-				{
-					DynamicArray itemsToChoose;  // vector<ItemEntry>
-					// a selection of items in the slot. need to choose 1.
-					for ( JsonValueIt itemArray_itr = itemSlot_itr->Begin(); itemArray_itr != itemSlot_itr->End(); ++itemArray_itr )
-					{
-						ItemEntry item;
-						for ( JsonMemberIt item_itr = itemArray_itr->MemberBegin(); item_itr != itemArray_itr->MemberEnd(); ++item_itr )
-						{
-							item.readKeyToItemEntry(item_itr);
-						}
-						dynarray_push<ItemEntry>(itemsToChoose, item);
-					}
-					if ( dynarray_pair_size<std::pair<ItemEntry, int>>(itemsToChoose) > 0 )
-					{
-						DynamicArrayU32 itemChances((size_t)dynarray_size<ItemEntry>(itemsToChoose), 0);
-						int index = 0;
-						for ( int64_t _ii2 = 0; _ii2 < dynarray_size<ItemEntry>(itemsToChoose); ++_ii2 )
-						{
-							itemChances.at(index) = dynarray_at<ItemEntry>(itemsToChoose, _ii2)->weightedChance;
-							++index;
-						}
-
-						int result = monster_stat_rng.discrete(itemChances.data(), itemChances.size());
-						dynarray_push<ItemEntry>(statEntry->inventory_items, *dynarray_at<ItemEntry>(itemsToChoose, result));
-					}
-				}
-				else
-				{
-					ItemEntry item;
-					for ( JsonMemberIt item_itr = itemSlot_itr->MemberBegin(); item_itr != itemSlot_itr->MemberEnd(); ++item_itr )
-					{
-						item.readKeyToItemEntry(item_itr);
-					}
-					dynarray_push<ItemEntry>(statEntry->inventory_items, item);
-				}
-			}
-			if ( d.HasMember("followers") )
-			{
-				const JsonNode numFollowersVal = d["followers"]["num_followers"];
-				statEntry->numFollowers = numFollowersVal.GetInt();
-				const JsonNode followers = d["followers"]["follower_variants"];
-
-				statEntry->followerVariants.clear();
-				for ( JsonMemberIt follower_itr = followers.MemberBegin(); follower_itr != followers.MemberEnd(); ++follower_itr )
-				{
-										MonsterStatCustomManager::StatEntry::VariantPair_t vp;
-					vp.name = follower_itr->name.GetString();
-					vp.chance = follower_itr->value.GetInt();
-					statEntry->followerVariants.push_back(vp);
-				}
-			}
-			if ( d.HasMember("properties") )
-			{
-				if ( d["properties"].HasMember("monster_name_always_display_as_generic_species") )
-				{
-					statEntry->isMonsterNameGeneric = d["properties"]["monster_name_always_display_as_generic_species"].GetBool();
-				}
-				if ( d["properties"].HasMember("populate_empty_equipped_items_with_default") )
-				{
-					statEntry->useDefaultEquipment = d["properties"]["populate_empty_equipped_items_with_default"].GetBool();
-				}
-				if ( d["properties"].HasMember("populate_default_inventory") )
-				{
-					statEntry->useDefaultInventoryItems = d["properties"]["populate_default_inventory"].GetBool();
-				}
-				if ( d["properties"].HasMember("disable_miniboss_chance") )
-				{
-					statEntry->disableMiniboss = d["properties"]["disable_miniboss_chance"].GetBool();
-				}
-				if ( d["properties"].HasMember("force_player_recruitable") )
-				{
-					statEntry->forceRecruitableToPlayer = d["properties"]["force_player_recruitable"].GetBool();
-				}
-				if ( d["properties"].HasMember("force_player_friendly") )
-				{
-					statEntry->forceFriendlyToPlayer = d["properties"]["force_player_friendly"].GetBool();
-				}
-				if ( d["properties"].HasMember("force_player_enemy") )
-				{
-					statEntry->forceEnemyToPlayer = d["properties"]["force_player_enemy"].GetBool();
-				}
-				if ( d["properties"].HasMember("disable_item_drops") )
-				{
-					statEntry->disableItemDrops = d["properties"]["disable_item_drops"].GetBool();
-				}
-				if ( d["properties"].HasMember("xp_award_percent") )
-				{
-					statEntry->xpAwardPercent = d["properties"]["xp_award_percent"].GetInt();
-				}
-				if ( d["properties"].HasMember("enable_casting_inventory_spellbooks") )
-				{
-					statEntry->castSpellbooksFromInventory = d["properties"]["enable_casting_inventory_spellbooks"].GetBool();
-				}
-				if ( d["properties"].HasMember("spellbook_cast_cooldown") )
-				{
-					statEntry->spellbookCastCooldown = d["properties"]["spellbook_cast_cooldown"].GetInt();
-				}
-			}
-			if ( d.HasMember("shopkeeper_properties") )
-			{
-				if ( d["shopkeeper_properties"].HasMember("store_type_chances") )
-				{
-					for ( JsonMemberIt types_itr = d["shopkeeper_properties"]["store_type_chances"].MemberBegin(); 
-						types_itr != d["shopkeeper_properties"]["store_type_chances"].MemberEnd(); ++types_itr )
-					{
-											MonsterStatCustomManager::StatEntry::VariantPair_t vp2;
-					vp2.name = types_itr->name.GetString();
-					vp2.chance = types_itr->value.GetInt();
-					statEntry->shopkeeperStoreTypes.push_back(vp2);
-					}
-					if ( !statEntry->shopkeeperStoreTypes.empty() )
-					{
-						DynamicArrayU32 storeChances(statEntry->shopkeeperStoreTypes.size(), 0);
-						int index = 0;
-						for ( auto& chance : storeChances )
-						{
-							chance = statEntry->shopkeeperStoreTypes.at(index).chance;
-							++index;
-						}
-
-						DynamicString result = statEntry->shopkeeperStoreTypes.at(monster_stat_rng.discrete(storeChances.data(), storeChances.size())).name;
-						index = 0;
-						for ( auto& lookup : shopkeeperTypeStrings )
-						{
-							if ( lookup.compare(result) == 0 )
-							{
-								statEntry->chosenShopkeeperStore = index;
-								break;
-							}
-							++index;
-						}
-					}
-					if ( d["shopkeeper_properties"].HasMember("generate_default_shop_items") )
-					{
-						statEntry->shopkeeperGenDefaultItems = d["shopkeeper_properties"]["generate_default_shop_items"].GetBool();
-					}
-					if ( d["shopkeeper_properties"].HasMember("num_generated_items_min") )
-					{
-						statEntry->shopkeeperMinItems = d["shopkeeper_properties"]["num_generated_items_min"].GetInt();
-					}
-					if ( d["shopkeeper_properties"].HasMember("num_generated_items_max") )
-					{
-						statEntry->shopkeeperMaxItems = d["shopkeeper_properties"]["num_generated_items_max"].GetInt();
-					}
-					if ( d["shopkeeper_properties"].HasMember("generated_item_blessing_max") )
-					{
-						statEntry->shopkeeperMaxGeneratedBlessing = d["shopkeeper_properties"]["generated_item_blessing_max"].GetInt();
-					}
-				}
-			}
-			printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
-			return statEntry;
-		}
-		else
-		{
-			printlog("[JSON]: Error: Could not locate json file %s", filePath.c_str());
-		}
-		return nullptr;
-	}
+	StatEntry* readFromFile(std::string monsterFileName);
 };
 extern MonsterStatCustomManager monsterStatCustomManager;
 
@@ -1369,13 +234,7 @@ public:
 			levelmax = levelNumMax;
 			chance = chanceNum;
 		};
-		void addVariant(std::string variantName, int chance)
-		{
-			MonsterVariant_t v;
-			v.name = variantName.c_str();
-			v.chance = chance;
-			variants.push_back(v);
-		}
+		void addVariant(std::string variantName, int chance);
 	};
 
 	class LevelCurve
@@ -1399,113 +258,9 @@ public:
 	DynamicArrayT<FollowerGenerateDetails_t> followersToGenerateForLeaders;
 	inline bool inUse() { return usingCustomManager; };
 
-	void readFromFile(Uint32 seed)
-	{
-		monster_curve_rng.seedBytes(&seed, sizeof(seed));
-		MonsterStatCustomManager::monster_stat_rng.seedBytes(&seed, sizeof(seed));
+	void readFromFile(Uint32 seed);
 
-		allLevelCurves.clear();
-		usingCustomManager = false;
-		if ( PHYSFS_getRealDir("/data/monstercurve.json") )
-		{
-			DynamicString inputPath = PHYSFS_getRealDir("/data/monstercurve.json");
-			inputPath.append("/data/monstercurve.json");
-
-			File* fp = FileIO::open(inputPath.c_str(), "rb");
-			if ( !fp )
-			{
-				printlog("[JSON]: Error: Could not locate json file %s", inputPath.c_str());
-				return;
-			}
-			char buf[65536];
-			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
-			buf[count] = '\0';
-			FileIO::close(fp);
-
-			JsonDoc jd(buf);
-			if ( !jd.ok() ) { return; }
-			JsonNode d = jd.root;
-			if ( !d.HasMember("version") )
-			{
-				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
-				return;
-			}
-			int version = d["version"].GetInt();
-
-			if ( d.HasMember("levels") )
-			{
-				usingCustomManager = true;
-				const JsonNode levels = d["levels"];
-				for ( JsonMemberIt map_itr = levels.MemberBegin(); map_itr != levels.MemberEnd(); ++map_itr )
-				{
-					LevelCurve newCurve;
-					newCurve.mapName = map_itr->name.GetString();
-					if ( map_itr->value.HasMember("random_generation_monsters") )
-					{
-						const JsonNode randomGeneration = map_itr->value["random_generation_monsters"];
-						for ( JsonValueIt monsters_itr = randomGeneration.Begin(); monsters_itr != randomGeneration.End(); ++monsters_itr )
-						{
-							const JsonNode monster = *monsters_itr;
-							MonsterCurveEntry newMonster(monster["name"].GetString(),
-								monster["dungeon_depth_minimum"].GetInt(),
-								monster["dungeon_depth_maximum"].GetInt(),
-								monster["weighted_chance"].GetInt(),
-								"");
-
-							if ( monster.HasMember("variants") )
-							{
-								for ( JsonMemberIt var_itr = monster["variants"].MemberBegin();
-									var_itr != monster["variants"].MemberEnd(); ++var_itr )
-								{
-									newMonster.addVariant(var_itr->name.GetString(), var_itr->value.GetInt());
-								}
-							}
-							newCurve.monsterCurve.push_back(newMonster);
-						}
-					}
-
-					if ( map_itr->value.HasMember("fixed_monsters") )
-					{
-						const JsonNode fixedGeneration = map_itr->value["fixed_monsters"];
-						for ( JsonValueIt monsters_itr = fixedGeneration.Begin(); monsters_itr != fixedGeneration.End(); ++monsters_itr )
-						{
-							const JsonNode monster = *monsters_itr;
-							MonsterCurveEntry newMonster(monster["name"].GetString(), 0, 255, 1, "");
-
-							if ( monster.HasMember("variants") )
-							{
-								for ( JsonMemberIt var_itr = monster["variants"].MemberBegin();
-									var_itr != monster["variants"].MemberEnd(); ++var_itr )
-								{
-									newMonster.addVariant(var_itr->name.GetString(), var_itr->value.GetInt());
-								}
-							}
-							newCurve.fixedSpawns.push_back(newMonster);
-						}
-					}
-					allLevelCurves.push_back(newCurve);
-				}
-			}
-			printCurve(allLevelCurves);
-			printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
-		}
-	}
-
-	static int getMonsterTypeFromString(std::string monsterStr)
-	{
-		if ( monsterStr.compare("") == 0 )
-		{
-			return NOTHING;
-		}
-		for ( int i = NOTHING; i < NUMMONSTERS; ++i )
-		{
-			if ( monsterStr.compare(monstertypename[i]) == 0 )
-			{
-				return i;
-			}
-		}
-		return NOTHING;
-	}
+	static int getMonsterTypeFromString(std::string monsterStr);
 	void printCurve(DynamicArrayT<LevelCurve> toPrint)
 	{
 		return;
@@ -1519,335 +274,18 @@ public:
 			}
 		}
 	}
-	bool curveExistsForCurrentMapName(std::string currentMap)
-	{
-		if ( !inUse() )
-		{
-			return false;
-		}
-		if ( currentMap.compare("") == 0 )
-		{
-			return false;
-		}
-		for ( LevelCurve curve : allLevelCurves )
-		{
-			if ( curve.mapName.compare(currentMap) == 0 )
-			{
-				//printlog("[MonsterCurveCustomManager]: curveExistsForCurrentMapName: true");
-				return true;
-			}
-		}
-		return false;
-	}
-	int rollMonsterFromCurve(std::string currentMap)
-	{
-		DynamicArrayU32 monsterCurveChances(NUMMONSTERS, 0);
+	bool curveExistsForCurrentMapName(std::string currentMap);
+	int rollMonsterFromCurve(std::string currentMap);
+	std::string rollMonsterVariant(DynamicString currentMap, int monsterType);
+	std::string rollFixedMonsterVariant(DynamicString currentMap, int monsterType);
 
-		for ( LevelCurve curve : allLevelCurves )
-		{
-			if ( curve.mapName.compare(currentMap) == 0 )
-			{
-				for ( MonsterCurveEntry& monster : curve.monsterCurve )
-				{
-					if ( currentlevel >= monster.levelmin && currentlevel <= monster.levelmax )
-					{
-						if ( monster.monsterType != NOTHING )
-						{
-							monsterCurveChances[monster.monsterType] += monster.chance;
-						}
-					}
-					else
-					{
-						if ( monster.fallbackMonsterType != NOTHING )
-						{
-							monsterCurveChances[monster.fallbackMonsterType] += monster.chance;
-						}
-					}
-				}
-				int result = monster_curve_rng.discrete(monsterCurveChances.data(), monsterCurveChances.size());
-				//printlog("[MonsterCurveCustomManager]: Rolled: %d", result);
-				return result;
-			}
-		}
-		printlog("[MonsterCurveCustomManager]: Error: default to nothing.");
-		return NOTHING;
-	}
-	std::string rollMonsterVariant(DynamicString currentMap, int monsterType)
-	{
-		for ( LevelCurve& curve : allLevelCurves )
-		{
-			if ( curve.mapName.compare(currentMap) == 0 )
-			{
-				DynamicArrayStr variantResults;
-				DynamicArrayU32 variantChances;
-				for ( MonsterCurveEntry& monster : curve.monsterCurve )
-				{
-					if ( currentlevel >= monster.levelmin && currentlevel <= monster.levelmax )
-					{
-						if ( monster.monsterType == monsterType && monster.variants.size() > 0 )
-						{
-							for ( auto& pair : monster.variants )
-							{
-								auto find = std::find(variantResults.begin(), variantResults.end(), pair.name);
-								if ( find == variantResults.end() )
-								{
-									variantResults.push_back(pair.name);
-									variantChances.push_back(pair.chance);
-								}
-								else
-								{
-									size_t dist = static_cast<size_t>(std::distance(variantResults.begin(), find));
-									variantChances.at(dist) += pair.chance;
-								}
-							}
+	void createMonsterFromFile(Entity* entity, Stat* myStats, const std::string& filename, Monster& outMonsterType);
 
-						}
-					}
-				}
-				if ( !variantResults.empty() )
-				{
-					int result = monster_curve_rng.discrete(variantChances.data(), variantChances.size());
-					return variantResults[result];
-				}
-			}
-		}
-		return "default";
-	}
-	std::string rollFixedMonsterVariant(DynamicString currentMap, int monsterType)
-	{
-		for ( LevelCurve& curve : allLevelCurves )
-		{
-			if ( curve.mapName.compare(currentMap) == 0 )
-			{
-				for ( MonsterCurveEntry& monster : curve.fixedSpawns )
-				{
-					if ( monster.monsterType == monsterType && monster.variants.size() > 0 )
-					{
-						DynamicArrayU32 variantChances(monster.variants.size(), 0);
-						int index = 0;
-						for ( auto& pair : monster.variants )
-						{
-							variantChances.at(index) = pair.chance;
-							++index;
-						}
+	void generateFollowersForLeaders();
 
-						int result = monster_curve_rng.discrete(variantChances.data(), variantChances.size());
-						return monster.variants.at(result).name.c_str();
-					}
-				}
-			}
-		}
-		return "default";
-	}
+	void writeSampleToDocument();
 
-	void createMonsterFromFile(Entity* entity, Stat* myStats, const std::string& filename, Monster& outMonsterType)
-	{
-		MonsterStatCustomManager::StatEntry* statEntry = monsterStatCustomManager.readFromFile(filename.c_str());
-		if ( statEntry )
-		{
-			statEntry->setStatsAndEquipmentToMonster(myStats);
-			outMonsterType = myStats->type;
-			while ( statEntry->numFollowers > 0 )
-			{
-				DynamicString followerName = statEntry->getFollowerVariant();
-				if ( followerName.compare("") && followerName.compare("none") )
-				{
-					followersToGenerateForLeaders.push_back(FollowerGenerateDetails_t());
-					auto& entry = followersToGenerateForLeaders.back();
-					entry.followerName = followerName;
-					entry.x = entity->x;
-					entry.y = entity->y;
-					entry.uid = entity->getUID();
-					entry.leaderType = myStats->type;
-				}
-				--statEntry->numFollowers;
-			}
-			delete statEntry;
-		}
-	}
-
-	void generateFollowersForLeaders()
-	{
-		if ( multiplayer != CLIENT )
-		{
-			for ( auto& entry : followersToGenerateForLeaders )
-			{
-				MonsterStatCustomManager::StatEntry* followerEntry = monsterStatCustomManager.readFromFile(entry.followerName.c_str());
-				if ( followerEntry )
-				{
-					Entity* summonedFollower = summonMonsterNoSmoke(static_cast<Monster>(followerEntry->type), entry.x, entry.y);
-					if ( summonedFollower )
-					{
-						if ( summonedFollower->getStats() )
-						{
-							followerEntry->setStatsAndEquipmentToMonster(summonedFollower->getStats());
-							summonedFollower->getStats()->leader_uid = entry.uid;
-						}
-						summonedFollower->seedEntityRNG(monster_curve_rng.getU32());
-					}
-					delete followerEntry;
-				}
-				else
-				{
-					Entity* summonedFollower = summonMonsterNoSmoke(static_cast<Monster>(entry.leaderType), entry.x, entry.y);
-					if ( summonedFollower )
-					{
-						if ( summonedFollower->getStats() )
-						{
-							summonedFollower->getStats()->leader_uid = entry.uid;
-						}
-						summonedFollower->seedEntityRNG(monster_curve_rng.getU32());
-					}
-				}
-			}
-		}
-		followersToGenerateForLeaders.clear();
-	}
-
-	void writeSampleToDocument()
-	{
-		JsonNode d;
-		d.SetObject();
-
-		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
-		JsonNode levelObj(ObjectTypeTag);
-		levelObj.AddMember("The Mines", JsonNode(ObjectTypeTag));
-		levelObj["The Mines"].AddMember("fixed_monsters", JsonNode(ArrayTypeTag));
-
-		JsonNode fm = levelObj["The Mines"]["fixed_monsters"];
-		fm.PushBack(JsonNode(ObjectTypeTag));
-		fm[uint32_t(0)].AddMember("name", "rat");
-		fm[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
-		fm[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
-
-		fm.PushBack(JsonNode(ObjectTypeTag));
-		fm[uint32_t(1)].AddMember("name", "skeleton");
-		fm[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
-		fm[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
-		
-		fm.PushBack(JsonNode(ObjectTypeTag));
-		fm[uint32_t(2)].AddMember("name", "spider");
-		fm[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
-		fm[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
-
-		fm.PushBack(JsonNode(ObjectTypeTag));
-		fm[uint32_t(3)].AddMember("name", "troll");
-		fm[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
-		fm[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
-
-		levelObj["The Mines"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
-
-		JsonNode mines = levelObj["The Mines"]["random_generation_monsters"];
-		mines.PushBack(JsonNode(ObjectTypeTag));
-		mines[uint32_t(0)].AddMember("name", "rat");
-		mines[uint32_t(0)].AddMember("weighted_chance", JsonNode(4));
-		mines[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		mines[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		mines[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
-		mines[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
-
-		mines.PushBack(JsonNode(ObjectTypeTag));
-		mines[uint32_t(1)].AddMember("name", "skeleton");
-		mines[uint32_t(1)].AddMember("weighted_chance", JsonNode(4));
-		mines[uint32_t(1)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		mines[uint32_t(1)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		mines[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
-		mines[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
-
-		mines.PushBack(JsonNode(ObjectTypeTag));
-		mines[uint32_t(2)].AddMember("name", "spider");
-		mines[uint32_t(2)].AddMember("weighted_chance", JsonNode(1));
-		mines[uint32_t(2)].AddMember("dungeon_depth_minimum", JsonNode(2));
-		mines[uint32_t(2)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		mines[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
-		mines[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
-
-		mines.PushBack(JsonNode(ObjectTypeTag));
-		mines[uint32_t(3)].AddMember("name", "troll");
-		mines[uint32_t(3)].AddMember("weighted_chance", JsonNode(1));
-		mines[uint32_t(3)].AddMember("dungeon_depth_minimum", JsonNode(2));
-		mines[uint32_t(3)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		mines[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
-		mines[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
-
-		levelObj.AddMember("The Swamp", JsonNode(ObjectTypeTag));
-		levelObj["The Swamp"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
-		levelObj["The Swamp"]["random_generation_monsters"].PushBack(JsonNode(ObjectTypeTag));
-
-		JsonNode swamp = levelObj["The Swamp"]["random_generation_monsters"];
-		swamp[uint32_t(0)].AddMember("name", "spider");
-		swamp[uint32_t(0)].AddMember("weighted_chance", JsonNode(2));
-		swamp[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		swamp[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		swamp[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
-		swamp[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
-
-		swamp.PushBack(JsonNode(ObjectTypeTag));
-		swamp[uint32_t(1)].AddMember("name", "goblin");
-		swamp[uint32_t(1)].AddMember("weighted_chance", JsonNode(3));
-		swamp[uint32_t(1)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		swamp[uint32_t(1)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		swamp[uint32_t(1)].AddMember("variants", JsonNode(ObjectTypeTag));
-		swamp[uint32_t(1)]["variants"].AddMember("default", JsonNode(1));
-
-		swamp.PushBack(JsonNode(ObjectTypeTag));
-		swamp[uint32_t(2)].AddMember("name", "slime");
-		swamp[uint32_t(2)].AddMember("weighted_chance", JsonNode(3));
-		swamp[uint32_t(2)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		swamp[uint32_t(2)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		swamp[uint32_t(2)].AddMember("variants", JsonNode(ObjectTypeTag));
-		swamp[uint32_t(2)]["variants"].AddMember("default", JsonNode(1));
-
-		swamp.PushBack(JsonNode(ObjectTypeTag));
-		swamp[uint32_t(3)].AddMember("name", "ghoul");
-		swamp[uint32_t(3)].AddMember("weighted_chance", JsonNode(2));
-		swamp[uint32_t(3)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		swamp[uint32_t(3)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		swamp[uint32_t(3)].AddMember("variants", JsonNode(ObjectTypeTag));
-		swamp[uint32_t(3)]["variants"].AddMember("default", JsonNode(1));
-
-		levelObj.AddMember("My level", JsonNode(ObjectTypeTag));
-
-		levelObj["My level"].AddMember("random_generation_monsters", JsonNode(ArrayTypeTag));
-		levelObj["My level"]["random_generation_monsters"].PushBack(JsonNode(ObjectTypeTag));
-		JsonNode customLevel = levelObj["My level"]["random_generation_monsters"];
-		customLevel[uint32_t(0)].AddMember("name", "demon");
-		customLevel[uint32_t(0)].AddMember("weighted_chance", JsonNode(1));
-		customLevel[uint32_t(0)].AddMember("dungeon_depth_minimum", JsonNode(0));
-		customLevel[uint32_t(0)].AddMember("dungeon_depth_maximum", JsonNode(99));
-		customLevel[uint32_t(0)].AddMember("variants", JsonNode(ObjectTypeTag));
-		customLevel[uint32_t(0)]["variants"].AddMember("default", JsonNode(1));
-
-		CustomHelpers::addMemberToRoot(d, "levels", levelObj);
-
-		writeToFile(d);
-	}
-
-	void writeToFile(JsonNode d)
-	{
-		int filenum = 0;
-		DynamicString testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
-		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
-		{
-			++filenum;
-			testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
-		}
-		DynamicString outputPath = PHYSFS_getRealDir("/data/");
-		outputPath.append(PHYSFS_getDirSeparator());
-		DynamicString fileName = "data/monstercurve_export" + std::to_string(filenum) + ".json";
-		outputPath.append(fileName.c_str());
-
-		File* fp = FileIO::open(outputPath.c_str(), "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		const char* json = json_node_serialize(d.h, false);
-		fp->write(json, sizeof(char), strlen(json));
-		json_string_free(json);
-
-		FileIO::close(fp);
-	}
+	void writeToFile(JsonNode d);
 };
 extern MonsterCurveCustomManager monsterCurveCustomManager;
 
@@ -1867,28 +305,7 @@ public:
 	int playerWeightPercent = 100;
 	double playerSpeedMax = 12.5;
 	inline bool inUse() { return usingCustomManager; };
-	void resetValues()
-	{
-		usingCustomManager = false;
-		xpShareRange = XPSHARERANGE;
-		globalXPPercent = 100;
-		globalGoldPercent = 100;
-		minimapShareProgress = false;
-		playerWeightPercent = 100;
-		playerSpeedMax = 12.5;
-
-		minotaurForceEnableFloors.first.clear();
-		minotaurForceEnableFloors.second.clear();
-		minotaurForceDisableFloors.first.clear();
-		minotaurForceDisableFloors.second.clear();
-		hungerDisableFloors.first.clear();
-		hungerDisableFloors.second.clear();
-		herxChatterDisableFloors.first.clear();
-		herxChatterDisableFloors.second.clear();
-		minimapDisableFloors.first.clear();
-		minimapDisableFloors.second.clear();
-		allMapGenerations.clear();
-	}
+	void resetValues();
 
 	class MapGeneration
 	{
@@ -1908,549 +325,31 @@ public:
 	};
 
 	DynamicArrayT<MapGeneration> allMapGenerations;
-	bool mapGenerationExistsForMapName(std::string name)
-	{
-		for ( auto& it : allMapGenerations )
-		{
-			if ( it.mapName.compare(name) == 0 )
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	MapGeneration* getMapGenerationForMapName(std::string name)
-	{
-		for ( auto& it : allMapGenerations )
-		{
-			if ( it.mapName.compare(name) == 0 )
-			{
-				return &it;
-			}
-		}
-		return nullptr;
-	}
+	bool mapGenerationExistsForMapName(std::string name);
+	MapGeneration* getMapGenerationForMapName(std::string name);
 
-	void writeAllToDocument()
-	{
-		JsonNode d;
-		d.SetObject();
+	void writeAllToDocument();
 
-		CustomHelpers::addMemberToRoot(d, "version", JsonNode(1));
-		CustomHelpers::addMemberToRoot(d, "xp_share_range", JsonNode(xpShareRange));
-		CustomHelpers::addMemberToRoot(d, "global_xp_award_percent", JsonNode(globalXPPercent));
-		CustomHelpers::addMemberToRoot(d, "global_gold_drop_scale_percent", JsonNode(globalGoldPercent));
-		CustomHelpers::addMemberToRoot(d, "player_share_minimap_progress", JsonNode(minimapShareProgress));
-		CustomHelpers::addMemberToRoot(d, "player_speed_weight_impact_percent", JsonNode(playerWeightPercent));
-		CustomHelpers::addMemberToRoot(d, "player_speed_max", JsonNode(playerSpeedMax));
+	void writeToFile(JsonNode d);
 
-		JsonNode obj(ObjectTypeTag);
-		JsonNode arr(ArrayTypeTag);
-		CustomHelpers::addMemberToRoot(d, "minotaur_force_disable_on_floors", obj);
-		CustomHelpers::addMemberToSubkey(d, "minotaur_force_disable_on_floors", "normal_floors", arr);
-		CustomHelpers::addMemberToSubkey(d, "minotaur_force_disable_on_floors", "secret_floors", arr);
-		CustomHelpers::addMemberToRoot(d, "minotaur_force_enable_on_floors", obj);
-		CustomHelpers::addMemberToSubkey(d, "minotaur_force_enable_on_floors", "normal_floors", arr);
-		CustomHelpers::addMemberToSubkey(d, "minotaur_force_enable_on_floors", "secret_floors", arr);
-		CustomHelpers::addMemberToRoot(d, "disable_herx_messages_on_floors", obj);
-		CustomHelpers::addMemberToSubkey(d, "disable_herx_messages_on_floors", "normal_floors", arr);
-		CustomHelpers::addMemberToSubkey(d, "disable_herx_messages_on_floors", "secret_floors", arr);
-		CustomHelpers::addMemberToRoot(d, "disable_minimap_on_floors", obj);
-		CustomHelpers::addMemberToSubkey(d, "disable_minimap_on_floors", "normal_floors", arr);
-		CustomHelpers::addMemberToSubkey(d, "disable_minimap_on_floors", "secret_floors", arr);
+	void readFromFile();
 
-		JsonNode mapGenObj;
-		mapGenObj.SetObject();
-		CustomHelpers::addMemberToRoot(d, "map_generation", mapGenObj);
-		JsonNode key1("The Mines");
-		JsonNode minesObj(ObjectTypeTag);
+	bool readKeyToGameplayProperty(JsonMemberIt itr);
 
-		JsonNode trapArray1(ArrayTypeTag);
-		trapArray1.PushBack("boulders");
-		minesObj.AddMember("trap_generation_types", trapArray1);
-		minesObj.AddMember("minotaur_floors", JsonNode(ArrayTypeTag));
-		minesObj["minotaur_floors"].PushBack(2);
-		minesObj["minotaur_floors"].PushBack(3);
-		minesObj.AddMember("minotaur_floor_percent", JsonNode(50));
+	bool readKeyToMapGenerationProperty(MapGeneration& m, JsonMemberIt itr);
 
-		minesObj.AddMember("dark_floors", JsonNode(ArrayTypeTag));
-		minesObj["dark_floors"].PushBack(1);
-		minesObj["dark_floors"].PushBack(2);
-		minesObj["dark_floors"].PushBack(3);
-		minesObj["dark_floors"].PushBack(4);
-		minesObj.AddMember("dark_floor_percent", JsonNode(25));
+	bool processedMinotaurSpawn(int level, bool secret, std::string mapName);
 
-		minesObj.AddMember("shop_floors", JsonNode(ArrayTypeTag));
-		minesObj["shop_floors"].PushBack(2);
-		minesObj["shop_floors"].PushBack(3);
-		minesObj["shop_floors"].PushBack(4);
-		minesObj.AddMember("shop_floor_percent", JsonNode(50));
+	bool processedDarkFloor(int level, bool secret, std::string mapName);
 
-		minesObj.AddMember("npc_floors", JsonNode(ArrayTypeTag));
-		minesObj["npc_floors"].PushBack(2);
-		minesObj["npc_floors"].PushBack(3);
-		minesObj["npc_floors"].PushBack(4);
-		minesObj.AddMember("npc_spawn_chance", JsonNode(10));
-
-		d["map_generation"].AddMember(key1, minesObj);
-		
-		JsonNode key2("The Swamp");
-		JsonNode swampObj(ObjectTypeTag);
-
-		JsonNode trapArray2(ArrayTypeTag);
-		trapArray2.PushBack("boulders");
-		trapArray2.PushBack("arrows");
-		swampObj.AddMember("trap_generation_types", trapArray2);
-		swampObj.AddMember("minotaur_floors", JsonNode(ArrayTypeTag));
-		swampObj["minotaur_floors"].PushBack(7);
-		swampObj["minotaur_floors"].PushBack(8);
-		swampObj.AddMember("minotaur_floor_percent", JsonNode(50));
-
-		swampObj.AddMember("dark_floors", JsonNode(ArrayTypeTag));
-		swampObj["dark_floors"].PushBack(6);
-		swampObj["dark_floors"].PushBack(7);
-		swampObj["dark_floors"].PushBack(8);
-		swampObj["dark_floors"].PushBack(9);
-		swampObj.AddMember("dark_floor_percent", JsonNode(25));
-
-		swampObj.AddMember("shop_floors", JsonNode(ArrayTypeTag));
-		swampObj["shop_floors"].PushBack(6);
-		swampObj["shop_floors"].PushBack(7);
-		swampObj["shop_floors"].PushBack(8);
-		swampObj["shop_floors"].PushBack(9);
-		swampObj.AddMember("shop_floor_percent", JsonNode(50));
-
-		swampObj.AddMember("npc_floors", JsonNode(ArrayTypeTag));
-		swampObj["npc_floors"].PushBack(6);
-		swampObj["npc_floors"].PushBack(7);
-		swampObj["npc_floors"].PushBack(8);
-		swampObj["npc_floors"].PushBack(9);
-		swampObj.AddMember("npc_spawn_chance", JsonNode(10));
-
-		d["map_generation"].AddMember(key2, swampObj);
-
-		writeToFile(d);
-	}
-
-	void writeToFile(JsonNode d)
-	{
-		int filenum = 0;
-		DynamicString testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
-		while ( PHYSFS_getRealDir(testPath.c_str()) != nullptr && filenum < 1000 )
-		{
-			++filenum;
-			testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
-		}
-		DynamicString outputPath = PHYSFS_getRealDir("/data/");
-		outputPath.append(PHYSFS_getDirSeparator());
-		DynamicString fileName = "data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
-		outputPath.append(fileName.c_str());
-
-		File* fp = FileIO::open(outputPath.c_str(), "wb");
-		if ( !fp )
-		{
-			return;
-		}
-		const char* json = json_node_serialize(d.h, false);
-		fp->write(json, sizeof(char), strlen(json));
-		json_string_free(json);
-
-		FileIO::close(fp);
-	}
-
-	void readFromFile()
-	{
-		resetValues();
-		if ( PHYSFS_getRealDir("/data/gameplaymodifiers.json") )
-		{
-			DynamicString inputPath = PHYSFS_getRealDir("/data/gameplaymodifiers.json");
-			inputPath.append("/data/gameplaymodifiers.json");
-
-			File* fp = FileIO::open(inputPath.c_str(), "rb");
-			if ( !fp )
-			{
-				printlog("[JSON]: Error: Could not locate json file %s", inputPath.c_str());
-				return;
-			}
-			char buf[65536];
-			int count = fp->read(buf, sizeof(buf[0]), sizeof(buf));
-			buf[count] = '\0';
-			FileIO::close(fp);
-
-			JsonDoc jd(buf);
-			if ( !jd.ok() ) { return; }
-			JsonNode d = jd.root;
-			if ( !d.HasMember("version") )
-			{
-				printlog("[JSON]: Error: No 'version' value in json file, or JSON syntax incorrect! %s", inputPath.c_str());
-				return;
-			}
-			int version = d["version"].GetInt();
-
-			for ( JsonMemberIt prop_itr = d.MemberBegin(); prop_itr != d.MemberEnd(); ++prop_itr )
-			{
-				if ( readKeyToGameplayProperty(prop_itr) )
-				{
-					usingCustomManager = true;
-				}
-			}
-			
-			printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
-		}
-	}
-
-	bool readKeyToGameplayProperty(JsonMemberIt itr)
-	{
-		DynamicString name = itr->name.GetString();
-		if ( name.compare("version") == 0 )
-		{
-			return true;
-		}
-		else if ( name.compare("xp_share_range") == 0 )
-		{
-			xpShareRange = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("global_xp_award_percent") == 0 )
-		{
-			globalXPPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("global_gold_drop_scale_percent") == 0 )
-		{
-			globalGoldPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("player_share_minimap_progress") == 0 )
-		{
-			minimapShareProgress = itr->value.GetBool();
-			return true;
-		}
-		else if ( name.compare("player_speed_weight_impact_percent") == 0 )
-		{
-			playerWeightPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("player_speed_max") == 0 )
-		{
-			playerSpeedMax = itr->value.GetDouble();
-			return true;
-		}
-		else if ( name.compare("minotaur_force_disable_on_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
-			{
-				minotaurForceDisableFloors.first.insert(arr_itr->GetInt());
-			}
-			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
-			{
-				minotaurForceDisableFloors.second.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("minotaur_force_enable_on_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
-			{
-				minotaurForceEnableFloors.first.insert(arr_itr->GetInt());
-			}
-			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
-			{
-				minotaurForceEnableFloors.second.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("disable_hunger_on_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
-			{
-				hungerDisableFloors.first.insert(arr_itr->GetInt());
-			}
-			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
-			{
-				hungerDisableFloors.second.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("disable_herx_messages_on_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
-			{
-				herxChatterDisableFloors.first.insert(arr_itr->GetInt());
-			}
-			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
-			{
-				herxChatterDisableFloors.second.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("disable_minimap_on_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value["normal_floors"].Begin(); arr_itr != itr->value["normal_floors"].End(); ++arr_itr )
-			{
-				minimapDisableFloors.first.insert(arr_itr->GetInt());
-			}
-			for ( JsonValueIt arr_itr = itr->value["secret_floors"].Begin(); arr_itr != itr->value["secret_floors"].End(); ++arr_itr )
-			{
-				minimapDisableFloors.second.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("map_generation") == 0 )
-		{
-			for ( JsonMemberIt map_itr = itr->value.MemberBegin(); map_itr != itr->value.MemberEnd(); ++map_itr )
-			{
-				DynamicString mapName = map_itr->name.GetString();
-				MapGeneration m(mapName);
-				for ( JsonMemberIt obj_itr = map_itr->value.MemberBegin(); obj_itr != map_itr->value.MemberEnd(); ++obj_itr )
-				{
-					readKeyToMapGenerationProperty(m, obj_itr);
-				}
-				allMapGenerations.push_back(m);
-			}
-			return true;
-		}
-		printlog("[JSON]: Unknown property '%s'", name.c_str());
-		return false;
-	}
-
-	bool readKeyToMapGenerationProperty(MapGeneration& m, JsonMemberIt itr)
-	{
-		DynamicString name = itr->name.GetString();
-		if ( name.compare("trap_generation_types") == 0 )
-		{
-			m.usingTrapTypes = true;
-			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
-			{
-				m.trapTypes.push_back(arr_itr->GetString());
-			}
-			return true;
-		}
-		else if ( name.compare("minotaur_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
-			{
-				m.minoFloors.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("dark_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
-			{
-				m.darkFloors.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("shop_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
-			{
-				m.shopFloors.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("npc_floors") == 0 )
-		{
-			for ( JsonValueIt arr_itr = itr->value.Begin(); arr_itr != itr->value.End(); ++arr_itr )
-			{
-				m.npcSpawnFloors.insert(arr_itr->GetInt());
-			}
-			return true;
-		}
-		else if ( name.compare("dark_floor_percent") == 0 )
-		{
-			m.darkPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("minotaur_floor_percent") == 0 )
-		{
-			m.minoPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("shop_floor_percent") == 0 )
-		{
-			m.shopPercent = itr->value.GetInt();
-			return true;
-		}
-		else if ( name.compare("npc_spawn_chance") == 0 )
-		{
-			m.npcSpawnPercent = itr->value.GetInt();
-			return true;
-		}
-		printlog("[JSON]: Unknown property '%s'", name.c_str());
-		return false;
-	}
-
-	bool processedMinotaurSpawn(int level, bool secret, std::string mapName)
-	{
-		if ( !inUse() )
-		{
-			return false;
-		}
-
-		if ( CustomHelpers::isLevelPartOfSet(level, secret, minotaurForceEnableFloors) )
-		{
-			minotaurlevel = 1;
-			return true;
-		}
-		if ( CustomHelpers::isLevelPartOfSet(level, secret, minotaurForceDisableFloors) )
-		{
-			minotaurlevel = 0;
-			return true;
-		}
-
-		auto m = getMapGenerationForMapName(mapName);
-		if ( m )
-		{
-			if ( m->minoPercent == -1 )
-			{
-				// no key value read in.
-				return false;
-			}
-
-			if ( m->minoFloors.find(level) == m->minoFloors.end() )
-			{
-				// not found
-				minotaurlevel = 0;
-				return true;
-			}
-			// found, roll prng
-			if ( map_rng.rand() % 100 < m->minoPercent )
-			{
-				minotaurlevel = 1;
-			}
-			else
-			{
-				minotaurlevel = 0;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	bool processedDarkFloor(int level, bool secret, std::string mapName)
-	{
-		if ( !inUse() )
-		{
-			return false;
-		}
-
-		auto m = getMapGenerationForMapName(mapName);
-		if ( m )
-		{
-			if ( m->darkPercent == -1 )
-			{
-				// no key value read in.
-				return false;
-			}
-
-			if ( m->darkFloors.find(level) == m->darkFloors.end() )
-			{
-				// not found
-				darkmap = false;
-				return true;
-			}
-			// found, roll prng
-			if ( map_rng.rand() % 100 < m->darkPercent )
-			{
-				darkmap = true;
-			}
-			else
-			{
-				darkmap = false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	bool processedShopFloor(int level, bool secret, std::string mapName, bool& shoplevel)
-	{
-		if ( !inUse() )
-		{
-			return false;
-		}
-
-		auto m = getMapGenerationForMapName(mapName);
-		if ( m )
-		{
-			if ( m->shopPercent == -1 )
-			{
-				// no key value read in.
-				return false;
-			}
-
-			if ( m->shopFloors.find(level) == m->shopFloors.end() )
-			{
-				// not found
-				shoplevel = false;
-				return true;
-			}
-			// found, roll prng
-			if ( map_rng.rand() % 100 < m->shopPercent )
-			{
-				shoplevel = true;
-			}
-			else
-			{
-				shoplevel = false;
-			}
-			return true;
-		}
-		return false;
-	}
+	bool processedShopFloor(int level, bool secret, std::string mapName, bool& shoplevel);
 
 	enum PropertyTypes : int
 	{
 		PROPERTY_NPC
 	};
 
-	bool processedPropertyForFloor(int level, bool secret, std::string mapName, PropertyTypes propertyType, bool& bOut)
-	{
-		if ( !inUse() )
-		{
-			return false;
-		}
-
-		auto m = getMapGenerationForMapName(mapName);
-		if ( m )
-		{
-			int percentValue = -1;
-			switch ( propertyType )
-			{
-				case PROPERTY_NPC:
-					if ( m->npcSpawnFloors.find(level) == m->npcSpawnFloors.end() )
-					{
-						// not found
-						bOut = false;
-						return true;
-					}
-					percentValue = m->npcSpawnPercent;
-					break;
-				default:
-					break;
-			}
-
-			if ( percentValue == -1 )
-			{
-				// no key value read in.
-				return false;
-			}
-
-			// found, roll prng
-			if ( map_rng.rand() % 100 < percentValue )
-			{
-				bOut = true;
-			}
-			else
-			{
-				bOut = false;
-			}
-			return true;
-		}
-		return false;
-	}
+	bool processedPropertyForFloor(int level, bool secret, std::string mapName, PropertyTypes propertyType, bool& bOut);
 };
 template <> struct DynamicArrayKindOf<MonsterCurveCustomManager::FollowerGenerateDetails_t> { static constexpr int value = Kind_FollowerDetails; };
 template <> struct DynamicArrayKindOf<MonsterStatCustomManager::StatEntry::VariantPair_t> { static constexpr int value = Kind_VariantPair; };
@@ -2490,21 +389,8 @@ public:
 	public:
 		Uint32 serverFlags = 0;
 		bool bHasSavedServerFlags = false;
-		void restoreSavedServerFlags()
-		{ 
-			if ( bHasSavedServerFlags )
-			{
-				bHasSavedServerFlags = false;
-				svFlags = serverFlags;
-				printlog("[SESSION]: Restoring server flags\n");
-			}
-		}
-		void saveServerFlags()
-		{
-			serverFlags = svFlags;
-			bHasSavedServerFlags = true;
-			printlog("[SESSION]: Saving server flags\n");
-		}
+		void restoreSavedServerFlags();
+		void saveServerFlags();
 
 		class SeededRun_t
 		{
@@ -2537,7 +423,7 @@ public:
 			};
 
 			bool isActive() { return inUse; }
-			bool isActive(ChallengeEvents_t _eventType) { return inUse && (eventType == _eventType); }
+			bool isActive(ChallengeEvents_t _eventType);
 			DynamicString scenarioStr = "";
 			DynamicString lid = "";
 			int lid_version = -1;
@@ -2569,79 +455,26 @@ public:
 		} challengeRun;
 	} currentSession;
 
-	bool isServerflagDisabledForCurrentMode(int i)
-	{
-		if ( getMode() == GAME_MODE_DEFAULT )
-		{
-			return false;
-		}
-		/*else if ( getMode() == GAME_MODE_TUTORIAL )
-		{
-			int flag = power(2, i);
-			switch ( flag )
-			{
-				case SV_FLAG_HARDCORE:
-				case SV_FLAG_HUNGER:
-				case SV_FLAG_FRIENDLYFIRE:
-				case SV_FLAG_LIFESAVING:
-				case SV_FLAG_TRAPS:
-				case SV_FLAG_CLASSIC:
-				case SV_FLAG_MINOTAURS:
-				case SV_FLAG_KEEPINVENTORY:
-					return true;
-					break;
-				default:
-					break;
-			}
-			return false;
-		}*/
-		else if ( getMode() == GAME_MODE_CUSTOM_RUN_ONESHOT
-			|| getMode() == GAME_MODE_CUSTOM_RUN )
-		{
-			if ( currentSession.challengeRun.lockedFlags & i )
-			{
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
+	bool isServerflagDisabledForCurrentMode(int i);
 
 	class Tutorial_t
 	{
 		DynamicString currentMap = "";
 		const Uint32 kNumTutorialLevels = 10;
 	public:
-		void init()
-		{
-			readFromFile();
-		}
+		void init();
 		int dungeonLevel = -1;
 		bool showFirstTutorialCompletedPrompt = false;
 		bool firstTutorialCompleted = false;
 		void createFirstTutorialCompletedPrompt();
-		void setTutorialMap(std::string& mapname)
-		{
-			loadCustomNextMap = mapname.c_str();
-			currentMap = loadCustomNextMap;
-		}
-		void launchHub()
-		{
-			loadCustomNextMap = "tutorial_hub.lmp";
-			currentMap = loadCustomNextMap;
-		}
+		void setTutorialMap(std::string& mapname);
+		void launchHub();
 		void startTutorial(std::string mapToSet);
 		static void buttonReturnToTutorialHub(button_t* my);
 		static void buttonRestartTrial(button_t* my);
 		const Uint32 getNumTutorialLevels() { return kNumTutorialLevels; }
 		void openGameoverWindow();
-		void onMapRestart(int levelNum)
-		{
-#ifndef EDITOR
-			achievementObserver.updateGlobalStat(
-				std::min(STEAM_GSTAT_TUTORIAL1_ATTEMPTS - 1 + levelNum, static_cast<int>(STEAM_GSTAT_TUTORIAL10_ATTEMPTS)), -1);
-#endif // !EDITOR
-		}
+		void onMapRestart(int levelNum);
 
 		class Menu_t
 		{
@@ -2649,7 +482,7 @@ public:
 		public:
 			bool isOpen() { return bWindowOpen; }
 			void open();
-			void close() { bWindowOpen = false; }
+			void close();
 			void onClickEntry();
 			int windowScroll = 0;
 			int selectedMenuItem = -1;
@@ -2664,7 +497,7 @@ public:
 			void createPrompt();
 			void drawDialogue();
 			bool isOpen() { return bWindowOpen; }
-			void close() { bWindowOpen = false; }
+			void close();
 			bool doButtonSkipPrompt = false;
 			bool showFirstTimePrompt = false;
 			static void buttonSkipPrompt(button_t* my);
@@ -2696,23 +529,7 @@ public:
 #else
 		const DynamicString tutorialScoresFilename = "/savegames/tutorial_scores.json";
 #endif
-		void writeToFile(JsonNode d)
-		{
-			DynamicString outputPath = outputdir;
-			outputPath.append(tutorialScoresFilename.c_str());
-
-			File* fp = FileIO::open(outputPath.c_str(), "wb");
-			if ( !fp )
-			{
-				return;
-			}
-			const char* json = json_node_serialize(d.h, false);
-		fp->write(json, sizeof(char), strlen(json));
-		json_string_free(json);
-			fp->write("", sizeof(char), 1);
-
-			FileIO::close(fp);
-		}
+		void writeToFile(JsonNode d);
 	} Tutorial;
 };
 extern GameModeManager_t gameModeManager;
@@ -2875,13 +692,13 @@ public:
 		DynamicMapI32 minWidths;
 		DynamicMapI32 maxWidths;
 		DynamicMapI32 headerMaxWidths;
-		void setColorHeading(Uint32 color) { headingTextColor = color; }
-		void setColorDescription(Uint32 color) { descriptionTextColor = color; }
-		void setColorDetails(Uint32 color) { detailsTextColor = color; }
-		void setColorPositive(Uint32 color) { positiveTextColor = color; }
-		void setColorNegative(Uint32 color) { negativeTextColor = color; }
-		void setColorStatus(Uint32 color) { statusEffectTextColor = color; }
-		void setColorFaintText(Uint32 color) { faintTextColor = color; }
+		void setColorHeading(Uint32 color);
+		void setColorDescription(Uint32 color);
+		void setColorDetails(Uint32 color);
+		void setColorPositive(Uint32 color);
+		void setColorNegative(Uint32 color);
+		void setColorStatus(Uint32 color);
+		void setColorFaintText(Uint32 color);
 	};
 	void setSpellValueIfKeyPresent(spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, int& toSet);
 	void setSpellValueIfKeyPresent(spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet);
@@ -3017,10 +834,10 @@ class DebugTimers_t
 {
 	std::map<std::string, std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>>> timepoints;
 public:
-	void addTimePoint(std::string key, DynamicString desc = "") { timepoints[key].push_back(std::make_pair(desc, std::chrono::high_resolution_clock::now())); }
+	void addTimePoint(std::string key, DynamicString desc = "");
 	void printTimepoints(std::string key, int& posy);
-	void clearTimepoints(std::string key) { timepoints[key].clear(); }
-	void clearAllTimepoints() { timepoints.clear(); }
+	void clearTimepoints(std::string key);
+	void clearAllTimepoints();
 	void printAllTimepoints();
 };
 extern DebugTimers_t DebugTimers;
@@ -3055,21 +872,7 @@ public:
 	~GlyphRenderer_t() {};
 	bool readFromFile();
 	void renderGlyphsToPNGs();
-	DynamicString& getGlyphPath(int scancode, bool pressed = false) 
-	{ 
-		if ( allGlyphs.find(scancode) != allGlyphs.end() )
-		{ 
-			if ( pressed )
-			{
-				return allGlyphs[scancode].pressedRenderedFullpath;
-			}
-			else
-			{
-				return allGlyphs[scancode].unpressedRenderedFullpath;
-			}
-		}
-		return defaultstring;
-	}
+	DynamicString& getGlyphPath(int scancode, bool pressed = false);
 };
 // MapValueKindOf for GlyphRenderer_t::GlyphData_t (owns 8 DynamicStrings) — kind 27 = MK_GlyphData
 template <> struct MapValueKindOf<GlyphRenderer_t::GlyphData_t> { static constexpr int value = MK_GlyphData; };
@@ -3308,11 +1111,7 @@ public:
 		int value = 0;
 		bool needsUpdate = true;
 		void set(const int _value);
-		void reset()
-		{
-			value = 0;
-			needsUpdate = true;
-		}
+		void reset();
 	};
 	GameplayPreference_t preferences[GPREF_ENUM_END];
 	bool isInit = false;
@@ -3337,14 +1136,7 @@ public:
 		GOPT_ENUM_END
 	};
 	static GameplayPreference_t gameConfig[GOPT_ENUM_END];
-	static int getGameConfigValue(GameConfigIndexes index)
-	{
-		if ( index >= 0 && index < GOPT_ENUM_END )
-		{
-			return gameConfig[index].value;
-		}
-		return 0;
-	}
+	static int getGameConfigValue(GameConfigIndexes index);
 	static void serverProcessGameConfig();
 	static void serverUpdateGameConfig();
 	static void receiveGameConfig();
@@ -3374,27 +1166,8 @@ struct EditorEntityData_t
 		DynamicSetI32 pathableMonsters;
 		int colliderJumpLangEntry = 6234;
 		DynamicMapI32 overrideProperties;
-		bool hasOverride(std::string key) const
-		{
-			auto find = overrideProperties.find(key);
-			if ( find != overrideProperties.end() )
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		int getOverride(std::string key) const
-		{
-			auto find = overrideProperties.find(key);
-			if ( find != overrideProperties.end() )
-			{
-				return find->second;
-			}
-			return 0;
-		}
+		bool hasOverride(std::string key) const;
+		int getOverride(std::string key) const;
 	};
 	typedef ColliderDmgProperties_tMirror ColliderDmgProperties_t;
 	static const int COLLIDER_COLLISION_FLAG_MINO = 2;
@@ -3403,15 +1176,7 @@ struct EditorEntityData_t
 	static DynamicMapI32T<EntityColliderData_t> colliderData;
 	static DynamicMapStrI32Map colliderRandomGenPool;
 	static DynamicMapI32 colliderNameIndexes;
-	static int getColliderIndexFromName(std::string name)
-	{
-		auto find = colliderNameIndexes.find(name);
-		if ( find != colliderNameIndexes.end() )
-		{
-			return find->second;
-		}
-		return 0;
-	}
+	static int getColliderIndexFromName(std::string name);
 	static void readFromFile();
 };
 extern EditorEntityData_t editorEntityData;
@@ -4212,34 +1977,7 @@ struct Compendium_t
 	static void writeUnlocksSaveData();
 	static void readUnlocksSaveData();
 
-	static const char* getSkillStringForCompendium(const int skill)
-	{
-		switch ( skill )
-		{
-		case PRO_LOCKPICKING: return "tinkering skill";
-		case PRO_STEALTH: return "stealth skill";
-		case PRO_TRADING: return "trading skill";
-		case PRO_APPRAISAL: return "lore skill";
-		case PRO_LEGACY_SWIMMING: return "swimming skill";
-		case PRO_THAUMATURGY: return "thaumaturgy skill";
-		case PRO_LEADERSHIP: return "leadership skill";
-		case PRO_LEGACY_SPELLCASTING: return "casting skill";
-		case PRO_MYSTICISM: return "mysticism skill";
-		case PRO_LEGACY_MAGIC: return "magic skill";
-		case PRO_SORCERY: return "sorcery skill";
-		case PRO_RANGED: return "ranged skill";
-		case PRO_SWORD: return "sword skill";
-		case PRO_MACE: return "mace skill";
-		case PRO_AXE: return "axe skill";
-		case PRO_POLEARM: return "polearm skill";
-		case PRO_SHIELD: return "blocking skill";
-		case PRO_UNARMED: return "unarmed skill";
-		case PRO_ALCHEMY: return "alchemy skill";
-		default:
-			break;
-		}
-		return "";
-	}
+	static const char* getSkillStringForCompendium(const int skill);
 
 	struct CompendiumEntityCurrent
 	{
@@ -4247,13 +1985,7 @@ struct Compendium_t
 		DynamicString modelName = "";
 		int modelIndex = -1;
 		Uint32 modelRNG = 0;
-		void set(std::string _contentsName, std::string _modelName, int _modelIndex = -1)
-		{
-			contentsName = _contentsName;
-			modelName = _modelName;
-			modelIndex = _modelIndex;
-			++modelRNG;
-		}
+		void set(std::string _contentsName, std::string _modelName, int _modelIndex = -1);
 	};
 	static CompendiumEntityCurrent compendiumEntityCurrent;
 

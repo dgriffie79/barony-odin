@@ -45,7 +45,7 @@ public:
     type_t              getType() const { return type; }
     Widget*             getParent() { return parent; }
     const Widget*       getParent() const { return parent; }
-    const char*		    getName() const { return name.c_str(); }
+    const char*		    getName() const;
     bool			    isPressed() const { return reallyPressed; }
 	bool				isCurrentlyPressed() const { return pressed; }
     bool			    isHighlighted() const { return highlighted; }
@@ -60,44 +60,44 @@ public:
     Sint32              getOwner() const { return owner; }
     void			    (*getTickCallback() const)(Widget&) { return tickCallback; }
     void			    (*getDrawCallback() const)(const Widget&, const SDL_Rect) { return drawCallback; }
-    const char*         getWidgetSearchParent() const { return widgetSearchParent.c_str(); }
+    const char*         getWidgetSearchParent() const;
     auto&               getWidgetActions() const { return widgetActions; }
     auto&               getWidgetMovements() const { return widgetMovements; }
     auto&               getWidgets() const { return widgets; }
     const void*         getUserData() const { return userData; }
     void*               getUserData() { return userData; }
-    SDL_Rect            getButtonsOffset() const { return buttonsOffset; }
-    SDL_Rect            getSelectorOffset() const { return selectorOffset; }
+    SDL_Rect            getButtonsOffset() const;
+    SDL_Rect            getSelectorOffset() const;
     glyph_position_t    getGlyphPosition() const { return glyphPosition; }
 
-    void	setName(const char* _name) { name = _name; }
-    void	setPressed(bool _pressed) { reallyPressed = pressed = _pressed; }
-    void	setDisabled(bool _disabled) { disabled = _disabled; }
-    void    setInvisible(bool _invisible) { invisible = _invisible; }
-    void    setHideGlyphs(bool _hideGlyphs) { hideGlyphs = _hideGlyphs; }
-    void    setHideKeyboardGlyphs(bool _hideGlyphs) { hideKeyboardGlyphs = _hideGlyphs; }
-    void    setHideSelectors(bool _hideSelectors) { hideSelectors = _hideSelectors; }
-    void    setOwner(Sint32 _owner) { owner = _owner; }
-    void	setTickCallback(void (*const fn)(Widget&)) { tickCallback = fn; }
-    void	setDrawCallback(void (*const fn)(const Widget&, const SDL_Rect)) { drawCallback = fn; }
-    void    setWidgetRight(const char* s) { widgetMovements["MenuRight"] = s; widgetMovements["AltMenuRight"] = s; }
-    void    setWidgetDown(const char* s) { widgetMovements["MenuDown"] = s; widgetMovements["AltMenuDown"] = s; }
-    void    setWidgetLeft(const char* s) { widgetMovements["MenuLeft"] = s; widgetMovements["AltMenuLeft"] = s; }
-    void    setWidgetUp(const char* s) { widgetMovements["MenuUp"] = s; widgetMovements["AltMenuUp"] = s; }
-    void    setWidgetPageLeft(const char* s) { widgetActions["MenuPageLeft"] = s; }
-    void    setWidgetPageRight(const char* s) { widgetActions["MenuPageRight"] = s; }
-    void    setWidgetBack(const char* s) { widgetActions["MenuCancel"] = s; }
-    void    removeWidgetAction(const char* binding) { if ( widgetActions.find(binding) != widgetActions.end() ) { widgetActions.erase(binding); } }
-    void    setWidgetSearchParent(const char* s) { widgetSearchParent = s; }
-    void    addWidgetAction(const char* binding, const char* action) { widgetActions[binding] = action; }
-    void    addWidgetMovement(const char* binding, const char* action) { widgetMovements[binding] = action; }
-    void    setUserData(void* p) { userData = p; }
-    void    setButtonsOffset(SDL_Rect r) { buttonsOffset = r; }
-    void    setSelectorOffset(SDL_Rect r) { selectorOffset = r; }
-	void	setMenuConfirmControlType(int flags) { menuConfirmControlType = flags; }
-    void    setGlyphPosition(glyph_position_t p) { glyphPosition = p; }
-    void    setAlwaysShowGlyphs(bool b) { alwaysShowGlyphs = b; }
-    void    setDontSearchAncestors(bool b) { dontSearchAncestors = b; }
+    void	setName(const char* _name);
+    void	setPressed(bool _pressed);
+    void	setDisabled(bool _disabled);
+    void    setInvisible(bool _invisible);
+    void    setHideGlyphs(bool _hideGlyphs);
+    void    setHideKeyboardGlyphs(bool _hideGlyphs);
+    void    setHideSelectors(bool _hideSelectors);
+    void    setOwner(Sint32 _owner);
+    void	setTickCallback(void (*const fn)(Widget&));
+    void	setDrawCallback(void (*const fn)(const Widget&, const SDL_Rect));
+    void    setWidgetRight(const char* s);
+    void    setWidgetDown(const char* s);
+    void    setWidgetLeft(const char* s);
+    void    setWidgetUp(const char* s);
+    void    setWidgetPageLeft(const char* s);
+    void    setWidgetPageRight(const char* s);
+    void    setWidgetBack(const char* s);
+    void    removeWidgetAction(const char* binding);
+    void    setWidgetSearchParent(const char* s);
+    void    addWidgetAction(const char* binding, const char* action);
+    void    addWidgetMovement(const char* binding, const char* action);
+    void    setUserData(void* p);
+    void    setButtonsOffset(SDL_Rect r);
+    void    setSelectorOffset(SDL_Rect r);
+	void	setMenuConfirmControlType(int flags);
+    void    setGlyphPosition(glyph_position_t p);
+    void    setAlwaysShowGlyphs(bool b);
+    void    setDontSearchAncestors(bool b);
     
     //! removes the widget safely
     void removeSelf();

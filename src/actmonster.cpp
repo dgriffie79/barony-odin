@@ -15385,3 +15385,5 @@ bool Entity::monsterCanTradeWith(int player)  const
 	}
 	return false;
 }
+
+void MonsterAllyFormation_t::reset() { units.clear(); }

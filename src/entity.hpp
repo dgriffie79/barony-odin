@@ -119,31 +119,11 @@ public:
 
 	void* entity_sound = nullptr;
 
-	void stopEntitySound()
-	{
-	}
+	void stopEntitySound();
 
-	void setEntityString(const char* str)
-	{
-		if ( string )
-		{
-			free(string);
-			string = nullptr;
-		}
-		if ( !str ) { return; }
-		size_t len = sizeof(char) * (strlen(str) + 1);
-		if ( string = (char*)malloc(len) )
-		{
-			memset(string, 0, len);
-			stringCopy(string, str, len, strlen(str));
-		}
-	}
+	void setEntityString(const char* str);
 
-	bool entityHasString(const char* str)
-	{
-		if ( !string ) { return false; }
-		return (!strcmp(string, str) ? true : false);
-	}
+	bool entityHasString(const char* str);
 
 	Uint32 getUID() const {return uid;}
 	void setUID(Uint32 new_uid);
@@ -1139,37 +1119,13 @@ public:
 		SHOW_MAP_PINPOINT = 5,
 		SHOW_MAP_DETECT_MONSTER = 6
 	};
-	void setEntityShowOnMap(EntityShowMapSource source, int duration)
-	{
-		entityShowOnMap() = 0;
-		entityShowOnMap() |= ((int)source & 0xFF) << 24;
-		entityShowOnMap() |= duration & 0xFFFFFF;
-	}
-	void entityShowOnMapTickDuration()
-	{
-		auto duration = getEntityShowOnMapDuration();
-		auto source = getEntityShowOnMapSource();
-		if ( duration > 0 )
-		{
-			--duration;
-		}
-		if ( duration == 0 )
-		{
-			entityShowOnMap() = 0;
-		}
-		else
-		{
-			setEntityShowOnMap(source, duration);
-		}
-	}
+	void setEntityShowOnMap(EntityShowMapSource source, int duration);
+	void entityShowOnMapTickDuration();
 	int getEntityShowOnMapDuration()
 	{
 		return (EntityShowMapSource)(entityShowOnMap() & 0xFFFFFF);
 	}
-	EntityShowMapSource getEntityShowOnMapSource()
-	{
-		return (EntityShowMapSource)((entityShowOnMap() >> 24) & 0xFF);
-	}
+	EntityShowMapSource getEntityShowOnMapSource();
 
 	//--WORLDTOOLTIP--
 	inline real_t& worldTooltipAlpha() { return fskill[0]; }
@@ -1428,27 +1384,9 @@ public:
 	void actIronDoor();
 	void actWind();
 
-	Monster getRace() const
-	{
-		Stat* myStats = getStats();
+	Monster getRace() const;
 
-		if ( !myStats )
-		{
-			return NOTHING;
-		}
-
-		return myStats->type;
-	}
-
-	bool inline skillCapstoneUnlockedEntity(int proficiency) const
-	{
-		if ( !getStats() )
-		{
-			return false;
-		}
-
-		return (getStats()->getModifiedProficiency(proficiency) >= CAPSTONE_UNLOCK_LEVEL[proficiency]);
-	}
+	bool inline skillCapstoneUnlockedEntity(int proficiency) const;
 
 	/*
 	 * Returns -1 if not a player.
@@ -1564,74 +1502,9 @@ public:
 	bool monsterReleaseAttackTarget(bool force = false);
 
 	//Lets monsters swap out weapons.
-	void inline chooseWeapon(const Entity* target, double dist)
-	{
-		Stat* myStats = getStats();
-		if ( !myStats )
-		{
-			return;
-		}
-
-		if ( myStats->getEffectActive(EFF_FEAR) )
-		{
-			return; // don't change weapons while feared.
-		}
-
-		switch ( myStats->type )
-		{
-			case GOATMAN:
-				goatmanChooseWeapon(target, dist);
-				break;
-			case INSECTOID:
-				insectoidChooseWeapon(target, dist);
-				break;
-			case INCUBUS:
-				incubusChooseWeapon(target, dist);
-				break;
-			case VAMPIRE:
-				vampireChooseWeapon(target, dist);
-				break;
-			case SHADOW:
-				shadowChooseWeapon(target, dist);
-				break;
-			case SUCCUBUS:
-				succubusChooseWeapon(target, dist);
-				break;
-			case SLIME:
-				slimeChooseWeapon(target, dist);
-				break;
-			case MOTH_SMALL:
-				mothChooseWeapon(target, dist);
-				break;
-			case BUGBEAR:
-				bugbearChooseWeapon(target, dist);
-				break;
-			case DRYAD:
-				monsterDChooseWeapon(target, dist);
-				break;
-			case MYCONID:
-				monsterMChooseWeapon(target, dist);
-				break;
-			case GREMLIN:
-				monsterGChooseWeapon(target, dist);
-				break;
-			case SHOPKEEPER:
-				if ( target )
-				{
-					if ( Stat* targetStats = target->getStats() )
-					{
-						if ( targetStats->type == SHOPKEEPER && myStats->weapon && myStats->weapon->type == SPELLBOOK_DRAIN_SOUL )
-						{
-							// gentlemans agreement to shoot bleed
-							myStats->weapon->type = SPELLBOOK_BLEED;
-						}
-					}
-				}
-				break;
-			default:
-				break;
-		}
-	}
+	#ifndef EDITOR
+	void chooseWeapon(const Entity* target, double dist);
+	#endif
 	void goatmanChooseWeapon(const Entity* target, double dist);
 	void insectoidChooseWeapon(const Entity* target, double dist);
 	void incubusChooseWeapon(const Entity* target, double dist);
@@ -1647,10 +1520,7 @@ public:
 	void skeletonSummonSetEquipment(Stat* myStats, int rank);
 	static void tinkerBotSetStats(Stat* myStats, int rank);
 	static void mimicSetStats(Stat* myStats);
-	bool monsterInMeleeRange(const Entity* target, double dist) const
-	{
-		return (dist < STRIKERANGE);
-	}
+	bool monsterInMeleeRange(const Entity* target, double dist) const;
 
 	node_t* addItemToMonsterInventory(Item* item);
 
@@ -2092,26 +1962,8 @@ public:
 		CREATURES_PLAYERS,
 		ITEMS
 	};*/
-	bool containsOperator(char c)
-	{
-		if ( c == '+' || c == '-' || c == '=' )
-		{
-			return true;
-		}
-		return false;
-	}
-	void eraseTag(std::string& script, std::string& scriptTag, size_t tagIndex)
-	{
-		if ( tagIndex + scriptTag.length() < script.length()
-			&& script.at(tagIndex + scriptTag.length()) == ' ' )
-		{
-			script.erase(tagIndex, strlen(scriptTag.c_str()) + 1);
-		}
-		else
-		{
-			script.erase(tagIndex, strlen(scriptTag.c_str()));
-		}
-	}
+	bool containsOperator(char c);
+	void eraseTag(std::string& script, std::string& scriptTag, size_t tagIndex);
 	void updateClientInformation(int player, bool clearInventory, bool clearStats, ClientInformationType updateType);
 	void playerClearInventory(bool clearStats);
 	DynamicString getScriptFromEntity(Entity& src);
@@ -2122,47 +1974,13 @@ public:
 	int textSourceProcessScriptTag(std::string& input, std::string findTag, Entity& src);
 	int textSourceProcessScriptTag(DynamicString& input, std::string findTag, Entity& src);
 	bool hasClearedInventory = false;
-	int getScriptType(Sint32 skill)
-	{
-		return (skill & 0xF);
-	}
-	int getAttachedToEntityType(Sint32 skill)
-	{
-		return ((skill & 0xFF0) >> 4);
-	}
-	int getTriggerType(Sint32 skill)
-	{
-		return ((skill & 0xF000) >> 12);
-	}
-	void setScriptType(Sint32& skill, int setValue)
-	{
-		skill &= 0xFFFFFFF0;
-		skill |= (setValue & 0xF);
-	}
-	void setAttachedToEntityType(Sint32& skill, int setValue)
-	{
-		skill &= 0xFFFFF00F;
-		skill |= ((setValue << 4) & 0xFF0);
-	}
-	void setTriggerType(Sint32& skill, int setValue)
-	{
-		skill &= 0xFFFF0FFF;
-		skill |= ((setValue << 12) & 0xF000);
-	}
-	DynamicArrayT<Entity*> getScriptAttachedEntities(Entity& script)
-	{
-		DynamicArrayT<Entity*> entities;
-		for ( node_t* node = script.children.first; node; node = node->next )
-		{
-			Uint32 entityUid = *((Uint32*)node->element);
-			Entity* child = uidToEntity(entityUid);
-			if ( child )
-			{
-				entities.push_back(child);
-			}
-		}
-		return entities;
-	}
+	int getScriptType(Sint32 skill);
+	int getAttachedToEntityType(Sint32 skill);
+	int getTriggerType(Sint32 skill);
+	void setScriptType(Sint32& skill, int setValue);
+	void setAttachedToEntityType(Sint32& skill, int setValue);
+	void setTriggerType(Sint32& skill, int setValue);
+	DynamicArrayT<Entity*> getScriptAttachedEntities(Entity& script);
 	DynamicMapI32 scriptVariables;
 };
 extern TextSourceScript textSourceScript;

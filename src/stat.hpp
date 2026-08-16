@@ -347,60 +347,16 @@ public:
 	Sint32 PLAYER_LVL_STAT_TIMER[NUMSTATS * 2];
 
 	// skills and effects
-	Sint32 getProficiency(int skill) const
-	{
-		if ( skill >= 0 && skill < NUMPROFICIENCIES )
-		{
-			return PROFICIENCIES[skill];
-		}
-		return 0;
-	}
+	Sint32 getProficiency(int skill) const;
 	Sint32 getModifiedProficiency(int skill) const;
-	void setProficiency(int skill, int value)
-	{
-		if ( skill >= 0 && skill < NUMPROFICIENCIES )
-		{
-			PROFICIENCIES[skill] = std::min(std::max(0, value), 100);
-		}
-	}
-	void setProficiencyUnsafe(int skill, int value)
-	{
-		PROFICIENCIES[skill] = value;
-	}
+	void setProficiency(int skill, int value);
+	void setProficiencyUnsafe(int skill, int value);
 	int getGoldWeight() const;
 	static constexpr Uint8 nullEffectValue = 0;
-	const Uint8& getEffectActive(int effect) const
-	{
-		if ( effect >= 0 && effect < NUMEFFECTS )
-		{
-			return EFFECTS[effect];
-		}
-		return Stat::nullEffectValue;
-	}
-	void clearEffect(int effect)
-	{
-		if ( effect >= 0 && effect < NUMEFFECTS )
-		{
-			EFFECTS[effect] = 0;
-		}
-	}
-	void setEffectActive(int effect, Uint8 effectStrength)
-	{
-#ifndef EDITOR
-		assert(effectStrength > 0);
-#endif
-		if ( effect >= 0 && effect < NUMEFFECTS )
-		{
-			EFFECTS[effect] = std::max(EFFECTS[effect], effectStrength); // strongest value remains
-		}
-	}
-	void setEffectValueUnsafe(int effect, Uint8 effectStrength)
-	{
-		if ( effect >= 0 && effect < NUMEFFECTS )
-		{
-			EFFECTS[effect] = effectStrength;
-		}
-	}
+	const Uint8& getEffectActive(int effect) const;
+	void clearEffect(int effect);
+	void setEffectActive(int effect, Uint8 effectStrength);
+	void setEffectValueUnsafe(int effect, Uint8 effectStrength);
 	Uint32 EFFECTS_ACCRETION_TIME[NUMEFFECTS];
 	Sint32 EFFECTS_TIMERS[NUMEFFECTS];
 	bool defending;
@@ -498,17 +454,7 @@ public:
 	int getPassiveShieldBonus(bool checkShield, bool excludeSkill) const;
 	int getActiveShieldBonus(bool checkShield, bool excludeSkill, Item* shieldItem = nullptr, bool checkNonShieldBonus = false) const;
 	static int getParryingACBonus(Stat* myStats, Item* myWeapon, bool checkWeapon, bool excludeSkill, int weaponSkill);
-	DynamicString getAttribute(DynamicString key) const
-	{ 
-		if ( attributes.contains(key) )
-		{
-			return attributes.at(key).c_str();
-		}
-		else
-		{
-			return "";
-		}
-	}
+	DynamicString getAttribute(DynamicString key) const;
 	void setAttribute(DynamicString key, DynamicString value);
 	bool statusEffectRemovedByCureAilment(const int effect, Entity* my);
 	int numShillelaghDebuffsActive(Entity* my);

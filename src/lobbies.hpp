@@ -71,26 +71,10 @@ public:
 	{
 		return P2PType;
 	}
-	LobbyServiceType setLobbyJoinTypeOfCurrentSelection()
-	{
-		if ( getDisplayedResultLobbyType(selectedLobbyInList) != LOBBY_DISABLE )
-		{
-			joiningType = getDisplayedResultLobbyType(selectedLobbyInList);
-		}
-		return joiningType;
-	}
-	void setHostingType(LobbyServiceType type)
-	{
-		hostingType = type;
-	}
-	void setLobbyJoinType(LobbyServiceType type)
-	{
-	    joiningType = type;
-	}
-	void setP2PType(LobbyServiceType type)
-	{
-		P2PType = type;
-	}
+	LobbyServiceType setLobbyJoinTypeOfCurrentSelection();
+	void setHostingType(LobbyServiceType type);
+	void setLobbyJoinType(LobbyServiceType type);
+	void setP2PType(LobbyServiceType type);
 	static void logError(const char* str, ...)
 	{
 		char newstr[1024] = { 0 };

@@ -4585,3 +4585,48 @@ void updateEntityOldHPBeforeMagicHit(Entity& my, Entity& projectile)
 		}
 	}
 }
+
+void spellElement_t::setDamage(int _damage) { damage = _damage; }
+
+void spellElement_t::setDamageSecondary(int _damage) { damage2 = _damage; }
+
+void spellElement_t::setDurationSecondary(int _duration) { duration2 = _duration; }
+
+void spellElement_t::setDamageMult(real_t _mult) { damage_mult = _mult; }
+
+void spellElement_t::setDamageSecondaryMult(real_t _mult) { damage2_mult = _mult; }
+
+void spellElement_t::setDurationMult(real_t _mult) { duration_mult = _mult; }
+
+void spellElement_t::setDurationSecondaryMult(real_t _mult) { duration2_mult = _mult; }
+
+void spellElement_t::setChanneledManaDuration(int _duration) { channeledMana_duration = _duration; }
+
+void spellElement_t::setChanneledManaMult(real_t _mult) { channeledMana_mult = _mult; }
+
+TempTexture* AOEIndicators_t::getTexture(Uint32 uid) {
+		auto find = indicators.find(uid);
+		if ( find != indicators.end() )
+		{
+			return find->second.texture;
+		}
+		return nullptr;
+	}
+
+SDL_Surface* AOEIndicators_t::getSurface(Uint32 uid) {
+		auto find = indicators.find(uid);
+		if ( find != indicators.end() )
+		{
+			return find->second.surfaceOld;
+		}
+		return nullptr;
+	}
+
+AOEIndicators_t::Indicator_t * AOEIndicators_t::getIndicator(Uint32 uid) {
+		auto find = indicators.find(uid);
+		if ( find != indicators.end() )
+		{
+			return &find->second;
+		}
+		return nullptr;
+	}

@@ -577,3 +577,67 @@ void Widget::scrollParent() {
         break;
     }
 }
+
+const char*		    Widget::getName() const { return name.c_str(); }
+
+const char*         Widget::getWidgetSearchParent() const { return widgetSearchParent.c_str(); }
+
+SDL_Rect            Widget::getButtonsOffset() const { return buttonsOffset; }
+
+SDL_Rect            Widget::getSelectorOffset() const { return selectorOffset; }
+
+void	Widget::setName(const char* _name) { name = _name; }
+
+void	Widget::setPressed(bool _pressed) { reallyPressed = pressed = _pressed; }
+
+void	Widget::setDisabled(bool _disabled) { disabled = _disabled; }
+
+void    Widget::setInvisible(bool _invisible) { invisible = _invisible; }
+
+void    Widget::setHideGlyphs(bool _hideGlyphs) { hideGlyphs = _hideGlyphs; }
+
+void    Widget::setHideKeyboardGlyphs(bool _hideGlyphs) { hideKeyboardGlyphs = _hideGlyphs; }
+
+void    Widget::setHideSelectors(bool _hideSelectors) { hideSelectors = _hideSelectors; }
+
+void    Widget::setOwner(Sint32 _owner) { owner = _owner; }
+
+void	Widget::setTickCallback(void (*const fn)(Widget&)) { tickCallback = fn; }
+
+void	Widget::setDrawCallback(void (*const fn)(const Widget&, const SDL_Rect)) { drawCallback = fn; }
+
+void    Widget::setWidgetRight(const char* s) { widgetMovements["MenuRight"] = s; widgetMovements["AltMenuRight"] = s; }
+
+void    Widget::setWidgetDown(const char* s) { widgetMovements["MenuDown"] = s; widgetMovements["AltMenuDown"] = s; }
+
+void    Widget::setWidgetLeft(const char* s) { widgetMovements["MenuLeft"] = s; widgetMovements["AltMenuLeft"] = s; }
+
+void    Widget::setWidgetUp(const char* s) { widgetMovements["MenuUp"] = s; widgetMovements["AltMenuUp"] = s; }
+
+void    Widget::setWidgetPageLeft(const char* s) { widgetActions["MenuPageLeft"] = s; }
+
+void    Widget::setWidgetPageRight(const char* s) { widgetActions["MenuPageRight"] = s; }
+
+void    Widget::setWidgetBack(const char* s) { widgetActions["MenuCancel"] = s; }
+
+void    Widget::removeWidgetAction(const char* binding) { if ( widgetActions.find(binding) != widgetActions.end() ) { widgetActions.erase(binding); } }
+
+void    Widget::setWidgetSearchParent(const char* s) { widgetSearchParent = s; }
+
+void    Widget::addWidgetAction(const char* binding, const char* action) { widgetActions[binding] = action; }
+
+void    Widget::addWidgetMovement(const char* binding, const char* action) { widgetMovements[binding] = action; }
+
+void    Widget::setUserData(void* p) { userData = p; }
+
+void    Widget::setButtonsOffset(SDL_Rect r) { buttonsOffset = r; }
+
+void    Widget::setSelectorOffset(SDL_Rect r) { selectorOffset = r; }
+
+void	Widget::setMenuConfirmControlType(int flags) { menuConfirmControlType = flags; }
+
+void    Widget::setGlyphPosition(glyph_position_t p) { glyphPosition = p; }
+
+void    Widget::setAlwaysShowGlyphs(bool b) { alwaysShowGlyphs = b; }
+
+void    Widget::setDontSearchAncestors(bool b) { dontSearchAncestors = b; }

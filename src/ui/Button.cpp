@@ -482,3 +482,67 @@ SDL_Rect Button::getAbsoluteSize() const
 	}
 	return _size;
 }
+
+const char*					Button::getText() const { return text.c_str(); }
+
+const char*					Button::getFont() const { return font.c_str(); }
+
+const int					Button::getHJustify() const { return static_cast<int>(hjustify); }
+
+const int					Button::getVJustify() const { return static_cast<int>(vjustify); }
+
+const char*					Button::getBackground() const { return background.c_str(); }
+
+const char*					Button::getBackgroundHighlighted() const { return backgroundHighlighted.c_str(); }
+
+const char*					Button::getBackgroundActivated() const { return backgroundActivated.c_str(); }
+
+SDL_Rect                    Button::getTextOffset() const { return textOffset; }
+
+void	Button::setBorder(int _border) { border = _border; }
+
+void	Button::setPos(int x, int y) { size.x = x; size.y = y; }
+
+void	Button::setSize(SDL_Rect _size) { size = _size; }
+
+void	Button::setColor(const Uint32& _color) { color = _color; }
+
+void	Button::setTextColor(const Uint32& _color) { textColor = _color; }
+
+void	Button::setTextHighlightColor(const Uint32& _color) { textHighlightColor = _color; }
+
+void	Button::setBorderColor(const Uint32& _color) { borderColor = _color; }
+
+void	Button::setHighlightColor(const Uint32& _color) { highlightColor = _color; }
+
+void	Button::setText(const char* _text) { text = _text; }
+
+void	Button::setFont(const char* _font) { font = _font; }
+
+void    Button::setIconColor(const Uint32& _color) { iconColor = _color; }
+
+void	Button::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+
+void	Button::setStyle(int _style) { style = static_cast<style_t>(_style); }
+
+void	Button::setCallback(void (*const fn)(Button&)) { callback = fn; }
+
+void	Button::setBackground(const char* image) { background = image; }
+
+void	Button::setBackgroundHighlighted(const char* image) { backgroundHighlighted = image; }
+
+void	Button::setBackgroundActivated(const char* image) { backgroundActivated = image; }
+
+void	Button::setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
+
+void	Button::setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
+
+void	Button::setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
+
+void    Button::setTextOffset(const SDL_Rect& offset) { textOffset = offset; }
+
+void	Button::setOntop(const bool _ontop) { ontop = _ontop; }
+
+void	Button::setPaddingPerTextLine(int padding) { paddingPerTextLine = padding; }
+
+void	Button::setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }

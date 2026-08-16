@@ -2814,3 +2814,82 @@ void Frame::scrollParent() {
 	}
 	fparent->setActualSize(fActualSize);
 }
+
+const char*						Frame::getFont() const { return font.c_str(); }
+
+void							Frame::setBlitDirty(bool _bBlitDity) { bBlitDirty = _bBlitDity; }
+
+void							Frame::setBlitToParent(bool _bBlitParent) { bBlitToParent = _bBlitParent; }
+
+void	Frame::setFont(const char* _font) { font = _font; }
+
+void	Frame::setBorder(const int _border) { border = _border; }
+
+void	Frame::setPos(const int x, const int y) { size.x = x; size.y = y; }
+
+void	Frame::setSize(SDL_Rect _size) { size = _size; }
+
+void	Frame::setBorderStyle(int _borderStyle) { borderStyle = static_cast<border_style_t>(_borderStyle); }
+
+void	Frame::setHigh(bool b) { borderStyle = b ? BORDER_BEVEL_HIGH : BORDER_BEVEL_LOW; }
+
+void	Frame::setColor(const Uint32& _color) { color = _color; }
+
+void    Frame::setSelectedEntryColor(const Uint32& _color) { selectedEntryColor = _color; }
+
+void    Frame::setActivatedEntryColor(const Uint32& _color) { activatedEntryColor = _color; }
+
+void	Frame::setBorderColor(const Uint32& _color) { borderColor = _color; }
+
+void    Frame::setSliderColor(const Uint32& _color) { sliderColor = _color; }
+
+void	Frame::setDisabled(const bool _disabled) { disabled = _disabled; }
+
+void	Frame::setHollow(const bool _hollow) { hollow = _hollow; }
+
+void	Frame::setDropDown(const bool _dropDown) { dropDown = _dropDown; }
+
+void	Frame::setScrollBarsEnabled(const bool _scrollbars) { scrollbars = _scrollbars; }
+
+void	Frame::setAllowScrollBinds(const bool _allow) { allowScrollBinds = _allow; }
+
+void	Frame::setListOffset(SDL_Rect _size) { listOffset = _size; }
+
+void	Frame::setInheritParentFrameOpacity(const bool _inherit) { inheritParentFrameOpacity = _inherit; }
+
+void	Frame::setOpacity(const real_t _opacity) { opacity = _opacity; }
+
+void	Frame::setListJustify(justify_t _justify) { justify = _justify; }
+
+void	Frame::setClickable(const bool _clickable) { clickable = _clickable; }
+
+void    Frame::setDontTickChildren(const bool b) { dontTickChildren = b; }
+
+void    Frame::setEntrySize(int _size) { entrySize = _size; }
+
+void    Frame::setActivation(entry_t* entry) { activation = entry; }
+
+void    Frame::setScrollWithLeftControls(const bool b) { scrollWithLeftControls = b; }
+
+void    Frame::setAccelerationX(const float x) { scrollAccelerationX = x; }
+
+void    Frame::setAccelerationY(const float y) { scrollAccelerationY = y; }
+
+void	Frame::setListMenuCancelOverride(const bool b) { bListMenuListCancelOverride = b; }
+
+void	Frame::setAllowScrollParent(const bool b) { allowScrollParent = b; }
+
+void	Frame::setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }
+
+void Frame::setActualSize(SDL_Rect _actualSize) {
+		allowScrolling = true;
+		actualSize = _actualSize;
+		scrollX -= (int)scrollX;
+		scrollY -= (int)scrollY;
+		scrollX += actualSize.x;
+		scrollY += actualSize.y;
+		scrollVelocityX = 0.f;
+		scrollVelocityY = 0.f;
+		scrollAccelerationX = 0.f;
+		scrollAccelerationY = 0.f;
+	}

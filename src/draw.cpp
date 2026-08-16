@@ -4149,3 +4149,34 @@ GLhalf toFloat16(float f) {
 		return GLhalf(s | (e << 10) | (m >> 13));
 	}
 }
+
+void TempTexture::setParameters(bool clamp, bool point) {
+        GL_CHECK_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+        GL_CHECK_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+        GL_CHECK_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, point ? GL_NEAREST : GL_LINEAR));
+        GL_CHECK_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, point ? GL_NEAREST : GL_LINEAR));
+    }
+
+void TempTexture::load(SDL_Surface* surf, bool clamp, bool point) {
+        SDL_LockSurface(surf);
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
+        GL_CHECK_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surf->w, surf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels));
+        setParameters(clamp, point);
+        w = surf->w;
+        h = surf->h;
+        SDL_UnlockSurface(surf);
+    }
+
+void TempTexture::loadFloat(float* data, int width, int height, bool clamp, bool point) {
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
+        GL_CHECK_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, GL_FLOAT, data));
+        setParameters(clamp, point);
+        w = width;
+        h = height;
+    }
+
+void TempTexture::bind() {
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
+    }
+
+bool Mesh::isInitialized() const { return vbo[0] != 0; }

@@ -24,18 +24,7 @@ class UIToastNotification
 	friend class UIToastNotificationManager_t;
 
 public:
-	void resetUIPointers()
-	{
-		frame = nullptr;
-		headerField = nullptr;
-		mainField = nullptr;
-		progressField = nullptr;
-		closeButton = nullptr;
-		actionButton = nullptr;
-		frameImage = nullptr;
-		progressBar = nullptr;
-		progressBarBackground = nullptr;
-	}
+	void resetUIPointers();
 
 	UIToastNotification(const char* image) :
 		notificationImage(image)
@@ -73,40 +62,22 @@ public:
 
 	CardType cardType = CardType::UI_CARD_DEFAULT;
 
-	void setMainText(const char* text) {
-		mainCardText = text;
-	}
-	void setSecondaryText(const char* text) {
-		secondaryCardText = text;
-	}
-	void setHeaderText(const char* text) {
-		headerCardText = text;
-	}
-	void setActionText(const char* text) {
-		actionText = text;
-	}
-	void setDisplayedText(const char* text) {
-		displayedText = text;
-	}
+	void setMainText(const char* text);
+	void setSecondaryText(const char* text);
+	void setHeaderText(const char* text);
+	void setActionText(const char* text);
+	void setDisplayedText(const char* text);
 
 	const std::string& getDisplayedText()
 	{
 		return displayedText;
 	}
 
-	void setIdleSeconds(Uint32 seconds) {
-		idleTicksToHide = seconds * TICKS_PER_SECOND;
-	}
-	void setStatisticCurrentValue(int value) {
-		statisticUpdateCurrent = value;
-	}
-	void setStatisticMaxValue(int value) {
-		statisticUpdateMax = value;
-	}
-	void setAchievementName(const char* achName) {
-		achievementID = achName;
-	}
-	const char* getMainText() { return mainCardText.c_str(); }
+	void setIdleSeconds(Uint32 seconds);
+	void setStatisticCurrentValue(int value);
+	void setStatisticMaxValue(int value);
+	void setAchievementName(const char* achName);
+	const char* getMainText();
 	CardState getCardState() { return cardState; }
 
 	void init();
@@ -187,9 +158,7 @@ private:
 	Frame::image_t* progressBar = nullptr;
 	Frame::image_t* progressBarBackground = nullptr;
 
-	bool matchesAchievementName(const char* achName) {
-		return (achievementID.compare(achName) == 0);
-	}
+	bool matchesAchievementName(const char* achName);
 };
 
 // owning array element: the 7 DynamicString members are deep-copied/freed by
@@ -213,53 +182,10 @@ public:
         term(true);
 	}
 
-	const char* getImage(const char* image)
-	{
-		if ( image == nullptr )
-		{
-			return "#images/ui/Toasts/bell1.png";
-		}
-		return image;
-	};
+	const char* getImage(const char* image);;
 
-	void init()
-	{
-		if (bIsInit) {
-			return;
-		}
-		bIsInit = true;
-		//communityLink1 = loadImage("images/system/CommunityLink1.png");
-		//promoLink1 = loadImage("images/system/Promo1.png");
-		frame = gui->addFrame("toasts");
-		frame->setHollow(true);
-		if (intro) {
-			achievementsCheck = true;
-		}
-	}
-	void term(const bool clearNotifications)
-	{
-		if (!bIsInit) {
-			return;
-		}
-		bIsInit = false;
-		if ( clearNotifications )
-		{
-			allNotifications.clear();
-		}
-		else
-		{
-			for ( int64_t i = 0; i < allNotifications.size(); ++i )
-			{
-				auto& n = allNotifications[i];
-				n.isInit = false;
-				n.resetUIPointers();
-			}
-		}
-		if (frame) {
-			frame->removeSelf();
-			frame = nullptr;
-		}
-	}
+	void init();
+	void term(const bool clearNotifications);
 	void drawNotifications(bool isMoviePlaying, bool beforeFadeout);
 	void createEpicLoginNotification();
 	void createEpicCrossplayLoginNotification();
@@ -274,33 +200,8 @@ public:
 	/// @param image nullptr for default barony icon
 	UIToastNotification* addNotification(const char* image);
 
-	UIToastNotification* getNotificationSingle(UIToastNotification::CardType cardType)
-	{
-		for ( int64_t i = 0; i < allNotifications.size(); ++i )
-		{
-			auto& card = allNotifications[i];
-			if ( card.cardType == cardType )
-			{
-				return &card;
-			}
-		}
-		return nullptr;
-	}
-	UIToastNotification* getNotificationAchievementSingle(const char* achName)
-	{
-		for ( int64_t i = 0; i < allNotifications.size(); ++i )
-		{
-			auto& card = allNotifications[i];
-			if ( card.cardType == UIToastNotification::CardType::UI_CARD_ACHIEVEMENT )
-			{
-				if ( card.matchesAchievementName(achName) )
-				{
-					return &card;
-				}
-			}
-		}
-		return nullptr;
-	}
+	UIToastNotification* getNotificationSingle(UIToastNotification::CardType cardType);
+	UIToastNotification* getNotificationAchievementSingle(const char* achName);
 	DynamicArrayT<UIToastNotification> allNotifications;
 };
 extern UIToastNotificationManager_t UIToastNotificationManager;

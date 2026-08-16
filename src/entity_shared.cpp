@@ -3093,3 +3093,17 @@ void setSpriteAttributes(Entity* entityNew, Entity* entityToCopy, Entity* entity
 		// new entity, will follow the mouse movements when created.
 	}
 }
+
+void Entity::seedEntityRNG(Uint32 seed)
+{
+	if ( !entity_rng )
+	{
+		entity_rng = new BaronyRNG();
+	}
+	if ( entity_rng )
+	{
+		entity_rng->seedBytes(&seed, sizeof(seed));
+	}
+}
+
+

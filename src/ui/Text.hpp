@@ -21,7 +21,7 @@ public:
 	//! special char marks font to be used
 	static const char fontBreak = '\b';
 
-	const char*				getName() const { return name.c_str(); }
+	const char*				getName() const;
 	const GLuint			getTexID() const { return texid; }
 	const SDL_Surface*		getSurf() const { return surf; }
 	const unsigned int		getWidth() const { return width; }
@@ -77,13 +77,13 @@ public:
 	//! add a key value pair to the highlighted word map
 	//! @param word the word 'index' in the sentence (first word is 0)
 	//! @param color the color to set the word to
-	void addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
+	void addWordToHighlight(int word, Uint32 color);
 
 	//! gets map for highlighted words
 	const DynamicMapI32T<Uint32>& getWordsToHighlight() const { return wordsToHighlight; }
 
 	//! reset the highlighted word map
-	void clearWordsToHighlight() { wordsToHighlight.clear(); }
+	void clearWordsToHighlight();
 private:
 	DynamicString name;
 	GLuint texid = 0;

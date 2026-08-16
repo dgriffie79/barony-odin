@@ -80,33 +80,20 @@ public:
     LightDef& operator[](const char* key) { return *reinterpret_cast<LightDef*>(barony_dynamic_map_str_entry(&raw, DynamicString(key), MK_LightDef)); }
     LightDef& operator[](const DynamicString& key) { return *reinterpret_cast<LightDef*>(barony_dynamic_map_str_entry(&raw, key, MK_LightDef)); }
     LightDef& operator[](const std::string& key) { return *reinterpret_cast<LightDef*>(barony_dynamic_map_str_entry(&raw, DynamicString(key.c_str()), MK_LightDef)); }
-    bool contains(const char* key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v, MK_LightDef); }
-    bool contains(const DynamicString& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), key, &v, MK_LightDef); }
-    bool contains(const std::string& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v, MK_LightDef); }
+    bool contains(const char* key) const;
+    bool contains(const DynamicString& key) const;
+    bool contains(const std::string& key) const;
     int64_t size() const { return barony_dynamic_map_str_len(const_cast<DynamicMapRaw*>(&raw), MK_LightDef); }
-    bool empty() const { return size() == 0; }
-    void clear() { barony_dynamic_map_str_clear(&raw, MK_LightDef); }
+    bool empty() const;
+    void clear();
     bool erase(const char* key) { return barony_dynamic_map_str_erase(&raw, DynamicString(key), MK_LightDef); }
     bool erase(const DynamicString& key) { return barony_dynamic_map_str_erase(&raw, key, MK_LightDef); }
     // find() iterator (std::map-like)
     struct KV { const char* first; LightDef second; };
     struct Iterator { KV kv{}; bool valid = false; const KV* operator->() const { return &kv; } };
-    Iterator find(const char* key) const {
-        Iterator it;
-        int32_t n = (int32_t)size();
-        if (n > 0) {
-            std::vector<void*> kp(n); std::vector<int32_t> kl(n); std::vector<LightDef> vv(n);
-            int32_t got = barony_dynamic_map_str_entries(const_cast<DynamicMapRaw*>(&raw), kp.data(), kl.data(), vv.data(), n, MK_LightDef);
-            for (int32_t i = 0; i < got; ++i) {
-                if (kl[i] == (int32_t)std::strlen(key) && std::memcmp(kp[i], key, kl[i]) == 0) {
-                    it.kv.first = (const char*)kp[i]; it.kv.second = vv[i]; it.valid = true; break;
-                }
-            }
-        }
-        return it;
-    }
-    Iterator find(const std::string& key) const { return find(key.c_str()); }
-    Iterator end() const { return Iterator{}; }
+    Iterator find(const char* key) const;
+    Iterator find(const std::string& key) const;
+    Iterator end() const;
     friend bool operator!=(const Iterator& a, const Iterator& b) { return a.valid != b.valid; }
     friend bool operator==(const Iterator& a, const Iterator& b) { return a.valid == b.valid; }
 };
