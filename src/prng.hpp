@@ -80,6 +80,8 @@ private:
     uint8_t i2;          // rng index 2
     size_t bytes_read;   // number of bytes read since seeding
 
+
+    public:
     void seedImpl(const void*, size_t);
 };
 
@@ -88,3 +90,31 @@ extern BaronyRNG net_rng;   // RNG which must always be synchronized among all c
 extern BaronyRNG map_rng;   // used strictly during map generation
 extern BaronyRNG map_server_rng; // used during map generation for server only to seed local entity rng
 extern BaronyRNG map_sequence_rng; // used to determine the next map seed
+
+// Flattened C-ABI entry points (Odin @(export) proc "c"). C++ method bodies
+// forward to these; the Odin side owns the implementation.
+extern "C" {
+void BaronyRNG_seedTime(BaronyRNG* self);
+void BaronyRNG_seedBytes(BaronyRNG* self, const void* key, size_t size);
+void BaronyRNG_getBytes(BaronyRNG* self, void* data, size_t size);
+int  BaronyRNG_getSeed(const BaronyRNG* self, void* out, size_t size);
+void BaronyRNG_testSeedHealth(const BaronyRNG* self);
+void BaronyRNG_setMarker(const BaronyRNG* self);
+void BaronyRNG_checkMarker(const BaronyRNG* self);
+size_t BaronyRNG_bytesRead(const BaronyRNG* self);
+uint8_t  BaronyRNG_getU8(BaronyRNG* self);
+uint16_t BaronyRNG_getU16(BaronyRNG* self);
+uint32_t BaronyRNG_getU32(BaronyRNG* self);
+uint64_t BaronyRNG_getU64(BaronyRNG* self);
+int8_t  BaronyRNG_getI8(BaronyRNG* self);
+int16_t BaronyRNG_getI16(BaronyRNG* self);
+int32_t BaronyRNG_getI32(BaronyRNG* self);
+int64_t BaronyRNG_getI64(BaronyRNG* self);
+float  BaronyRNG_getF32(BaronyRNG* self);
+double BaronyRNG_getF64(BaronyRNG* self);
+int BaronyRNG_rand(BaronyRNG* self);
+int BaronyRNG_uniform(BaronyRNG* self, int a, int b);
+int BaronyRNG_discrete(BaronyRNG* self, const unsigned int* chances, int size);
+int BaronyRNG_normal(BaronyRNG* self, int mean, int deviation);
+void BaronyRNG_seedImpl(BaronyRNG* self, const void* key, size_t size);
+}

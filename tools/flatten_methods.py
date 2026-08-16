@@ -287,9 +287,115 @@ def analyze(header, clsname):
     for m in flatten:
         print(f"    {odin_foreign_decl(clsname, m, names[m])}")
     print("}")
+    return flatten, names
+
+
+# ---------------------------------------------------------------------------
+# --apply mode: actually edit the .cpp (insert forwarders) and .hpp (relabel)
+# ---------------------------------------------------------------------------
+
+def find_method_end(text, brace_pos):
+    """Given a position at an opening brace, return the index AFTER its match."""
+    depth = 0
+    i = brace_pos
+    while i < len(text):
+        if text[i] == '{':
+            depth += 1
+        elif text[i] == '}':
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return -1
+
+def apply_mode(header, clsname, cpp_path, odin_bindings_path):
+    """Insert forwarders into cpp_path, relabel private methods in header,
+    and write the Odin foreign block to odin_bindings_path."""
+    tu = parse(header)
+    target = None
+    for node in tu.cursor.walk_preorder():
+        if node.kind == CursorKind.CLASS_DECL and node.spelling == clsname and node.is_definition():
+            target = node
+            break
+    if target is None:
+        print(f"class {clsname} not found in {header}")
+        return
+
+    methods = [c for c in target.get_children() if c.kind == CursorKind.CXX_METHOD]
+    flatten = []
+    private_to_relabel = []
+    for m in methods:
+        if m.is_deleted_method() or m.is_default_method() or is_trivial_accessor(m):
+            continue
+        if m.access_specifier == AccessSpecifier.PRIVATE:
+            private_to_relabel.append(m.spelling)
+        flatten.append(m)
+    names = assign_flat_names(clsname, flatten)
+
+    # 1. Insert forwarders into the .cpp
+    cpp_text = open(cpp_path, encoding='utf-8').read()
+    insertions = []  # (pos, text)
+    for m in flatten:
+        fwd = emit_forwarder(clsname, m, names[m])
+        # Find the method DEFINITION in the .cpp: ClassName::methodName(
+        # Skip declarations (no body). Match the first definition occurrence.
+        sig = f"{clsname}::{m.spelling}"
+        idx = 0
+        while True:
+            idx = cpp_text.find(sig, idx)
+            if idx == -1:
+                print(f"  WARN: definition not found for {sig} in {cpp_path}")
+                break
+            # find '{' within the next 300 chars (definition), else it's a decl
+            window = cpp_text[idx:idx+300]
+            b = window.find('{')
+            if b != -1:
+                end = find_method_end(cpp_text, idx + b)
+                if end != -1:
+                    insertions.append((end, f"\n\n{fwd}\n"))
+                break
+            idx += len(sig)
+    insertions.sort(key=lambda x: -x[0])
+    for pos, text in insertions:
+        cpp_text = cpp_text[:pos] + text + cpp_text[pos:]
+    open(cpp_path, 'w', encoding='utf-8').write(cpp_text)
+    print(f"  inserted {len(insertions)} forwarders into {cpp_path}")
+
+    # 2. Relabel private methods -> public in the header.
+    hdr_path = os.path.join(SRC, header)
+    hdr = open(hdr_path, encoding='utf-8').read()
+    if private_to_relabel:
+        for name in private_to_relabel:
+            # Relabel: change `private:` before this method's declaration.
+            # Robust approach: insert `public:` immediately before the method decl.
+            # Match the method declaration line (name followed by '(').
+            import re as _re
+            pat = _re.compile(r'(\n[ \t]*)((?:static[ \t]+)?[^\n;]*\b' + _re.escape(name) + r'\s*\()')
+            m2 = pat.search(hdr)
+            if m2:
+                # insert `public:` just before, on its own line at same indent
+                indent = m2.group(1)
+                hdr = hdr[:m2.start()] + f"\n{indent}public:" + hdr[m2.start():]
+        open(hdr_path, 'w', encoding='utf-8').write(hdr)
+        print(f"  relabeled {len(private_to_relabel)} private method(s) -> public in {header}: {', '.join(private_to_relabel)}")
+    else:
+        print(f"  no private methods to relabel in {header}")
+
+    # 3. Write the Odin foreign block.
+    decls = "\n".join(f"    {odin_foreign_decl(clsname, m, names[m])}" for m in flatten)
+    block = f"// Auto-generated: flatten_methods.py --apply {header} {clsname}\nforeign _barony {{\n{decls}\n}}\n"
+    open(odin_bindings_path, 'w', encoding='utf-8').write(block)
+    print(f"  wrote Odin foreign block to {odin_bindings_path}")
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print(__doc__)
         sys.exit(1)
-    analyze(sys.argv[1], sys.argv[2])
+    if '--apply' in sys.argv:
+        # usage: flatten_methods.py <header> <class> --apply <cpp_path> <odin_bindings_path>
+        a = sys.argv.index('--apply')
+        cpp_path = sys.argv[a+1]
+        odin_path = sys.argv[a+2]
+        apply_mode(sys.argv[1], sys.argv[2], cpp_path, odin_path)
+    else:
+        analyze(sys.argv[1], sys.argv[2])
