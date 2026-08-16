@@ -90,3 +90,4 @@ meson-logs/
 meson-private/
 .pi-subagents
 .pi
+tmp

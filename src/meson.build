@@ -358,7 +358,6 @@ if host_system == 'windows'
       output : 'barony.exe',
       input : [
         odin_root / 'main.odin',
-        odin_root / 'main_types.odin',
         odin_root / 'hash.odin',
         odin_root / 'paths.odin',
         odin_root / 'collision.odin',
@@ -379,6 +378,7 @@ if host_system == 'windows'
         odin_root / 'containers' / 'dynamic_array.odin',
         odin_root / 'containers' / 'dynamic_map.odin',
         odin_root / 'containers' / 'dynamic_string.odin',
+        odin_root / 'interface_consolecommand.odin',
         odin_root / 'json_shim' / 'json_shim.odin',
       ],
       depends : [barony_game_lib],
@@ -397,7 +397,6 @@ if host_system == 'windows'
         output : 'editor.exe',
         input : [
           odin_root / 'main.odin',
-          odin_root / 'main_types.odin',
           odin_root / 'hash.odin',
           odin_root / 'paths.odin',
           odin_root / 'collision.odin',
@@ -416,7 +415,8 @@ if host_system == 'windows'
           odin_root / 'containers' / 'dynamic_array.odin',
           odin_root / 'containers' / 'dynamic_map.odin',
           odin_root / 'containers' / 'dynamic_string.odin',
-          odin_root / 'json_shim' / 'json_shim.odin',
+          odin_root / 'interface_consolecommand.odin',
+        odin_root / 'json_shim' / 'json_shim.odin',
         ],
         depends : [barony_editor_lib],
         command : [
