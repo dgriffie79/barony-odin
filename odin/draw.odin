@@ -30,21 +30,16 @@ UIF32 :: struct #raw_union {
 }
 #assert(size_of(UIF32) == 4)
 
-// class TempTexture — 40 bytes.
-// _texid/_w/_h are private real data; texid/w/h are reference members that
-// alias them (a reference is a pointer-sized slot holding the target address).
-// In Odin, references don't exist, so the aliases become rawptr slots holding
-// the address of the corresponding private member. A port would drop the
-// references entirely and expose accessor procs instead.
+// class TempTexture — 12 bytes.
+// References removed in C++ (draw.hpp): texid/w/h are now the real public
+// members (were private _texid/_w/_h aliased by const refs; nothing wrote
+// through the aliases). Odin mirror is just the 3 members.
 Temp_Texture :: struct {
-	_texid: u32, // GLuint
-	_w:     i32,
-	_h:     i32,
-	texid:  rawptr, // const GLuint& -> &_texid
-	w:      rawptr, // int& -> &_w
-	h:      rawptr, // int& -> &_h
+	texid: u32, // GLuint
+	w:     i32,
+	h:     i32,
 }
-#assert(size_of(Temp_Texture) == 40)
+#assert(size_of(Temp_Texture) == 12)
 
 // struct Mesh — 144 bytes (140 data + pad to 8-alignment)
 Mesh :: struct {

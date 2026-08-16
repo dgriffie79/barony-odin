@@ -98,23 +98,22 @@ float toFloat32(GLhalf value);
 GLhalf toFloat16(float f);
 
 class TempTexture {
-private:
-    GLuint _texid = 0;
-    int _w = 0;
-    int _h = 0;
 public:
-    const GLuint& texid = _texid;
-    int& w = _w;
-    int& h = _h;
+    // Real data members (were private _texid/_w/_h with public reference
+    // aliases texid/w/h). References are not portable (Odin has none), and
+    // nothing wrote through them, so the aliases are folded into the members.
+    GLuint texid = 0;
+    int w = 0;
+    int h = 0;
 
     TempTexture() {
-        GL_CHECK_ERR(glGenTextures(1, &_texid));
+        GL_CHECK_ERR(glGenTextures(1, &texid));
     }
 
     ~TempTexture() {
-        if( _texid ) {
-            GL_CHECK_ERR(glDeleteTextures(1,&_texid));
-            _texid = 0;
+        if( texid ) {
+            GL_CHECK_ERR(glDeleteTextures(1,&texid));
+            texid = 0;
         }
     }
     
@@ -127,24 +126,24 @@ public:
 
     void load(SDL_Surface* surf, bool clamp, bool point) {
         SDL_LockSurface(surf);
-        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, _texid));
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
         GL_CHECK_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surf->w, surf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels));
         setParameters(clamp, point);
-        _w = surf->w;
-        _h = surf->h;
+        w = surf->w;
+        h = surf->h;
         SDL_UnlockSurface(surf);
     }
     
     void loadFloat(float* data, int width, int height, bool clamp, bool point) {
-        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, _texid));
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
         GL_CHECK_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, GL_FLOAT, data));
         setParameters(clamp, point);
-        _w = width;
-        _h = height;
+        w = width;
+        h = height;
     }
 
     void bind() {
-        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, _texid));
+        GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
     }
 };
 
