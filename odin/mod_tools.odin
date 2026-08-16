@@ -1,14 +1,13 @@
 // mod_tools.odin — Odin mirror of mod_tools.hpp (data-carrying top-level structs).
 //
-// NOTE: mod_tools.hpp is the "port-with-file" giant. Most of its deeply-nested
-// map-value structs already have shim twins in the containers package
-// (Statue_t, EntityColliderData_t, ItemTooltip_t, spellItem_t, Entry_t,
-// World_t, Codex_t, Monster_t, Event_t, EventVal_t, ModelOffset_t, etc.) used
-// by the C++ map shims — those are NOT re-mirrored here. The manager classes
-// (CustomHelpers, MonsterStatCustomManager, GameplayCustomManager,
-// GameModeManager_t, Compendium_t, ItemTooltips_t, StatueManager_t, ...) are
-// statics-only and need no instance mirror. This file mirrors the top-level
-// instance-data structs that cross the C++/Odin boundary.
+// Scope note: mod_tools.hpp is the "port-with-file" giant. Most of its
+// deeply-nested structs (Statue_t, EntityColliderData_t, ItemTooltip_t,
+// spellItem_t, Entry_t, World_t, Codex_t, Monster_t, Event_t, EventVal_t,
+// ModelOffset_t, etc.) are map-value types stored in static/global containers;
+// the containers package holds their verified layout twins used by the C++ map
+// shims. Those structs get core mirrors when their containing code is ported
+// (they are not referenced by any current core mirror). This file mirrors the
+// top-level instance-data structs that cross the C++/Odin boundary now.
 package main
 
 // struct LibCURL_t — 16 bytes
