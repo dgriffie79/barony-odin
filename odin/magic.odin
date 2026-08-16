@@ -117,3 +117,88 @@ PrevData_t :: struct {
 	size:    i32,
 }
 #assert(size_of(PrevData_t) == 32)
+
+// enum AOEIndicators_t::SurfaceCacheTypes
+SurfaceCacheTypes :: enum i32 {
+	CACHE_NONE,
+	CACHE_VORTEX,
+	CACHE_CASTING,
+	CACHE_BOOBY_TRAP,
+	CACHE_BOOBY_TRAP2,
+	CACHE_IGNITE,
+	CACHE_IGNITE2,
+	CACHE_SHATTER_OBJECTS,
+	CACHE_SHATTER_OBJECTS2,
+	CACHE_FLAME_CLOAK,
+	CACHE_EXPLOSION_AREA,
+	CACHE_MUSHROOM_1,
+	CACHE_MUSHROOM_2,
+	CACHE_MUSHROOM_3,
+	CACHE_MUSHROOM_4,
+	CACHE_MAGICIANS_ARMOR,
+	CACHE_THAUM_ARMOR,
+	CACHE_PSYCHIC_SPEAR,
+	CACHE_RADIUS_MAGIC_GENERIC,
+}
+
+// struct AOEIndicators_t::Indicator_t — 136 bytes
+Indicator_t :: struct {
+	texture:        ^Temp_Texture, // TempTexture* (owned)
+	surface_old:    rawptr,        // SDL_Surface*
+	radius_max:     i32,
+	radius_min:     i32,
+	radius:         i32,
+	size:           i32,
+	lifetime:       i32,
+	gradient:       i32,
+	uid:            u32,
+	loop:           bool,
+	casting_target: bool,
+	frames_per_tick: u32,
+	ticks_per_update: u32,
+	delay_ticks:    u32,
+	indicator_color: u32,
+	arc:            f64, // real_t
+	expired:        bool,
+	loop_type:      i32,
+	loop_ticks:     u32,
+	loop_timer:     u32,
+	expire_alpha_rate: f64, // real_t
+	cache_type:     SurfaceCacheTypes,
+	prev_data:      PrevData_t,
+}
+#assert(size_of(Indicator_t) == 136)
+
+// struct spellcastingAnimationManager — 136 bytes
+Spellcasting_Animation_Manager_T :: struct {
+	spell:             ^spell_t,
+	caster:            u32,
+	player:            i32,
+	active:            bool,
+	active_spellbook:  bool,
+	stage:             i32,
+	circle_count:      i32,
+	times_to_circle:   i32,
+	throw_count:       i32,
+	active_count:      i32,
+	overcharge:        i32,
+	overcharge_init:   i32,
+	consume_interval:  i32,
+	consume_timer:     i32,
+	mana_left:         i32,
+	mana_cost:         i32,
+	consume_mana:      bool,
+	lefthand_movex:    f32,
+	lefthand_movey:    f32,
+	lefthand_angle:    f32,
+	vibrate_x:         f32,
+	vibrate_y:         f32,
+	target_x:          f64, // real_t
+	target_y:          f64,
+	caster_x:          f64,
+	caster_y:          f64,
+	target_uid:        u32,
+	wall_dir:          i32,
+	rangefinder:       i32, // SpellRangefinderType enum
+}
+#assert(size_of(Spellcasting_Animation_Manager_T) == 136)
