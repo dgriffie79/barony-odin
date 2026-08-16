@@ -36,7 +36,7 @@ Entity :: struct {
 	uid:                  u32,
 	dithering_disabled:   bool,
 	dithering_override:   i32,
-	dithering:            containers.Raw_Map, // DynamicMapPtrT<Dither_t> (32B)
+	dithering:            map[rawptr]Dither_t, // DynamicMapPtrT<Dither_t> (ptr-keyed)
 	light_bonus:          vec4_t,
 	entity_sound:         rawptr, // void* (former FMOD/OpenAL channel)
 	ticks:                u32,
@@ -92,8 +92,8 @@ Entity :: struct {
 	clients_have_its_stats: bool,
 	behavior:             proc(^Entity), // void (*behavior)(class Entity*)
 	ranbehavior:          bool,
-	bodyparts:            containers.Raw_Dynamic_Array, // DynamicArray (40B)
-	collision_ignore_targets: containers.Raw_Map, // DynamicSetI32 (32B)
+	bodyparts:            [dynamic]^Entity, // vector<Entity*> (non-owning)
+	collision_ignore_targets: map[i32]struct{}, // DynamicSetI32 (32B)
 }
 
 #assert(size_of(Entity) == 1432)

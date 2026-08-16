@@ -86,7 +86,7 @@ ItemGeneric :: struct {
 	category:               Category,
 	level:                  i32,
 	item_slot:              Item_Equippable_Slot,
-	attributes:             containers.Raw_Map, // DynamicMapI32 (32B)
+	attributes:             map[string]i32, // DynamicMapI32 = DynamicMapStrT<int32_t> (string-keyed)
 	tooltip:                containers.DynamicString,
 }
 

@@ -6,7 +6,7 @@ import "containers"
 // struct MonsterTrapIgnoreEntities_t — 40 bytes
 // { DynamicSetI32 ignoreEntities (32B); Uint32 parent; }
 MonsterTrap_Ignore_Entities_t :: struct {
-	ignore_entities: containers.Raw_Map, // DynamicSetI32 (32B)
+	ignore_entities: map[i32]struct{}, // DynamicSetI32 (32B)
 	parent:          u32,
 }
 

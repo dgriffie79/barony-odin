@@ -20,7 +20,7 @@ File :: struct {
 	// assert will need updating then)
 	path_opaque: [32]u8,
 	fp:          rawptr, // FILE*
-	data:        containers.Raw_Dynamic_Array, // DynamicArray (40B)
+	data:        [dynamic]u8, // byte buffer (vector<uint8_t>)
 	pos:         u64, // size_t
 }
 #assert(size_of(File) == 96)

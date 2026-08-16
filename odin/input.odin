@@ -28,13 +28,13 @@ ControllerType :: enum i32 {
 Input :: struct {
 	player:               i32,
 	inverted:             bool,
-	bindings:             containers.Raw_Map, // DynamicMapBinding (32B)
-	kb_bindings:          containers.Raw_Map, // DynamicMapStr (32B)
-	gamepad_bindings:     containers.Raw_Map, // DynamicMapStr (32B)
-	joystick_bindings:    containers.Raw_Map, // DynamicMapStr (32B)
-	kb_system_bindings:   containers.Raw_Map, // DynamicMapStr (32B)
-	gamepad_system_bindings: containers.Raw_Map, // DynamicMapStr (32B)
-	joystick_system_bindings: containers.Raw_Map, // DynamicMapStr (32B)
+	bindings:             map[string]containers.binding_t, // DynamicMapBinding = DynamicMapStrT<binding_tMirror> (string-keyed)
+	kb_bindings:          map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	gamepad_bindings:     map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	joystick_bindings:    map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	kb_system_bindings:   map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	gamepad_system_bindings: map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	joystick_system_bindings: map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
 	disabled:             bool,
 }
 #assert(size_of(Input) == 240)

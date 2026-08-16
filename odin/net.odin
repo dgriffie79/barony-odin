@@ -15,14 +15,14 @@ NetHandler :: struct {
 	steam_packet_thread:                    ^i32, // int*
 	continue_multithreading_steam_packets:  bool,
 	game_packets_lock:                      ^i32, // int*
-	game_packets:                           containers.Raw_Dynamic_Array, // DynamicArrayT<SteamPacketWrapper*> (40B)
+	game_packets:                           [dynamic]rawptr, // DynamicArrayT<SteamPacketWrapper*> (pointers, non-owning)
 	continue_multithreading_steam_packets_lock: ^i32,
 }
 #assert(size_of(NetHandler) == 72)
 
 // struct PingNetworkStatus_t — 64 bytes
 PingNetworkStatus_t :: struct {
-	pings:                     containers.Raw_Map, // DynamicMapI32T<Uint32> (32B)
+	pings:                     map[[4]byte]u32, // DynamicMapI32T<Uint32> (i32-keyed)
 	last_pingtime:             u32,
 	last_sequence:             u32,
 	oldest_sequence_ticks:     u32,

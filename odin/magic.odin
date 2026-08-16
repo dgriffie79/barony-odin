@@ -34,7 +34,7 @@ EffectLocations_t :: struct {
 // class ParticleTimerEffect_t — 32 bytes
 // { DynamicMapI32T<Effect_t> effectMap; }
 ParticleTimerEffect_t :: struct {
-	effect_map: containers.Raw_Map, // DynamicMapI32T<Effect_t> (32B)
+	effect_map: map[[4]byte]Effect_t, // DynamicMapI32T<Effect_t> (i32-keyed)
 }
 #assert(size_of(ParticleTimerEffect_t) == 32)
 

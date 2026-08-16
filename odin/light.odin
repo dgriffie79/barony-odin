@@ -50,7 +50,7 @@ Light_Iterator :: struct {
 // (32B) with per-key LightDef values. Mirrors as map[string]Light_Def (native).
 // Layout note: the C++ class has one DynamicMapRaw member (32B) + no other data.
 DynamicMapLightDef :: struct {
-	raw: containers.Raw_Map, // DynamicMapRaw (32B)
+	raw: map[string]Light_Def, // DynamicMapLightDef (map<string,LightDef>, native)
 }
 
 #assert(size_of(DynamicMapLightDef) == 32)

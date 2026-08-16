@@ -154,15 +154,15 @@ map_t :: struct {
 	skybox:                u32,
 	flags:                 [16]i32, // Sint32 flags[16]
 	tiles:                 ^i32,    // Sint32* tiles
-	entities_map:          containers.Raw_Map, // DynamicMapI32T<node_t*> (32B)
+	entities_map:          map[[4]byte]^node_t, // DynamicMapI32T<node_t*> (i32-keyed)
 	entities:              ^list_t,
 	creatures:             ^list_t,
 	worldUI:               ^list_t,
 	trapexcludelocations:  ^bool,
 	monsterexcludelocations: ^bool,
 	lootexcludelocations:  ^bool,
-	liquidSfxPlayedTiles:  containers.Raw_Map, // DynamicSetI32 (32B)
-	tileAttributes:        containers.Raw_Map, // DynamicMapI32T<Uint32> (32B)
+	liquidSfxPlayedTiles:  map[i32]struct{}, // DynamicSetI32
+	tileAttributes:        map[[4]byte]u32, // DynamicMapI32T<Uint32> (i32-keyed)
 	filename:              [256]u8, // char filename[256]
 }
 
@@ -295,5 +295,5 @@ Animated_Tile :: struct {
 #assert(size_of(door_t) == 16)
 #assert(size_of(cameravars_t) == 24)
 #assert(size_of(Animated_Tile) == 32)
-// map_t size assert is below (depends on containers.Raw_Map layout)
+// map_t size assert is below (map members are native map[[4]byte]V / map[i32]struct{})
 // #assert(size_of(map_t) == 552)

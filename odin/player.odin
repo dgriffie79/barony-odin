@@ -226,7 +226,7 @@ Haptic_T :: struct {
 	haptic_effect:     Haptic_Effect,
 	haptic_tick:       u32,
 	oscillator_tick:   u32,
-	active_rumbles:    containers.Raw_Dynamic_Array, // vector<pair<Uint32,Rumble>> (40B)
+	active_rumbles:    [dynamic]Uint32_Rumble_Pair, // vector<pair<Uint32,Rumble>>
 	vibration_enabled: bool,
 }
 #assert(size_of(Haptic_T) == 80)
@@ -391,6 +391,35 @@ Monster_String_Pair_T :: struct {
 }
 #assert(size_of(Monster_String_Pair_T) == 24)
 
+// --- local pair mirrors (player.hpp raw DynamicArray members) ---
+// vector<pair<Uint32,Rumble>> (Haptic_t::activeRumbles) — 48B
+Uint32_Rumble_Pair :: struct {
+	first:  u32,
+	second: Rumble,
+}
+#assert(size_of(Uint32_Rumble_Pair) == 48)
+
+// vector<pair<Uint32,FollowerBar_t>> (HUD_t::followerBars/playerBars) — 288B
+Uint32_FollowerBar_Pair :: struct {
+	first:  u32,
+	second: Follower_Bar_T,
+}
+#assert(size_of(Uint32_FollowerBar_Pair) == 288)
+
+// vector<pair<Entity*,real_t>> (WorldUI_t::tooltipsInRange) — 16B
+EntityF64_Pair :: struct {
+	first:  ^Entity,
+	second: f64,
+}
+#assert(size_of(EntityF64_Pair) == 16)
+
+// vector<pair<int,Uint32>> (PlayerMechanics_t::pendingDucks) — 8B
+Int_U32_Pair :: struct {
+	first:  i32,
+	second: u32,
+}
+#assert(size_of(Int_U32_Pair) == 8)
+
 // struct Player::GUIDropdown_t::DropDown_t — 88 bytes
 Drop_Down_T :: struct {
 	title:         containers.DynamicString,
@@ -398,7 +427,7 @@ Drop_Down_T :: struct {
 	align_right:   bool,
 	module:        i32,
 	default_option: i32,
-	options:       containers.Raw_Dynamic_Array, // DynamicArrayOption (40B)
+	options:       [dynamic]containers.DropdownOption_t, // DynamicArrayOption
 }
 #assert(size_of(Drop_Down_T) == 88)
 
@@ -546,7 +575,7 @@ Appraisal_T :: struct {
 	timer:                      i32,
 	timermax:                   i32,
 	current_item:               u32,
-	appraisal_progression_items: containers.Raw_Map, // DynamicMapI32T<int> (32B)
+	appraisal_progression_items: map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
 	old_item:                   u32,
 	manual_appraised_item:      u32,
 	anim_appraisal:             f64,
@@ -554,7 +583,7 @@ Appraisal_T :: struct {
 	item_notify_updated_this_tick: u32,
 	item_notify_anim_state:     i32,
 	spell_learn_anim:           f64,
-	items_to_notify:            containers.Raw_Map, // DynamicMapI32T<ItemNotifyHoverStates> (32B)
+	items_to_notify:            map[[4]byte]Item_Notify_Hover_States, // DynamicMapI32T<ItemNotifyHoverStates> (i32-keyed)
 }
 #assert(size_of(Appraisal_T) == 128)
 
@@ -578,9 +607,9 @@ Inventory_T :: struct {
 	selected_item_cursor_frame: rawptr, // Frame*
 	spell_frame:             rawptr, // Frame*
 	chest_frame:             rawptr, // Frame*
-	slot_frames:             containers.Raw_Map, // DynamicMapI32T<Frame*> (32B)
-	spell_slot_frames:       containers.Raw_Map, // DynamicMapI32T<Frame*> (32B)
-	chest_slot_frames:       containers.Raw_Map, // DynamicMapI32T<Frame*> (32B)
+	slot_frames:             map[[4]byte]rawptr, // DynamicMapI32T<Frame*> (i32-keyed, non-owning)
+	spell_slot_frames:       map[[4]byte]rawptr, // DynamicMapI32T<Frame*> (i32-keyed, non-owning)
+	chest_slot_frames:       map[[4]byte]rawptr, // DynamicMapI32T<Frame*> (i32-keyed, non-owning)
 	b_compact_view:          bool,
 	slide_out_percent:       f64,
 	b_first_time_snap_cursor: bool,
@@ -635,7 +664,7 @@ Shop_GUI_T :: struct {
 	last_tooltip_module:    i32,
 	selected_shop_slot_x:   i32,
 	selected_shop_slot_y:   i32,
-	shop_slot_frames:       containers.Raw_Map, // DynamicMapI32T<Frame*> (32B)
+	shop_slot_frames:       map[[4]byte]rawptr, // DynamicMapI32T<Frame*> (i32-keyed, non-owning)
 }
 #assert(size_of(Shop_GUI_T) == 192)
 
@@ -724,7 +753,7 @@ Skill_Entry_T :: struct {
 	effect_start_offset_x:    i32,
 	effect_background_offset_x: i32,
 	effect_background_width:  i32,
-	effects:                  containers.Raw_Dynamic_Array, // DynamicArrayT<SkillEffect_t> (40B)
+	effects:                  [dynamic]Skill_Effect_T, // DynamicArrayT<SkillEffect_t>
 }
 #assert(size_of(Skill_Entry_T) == 208)
 
@@ -734,7 +763,7 @@ Skill_Sheet_Data_T :: struct {
 	novice_text_color:             u32,
 	expert_text_color:             u32,
 	legend_text_color:             u32,
-	skill_entries:                 containers.Raw_Dynamic_Array, // DynamicArrayT<SkillEntry_t> (40B)
+	skill_entries:                 [dynamic]Skill_Entry_T, // DynamicArrayT<SkillEntry_t>
 	icon_bg_path_default:          containers.DynamicString,
 	icon_bg_path_novice:           containers.DynamicString,
 	icon_bg_path_expert:           containers.DynamicString,
@@ -747,10 +776,10 @@ Skill_Sheet_Data_T :: struct {
 	select_skill_img:              containers.DynamicString,
 	highlight_skill_img_right:     containers.DynamicString,
 	select_skill_img_right:        containers.DynamicString,
-	potion_names_to_filter:        containers.Raw_Dynamic_Array, // DynamicArrayStr (40B)
-	leadership_ally_table_base:    containers.Raw_Map, // DynamicMapI32T<DynamicArrayS32> (32B)
-	leadership_ally_table_legendary: containers.Raw_Map, // DynamicMapI32T<DynamicArrayS32> (32B)
-	leadership_ally_table_special_recruitment: containers.Raw_Map, // DynamicMapI32T<DynamicArrayT<MonsterStringPair_t>> (32B)
+	potion_names_to_filter:        [dynamic]containers.DynamicString, // DynamicArrayStr
+	leadership_ally_table_base:    map[[4]byte][dynamic]i32, // DynamicMapI32T<DynamicArrayS32> (i32-keyed)
+	leadership_ally_table_legendary: map[[4]byte][dynamic]i32, // DynamicMapI32T<DynamicArrayS32> (i32-keyed)
+	leadership_ally_table_special_recruitment: map[[4]byte][dynamic]Monster_String_Pair_T, // DynamicMapI32T<DynamicArrayT<MonsterStringPair_t>> (i32-keyed)
 }
 #assert(size_of(Skill_Sheet_Data_T) == 384)
 
@@ -931,8 +960,8 @@ HUD_T :: struct {
 	mp_bar:                      Bar_T,
 	enemy_bar:                   Bar_T,
 	follower_display:            Follower_Display_T,
-	follower_bars:               containers.Raw_Dynamic_Array, // DynamicArray (40B)
-	player_bars:                 containers.Raw_Dynamic_Array, // DynamicArray (40B)
+	follower_bars:               [dynamic]Uint32_FollowerBar_Pair, // vector<pair<Uint32,FollowerBar_t>>
+	player_bars:                 [dynamic]Uint32_FollowerBar_Pair, // vector<pair<Uint32,FollowerBar_t>>
 	compact_layout_mode:         i32, // CompactLayoutModes enum
 	b_show_ui_navigation:        bool,
 	status_fx_focused_window_active: bool,
@@ -1022,7 +1051,7 @@ Message_Zone_T :: struct {
 	font:                       rawptr, // TTF_Font*
 	old_sdl_ticks:              u32,
 	player:                     rawptr, // Player&
-	notification_messages:      containers.Raw_Dynamic_Array, // DynamicArrayT<Message*> (40B)
+	notification_messages:      [dynamic]^Message, // DynamicArrayT<Message*> (non-owning)
 	message_max_entries:        i32,
 	chat_frame:                 rawptr, // Frame*
 	anim_fade:                  f64,
@@ -1095,7 +1124,7 @@ Dialogue_T :: struct {
 World_Tooltip_Dialogue_T :: struct {
 	player:           rawptr, // Player&
 	player_dialogue:  Dialogue_T,
-	shared_dialogues: containers.Raw_Map, // DynamicMapI32T<Dialogue_t> (32B)
+	shared_dialogues: map[[4]byte]Dialogue_T, // DynamicMapI32T<Dialogue_t> (i32-keyed)
 }
 #assert(size_of(World_Tooltip_Dialogue_T) == 184)
 
@@ -1106,7 +1135,7 @@ World_UI_T :: struct {
 	world_tooltip_item:         World_Tooltip_Item_T,
 	world_tooltip_dialogue:     World_Tooltip_Dialogue_T,
 	tooltip_view:               i32, // TooltipView enum
-	tooltips_in_range:          containers.Raw_Dynamic_Array, // DynamicArray (40B)
+	tooltips_in_range:          [dynamic]EntityF64_Pair, // vector<pair<Entity*,real_t>>
 	modified_tooltip_draw_height: f64,
 	player_last_yaw:            f64,
 	player_last_pitch:          f64,
@@ -1129,7 +1158,7 @@ Paper_Doll_T :: struct {
 	player:                     rawptr, // Player&
 	enabled:                    bool,
 	doll_slots:                 [10]Paper_Doll_Slot_T,
-	returning_items_to_inventory: containers.Raw_Dynamic_Array, // DynamicArrayU32 (40B)
+	returning_items_to_inventory: [dynamic]u32, // DynamicArrayU32
 	portrait_active_to_edit:    bool,
 	portrait_rotation_inertia:  f64,
 	portrait_rotation_percent:  f64,
@@ -1211,27 +1240,27 @@ Minimap_T :: struct {
 // class Player::CompendiumProgress_t — 168 bytes
 Compendium_Progress_T :: struct {
 	player:               rawptr, // Player&
-	item_events:          containers.Raw_Map, // DynamicMapStrI32Map (32B)
-	floor_events:         containers.Raw_Map, // DynamicMapI32T<DynamicMapStrI32Map> (32B)
+	item_events:          map[string]map[[4]byte]i32, // DynamicMapStrI32Map (string->i32 map)
+	floor_events:         map[[4]byte]map[string]map[[4]byte]i32, // DynamicMapI32T<DynamicMapStrI32Map> (i32-keyed)
 	player_dist_accum:    f64,
 	player_sneak_time:    u32,
 	player_alive_time_moving: u32,
 	player_alive_time_stopped: u32,
 	player_alive_time_total: u32,
 	player_game_time_total: u32,
-	player_equip_slot_time: containers.Raw_Map, // DynamicMapI32T<Uint32> (32B)
-	ally_time_spent:      containers.Raw_Map, // DynamicMapI32T<Uint32> (32B)
+	player_equip_slot_time: map[[4]byte]u32, // DynamicMapI32T<Uint32> (i32-keyed)
+	ally_time_spent:      map[[4]byte]u32, // DynamicMapI32T<Uint32> (i32-keyed)
 }
 #assert(size_of(Compendium_Progress_T) == 168)
 
 // class Player::PlayerMechanics_t — 512 bytes
 Player_Mechanics_T :: struct {
 	player:                       rawptr, // Player&
-	item_degrade_rng:             containers.Raw_Map, // DynamicMapI32T<int> (32B)
-	learned_spells:               containers.Raw_Map, // DynamicSetI32 (32B)
-	ducks_in_a_row:               containers.Raw_Dynamic_Array, // DynamicArray (40B)
-	pending_ducks:                containers.Raw_Dynamic_Array, // DynamicArray (40B)
-	favorite_books_achievement:   containers.Raw_Map, // DynamicMapI32T<int> (32B)
+	item_degrade_rng:             map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
+	learned_spells:               map[i32]struct{}, // DynamicSetI32
+	ducks_in_a_row:               [dynamic]containers.IntPair_t, // vector<pair<int,int>>
+	pending_ducks:                [dynamic]Int_U32_Pair, // vector<pair<int,Uint32>>
+	favorite_books_achievement:   map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
 	num_fishing_caught:           i32,
 	sustained_spell_mp_used_sorcery: i32,
 	sustained_spell_mp_used_mysticism: i32,
@@ -1243,20 +1272,20 @@ Player_Mechanics_T :: struct {
 	foci_holy_charge_time:        i32,
 	foci_dark_charge_time:        i32,
 	last_foci_held_type:          i32,
-	escalating_rng_rolls:         containers.Raw_Map, // DynamicMapI32T<int> (32B)
-	escalating_spell_rng_rolls:   containers.Raw_Map, // DynamicMapI32T<int> (32B)
-	base_spell_level_up_procs:    containers.Raw_Map, // DynamicMapI32T<int> (32B)
-	sustained_spell_id_counter:   containers.Raw_Map, // DynamicMapI32T<real_t> (32B)
-	enemy_raised_blocking_against: containers.Raw_Map, // DynamicMapI32T<int> (32B)
-	enemy_raised_stealth_against: containers.Raw_Map, // DynamicMapI32T<int> (32B)
+	escalating_rng_rolls:         map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
+	escalating_spell_rng_rolls:   map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
+	base_spell_level_up_procs:    map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
+	sustained_spell_id_counter:   map[[4]byte]f64, // DynamicMapI32T<real_t> (i32-keyed)
+	enemy_raised_blocking_against: map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
+	enemy_raised_stealth_against: map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
 	ensemble_playing:             i32,
 	ensemble_require_recast:      bool,
 	ensemble_taken_initial_mp:    bool,
 	previously_levitating:        bool,
 	donation_revealed_on_floor:   u32,
 	donation_claimed:             bool,
-	targets_compelled:            containers.Raw_Map, // DynamicMapU32Map (32B)
-	targets_refuse_compel:        containers.Raw_Map, // DynamicSetI32 (32B)
+	targets_compelled:            map[[4]byte]map[[4]byte]u32, // DynamicMapU32Map (i32->i32 map)
+	targets_refuse_compel:        map[i32]struct{}, // DynamicSetI32
 	gremlin_breakable_counter:    i32,
 	ensemble_data_update:         u32,
 }

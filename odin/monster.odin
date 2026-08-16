@@ -17,25 +17,25 @@ MonsterData_IconLookup_t :: struct {
 MonsterDataEntry_t :: struct {
 	monster_type:            i32,
 	default_icon_path:       containers.DynamicString,
-	icon_sprites_and_paths:  containers.Raw_Map, // DynamicMapI32T<IconLookup_t> (32B)
-	key_to_sprite_lookup:    containers.Raw_Map, // DynamicMapStrT<DynamicArrayS32> (32B)
-	model_indexes:           containers.Raw_Map, // DynamicSetI32 (32B)
-	player_model_indexes:    containers.Raw_Map, // DynamicSetI32 (32B)
+	icon_sprites_and_paths:  map[[4]byte]MonsterData_IconLookup_t, // DynamicMapI32T<IconLookup_t> (i32-keyed)
+	key_to_sprite_lookup:    map[string][dynamic]i32, // DynamicMapStrT<DynamicArrayS32> (string-keyed)
+	model_indexes:           map[i32]struct{}, // DynamicSetI32
+	player_model_indexes:    map[i32]struct{}, // DynamicSetI32
 	default_short_display_name: containers.DynamicString,
-	special_npcs:            containers.Raw_Map, // DynamicMapSpecialNPC (32B)
+	special_npcs:            map[string]containers.SpecialNPCEntry_t, // DynamicMapSpecialNPC (string-keyed)
 }
 #assert(size_of(MonsterDataEntry_t) == 200)
 
 // struct MonsterData_t — holds the entries map (statics; the class itself is
 // empty of per-instance data in the C++ struct) — represented as the entries map.
 MonsterData_t :: struct {
-	monster_data_entries: containers.Raw_Map, // DynamicMapI32T<MonsterDataEntry_t>
+	monster_data_entries: map[[4]byte]MonsterDataEntry_t, // DynamicMapI32T<MonsterDataEntry_t> (i32-keyed)
 }
 
 // class ShopkeeperPlayerHostility_t — 128 bytes
 // { DynamicMapI32T<PlayerRaceHostility_t> playerHostility[4]; }
 ShopkeeperPlayerHostility_t :: struct {
-	player_hostility: [4]containers.Raw_Map, // 4 x DynamicMapI32T (32B each)
+	player_hostility: [4]map[[4]byte]PlayerRaceHostility_t, // 4 x DynamicMapI32T (i32-keyed)
 }
 #assert(size_of(ShopkeeperPlayerHostility_t) == 128)
 
@@ -64,8 +64,8 @@ Wanted_Level :: enum i32 {
 
 // struct MonsterAllies_t (MonsterAllyFormation_t::MonsterAllies_t) — 72 bytes
 MonsterAllies_t :: struct {
-	melee_units:   containers.Raw_Map, // DynamicMapI32T<FormationInfo_t> (32B)
-	ranged_units:  containers.Raw_Map, // DynamicMapI32T<FormationInfo_t> (32B)
+	melee_units:   map[[4]byte]FormationInfo_t, // DynamicMapI32T<FormationInfo_t> (i32-keyed)
+	ranged_units:  map[[4]byte]FormationInfo_t, // DynamicMapI32T<FormationInfo_t> (i32-keyed)
 	updated_on_tick: u32,
 }
 #assert(size_of(MonsterAllies_t) == 72)
@@ -84,15 +84,15 @@ FormationInfo_t :: struct {
 // class MonsterAllyFormation_t — 72 bytes
 // { DynamicMapI32T<MonsterAllies_t> units; DynamicArrayT<pair<int,int>> formationShape; }
 MonsterAllyFormation_t :: struct {
-	units:           containers.Raw_Map, // DynamicMapI32T<MonsterAllies_t> (32B)
-	formation_shape: containers.Raw_Dynamic_Array, // DynamicArrayT<pair<int,int>> (40B)
+	units:           map[[4]byte]MonsterAllies_t, // DynamicMapI32T<MonsterAllies_t> (i32-keyed)
+	formation_shape: [dynamic]containers.IntPair_t, // DynamicArrayT<pair<int,int>> (POD pair)
 }
 #assert(size_of(MonsterAllyFormation_t) == 72)
 
 // class MimicGenerator — 592 bytes
 MimicGenerator :: struct {
 	mimic_rng:          Barony_RNG, // 528B
-	mimic_floors:       containers.Raw_Map, // DynamicSetI32 (32B)
-	mimic_secret_floors: containers.Raw_Map, // DynamicSetI32 (32B)
+	mimic_floors:       map[i32]struct{}, // DynamicSetI32
+	mimic_secret_floors: map[i32]struct{}, // DynamicSetI32
 }
 #assert(size_of(MimicGenerator) == 592)

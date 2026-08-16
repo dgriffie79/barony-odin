@@ -43,7 +43,7 @@ Lootbag_t :: struct {
 	spawn_y:         i32,
 	spawned_on_ground: bool,
 	looted:            bool,
-	items:           containers.Raw_Dynamic_Array, // DynamicArrayT<Item> (40B)
+	items:           [dynamic]Item, // DynamicArrayT<Item>
 }
 
 #assert(size_of(Lootbag_t) == 56) // 12B scalars + pad + 40B array
@@ -124,13 +124,13 @@ Stat :: struct {
 	mask:                ^Item,
 	monster_sound:       rawptr, // void* (former FMOD/OpenAL channel)
 	monster_idlevar:     i32,
-	attributes:          containers.Raw_Map, // DynamicMapStr (32B)
-	player_lootbags:     containers.Raw_Map, // DynamicMapI32T<Lootbag_t> (32B)
+	attributes:          map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	player_lootbags:     map[[4]byte]Lootbag_t, // DynamicMapI32T<Lootbag_t> (i32-keyed)
 	void_chest_inventory: list_t,
 	magic_effects:       list_t,
 	editor_items:        [112]i32, // Sint32 EDITOR_ITEMS[ITEM_SLOT_NUM] (112)
 	monster_ranged_accuracy: Monster_Ranged_Accuracy,
-	item_last_degrades_tick: containers.Raw_Map, // DynamicMapI32T<Uint32> (32B)
+	item_last_degrades_tick: map[[4]byte]u32, // DynamicMapI32T<Uint32> (i32-keyed)
 }
 
 #assert(size_of(Stat) == 2856)

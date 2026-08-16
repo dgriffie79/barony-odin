@@ -43,7 +43,7 @@ Temp_Texture :: struct {
 
 // struct Mesh — 144 bytes (140 data + pad to 8-alignment)
 Mesh :: struct {
-	data:          [3]containers.Raw_Dynamic_Array, // DynamicArrayT<float>[3] (40B each = 120B)
+	data:          [3][dynamic]f32, // DynamicArrayT<float>[3] (native [dynamic]f32)
 	vao:           u32,
 	vbo:           [3]u32,
 	num_vertices:  u32,
@@ -98,8 +98,8 @@ Chunk :: struct {
 	y:              i32,
 	w:              i32,
 	h:              i32,
-	tiles:          containers.Raw_Dynamic_Array, // DynamicArrayS32 (40B)
-	dithering:      containers.Raw_Map,           // DynamicMapPtrT<ChunkDither_t> (32B)
+	tiles:          [dynamic]i32, // DynamicArrayS32
+	dithering:      map[rawptr]Chunk_Dither,      // DynamicMapPtrT<ChunkDither_t> (ptr-keyed)
 }
 #assert(size_of(Chunk) == 112)
 

@@ -22,9 +22,31 @@ score_lootbag_t :: struct {
 	spawn_y:          i32,
 	spawned_on_ground: bool,
 	looted:           bool,
-	items:            containers.Raw_Dynamic_Array, // DynamicArray (40B)
+	items:            [dynamic]score_item_t, // vector<item_t> (POD)
 }
 #assert(size_of(score_lootbag_t) == 56)
+
+// --- pair mirrors for the serialized stat_t arrays (scores.hpp) ---
+// vector<pair<DynamicString, Uint32>> (player_equipment) — 24B
+Score_StringU32_Pair :: struct {
+	first:  containers.DynamicString,
+	second: u32,
+}
+#assert(size_of(Score_StringU32_Pair) == 24)
+
+// vector<pair<DynamicString, item_t>> (npc_equipment) — 48B
+Score_StringItem_Pair :: struct {
+	first:  containers.DynamicString,
+	second: score_item_t,
+}
+#assert(size_of(Score_StringItem_Pair) == 48)
+
+// vector<pair<Uint32, lootbag_t>> (player_lootbags) — 64B
+Score_U32Lootbag_Pair :: struct {
+	first:  u32,
+	second: score_lootbag_t,
+}
+#assert(size_of(Score_U32Lootbag_Pair) == 64)
 
 // struct stat_t (scores.hpp serialization mirror) — 528 bytes
 score_stat_t :: struct {
@@ -46,17 +68,17 @@ score_stat_t :: struct {
 	lvl:                   i32,
 	gold:                  i32,
 	hunger:                i32,
-	proficiencies:         containers.Raw_Dynamic_Array, // DynamicArrayS32 (40B)
-	effects:               containers.Raw_Dynamic_Array,
-	effects_timers:        containers.Raw_Dynamic_Array,
-	effects_accretion_time: containers.Raw_Dynamic_Array,
-	misc_flags:            containers.Raw_Dynamic_Array,
-	attributes:            containers.Raw_Dynamic_Array,
-	player_equipment:      containers.Raw_Dynamic_Array,
-	npc_equipment:         containers.Raw_Dynamic_Array,
-	inventory:             containers.Raw_Dynamic_Array,
-	void_chest_inventory:  containers.Raw_Dynamic_Array,
-	player_lootbags:       containers.Raw_Dynamic_Array,
+	proficiencies:         [dynamic]i32, // DynamicArrayS32
+	effects:               [dynamic]i32, // DynamicArrayS32
+	effects_timers:        [dynamic]i32, // DynamicArrayS32
+	effects_accretion_time: [dynamic]i32, // DynamicArrayS32
+	misc_flags:            [dynamic]i32, // DynamicArrayS32
+	attributes:            [dynamic]containers.DynamicStringPair_t, // vector<pair<DynamicString,DynamicString>>
+	player_equipment:      [dynamic]Score_StringU32_Pair, // vector<pair<DynamicString,Uint32>>
+	npc_equipment:         [dynamic]Score_StringItem_Pair, // vector<pair<DynamicString,item_t>>
+	inventory:             [dynamic]score_item_t, // vector<item_t> (POD)
+	void_chest_inventory:  [dynamic]score_item_t, // vector<item_t> (POD)
+	player_lootbags:       [dynamic]Score_U32Lootbag_Pair, // vector<pair<Uint32,lootbag_t>>
 }
 #assert(size_of(score_stat_t) == 528)
 
@@ -104,9 +126,9 @@ SaveGameInfo :: struct {
 	hiscore_killed_monster: i32,
 	hiscore_killed_item:  i32,
 	hiscore_dummy_loading: bool,
-	players_connected:    containers.Raw_Dynamic_Array, // DynamicArrayS32 (40B)
-	players:              containers.Raw_Dynamic_Array, // DynamicArrayT<Player> (40B)
-	map_messages:         containers.Raw_Dynamic_Array, // DynamicArrayStringPair (40B)
-	additional_data:      containers.Raw_Dynamic_Array, // DynamicArrayStringPair (40B)
+	players_connected:    [dynamic]i32, // DynamicArrayS32
+	players:              [dynamic]containers.HiscorePlayer_t, // DynamicArrayT<SaveGameInfo::Player> (hiscore save record, NOT game Player)
+	map_messages:         [dynamic]containers.DynamicStringPair_t, // DynamicArrayStringPair
+	additional_data:      [dynamic]containers.DynamicStringPair_t, // DynamicArrayStringPair
 }
 #assert(size_of(SaveGameInfo) == 312)
