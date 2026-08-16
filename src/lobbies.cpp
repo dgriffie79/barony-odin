@@ -36,6 +36,9 @@ std::string LobbyHandler_t::getCurrentRoomKey() const
     return "";
 }
 
+extern "C" std::string LobbyHandler_t_getCurrentRoomKey(const LobbyHandler_t* self) { return self->getCurrentRoomKey(); }
+
+
 std::string LobbyHandler_t::getLobbyJoinFailedConnectString(int result)
 {
 	char buf[1024] = "";
@@ -79,6 +82,9 @@ std::string LobbyHandler_t::getLobbyJoinFailedConnectString(int result)
 	return buf;
 }
 
+extern "C" std::string LobbyHandler_t_getLobbyJoinFailedConnectString(int result) { return LobbyHandler_t::getLobbyJoinFailedConnectString(result); }
+
+
 
 void LobbyHandler_t::handleLobbyListRequests()
 {
@@ -89,6 +95,9 @@ void LobbyHandler_t::handleLobbyListRequests()
 
 	return;
 }
+
+extern "C" void LobbyHandler_t_handleLobbyListRequests(LobbyHandler_t* self) { return self->handleLobbyListRequests(); }
+
 
 void LobbyHandler_t::updateSearchResults()
 {
@@ -102,6 +111,9 @@ void LobbyHandler_t::updateSearchResults()
 	return;
 }
 
+extern "C" void LobbyHandler_t_updateSearchResults(LobbyHandler_t* self) { return self->updateSearchResults(); }
+
+
 LobbyHandler_t::LobbyServiceType LobbyHandler_t::getDisplayedResultLobbyType(int selection)
 {
 	if ( selection < 0 || selection >= kNumSearchResults )
@@ -110,6 +122,9 @@ LobbyHandler_t::LobbyServiceType LobbyHandler_t::getDisplayedResultLobbyType(int
 	}
 	return lobbyDisplayedSearchResults[selection].second;
 }
+
+extern "C" LobbyHandler_t::LobbyServiceType LobbyHandler_t_getDisplayedResultLobbyType(LobbyHandler_t* self, int selection) { return self->getDisplayedResultLobbyType(selection); }
+
 Sint32 LobbyHandler_t::getDisplayedResultLobbyIndex(int selection)
 {
 	if ( selection < 0 || selection >= kNumSearchResults )
@@ -119,19 +134,31 @@ Sint32 LobbyHandler_t::getDisplayedResultLobbyIndex(int selection)
 	return lobbyDisplayedSearchResults[selection].first;
 }
 
+extern "C" int LobbyHandler_t_getDisplayedResultLobbyIndex(LobbyHandler_t* self, int selection) { return self->getDisplayedResultLobbyIndex(selection); }
+
+
 
 void LobbyHandler_t::filterLobbyButton(button_t* my)
 {
 	LobbyHandler.showLobbyFilters = !LobbyHandler.showLobbyFilters;
 }
 
+extern "C" void LobbyHandler_t_filterLobbyButton(button_t * my) { return LobbyHandler_t::filterLobbyButton(my); }
+
+
 void LobbyHandler_t::searchLobbyWithFilter(button_t* my)
 {
 }
 
+extern "C" void LobbyHandler_t_searchLobbyWithFilter(button_t * my) { return LobbyHandler_t::searchLobbyWithFilter(my); }
+
+
 void LobbyHandler_t::drawLobbyFilters()
 {
 }
+
+extern "C" void LobbyHandler_t_drawLobbyFilters(LobbyHandler_t* self) { return self->drawLobbyFilters(); }
+
 
 LobbyHandler_t::LobbyServiceType LobbyHandler_t::setLobbyJoinTypeOfCurrentSelection() {
 		if ( getDisplayedResultLobbyType(selectedLobbyInList) != LOBBY_DISABLE )
@@ -141,14 +168,26 @@ LobbyHandler_t::LobbyServiceType LobbyHandler_t::setLobbyJoinTypeOfCurrentSelect
 		return joiningType;
 	}
 
+extern "C" LobbyHandler_t::LobbyServiceType LobbyHandler_t_setLobbyJoinTypeOfCurrentSelection(LobbyHandler_t* self) { return self->setLobbyJoinTypeOfCurrentSelection(); }
+
+
 void LobbyHandler_t::setHostingType(LobbyServiceType type) {
 		hostingType = type;
 	}
+
+extern "C" void LobbyHandler_t_setHostingType(LobbyHandler_t* self, LobbyHandler_t::LobbyServiceType type) { return self->setHostingType(type); }
+
 
 void LobbyHandler_t::setLobbyJoinType(LobbyServiceType type) {
 	    joiningType = type;
 	}
 
+extern "C" void LobbyHandler_t_setLobbyJoinType(LobbyHandler_t* self, LobbyHandler_t::LobbyServiceType type) { return self->setLobbyJoinType(type); }
+
+
 void LobbyHandler_t::setP2PType(LobbyServiceType type) {
 		P2PType = type;
 	}
+
+extern "C" void LobbyHandler_t_setP2PType(LobbyHandler_t* self, LobbyHandler_t::LobbyServiceType type) { return self->setP2PType(type); }
+

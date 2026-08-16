@@ -2316,6 +2316,9 @@ bool Entity::isBoulderSprite()
 	return false;
 }
 
+extern "C" bool Entity_isBoulderSprite(Entity* self) { return self->isBoulderSprite(); }
+
+
 void boulderLavaOrArcaneOnDestroy(Entity* my, int sprite, Entity* boulderHitEntity)
 {
 	if ( !boulderHitEntity && !my )

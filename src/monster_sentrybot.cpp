@@ -2334,3 +2334,6 @@ void Entity::tinkerBotSetStats(Stat* myStats, int rank)
 	myStats->OLDHP = myStats->HP;
 	return;
 }
+
+extern "C" void Entity_tinkerBotSetStats(Stat * myStats, int rank) { return Entity::tinkerBotSetStats(myStats, rank); }
+

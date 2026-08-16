@@ -1538,3 +1538,6 @@ void Entity::vampireChooseWeapon(const Entity* target, double dist)
 	}
 	return;
 }
+
+extern "C" void Entity_vampireChooseWeapon(Entity* self, const Entity * target, double dist) { return self->vampireChooseWeapon(target, dist); }
+

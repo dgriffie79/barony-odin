@@ -102,6 +102,9 @@ void UIToastNotification::init()
 	progressBar = frame->addImage(SDL_Rect{ 0, 0, 0, 0 }, makeColorRGB(0, 160, 48), "images/system/white.png", "progressBar");
 }
 
+extern "C" void UIToastNotification_init(UIToastNotification* self) { return self->init(); }
+
+
 void UIToastNotification::draw()
 {
 	if (!isInit)
@@ -160,12 +163,18 @@ void UIToastNotification::draw()
 	}
 }
 
+extern "C" void UIToastNotification_draw(UIToastNotification* self) { return self->draw(); }
+
+
 void UIToastNotification::undockCard()
 {
 	dockedCardHide = true;
 	mainCardHide = false;
 	lastInteractedTick = ticks;
 }
+
+extern "C" void UIToastNotification_undockCard(UIToastNotification* self) { return self->undockCard(); }
+
 
 void UIToastNotification::hideMainCard()
 {
@@ -174,6 +183,9 @@ void UIToastNotification::hideMainCard()
 	lastInteractedTick = ticks;
 }
 
+extern "C" void UIToastNotification_hideMainCard(UIToastNotification* self) { return self->hideMainCard(); }
+
+
 void UIToastNotification::showMainCard()
 {
 	mainCardHide = false;
@@ -181,16 +193,25 @@ void UIToastNotification::showMainCard()
 	lastInteractedTick = ticks;
 }
 
+extern "C" void UIToastNotification_showMainCard(UIToastNotification* self) { return self->showMainCard(); }
+
+
 void UIToastNotification::cardForceTickUpdate()
 {
 	lastInteractedTick = ticks;
 }
+
+extern "C" void UIToastNotification_cardForceTickUpdate(UIToastNotification* self) { return self->cardForceTickUpdate(); }
+
 
 void UIToastNotification::updateCardStatisticEvent(int updatedValue)
 {
 	pendingStatisticUpdateCurrent = updatedValue;
 	updateCardEvent(true, false);
 }
+
+extern "C" void UIToastNotification_updateCardStatisticEvent(UIToastNotification* self, int updatedValue) { return self->updateCardStatisticEvent(updatedValue); }
+
 
 void UIToastNotification::updateCardEvent(bool updateMainText, bool updateSecondaryText)
 {
@@ -207,6 +228,9 @@ void UIToastNotification::updateCardEvent(bool updateMainText, bool updateSecond
 		cardUpdateDisplaySecondaryText = true;
 	}
 }
+
+extern "C" void UIToastNotification_updateCardEvent(UIToastNotification* self, bool updateMainText, bool updateSecondaryText) { return self->updateCardEvent(updateMainText, updateSecondaryText); }
+
 
 void UIToastNotification::animate(int& xout, int& current_ticks, int duration, int width, bool hideElement, bool& isHidden)
 {
@@ -230,6 +254,9 @@ void UIToastNotification::animate(int& xout, int& current_ticks, int duration, i
 		current_ticks = std::min(current_ticks + 1, static_cast<int>(scaledDuration));
 	}
 }
+
+extern "C" void UIToastNotification_animate(UIToastNotification* self, int & xout, int & current_ticks, int duration, int width, bool hideElement, bool & isHidden) { return self->animate(xout, current_ticks, duration, width, hideElement, isHidden); }
+
 
 void UIToastNotification::drawDockedCard()
 {
@@ -284,6 +311,9 @@ void UIToastNotification::drawDockedCard()
 		}
 	}
 }
+
+extern "C" void UIToastNotification_drawDockedCard(UIToastNotification* self) { return self->drawDockedCard(); }
+
 
 void UIToastNotification::drawMainCard()
 {
@@ -398,6 +428,9 @@ void UIToastNotification::drawMainCard()
 	frameImage->pos = SDL_Rect{offset, 8, imgSize, imgSize};
 }
 
+extern "C" void UIToastNotification_drawMainCard(UIToastNotification* self) { return self->drawMainCard(); }
+
+
 void UIToastNotification::drawProgressBar(const SDL_Rect& src)
 {
 	const int height = 16;
@@ -423,6 +456,9 @@ void UIToastNotification::drawProgressBar(const SDL_Rect& src)
 	progressField->setText(progress_str);
 }
 
+extern "C" void UIToastNotification_drawProgressBar(UIToastNotification* self, const SDL_Rect & src) { return self->drawProgressBar(src); }
+
+
 void UIToastNotification::drawCloseButton(const SDL_Rect& src)
 {
 	closeButton->setInvisible(false);
@@ -430,6 +466,9 @@ void UIToastNotification::drawCloseButton(const SDL_Rect& src)
 	const SDL_Rect r{ src.w - 4 - 26, 4, 26, 26 };
 	closeButton->setSize(r);
 }
+
+extern "C" void UIToastNotification_drawCloseButton(UIToastNotification* self, const SDL_Rect & src) { return self->drawCloseButton(src); }
+
 
 void UIToastNotification::drawActionButton(const SDL_Rect& src)
 {
@@ -439,6 +478,9 @@ void UIToastNotification::drawActionButton(const SDL_Rect& src)
 	actionButton->setSize(r);
 	actionButton->setText(actionText.c_str());
 }
+
+extern "C" void UIToastNotification_drawActionButton(UIToastNotification* self, const SDL_Rect & src) { return self->drawActionButton(src); }
+
 
 UIToastNotificationManager_t UIToastNotificationManager;
 static CvarBool cvar_achievements_warning("/achievements_warning", true);
@@ -615,6 +657,9 @@ void UIToastNotificationManager_t::drawNotifications(bool isMoviePlaying, bool b
 	}
 }
 
+extern "C" void UIToastNotificationManager_t_drawNotifications(UIToastNotificationManager_t* self, bool isMoviePlaying, bool beforeFadeout) { return self->drawNotifications(isMoviePlaying, beforeFadeout); }
+
+
 UIToastNotification* UIToastNotificationManager_t::addNotification(const char* image)
 {
 	if ( !bIsInit )
@@ -626,6 +671,9 @@ UIToastNotification* UIToastNotificationManager_t::addNotification(const char* i
 	auto& notification = allNotifications.back();
 	return &notification;
 }
+
+extern "C" UIToastNotification * UIToastNotificationManager_t_addNotification(UIToastNotificationManager_t* self, const char * image) { return self->addNotification(image); }
+
 
 void UIToastNotificationManager_t::createEpicLoginNotification()
 {
@@ -657,6 +705,9 @@ void UIToastNotificationManager_t::createEpicLoginNotification()
 	}
 }
 
+extern "C" void UIToastNotificationManager_t_createEpicLoginNotification(UIToastNotificationManager_t* self) { return self->createEpicLoginNotification(); }
+
+
 void UIToastNotificationManager_t::createEpicCrossplayLoginNotification()
 {
 	if (!UIToastNotificationManager.getNotificationSingle(UIToastNotification::CardType::UI_CARD_CROSSPLAY_ACCOUNT))
@@ -674,6 +725,9 @@ void UIToastNotificationManager_t::createEpicCrossplayLoginNotification()
 		n->setIdleSeconds(5);
 	}
 }
+
+extern "C" void UIToastNotificationManager_t_createEpicCrossplayLoginNotification(UIToastNotificationManager_t* self) { return self->createEpicCrossplayLoginNotification(); }
+
 
 void openURLTryWithOverlay(const std::string& url, bool forceSystemBrowser)
 {
@@ -725,6 +779,9 @@ void UIToastNotificationManager_t::createAchievementsDisabledNotification()
 	}
 }
 
+extern "C" void UIToastNotificationManager_t_createAchievementsDisabledNotification(UIToastNotificationManager_t* self) { return self->createAchievementsDisabledNotification(); }
+
+
 void UIToastNotificationManager_t::createGenericNotification(const char* header, const char* text)
 {
 	UIToastNotification* n = UIToastNotificationManager.addNotification(nullptr);
@@ -737,9 +794,15 @@ void UIToastNotificationManager_t::createGenericNotification(const char* header,
 	n->setIdleSeconds(10);
 }
 
+extern "C" void UIToastNotificationManager_t_createGenericNotification(UIToastNotificationManager_t* self, const char * header, const char * text) { return self->createGenericNotification(header, text); }
+
+
 void UIToastNotificationManager_t::createLeaderboardNotification(std::string info)
 {
 }
+
+extern "C" void UIToastNotificationManager_t_createLeaderboardNotification(UIToastNotificationManager_t* self, std::string info) { return self->createLeaderboardNotification(info); }
+
 
 void truncateMainText(std::string& str)
 {
@@ -806,6 +869,9 @@ void UIToastNotificationManager_t::createAchievementNotification(const char* nam
 	n->setIdleSeconds(5);
 }
 
+extern "C" void UIToastNotificationManager_t_createAchievementNotification(UIToastNotificationManager_t* self, const char * name) { return self->createAchievementNotification(name); }
+
+
 void UIToastNotificationManager_t::createNewSeedNotification()
 {
 	UIToastNotification* n = UIToastNotificationManager.addNotification("*#images/ui/Main Menus/Challenges/seed_attempted64px.png");
@@ -817,6 +883,9 @@ void UIToastNotificationManager_t::createNewSeedNotification()
 	n->setMainText(Language::get(6170));
 	n->setIdleSeconds(10);
 }
+
+extern "C" void UIToastNotificationManager_t_createNewSeedNotification(UIToastNotificationManager_t* self) { return self->createNewSeedNotification(); }
+
 
 void UIToastNotificationManager_t::createStatisticUpdateNotification(const char* name, int currentValue, int maxValue)
 {
@@ -877,6 +946,9 @@ void UIToastNotificationManager_t::createStatisticUpdateNotification(const char*
 	n->setStatisticMaxValue(maxValue);
 	n->setIdleSeconds(5);
 }
+
+extern "C" void UIToastNotificationManager_t_createStatisticUpdateNotification(UIToastNotificationManager_t* self, const char * name, int currentValue, int maxValue) { return self->createStatisticUpdateNotification(name, currentValue, maxValue); }
+
 
 void createGenericWindowDecorations(Frame& frame) {
 	frame.addImage(SDL_Rect{ 0,0,0,0 }, 0xffffffff, "*#images/ui/GenericWindow.png", "topleft");
@@ -1015,47 +1087,83 @@ void UIToastNotification::resetUIPointers() {
 		progressBarBackground = nullptr;
 	}
 
+extern "C" void UIToastNotification_resetUIPointers(UIToastNotification* self) { return self->resetUIPointers(); }
+
+
 void UIToastNotification::setMainText(const char* text) {
 		mainCardText = text;
 	}
+
+extern "C" void UIToastNotification_setMainText(UIToastNotification* self, const char * text) { return self->setMainText(text); }
+
 
 void UIToastNotification::setSecondaryText(const char* text) {
 		secondaryCardText = text;
 	}
 
+extern "C" void UIToastNotification_setSecondaryText(UIToastNotification* self, const char * text) { return self->setSecondaryText(text); }
+
+
 void UIToastNotification::setHeaderText(const char* text) {
 		headerCardText = text;
 	}
+
+extern "C" void UIToastNotification_setHeaderText(UIToastNotification* self, const char * text) { return self->setHeaderText(text); }
+
 
 void UIToastNotification::setActionText(const char* text) {
 		actionText = text;
 	}
 
+extern "C" void UIToastNotification_setActionText(UIToastNotification* self, const char * text) { return self->setActionText(text); }
+
+
 void UIToastNotification::setDisplayedText(const char* text) {
 		displayedText = text;
 	}
+
+extern "C" void UIToastNotification_setDisplayedText(UIToastNotification* self, const char * text) { return self->setDisplayedText(text); }
+
 
 void UIToastNotification::setIdleSeconds(Uint32 seconds) {
 		idleTicksToHide = seconds * TICKS_PER_SECOND;
 	}
 
+extern "C" void UIToastNotification_setIdleSeconds(UIToastNotification* self, Uint32 seconds) { return self->setIdleSeconds(seconds); }
+
+
 void UIToastNotification::setStatisticCurrentValue(int value) {
 		statisticUpdateCurrent = value;
 	}
+
+extern "C" void UIToastNotification_setStatisticCurrentValue(UIToastNotification* self, int value) { return self->setStatisticCurrentValue(value); }
+
 
 void UIToastNotification::setStatisticMaxValue(int value) {
 		statisticUpdateMax = value;
 	}
 
+extern "C" void UIToastNotification_setStatisticMaxValue(UIToastNotification* self, int value) { return self->setStatisticMaxValue(value); }
+
+
 void UIToastNotification::setAchievementName(const char* achName) {
 		achievementID = achName;
 	}
 
+extern "C" void UIToastNotification_setAchievementName(UIToastNotification* self, const char * achName) { return self->setAchievementName(achName); }
+
+
 const char* UIToastNotification::getMainText() { return mainCardText.c_str(); }
+
+extern "C" const char * UIToastNotification_getMainText(UIToastNotification* self) { return self->getMainText(); }
+
 
 bool UIToastNotification::matchesAchievementName(const char* achName) {
 		return (achievementID.compare(achName) == 0);
 	}
+
+extern "C" bool UIToastNotification_matchesAchievementName(UIToastNotification* self, const char * achName) { return self->matchesAchievementName(achName); }
+
 
 const char* UIToastNotificationManager_t::getImage(const char* image) {
 		if ( image == nullptr )
@@ -1064,6 +1172,9 @@ const char* UIToastNotificationManager_t::getImage(const char* image) {
 		}
 		return image;
 	}
+
+extern "C" const char * UIToastNotificationManager_t_getImage(UIToastNotificationManager_t* self, const char * image) { return self->getImage(image); }
+
 
 void UIToastNotificationManager_t::init() {
 		if (bIsInit) {
@@ -1078,6 +1189,9 @@ void UIToastNotificationManager_t::init() {
 			achievementsCheck = true;
 		}
 	}
+
+extern "C" void UIToastNotificationManager_t_init(UIToastNotificationManager_t* self) { return self->init(); }
+
 
 void UIToastNotificationManager_t::term(const bool clearNotifications) {
 		if (!bIsInit) {
@@ -1103,6 +1217,9 @@ void UIToastNotificationManager_t::term(const bool clearNotifications) {
 		}
 	}
 
+extern "C" void UIToastNotificationManager_t_term(UIToastNotificationManager_t* self, const bool clearNotifications) { return self->term(clearNotifications); }
+
+
 UIToastNotification* UIToastNotificationManager_t::getNotificationSingle(UIToastNotification::CardType cardType) {
 		for ( int64_t i = 0; i < allNotifications.size(); ++i )
 		{
@@ -1114,6 +1231,9 @@ UIToastNotification* UIToastNotificationManager_t::getNotificationSingle(UIToast
 		}
 		return nullptr;
 	}
+
+extern "C" UIToastNotification * UIToastNotificationManager_t_getNotificationSingle(UIToastNotificationManager_t* self, UIToastNotification::CardType cardType) { return self->getNotificationSingle(cardType); }
+
 
 UIToastNotification* UIToastNotificationManager_t::getNotificationAchievementSingle(const char* achName) {
 		for ( int64_t i = 0; i < allNotifications.size(); ++i )
@@ -1129,3 +1249,6 @@ UIToastNotification* UIToastNotificationManager_t::getNotificationAchievementSin
 		}
 		return nullptr;
 	}
+
+extern "C" UIToastNotification * UIToastNotificationManager_t_getNotificationAchievementSingle(UIToastNotificationManager_t* self, const char * achName) { return self->getNotificationAchievementSingle(achName); }
+

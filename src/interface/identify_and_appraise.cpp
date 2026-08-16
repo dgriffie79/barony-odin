@@ -448,6 +448,9 @@ bool Player::Inventory_t::Appraisal_t::appraisalPossible(Item* item)
 	return false;
 }
 
+extern "C" bool Appraisal_t_appraisalPossible(Player::Inventory_t::Appraisal_t* self, Item * item) { return self->appraisalPossible(item); }
+
+
 void Player::Inventory_t::Appraisal_t::appraiseItem(Item* item)
 {
 	if (!item)
@@ -580,6 +583,9 @@ void Player::Inventory_t::Appraisal_t::appraiseItem(Item* item)
 	old_item = 0;
 }
 
+extern "C" void Appraisal_t_appraiseItem(Player::Inventory_t::Appraisal_t* self, Item * item) { return self->appraiseItem(item); }
+
+
 DynamicArray Player::Inventory_t::Appraisal_t::appraisal_time_points;  // vector<pair<int,int>>
 DynamicArray Player::Inventory_t::Appraisal_t::appraisal_tables;  // vector<AppraisalBreakpoint_t> (POD)
 int Player::Inventory_t::Appraisal_t::fastTimeAppraisal = 10 * TICKS_PER_SECOND;
@@ -669,6 +675,9 @@ void Player::Inventory_t::Appraisal_t::readFromFile()
 
 	json_reader_destroy(jsonReader);
 }
+
+extern "C" void Appraisal_t_readFromFile() { return Player::Inventory_t::Appraisal_t::readFromFile(); }
+
 
 int Player::Inventory_t::Appraisal_t::getAppraisalTime(Item* item)
 {
@@ -835,6 +844,9 @@ int Player::Inventory_t::Appraisal_t::getAppraisalTime(Item* item)
 	appraisal_time = std::min(std::max(1, appraisal_time), 36000);
 	return appraisal_time;
 }
+
+extern "C" int Appraisal_t_getAppraisalTime(Player::Inventory_t::Appraisal_t* self, Item * item) { return self->getAppraisalTime(item); }
+
 //
 //inline Item* getItemInfoFromIdentifyGUI(const int player, int slot)
 //{

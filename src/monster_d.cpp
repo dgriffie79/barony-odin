@@ -2208,6 +2208,9 @@ void Entity::monsterDChooseWeapon(const Entity* target, double dist)
 	}
 }
 
+extern "C" void Entity_monsterDChooseWeapon(Entity* self, const Entity * target, double dist) { return self->monsterDChooseWeapon(target, dist); }
+
+
 //void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 //{
 //	if ( monsterSpecialState != 0 )

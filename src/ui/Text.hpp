@@ -98,5 +98,7 @@ private:
 
 	//! get the number of text lines occupied by the text
 	//! @return number of lines of text
+
+	public:
 	int countNumTextLines() const;
 };

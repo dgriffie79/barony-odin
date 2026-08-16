@@ -1259,6 +1259,9 @@ void Entity::lichFireSetNextAttack(Stat& myStats)
 	}
 }
 
+extern "C" void Entity_lichFireSetNextAttack(Entity* self, Stat & myStats) { return self->lichFireSetNextAttack(myStats); }
+
+
 void Entity::lichFireTeleport()
 {
 	monsterLichTeleportTimer() = 0;
@@ -1279,6 +1282,9 @@ void Entity::lichFireTeleport()
 		serverSpawnMiscParticles(this, spellTimer->particleTimerEndAction(), 593);
 	}
 }
+
+extern "C" void Entity_lichFireTeleport(Entity* self) { return self->lichFireTeleport(); }
+
 
 void Entity::lichFireSummonMonster(Monster creature)
 {
@@ -1325,3 +1331,6 @@ void Entity::lichFireSummonMonster(Monster creature)
 		}
 	}
 }
+
+extern "C" void Entity_lichFireSummonMonster(Entity* self, Monster creature) { return self->lichFireSummonMonster(creature); }
+

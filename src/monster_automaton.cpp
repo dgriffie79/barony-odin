@@ -1511,6 +1511,9 @@ bool Entity::automatonCanWieldItem(const Item& item) const
 	return false;
 }
 
+extern "C" bool Entity_automatonCanWieldItem(const Entity* self, const Item & item) { return self->automatonCanWieldItem(item); }
+
+
 
 void Entity::automatonRecycleItem()
 {
@@ -1716,3 +1719,6 @@ void Entity::automatonRecycleItem()
 
 	return;
 }
+
+extern "C" void Entity_automatonRecycleItem(Entity* self) { return self->automatonRecycleItem(); }
+

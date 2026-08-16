@@ -339,6 +339,8 @@ FileInterface& FileInterface::operator=(FileInterface&& other) noexcept {
 	return *this;
 }
 
+
+
 FileInterface FileInterface::makeWriter(File* file, EFileFormat format) {
 	FileInterface result;
 	result.format = format;
@@ -352,6 +354,9 @@ FileInterface FileInterface::makeWriter(File* file, EFileFormat format) {
 	}
 	return result;
 }
+
+extern "C" FileInterface FileInterface_makeWriter(File * file, EFileFormat format) { return FileInterface::makeWriter(file, format); }
+
 
 FileInterface FileInterface::makeReader(File* file) {
 	FileInterface result;
@@ -371,12 +376,18 @@ FileInterface FileInterface::makeReader(File* file) {
 	return result;
 }
 
+extern "C" FileInterface FileInterface_makeReader(File * file) { return FileInterface::makeReader(file); }
+
+
 bool FileInterface::beginObject() {
 	if (format == EFileFormat::Binary) {
 		return true;
 	}
 	return reading ? jsonReader->beginObject() : jsonWriter->beginObject();
 }
+
+extern "C" bool FileInterface_beginObject(FileInterface* self) { return self->beginObject(); }
+
 
 void FileInterface::endObject() {
 	if (format == EFileFormat::Binary) {
@@ -385,12 +396,18 @@ void FileInterface::endObject() {
 	if (reading) jsonReader->endObject(); else jsonWriter->endObject();
 }
 
+extern "C" void FileInterface_endObject(FileInterface* self) { return self->endObject(); }
+
+
 bool FileInterface::beginArray(Uint32& size) {
 	if (format == EFileFormat::Binary) {
 		return reading ? fp->read(&size, sizeof(size), 1) == 1 : fp->write(&size, sizeof(size), 1) == 1;
 	}
 	return reading ? jsonReader->beginArray(size) : jsonWriter->beginArray(size);
 }
+
+extern "C" bool FileInterface_beginArray(FileInterface* self, Uint32 & size) { return self->beginArray(size); }
+
 
 void FileInterface::endArray() {
 	if (format == EFileFormat::Binary) {
@@ -399,6 +416,9 @@ void FileInterface::endArray() {
 	if (reading) jsonReader->endArray(); else jsonWriter->endArray();
 }
 
+extern "C" void FileInterface_endArray(FileInterface* self) { return self->endArray(); }
+
+
 void FileInterface::propertyName(const char* name) {
 	if (format == EFileFormat::Binary) {
 		return;
@@ -406,12 +426,42 @@ void FileInterface::propertyName(const char* name) {
 	if (reading) jsonReader->propertyName(name); else jsonWriter->propertyName(name);
 }
 
+extern "C" void FileInterface_propertyName(FileInterface* self, const char * name) { return self->propertyName(name); }
+
+
 bool FileInterface::value(Uint32& v) {
 	if (format == EFileFormat::Binary) {
 		return reading ? fp->read(&v, sizeof(v), 1) == 1 : fp->write(&v, sizeof(v), 1) == 1;
 	}
 	return reading ? jsonReader->value(v) : jsonWriter->value(v);
 }
+
+
+extern "C" bool FileInterface_value_10(FileInterface* self, int & v) { return self->value(v); }
+
+
+
+
+extern "C" bool FileInterface_value_7(FileInterface* self, DynamicString & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value_6(FileInterface* self, std::string & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value_5(FileInterface* self, bool & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value_4(FileInterface* self, double & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value_3(FileInterface* self, float & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value_2(FileInterface* self, int & v) { return self->value(v); }
+
+
+extern "C" bool FileInterface_value(FileInterface* self, int & v) { return self->value(v); }
+
 
 bool FileInterface::value(Sint32& v) {
 	if (format == EFileFormat::Binary) {
@@ -461,6 +511,9 @@ void FileInterface::flushToFile() {
 	}
 }
 
+extern "C" void FileInterface_flushToFile(FileInterface* self) { return self->flushToFile(); }
+
+
 bool FileInterface::writeStringInternalBinary(const std::string& v) {
 	Uint32 len = (Uint32)v.size();
 	bool result = true;
@@ -471,6 +524,12 @@ bool FileInterface::writeStringInternalBinary(const std::string& v) {
 	}
 	return result;
 }
+
+extern "C" bool FileInterface_writeStringInternalBinary_2(FileInterface* self, const DynamicString & v) { return self->writeStringInternalBinary(v); }
+
+
+extern "C" bool FileInterface_writeStringInternalBinary(FileInterface* self, const std::string & v) { return self->writeStringInternalBinary(v); }
+
 
 bool FileInterface::writeStringInternalBinary(const DynamicString& v) {
 	Uint32 len = (Uint32)v.size();
@@ -497,6 +556,12 @@ bool FileInterface::readStringInternalBinary(std::string& v) {
 
 	return result;
 }
+
+extern "C" bool FileInterface_readStringInternalBinary_2(FileInterface* self, DynamicString & v) { return self->readStringInternalBinary(v); }
+
+
+extern "C" bool FileInterface_readStringInternalBinary(FileInterface* self, std::string & v) { return self->readStringInternalBinary(v); }
+
 
 bool FileInterface::readStringInternalBinary(DynamicString& v) {
 	Uint32 len;
@@ -549,6 +614,8 @@ bool FileHelper::writeObjectInternal(const char * filename, EFileFormat format, 
 	return success;
 }
 
+
+
 bool FileHelper::readObjectInternal(const char * filename, const SerializationFunc& serialize) {
 	File * file = FileIO::open(filename, "rb");
 #ifndef NDEBUG
@@ -572,6 +639,8 @@ bool FileHelper::readObjectInternal(const char * filename, const SerializationFu
 
 	return success;
 }
+
+
 
 bool FileInterface::value(DynamicArrayS32& v, Uint32 maxLength ) {
 		Uint32 size = (Uint32)v.size();

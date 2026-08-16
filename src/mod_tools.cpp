@@ -97,11 +97,17 @@ void GameModeManager_t::Tutorial_t::startTutorial(std::string mapToSet)
 	initClass(0);
 }
 
+extern "C" void Tutorial_t_startTutorial(GameModeManager_t::Tutorial_t* self, std::string mapToSet) { return self->startTutorial(mapToSet); }
+
+
 void GameModeManager_t::Tutorial_t::buttonReturnToTutorialHub(button_t* my)
 {
 	buttonStartSingleplayer(nullptr);
 	gameModeManager.Tutorial.launchHub();
 }
+
+extern "C" void Tutorial_t_buttonReturnToTutorialHub(button_t * my) { return GameModeManager_t::Tutorial_t::buttonReturnToTutorialHub(my); }
+
 
 void GameModeManager_t::Tutorial_t::buttonRestartTrial(button_t* my)
 {
@@ -127,15 +133,24 @@ void GameModeManager_t::Tutorial_t::buttonRestartTrial(button_t* my)
 	buttonReturnToTutorialHub(nullptr);
 }
 
+extern "C" void Tutorial_t_buttonRestartTrial(button_t * my) { return GameModeManager_t::Tutorial_t::buttonRestartTrial(my); }
+
+
 #ifdef EDITOR
 void GameModeManager_t::Tutorial_t::openGameoverWindow()
 {
 	return;
 }
+
+extern "C" void Tutorial_t_openGameoverWindow(GameModeManager_t::Tutorial_t* self) { return self->openGameoverWindow(); }
+
 void GameModeManager_t::Tutorial_t::createFirstTutorialCompletedPrompt()
 {
 	return;
 }
+
+extern "C" void Tutorial_t_createFirstTutorialCompletedPrompt(GameModeManager_t::Tutorial_t* self) { return self->createFirstTutorialCompletedPrompt(); }
+
 #else
 void GameModeManager_t::Tutorial_t::openGameoverWindow()
 {
@@ -280,6 +295,9 @@ void GameModeManager_t::Tutorial_t::readFromFile()
 	}
 }
 
+extern "C" void Tutorial_t_readFromFile(GameModeManager_t::Tutorial_t* self) { return self->readFromFile(); }
+
+
 
 void GameModeManager_t::Tutorial_t::writeToDocument()
 {
@@ -349,12 +367,18 @@ void GameModeManager_t::Tutorial_t::writeToDocument()
 	writeToFile(d);
 }
 
+extern "C" void Tutorial_t_writeToDocument(GameModeManager_t::Tutorial_t* self) { return self->writeToDocument(); }
+
+
 void GameModeManager_t::Tutorial_t::Menu_t::open()
 {
 	// deprecated
 	assert(0);
 	return;
 }
+
+extern "C" void Menu_t_open(GameModeManager_t::Tutorial_t::Menu_t* self) { return self->open(); }
+
 
 void GameModeManager_t::Tutorial_t::Menu_t::onClickEntry()
 {
@@ -372,6 +396,9 @@ void GameModeManager_t::Tutorial_t::Menu_t::onClickEntry()
 	gameModeManager.Tutorial.startTutorial(gameModeManager.Tutorial.levels.at(this->selectedMenuItem).filename);
 	steamStatisticUpdate(STEAM_STAT_TUTORIAL_ENTERED, ESteamStatTypes::STEAM_STAT_INT, 1);
 }
+
+extern "C" void Menu_t_onClickEntry(GameModeManager_t::Tutorial_t::Menu_t* self) { return self->onClickEntry(); }
+
 
 void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::createPrompt()
 {
@@ -414,6 +441,9 @@ void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::createPrompt()
 	//button->focused = 1;
 }
 
+extern "C" void FirstTimePrompt_t_createPrompt(GameModeManager_t::Tutorial_t::FirstTimePrompt_t* self) { return self->createPrompt(); }
+
+
 void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::drawDialogue()
 {
 	return;
@@ -440,11 +470,17 @@ void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::drawDialogue()
 	ttfPrintTextFormatted(ttf12, centerWindowX - (longestline(Language::get(3967)) * TTF12_WIDTH) / 2 - TTF12_WIDTH / 2, suby2 + 8 - TTF12_HEIGHT * 11, Language::get(3968));*/
 }
 
+extern "C" void FirstTimePrompt_t_drawDialogue(GameModeManager_t::Tutorial_t::FirstTimePrompt_t* self) { return self->drawDialogue(); }
+
+
 void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonSkipPrompt(button_t* my)
 {
 	gameModeManager.Tutorial.FirstTimePrompt.doButtonSkipPrompt = true;
 	gameModeManager.Tutorial.writeToDocument();
 }
+
+extern "C" void FirstTimePrompt_t_buttonSkipPrompt(button_t * my) { return GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonSkipPrompt(my); }
+
 
 void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonPromptEnterTutorialHub(button_t* my)
 {
@@ -452,6 +488,9 @@ void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonPromptEnterTutorial
 	gameModeManager.Tutorial.Menu.onClickEntry();
 	gameModeManager.Tutorial.writeToDocument();
 }
+
+extern "C" void FirstTimePrompt_t_buttonPromptEnterTutorialHub(button_t * my) { return GameModeManager_t::Tutorial_t::FirstTimePrompt_t::buttonPromptEnterTutorialHub(my); }
+
 
 void GameModeManager_t::CurrentSession_t::SeededRun_t::setup(DynamicString _seedString)
 {
@@ -473,11 +512,17 @@ void GameModeManager_t::CurrentSession_t::SeededRun_t::setup(DynamicString _seed
 	seedString = _seedString;
 }
 
+extern "C" void SeededRun_t_setup(GameModeManager_t::CurrentSession_t::SeededRun_t* self, DynamicString _seedString) { return self->setup(_seedString); }
+
+
 void GameModeManager_t::CurrentSession_t::SeededRun_t::reset()
 {
 	seed = 0;
 	seedString = "";
 }
+
+extern "C" void SeededRun_t_reset(GameModeManager_t::CurrentSession_t::SeededRun_t* self) { return self->reset(); }
+
 
 bool GameModeManager_t::allowsSaves()
 {
@@ -492,10 +537,16 @@ bool GameModeManager_t::allowsSaves()
 	return false;
 }
 
+extern "C" bool GameModeManager_t_allowsSaves(GameModeManager_t* self) { return self->allowsSaves(); }
+
+
 void GameModeManager_t::setMode(const GameModes mode)
 {
 	currentMode = mode;
 }
+
+extern "C" void GameModeManager_t_setMode(GameModeManager_t* self, const GameModeManager_t::GameModes mode) { return self->setMode(mode); }
+
 
 bool GameModeManager_t::allowsStatisticsOrAchievements(const char* achName, int statIndex)
 {
@@ -546,6 +597,9 @@ bool GameModeManager_t::allowsStatisticsOrAchievements(const char* achName, int 
 	return false;
 }
 
+extern "C" bool GameModeManager_t_allowsStatisticsOrAchievements(GameModeManager_t* self, const char * achName, int statIndex) { return self->allowsStatisticsOrAchievements(achName, statIndex); }
+
+
 bool GameModeManager_t::allowsHiscores()
 {
 	if ( currentMode == GAME_MODE_CUSTOM_RUN && currentSession.challengeRun.isActive()
@@ -561,6 +615,9 @@ bool GameModeManager_t::allowsHiscores()
 	return false;
 }
 
+extern "C" bool GameModeManager_t_allowsHiscores(GameModeManager_t* self) { return self->allowsHiscores(); }
+
+
 bool GameModeManager_t::isFastDeathGrave()
 {
 	if ( currentMode == GAME_MODE_TUTORIAL || currentMode == GAME_MODE_TUTORIAL_INIT )
@@ -573,6 +630,9 @@ bool GameModeManager_t::isFastDeathGrave()
 	}
 	return false;
 }
+
+extern "C" bool GameModeManager_t_isFastDeathGrave(GameModeManager_t* self) { return self->isFastDeathGrave(); }
+
 
 bool GameModeManager_t::allowsGlobalHiscores()
 {
@@ -591,6 +651,9 @@ bool GameModeManager_t::allowsGlobalHiscores()
 	return false;
 }
 
+extern "C" bool GameModeManager_t_allowsGlobalHiscores(GameModeManager_t* self) { return self->allowsGlobalHiscores(); }
+
+
 bool GameModeManager_t::allowsBoulderBreak()
 {
 	if ( currentMode != GAME_MODE_TUTORIAL )
@@ -599,6 +662,9 @@ bool GameModeManager_t::allowsBoulderBreak()
 	}
 	return false;
 }
+
+extern "C" bool GameModeManager_t_allowsBoulderBreak(GameModeManager_t* self) { return self->allowsBoulderBreak(); }
+
 
 DynamicArrayStr GameModeManager_t::CurrentSession_t::SeededRun_t::prefixes;
 DynamicArrayStr GameModeManager_t::CurrentSession_t::SeededRun_t::suffixes;
@@ -648,6 +714,9 @@ void GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile()
 		suffixes.push_back(it->GetString());
 	}
 }
+
+extern "C" void SeededRun_t_readSeedNamesFromFile() { return GameModeManager_t::CurrentSession_t::SeededRun_t::readSeedNamesFromFile(); }
+
 
 bool IRCHandler_t::readFromFile()
 {
@@ -702,6 +771,9 @@ bool IRCHandler_t::readFromFile()
 	return false;
 }
 
+extern "C" bool IRCHandler_t_readFromFile(IRCHandler_t* self) { return self->readFromFile(); }
+
+
 void IRCHandler_t::disconnect()
 {
 	if ( net_ircsocketset )
@@ -716,6 +788,9 @@ void IRCHandler_t::disconnect()
 	net_ircsocket = nullptr;
 	bSocketConnected = false;
 }
+
+extern "C" void IRCHandler_t_disconnect(IRCHandler_t* self) { return self->disconnect(); }
+
 
 bool IRCHandler_t::connect()
 {
@@ -752,6 +827,9 @@ bool IRCHandler_t::connect()
 	return true;
 }
 
+extern "C" bool IRCHandler_t_connect(IRCHandler_t* self) { return self->connect(); }
+
+
 int IRCHandler_t::packetSend(std::string data)
 {
 	if ( !bSocketConnected )
@@ -761,6 +839,9 @@ int IRCHandler_t::packetSend(std::string data)
 	int sentBytes = SDLNet_TCP_Send(net_ircsocket, data.data(), data.length());
 	return sentBytes;
 }
+
+extern "C" int IRCHandler_t_packetSend(IRCHandler_t* self, std::string data) { return self->packetSend(data); }
+
 
 int IRCHandler_t::packetReceive()
 {
@@ -786,6 +867,9 @@ int IRCHandler_t::packetReceive()
 	return 0;
 }
 
+extern "C" int IRCHandler_t_packetReceive(IRCHandler_t* self) { return self->packetReceive(); }
+
+
 void IRCHandler_t::run()
 {
 	if ( !bSocketConnected )
@@ -800,6 +884,9 @@ void IRCHandler_t::run()
 		handleMessage(msg);
 	}
 }
+
+extern "C" void IRCHandler_t_run(IRCHandler_t* self) { return self->run(); }
+
 
 void IRCHandler_t::handleMessage(std::string& msg)
 {
@@ -836,6 +923,9 @@ void IRCHandler_t::handleMessage(std::string& msg)
 #endif
 }
 
+extern "C" void IRCHandler_t_handleMessage(IRCHandler_t* self, std::string & msg) { return self->handleMessage(msg); }
+
+
 Uint32 ItemTooltips_t::itemsJsonHashRead = 0;
 const Uint32 ItemTooltips_t::kItemsJsonHash = 2516917045;
 
@@ -848,6 +938,12 @@ void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, J
 		//hash += (Uint32)((Uint32)toSet << (hashShift % 32)); ++hashShift;
 	}
 }
+
+extern "C" void ItemTooltips_t_setSpellValueIfKeyPresent_2(ItemTooltips_t* self, ItemTooltips_t::spellItem_t & t, JsonMemberIt item_itr, Uint32 & hash, Uint32 & hashShift, const char * key, real_t & toSet) { return self->setSpellValueIfKeyPresent(t, item_itr, hash, hashShift, key, toSet); }
+
+
+extern "C" void ItemTooltips_t_setSpellValueIfKeyPresent(ItemTooltips_t* self, ItemTooltips_t::spellItem_t & t, JsonMemberIt item_itr, Uint32 & hash, Uint32 & hashShift, const char * key, int & toSet) { return self->setSpellValueIfKeyPresent(t, item_itr, hash, hashShift, key, toSet); }
+
 void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, JsonMemberIt item_itr, Uint32& hash, Uint32& hashShift, const char* key, real_t& toSet)
 {
 	if ( item_itr->value.HasMember(key) )
@@ -1497,6 +1593,9 @@ void ItemTooltips_t::readItemsFromFile()
 	}*/
 }
 
+extern "C" void ItemTooltips_t_readItemsFromFile(ItemTooltips_t* self) { return self->readItemsFromFile(); }
+
+
 void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 {
 	if ( !PHYSFS_getRealDir("/lang/item_names.json") )
@@ -1649,6 +1748,9 @@ void ItemTooltips_t::readItemLocalizationsFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void ItemTooltips_t_readItemLocalizationsFromFile(ItemTooltips_t* self, bool forceLoadBaseDirectory) { return self->readItemLocalizationsFromFile(forceLoadBaseDirectory); }
+
+
 void ItemTooltips_t::readBookLocalizationsFromFile(bool forceLoadBaseDirectory)
 {
 	if ( !PHYSFS_getRealDir("/lang/book_names.json") )
@@ -1728,6 +1830,9 @@ void ItemTooltips_t::readBookLocalizationsFromFile(bool forceLoadBaseDirectory)
 
 	printlog("[JSON]: Successfully read %d book names from '%s'", bookNameLocalizations.size(), inputPath.c_str());
 }
+
+extern "C" void ItemTooltips_t_readBookLocalizationsFromFile(ItemTooltips_t* self, bool forceLoadBaseDirectory) { return self->readBookLocalizationsFromFile(forceLoadBaseDirectory); }
+
 
 #ifndef EDITOR
 void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
@@ -2073,6 +2178,9 @@ void ItemTooltips_t::readTooltipsFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void ItemTooltips_t_readTooltipsFromFile(ItemTooltips_t* self, bool forceLoadBaseDirectory) { return self->readTooltipsFromFile(forceLoadBaseDirectory); }
+
+
 DynamicString ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status status)
 {
 	if ( itemType >= ARTIFACT_ORB_BLUE && itemType <= ARTIFACT_ORB_GREEN )
@@ -2278,6 +2386,9 @@ DynamicString ItemTooltips_t::getItemStatusAdjective(Uint32 itemType, Status sta
 	return defaultString;
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemStatusAdjective(ItemTooltips_t* self, Uint32 itemType, Status status) { return self->getItemStatusAdjective(itemType, status); }
+
+
 DynamicString ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 {
 	if ( adjectives.find("beatitude_status") == adjectives.end() )
@@ -2298,6 +2409,9 @@ DynamicString ItemTooltips_t::getItemBeatitudeAdjective(Sint16 beatitude)
 		return adjectives["beatitude_status"]["uncursed"];
 	}
 }
+
+extern "C" DynamicString ItemTooltips_t_getItemBeatitudeAdjective(ItemTooltips_t* self, Sint16 beatitude) { return self->getItemBeatitudeAdjective(beatitude); }
+
 
 DynamicString ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
 {
@@ -2336,6 +2450,9 @@ DynamicString ItemTooltips_t::getProficiencyLevelName(Sint32 proficiencyLevel)
 	}
 }
 
+extern "C" DynamicString ItemTooltips_t_getProficiencyLevelName(ItemTooltips_t* self, Sint32 proficiencyLevel) { return self->getProficiencyLevelName(proficiencyLevel); }
+
+
 bool ItemTooltips_t::bIsSpellDamageOrHealingType(spell_t* spell)
 {
 	if ( !spell )
@@ -2350,6 +2467,9 @@ bool ItemTooltips_t::bIsSpellDamageOrHealingType(spell_t* spell)
 	return false;
 }
 
+extern "C" bool ItemTooltips_t_bIsSpellDamageOrHealingType(ItemTooltips_t* self, spell_t * spell) { return self->bIsSpellDamageOrHealingType(spell); }
+
+
 bool ItemTooltips_t::bSpellHasBasicHitMessage(const int spellID)
 {
 	if ( spellItems.find(spellID) != spellItems.end() )
@@ -2362,6 +2482,9 @@ bool ItemTooltips_t::bSpellHasBasicHitMessage(const int spellID)
 	}
 	return false;
 }
+
+extern "C" bool ItemTooltips_t_bSpellHasBasicHitMessage(ItemTooltips_t* self, const int spellID) { return self->bSpellHasBasicHitMessage(spellID); }
+
 
 int ItemTooltips_t::getSpellDamageOrHealAmount(const int player, spell_t* spell, Item* spellbook, const bool excludePlayerStats)
 {
@@ -2452,6 +2575,9 @@ int ItemTooltips_t::getSpellDamageOrHealAmount(const int player, spell_t* spell,
 #endif
 }
 
+extern "C" int ItemTooltips_t_getSpellDamageOrHealAmount(ItemTooltips_t* self, const int player, spell_t * spell, Item * spellbook, const bool excludePlayerStats) { return self->getSpellDamageOrHealAmount(player, spell, spellbook, excludePlayerStats); }
+
+
 std::string ItemTooltips_t::getSpellDescriptionText(const int player, Item& item)
 {
 #ifdef EDITOR
@@ -2484,6 +2610,9 @@ std::string ItemTooltips_t::getSpellDescriptionText(const int player, Item& item
 #endif
 }
 
+extern "C" std::string ItemTooltips_t_getSpellDescriptionText(ItemTooltips_t* self, const int player, Item & item) { return self->getSpellDescriptionText(player, item); }
+
+
 const char* ItemTooltips_t::getIconLabel(Item& item)
 {
 #ifndef EDITOR
@@ -2491,6 +2620,9 @@ const char* ItemTooltips_t::getIconLabel(Item& item)
 	return tmpItems[item.type].iconLabelPath.c_str();
 #endif
 }
+
+extern "C" const char * ItemTooltips_t_getIconLabel(ItemTooltips_t* self, Item & item) { return self->getIconLabel(item); }
+
 
 const char* spellValueToTier(int val)
 {
@@ -2778,6 +2910,9 @@ std::string ItemTooltips_t::getSpellIconFormatText(const int player, Item& item,
 	return defaultString;
 }
 
+extern "C" std::string ItemTooltips_t_getSpellIconFormatText(ItemTooltips_t* self, const int player, Item & item, std::string & format, const spell_t * spell, const int iconIndex, const bool compendiumTooltipIntro) { return self->getSpellIconFormatText(player, item, format, spell, iconIndex, compendiumTooltipIntro); }
+
+
 std::string ItemTooltips_t::getSpellIconText(const int player, Item& item, const bool compendiumTooltipIntro)
 {
 #ifndef EDITOR
@@ -2872,6 +3007,9 @@ std::string ItemTooltips_t::getSpellIconText(const int player, Item& item, const
 #endif
 }
 
+extern "C" std::string ItemTooltips_t_getSpellIconText(ItemTooltips_t* self, const int player, Item & item, const bool excludePlayerStats) { return self->getSpellIconText(player, item, excludePlayerStats); }
+
+
 real_t ItemTooltips_t::getSpellSustainCostPerSecond(int spellID)
 {
 	real_t cost = 0.0;
@@ -2916,6 +3054,9 @@ real_t ItemTooltips_t::getSpellSustainCostPerSecond(int spellID)
 	}*/
 	return cost;
 }
+
+extern "C" real_t ItemTooltips_t_getSpellSustainCostPerSecond(ItemTooltips_t* self, int spellID) { return self->getSpellSustainCostPerSecond(spellID); }
+
 
 DynamicString ItemTooltips_t::getSpellTypeString(const int player, Item& item)
 {
@@ -2969,6 +3110,9 @@ DynamicString ItemTooltips_t::getSpellTypeString(const int player, Item& item)
 	}
 #endif
 }
+
+extern "C" DynamicString ItemTooltips_t_getSpellTypeString(ItemTooltips_t* self, const int player, Item & item) { return self->getSpellTypeString(player, item); }
+
 
 std::string ItemTooltips_t::getCostOfSpellString(const int player, Item& item)
 {
@@ -3076,6 +3220,9 @@ std::string ItemTooltips_t::getCostOfSpellString(const int player, Item& item)
 #endif
 }
 
+extern "C" std::string ItemTooltips_t_getCostOfSpellString(ItemTooltips_t* self, const int player, Item & item) { return self->getCostOfSpellString(player, item); }
+
+
 node_t* ItemTooltips_t::getSpellNodeFromSpellID(int spellID)
 {
 	node_t* spellImageNode = nullptr;
@@ -3105,6 +3252,9 @@ node_t* ItemTooltips_t::getSpellNodeFromSpellID(int spellID)
 	}
 	return spellImageNode;
 }
+
+extern "C" node_t * ItemTooltips_t_getSpellNodeFromSpellID(ItemTooltips_t* self, int spellID) { return self->getSpellNodeFromSpellID(spellID); }
+
 
 std::string ItemTooltips_t::getSpellIconPath(const int player, Item& item, int spellID)
 {
@@ -3175,6 +3325,9 @@ std::string ItemTooltips_t::getSpellIconPath(const int player, Item& item, int s
 #endif
 }
 
+extern "C" std::string ItemTooltips_t_getSpellIconPath(ItemTooltips_t* self, const int player, Item & item, int spellID) { return self->getSpellIconPath(player, item, spellID); }
+
+
 DynamicString ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Uint32 itemType)
 {
 #ifdef EDITOR
@@ -3203,6 +3356,9 @@ DynamicString ItemTooltips_t::getItemPotionAlchemyAdjective(const int player, Ui
 #endif
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemPotionAlchemyAdjective(ItemTooltips_t* self, const int player, Uint32 itemType) { return self->getItemPotionAlchemyAdjective(player, itemType); }
+
+
 DynamicString ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 {
 #ifdef EDITOR
@@ -3224,6 +3380,9 @@ DynamicString ItemTooltips_t::getItemPotionHarmAllyAdjective(Item& item)
 	}
 #endif
 }
+
+extern "C" DynamicString ItemTooltips_t_getItemPotionHarmAllyAdjective(ItemTooltips_t* self, Item & item) { return self->getItemPotionHarmAllyAdjective(item); }
+
 
 DynamicString ItemTooltips_t::getItemProficiencyName(int proficiency)
 {
@@ -3255,6 +3414,9 @@ DynamicString ItemTooltips_t::getItemProficiencyName(int proficiency)
 	}
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemProficiencyName(ItemTooltips_t* self, int proficiency) { return self->getItemProficiencyName(proficiency); }
+
+
 DynamicString ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
 {
 	switch ( slotname )
@@ -3284,6 +3446,9 @@ DynamicString ItemTooltips_t::getItemSlotName(ItemEquippableSlot slotname)
 	}
 	return adjectives["equipment_slot_types"]["unknown"];
 }
+
+extern "C" DynamicString ItemTooltips_t_getItemSlotName(ItemTooltips_t* self, ItemEquippableSlot slotname) { return self->getItemSlotName(slotname); }
+
 
 DynamicString ItemTooltips_t::getItemStatShortName(const char* attr)
 {
@@ -3319,6 +3484,9 @@ DynamicString ItemTooltips_t::getItemStatShortName(const char* attr)
 	return defaultString;
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemStatShortName(ItemTooltips_t* self, const char * attribute) { return self->getItemStatShortName(attribute); }
+
+
 DynamicString ItemTooltips_t::getItemStatFullName(const char* attr)
 {
     const std::string attribute = attr;
@@ -3353,6 +3521,9 @@ DynamicString ItemTooltips_t::getItemStatFullName(const char* attr)
 	return defaultString;
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemStatFullName(ItemTooltips_t* self, const char * attribute) { return self->getItemStatFullName(attribute); }
+
+
 DynamicString ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_icon_text"].find(attribute) != adjectives["equipment_effects_icon_text"].end() )
@@ -3362,6 +3533,9 @@ DynamicString ItemTooltips_t::getItemEquipmentEffectsForIconText(std::string& at
 	return defaultString;
 }
 
+extern "C" DynamicString ItemTooltips_t_getItemEquipmentEffectsForIconText(ItemTooltips_t* self, std::string & attribute) { return self->getItemEquipmentEffectsForIconText(attribute); }
+
+
 DynamicString ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::string& attribute)
 {
 	if ( adjectives["equipment_effects_attributes_text"].find(attribute) != adjectives["equipment_effects_attributes_text"].end() )
@@ -3370,6 +3544,9 @@ DynamicString ItemTooltips_t::getItemEquipmentEffectsForAttributesText(std::stri
 	}
 	return defaultString;
 }
+
+extern "C" DynamicString ItemTooltips_t_getItemEquipmentEffectsForAttributesText(ItemTooltips_t* self, std::string & attribute) { return self->getItemEquipmentEffectsForAttributesText(attribute); }
+
 
 Sint32 getStatAttributeBonusFromItem(const int player, Item& item, const char* attribute)
 {
@@ -4872,6 +5049,12 @@ void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, I
 #endif
 }
 
+extern "C" void ItemTooltips_t_formatItemIcon_2(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, DynamicString & str, int iconIndex, DynamicString & conditionalAttribute, Frame * parentFrame) { return self->formatItemIcon(player, tooltipType, item, str, iconIndex, conditionalAttribute, parentFrame); }
+
+
+extern "C" void ItemTooltips_t_formatItemIcon(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, std::string & str, int iconIndex, std::string & conditionalAttribute, Frame * parentFrame) { return self->formatItemIcon(player, tooltipType, item, str, iconIndex, conditionalAttribute, parentFrame); }
+
+
 // DynamicString overload (bridges  the std::string version writes into str + conditionalAttribute)
 void ItemTooltips_t::formatItemIcon(const int player, std::string tooltipType, Item& item, DynamicString& str, int iconIndex, DynamicString& conditionalAttribute, Frame* parentFrame)
 {
@@ -4906,6 +5089,12 @@ void ItemTooltips_t::formatItemDescription(const int player, std::string tooltip
 	}
 	return;
 }
+
+extern "C" void ItemTooltips_t_formatItemDescription_2(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, DynamicString & str) { return self->formatItemDescription(player, tooltipType, item, str); }
+
+
+extern "C" void ItemTooltips_t_formatItemDescription(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, std::string & str) { return self->formatItemDescription(player, tooltipType, item, str); }
+
 
 void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType, Item& item, std::string& str, std::string detailTag, Frame* parentFrame)
 {
@@ -6617,6 +6806,12 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 #endif
 }
 
+extern "C" void ItemTooltips_t_formatItemDetails_2(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, DynamicString & str, DynamicString detailTag, Frame * parentFrame) { return self->formatItemDetails(player, tooltipType, item, str, detailTag, parentFrame); }
+
+
+extern "C" void ItemTooltips_t_formatItemDetails(ItemTooltips_t* self, const int player, std::string tooltipType, Item & item, std::string & str, std::string detailTag, Frame * parentFrame) { return self->formatItemDetails(player, tooltipType, item, str, detailTag, parentFrame); }
+
+
 // DynamicString overload (bridges  writes into str)
 void ItemTooltips_t::formatItemDescription(const int player, std::string tooltipType, Item& item, DynamicString& str)
 {
@@ -6678,6 +6873,12 @@ void ItemTooltips_t::stripOutHighlightBracketText(std::string& str, std::string&
 		}
 	}
 }
+
+extern "C" void ItemTooltips_t_stripOutHighlightBracketText_2(ItemTooltips_t* self, DynamicString & str, DynamicString & bracketText) { return self->stripOutHighlightBracketText(str, bracketText); }
+
+
+extern "C" void ItemTooltips_t_stripOutHighlightBracketText(ItemTooltips_t* self, std::string & str, std::string & bracketText) { return self->stripOutHighlightBracketText(str, bracketText); }
+
 
 // DynamicString overload (bridges  the std::string version writes into both)
 void ItemTooltips_t::stripOutHighlightBracketText(DynamicString& str, DynamicString& bracketText)
@@ -6777,6 +6978,12 @@ void ItemTooltips_t::getWordIndexesItemDetails(void* field, std::string& str, st
 		//messagePlayer(0, "Highlights: %d", h.first);
 	}
 }
+
+extern "C" void ItemTooltips_t_getWordIndexesItemDetails_2(ItemTooltips_t* self, void * field, DynamicString & str, DynamicString & highlightValues, DynamicString & positiveValues, DynamicString & negativeValues, DynamicMapI32T<Uint32> & highlightIndexes, DynamicMapI32T<Uint32> & positiveIndexes, DynamicMapI32T<Uint32> & negativeIndexes, ItemTooltips_t::ItemTooltip_t & tooltip) { return self->getWordIndexesItemDetails(field, str, highlightValues, positiveValues, negativeValues, highlightIndexes, positiveIndexes, negativeIndexes, tooltip); }
+
+
+extern "C" void ItemTooltips_t_getWordIndexesItemDetails(ItemTooltips_t* self, void * field, std::string & str, std::string & highlightValues, std::string & positiveValues, std::string & negativeValues, DynamicMapI32T<Uint32> & highlightIndexes, DynamicMapI32T<Uint32> & positiveIndexes, DynamicMapI32T<Uint32> & negativeIndexes, ItemTooltips_t::ItemTooltip_t & tooltip) { return self->getWordIndexesItemDetails(field, str, highlightValues, positiveValues, negativeValues, highlightIndexes, positiveIndexes, negativeIndexes, tooltip); }
+
 
 // DynamicString overload (bridges  writes into the string params)
 void ItemTooltips_t::getWordIndexesItemDetails(void* field, DynamicString& str, DynamicString& highlightValues, DynamicString& positiveValues, DynamicString& negativeValues,
@@ -6947,6 +7154,12 @@ void ItemTooltips_t::stripOutPositiveNegativeItemDetails(std::string& str, std::
 	}
 }
 
+extern "C" void ItemTooltips_t_stripOutPositiveNegativeItemDetails_2(ItemTooltips_t* self, DynamicString & str, DynamicString & positiveValues, DynamicString & negativeValues) { return self->stripOutPositiveNegativeItemDetails(str, positiveValues, negativeValues); }
+
+
+extern "C" void ItemTooltips_t_stripOutPositiveNegativeItemDetails(ItemTooltips_t* self, std::string & str, std::string & positiveValues, std::string & negativeValues) { return self->stripOutPositiveNegativeItemDetails(str, positiveValues, negativeValues); }
+
+
 // DynamicString overload (bridges  the std::string version writes into all three)
 void ItemTooltips_t::stripOutPositiveNegativeItemDetails(DynamicString& str, DynamicString& positiveValues, DynamicString& negativeValues)
 {
@@ -7079,6 +7292,9 @@ int StatueManager_t::processStatueExport()
 	return 1;
 }
 
+extern "C" int StatueManager_t_processStatueExport(StatueManager_t* self) { return self->processStatueExport(); }
+
+
 void StatueManager_t::resetStatueEditor()
 {
 	if ( editingPlayerUid != 0 )
@@ -7088,6 +7304,9 @@ void StatueManager_t::resetStatueEditor()
 	editingPlayerUid = 0;
 	StatueManager.activeEditing = false;
 }
+
+extern "C" void StatueManager_t_resetStatueEditor(StatueManager_t* self) { return self->resetStatueEditor(); }
+
 
 void StatueManager_t::refreshAllStatues()
 {
@@ -7112,6 +7331,9 @@ void StatueManager_t::refreshAllStatues()
 	}
 #endif // !EDITOR
 }
+
+extern "C" void StatueManager_t_refreshAllStatues(StatueManager_t* self) { return self->refreshAllStatues(); }
+
 
 void StatueManager_t::readAllStatues()
 {
@@ -7143,6 +7365,9 @@ void StatueManager_t::readAllStatues()
 		}
 	}
 }
+
+extern "C" void StatueManager_t_readAllStatues(StatueManager_t* self) { return self->readAllStatues(); }
+
 
 void StatueManager_t::readStatueFromFile(int index, std::string filename)
 {
@@ -7216,6 +7441,9 @@ void StatueManager_t::readStatueFromFile(int index, std::string filename)
 	}
 }
 
+extern "C" void StatueManager_t_readStatueFromFile(StatueManager_t* self, int index, std::string filename) { return self->readStatueFromFile(index, filename); }
+
+
 void DebugTimers_t::printAllTimepoints()
 {
 	int posy = 100;
@@ -7225,6 +7453,9 @@ void DebugTimers_t::printAllTimepoints()
 		posy += 16;
 	}
 }
+
+extern "C" void DebugTimers_t_printAllTimepoints(DebugTimers_t* self) { return self->printAllTimepoints(); }
+
 
 void DebugTimers_t::printTimepoints(std::string key, int& posy)
 {
@@ -7252,6 +7483,9 @@ void DebugTimers_t::printTimepoints(std::string key, int& posy)
 	}
 	printTextFormatted(font8x8_bmp, 8, starty, "%s:\n%s", key.c_str(), output.c_str());
 }
+
+extern "C" void DebugTimers_t_printTimepoints(DebugTimers_t* self, std::string key, int & posy) { return self->printTimepoints(key, posy); }
+
 
 bool GlyphRenderer_t::readFromFile()
 {
@@ -7435,6 +7669,9 @@ bool GlyphRenderer_t::readFromFile()
 	return false;
 }
 
+extern "C" bool GlyphRenderer_t_readFromFile(GlyphRenderer_t* self) { return self->readFromFile(); }
+
+
 void GlyphRenderer_t::renderGlyphsToPNGs()
 {
 #if defined(EDITOR)
@@ -7587,6 +7824,9 @@ void GlyphRenderer_t::renderGlyphsToPNGs()
 #endif
 }
 
+extern "C" void GlyphRenderer_t_renderGlyphsToPNGs(GlyphRenderer_t* self) { return self->renderGlyphsToPNGs(); }
+
+
 void ScriptTextParser_t::readAllScripts()
 {
 	allEntries.clear();
@@ -7619,6 +7859,9 @@ void ScriptTextParser_t::readAllScripts()
 		}
 	}
 }
+
+extern "C" void ScriptTextParser_t_readAllScripts(ScriptTextParser_t* self) { return self->readAllScripts(); }
+
 
 bool ScriptTextParser_t::readFromFile(const std::string& filename)
 {
@@ -8036,6 +8279,9 @@ bool ScriptTextParser_t::readFromFile(const std::string& filename)
 	return false;
 }
 
+extern "C" bool ScriptTextParser_t_readFromFile(ScriptTextParser_t* self, const std::string & filename) { return self->readFromFile(filename); }
+
+
 void ScriptTextParser_t::writeWorldSignsToFile()
 {
 #ifndef EDITOR
@@ -8203,6 +8449,9 @@ void ScriptTextParser_t::writeWorldSignsToFile()
 	FileIO::close(fp);
 #endif
 }
+
+extern "C" void ScriptTextParser_t_writeWorldSignsToFile(ScriptTextParser_t* self) { return self->writeWorldSignsToFile(); }
+
 
 #ifdef USE_THEORA_VIDEO
 #include "ui/Image.hpp"
@@ -8713,6 +8962,9 @@ void MonsterData_t::loadMonsterDataJSON()
 	}
 	printlog("[JSON]: Error: Could not locate json file %s", "/data/monster_data.json");
 }
+
+extern "C" void MonsterData_t_loadMonsterDataJSON() { return MonsterData_t::loadMonsterDataJSON(); }
+
 #endif
 
 #ifndef EDITOR
@@ -9003,6 +9255,9 @@ void ShopkeeperConsumables_t::readFromFile()
 	printlog("[JSON]: Successfully read json file %s, processed %d shop consumables", inputPath.c_str(), entries.size());
 }
 
+extern "C" void ShopkeeperConsumables_t_readFromFile() { return ShopkeeperConsumables_t::readFromFile(); }
+
+
 
 ClassHotbarConfig_t::ClassHotbar_t ClassHotbarConfig_t::ClassHotbarsDefault[NUMCLASSES];
 ClassHotbarConfig_t::ClassHotbar_t ClassHotbarConfig_t::ClassHotbars[NUMCLASSES];
@@ -9250,6 +9505,9 @@ void ClassHotbarConfig_t::writeToFile(HotbarConfigType fileWriteType, HotbarConf
 	return;
 }
 
+extern "C" void ClassHotbarConfig_t_writeToFile(ClassHotbarConfig_t::HotbarConfigType fileWriteType, ClassHotbarConfig_t::HotbarConfigWriteMode writeMode) { return ClassHotbarConfig_t::writeToFile(fileWriteType, writeMode); }
+
+
 void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fileReadType)
 {
 	std::string filename = "data/class_hotbars.json";
@@ -9391,6 +9649,9 @@ void ClassHotbarConfig_t::readFromFile(ClassHotbarConfig_t::HotbarConfigType fil
 	printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 }
 
+extern "C" void ClassHotbarConfig_t_readFromFile(ClassHotbarConfig_t::HotbarConfigType fileReadType) { return ClassHotbarConfig_t::readFromFile(fileReadType); }
+
+
 void ClassHotbarConfig_t::ClassHotbar_t::ClassHotbarLayout_t::init()
 {
 	hasData = false;
@@ -9412,6 +9673,9 @@ void ClassHotbarConfig_t::ClassHotbar_t::ClassHotbarLayout_t::init()
 	}
 }
 
+extern "C" void ClassHotbarLayout_t_init(ClassHotbarConfig_t::ClassHotbar_t::ClassHotbarLayout_t* self) { return self->init(); }
+
+
 void ClassHotbarConfig_t::init()
 {
 	for ( int c = 0; c < NUMCLASSES; ++c )
@@ -9427,6 +9691,9 @@ void ClassHotbarConfig_t::init()
 	readFromFile(HOTBAR_LAYOUT_DEFAULT_CONFIG);
 	readFromFile(HOTBAR_LAYOUT_CUSTOM_CONFIG);
 }
+
+extern "C" void ClassHotbarConfig_t_init() { return ClassHotbarConfig_t::init(); }
+
 
 void ClassHotbarConfig_t::assignHotbarSlots(const int player)
 {
@@ -9545,6 +9812,9 @@ void ClassHotbarConfig_t::assignHotbarSlots(const int player)
 	}
 }
 
+extern "C" void ClassHotbarConfig_t_assignHotbarSlots(const int player) { return ClassHotbarConfig_t::assignHotbarSlots(player); }
+
+
 LocalAchievements_t LocalAchievements;
 
 void LocalAchievements_t::readFromFile()
@@ -9609,6 +9879,9 @@ void LocalAchievements_t::readFromFile()
 	sortAchievementsForDisplay();
 }
 
+extern "C" void LocalAchievements_t_readFromFile() { return LocalAchievements_t::readFromFile(); }
+
+
 void LocalAchievements_t::writeToFile()
 {
 	char path[PATH_MAX] = "";
@@ -9669,6 +9942,9 @@ void LocalAchievements_t::writeToFile()
 	return;
 }
 
+extern "C" void LocalAchievements_t_writeToFile() { return LocalAchievements_t::writeToFile(); }
+
+
 void LocalAchievements_t::init()
 {
 	LocalAchievements.achievements.clear();
@@ -9684,6 +9960,9 @@ void LocalAchievements_t::init()
 		LocalAchievements.statistics[i].value = 0;
 	}
 }
+
+extern "C" void LocalAchievements_t_init() { return LocalAchievements_t::init(); }
+
 
 void LocalAchievements_t::updateAchievement(const char* name, const bool unlocked)
 {
@@ -9702,6 +9981,9 @@ void LocalAchievements_t::updateAchievement(const char* name, const bool unlocke
 	}
 }
 
+extern "C" void LocalAchievements_t_updateAchievement(LocalAchievements_t* self, const char * name, const bool unlocked) { return self->updateAchievement(name, unlocked); }
+
+
 void LocalAchievements_t::updateStatistic(const int stat_num, const int value)
 {
 	if ( statistics.find(stat_num) != statistics.end() )
@@ -9710,6 +9992,9 @@ void LocalAchievements_t::updateStatistic(const int stat_num, const int value)
 		stat.value = value;
 	}
 }
+
+extern "C" void LocalAchievements_t_updateStatistic(LocalAchievements_t* self, const int stat_num, const int value) { return self->updateStatistic(stat_num, value); }
+
 
 GameplayPreferences_t gameplayPreferences[MAXPLAYERS];
 
@@ -9721,6 +10006,9 @@ void GameplayPreferences_t::GameplayPreference_t::set(const int _value)
 	}
 	value = _value;
 }
+
+extern "C" void GameplayPreference_t_set(GameplayPreferences_t::GameplayPreference_t* self, const int _value) { return self->set(_value); }
+
 
 void GameplayPreferences_t::requestUpdateFromClient()
 {
@@ -9738,6 +10026,9 @@ void GameplayPreferences_t::requestUpdateFromClient()
 	net_packet->len = 5;
 	sendPacketSafe(net_sock, -1, net_packet, player - 1);
 }
+
+extern "C" void GameplayPreferences_t_requestUpdateFromClient(GameplayPreferences_t* self) { return self->requestUpdateFromClient(); }
+
 
 void GameplayPreferences_t::sendToClients(const int targetPlayer)
 {
@@ -9764,6 +10055,9 @@ void GameplayPreferences_t::sendToClients(const int targetPlayer)
 	sendPacketSafe(net_sock, -1, net_packet, targetPlayer - 1);
 }
 
+extern "C" void GameplayPreferences_t_sendToClients(GameplayPreferences_t* self, const int targetPlayer) { return self->sendToClients(targetPlayer); }
+
+
 void GameplayPreferences_t::receivePacket()
 {
 	if ( !net_packet )
@@ -9785,6 +10079,9 @@ void GameplayPreferences_t::receivePacket()
 		playerPrefs.lastUpdateTick = ticks;
 	}
 }
+
+extern "C" void GameplayPreferences_t_receivePacket() { return GameplayPreferences_t::receivePacket(); }
+
 
 void GameplayPreferences_t::sendToServer()
 {
@@ -9810,6 +10107,9 @@ void GameplayPreferences_t::sendToServer()
 	net_packet->len = 6 + index;
 	sendPacketSafe(net_sock, -1, net_packet, 0);
 }
+
+extern "C" void GameplayPreferences_t_sendToServer(GameplayPreferences_t* self) { return self->sendToServer(); }
+
 
 void GameplayPreferences_t::process()
 {
@@ -9971,6 +10271,9 @@ void GameplayPreferences_t::process()
 	}
 }
 
+extern "C" void GameplayPreferences_t_process(GameplayPreferences_t* self) { return self->process(); }
+
+
 GameplayPreferences_t::GameplayPreference_t GameplayPreferences_t::gameConfig[GameplayPreferences_t::GOPT_ENUM_END];
 Uint32 GameplayPreferences_t::lastGameConfigUpdateTick = 0;
 void GameplayPreferences_t::reset()
@@ -9990,6 +10293,9 @@ void GameplayPreferences_t::reset()
 	}
 	lastGameConfigUpdateTick = 0;
 }
+
+extern "C" void GameplayPreferences_t_reset() { return GameplayPreferences_t::reset(); }
+
 void GameplayPreferences_t::serverUpdateGameConfig()
 {
 	lastGameConfigUpdateTick = ticks;
@@ -10018,6 +10324,9 @@ void GameplayPreferences_t::serverUpdateGameConfig()
 	}
 }
 
+extern "C" void GameplayPreferences_t_serverUpdateGameConfig() { return GameplayPreferences_t::serverUpdateGameConfig(); }
+
+
 void GameplayPreferences_t::receiveGameConfig()
 {
 	if ( !net_packet ) { return; }
@@ -10032,6 +10341,9 @@ void GameplayPreferences_t::receiveGameConfig()
 	}
 	lastGameConfigUpdateTick = ticks;
 }
+
+extern "C" void GameplayPreferences_t_receiveGameConfig() { return GameplayPreferences_t::receiveGameConfig(); }
+
 
 void GameplayPreferences_t::serverProcessGameConfig()
 {
@@ -10236,6 +10548,9 @@ void GameplayPreferences_t::serverProcessGameConfig()
 		lastGameConfigUpdateTick = ticks;
 	}
 }
+
+extern "C" void GameplayPreferences_t_serverProcessGameConfig() { return GameplayPreferences_t::serverProcessGameConfig(); }
+
 #endif // !EDITOR
 
 EditorEntityData_t editorEntityData;
@@ -10539,6 +10854,9 @@ void EditorEntityData_t::readFromFile()
 	}
 }
 
+extern "C" void EditorEntityData_t_readFromFile() { return EditorEntityData_t::readFromFile(); }
+
+
 DynamicArrayS32 Mods::modelsListModifiedIndexes;
 DynamicArrayS32 Mods::soundsListModifiedIndexes;
 DynamicArraySurfacePtrStringPair Mods::systemResourceImagesToReload;
@@ -10585,6 +10903,9 @@ void Mods::updateModCounts()
 		}
 	}
 }
+
+extern "C" void Mods_updateModCounts() { return Mods::updateModCounts(); }
+
 #ifdef WINDOWS
 #ifdef _UNICODE
 #else
@@ -10755,6 +11076,9 @@ bool Mods::verifyMapFiles(const char* folder, bool ignoreBaseFolder)
 	return true;
 }
 
+extern "C" bool Mods_verifyMapFiles(const char * file, bool ignoreBaseFolder) { return Mods::verifyMapFiles(file, ignoreBaseFolder); }
+
+
 void Mods::verifyAchievements(const char* fullpath, bool ignoreBaseFolder)
 {
 	if ( physfsIsMapLevelListModded() )
@@ -10780,6 +11104,9 @@ void Mods::verifyAchievements(const char* fullpath, bool ignoreBaseFolder)
 	}
 }
 
+extern "C" void Mods_verifyAchievements(const char * fullpath, bool ignoreBaseFolder) { return Mods::verifyAchievements(fullpath, ignoreBaseFolder); }
+
+
 bool Mods::isPathInMountedFiles(std::string findStr)
 {
 	for ( auto it = Mods::mountedFilepaths.begin(); it != Mods::mountedFilepaths.end(); ++it )
@@ -10792,6 +11119,9 @@ bool Mods::isPathInMountedFiles(std::string findStr)
 	}
 	return false;
 }
+
+extern "C" bool Mods_isPathInMountedFiles(std::string findStr) { return Mods::isPathInMountedFiles(findStr); }
+
 
 bool Mods::removePathFromMountedFiles(std::string findStr)
 {
@@ -10806,6 +11136,9 @@ bool Mods::removePathFromMountedFiles(std::string findStr)
 	}
 	return false;
 }
+
+extern "C" bool Mods_removePathFromMountedFiles(std::string findStr) { return Mods::removePathFromMountedFiles(findStr); }
+
 
 bool Mods::clearAllMountedPaths()
 {
@@ -10839,6 +11172,9 @@ bool Mods::clearAllMountedPaths()
 	return success;
 }
 
+extern "C" bool Mods_clearAllMountedPaths() { return Mods::clearAllMountedPaths(); }
+
+
 bool Mods::mountAllExistingPaths()
 {
 	bool success = true;
@@ -10857,6 +11193,9 @@ bool Mods::mountAllExistingPaths()
 	Mods::numCurrentModsLoaded = Mods::mountedFilepaths.size();
 	return success;
 }
+
+extern "C" bool Mods_mountAllExistingPaths() { return Mods::mountAllExistingPaths(); }
+
 
 void Mods::loadModels(int start, int end) {
 	start = std::clamp(start, 0, (int)nummodels - 1);
@@ -10937,6 +11276,9 @@ void Mods::loadModels(int start, int end) {
 	}
 	generateVBOs(start, end);
 }
+
+extern "C" void Mods_loadModels(int start, int end) { return Mods::loadModels(start, end); }
+
 
 void Mods::unloadMods(bool force)
 {
@@ -11135,6 +11477,9 @@ void Mods::unloadMods(bool force)
 	isLoading = false;
 #endif
 }
+
+extern "C" void Mods_unloadMods(bool force) { return Mods::unloadMods(force); }
+
 
 void Mods::loadMods()
 {
@@ -11353,6 +11698,9 @@ void Mods::loadMods()
 #endif
 }
 
+extern "C" void Mods_loadMods() { return Mods::loadMods(); }
+
+
 void Mods::writeLevelsTxtAndPreview(std::string modFolder)
 {
 	std::string path = outputdir;
@@ -11447,6 +11795,9 @@ void Mods::writeLevelsTxtAndPreview(std::string modFolder)
 	}
 }
 
+extern "C" void Mods_writeLevelsTxtAndPreview(std::string modFolder) { return Mods::writeLevelsTxtAndPreview(modFolder); }
+
+
 int Mods::createBlankModDirectory(std::string foldername)
 {
 	std::string baseDir = outputdir;
@@ -11516,6 +11867,9 @@ int Mods::createBlankModDirectory(std::string foldername)
 	return 2;
 }
 
+extern "C" int Mods_createBlankModDirectory(std::string foldername) { return Mods::createBlankModDirectory(foldername); }
+
+
 EquipmentModelOffsets_t EquipmentModelOffsets;
 
 int EquipmentModelOffsets_t::modelOffsetExists(int monster, int sprite, int monsterSprite)
@@ -11546,10 +11900,16 @@ int EquipmentModelOffsets_t::modelOffsetExists(int monster, int sprite, int mons
 	return 0;
 }
 
+extern "C" int EquipmentModelOffsets_t_modelOffsetExists(EquipmentModelOffsets_t* self, int monster, int sprite, int monsterSprite) { return self->modelOffsetExists(monster, sprite, monsterSprite); }
+
+
 EquipmentModelOffsets_t::ModelOffset_t& EquipmentModelOffsets_t::getModelOffset(int monster, int sprite)
 {
 	return monsterModelsMap[monster][sprite];
 }
+
+extern "C" EquipmentModelOffsets_t::ModelOffset_t & EquipmentModelOffsets_t_getModelOffset(EquipmentModelOffsets_t* self, int monster, int sprite) { return self->getModelOffset(monster, sprite); }
+
 
 int EquipmentModelOffsets_t::expandHelmToFitMask(int monster, int helmSprite, int maskSprite, int monsterSprite)
 {
@@ -11571,6 +11931,9 @@ int EquipmentModelOffsets_t::expandHelmToFitMask(int monster, int helmSprite, in
 	return 0;
 }
 
+extern "C" int EquipmentModelOffsets_t_expandHelmToFitMask(EquipmentModelOffsets_t* self, int monster, int helmSprite, int maskSprite, int monsterSprite) { return self->expandHelmToFitMask(monster, helmSprite, maskSprite, monsterSprite); }
+
+
 int EquipmentModelOffsets_t::maskHasAdjustmentForExpandedHelm(int monster, int helmSprite, int maskSprite, int monsterSprite)
 {
 	if ( int resultMonsterSprite = modelOffsetExists(monster, maskSprite, monsterSprite) )
@@ -11587,6 +11950,9 @@ int EquipmentModelOffsets_t::maskHasAdjustmentForExpandedHelm(int monster, int h
 	}
 	return 0;
 }
+
+extern "C" int EquipmentModelOffsets_t_maskHasAdjustmentForExpandedHelm(EquipmentModelOffsets_t* self, int monster, int helmSprite, int maskSprite, int monsterSprite) { return self->maskHasAdjustmentForExpandedHelm(monster, helmSprite, maskSprite, monsterSprite); }
+
 
 EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets_t::getExpandHelmOffset(int monster, 
 	int helmSprite, int maskSprite)
@@ -11606,6 +11972,9 @@ EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets
 	return EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t();
 }
 
+extern "C" EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets_t_getExpandHelmOffset(EquipmentModelOffsets_t* self, int monster, int helmSprite, int maskSprite) { return self->getExpandHelmOffset(monster, helmSprite, maskSprite); }
+
+
 EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets_t::getMaskOffsetForExpandHelm(int monster, 
 	int helmSprite, int maskSprite)
 {
@@ -11623,6 +11992,9 @@ EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets
 	}
 	return EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t();
 }
+
+extern "C" EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t EquipmentModelOffsets_t_getMaskOffsetForExpandHelm(EquipmentModelOffsets_t* self, int monster, int helmSprite, int maskSprite) { return self->getMaskOffsetForExpandHelm(monster, helmSprite, maskSprite); }
+
 
 void EquipmentModelOffsets_t::readBaseItemsFromFile()
 {
@@ -11735,6 +12107,9 @@ void EquipmentModelOffsets_t::readBaseItemsFromFile()
 		}
 	}
 }
+
+extern "C" void EquipmentModelOffsets_t_readBaseItemsFromFile(EquipmentModelOffsets_t* self) { return self->readBaseItemsFromFile(); }
+
 
 void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterType)
 {
@@ -12082,6 +12457,9 @@ void EquipmentModelOffsets_t::readFromFile(std::string monsterName, int monsterT
 	printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 }
 
+extern "C" void EquipmentModelOffsets_t_readFromFile(EquipmentModelOffsets_t* self, std::string monsterName, int monsterType) { return self->readFromFile(monsterName, monsterType); }
+
+
 #ifndef EDITOR
 void GameModeManager_t::CurrentSession_t::ChallengeRun_t::updateKillEvent(Entity* entity)
 {
@@ -12148,6 +12526,9 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::updateKillEvent(Entity
 	}
 }
 
+extern "C" void ChallengeRun_t_updateKillEvent(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self, Entity * entity) { return self->updateKillEvent(entity); }
+
+
 void GameModeManager_t::CurrentSession_t::ChallengeRun_t::applySettings()
 {
 	if ( !inUse ) { return; }
@@ -12155,6 +12536,9 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::applySettings()
 	svFlags = setFlags;
 	svFlags |= SV_FLAG_HUNGER;
 }
+
+extern "C" void ChallengeRun_t_applySettings(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self) { return self->applySettings(); }
+
 
 void GameModeManager_t::CurrentSession_t::ChallengeRun_t::setup(std::string _scenario)
 {
@@ -12171,6 +12555,9 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::setup(std::string _sce
 		printlog("[Challenge]: Loaded scenario");
 	}
 }
+
+extern "C" void ChallengeRun_t_setup(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self, std::string _scenario) { return self->setup(_scenario); }
+
 
 void GameModeManager_t::CurrentSession_t::ChallengeRun_t::reset()
 {
@@ -12221,6 +12608,9 @@ void GameModeManager_t::CurrentSession_t::ChallengeRun_t::reset()
 	numKills = -1;
 
 }
+
+extern "C" void ChallengeRun_t_reset(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self) { return self->reset(); }
+
 
 #ifndef NDEBUG
 static CvarInt cvar_challengerace("/challengerace", -1);
@@ -12510,6 +12900,9 @@ bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::loadScenario()
 
 	return true;
 }
+
+extern "C" bool ChallengeRun_t_loadScenario(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self) { return self->loadScenario(); }
+
 #endif
 
 void jsonVecToVec(JsonNode val, DynamicArrayStr& vec)
@@ -12657,35 +13050,56 @@ void Compendium_t::readContentsLang(std::string name, DynamicMapStrArrayStringPa
 	}
 }
 
+extern "C" void Compendium_t_readContentsLang(std::string name, DynamicMapStrArrayStringPair & contents, DynamicMapStr & contentsMap) { return Compendium_t::readContentsLang(name, contents, contentsMap); }
+
+
 void Compendium_t::CompendiumMonsters_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_monsters", contents_unfiltered, contentsMap);
 }
+
+extern "C" void CompendiumMonsters_t_readContentsLang() { return Compendium_t::CompendiumMonsters_t::readContentsLang(); }
+
 
 void Compendium_t::CompendiumWorld_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_world", contents, contentsMap);
 }
 
+extern "C" void CompendiumWorld_t_readContentsLang() { return Compendium_t::CompendiumWorld_t::readContentsLang(); }
+
+
 void Compendium_t::CompendiumCodex_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_codex", contents, contentsMap);
 }
+
+extern "C" void CompendiumCodex_t_readContentsLang() { return Compendium_t::CompendiumCodex_t::readContentsLang(); }
+
 
 void Compendium_t::CompendiumItems_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_items", contents, contentsMap);
 }
 
+extern "C" void CompendiumItems_t_readContentsLang() { return Compendium_t::CompendiumItems_t::readContentsLang(); }
+
+
 void Compendium_t::CompendiumMagic_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_magic", contents, contentsMap);
 }
 
+extern "C" void CompendiumMagic_t_readContentsLang() { return Compendium_t::CompendiumMagic_t::readContentsLang(); }
+
+
 void Compendium_t::AchievementData_t::readContentsLang()
 {
 	Compendium_t::readContentsLang("contents_achievements", contents, contentsMap);
 }
+
+extern "C" void AchievementData_t_readContentsLang() { return Compendium_t::AchievementData_t::readContentsLang(); }
+
 
 void Compendium_t::updateTooltip()
 {
@@ -12734,6 +13148,9 @@ void Compendium_t::updateTooltip()
 
 	}
 }
+
+extern "C" void Compendium_t_updateTooltip() { return Compendium_t::updateTooltip(); }
+
 
 void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 {
@@ -12799,6 +13216,9 @@ void Compendium_t::readItemsTranslationsFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 }
+
+extern "C" void Compendium_t_readItemsTranslationsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readItemsTranslationsFromFile(forceLoadBaseDirectory); }
+
 
 void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 {
@@ -13060,6 +13480,9 @@ void Compendium_t::readItemsFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void Compendium_t_readItemsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readItemsFromFile(forceLoadBaseDirectory); }
+
+
 void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 {
 	const std::string filename = "lang/compendium_lang/lang_magic.json";
@@ -13124,6 +13547,9 @@ void Compendium_t::readMagicTranslationsFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 }
+
+extern "C" void Compendium_t_readMagicTranslationsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readMagicTranslationsFromFile(forceLoadBaseDirectory); }
+
 
 void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 {
@@ -13569,6 +13995,9 @@ void Compendium_t::readMagicFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void Compendium_t_readMagicFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readMagicFromFile(forceLoadBaseDirectory); }
+
+
 void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 {
 	const std::string filename = "lang/compendium_lang/lang_codex.json";
@@ -13699,6 +14128,9 @@ void Compendium_t::readCodexTranslationsFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 }
+
+extern "C" void Compendium_t_readCodexTranslationsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readCodexTranslationsFromFile(forceLoadBaseDirectory); }
+
 
 void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 {
@@ -13931,6 +14363,9 @@ void Compendium_t::readCodexFromFile(bool forceLoadBaseDirectory)
 	}
 }
 
+extern "C" void Compendium_t_readCodexFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readCodexFromFile(forceLoadBaseDirectory); }
+
+
 void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 {
 	const std::string filename = "lang/compendium_lang/lang_world.json";
@@ -14061,6 +14496,9 @@ void Compendium_t::readWorldTranslationsFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 }
+
+extern "C" void Compendium_t_readWorldTranslationsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readWorldTranslationsFromFile(forceLoadBaseDirectory); }
+
 
 void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 {
@@ -14354,6 +14792,9 @@ void Compendium_t::readWorldFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void Compendium_t_readWorldFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readWorldFromFile(forceLoadBaseDirectory); }
+
+
 DynamicMapI32 Compendium_t::Events_t::monsterUniqueIDLookup;
 DynamicMapI32T<DynamicSetI32> Compendium_t::Events_t::eventMonsterLookup;
 void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
@@ -14430,6 +14871,9 @@ void Compendium_t::readMonstersTranslationsFromFile(bool forceLoadBaseDirectory)
 		}
 	}
 }
+
+extern "C" void Compendium_t_readMonstersTranslationsFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readMonstersTranslationsFromFile(forceLoadBaseDirectory); }
+
 
 void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 {
@@ -14714,6 +15158,9 @@ void Compendium_t::readMonstersFromFile(bool forceLoadBaseDirectory)
 	}*/
 }
 
+extern "C" void Compendium_t_readMonstersFromFile(Compendium_t* self, bool forceLoadBaseDirectory) { return self->readMonstersFromFile(forceLoadBaseDirectory); }
+
+
 Uint32 Compendium_t::lastTickUpdate = 0;
 DynamicMapI32T<Compendium_t::Events_t::Event_t> Compendium_t::Events_t::events;
 DynamicMapI32 Compendium_t::Events_t::eventIdLookup;
@@ -14795,6 +15242,9 @@ void Compendium_t::Events_t::readEventsTranslations()
 		}
 	}
 }
+
+extern "C" void Events_t_readEventsTranslations() { return Compendium_t::Events_t::readEventsTranslations(); }
+
 
 std::string Compendium_t::Events_t::formatEventRecordText(Sint32 value, const char* formatType, int formatVal, DynamicMapStr& langMap)
 {
@@ -15022,6 +15472,9 @@ std::string Compendium_t::Events_t::formatEventRecordText(Sint32 value, const ch
 	}
 	return output;
 }
+
+extern "C" std::string Events_t_formatEventRecordText(Sint32 value, const char * formatType, int formatVal, DynamicMapStr & langMap) { return Compendium_t::Events_t::formatEventRecordText(value, formatType, formatVal, langMap); }
+
 
 std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEventValue(std::string key, 
 	std::string compendiumSection, std::string compendiumContentsSelected, int specificClass)
@@ -15671,6 +16124,9 @@ std::vector<std::pair<std::string, Sint32>> Compendium_t::Events_t::getCustomEve
 	return results;
 }
 
+extern "C" std::vector<std::pair<std::string, Sint32>> Events_t_getCustomEventValue(std::string key, std::string compendiumSection, std::string compendiumContentsSelected, int specificClass) { return Compendium_t::Events_t::getCustomEventValue(key, compendiumSection, compendiumContentsSelected, specificClass); }
+
+
 void Compendium_t::Events_t::readEventsFromFile()
 {
 	const std::string filename = "data/compendium/events.json";
@@ -15818,6 +16274,9 @@ void Compendium_t::Events_t::readEventsFromFile()
 	}
 }
 
+extern "C" void Events_t_readEventsFromFile() { return Compendium_t::Events_t::readEventsFromFile(); }
+
+
 void Compendium_t::Events_t::loadItemsSaveData()
 {
 	const std::string filename = "savegames/compendium_items.json";
@@ -15932,6 +16391,9 @@ void Compendium_t::Events_t::loadItemsSaveData()
 	CompendiumEntries.migrateOldSkillIndexes = false;
 }
 
+extern "C" void Events_t_loadItemsSaveData() { return Compendium_t::Events_t::loadItemsSaveData(); }
+
+
 static CvarBool cvar_compendiumClientSave("/compendium_client_save", false);
 static ConsoleCommand ccmd_compendium_dummy_data(
 	"/compendium_dummy_data", "Create test compendium data",
@@ -15998,6 +16460,9 @@ void Compendium_t::Events_t::createDummyClientData(const int playernum)
 		}
 	}
 }
+
+extern "C" void Events_t_createDummyClientData(const int playernum) { return Compendium_t::Events_t::createDummyClientData(playernum); }
+
 
 void Compendium_t::readUnlocksSaveData()
 {
@@ -16220,6 +16685,9 @@ void Compendium_t::readUnlocksSaveData()
 	}
 }
 
+extern "C" void Compendium_t_readUnlocksSaveData() { return Compendium_t::readUnlocksSaveData(); }
+
+
 void Compendium_t::writeUnlocksSaveData()
 {
 	char path[PATH_MAX] = "";
@@ -16305,6 +16773,9 @@ void Compendium_t::writeUnlocksSaveData()
 	return;
 }
 
+extern "C" void Compendium_t_writeUnlocksSaveData() { return Compendium_t::writeUnlocksSaveData(); }
+
+
 void Compendium_t::Events_t::writeItemsSaveData()
 {
 	char path[PATH_MAX] = "";
@@ -16352,6 +16823,9 @@ void Compendium_t::Events_t::writeItemsSaveData()
 	printlog("[JSON]: Successfully wrote json file %s", path);
 	return;
 }
+
+extern "C" void Events_t_writeItemsSaveData() { return Compendium_t::Events_t::writeItemsSaveData(); }
+
 
 bool Compendium_t::Events_t::EventVal_t::applyValue(const Sint32 val)
 {
@@ -16412,6 +16886,9 @@ bool Compendium_t::Events_t::EventVal_t::applyValue(const Sint32 val)
 		return false;
 	}
 }
+
+extern "C" bool EventVal_t_applyValue(Compendium_t::Events_t::EventVal_t* self, const Sint32 val) { return self->applyValue(val); }
+
 
 void onCompendiumLevelExit(const int playernum, const char* level, const bool enteringLvl, const bool died)
 {
@@ -16608,6 +17085,9 @@ void Compendium_t::Events_t::updateEventsInMainLoop(const int playernum)
 	}
 }
 
+extern "C" void Events_t_updateEventsInMainLoop(const int playernum) { return Compendium_t::Events_t::updateEventsInMainLoop(playernum); }
+
+
 const char* Compendium_t::compendiumCurrentLevelToWorldString(const int currentlevel, const bool secretlevel)
 {
 	if ( !secretlevel )
@@ -16716,6 +17196,9 @@ const char* Compendium_t::compendiumCurrentLevelToWorldString(const int currentl
 	return "";
 }
 
+extern "C" const char * Compendium_t_compendiumCurrentLevelToWorldString(const int currentlevel, const bool secretlevel) { return Compendium_t::compendiumCurrentLevelToWorldString(currentlevel, secretlevel); }
+
+
 void Compendium_t::Events_t::onEndgameEvent(const int playernum, const bool tutorialend, const bool saveHighscore, const bool died)
 {
 	if ( players[playernum]->isLocalPlayer() )
@@ -16788,6 +17271,9 @@ void Compendium_t::Events_t::onEndgameEvent(const int playernum, const bool tuto
 	}
 }
 
+extern "C" void Events_t_onEndgameEvent(const int playernum, const bool tutorialend, const bool saveHighscore, const bool died) { return Compendium_t::Events_t::onEndgameEvent(playernum, tutorialend, saveHighscore, died); }
+
+
 void Player::CompendiumProgress_t::updateFloorEvents()
 {
 	floorEvents.forEach([&](int tagInt, DynamicMapStrI32Map& p1) {
@@ -16807,6 +17293,9 @@ void Player::CompendiumProgress_t::updateFloorEvents()
 
 	floorEvents.clear();
 }
+
+extern "C" void CompendiumProgress_t_updateFloorEvents(Player::CompendiumProgress_t* self) { return self->updateFloorEvents(); }
+
 
 void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int prevlevel, const bool prevsecretfloor, const std::string prevmapname, const bool died)
 {
@@ -17008,6 +17497,9 @@ void Compendium_t::Events_t::onLevelChangeEvent(const int playernum, const int p
 		}
 	}
 }
+
+extern "C" void Events_t_onLevelChangeEvent(const int playernum, const int prevlevel, const bool prevsecretfloor, const std::string prevmapname, const bool died) { return Compendium_t::Events_t::onLevelChangeEvent(playernum, prevlevel, prevsecretfloor, prevmapname, died); }
+
 
 bool allowedCompendiumProgress()
 {
@@ -17233,6 +17725,9 @@ void Compendium_t::Events_t::eventUpdate(int playernum, const EventTags tag, con
 	}
 }
 
+extern "C" void Events_t_eventUpdate(int playernum, const Compendium_t::EventTags tag, const ItemType type, Sint32 value, const bool loadingValue, const int spellID) { return Compendium_t::Events_t::eventUpdate(playernum, tag, type, value, loadingValue, spellID); }
+
+
 void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags tag, const Entity* entity,
 	Sint32 value, const bool loadingValue, const int entryID)
 {
@@ -17401,6 +17896,9 @@ void Compendium_t::Events_t::eventUpdateMonster(int playernum, const EventTags t
 		}
 	}
 }
+
+extern "C" void Events_t_eventUpdateMonster(int playernum, const Compendium_t::EventTags tag, const Entity * entity, Sint32 value, const bool loadingValue, const int entryID) { return Compendium_t::Events_t::eventUpdateMonster(playernum, tag, entity, value, loadingValue, entryID); }
+
 
 void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag, const char* category, Sint32 value, 
 	const bool loadingValue, const int entryID, const bool commitUniqueValue)
@@ -17689,6 +18187,9 @@ void Compendium_t::Events_t::eventUpdateWorld(int playernum, const EventTags tag
 	}
 }
 
+extern "C" void Events_t_eventUpdateWorld(int playernum, const Compendium_t::EventTags tag, const char * category, Sint32 value, const bool loadingValue, const int entryID, const bool commitUniqueValue) { return Compendium_t::Events_t::eventUpdateWorld(playernum, tag, category, value, loadingValue, entryID, commitUniqueValue); }
+
+
 void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag, const char* category, 
 	Sint32 value, const bool loadingValue, const int entryID, const bool floorEvent)
 {
@@ -17966,6 +18467,9 @@ void Compendium_t::Events_t::eventUpdateCodex(int playernum, const EventTags tag
 	}
 }
 
+extern "C" void Events_t_eventUpdateCodex(int playernum, const Compendium_t::EventTags tag, const char * category, Sint32 value, const bool loadingValue, const int entryID, const bool floorEvent) { return Compendium_t::Events_t::eventUpdateCodex(playernum, tag, category, value, loadingValue, entryID, floorEvent); }
+
+
 Uint8 Compendium_t::Events_t::clientSequence = 0;
 int Compendium_t::Events_t::previousCurrentLevel = 0;
 bool Compendium_t::Events_t::previousSecretlevel = false;
@@ -18071,6 +18575,9 @@ void Compendium_t::Events_t::sendClientDataOverNet(const int playernum)
 		//}
 	}
 }
+
+extern "C" void Events_t_sendClientDataOverNet(const int playernum) { return Compendium_t::Events_t::sendClientDataOverNet(playernum); }
+
 
 void Compendium_t::readModelLimbsFromFile(std::string section)
 {
@@ -18308,6 +18815,9 @@ void Compendium_t::readModelLimbsFromFile(std::string section)
 	}
 }
 
+extern "C" void Compendium_t_readModelLimbsFromFile(Compendium_t* self, std::string section) { return self->readModelLimbsFromFile(section); }
+
+
 void Compendium_t::exportCurrentMonster(Entity* monster)
 {
 	if ( !monster )
@@ -18408,6 +18918,9 @@ void Compendium_t::exportCurrentMonster(Entity* monster)
 
 	return;
 }
+
+extern "C" void Compendium_t_exportCurrentMonster(Compendium_t* self, Entity * monster) { return self->exportCurrentMonster(monster); }
+
 
 bool Compendium_t::lorePointsFirstLoad = true;
 void Compendium_t::updateLorePointCounts()
@@ -18628,6 +19141,9 @@ void Compendium_t::updateLorePointCounts()
 	Compendium_t::PointsAnim_t::countUnreadNotifs();
 }
 
+extern "C" void Compendium_t_updateLorePointCounts() { return Compendium_t::updateLorePointCounts(); }
+
+
 real_t Compendium_t::PointsAnim_t::anim = 0.0;
 real_t Compendium_t::PointsAnim_t::animNoFunds = 0.0;
 Uint32 Compendium_t::PointsAnim_t::noFundsTick = 0;
@@ -18736,6 +19252,9 @@ void Compendium_t::PointsAnim_t::countUnreadNotifs()
 	}
 }
 
+extern "C" void PointsAnim_t_countUnreadNotifs() { return Compendium_t::PointsAnim_t::countUnreadNotifs(); }
+
+
 void Compendium_t::PointsAnim_t::tickAnimate()
 {
 	const auto balance = Compendium_t::lorePointsFromAchievements - Compendium_t::lorePointsSpent;
@@ -18819,12 +19338,18 @@ void Compendium_t::PointsAnim_t::tickAnimate()
 	}
 }
 
+extern "C" void PointsAnim_t_tickAnimate() { return Compendium_t::PointsAnim_t::tickAnimate(); }
+
+
 void Compendium_t::PointsAnim_t::noFundsEvent()
 {
 	playSound(90, 64);
 	noFundsTick = ticks;
 	animNoFunds = 1.0;
 }
+
+extern "C" void PointsAnim_t_noFundsEvent() { return Compendium_t::PointsAnim_t::noFundsEvent(); }
+
 
 void Compendium_t::PointsAnim_t::pointsChangeEvent(Sint32 amount)
 {
@@ -18881,6 +19406,9 @@ void Compendium_t::PointsAnim_t::pointsChangeEvent(Sint32 amount)
 		pointsCurrent = balance;
 	}
 }
+
+extern "C" void PointsAnim_t_pointsChangeEvent(Sint32 amount) { return Compendium_t::PointsAnim_t::pointsChangeEvent(amount); }
+
 
 DynamicArrayS32 Compendium_t::CompendiumMonsters_t::Monster_t::getDisplayStat(const char* name)
 {
@@ -19130,6 +19658,9 @@ DynamicArrayS32 Compendium_t::CompendiumMonsters_t::Monster_t::getDisplayStat(co
 
 	return retVal;
 }
+
+extern "C" DynamicArrayS32 Monster_t_getDisplayStat(Compendium_t::CompendiumMonsters_t::Monster_t* self, const char * name) { return self->getDisplayStat(name); }
+
 #endif
 
 DynamicMapAchievementData Compendium_t::achievements;
@@ -19152,13 +19683,22 @@ void CustomHelpers::addMemberToSubkey(JsonNode d, std::string subkey, std::strin
 		d[subkey.c_str()].AddMember(name.c_str(), value);
 	}
 
+extern "C" void CustomHelpers_addMemberToSubkey(JsonNode d, std::string subkey, std::string name, JsonNode value) { return CustomHelpers::addMemberToSubkey(d, subkey, name, value); }
+
+
 void CustomHelpers::addMemberToRoot(JsonNode d, std::string name, JsonNode value) {
 		d.AddMember(name.c_str(), value);
 	}
 
+extern "C" void CustomHelpers_addMemberToRoot(JsonNode d, std::string name, JsonNode value) { return CustomHelpers::addMemberToRoot(d, name, value); }
+
+
 void CustomHelpers::addArrayMemberToSubkey(JsonNode d, std::string subkey, JsonNode value) {
 		d[subkey.c_str()].PushBack(value);
 	}
+
+extern "C" void CustomHelpers_addArrayMemberToSubkey(JsonNode d, std::string subkey, JsonNode value) { return CustomHelpers::addArrayMemberToSubkey(d, subkey, value); }
+
 
 #ifndef EDITOR
 int MonsterStatCustomManager::getSlotFromKeyName(std::string keyName) {
@@ -19204,6 +19744,9 @@ int MonsterStatCustomManager::getSlotFromKeyName(std::string keyName) {
 		}
 		return 0;
 	}
+
+extern "C" int MonsterStatCustomManager_getSlotFromKeyName(MonsterStatCustomManager* self, std::string keyName) { return self->getSlotFromKeyName(keyName); }
+
 
 void MonsterStatCustomManager::writeAllFromStats(Stat* myStats) {
 		JsonNode d;
@@ -19269,6 +19812,9 @@ void MonsterStatCustomManager::writeAllFromStats(Stat* myStats) {
 		writeToFile(d, monstertypename[myStats->type]);
 	}
 
+extern "C" void MonsterStatCustomManager_writeAllFromStats(MonsterStatCustomManager* self, Stat * myStats) { return self->writeAllFromStats(myStats); }
+
+
 void MonsterStatCustomManager::readItemsFromStats(Stat* myStats, JsonNode d) {
 		JsonNode equippedItemsObject;
 		equippedItemsObject.SetObject();
@@ -19296,6 +19842,9 @@ void MonsterStatCustomManager::readItemsFromStats(Stat* myStats, JsonNode d) {
 			}
 		}
 	}
+
+extern "C" void MonsterStatCustomManager_readItemsFromStats(MonsterStatCustomManager* self, Stat * myStats, JsonNode d) { return self->readItemsFromStats(myStats, d); }
+
 
 void MonsterStatCustomManager::readAttributesFromStats(Stat* myStats, JsonNode d) {
 		JsonNode statsObject;
@@ -19347,6 +19896,9 @@ void MonsterStatCustomManager::readAttributesFromStats(Stat* myStats, JsonNode d
 			CustomHelpers::addMemberToSubkey(d, "proficiencies", getSkillLangEntry(i), JsonNode(statEntry.PROFICIENCIES[i]));
 		}
 	}
+
+extern "C" void MonsterStatCustomManager_readAttributesFromStats(MonsterStatCustomManager* self, Stat * myStats, JsonNode d) { return self->readAttributesFromStats(myStats, d); }
+
 
 bool MonsterStatCustomManager::readKeyToStatEntry(StatEntry& statEntry, JsonMemberIt itr) {
 		DynamicString name = itr->name.GetString();
@@ -19517,6 +20069,9 @@ bool MonsterStatCustomManager::readKeyToStatEntry(StatEntry& statEntry, JsonMemb
 		return false;
 	}
 
+extern "C" bool MonsterStatCustomManager_readKeyToStatEntry(MonsterStatCustomManager* self, MonsterStatCustomManager::StatEntry & statEntry, JsonMemberIt itr) { return self->readKeyToStatEntry(statEntry, itr); }
+
+
 void MonsterStatCustomManager::addArrayMemberFromItem(JsonNode d, std::string rootKey, Item* item) {
 		if ( item )
 		{
@@ -19527,6 +20082,9 @@ void MonsterStatCustomManager::addArrayMemberFromItem(JsonNode d, std::string ro
 		}
 	}
 
+extern "C" void MonsterStatCustomManager_addArrayMemberFromItem(MonsterStatCustomManager* self, JsonNode d, std::string rootKey, Item * item) { return self->addArrayMemberFromItem(d, rootKey, item); }
+
+
 void MonsterStatCustomManager::addMemberFromItem(JsonNode d, std::string rootKey, std::string key, Item* item) {
 		if ( item )
 		{
@@ -19536,6 +20094,9 @@ void MonsterStatCustomManager::addMemberFromItem(JsonNode d, std::string rootKey
 			CustomHelpers::addMemberToSubkey(d, rootKey, key.c_str(), itemObject);
 		}
 	}
+
+extern "C" void MonsterStatCustomManager_addMemberFromItem(MonsterStatCustomManager* self, JsonNode d, std::string rootKey, std::string key, Item * item) { return self->addMemberFromItem(d, rootKey, key, item); }
+
 
 void MonsterStatCustomManager::writeToFile(JsonNode d, std::string monsterFileName) {
 		int filenum = 0;
@@ -19561,6 +20122,9 @@ void MonsterStatCustomManager::writeToFile(JsonNode d, std::string monsterFileNa
 		json_string_free(json);
 		FileIO::close(fp);
 	}
+
+extern "C" void MonsterStatCustomManager_writeToFile(MonsterStatCustomManager* self, JsonNode d, std::string monsterFileName) { return self->writeToFile(d, monsterFileName); }
+
 
 MonsterStatCustomManager::StatEntry * MonsterStatCustomManager::readFromFile(std::string monsterFileName) {
 		DynamicString filePath = "/data/custom-monsters/";
@@ -19816,6 +20380,9 @@ MonsterStatCustomManager::StatEntry * MonsterStatCustomManager::readFromFile(std
 		return nullptr;
 	}
 
+extern "C" MonsterStatCustomManager::StatEntry * MonsterStatCustomManager_readFromFile(MonsterStatCustomManager* self, std::string monsterFileName) { return self->readFromFile(monsterFileName); }
+
+
 void MonsterStatCustomManager::ItemEntry::readFromItem(const Item& itemToRead) {
 			type = itemToRead.type;
 			status = itemToRead.status;
@@ -19828,6 +20395,9 @@ void MonsterStatCustomManager::ItemEntry::readFromItem(const Item& itemToRead) {
 				dropItemOnDeath = false;
 			}
 		}
+
+extern "C" void ItemEntry_readFromItem(MonsterStatCustomManager::ItemEntry* self, const Item & itemToRead) { return self->readFromItem(itemToRead); }
+
 
 void MonsterStatCustomManager::ItemEntry::setValueFromAttributes(JsonNode d, JsonNode outObject) {
 			JsonNode key1("type");
@@ -19847,6 +20417,9 @@ void MonsterStatCustomManager::ItemEntry::setValueFromAttributes(JsonNode d, Jso
 			outObject.AddMember("slot_weighted_chance", JsonNode(1));
 		}
 
+extern "C" void ItemEntry_setValueFromAttributes(MonsterStatCustomManager::ItemEntry* self, JsonNode d, JsonNode outObject) { return self->setValueFromAttributes(d, outObject); }
+
+
 const char* MonsterStatCustomManager::ItemEntry::getRandomArrayStr(const JsonNode arr, const char* invalidEntry) {
 			if ( arr.Size() == 0 )
 			{
@@ -19855,6 +20428,9 @@ const char* MonsterStatCustomManager::ItemEntry::getRandomArrayStr(const JsonNod
 			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetString());
 		}
 
+extern "C" const char * ItemEntry_getRandomArrayStr(MonsterStatCustomManager::ItemEntry* self, const JsonNode arr, const char * invalidEntry) { return self->getRandomArrayStr(arr, invalidEntry); }
+
+
 int MonsterStatCustomManager::ItemEntry::getRandomArrayInt(const JsonNode arr, int invalidEntry) {
 			if ( arr.Size() == 0 )
 			{
@@ -19862,6 +20438,9 @@ int MonsterStatCustomManager::ItemEntry::getRandomArrayInt(const JsonNode arr, i
 			}
 			return (arr[uint32_t(monster_stat_rng.rand() % arr.Size())].GetInt());
 		}
+
+extern "C" int ItemEntry_getRandomArrayInt(MonsterStatCustomManager::ItemEntry* self, const JsonNode arr, int invalidEntry) { return self->getRandomArrayInt(arr, invalidEntry); }
+
 
 bool MonsterStatCustomManager::ItemEntry::readKeyToItemEntry(JsonMemberIt itr) {
 			DynamicString name = itr->name.GetString();
@@ -19985,6 +20564,9 @@ bool MonsterStatCustomManager::ItemEntry::readKeyToItemEntry(JsonMemberIt itr) {
 			return false;
 		}
 
+extern "C" bool ItemEntry_readKeyToItemEntry(MonsterStatCustomManager::ItemEntry* self, JsonMemberIt itr) { return self->readKeyToItemEntry(itr); }
+
+
 std::basic_string<char> MonsterStatCustomManager::StatEntry::getFollowerVariant() {
 			if ( followerVariants.size() > 0 )
 			{
@@ -20001,6 +20583,9 @@ std::basic_string<char> MonsterStatCustomManager::StatEntry::getFollowerVariant(
 			}
 			return "none";
 		}
+
+extern "C" std::string StatEntry_getFollowerVariant(MonsterStatCustomManager::StatEntry* self) { return self->getFollowerVariant(); }
+
 
 void MonsterStatCustomManager::StatEntry::readFromStats(const Stat* myStats) {
 			strcpy(name, myStats->name);
@@ -20045,6 +20630,9 @@ void MonsterStatCustomManager::StatEntry::readFromStats(const Stat* myStats) {
 			}
 		}
 
+extern "C" void StatEntry_readFromStats(MonsterStatCustomManager::StatEntry* self, const Stat * myStats) { return self->readFromStats(myStats); }
+
+
 void MonsterStatCustomManager::StatEntry::setStats(Stat* myStats) {
 			strcpy(myStats->name, name);
 			myStats->type = static_cast<Monster>(type);
@@ -20083,6 +20671,9 @@ void MonsterStatCustomManager::StatEntry::setStats(Stat* myStats) {
 				myStats->setProficiency(i, PROFICIENCIES[i]);
 			}
 		}
+
+extern "C" void StatEntry_setStats(MonsterStatCustomManager::StatEntry* self, Stat * myStats) { return self->setStats(myStats); }
+
 
 void MonsterStatCustomManager::StatEntry::setItems(Stat* myStats) {
 			DynamicSetI32 equippedSlots;
@@ -20222,6 +20813,9 @@ void MonsterStatCustomManager::StatEntry::setItems(Stat* myStats) {
 			}
 		}
 
+extern "C" void StatEntry_setItems(MonsterStatCustomManager::StatEntry* self, Stat * myStats) { return self->setItems(myStats); }
+
+
 void MonsterStatCustomManager::StatEntry::setStatsAndEquipmentToMonster(Stat* myStats) {
 			//myStats->clearStats();
 			setStats(myStats);
@@ -20291,6 +20885,9 @@ void MonsterStatCustomManager::StatEntry::setStatsAndEquipmentToMonster(Stat* my
 			}
 		}
 
+extern "C" void StatEntry_setStatsAndEquipmentToMonster(MonsterStatCustomManager::StatEntry* self, Stat * myStats) { return self->setStatsAndEquipmentToMonster(myStats); }
+
+
 void MonsterStatCustomManager::StatEntry::setStatsAndEquipmentToPlayer(Stat* myStats, int player) {
 			//if ( player == 0 )
 			//{
@@ -20306,6 +20903,9 @@ void MonsterStatCustomManager::StatEntry::setStatsAndEquipmentToPlayer(Stat* myS
 			//	tmpScript.updateClientInformation(player, true, true, TextSourceScript::CLIENT_UPDATE_ALL);
 			//}
 		}
+
+extern "C" void StatEntry_setStatsAndEquipmentToPlayer(MonsterStatCustomManager::StatEntry* self, Stat * myStats, int player) { return self->setStatsAndEquipmentToPlayer(myStats, player); }
+
 
 void MonsterCurveCustomManager::readFromFile(Uint32 seed) {
 		monster_curve_rng.seedBytes(&seed, sizeof(seed));
@@ -20398,6 +20998,9 @@ void MonsterCurveCustomManager::readFromFile(Uint32 seed) {
 		}
 	}
 
+extern "C" void MonsterCurveCustomManager_readFromFile(MonsterCurveCustomManager* self, Uint32 seed) { return self->readFromFile(seed); }
+
+
 int MonsterCurveCustomManager::getMonsterTypeFromString(std::string monsterStr) {
 		if ( monsterStr.compare("") == 0 )
 		{
@@ -20412,6 +21015,9 @@ int MonsterCurveCustomManager::getMonsterTypeFromString(std::string monsterStr) 
 		}
 		return NOTHING;
 	}
+
+extern "C" int MonsterCurveCustomManager_getMonsterTypeFromString(std::string monsterStr) { return MonsterCurveCustomManager::getMonsterTypeFromString(monsterStr); }
+
 
 bool MonsterCurveCustomManager::curveExistsForCurrentMapName(std::string currentMap) {
 		if ( !inUse() )
@@ -20432,6 +21038,9 @@ bool MonsterCurveCustomManager::curveExistsForCurrentMapName(std::string current
 		}
 		return false;
 	}
+
+extern "C" bool MonsterCurveCustomManager_curveExistsForCurrentMapName(MonsterCurveCustomManager* self, std::string currentMap) { return self->curveExistsForCurrentMapName(currentMap); }
+
 
 int MonsterCurveCustomManager::rollMonsterFromCurve(std::string currentMap) {
 		DynamicArrayU32 monsterCurveChances(NUMMONSTERS, 0);
@@ -20465,6 +21074,9 @@ int MonsterCurveCustomManager::rollMonsterFromCurve(std::string currentMap) {
 		printlog("[MonsterCurveCustomManager]: Error: default to nothing.");
 		return NOTHING;
 	}
+
+extern "C" int MonsterCurveCustomManager_rollMonsterFromCurve(MonsterCurveCustomManager* self, std::string currentMap) { return self->rollMonsterFromCurve(currentMap); }
+
 
 std::basic_string<char> MonsterCurveCustomManager::rollMonsterVariant(DynamicString currentMap, int monsterType) {
 		for ( LevelCurve& curve : allLevelCurves )
@@ -20507,6 +21119,9 @@ std::basic_string<char> MonsterCurveCustomManager::rollMonsterVariant(DynamicStr
 		return "default";
 	}
 
+extern "C" std::string MonsterCurveCustomManager_rollMonsterVariant(MonsterCurveCustomManager* self, DynamicString currentMap, int monsterType) { return self->rollMonsterVariant(currentMap, monsterType); }
+
+
 std::basic_string<char> MonsterCurveCustomManager::rollFixedMonsterVariant(DynamicString currentMap, int monsterType) {
 		for ( LevelCurve& curve : allLevelCurves )
 		{
@@ -20533,6 +21148,9 @@ std::basic_string<char> MonsterCurveCustomManager::rollFixedMonsterVariant(Dynam
 		return "default";
 	}
 
+extern "C" std::string MonsterCurveCustomManager_rollFixedMonsterVariant(MonsterCurveCustomManager* self, DynamicString currentMap, int monsterType) { return self->rollFixedMonsterVariant(currentMap, monsterType); }
+
+
 void MonsterCurveCustomManager::createMonsterFromFile(Entity* entity, Stat* myStats, const std::string& filename, Monster& outMonsterType) {
 		MonsterStatCustomManager::StatEntry* statEntry = monsterStatCustomManager.readFromFile(filename.c_str());
 		if ( statEntry )
@@ -20557,6 +21175,9 @@ void MonsterCurveCustomManager::createMonsterFromFile(Entity* entity, Stat* mySt
 			delete statEntry;
 		}
 	}
+
+extern "C" void MonsterCurveCustomManager_createMonsterFromFile(MonsterCurveCustomManager* self, Entity * entity, Stat * myStats, const std::string & filename, Monster & outMonsterType) { return self->createMonsterFromFile(entity, myStats, filename, outMonsterType); }
+
 
 void MonsterCurveCustomManager::generateFollowersForLeaders() {
 		if ( multiplayer != CLIENT )
@@ -20594,6 +21215,9 @@ void MonsterCurveCustomManager::generateFollowersForLeaders() {
 		}
 		followersToGenerateForLeaders.clear();
 	}
+
+extern "C" void MonsterCurveCustomManager_generateFollowersForLeaders(MonsterCurveCustomManager* self) { return self->generateFollowersForLeaders(); }
+
 
 void MonsterCurveCustomManager::writeSampleToDocument() {
 		JsonNode d;
@@ -20713,6 +21337,9 @@ void MonsterCurveCustomManager::writeSampleToDocument() {
 		writeToFile(d);
 	}
 
+extern "C" void MonsterCurveCustomManager_writeSampleToDocument(MonsterCurveCustomManager* self) { return self->writeSampleToDocument(); }
+
+
 void MonsterCurveCustomManager::writeToFile(JsonNode d) {
 		int filenum = 0;
 		DynamicString testPath = "/data/monstercurve_export" + std::to_string(filenum) + ".json";
@@ -20738,12 +21365,18 @@ void MonsterCurveCustomManager::writeToFile(JsonNode d) {
 		FileIO::close(fp);
 	}
 
+extern "C" void MonsterCurveCustomManager_writeToFile(MonsterCurveCustomManager* self, JsonNode d) { return self->writeToFile(d); }
+
+
 void MonsterCurveCustomManager::MonsterCurveEntry::addVariant(std::string variantName, int chance) {
 			MonsterVariant_t v;
 			v.name = variantName.c_str();
 			v.chance = chance;
 			variants.push_back(v);
 		}
+
+extern "C" void MonsterCurveEntry_addVariant(MonsterCurveCustomManager::MonsterCurveEntry* self, std::string variantName, int chance) { return self->addVariant(variantName, chance); }
+
 
 void GameplayCustomManager::resetValues() {
 		usingCustomManager = false;
@@ -20767,6 +21400,9 @@ void GameplayCustomManager::resetValues() {
 		allMapGenerations.clear();
 	}
 
+extern "C" void GameplayCustomManager_resetValues(GameplayCustomManager* self) { return self->resetValues(); }
+
+
 bool GameplayCustomManager::mapGenerationExistsForMapName(std::string name) {
 		for ( auto& it : allMapGenerations )
 		{
@@ -20778,6 +21414,9 @@ bool GameplayCustomManager::mapGenerationExistsForMapName(std::string name) {
 		return false;
 	}
 
+extern "C" bool GameplayCustomManager_mapGenerationExistsForMapName(GameplayCustomManager* self, std::string name) { return self->mapGenerationExistsForMapName(name); }
+
+
 GameplayCustomManager::MapGeneration * GameplayCustomManager::getMapGenerationForMapName(std::string name) {
 		for ( auto& it : allMapGenerations )
 		{
@@ -20788,6 +21427,9 @@ GameplayCustomManager::MapGeneration * GameplayCustomManager::getMapGenerationFo
 		}
 		return nullptr;
 	}
+
+extern "C" GameplayCustomManager::MapGeneration * GameplayCustomManager_getMapGenerationForMapName(GameplayCustomManager* self, std::string name) { return self->getMapGenerationForMapName(name); }
+
 
 void GameplayCustomManager::writeAllToDocument() {
 		JsonNode d;
@@ -20889,6 +21531,9 @@ void GameplayCustomManager::writeAllToDocument() {
 		writeToFile(d);
 	}
 
+extern "C" void GameplayCustomManager_writeAllToDocument(GameplayCustomManager* self) { return self->writeAllToDocument(); }
+
+
 void GameplayCustomManager::writeToFile(JsonNode d) {
 		int filenum = 0;
 		DynamicString testPath = "/data/gameplaymodifiers_export" + std::to_string(filenum) + ".json";
@@ -20913,6 +21558,9 @@ void GameplayCustomManager::writeToFile(JsonNode d) {
 
 		FileIO::close(fp);
 	}
+
+extern "C" void GameplayCustomManager_writeToFile(GameplayCustomManager* self, JsonNode d) { return self->writeToFile(d); }
+
 
 void GameplayCustomManager::readFromFile() {
 		resetValues();
@@ -20953,6 +21601,9 @@ void GameplayCustomManager::readFromFile() {
 			printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 		}
 	}
+
+extern "C" void GameplayCustomManager_readFromFile(GameplayCustomManager* self) { return self->readFromFile(); }
+
 
 bool GameplayCustomManager::readKeyToGameplayProperty(JsonMemberIt itr) {
 		DynamicString name = itr->name.GetString();
@@ -21068,6 +21719,9 @@ bool GameplayCustomManager::readKeyToGameplayProperty(JsonMemberIt itr) {
 		return false;
 	}
 
+extern "C" bool GameplayCustomManager_readKeyToGameplayProperty(GameplayCustomManager* self, JsonMemberIt itr) { return self->readKeyToGameplayProperty(itr); }
+
+
 bool GameplayCustomManager::readKeyToMapGenerationProperty(MapGeneration& m, JsonMemberIt itr) {
 		DynamicString name = itr->name.GetString();
 		if ( name.compare("trap_generation_types") == 0 )
@@ -21135,6 +21789,9 @@ bool GameplayCustomManager::readKeyToMapGenerationProperty(MapGeneration& m, Jso
 		return false;
 	}
 
+extern "C" bool GameplayCustomManager_readKeyToMapGenerationProperty(GameplayCustomManager* self, GameplayCustomManager::MapGeneration & m, JsonMemberIt itr) { return self->readKeyToMapGenerationProperty(m, itr); }
+
+
 bool GameplayCustomManager::processedMinotaurSpawn(int level, bool secret, std::string mapName) {
 		if ( !inUse() )
 		{
@@ -21181,6 +21838,9 @@ bool GameplayCustomManager::processedMinotaurSpawn(int level, bool secret, std::
 		return false;
 	}
 
+extern "C" bool GameplayCustomManager_processedMinotaurSpawn(GameplayCustomManager* self, int level, bool secret, std::string mapName) { return self->processedMinotaurSpawn(level, secret, mapName); }
+
+
 bool GameplayCustomManager::processedDarkFloor(int level, bool secret, std::string mapName) {
 		if ( !inUse() )
 		{
@@ -21216,6 +21876,9 @@ bool GameplayCustomManager::processedDarkFloor(int level, bool secret, std::stri
 		return false;
 	}
 
+extern "C" bool GameplayCustomManager_processedDarkFloor(GameplayCustomManager* self, int level, bool secret, std::string mapName) { return self->processedDarkFloor(level, secret, mapName); }
+
+
 bool GameplayCustomManager::processedShopFloor(int level, bool secret, std::string mapName, bool& shoplevel) {
 		if ( !inUse() )
 		{
@@ -21250,6 +21913,9 @@ bool GameplayCustomManager::processedShopFloor(int level, bool secret, std::stri
 		}
 		return false;
 	}
+
+extern "C" bool GameplayCustomManager_processedShopFloor(GameplayCustomManager* self, int level, bool secret, std::string mapName, bool & shoplevel) { return self->processedShopFloor(level, secret, mapName, shoplevel); }
+
 
 bool GameplayCustomManager::processedPropertyForFloor(int level, bool secret, std::string mapName, PropertyTypes propertyType, bool& bOut) {
 		if ( !inUse() )
@@ -21295,6 +21961,9 @@ bool GameplayCustomManager::processedPropertyForFloor(int level, bool secret, st
 		}
 		return false;
 	}
+
+extern "C" bool GameplayCustomManager_processedPropertyForFloor(GameplayCustomManager* self, int level, bool secret, std::string mapName, GameplayCustomManager::PropertyTypes propertyType, bool & bOut) { return self->processedPropertyForFloor(level, secret, mapName, propertyType, bOut); }
+
 #endif // !EDITOR
 
 #
@@ -21335,6 +22004,9 @@ bool GameModeManager_t::isServerflagDisabledForCurrentMode(int i) {
 		return false;
 	}
 
+extern "C" bool GameModeManager_t_isServerflagDisabledForCurrentMode(GameModeManager_t* self, int i) { return self->isServerflagDisabledForCurrentMode(i); }
+
+
 #ifndef EDITOR
 void GameModeManager_t::CurrentSession_t::restoreSavedServerFlags() { 
 			if ( bHasSavedServerFlags )
@@ -21345,29 +22017,47 @@ void GameModeManager_t::CurrentSession_t::restoreSavedServerFlags() {
 			}
 		}
 
+extern "C" void CurrentSession_t_restoreSavedServerFlags(GameModeManager_t::CurrentSession_t* self) { return self->restoreSavedServerFlags(); }
+
+
 void GameModeManager_t::CurrentSession_t::saveServerFlags() {
 			serverFlags = svFlags;
 			bHasSavedServerFlags = true;
 			printlog("[SESSION]: Saving server flags\n");
 		}
+
+extern "C" void CurrentSession_t_saveServerFlags(GameModeManager_t::CurrentSession_t* self) { return self->saveServerFlags(); }
+
 #endif // !EDITOR
 
 
 bool GameModeManager_t::CurrentSession_t::ChallengeRun_t::isActive(ChallengeEvents_t _eventType) { return inUse && (eventType == _eventType); }
 
+extern "C" bool ChallengeRun_t_isActive(GameModeManager_t::CurrentSession_t::ChallengeRun_t* self, GameModeManager_t::CurrentSession_t::ChallengeRun_t::ChallengeEvents_t _eventType) { return self->isActive(_eventType); }
+
+
 void GameModeManager_t::Tutorial_t::init() {
 			readFromFile();
 		}
+
+extern "C" void Tutorial_t_init(GameModeManager_t::Tutorial_t* self) { return self->init(); }
+
 
 void GameModeManager_t::Tutorial_t::setTutorialMap(std::string& mapname) {
 			loadCustomNextMap = mapname.c_str();
 			currentMap = loadCustomNextMap;
 		}
 
+extern "C" void Tutorial_t_setTutorialMap(GameModeManager_t::Tutorial_t* self, std::string & mapname) { return self->setTutorialMap(mapname); }
+
+
 void GameModeManager_t::Tutorial_t::launchHub() {
 			loadCustomNextMap = "tutorial_hub.lmp";
 			currentMap = loadCustomNextMap;
 		}
+
+extern "C" void Tutorial_t_launchHub(GameModeManager_t::Tutorial_t* self) { return self->launchHub(); }
+
 
 void GameModeManager_t::Tutorial_t::onMapRestart(int levelNum) {
 #ifndef EDITOR
@@ -21375,6 +22065,9 @@ void GameModeManager_t::Tutorial_t::onMapRestart(int levelNum) {
 				std::min(STEAM_GSTAT_TUTORIAL1_ATTEMPTS - 1 + levelNum, static_cast<int>(STEAM_GSTAT_TUTORIAL10_ATTEMPTS)), -1);
 #endif // !EDITOR
 		}
+
+extern "C" void Tutorial_t_onMapRestart(GameModeManager_t::Tutorial_t* self, int levelNum) { return self->onMapRestart(levelNum); }
+
 
 void GameModeManager_t::Tutorial_t::writeToFile(JsonNode d) {
 			DynamicString outputPath = outputdir;
@@ -21393,30 +22086,69 @@ void GameModeManager_t::Tutorial_t::writeToFile(JsonNode d) {
 			FileIO::close(fp);
 		}
 
+extern "C" void Tutorial_t_writeToFile(GameModeManager_t::Tutorial_t* self, JsonNode d) { return self->writeToFile(d); }
+
+
 
 void GameModeManager_t::Tutorial_t::Menu_t::close() { bWindowOpen = false; }
 
+extern "C" void Menu_t_close(GameModeManager_t::Tutorial_t::Menu_t* self) { return self->close(); }
+
+
 void GameModeManager_t::Tutorial_t::FirstTimePrompt_t::close() { bWindowOpen = false; }
+
+extern "C" void FirstTimePrompt_t_close(GameModeManager_t::Tutorial_t::FirstTimePrompt_t* self) { return self->close(); }
+
 
 void ItemTooltips_t::ItemTooltip_t::setColorHeading(Uint32 color) { headingTextColor = color; }
 
+extern "C" void ItemTooltip_t_setColorHeading(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorHeading(color); }
+
+
 void ItemTooltips_t::ItemTooltip_t::setColorDescription(Uint32 color) { descriptionTextColor = color; }
+
+extern "C" void ItemTooltip_t_setColorDescription(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorDescription(color); }
+
 
 void ItemTooltips_t::ItemTooltip_t::setColorDetails(Uint32 color) { detailsTextColor = color; }
 
+extern "C" void ItemTooltip_t_setColorDetails(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorDetails(color); }
+
+
 void ItemTooltips_t::ItemTooltip_t::setColorPositive(Uint32 color) { positiveTextColor = color; }
+
+extern "C" void ItemTooltip_t_setColorPositive(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorPositive(color); }
+
 
 void ItemTooltips_t::ItemTooltip_t::setColorNegative(Uint32 color) { negativeTextColor = color; }
 
+extern "C" void ItemTooltip_t_setColorNegative(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorNegative(color); }
+
+
 void ItemTooltips_t::ItemTooltip_t::setColorStatus(Uint32 color) { statusEffectTextColor = color; }
+
+extern "C" void ItemTooltip_t_setColorStatus(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorStatus(color); }
+
 
 void ItemTooltips_t::ItemTooltip_t::setColorFaintText(Uint32 color) { faintTextColor = color; }
 
+extern "C" void ItemTooltip_t_setColorFaintText(ItemTooltips_t::ItemTooltip_t* self, Uint32 color) { return self->setColorFaintText(color); }
+
+
 void DebugTimers_t::addTimePoint(std::string key, DynamicString desc ) { timepoints[key].push_back(std::make_pair(desc, std::chrono::high_resolution_clock::now())); }
+
+extern "C" void DebugTimers_t_addTimePoint(DebugTimers_t* self, std::string key, DynamicString desc) { return self->addTimePoint(key, desc); }
+
 
 void DebugTimers_t::clearTimepoints(std::string key) { timepoints[key].clear(); }
 
+extern "C" void DebugTimers_t_clearTimepoints(DebugTimers_t* self, std::string key) { return self->clearTimepoints(key); }
+
+
 void DebugTimers_t::clearAllTimepoints() { timepoints.clear(); }
+
+extern "C" void DebugTimers_t_clearAllTimepoints(DebugTimers_t* self) { return self->clearAllTimepoints(); }
+
 
 DynamicString& GlyphRenderer_t::getGlyphPath(int scancode, bool pressed ) { 
 		if ( allGlyphs.find(scancode) != allGlyphs.end() )
@@ -21433,6 +22165,9 @@ DynamicString& GlyphRenderer_t::getGlyphPath(int scancode, bool pressed ) {
 		return defaultstring;
 	}
 
+extern "C" DynamicString & GlyphRenderer_t_getGlyphPath(GlyphRenderer_t* self, int scancode, bool pressed) { return self->getGlyphPath(scancode, pressed); }
+
+
 #ifndef EDITOR
 int GameplayPreferences_t::getGameConfigValue(GameplayPreferences_t::GameConfigIndexes index) {
 		if ( index >= 0 && index < GOPT_ENUM_END )
@@ -21442,10 +22177,16 @@ int GameplayPreferences_t::getGameConfigValue(GameplayPreferences_t::GameConfigI
 		return 0;
 	}
 
+extern "C" int GameplayPreferences_t_getGameConfigValue(GameplayPreferences_t::GameConfigIndexes index) { return GameplayPreferences_t::getGameConfigValue(index); }
+
+
 void GameplayPreferences_t::GameplayPreference_t::reset() {
 			value = 0;
 			needsUpdate = true;
 		}
+
+extern "C" void GameplayPreference_t_reset(GameplayPreferences_t::GameplayPreference_t* self) { return self->reset(); }
+
 #endif // !EDITOR
 
 int EditorEntityData_t::getColliderIndexFromName(std::string name) {
@@ -21456,6 +22197,9 @@ int EditorEntityData_t::getColliderIndexFromName(std::string name) {
 		}
 		return 0;
 	}
+
+extern "C" int EditorEntityData_t_getColliderIndexFromName(std::string name) { return EditorEntityData_t::getColliderIndexFromName(name); }
+
 
 bool EditorEntityData_t::EntityColliderData_t::hasOverride(std::string key) const {
 			auto find = overrideProperties.find(key);
@@ -21469,6 +22213,9 @@ bool EditorEntityData_t::EntityColliderData_t::hasOverride(std::string key) cons
 			}
 		}
 
+extern "C" bool EntityColliderData_t_hasOverride(const EditorEntityData_t::EntityColliderData_t* self, std::string key) { return self->hasOverride(key); }
+
+
 int EditorEntityData_t::EntityColliderData_t::getOverride(std::string key) const {
 			auto find = overrideProperties.find(key);
 			if ( find != overrideProperties.end() )
@@ -21477,6 +22224,9 @@ int EditorEntityData_t::EntityColliderData_t::getOverride(std::string key) const
 			}
 			return 0;
 		}
+
+extern "C" int EntityColliderData_t_getOverride(const EditorEntityData_t::EntityColliderData_t* self, std::string key) { return self->getOverride(key); }
+
 
 const char* Compendium_t::getSkillStringForCompendium(const int skill) {
 		switch ( skill )
@@ -21506,9 +22256,15 @@ const char* Compendium_t::getSkillStringForCompendium(const int skill) {
 		return "";
 	}
 
+extern "C" const char * Compendium_t_getSkillStringForCompendium(const int skill) { return Compendium_t::getSkillStringForCompendium(skill); }
+
+
 void Compendium_t::CompendiumEntityCurrent::set(std::string _contentsName, std::string _modelName, int _modelIndex ) {
 			contentsName = _contentsName;
 			modelName = _modelName;
 			modelIndex = _modelIndex;
 			++modelRNG;
 		}
+
+extern "C" void CompendiumEntityCurrent_set(Compendium_t::CompendiumEntityCurrent* self, std::string _contentsName, std::string _modelName, int _modelIndex) { return self->set(_contentsName, _modelName, _modelIndex); }
+

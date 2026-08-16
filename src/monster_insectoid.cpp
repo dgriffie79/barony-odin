@@ -1679,6 +1679,9 @@ bool Entity::insectoidCanWieldItem(const Item& item) const
 	return false;
 }
 
+extern "C" bool Entity_insectoidCanWieldItem(const Entity* self, const Item & item) { return self->insectoidCanWieldItem(item); }
+
+
 void Entity::insectoidChooseWeapon(const Entity* target, double dist)
 {
 	if ( monsterSpecialState() != 0 )
@@ -1780,3 +1783,6 @@ void Entity::insectoidChooseWeapon(const Entity* target, double dist)
 	}
 	return;
 }
+
+extern "C" void Entity_insectoidChooseWeapon(Entity* self, const Entity * target, double dist) { return self->insectoidChooseWeapon(target, dist); }
+

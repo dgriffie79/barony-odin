@@ -338,6 +338,9 @@ void Entity::actPedestalBase()
 	}
 }
 
+extern "C" void Entity_actPedestalBase(Entity* self) { return self->actPedestalBase(); }
+
+
 void Entity::actPedestalOrb()
 {
 	real_t upper_z = orbStartZ() - 0.4;
@@ -535,6 +538,9 @@ void Entity::actPedestalOrb()
 	spawnAmbientParticles(40, particleSprite, 10 + local_rng.rand() % 40, 1.0, false);
 }
 
+extern "C" void Entity_actPedestalOrb(Entity* self) { return self->actPedestalOrb(); }
+
+
 void Entity::pedestalOrbInit()
 {
 	Entity* parent = uidToEntity(this->parent);
@@ -579,4 +585,7 @@ void Entity::pedestalOrbInit()
 		}
 	}
 }
+
+extern "C" void Entity_pedestalOrbInit(Entity* self) { return self->pedestalOrbInit(); }
+
 

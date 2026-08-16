@@ -9601,10 +9601,16 @@ Uint8*& SteamPacketWrapper::data()
 	return _data;
 }
 
+extern "C" Uint8 *& SteamPacketWrapper_data(SteamPacketWrapper* self) { return self->data(); }
+
+
 int& SteamPacketWrapper::len()
 {
 	return _len;
 }
+
+extern "C" int & SteamPacketWrapper_len(SteamPacketWrapper* self) { return self->len(); }
+
 
 NetHandler::NetHandler()
 {
@@ -9671,9 +9677,15 @@ void NetHandler::toggleMultithreading(bool disableMultithreading)
 	}
 }
 
+extern "C" void NetHandler_toggleMultithreading(NetHandler* self, bool disableMultithreading) { return self->toggleMultithreading(disableMultithreading); }
+
+
 void NetHandler::initializeMultithreadedPacketHandling()
 {
 }
+
+extern "C" void NetHandler_initializeMultithreadedPacketHandling(NetHandler* self) { return self->initializeMultithreadedPacketHandling(); }
+
 
 void NetHandler::stopMultithreadedPacketHandling()
 {
@@ -9682,11 +9694,17 @@ void NetHandler::stopMultithreadedPacketHandling()
 	SDL_UnlockMutex(continue_multithreading_steam_packets_lock);
 }
 
+extern "C" void NetHandler_stopMultithreadedPacketHandling(NetHandler* self) { return self->stopMultithreadedPacketHandling(); }
+
+
 bool NetHandler::getContinueMultithreadingSteamPackets()
 {
 	return continue_multithreading_steam_packets;
 	//SDL_UnlockMutex(continue_multithreading_steam_packets_lock);
 }
+
+extern "C" bool NetHandler_getContinueMultithreadingSteamPackets(NetHandler* self) { return self->getContinueMultithreadingSteamPackets(); }
+
 
 void NetHandler::addGamePacket(SteamPacketWrapper* packet)
 {
@@ -9701,6 +9719,9 @@ void NetHandler::addGamePacket(SteamPacketWrapper* packet)
 		game_packets.push_back(packet);
 	}
 }
+
+extern "C" void NetHandler_addGamePacket(NetHandler* self, SteamPacketWrapper * packet) { return self->addGamePacket(packet); }
+
 
 SteamPacketWrapper* NetHandler::getGamePacket()
 {
@@ -9725,6 +9746,9 @@ SteamPacketWrapper* NetHandler::getGamePacket()
 	}
 	return packet;
 }
+
+extern "C" SteamPacketWrapper * NetHandler_getGamePacket(NetHandler* self) { return self->getGamePacket(); }
+
 
 int EOSPacketThread(void* data)
 {
@@ -9843,6 +9867,9 @@ void PingNetworkStatus_t::reset()
 	}
 }
 
+extern "C" void PingNetworkStatus_t_reset() { return PingNetworkStatus_t::reset(); }
+
+
 void PingNetworkStatus_t::receive()
 {
 	int player = net_packet->data[4];
@@ -9879,6 +9906,9 @@ void PingNetworkStatus_t::receive()
 	}
 }
 
+extern "C" void PingNetworkStatus_t_receive() { return PingNetworkStatus_t::receive(); }
+
+
 void PingNetworkStatus_t::respond()
 {
 	int player = net_packet->data[4];
@@ -9908,6 +9938,9 @@ void PingNetworkStatus_t::respond()
 	}
 }
 
+extern "C" void PingNetworkStatus_t_respond() { return PingNetworkStatus_t::respond(); }
+
+
 void PingNetworkStatus_t::saveDisplayMillis(bool forceUpdate)
 {
 	if ( oldestSequenceTicks > 0 )
@@ -9923,6 +9956,9 @@ void PingNetworkStatus_t::saveDisplayMillis(bool forceUpdate)
 		displayMillis = displayMillisImmediate;
 	}
 }
+
+extern "C" void PingNetworkStatus_t_saveDisplayMillis(PingNetworkStatus_t* self, bool forceUpdate) { return self->saveDisplayMillis(forceUpdate); }
+
 
 void PingNetworkStatus_t::update()
 {
@@ -10053,6 +10089,9 @@ void PingNetworkStatus_t::update()
 	}
 }
 
+extern "C" void PingNetworkStatus_t_update() { return PingNetworkStatus_t::update(); }
+
+
 void PingNetworkStatus_t::clear() {
 		pings.clear();
 		needsUpdate = true;
@@ -10064,3 +10103,6 @@ void PingNetworkStatus_t::clear() {
 		sequence = 0;
 		displayMillisImmediate = 0;
 	}
+
+extern "C" void PingNetworkStatus_t_clear(PingNetworkStatus_t* self) { return self->clear(); }
+

@@ -945,6 +945,9 @@ bool Entity::collisionProjectileMiss(Entity* parent, Entity* projectile)
 	return false;
 }
 
+extern "C" bool Entity_collisionProjectileMiss(Entity* self, Entity * parent, Entity * projectile) { return self->collisionProjectileMiss(parent, projectile); }
+
+
 /*-------------------------------------------------------------------------------
 
 	barony_clear

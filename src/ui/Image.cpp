@@ -63,6 +63,9 @@ bool Image::finalize() {
 	}
 }
 
+extern "C" bool Image_finalize(Image* self) { return self->finalize(); }
+
+
 Image::~Image() {
 	if (surf) {
 		SDL_FreeSurface(surf);
@@ -83,12 +86,24 @@ void Image::bind() const {
     GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
 }
 
+extern "C" void Image_bind(const Image* self) { return self->bind(); }
+
+
 void Image::draw(const SDL_Rect* src, const SDL_Rect dest, const SDL_Rect viewport) const {
     if (!surf || !texid) {
         return;
     }
 	draw(texid, surf->w, surf->h, src, dest, viewport, 0xffffffff);
 }
+
+extern "C" void Image_draw_3(GLuint texid, int textureWidth, int textureHeight, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color, real_t angle) { return Image::draw(texid, textureWidth, textureHeight, src, dest, viewport, color, angle); }
+
+
+extern "C" void Image_draw_2(GLuint texid, int textureWidth, int textureHeight, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color) { return Image::draw(texid, textureWidth, textureHeight, src, dest, viewport, color); }
+
+
+extern "C" void Image_draw(const Image* self, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport) { return self->draw(src, dest, viewport); }
+
 
 void Image::drawColor(const SDL_Rect* src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32& color) const {
     if (!surf || !texid) {
@@ -97,12 +112,18 @@ void Image::drawColor(const SDL_Rect* src, const SDL_Rect dest, const SDL_Rect v
     draw(texid, surf->w, surf->h, src, dest, viewport, color);
 }
 
+extern "C" void Image_drawColor(const Image* self, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color) { return self->drawColor(src, dest, viewport, color); }
+
+
 void Image::drawRotated(const SDL_Rect* src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32& color, real_t angle) const {
     if (!surf || !texid) {
         return;
     }
     draw(texid, surf->w, surf->h, src, dest, viewport, color, angle);
 }
+
+extern "C" void Image_drawRotated(const Image* self, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color, real_t angle) { return self->drawRotated(src, dest, viewport, color, angle); }
+
 
 Mesh Image::mesh = {
     {
@@ -245,6 +266,9 @@ void Image::setupGL(GLuint texid, const Uint32& color) {
     GL_CHECK_ERR(glUniform4fv(shader.uniform("uColor"), 1, cv));
 }
 
+extern "C" void Image_setupGL(GLuint texid, const Uint32 & color) { return Image::setupGL(texid, color); }
+
+
 void Image::draw(GLuint texid, int textureWidth, int textureHeight,
     const SDL_Rect* src, const SDL_Rect dest,
     const SDL_Rect viewport, const Uint32& color)
@@ -365,6 +389,12 @@ void Image::drawClockwise(float lerp,
     drawClockwise(texid, surf->w, surf->h, lerp, src, dest, viewport, color);
 }
 
+extern "C" void Image_drawClockwise_2(GLuint texid, int textureWidth, int textureHeight, float lerp, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color) { return Image::drawClockwise(texid, textureWidth, textureHeight, lerp, src, dest, viewport, color); }
+
+
+extern "C" void Image_drawClockwise(Image* self, float lerp, const SDL_Rect * src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color) { return self->drawClockwise(lerp, src, dest, viewport, color); }
+
+
 void Image::drawClockwise(
     GLuint texid, int textureWidth, int textureHeight, float lerp,
     const SDL_Rect* src, const SDL_Rect dest,
@@ -435,6 +465,9 @@ size_t Image::hash(const char* name) {
 	return hashed_images.hash_function()(name);
 }
 
+extern "C" size_t Image_hash(const char * name) { return Image::hash(name); }
+
+
 Image* Image::get(size_t hash, const char* name) {
 	if (!name || name[0] == '\0') {
 		return nullptr;
@@ -467,6 +500,12 @@ Image* Image::get(size_t hash, const char* name) {
 	return image;
 }
 
+extern "C" Image * Image_get_2(size_t hash, const char * key) { return Image::get(hash, key); }
+
+
+extern "C" Image * Image_get(const char * name) { return Image::get(name); }
+
+
 Image* Image::get(const char* name) {
 	return get(hash(name), name);
 }
@@ -481,6 +520,9 @@ void Image::dumpCache() {
     clockwiseMesh.destroy();
     shader.destroy();
 }
+
+extern "C" void Image_dumpCache() { return Image::dumpCache(); }
+
 
 #ifndef EDITOR
 #include "../net.hpp"
@@ -498,10 +540,25 @@ static ConsoleCommand dump("/images_cache_dump", "dump image cache",
 
 const char*				Image::getName() const { return name.c_str(); }
 
+extern "C" const char * Image_getName(const Image* self) { return self->getName(); }
+
+
 const bool		Image::isStreamable() const { return true; }
+
+extern "C" const bool Image_isStreamable(const Image* self) { return self->isStreamable(); }
+
 
 const void				Image::setOutlineSurf(SDL_Surface* toSet) { outlineSurf = toSet; }
 
+extern "C" const void Image_setOutlineSurf(Image* self, SDL_Surface * toSet) { return self->setOutlineSurf(toSet); }
+
+
 const unsigned int		Image::getWidth() const { return surf ? surf->w : 0U; }
 
+extern "C" const unsigned int Image_getWidth(const Image* self) { return self->getWidth(); }
+
+
 const unsigned int		Image::getHeight()	const { return surf ? surf->h : 0U; }
+
+extern "C" const unsigned int Image_getHeight(const Image* self) { return self->getHeight(); }
+

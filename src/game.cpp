@@ -291,7 +291,10 @@ void TimerExperiments::integrate(TimerExperiments::State& state,
 {
 	//state.velocity += state.acceleration * dt / std::chrono::seconds{ 1 };
 	state.position += state.velocity * dt / std::chrono::seconds{ 1 };
-};
+}
+
+extern "C" void TimerExperiments_integrate(TimerExperiments::State & state, TimerExperiments::time_point a1, TimerExperiments::duration dt) { return TimerExperiments::integrate(state, a1, dt); }
+;
 
 void TimerExperiments::updateEntityInterpolationPosition(Entity* entity)
 {
@@ -374,6 +377,9 @@ void TimerExperiments::updateEntityInterpolationPosition(Entity* entity)
 	}
 	entity->lerpCurrentState.roll.velocity = TimerExperiments::lerpFactor * (diff);
 }
+
+extern "C" void TimerExperiments_updateEntityInterpolationPosition(Entity * entity) { return TimerExperiments::updateEntityInterpolationPosition(entity); }
+
 
 void TimerExperiments::renderCameras(view_t& camera, int player)
 {
@@ -483,6 +489,9 @@ void TimerExperiments::renderCameras(view_t& camera, int player)
 	//}
 }
 
+extern "C" void TimerExperiments_renderCameras(view_t & camera, int player) { return TimerExperiments::renderCameras(camera, player); }
+
+
 void TimerExperiments::postRenderRestore(view_t& camera, int player)
 {
 	// unused for now?
@@ -518,16 +527,25 @@ void TimerExperiments::postRenderRestore(view_t& camera, int player)
 	}*/
 }
 
+extern "C" void TimerExperiments_postRenderRestore(view_t & camera, int player) { return TimerExperiments::postRenderRestore(camera, player); }
+
+
 void TimerExperiments::State::resetMovement()
 {
 	velocity = 0.0;
 	acceleration = 0.0;
 }
 
+extern "C" void State_resetMovement(TimerExperiments::State* self) { return self->resetMovement(); }
+
+
 void TimerExperiments::State::resetPosition()
 {
 	position = 0.0;
 }
+
+extern "C" void State_resetPosition(TimerExperiments::State* self) { return self->resetPosition(); }
+
 
 void TimerExperiments::State::normalize(real_t min, real_t max)
 {
@@ -543,6 +561,9 @@ void TimerExperiments::State::normalize(real_t min, real_t max)
 	}
 }
 
+extern "C" void State_normalize(TimerExperiments::State* self, int min, int max) { return self->normalize(min, max); }
+
+
 void TimerExperiments::EntityStates::resetMovement()
 {
 	x.resetMovement();
@@ -552,6 +573,9 @@ void TimerExperiments::EntityStates::resetMovement()
 	yaw.resetMovement();
 	roll.resetMovement();
 }
+
+extern "C" void EntityStates_resetMovement(TimerExperiments::EntityStates* self) { return self->resetMovement(); }
+
 
 void TimerExperiments::EntityStates::resetPosition()
 {
@@ -563,10 +587,16 @@ void TimerExperiments::EntityStates::resetPosition()
 	roll.resetPosition();
 }
 
+extern "C" void EntityStates_resetPosition(TimerExperiments::EntityStates* self) { return self->resetPosition(); }
+
+
 void TimerExperiments::reset()
 {
 
 }
+
+extern "C" void TimerExperiments_reset() { return TimerExperiments::reset(); }
+
 
 
 void TimerExperiments::updateClocks()
@@ -722,11 +752,17 @@ void TimerExperiments::updateClocks()
 	}
 }
 
+extern "C" void TimerExperiments_updateClocks() { return TimerExperiments::updateClocks(); }
+
+
 real_t TimerExperiments::lerpAngle(real_t angle1, real_t angle2, real_t alpha)
 {
 	real_t adiff = angle2 - angle1;
 	return angle1 + alpha * (fmod(3 * PI + fmod(adiff, 2 * PI), 2 * PI) - PI);
 }
+
+extern "C" int TimerExperiments_lerpAngle(int angle1, int angle2, int alpha) { return TimerExperiments::lerpAngle(angle1, angle2, alpha); }
+
 
 DynamicString TimerExperiments::render(State state)
 {
@@ -751,6 +787,9 @@ DynamicString TimerExperiments::render(State state)
 	}*/
 	return output;
 }
+
+extern "C" DynamicString TimerExperiments_render(TimerExperiments::State state) { return TimerExperiments::render(state); }
+
 
 enum DemoMode {
     STOPPED,
@@ -8002,6 +8041,9 @@ void DebugStatsClass::storeStats()
 		out10, out1, out2, out3, out4, out5, out6, out7, out8, out9);
 }
 
+extern "C" void DebugStatsClass_storeStats(DebugStatsClass* self) { return self->storeStats(); }
+
+
 void DebugStatsClass::storeEventStats()
 {
 	double out1 = 1000 * std::chrono::duration_cast<std::chrono::duration<double>>(eventsT2stored - eventsT1stored).count();
@@ -8017,6 +8059,9 @@ void DebugStatsClass::storeEventStats()
 		"Events1: %4.5fms\nEvents2: %4.5fms\nEvents3: %4.5fms\nEvents4: %4.5fms\nEvents5: %4.5fms\nMessagesT1: %4.5fms\nMessagesT2: %4.5fms\n",
 		out1, out2, out3, out4, out5, messages1, messages2);
 }
+
+extern "C" void DebugStatsClass_storeEventStats(DebugStatsClass* self) { return self->storeEventStats(); }
+
 
 void inline DebugStatsClass::storeOldTimePoints() {
 		t1Stored = t1StartLoop;
@@ -8041,6 +8086,12 @@ void inline DebugStatsClass::storeOldTimePoints() {
 		messagesT1stored = messagesT1;
 	}
 
+extern "C" void DebugStatsClass_storeOldTimePoints(DebugStatsClass* self) { return self->storeOldTimePoints(); }
+
+
 TimerExperiments::Clock::time_point TimerExperiments::Clock::now() noexcept {
 			return time_point{ duration{ SDL_GetTicks() } };
 		}
+
+extern "C" TimerExperiments::Clock::time_point Clock_now() { return TimerExperiments::Clock::now(); }
+

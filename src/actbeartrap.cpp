@@ -1265,6 +1265,9 @@ bool Entity::entityCheckIfTriggeredWallButton()
 	return foundButton;
 }
 
+extern "C" bool Entity_entityCheckIfTriggeredWallButton(Entity* self) { return self->entityCheckIfTriggeredWallButton(); }
+
+
 bool Entity::entityCheckIfTriggeredBomb(bool triggerBomb)
 {
 	if ( multiplayer == CLIENT )
@@ -1299,6 +1302,9 @@ bool Entity::entityCheckIfTriggeredBomb(bool triggerBomb)
 	}
 	return foundBomb;
 }
+
+extern "C" bool Entity_entityCheckIfTriggeredBomb(Entity* self, bool triggerBomb) { return self->entityCheckIfTriggeredBomb(triggerBomb); }
+
 
 void actDecoyBox(Entity* my)
 {

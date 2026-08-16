@@ -1133,6 +1133,9 @@ void Entity::actChest()
 	}
 }
 
+extern "C" void Entity_actChest(Entity* self) { return self->actChest(); }
+
+
 void actChestLid(Entity* my)
 {
 	int i;
@@ -1282,6 +1285,9 @@ void Entity::closeChest()
 	}
 }
 
+extern "C" void Entity_closeChest(Entity* self) { return self->closeChest(); }
+
+
 void Entity::closeChestServer()
 {
 	if (chestStatus())
@@ -1291,6 +1297,9 @@ void Entity::closeChestServer()
 		players[chestOpener()]->inventoryUI.chestGUI.closeChest();
 	}
 }
+
+extern "C" void Entity_closeChestServer(Entity* self) { return self->closeChestServer(); }
+
 
 Item* Entity::addItemToVoidChest(int player, Item* item, bool forceNewStack, Item* specificDestinationStack)
 {
@@ -1329,6 +1338,9 @@ Item* Entity::addItemToVoidChest(int player, Item* item, bool forceNewStack, Ite
 
 	return addItemToVoidChestServer(player, item, forceNewStack, specificDestinationStack);
 }
+
+extern "C" Item * Entity_addItemToVoidChest(int player, Item * item, bool forceNewStack, Item * specificDestinationStack) { return Entity::addItemToVoidChest(player, item, forceNewStack, specificDestinationStack); }
+
 
 Item* Entity::addItemToChest(Item* item, bool forceNewStack, Item* specificDestinationStack)
 {
@@ -1416,6 +1428,9 @@ Item* Entity::addItemToChest(Item* item, bool forceNewStack, Item* specificDesti
 	}
 	return item;
 }
+
+extern "C" Item * Entity_addItemToChest(Entity* self, Item * item, bool forceNewStack, Item * specificDestinationStack) { return self->addItemToChest(item, forceNewStack, specificDestinationStack); }
+
 
 Item* Entity::addItemToChestFromInventory(int player, Item* item, int amount, bool forceNewStack, Item* specificDestinationStack)
 {
@@ -1571,6 +1586,9 @@ Item* Entity::addItemToChestFromInventory(int player, Item* item, int amount, bo
 	return addItemToChest(newitem, forceNewStack, specificDestinationStack);
 }
 
+extern "C" Item * Entity_addItemToChestFromInventory(Entity* self, int player, Item * item, int amount, bool forceNewStack, Item * specificDestinationStack) { return self->addItemToChestFromInventory(player, item, amount, forceNewStack, specificDestinationStack); }
+
+
 Item* Entity::getItemFromChest(Item* item, int amount, bool getInfoOnly)
 {
 	/*
@@ -1661,6 +1679,9 @@ Item* Entity::getItemFromChest(Item* item, int amount, bool getInfoOnly)
 	return newitem;
 }
 
+extern "C" Item * Entity_getItemFromChest(Entity* self, Item * item, int amount, bool getInfoOnly) { return self->getItemFromChest(item, amount, getInfoOnly); }
+
+
 void closeChestClientside(const int player)
 {
 	if ( player < 0 )
@@ -1706,6 +1727,9 @@ list_t* Entity::getChestInventoryList()
 	}
 	return nullptr;
 }
+
+extern "C" list_t * Entity_getChestInventoryList(Entity* self) { return self->getChestInventoryList(); }
+
 
 Item* addItemToChestClientside(const int player, Item* item, bool forceNewStack, Item* specificDestinationStack)
 {
@@ -1934,6 +1958,9 @@ Item* Entity::addItemToVoidChestServer(int player, Item* item, bool forceNewStac
 	return item;
 }
 
+extern "C" Item * Entity_addItemToVoidChestServer(int player, Item * item, bool forceNewStack, Item * specificDestinationStack) { return Entity::addItemToVoidChestServer(player, item, forceNewStack, specificDestinationStack); }
+
+
 Item* Entity::addItemToChestServer(Item* item, bool forceNewStack, Item* specificDestinationStack)
 {
 	if (!item)
@@ -1982,6 +2009,9 @@ Item* Entity::addItemToChestServer(Item* item, bool forceNewStack, Item* specifi
 	item->node->deconstructor = &defaultDeconstructor;
 	return item;
 }
+
+extern "C" Item * Entity_addItemToChestServer(Entity* self, Item * item, bool forceNewStack, Item * specificDestinationStack) { return self->addItemToChestServer(item, forceNewStack, specificDestinationStack); }
+
 
 bool Entity::removeItemFromVoidChestServer(int player, Item* item, int count)
 {
@@ -2039,6 +2069,9 @@ bool Entity::removeItemFromVoidChestServer(int player, Item* item, int count)
 	}
 	return removedItems;
 }
+
+extern "C" bool Entity_removeItemFromVoidChestServer(int player, Item * item, int count) { return Entity::removeItemFromVoidChestServer(player, item, count); }
+
 
 bool Entity::removeItemFromChestServer(Item* item, int count)
 {
@@ -2100,16 +2133,25 @@ bool Entity::removeItemFromChestServer(Item* item, int count)
 	return removedItems;
 }
 
+extern "C" bool Entity_removeItemFromChestServer(Entity* self, Item * item, int count) { return self->removeItemFromChestServer(item, count); }
+
+
 void Entity::unlockChest()
 {
 	chestLocked() = 0;
 	chestPreventLockpickCapstoneExploit() = 1;
 }
 
+extern "C" void Entity_unlockChest(Entity* self) { return self->unlockChest(); }
+
+
 void Entity::lockChest()
 {
 	chestLocked() = 1;
 }
+
+extern "C" void Entity_lockChest(Entity* self) { return self->lockChest(); }
+
 
 void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity *caster, bool doSound)
 {
@@ -2215,3 +2257,6 @@ void Entity::chestHandleDamageMagic(int damage, Entity &magicProjectile, Entity 
 		playSoundEntity(this, 28, 128);
 	}
 }
+
+extern "C" void Entity_chestHandleDamageMagic(Entity* self, int damage, Entity & magicProjectile, Entity * caster, bool doSound) { return self->chestHandleDamageMagic(damage, magicProjectile, caster, doSound); }
+

@@ -92,11 +92,17 @@ void Frame::fboInit() {
     gui_fb_downscaled.init(Frame::virtualScreenX / 2, Frame::virtualScreenY / 2, GL_LINEAR, GL_NEAREST); // 360p resolution
 }
 
+extern "C" void Frame_fboInit() { return Frame::fboInit(); }
+
+
 void Frame::fboDestroy() {
 	gui_fb.destroy();
 	gui_fb_upscaled.destroy();
 	gui_fb_downscaled.destroy();
 }
+
+extern "C" void Frame_fboDestroy() { return Frame::fboDestroy(); }
+
 
 #ifndef EDITOR
 #include "../interface/ui.hpp"
@@ -153,6 +159,9 @@ void Frame::guiInit() {
 #endif
 }
 
+extern "C" void Frame_guiInit() { return Frame::guiInit(); }
+
+
 void Frame::guiDestroy() {
 #ifndef EDITOR
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -180,12 +189,18 @@ void Frame::guiDestroy() {
 	fboDestroy();
 }
 
+extern "C" void Frame_guiDestroy() { return Frame::guiDestroy(); }
+
+
 void Frame::guiResize(int x, int y) {
     _virtualScreenX = x;
     _virtualScreenY = y;
     guiDestroy();
     guiInit();
 }
+
+extern "C" void Frame_guiResize(int x, int y) { return Frame::guiResize(x, y); }
+
 
 Frame::Frame(const char* _name) {
 	type = WIDGET_FRAME;
@@ -278,6 +293,9 @@ void Frame::predraw() {
     GL_CHECK_ERR(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 }
 
+extern "C" void Frame_predraw() { return Frame::predraw(); }
+
+
 void Frame::postdraw() {
 	drawingGui = false;
 	if ( !*ui_scale_native ) {
@@ -318,6 +336,9 @@ void Frame::postdraw() {
     GL_CHECK_ERR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     GL_CHECK_ERR(glDisable(GL_BLEND));
 }
+
+extern "C" void Frame_postdraw() { return Frame::postdraw(); }
+
 #else
 // EDITOR ONLY DEFINITIONS:
 void Frame::predraw() {
@@ -362,6 +383,12 @@ void Frame::draw() const {
 	Frame::draw(size, _actualSize, selectedWidgets);
 	Frame::drawPost(size, _actualSize, selectedWidgets, searchParents);
 }
+
+extern "C" void Frame_draw_2(const Frame* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets) { return self->draw(_size, _actualSize, selectedWidgets); }
+
+
+extern "C" void Frame_draw(const Frame* self) { return self->draw(); }
+
 
 void Frame::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
     const DynamicArrayT<Widget*>& selectedWidgets,
@@ -410,6 +437,9 @@ void Frame::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 
 	Widget::drawPost(_size, selectedWidgets, searchParents);
 }
+
+extern "C" void Frame_drawPost(const Frame* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets, const DynamicArrayT<Widget *> & searchParents) { return self->drawPost(_size, _actualSize, selectedWidgets, searchParents); }
+
 
 static bool isMouseActive(int owner) {
 #if defined(EDITOR)
@@ -971,6 +1001,12 @@ Frame::result_t Frame::process() {
 
 	return result;
 }
+
+extern "C" Frame::result_t Frame_process_2(Frame* self, SDL_Rect _size, SDL_Rect actualSize, const bool usable) { return self->process(_size, actualSize, usable); }
+
+
+extern "C" Frame::result_t Frame_process(Frame* self) { return self->process(); }
+
 
 Frame::result_t Frame::process(SDL_Rect _size, SDL_Rect _actualSize, bool usable) {
 	result_t result;
@@ -1697,6 +1733,9 @@ void Frame::processField(const SDL_Rect& _size, Field& field, Widget*& destWidge
 	}
 }
 
+extern "C" void Frame_processField(Frame* self, const SDL_Rect & _size, Field & field, Widget *& destWidget, Frame::result_t & result) { return self->processField(_size, field, destWidget, result); }
+
+
 void Frame::processButton(const SDL_Rect& _size, Button& button, Widget*& destWidget, result_t& result) {
 	const bool mouseActive = isMouseActive(owner);
 	if (!destWidget) {
@@ -1720,6 +1759,9 @@ void Frame::processButton(const SDL_Rect& _size, Button& button, Widget*& destWi
 		button.deselect();
 	}
 }
+
+extern "C" void Frame_processButton(Frame* self, const SDL_Rect & _size, Button & button, Widget *& destWidget, Frame::result_t & result) { return self->processButton(_size, button, destWidget, result); }
+
 
 void Frame::processSlider(const SDL_Rect& _size, Slider& slider, Widget*& destWidget, result_t& result) {
 	const bool mouseActive = isMouseActive(owner);
@@ -1747,6 +1789,9 @@ void Frame::processSlider(const SDL_Rect& _size, Slider& slider, Widget*& destWi
 		slider.deselect();
 	}
 }
+
+extern "C" void Frame_processSlider(Frame* self, const SDL_Rect & _size, Slider & slider, Widget *& destWidget, Frame::result_t & result) { return self->processSlider(_size, slider, destWidget, result); }
+
 
 void Frame::postprocess() {
 #if !defined(EDITOR) && !defined(NDEBUG)
@@ -1824,9 +1869,15 @@ void Frame::postprocess() {
     }
 }
 
+extern "C" void Frame_postprocess(Frame* self) { return self->postprocess(); }
+
+
 Frame* Frame::addFrame(const char* name) {
 	return new Frame(*this, name);
 }
+
+extern "C" Frame * Frame_addFrame(Frame* self, const char * name) { return self->addFrame(name); }
+
 
 Button* Frame::addButton(const char* name) {
 	Button* button = new Button(*this);
@@ -1834,11 +1885,17 @@ Button* Frame::addButton(const char* name) {
 	return button;
 }
 
+extern "C" Button * Frame_addButton(Frame* self, const char * name) { return self->addButton(name); }
+
+
 Field* Frame::addField(const char* name, const int len) {
 	Field* field = new Field(*this, len);
 	field->setName(name);
 	return field;
 }
+
+extern "C" Field * Frame_addField(Frame* self, const char * name, const int len) { return self->addField(name, len); }
+
 
 Frame::image_t* Frame::addImage(const SDL_Rect pos, const Uint32 color, const char* image, const char* name) {
 	if (!image || !name) {
@@ -1853,6 +1910,9 @@ Frame::image_t* Frame::addImage(const SDL_Rect pos, const Uint32 color, const ch
 	return imageObj;
 }
 
+extern "C" Frame::image_t * Frame_addImage(Frame* self, const SDL_Rect pos, const Uint32 color, const char * image, const char * name) { return self->addImage(pos, color, image, name); }
+
+
 Slider* Frame::addSlider(const char* name) {
 	if (!name) {
 		return nullptr;
@@ -1862,6 +1922,9 @@ Slider* Frame::addSlider(const char* name) {
 	sliders.push_back(slider);
 	return slider;
 }
+
+extern "C" Slider * Frame_addSlider(Frame* self, const char * name) { return self->addSlider(name); }
+
 
 Frame::entry_t* Frame::addEntry(const char* name, bool resizeFrame) {
 	entry_t* entry = new entry_t(*this);
@@ -1875,6 +1938,9 @@ Frame::entry_t* Frame::addEntry(const char* name, bool resizeFrame) {
 
 	return entry;
 }
+
+extern "C" Frame::entry_t * Frame_addEntry(Frame* self, const char * name, bool resizeFrame) { return self->addEntry(name, resizeFrame); }
+
 
 void Frame::clear() {
 	// delete widgets
@@ -1897,6 +1963,9 @@ void Frame::clear() {
 	selection = -1;
 }
 
+extern "C" void Frame_clear(Frame* self) { return self->clear(); }
+
+
 void Frame::clearEntries() {
 	while (list.size()) {
 		delete list.front();
@@ -1904,6 +1973,9 @@ void Frame::clearEntries() {
 	}
 	selection = -1;
 }
+
+extern "C" void Frame_clearEntries(Frame* self) { return self->clearEntries(); }
+
 
 bool Frame::remove(const char* name) {
     bool result = removeBase(name);
@@ -1919,6 +1991,9 @@ bool Frame::remove(const char* name) {
     }
     return result;
 }
+
+extern "C" bool Frame_remove(Frame* self, const char * name) { return self->remove(name); }
+
 
 bool Frame::removeEntry(const char* name, bool resizeFrame) {
 	for (int i = 0; i < list.size(); ++i) {
@@ -1937,6 +2012,9 @@ bool Frame::removeEntry(const char* name, bool resizeFrame) {
 	}
 	return false;
 }
+
+extern "C" bool Frame_removeEntry(Frame* self, const char * name, bool resizeFrame) { return self->removeEntry(name, resizeFrame); }
+
 
 int Frame::numFindFrameCalls = 0;
 
@@ -2010,6 +2088,9 @@ Frame* Frame::findFrame(const char* name, const FrameSearchType frameSearchType)
 	return nullptr;
 }
 
+extern "C" Frame * Frame_findFrame(Frame* self, const char * name, const Frame::FrameSearchType frameSearchType) { return self->findFrame(name, frameSearchType); }
+
+
 Button* Frame::findButton(const char* name) {
 	for (auto button : buttons) {
 		if ( button->isToBeDeleted() )
@@ -2023,6 +2104,9 @@ Button* Frame::findButton(const char* name) {
 	return nullptr;
 }
 
+extern "C" Button * Frame_findButton(Frame* self, const char * name) { return self->findButton(name); }
+
+
 Field* Frame::findField(const char* name) {
 	for (auto field : fields) {
 		if (strcmp(field->getName(), name) == 0) {
@@ -2031,6 +2115,9 @@ Field* Frame::findField(const char* name) {
 	}
 	return nullptr;
 }
+
+extern "C" Field * Frame_findField(Frame* self, const char * name) { return self->findField(name); }
+
 
 Frame::image_t* Frame::findImage(const char* name) {
 	for (auto image : images) {
@@ -2041,6 +2128,9 @@ Frame::image_t* Frame::findImage(const char* name) {
 	return nullptr;
 }
 
+extern "C" Frame::image_t * Frame_findImage(Frame* self, const char * name) { return self->findImage(name); }
+
+
 Frame::entry_t* Frame::findEntry(const char* name) {
 	for (auto entry : list) {
 		if (entry->name == name) {
@@ -2050,6 +2140,9 @@ Frame::entry_t* Frame::findEntry(const char* name) {
 	return nullptr;
 }
 
+extern "C" Frame::entry_t * Frame_findEntry(Frame* self, const char * name) { return self->findEntry(name); }
+
+
 Slider* Frame::findSlider(const char* name) {
 	for (auto slider : sliders) {
 		if (strcmp(slider->getName(), name) == 0) {
@@ -2058,6 +2151,9 @@ Slider* Frame::findSlider(const char* name) {
 	}
 	return nullptr;
 }
+
+extern "C" Slider * Frame_findSlider(Frame* self, const char * name) { return self->findSlider(name); }
+
 
 void Frame::resizeForEntries() {
     int entrySize = this->entrySize;
@@ -2073,6 +2169,9 @@ void Frame::resizeForEntries() {
 	actualSize.h = (Uint32)list.size() * entrySize;
 	actualSize.y = std::min(std::max(0, actualSize.y), std::max(0, actualSize.h - size.h));
 }
+
+extern "C" void Frame_resizeForEntries(Frame* self) { return self->resizeForEntries(); }
+
 
 SDL_Rect Frame::getRelativeMousePositionImpl(SDL_Rect& _size, SDL_Rect& _actualSize, bool realtime) const {
 #ifdef EDITOR
@@ -2121,11 +2220,17 @@ SDL_Rect Frame::getRelativeMousePositionImpl(SDL_Rect& _size, SDL_Rect& _actualS
 #endif
 }
 
+extern "C" SDL_Rect Frame_getRelativeMousePositionImpl(const Frame* self, SDL_Rect & _size, SDL_Rect & _actualSize, bool realtime) { return self->getRelativeMousePositionImpl(_size, _actualSize, realtime); }
+
+
 SDL_Rect Frame::getRelativeMousePosition(bool realtime) const {
 	SDL_Rect _size = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	SDL_Rect _actualSize = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	return getRelativeMousePositionImpl(_size, _actualSize, realtime);
 }
+
+extern "C" SDL_Rect Frame_getRelativeMousePosition(const Frame* self, bool realtime) { return self->getRelativeMousePosition(realtime); }
+
 
 bool Frame::capturesMouseImpl(SDL_Rect& _size, SDL_Rect& _actualSize, bool realtime) const {
 	if (parent) {
@@ -2176,17 +2281,26 @@ bool Frame::capturesMouseImpl(SDL_Rect& _size, SDL_Rect& _actualSize, bool realt
 	}
 }
 
+extern "C" bool Frame_capturesMouseImpl(const Frame* self, SDL_Rect & _size, SDL_Rect & _actualSize, bool realtime) { return self->capturesMouseImpl(_size, _actualSize, realtime); }
+
+
 bool Frame::capturesMouseInRealtimeCoords() const {
 	SDL_Rect _size = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	SDL_Rect _actualSize = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	return capturesMouseImpl(_size, _actualSize, true);
 }
 
+extern "C" bool Frame_capturesMouseInRealtimeCoords(const Frame* self) { return self->capturesMouseInRealtimeCoords(); }
+
+
 bool Frame::capturesMouse() const {
 	SDL_Rect _size = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	SDL_Rect _actualSize = SDL_Rect{0, 0, Frame::virtualScreenX, Frame::virtualScreenY};
 	return capturesMouseImpl(_size, _actualSize, false);
 }
+
+extern "C" bool Frame_capturesMouse(const Frame* self) { return self->capturesMouse(); }
+
 
 void Frame::warpMouseToFrame(const int player, Uint32 flags) const
 {
@@ -2198,6 +2312,9 @@ void Frame::warpMouseToFrame(const int player, Uint32 flags) const
 		flags);
 #endif
 }
+
+extern "C" void Frame_warpMouseToFrame(const Frame* self, const int player, Uint32 flags) { return self->warpMouseToFrame(player, flags); }
+
 
 SDL_Rect Frame::getAbsoluteSize() const
 {
@@ -2212,6 +2329,9 @@ SDL_Rect Frame::getAbsoluteSize() const
 	return _size;
 }
 
+extern "C" SDL_Rect Frame_getAbsoluteSize(const Frame* self) { return self->getAbsoluteSize(); }
+
+
 Frame* Frame::getParent() {
 	if (parent && parent->getType() == WIDGET_FRAME) {
 		return static_cast<Frame*>(parent);
@@ -2219,6 +2339,9 @@ Frame* Frame::getParent() {
 		return nullptr;
 	}
 }
+
+extern "C" Frame * Frame_getParent(Frame* self) { return self->getParent(); }
+
 
 void Frame::deselect() {
 	deselectBase();
@@ -2246,6 +2369,9 @@ void Frame::deselect() {
 	}
 }
 
+extern "C" void Frame_deselect(Frame* self) { return self->deselect(); }
+
+
 void Frame::activate() {
 	select();
 	if (!list.size()) {
@@ -2264,11 +2390,17 @@ void Frame::activate() {
     }
 }
 
+extern "C" void Frame_activate(Frame* self) { return self->activate(); }
+
+
 void Frame::activateSelection() {
 	if (selection >= 0 && selection < list.size()) {
 		activateEntry(*list[selection]);
 	}
 }
+
+extern "C" void Frame_activateSelection(Frame* self) { return self->activateSelection(); }
+
 
 void Frame::setSelection(int index) {
     if (selection != index) {
@@ -2283,9 +2415,15 @@ void Frame::setSelection(int index) {
     }
 }
 
+extern "C" void Frame_setSelection(Frame* self, int index) { return self->setSelection(index); }
+
+
 void Frame::enableScroll(bool enabled) {
 	allowScrolling = enabled;
 }
+
+extern "C" void Frame_enableScroll(Frame* self, bool enabled) { return self->enableScroll(enabled); }
+
 
 void Frame::scrollToSelection(bool scroll_to_top) {
 	if (selection < 0 || selection >= list.size()) {
@@ -2315,6 +2453,9 @@ void Frame::scrollToSelection(bool scroll_to_top) {
 	syncScroll();
 }
 
+extern "C" void Frame_scrollToSelection(Frame* self, bool scroll_to_top) { return self->scrollToSelection(scroll_to_top); }
+
+
 void Frame::activateEntry(entry_t& entry) {
 	activation = &entry;
 	if (keystatus[SDLK_LCTRL] || keystatus[SDLK_RCTRL]) {
@@ -2330,6 +2471,9 @@ void Frame::activateEntry(entry_t& entry) {
 		toBeDeleted = true;
 	}
 }
+
+extern "C" void Frame_activateEntry(Frame* self, Frame::entry_t & entry) { return self->activateEntry(entry); }
+
 
 void createTestUI() {
 	Frame* window = gui->addFrame("window");
@@ -2621,9 +2765,15 @@ void Frame::drawImage(const image_t* image, const SDL_Rect& _size, const SDL_Rec
 	}
 }
 
+extern "C" void Frame_drawImage(const Frame* self, const Frame::image_t * image, const SDL_Rect & _size, const SDL_Rect & scroll) { return self->drawImage(image, _size, scroll); }
+
+
 void Frame::addSyncScrollTarget(const char* name) {
     syncScrollTargets.push_back(std::string(name));
 }
+
+extern "C" void Frame_addSyncScrollTarget(Frame* self, const char * name) { return self->addSyncScrollTarget(name); }
+
 
 void Frame::syncScroll() {
     Frame* fparent = parent ?
@@ -2642,6 +2792,9 @@ void Frame::syncScroll() {
     }
 }
 
+extern "C" void Frame_syncScroll(Frame* self) { return self->syncScroll(); }
+
+
 void Frame::bringToTop() {
     if (!parent) {
         return;
@@ -2655,6 +2808,9 @@ void Frame::bringToTop() {
         }
     }
 }
+
+extern "C" void Frame_bringToTop(Frame* self) { return self->bringToTop(); }
+
 
 Frame* Frame::findParentToBlitTo()
 {
@@ -2677,6 +2833,9 @@ Frame* Frame::findParentToBlitTo()
 	}
 	return nullptr;
 }
+
+extern "C" Frame * Frame_findParentToBlitTo(Frame* self) { return self->findParentToBlitTo(); }
+
 
 void Frame::setBlitChildren(bool _doBlit)
 {
@@ -2785,6 +2944,9 @@ void Frame::setBlitChildren(bool _doBlit)
 	}
 }
 
+extern "C" void Frame_setBlitChildren(Frame* self, bool _doBlit) { return self->setBlitChildren(_doBlit); }
+
+
 void Frame::scrollParent() {
 	if ( !allowScrollParent )
 	{
@@ -2815,71 +2977,173 @@ void Frame::scrollParent() {
 	fparent->setActualSize(fActualSize);
 }
 
+extern "C" void Frame_scrollParent(Frame* self) { return self->scrollParent(); }
+
+
 const char*						Frame::getFont() const { return font.c_str(); }
+
+extern "C" const char * Frame_getFont(const Frame* self) { return self->getFont(); }
+
 
 void							Frame::setBlitDirty(bool _bBlitDity) { bBlitDirty = _bBlitDity; }
 
+extern "C" void Frame_setBlitDirty(Frame* self, bool _bBlitDity) { return self->setBlitDirty(_bBlitDity); }
+
+
 void							Frame::setBlitToParent(bool _bBlitParent) { bBlitToParent = _bBlitParent; }
+
+extern "C" void Frame_setBlitToParent(Frame* self, bool _bBlitParent) { return self->setBlitToParent(_bBlitParent); }
+
 
 void	Frame::setFont(const char* _font) { font = _font; }
 
+extern "C" void Frame_setFont(Frame* self, const char * _font) { return self->setFont(_font); }
+
+
 void	Frame::setBorder(const int _border) { border = _border; }
+
+extern "C" void Frame_setBorder(Frame* self, const int _border) { return self->setBorder(_border); }
+
 
 void	Frame::setPos(const int x, const int y) { size.x = x; size.y = y; }
 
+extern "C" void Frame_setPos(Frame* self, const int x, const int y) { return self->setPos(x, y); }
+
+
 void	Frame::setSize(SDL_Rect _size) { size = _size; }
+
+extern "C" void Frame_setSize(Frame* self, SDL_Rect _size) { return self->setSize(_size); }
+
 
 void	Frame::setBorderStyle(int _borderStyle) { borderStyle = static_cast<border_style_t>(_borderStyle); }
 
+extern "C" void Frame_setBorderStyle(Frame* self, int _borderStyle) { return self->setBorderStyle(_borderStyle); }
+
+
 void	Frame::setHigh(bool b) { borderStyle = b ? BORDER_BEVEL_HIGH : BORDER_BEVEL_LOW; }
+
+extern "C" void Frame_setHigh(Frame* self, bool b) { return self->setHigh(b); }
+
 
 void	Frame::setColor(const Uint32& _color) { color = _color; }
 
+extern "C" void Frame_setColor(Frame* self, const Uint32 & _color) { return self->setColor(_color); }
+
+
 void    Frame::setSelectedEntryColor(const Uint32& _color) { selectedEntryColor = _color; }
+
+extern "C" void Frame_setSelectedEntryColor(Frame* self, const Uint32 & _color) { return self->setSelectedEntryColor(_color); }
+
 
 void    Frame::setActivatedEntryColor(const Uint32& _color) { activatedEntryColor = _color; }
 
+extern "C" void Frame_setActivatedEntryColor(Frame* self, const Uint32 & _color) { return self->setActivatedEntryColor(_color); }
+
+
 void	Frame::setBorderColor(const Uint32& _color) { borderColor = _color; }
+
+extern "C" void Frame_setBorderColor(Frame* self, const Uint32 & _color) { return self->setBorderColor(_color); }
+
 
 void    Frame::setSliderColor(const Uint32& _color) { sliderColor = _color; }
 
+extern "C" void Frame_setSliderColor(Frame* self, const Uint32 & _color) { return self->setSliderColor(_color); }
+
+
 void	Frame::setDisabled(const bool _disabled) { disabled = _disabled; }
+
+extern "C" void Frame_setDisabled(Frame* self, const bool _disabled) { return self->setDisabled(_disabled); }
+
 
 void	Frame::setHollow(const bool _hollow) { hollow = _hollow; }
 
+extern "C" void Frame_setHollow(Frame* self, const bool _hollow) { return self->setHollow(_hollow); }
+
+
 void	Frame::setDropDown(const bool _dropDown) { dropDown = _dropDown; }
+
+extern "C" void Frame_setDropDown(Frame* self, const bool _dropDown) { return self->setDropDown(_dropDown); }
+
 
 void	Frame::setScrollBarsEnabled(const bool _scrollbars) { scrollbars = _scrollbars; }
 
+extern "C" void Frame_setScrollBarsEnabled(Frame* self, const bool _scrollbars) { return self->setScrollBarsEnabled(_scrollbars); }
+
+
 void	Frame::setAllowScrollBinds(const bool _allow) { allowScrollBinds = _allow; }
+
+extern "C" void Frame_setAllowScrollBinds(Frame* self, const bool _allow) { return self->setAllowScrollBinds(_allow); }
+
 
 void	Frame::setListOffset(SDL_Rect _size) { listOffset = _size; }
 
+extern "C" void Frame_setListOffset(Frame* self, SDL_Rect _size) { return self->setListOffset(_size); }
+
+
 void	Frame::setInheritParentFrameOpacity(const bool _inherit) { inheritParentFrameOpacity = _inherit; }
+
+extern "C" void Frame_setInheritParentFrameOpacity(Frame* self, const bool _inherit) { return self->setInheritParentFrameOpacity(_inherit); }
+
 
 void	Frame::setOpacity(const real_t _opacity) { opacity = _opacity; }
 
+extern "C" void Frame_setOpacity(Frame* self, const real_t _opacity) { return self->setOpacity(_opacity); }
+
+
 void	Frame::setListJustify(justify_t _justify) { justify = _justify; }
+
+extern "C" void Frame_setListJustify(Frame* self, Frame::justify_t _justify) { return self->setListJustify(_justify); }
+
 
 void	Frame::setClickable(const bool _clickable) { clickable = _clickable; }
 
+extern "C" void Frame_setClickable(Frame* self, const bool _clickable) { return self->setClickable(_clickable); }
+
+
 void    Frame::setDontTickChildren(const bool b) { dontTickChildren = b; }
+
+extern "C" void Frame_setDontTickChildren(Frame* self, const bool b) { return self->setDontTickChildren(b); }
+
 
 void    Frame::setEntrySize(int _size) { entrySize = _size; }
 
+extern "C" void Frame_setEntrySize(Frame* self, int _size) { return self->setEntrySize(_size); }
+
+
 void    Frame::setActivation(entry_t* entry) { activation = entry; }
+
+extern "C" void Frame_setActivation(Frame* self, Frame::entry_t * entry) { return self->setActivation(entry); }
+
 
 void    Frame::setScrollWithLeftControls(const bool b) { scrollWithLeftControls = b; }
 
+extern "C" void Frame_setScrollWithLeftControls(Frame* self, const bool b) { return self->setScrollWithLeftControls(b); }
+
+
 void    Frame::setAccelerationX(const float x) { scrollAccelerationX = x; }
+
+extern "C" void Frame_setAccelerationX(Frame* self, const float x) { return self->setAccelerationX(x); }
+
 
 void    Frame::setAccelerationY(const float y) { scrollAccelerationY = y; }
 
+extern "C" void Frame_setAccelerationY(Frame* self, const float y) { return self->setAccelerationY(y); }
+
+
 void	Frame::setListMenuCancelOverride(const bool b) { bListMenuListCancelOverride = b; }
+
+extern "C" void Frame_setListMenuCancelOverride(Frame* self, const bool b) { return self->setListMenuCancelOverride(b); }
+
 
 void	Frame::setAllowScrollParent(const bool b) { allowScrollParent = b; }
 
+extern "C" void Frame_setAllowScrollParent(Frame* self, const bool b) { return self->setAllowScrollParent(b); }
+
+
 void	Frame::setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }
+
+extern "C" void Frame_setScrollParentOffset(Frame* self, const SDL_Rect & offset) { return self->setScrollParentOffset(offset); }
+
 
 void Frame::setActualSize(SDL_Rect _actualSize) {
 		allowScrolling = true;
@@ -2893,3 +3157,6 @@ void Frame::setActualSize(SDL_Rect _actualSize) {
 		scrollAccelerationX = 0.f;
 		scrollAccelerationY = 0.f;
 	}
+
+extern "C" void Frame_setActualSize(Frame* self, SDL_Rect _actualSize) { return self->setActualSize(_actualSize); }
+

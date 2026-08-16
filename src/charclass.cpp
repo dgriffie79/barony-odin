@@ -4106,6 +4106,9 @@ bool PlayerCharacterClassManager::serialize(FileInterface *const file) {
 		return true;
 	}
 
+extern "C" bool PlayerCharacterClassManager_serialize(PlayerCharacterClassManager* self, FileInterface *const file) { return self->serialize(file); }
+
+
 void PlayerCharacterClassManager::writeToFile() {
 		std::string outputPath = outputdir;
 		outputPath.append("/data/characterclasses.json");
@@ -4114,6 +4117,9 @@ void PlayerCharacterClassManager::writeToFile() {
 			printlog("[JSON]: Successfully read json file %s", outputPath.c_str());
 		}
 	}
+
+extern "C" void PlayerCharacterClassManager_writeToFile(PlayerCharacterClassManager* self) { return self->writeToFile(); }
+
 
 void PlayerCharacterClassManager::readFromFile() {
 		if ( PHYSFS_getRealDir("/data/characterclasses.json") )
@@ -4128,8 +4134,14 @@ void PlayerCharacterClassManager::readFromFile() {
 		}
 	}
 
+extern "C" void PlayerCharacterClassManager_readFromFile(PlayerCharacterClassManager* self) { return self->readFromFile(); }
+
+
 void PlayerCharacterClassManager::setCharacterStatsAfterSerialization() const {
 		classStats->HP = classStats->MAXHP;
 		classStats->OLDHP = classStats->HP;
 		classStats->MP = classStats->MAXMP;
 	}
+
+extern "C" void PlayerCharacterClassManager_setCharacterStatsAfterSerialization(const PlayerCharacterClassManager* self) { return self->setCharacterStatsAfterSerialization(); }
+

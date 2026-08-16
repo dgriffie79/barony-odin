@@ -14664,6 +14664,9 @@ bool Entity::magicFallingCollision()
 	return false;
 }
 
+extern "C" bool Entity_magicFallingCollision(Entity* self) { return self->magicFallingCollision(); }
+
+
 bool Entity::magicOrbitingCollision()
 {
 	hit.entity = nullptr;
@@ -14783,6 +14786,9 @@ bool Entity::magicOrbitingCollision()
 	return false;
 }
 
+extern "C" bool Entity_magicOrbitingCollision(Entity* self) { return self->magicOrbitingCollision(); }
+
+
 void Entity::castFallingMagicMissile(int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int heightDelay)
 {
 	spell_t* spell = getSpellFromID(spellID);
@@ -14802,6 +14808,9 @@ void Entity::castFallingMagicMissile(int spellID, real_t distFromCaster, real_t 
 		playSoundEntity(entity, spellGetCastSound(spell), 128);
 	}
 }
+
+extern "C" void Entity_castFallingMagicMissile(Entity* self, int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int heightDelay) { return self->castFallingMagicMissile(spellID, distFromCaster, angleFromCasterDirection, heightDelay); }
+
 
 Entity* Entity::castOrbitingMagicMissile(int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int duration)
 {
@@ -14838,6 +14847,9 @@ Entity* Entity::castOrbitingMagicMissile(int spellID, real_t distFromCaster, rea
 	}
 	return entity;
 }
+
+extern "C" Entity * Entity_castOrbitingMagicMissile(Entity* self, int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int duration) { return self->castOrbitingMagicMissile(spellID, distFromCaster, angleFromCasterDirection, duration); }
+
 
 Entity* castStationaryOrbitingMagicMissile(Entity* parent, int spellID, real_t centerx, real_t centery,
 	real_t distFromCenter, real_t angleFromCenterDirection, int duration)
@@ -16166,6 +16178,9 @@ void AOEIndicators_t::cleanup()
 	}
 	surfaceCache.clear();
 }
+
+extern "C" void AOEIndicators_t_cleanup() { return AOEIndicators_t::cleanup(); }
+
 std::map<Uint32, AOEIndicators_t::Indicator_t> AOEIndicators_t::indicators;
 Uint32 AOEIndicators_t::uids = 1;
 void AOEIndicators_t::update()
@@ -16206,6 +16221,9 @@ void AOEIndicators_t::update()
 	}
 }
 
+extern "C" void AOEIndicators_t_update() { return AOEIndicators_t::update(); }
+
+
 Uint32 AOEIndicators_t::createIndicator(int _radiusMin, int _radiusMax, int _size, int _lifetime)
 {
 	Uint32 uid = uids;
@@ -16213,6 +16231,9 @@ Uint32 AOEIndicators_t::createIndicator(int _radiusMin, int _radiusMax, int _siz
 	indicators.insert(std::make_pair(uid, Indicator_t(_radiusMin, _radiusMax, _size, _lifetime, uid)));
 	return uid;
 }
+
+extern "C" Uint32 AOEIndicators_t_createIndicator(int _radiusMin, int _radiusMax, int _size, int _lifetime) { return AOEIndicators_t::createIndicator(_radiusMin, _radiusMax, _size, _lifetime); }
+
 
 std::map<int, std::map<std::tuple<Uint8, Uint8, Uint8, Uint8, real_t, real_t, int>, SDL_Surface*>> AOEIndicators_t::surfaceCache;
 void AOEIndicators_t::Indicator_t::updateIndicator()
@@ -16652,6 +16673,9 @@ void AOEIndicators_t::Indicator_t::updateIndicator()
 	//	maxTotal = 0.0;
 	//}
 }
+
+extern "C" void Indicator_t_updateIndicator(AOEIndicators_t::Indicator_t* self) { return self->updateIndicator(); }
+
 
 Entity* createParticleAOEIndicator(Entity* parent, real_t x, real_t y, real_t z, Uint32 lifetime, int size)
 {

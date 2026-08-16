@@ -134,6 +134,9 @@ void Slider::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widg
 	}
 }
 
+extern "C" void Slider_draw(const Slider* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets) { return self->draw(_size, _actualSize, selectedWidgets); }
+
+
 void Slider::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
     const DynamicArrayT<Widget*>& selectedWidgets,
     const DynamicArrayT<Widget*>& searchParents) const {
@@ -161,6 +164,9 @@ void Slider::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 	Widget::drawPost(_handleSize, selectedWidgets, searchParents);
 }
 
+extern "C" void Slider_drawPost(const Slider* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets, const DynamicArrayT<Widget *> & searchParents) { return self->drawPost(_size, _actualSize, selectedWidgets, searchParents); }
+
+
 void Slider::updateHandlePosition() {
 	if (orientation == SLIDER_HORIZONTAL) {
 		handleSize.x = (railSize.x + border) - handleSize.w / 2 + ((float)(value - minValue) / (maxValue - minValue)) * (railSize.w - border * 2);
@@ -170,6 +176,9 @@ void Slider::updateHandlePosition() {
 		handleSize.y = (railSize.y + border) - handleSize.h / 2 + ((float)(value - minValue) / (maxValue - minValue)) * (railSize.h - border * 2);
 	}
 }
+
+extern "C" void Slider_updateHandlePosition(Slider* self) { return self->updateHandlePosition(); }
+
 
 Slider::result_t Slider::process(SDL_Rect _size, SDL_Rect _actualSize, const bool usable) {
 	Widget::process();
@@ -284,15 +293,24 @@ Slider::result_t Slider::process(SDL_Rect _size, SDL_Rect _actualSize, const boo
 	return result;
 }
 
+extern "C" Slider::result_t Slider_process(Slider* self, SDL_Rect _size, SDL_Rect _actualSize, const bool usable) { return self->process(_size, _actualSize, usable); }
+
+
 void Slider::activate() {
 	activated = activated == false;
 }
+
+extern "C" void Slider_activate(Slider* self) { return self->activate(); }
+
 
 void Slider::fireCallback() {
 	if (callback) {
 		(*callback)(*this);
 	}
 }
+
+extern "C" void Slider_fireCallback(Slider* self) { return self->fireCallback(); }
+
 
 bool Slider::control() {
 	if (!activated) {
@@ -350,10 +368,16 @@ bool Slider::control() {
 	return false;
 }
 
+extern "C" bool Slider_control(Slider* self) { return self->control(); }
+
+
 void Slider::deselect() {
 	activated = false;
 	deselectBase();
 }
+
+extern "C" void Slider_deselect(Slider* self) { return self->deselect(); }
+
 
 void Slider::scrollParent() {
 	Frame* fparent = static_cast<Frame*>(parent);
@@ -389,6 +413,9 @@ void Slider::scrollParent() {
 	fparent->setActualSize(fActualSize);
 }
 
+extern "C" void Slider_scrollParent(Slider* self) { return self->scrollParent(); }
+
+
 SDL_Rect Slider::getAbsoluteSize() const
 {
 	SDL_Rect _size{ handleSize.x, handleSize.y, handleSize.w, handleSize.h };
@@ -401,42 +428,105 @@ SDL_Rect Slider::getAbsoluteSize() const
 	return _size;
 }
 
+extern "C" SDL_Rect Slider_getAbsoluteSize(const Slider* self) { return self->getAbsoluteSize(); }
+
+
 const char*                 Slider::getTooltip() const { return tooltip.c_str(); }
+
+extern "C" const char * Slider_getTooltip(const Slider* self) { return self->getTooltip(); }
+
 
 const char*                 Slider::getHandleImageActivated() const { return handleImageActivated.c_str(); }
 
+extern "C" const char * Slider_getHandleImageActivated(const Slider* self) { return self->getHandleImageActivated(); }
+
+
 const char*                 Slider::getHandleImage() const { return handleImage.c_str(); }
+
+extern "C" const char * Slider_getHandleImage(const Slider* self) { return self->getHandleImage(); }
+
 
 const char*                 Slider::getRailImage() const { return railImage.c_str(); }
 
+extern "C" const char * Slider_getRailImage(const Slider* self) { return self->getRailImage(); }
+
+
 void    Slider::setOrientation(orientation_t o) { orientation = o; }
+
+extern "C" void Slider_setOrientation(Slider* self, Slider::orientation_t o) { return self->setOrientation(o); }
+
 
 void    Slider::setValue(float _value) { value = _value; }
 
+extern "C" void Slider_setValue(Slider* self, float _value) { return self->setValue(_value); }
+
+
 void    Slider::setMaxValue(float _value) { maxValue = _value; }
+
+extern "C" void Slider_setMaxValue(Slider* self, float _value) { return self->setMaxValue(_value); }
+
 
 void    Slider::setMinValue(float _value) { minValue = _value; }
 
+extern "C" void Slider_setMinValue(Slider* self, float _value) { return self->setMinValue(_value); }
+
+
 void    Slider::setValueSpeed(float _value) { valueSpeed = _value; }
+
+extern "C" void Slider_setValueSpeed(Slider* self, float _value) { return self->setValueSpeed(_value); }
+
 
 void    Slider::setBorder(int _border) { border = _border; }
 
+extern "C" void Slider_setBorder(Slider* self, int _border) { return self->setBorder(_border); }
+
+
 void    Slider::setHandleSize(const SDL_Rect rect) { handleSize = rect; }
+
+extern "C" void Slider_setHandleSize(Slider* self, const SDL_Rect rect) { return self->setHandleSize(rect); }
+
 
 void    Slider::setRailSize(const SDL_Rect rect) { railSize = rect; }
 
+extern "C" void Slider_setRailSize(Slider* self, const SDL_Rect rect) { return self->setRailSize(rect); }
+
+
 void    Slider::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+
+extern "C" void Slider_setTooltip(Slider* self, const char * _tooltip) { return self->setTooltip(_tooltip); }
+
 
 void    Slider::setColor(const Uint32& _color) { color = _color; }
 
+extern "C" void Slider_setColor(Slider* self, const Uint32 & _color) { return self->setColor(_color); }
+
+
 void    Slider::setHighlightColor(const Uint32& _color) { highlightColor = _color; }
+
+extern "C" void Slider_setHighlightColor(Slider* self, const Uint32 & _color) { return self->setHighlightColor(_color); }
+
 
 void	Slider::setCallback(void (*const fn)(Slider&)) { callback = fn; }
 
+extern "C" void Slider_setCallback(Slider* self, void (*fn)(Slider &)) { return self->setCallback(fn); }
+
+
 void    Slider::setHandleImageActivated(const char* _image) { handleImageActivated = _image; }
+
+extern "C" void Slider_setHandleImageActivated(Slider* self, const char * _image) { return self->setHandleImageActivated(_image); }
+
 
 void    Slider::setHandleImage(const char* _image) { handleImage = _image; }
 
+extern "C" void Slider_setHandleImage(Slider* self, const char * _image) { return self->setHandleImage(_image); }
+
+
 void    Slider::setRailImage(const char* _image) { railImage = _image; }
 
+extern "C" void Slider_setRailImage(Slider* self, const char * _image) { return self->setRailImage(_image); }
+
+
 void	Slider::setOntop(const bool _ontop) { ontop = _ontop; }
+
+extern "C" void Slider_setOntop(Slider* self, const bool _ontop) { return self->setOntop(_ontop); }
+

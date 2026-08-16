@@ -868,6 +868,9 @@ void Entity::actExpansionEndGamePortal()
 	}
 }
 
+extern "C" void Entity_actExpansionEndGamePortal(Entity* self) { return self->actExpansionEndGamePortal(); }
+
+
 void actMidGamePortal(Entity* my)
 {
 	if ( !my )
@@ -1110,6 +1113,9 @@ void Entity::actMidGamePortal()
 		}
 	}
 }
+
+extern "C" void Entity_actMidGamePortal(Entity* self) { return self->actMidGamePortal(); }
+
 
 int customPortalLookForMapWithName(char* mapToSearch, bool isSecretLevel, int levelOffset)
 {

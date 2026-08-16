@@ -3106,4 +3106,7 @@ void Entity::seedEntityRNG(Uint32 seed)
 	}
 }
 
+extern "C" void Entity_seedEntityRNG(Entity* self, Uint32 seed) { return self->seedEntityRNG(seed); }
+
+
 

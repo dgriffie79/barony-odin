@@ -5033,6 +5033,9 @@ int Item::getBaseFoodSatiation(ItemType type)
 	return hungerIncrease;
 }
 
+extern "C" int Item_getBaseFoodSatiation(ItemType type) { return Item::getBaseFoodSatiation(type); }
+
+
 void item_Food(Item*& item, int player)
 {
 	if ( !item )

@@ -10537,10 +10537,16 @@ failed:
 		printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 	}
 
+extern "C" void ClassDescriptions_readFromFile() { return MainMenu::ClassDescriptions::readFromFile(); }
+
+
 	RaceDescriptions::DescData_t& RaceDescriptions::getMonsterDescriptionData(int type) 
 	{ 
 		return data[monstertypename[type]]; 
 	}
+
+extern "C" MainMenu::RaceDescriptions::DescData_t & RaceDescriptions_getMonsterDescriptionData(int type) { return MainMenu::RaceDescriptions::getMonsterDescriptionData(type); }
+
 
 	void RaceDescriptions::readFromFile()
 	{
@@ -10726,6 +10732,9 @@ failed:
 		printlog("[JSON]: Successfully read json file %s", inputPath.c_str());
 	}
 
+extern "C" void RaceDescriptions_readFromFile() { return MainMenu::RaceDescriptions::readFromFile(); }
+
+
 	constexpr int num_classes = sizeof(classes_in_order) / sizeof(classes_in_order[0]);
 
     constexpr Uint32 color_dlc0 = makeColorRGB(169, 185, 212);
@@ -10883,6 +10892,15 @@ failed:
 		}
 	}
 
+extern "C" void RaceDescriptions_update_details_text_3(Frame & card, int race, int modified_race) { return MainMenu::RaceDescriptions::update_details_text(card, race, modified_race); }
+
+
+extern "C" void RaceDescriptions_update_details_text_2(Frame & card, void * stats) { return MainMenu::RaceDescriptions::update_details_text(card, stats); }
+
+
+extern "C" void RaceDescriptions_update_details_text(Frame & card) { return MainMenu::RaceDescriptions::update_details_text(card); }
+
+
 	void RaceDescriptions::update_details_text(Frame& card, void* stats) 
 	{
 		Monster race = HUMAN;
@@ -10999,6 +11017,9 @@ failed:
 			}
 		}
 	}
+
+extern "C" void ClassDescriptions_update_stat_growths(Frame & card, int classnum, int shapeshiftedType) { return MainMenu::ClassDescriptions::update_stat_growths(card, classnum, shapeshiftedType); }
+
 
 	void RaceDescriptions::update_details_text(Frame& card) {
 		const int index = card.getOwner();
@@ -22327,6 +22348,9 @@ failed:
 			updateBannerURL = d["update_banner_link"].GetString();
 		}
 	}
+
+extern "C" void MainMenuBanners_t_readFromFile() { return MainMenu::MainMenuBanners_t::readFromFile(); }
+
 
 	void createMainMenu(bool ingame) {
 		if (!ingame) { 
@@ -34756,3 +34780,6 @@ std::basic_string<char> MainMenu::RaceDescriptions::getRaceKey(int race) {
 			}
 			return "";
 		}
+
+extern "C" std::string RaceDescriptions_getRaceKey(int race) { return MainMenu::RaceDescriptions::getRaceKey(race); }
+

@@ -181,6 +181,9 @@ void Player::Ghost_t::handleGhostCameraBobbing(bool useRefreshRateDelta)
 	}
 }
 
+extern "C" void Ghost_t_handleGhostCameraBobbing(Player::Ghost_t* self, bool useRefreshRateDelta) { return self->handleGhostCameraBobbing(useRefreshRateDelta); }
+
+
 void Player::Ghost_t::handleGhostMovement(const bool useRefreshRateDelta)
 {
 	if ( !my ) { return; }
@@ -285,6 +288,9 @@ void Player::Ghost_t::handleGhostMovement(const bool useRefreshRateDelta)
 	}*/
 }
 
+extern "C" void Ghost_t_handleGhostMovement(Player::Ghost_t* self, bool useRefreshRateDelta) { return self->handleGhostMovement(useRefreshRateDelta); }
+
+
 void Player::Ghost_t::startQuickTurn()
 {
 	if ( !my )
@@ -305,6 +311,9 @@ void Player::Ghost_t::startQuickTurn()
 	quickTurnStartTicks = my->ticks;
 	bDoingQuickTurn = true;
 }
+
+extern "C" void Ghost_t_startQuickTurn(Player::Ghost_t* self) { return self->startQuickTurn(); }
+
 
 static CvarFloat cvar_quick_turn_speed("/quick_turn_speed", 1.f);
 
@@ -390,6 +399,9 @@ bool Player::Ghost_t::handleQuickTurn(bool useRefreshRateDelta)
 	}
 }
 
+extern "C" bool Ghost_t_handleQuickTurn(Player::Ghost_t* self, bool useRefreshRateDelta) { return self->handleQuickTurn(useRefreshRateDelta); }
+
+
 void Player::Ghost_t::reset()
 {
 	quickTurnRotation = 0.0;
@@ -411,6 +423,9 @@ void Player::Ghost_t::reset()
 	player.cleanUpOnEntityRemoval();
 }
 
+extern "C" void Ghost_t_reset(Player::Ghost_t* self) { return self->reset(); }
+
+
 bool Player::Ghost_t::allowedInteractEntity(Entity& entity)
 {
 	if ( entity.behavior == &actItem
@@ -430,6 +445,9 @@ bool Player::Ghost_t::allowedInteractEntity(Entity& entity)
 	return false;
 }
 
+extern "C" bool Ghost_t_allowedInteractEntity(Player::Ghost_t* self, Entity & entity) { return self->allowedInteractEntity(entity); }
+
+
 bool Player::Ghost_t::isActive()
 { 
 	if ( my )
@@ -442,6 +460,9 @@ bool Player::Ghost_t::isActive()
 	return false;
 }
 
+extern "C" bool Ghost_t_isActive(Player::Ghost_t* self) { return self->isActive(); }
+
+
 bool Player::Ghost_t::isSpiritGhost()
 {
 	if ( my )
@@ -450,6 +471,9 @@ bool Player::Ghost_t::isSpiritGhost()
 	}
 	return false;
 }
+
+extern "C" bool Ghost_t_isSpiritGhost(Player::Ghost_t* self) { return self->isSpiritGhost(); }
+
 
 void Player::Ghost_t::handleAttack()
 {
@@ -859,6 +883,9 @@ void Player::Ghost_t::handleAttack()
 		}
 	}
 }
+
+extern "C" void Ghost_t_handleAttack(Player::Ghost_t* self) { return self->handleAttack(); }
+
 
 void Player::Ghost_t::handleActions()
 {
@@ -1535,12 +1562,18 @@ void Player::Ghost_t::handleActions()
 	}
 }
 
+extern "C" void Ghost_t_handleActions(Player::Ghost_t* self) { return self->handleActions(); }
+
+
 void Player::Ghost_t::createBounceAnimate()
 {
 	if ( !my ) { return; }
 
 	GHOSTCAM_SQUISH_ANGLE = Player::Ghost_t::GHOST_SQUISH_START_ANGLE / 100.f;
 }
+
+extern "C" void Ghost_t_createBounceAnimate(Player::Ghost_t* self) { return self->createBounceAnimate(); }
+
 
 bool Player::Ghost_t::isControllable()
 {
@@ -1552,6 +1585,9 @@ bool Player::Ghost_t::isControllable()
 	}
 	return false;
 }
+
+extern "C" bool Ghost_t_isControllable(Player::Ghost_t* self) { return self->isControllable(); }
+
 
 void Player::Ghost_t::pauseMenuSpectate(const int player)
 {
@@ -1565,6 +1601,9 @@ void Player::Ghost_t::pauseMenuSpectate(const int player)
 		players[player]->ghost.setActive(false);
 	}
 }
+
+extern "C" void Ghost_t_pauseMenuSpectate(const int player) { return Player::Ghost_t::pauseMenuSpectate(player); }
+
 
 void Player::Ghost_t::pauseMenuSpawnGhost(const int player)
 {
@@ -1583,6 +1622,9 @@ void Player::Ghost_t::pauseMenuSpawnGhost(const int player)
 	}
 }
 
+extern "C" void Ghost_t_pauseMenuSpawnGhost(const int player) { return Player::Ghost_t::pauseMenuSpawnGhost(player); }
+
+
 bool Player::Ghost_t::gamemodeAllowsGhosts()
 {
 	if ( gameModeManager.getMode() == GameModeManager_t::GameModes::GAME_MODE_TUTORIAL )
@@ -1596,6 +1638,9 @@ bool Player::Ghost_t::gamemodeAllowsGhosts()
 	}
 	return false;
 }
+
+extern "C" bool Ghost_t_gamemodeAllowsGhosts() { return Player::Ghost_t::gamemodeAllowsGhosts(); }
+
 
 bool Player::Ghost_t::gameoverOnDismiss(const int player)
 {
@@ -1611,6 +1656,9 @@ bool Player::Ghost_t::gameoverOnDismiss(const int player)
 	}
 	return false;
 }
+
+extern "C" bool Ghost_t_gameoverOnDismiss(const int player) { return Player::Ghost_t::gameoverOnDismiss(player); }
+
 
 Entity* Player::Ghost_t::respawn()
 {
@@ -1677,6 +1725,9 @@ Entity* Player::Ghost_t::respawn()
 	}
 	return nullptr;
 }
+
+extern "C" Entity * Ghost_t_respawn(Player::Ghost_t* self) { return self->respawn(); }
+
 
 void actPlayerXP(Entity* my)
 {
@@ -1905,6 +1956,9 @@ Entity* Player::Ghost_t::spawnGhost()
 	return nullptr;
 }
 
+extern "C" Entity * Ghost_t_spawnGhost(Player::Ghost_t* self) { return self->spawnGhost(); }
+
+
 void Player::Ghost_t::handleGhostCameraUpdate(const bool useRefreshRateDelta)
 {
 	if ( !my ) { return; }
@@ -2115,6 +2169,9 @@ void Player::Ghost_t::handleGhostCameraUpdate(const bool useRefreshRateDelta)
 	}
 }
 
+extern "C" void Ghost_t_handleGhostCameraUpdate(Player::Ghost_t* self, bool useRefreshRateDelta) { return self->handleGhostCameraUpdate(useRefreshRateDelta); }
+
+
 Uint32 Player::Ghost_t::cooldownPushDelay = TICKS_PER_SECOND * 3;
 Uint32 Player::Ghost_t::cooldownChillDelay = TICKS_PER_SECOND * 3;
 Uint32 Player::Ghost_t::cooldownTeleportDelay = TICKS_PER_SECOND * 3;
@@ -2145,6 +2202,9 @@ int Player::Ghost_t::getSpriteForPlayer(const int player)
 	}
 	return GHOST_MODEL_P1 + index;
 }
+
+extern "C" int Ghost_t_getSpriteForPlayer(const int player) { return Player::Ghost_t::getSpriteForPlayer(player); }
+
 
 void actDeathGhostLimb(Entity* my)
 {
@@ -2177,6 +2237,9 @@ void Player::Ghost_t::initStartRoomLocation(int x, int y)
 	startRoomY = y;
 }
 
+extern "C" void Ghost_t_initStartRoomLocation(Player::Ghost_t* self, int x, int y) { return self->initStartRoomLocation(x, y); }
+
+
 void Player::Ghost_t::initTeleportLocations(int x, int y)
 {
 	teleportToPlayer = -1;
@@ -2193,6 +2256,9 @@ void Player::Ghost_t::initTeleportLocations(int x, int y)
 	}
 }
 
+extern "C" void Ghost_t_initTeleportLocations(Player::Ghost_t* self, int x, int y) { return self->initTeleportLocations(x, y); }
+
+
 void Player::Ghost_t::setActive(bool active)
 {
 	if ( my )
@@ -2208,6 +2274,9 @@ void Player::Ghost_t::setActive(bool active)
 		}
 	}
 }
+
+extern "C" void Ghost_t_setActive(Player::Ghost_t* self, bool active) { return self->setActive(active); }
+
 
 void actDeathGhost(Entity* my)
 {
@@ -3624,6 +3693,9 @@ bool Player::PlayerMovement_t::isPlayerSwimming()
 	return swimming;
 }
 
+extern "C" bool PlayerMovement_t_isPlayerSwimming(Player::PlayerMovement_t* self) { return self->isPlayerSwimming(); }
+
+
 bool Player::PlayerMovement_t::handleQuickTurn(bool useRefreshRateDelta)
 {
 	if ( !players[player.playernum]->entity || !bDoingQuickTurn )
@@ -3705,6 +3777,9 @@ bool Player::PlayerMovement_t::handleQuickTurn(bool useRefreshRateDelta)
 	}
 }
 
+extern "C" bool PlayerMovement_t_handleQuickTurn(Player::PlayerMovement_t* self, bool useRefreshRateDelta) { return self->handleQuickTurn(useRefreshRateDelta); }
+
+
 void Player::PlayerMovement_t::startQuickTurn()
 {
 	if ( !players[player.playernum]->entity || bDoingQuickTurn )
@@ -3762,6 +3837,9 @@ void Player::PlayerMovement_t::startQuickTurn()
 	//messagePlayer(0, "%.2f, %.2f, %.2f", tangent, playerFacingDir, (PI - abs(abs(playerFacingDir - tangent) - PI)) * 2);
 	}*/
 }
+
+extern "C" void PlayerMovement_t_startQuickTurn(Player::PlayerMovement_t* self) { return self->startQuickTurn(); }
+
 
 void Player::PlayerMovement_t::handlePlayerCameraUpdate(bool useRefreshRateDelta)
 {
@@ -4046,6 +4124,9 @@ void Player::PlayerMovement_t::handlePlayerCameraUpdate(bool useRefreshRateDelta
 	}
 }
 
+extern "C" void PlayerMovement_t_handlePlayerCameraUpdate(Player::PlayerMovement_t* self, bool useRefreshRateDelta) { return self->handlePlayerCameraUpdate(useRefreshRateDelta); }
+
+
 void Player::PlayerMovement_t::handlePlayerCameraBobbing(bool useRefreshRateDelta)
 {
 	if ( !players[player.playernum]->entity )
@@ -4270,6 +4351,9 @@ void Player::PlayerMovement_t::handlePlayerCameraBobbing(bool useRefreshRateDelt
 	}
 }
 
+extern "C" void PlayerMovement_t_handlePlayerCameraBobbing(Player::PlayerMovement_t* self, bool useRefreshRateDelta) { return self->handlePlayerCameraBobbing(useRefreshRateDelta); }
+
+
 real_t Player::PlayerMovement_t::getMaximumSpeed()
 {
 	real_t maxSpeed = 12.5;
@@ -4279,6 +4363,9 @@ real_t Player::PlayerMovement_t::getMaximumSpeed()
 	}
 	return maxSpeed;
 }
+
+extern "C" real_t PlayerMovement_t_getMaximumSpeed(Player::PlayerMovement_t* self) { return self->getMaximumSpeed(); }
+
 
 int Player::PlayerMovement_t::getCharacterEquippedWeight()
 {
@@ -4297,6 +4384,9 @@ int Player::PlayerMovement_t::getCharacterEquippedWeight()
 	return weight;
 }
 
+extern "C" int PlayerMovement_t_getCharacterEquippedWeight(Player::PlayerMovement_t* self) { return self->getCharacterEquippedWeight(); }
+
+
 int Player::PlayerMovement_t::getCharacterWeight()
 {
 	int weight = 0;
@@ -4314,6 +4404,9 @@ int Player::PlayerMovement_t::getCharacterWeight()
 	weight += stats[player.playernum]->getGoldWeight();
 	return weight;
 }
+
+extern "C" int PlayerMovement_t_getCharacterWeight(Player::PlayerMovement_t* self) { return self->getCharacterWeight(); }
+
 
 int Player::PlayerMovement_t::getCharacterModifiedWeight(int* customWeight)
 {
@@ -4338,6 +4431,9 @@ int Player::PlayerMovement_t::getCharacterModifiedWeight(int* customWeight)
 	return weight;
 }
 
+extern "C" int PlayerMovement_t_getCharacterModifiedWeight(Player::PlayerMovement_t* self, int * customWeight) { return self->getCharacterModifiedWeight(customWeight); }
+
+
 real_t Player::PlayerMovement_t::getWeightRatio(int weight, Sint32 STR)
 {
 	real_t weightratio_zero = (1000 - weight) / (double)(1000);
@@ -4356,6 +4452,9 @@ real_t Player::PlayerMovement_t::getWeightRatio(int weight, Sint32 STR)
 
 	return weightratio;
 }
+
+extern "C" real_t PlayerMovement_t_getWeightRatio(Player::PlayerMovement_t* self, int weight, Sint32 STR) { return self->getWeightRatio(weight, STR); }
+
 
 real_t Player::PlayerMovement_t::getSpeedFactor(real_t weightratio, Sint32 DEX)
 {
@@ -4478,6 +4577,9 @@ real_t Player::PlayerMovement_t::getSpeedFactor(real_t weightratio, Sint32 DEX)
 	return speedFactor;
 }
 
+extern "C" real_t PlayerMovement_t_getSpeedFactor(Player::PlayerMovement_t* self, real_t weightratio, Sint32 DEX) { return self->getSpeedFactor(weightratio, DEX); }
+
+
 real_t Player::PlayerMovement_t::getCurrentMovementSpeed()
 {
 	if ( players[player.playernum] && players[player.playernum]->entity )
@@ -4486,6 +4588,9 @@ real_t Player::PlayerMovement_t::getCurrentMovementSpeed()
 	}
 	return 0.0;
 }
+
+extern "C" real_t PlayerMovement_t_getCurrentMovementSpeed(Player::PlayerMovement_t* self) { return self->getCurrentMovementSpeed(); }
+
 
 void Player::PlayerMovement_t::handlePlayerMovement(bool useRefreshRateDelta)
 {
@@ -4878,6 +4983,9 @@ void Player::PlayerMovement_t::handlePlayerMovement(bool useRefreshRateDelta)
 	}
 }
 
+extern "C" void PlayerMovement_t_handlePlayerMovement(Player::PlayerMovement_t* self, bool useRefreshRateDelta) { return self->handlePlayerMovement(useRefreshRateDelta); }
+
+
 real_t Player::PlayerMovement_t::minimiseMaximiseCameraZ = 0.4;
 
 void Player::PlayerMovement_t::handlePlayerCameraPosition(bool useRefreshRateDelta)
@@ -5033,6 +5141,9 @@ void Player::PlayerMovement_t::handlePlayerCameraPosition(bool useRefreshRateDel
 		}
 	}
 }
+
+extern "C" void PlayerMovement_t_handlePlayerCameraPosition(Player::PlayerMovement_t* self, bool useRefreshRateDelta) { return self->handlePlayerCameraPosition(useRefreshRateDelta); }
+
 
 void statueCycleItem(Item& item, bool dirForward)
 {
@@ -14706,6 +14817,9 @@ void Entity::playerShakeGrowthHelmet()
 	}
 }
 
+extern "C" void Entity_playerShakeGrowthHelmet(Entity* self) { return self->playerShakeGrowthHelmet(); }
+
+
 // client function
 void actPlayerLimb(Entity* my)
 {
@@ -15114,6 +15228,9 @@ void Entity::playerLevelEntrySpeechSecond()
 	}
 }
 
+extern "C" void Entity_playerLevelEntrySpeechSecond(Entity* self) { return self->playerLevelEntrySpeechSecond(); }
+
+
 bool Entity::isPlayerHeadSprite(const int sprite)
 {
 	switch ( sprite )
@@ -15199,6 +15316,12 @@ bool Entity::isPlayerHeadSprite(const int sprite)
 	return false;
 }
 
+extern "C" bool Entity_isPlayerHeadSprite_2(const int sprite) { return Entity::isPlayerHeadSprite(sprite); }
+
+
+extern "C" bool Entity_isPlayerHeadSprite(const Entity* self) { return self->isPlayerHeadSprite(); }
+
+
 bool Entity::isPlayerHeadSprite() const
 {
 	return Entity::isPlayerHeadSprite(sprite);
@@ -15273,6 +15396,9 @@ Monster Entity::getMonsterFromPlayerRace(int playerRace)
 {
     return ::getMonsterFromPlayerRace(playerRace);
 }
+
+extern "C" Monster Entity_getMonsterFromPlayerRace(Entity* self, int playerRace) { return self->getMonsterFromPlayerRace(playerRace); }
+
 
 void Entity::setDefaultPlayerModel(int playernum, Monster playerRace, int limbType, int headSprite)
 {
@@ -15787,6 +15913,9 @@ void Entity::setDefaultPlayerModel(int playernum, Monster playerRace, int limbTy
 		}
 	}
 }
+
+extern "C" void Entity_setDefaultPlayerModel(Entity* self, int playernum, Monster playerRace, int limbType, int headSprite) { return self->setDefaultPlayerModel(playernum, playerRace, limbType, headSprite); }
+
 
 bool playerRequiresBloodToSustain(int player)
 {

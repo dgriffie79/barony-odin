@@ -1042,14 +1042,23 @@ void Player::GUI_t::setHoveringOverModuleButton(Player::GUI_t::GUIModules module
 	}
 	hoveringButtonModule = moduleOfButton;
 }
+
+extern "C" void GUI_t_setHoveringOverModuleButton(Player::GUI_t* self, Player::GUI_t::GUIModules moduleOfButton) { return self->setHoveringOverModuleButton(moduleOfButton); }
+
 void Player::GUI_t::clearHoveringOverModuleButton()
 {
 	hoveringButtonModule = MODULE_NONE;
 }
+
+extern "C" void GUI_t_clearHoveringOverModuleButton(Player::GUI_t* self) { return self->clearHoveringOverModuleButton(); }
+
 Player::GUI_t::GUIModules Player::GUI_t::hoveringOverModuleButton()
 {
 	return hoveringButtonModule;
 }
+
+extern "C" Player::GUI_t::GUIModules GUI_t_hoveringOverModuleButton(Player::GUI_t* self) { return self->hoveringOverModuleButton(); }
+
 
 bool Player::GUI_t::bActiveModuleHasNoCursor()
 {
@@ -1071,6 +1080,9 @@ bool Player::GUI_t::bActiveModuleHasNoCursor()
 	}
 	return false;
 }
+
+extern "C" bool GUI_t_bActiveModuleHasNoCursor(Player::GUI_t* self) { return self->bActiveModuleHasNoCursor(); }
+
 
 bool Player::GUI_t::bActiveModuleUsesInventory()
 {
@@ -1104,6 +1116,9 @@ bool Player::GUI_t::bActiveModuleUsesInventory()
 	}
 	return false;
 }
+
+extern "C" bool GUI_t_bActiveModuleUsesInventory(Player::GUI_t* self) { return self->bActiveModuleUsesInventory(); }
+
 
 bool Player::GUI_t::warpControllerToModule(bool moveCursorInstantly)
 {
@@ -1328,6 +1343,9 @@ bool Player::GUI_t::warpControllerToModule(bool moveCursorInstantly)
 	return warped;
 }
 
+extern "C" bool GUI_t_warpControllerToModule(Player::GUI_t* self, bool moveCursorInstantly) { return self->warpControllerToModule(moveCursorInstantly); }
+
+
 void Player::GUI_t::activateModule(Player::GUI_t::GUIModules module)
 {
 	GUIModules oldModule = activeModule;
@@ -1406,6 +1424,9 @@ void Player::GUI_t::activateModule(Player::GUI_t::GUIModules module)
 		}
 	}
 }
+
+extern "C" void GUI_t_activateModule(Player::GUI_t* self, Player::GUI_t::GUIModules module) { return self->activateModule(module); }
+
 
 void Player::openStatusScreen(const int whichGUIMode, const int whichInventoryMode, const int whichModule)
 {
@@ -1510,6 +1531,9 @@ void Player::openStatusScreen(const int whichGUIMode, const int whichInventoryMo
 	}
 }
 
+extern "C" void Player_openStatusScreen(Player* self, const int whichGUIMode, const int whichInventoryMode, const int whichModule) { return self->openStatusScreen(whichGUIMode, whichInventoryMode, whichModule); }
+
+
 void Player::closeAllGUIs(CloseGUIShootmode shootmodeAction, CloseGUIIgnore whatToClose)
 {
 	bool oldShootmode = shootmode;
@@ -1576,6 +1600,9 @@ void Player::closeAllGUIs(CloseGUIShootmode shootmodeAction, CloseGUIIgnore what
 	}
 }
 
+extern "C" void Player_closeAllGUIs(Player* self, CloseGUIShootmode shootmodeAction, CloseGUIIgnore whatToClose) { return self->closeAllGUIs(shootmodeAction, whatToClose); }
+
+
 void FollowerRadialMenu::initfollowerMenuGUICursor(bool openInventory)
 {
 	bool oldshootmode = players[gui_player]->shootmode;
@@ -1606,6 +1633,9 @@ void FollowerRadialMenu::initfollowerMenuGUICursor(bool openInventory)
 		menuY = inputs.getMouse(gui_player, Inputs::Y);
 	}
 }
+
+extern "C" void FollowerRadialMenu_initfollowerMenuGUICursor(FollowerRadialMenu* self, bool openInventory) { return self->initfollowerMenuGUICursor(openInventory); }
+
 
 void FollowerRadialMenu::closeFollowerMenuGUI(bool clearRecentEntity)
 {
@@ -1658,6 +1688,9 @@ void FollowerRadialMenu::closeFollowerMenuGUI(bool clearRecentEntity)
 	animInvalidActionTicks = 0;
 }
 
+extern "C" void FollowerRadialMenu_closeFollowerMenuGUI(FollowerRadialMenu* self, bool clearRecentEntity) { return self->closeFollowerMenuGUI(clearRecentEntity); }
+
+
 bool FollowerRadialMenu::followerMenuIsOpen()
 {
 	if ( selectMoveTo || followerToCommand != nullptr )
@@ -1666,6 +1699,9 @@ bool FollowerRadialMenu::followerMenuIsOpen()
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_followerMenuIsOpen(FollowerRadialMenu* self) { return self->followerMenuIsOpen(); }
+
 
 DynamicArrayT<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntries;
 DynamicArrayT<FollowerRadialMenu::PanelEntry> FollowerRadialMenu::panelEntriesAlternate;
@@ -1859,6 +1895,9 @@ void FollowerRadialMenu::loadFollowerJSON()
 	}
 }
 
+extern "C" void FollowerRadialMenu_loadFollowerJSON() { return FollowerRadialMenu::loadFollowerJSON(); }
+
+
 bool FollowerRadialMenu::followerGUIHasBeenCreated() const
 {
 	if ( followerFrame )
@@ -1881,6 +1920,9 @@ bool FollowerRadialMenu::followerGUIHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_followerGUIHasBeenCreated(const FollowerRadialMenu* self) { return self->followerGUIHasBeenCreated(); }
+
 
 void FollowerRadialMenu::createFollowerMenuGUI()
 {
@@ -1987,6 +2029,9 @@ void FollowerRadialMenu::createFollowerMenuGUI()
 	auto wheelStatImg = bannerFrame->addImage(SDL_Rect{ 0, 0, 0, 0 }, 0xFFFFFFFF, "", "stat img");
 	wheelStatImg->disabled = true;
 }
+
+extern "C" void FollowerRadialMenu_createFollowerMenuGUI(FollowerRadialMenu* self) { return self->createFollowerMenuGUI(); }
+
 
 void setFollowerBannerTextFormatted(const int player, Field* field, Uint32 color, DynamicSetI32& highlights, char const * const text, ...)
 {
@@ -4036,6 +4081,9 @@ void FollowerRadialMenu::drawFollowerMenu()
 	}
 }
 
+extern "C" void FollowerRadialMenu_drawFollowerMenu(FollowerRadialMenu* self) { return self->drawFollowerMenu(); }
+
+
 int FollowerRadialMenu::numMonstersToDrawInParty()
 {
 	int players = 0;
@@ -4048,6 +4096,9 @@ int FollowerRadialMenu::numMonstersToDrawInParty()
 	}
 	return std::max(2, (maxMonstersToDraw - std::max(0, players - 1) * 2));
 }
+
+extern "C" int FollowerRadialMenu_numMonstersToDrawInParty(FollowerRadialMenu* self) { return self->numMonstersToDrawInParty(); }
+
 
 void FollowerRadialMenu::selectNextFollower()
 {
@@ -4152,6 +4203,9 @@ void FollowerRadialMenu::selectNextFollower()
 	}
 }
 
+extern "C" void FollowerRadialMenu_selectNextFollower(FollowerRadialMenu* self) { return self->selectNextFollower(); }
+
+
 void FollowerRadialMenu::updateScrollPartySheet()
 {
 	if ( !stats[gui_player] )
@@ -4202,6 +4256,9 @@ void FollowerRadialMenu::updateScrollPartySheet()
 	}
 }
 
+extern "C" void FollowerRadialMenu_updateScrollPartySheet(FollowerRadialMenu* self) { return self->updateScrollPartySheet(); }
+
+
 bool FollowerRadialMenu::isTinkeringFollower(int type)
 {
 	if ( type == GYROBOT || type == SENTRYBOT
@@ -4211,6 +4268,9 @@ bool FollowerRadialMenu::isTinkeringFollower(int type)
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_isTinkeringFollower(FollowerRadialMenu* self, int type) { return self->isTinkeringFollower(type); }
+
 
 bool FollowerRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updateInteractText)
 {
@@ -4398,6 +4458,9 @@ bool FollowerRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool upda
 	}
 	return true;
 }
+
+extern "C" bool FollowerRadialMenu_allowedInteractEntity(FollowerRadialMenu* self, Entity & selectedEntity, bool updateInteractText) { return self->allowedInteractEntity(selectedEntity, updateInteractText); }
+
 
 int FollowerRadialMenu::optionDisabledForCreature(int playerSkillLVL, int monsterType, int option, Entity* follower)
 {
@@ -4815,6 +4878,9 @@ int FollowerRadialMenu::optionDisabledForCreature(int playerSkillLVL, int monste
 	return 0;
 }
 
+extern "C" int FollowerRadialMenu_optionDisabledForCreature(FollowerRadialMenu* self, int playerSkillLVL, int monsterType, int option, Entity * follower) { return self->optionDisabledForCreature(playerSkillLVL, monsterType, option, follower); }
+
+
 bool FollowerRadialMenu::allowedClassToggle(int monsterType)
 {
 	switch ( monsterType )
@@ -4831,6 +4897,9 @@ bool FollowerRadialMenu::allowedClassToggle(int monsterType)
 	return false;
 }
 
+extern "C" bool FollowerRadialMenu_allowedClassToggle(FollowerRadialMenu* self, int monsterType) { return self->allowedClassToggle(monsterType); }
+
+
 bool FollowerRadialMenu::allowedItemPickupToggle(int monsterType)
 {
 	switch ( monsterType )
@@ -4846,6 +4915,9 @@ bool FollowerRadialMenu::allowedItemPickupToggle(int monsterType)
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_allowedItemPickupToggle(FollowerRadialMenu* self, int monsterType) { return self->allowedItemPickupToggle(monsterType); }
+
 
 bool FollowerRadialMenu::allowedInteractFood(int monsterType)
 {
@@ -4872,6 +4944,9 @@ bool FollowerRadialMenu::allowedInteractFood(int monsterType)
 	return false;
 }
 
+extern "C" bool FollowerRadialMenu_allowedInteractFood(int monsterType) { return FollowerRadialMenu::allowedInteractFood(monsterType); }
+
+
 bool FollowerRadialMenu::allowedInteractWorld(int monsterType)
 {
 	switch ( monsterType )
@@ -4891,6 +4966,9 @@ bool FollowerRadialMenu::allowedInteractWorld(int monsterType)
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_allowedInteractWorld(int monsterType) { return FollowerRadialMenu::allowedInteractWorld(monsterType); }
+
 
 bool FollowerRadialMenu::allowedInteractItems(int monsterType)
 {
@@ -4930,6 +5008,9 @@ bool FollowerRadialMenu::allowedInteractItems(int monsterType)
 	return false;
 }
 
+extern "C" bool FollowerRadialMenu_allowedInteractItems(FollowerRadialMenu* self, int monsterType) { return self->allowedInteractItems(monsterType); }
+
+
 bool FollowerRadialMenu::attackCommandOnly(int monsterType)
 {
 	bool result = !(allowedInteractItems(monsterType) || allowedInteractWorld(monsterType) || allowedInteractFood(monsterType));
@@ -4947,6 +5028,9 @@ bool FollowerRadialMenu::attackCommandOnly(int monsterType)
 
 	return result;
 }
+
+extern "C" bool FollowerRadialMenu_attackCommandOnly(FollowerRadialMenu* self, int monsterType) { return self->attackCommandOnly(monsterType); }
+
 
 void FollowerRadialMenu::monsterGyroBotConvertCommand(int* option)
 {
@@ -4971,6 +5055,9 @@ void FollowerRadialMenu::monsterGyroBotConvertCommand(int* option)
 	}
 }
 
+extern "C" void FollowerRadialMenu_monsterGyroBotConvertCommand(FollowerRadialMenu* self, int * option) { return self->monsterGyroBotConvertCommand(option); }
+
+
 
 bool FollowerRadialMenu::monsterGyroBotOnlyCommand(int option)
 {
@@ -4989,6 +5076,9 @@ bool FollowerRadialMenu::monsterGyroBotOnlyCommand(int option)
 	return false;
 }
 
+extern "C" bool FollowerRadialMenu_monsterGyroBotOnlyCommand(FollowerRadialMenu* self, int option) { return self->monsterGyroBotOnlyCommand(option); }
+
+
 bool FollowerRadialMenu::monsterGyroBotDisallowedCommands(int option)
 {
 	switch ( option )
@@ -5002,6 +5092,9 @@ bool FollowerRadialMenu::monsterGyroBotDisallowedCommands(int option)
 	}
 	return false;
 }
+
+extern "C" bool FollowerRadialMenu_monsterGyroBotDisallowedCommands(FollowerRadialMenu* self, int option) { return self->monsterGyroBotDisallowedCommands(option); }
+
 
 bool GenericGUIMenu::isItemRemoveCursable(const Item* item)
 {
@@ -5020,6 +5113,9 @@ bool GenericGUIMenu::isItemRemoveCursable(const Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemRemoveCursable(GenericGUIMenu* self, const Item * item) { return self->isItemRemoveCursable(item); }
+
+
 bool GenericGUIMenu::isItemIdentifiable(const Item* item)
 {
 	if ( !item )
@@ -5032,6 +5128,9 @@ bool GenericGUIMenu::isItemIdentifiable(const Item* item)
 	}
 	return true;
 }
+
+extern "C" bool GenericGUIMenu_isItemIdentifiable(GenericGUIMenu* self, const Item * item) { return self->isItemIdentifiable(item); }
+
 
 bool GenericGUIMenu::isItemEnchantArmorable(const Item* item)
 {
@@ -5056,6 +5155,9 @@ bool GenericGUIMenu::isItemEnchantArmorable(const Item* item)
 
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemEnchantArmorable(GenericGUIMenu* self, const Item * item) { return self->isItemEnchantArmorable(item); }
+
 
 bool GenericGUIMenu::isItemEnchantWeaponable(const Item* item)
 {
@@ -5085,6 +5187,9 @@ bool GenericGUIMenu::isItemEnchantWeaponable(const Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemEnchantWeaponable(GenericGUIMenu* self, const Item * item) { return self->isItemEnchantWeaponable(item); }
+
+
 bool GenericGUIMenu::isItemDesecratable(const Item* item)
 {
 	if ( !item )
@@ -5104,6 +5209,9 @@ bool GenericGUIMenu::isItemDesecratable(const Item* item)
 
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemDesecratable(GenericGUIMenu* self, const Item * item) { return self->isItemDesecratable(item); }
+
 
 void GenericGUIMenu::desecrateItem(Item* item)
 {
@@ -5180,6 +5288,9 @@ void GenericGUIMenu::desecrateItem(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_desecrateItem(GenericGUIMenu* self, Item * item) { return self->desecrateItem(item); }
+
+
 bool GenericGUIMenu::isItemBlessWaterable(const Item* item)
 {
 	if ( !item )
@@ -5198,6 +5309,9 @@ bool GenericGUIMenu::isItemBlessWaterable(const Item* item)
 
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemBlessWaterable(GenericGUIMenu* self, const Item * item) { return self->isItemBlessWaterable(item); }
+
 
 void GenericGUIMenu::blessWater(Item* item)
 {
@@ -5218,6 +5332,9 @@ void GenericGUIMenu::blessWater(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_blessWater(GenericGUIMenu* self, Item * item) { return self->blessWater(item); }
+
+
 bool GenericGUIMenu::isItemSanctifiable(const Item* item)
 {
 	if ( !item )
@@ -5236,6 +5353,9 @@ bool GenericGUIMenu::isItemSanctifiable(const Item* item)
 
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemSanctifiable(GenericGUIMenu* self, const Item * item) { return self->isItemSanctifiable(item); }
+
 
 void GenericGUIMenu::sanctifyItem(Item* item)
 {
@@ -5312,6 +5432,9 @@ void GenericGUIMenu::sanctifyItem(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_sanctifyItem(GenericGUIMenu* self, Item * item) { return self->sanctifyItem(item); }
+
+
 bool GenericGUIMenu::isItemCleaseFoodable(const Item* item)
 {
 	if ( !item )
@@ -5337,6 +5460,9 @@ bool GenericGUIMenu::isItemCleaseFoodable(const Item* item)
 
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemCleaseFoodable(GenericGUIMenu* self, const Item * item) { return self->isItemCleaseFoodable(item); }
+
 
 void GenericGUIMenu::cleanseFood(Item* item)
 {
@@ -5379,6 +5505,9 @@ void GenericGUIMenu::cleanseFood(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_cleanseFood(GenericGUIMenu* self, Item * item) { return self->cleanseFood(item); }
+
+
 bool GenericGUIMenu::isItemVoidable(const Item* item)
 {
 	if ( !item )
@@ -5396,6 +5525,9 @@ bool GenericGUIMenu::isItemVoidable(const Item* item)
 	}
 	return true;
 }
+
+extern "C" bool GenericGUIMenu_isItemVoidable(GenericGUIMenu* self, const Item * item) { return self->isItemVoidable(item); }
+
 
 bool GenericGUIMenu::isItemAdorcisable(const Item* item)
 {
@@ -5425,6 +5557,9 @@ bool GenericGUIMenu::isItemAdorcisable(const Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemAdorcisable(GenericGUIMenu* self, const Item * item) { return self->isItemAdorcisable(item); }
+
+
 bool GenericGUIMenu::isItemScepterChargeable(const Item* item)
 {
 	if ( !item )
@@ -5442,6 +5577,9 @@ bool GenericGUIMenu::isItemScepterChargeable(const Item* item)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemScepterChargeable(GenericGUIMenu* self, const Item * item) { return self->isItemScepterChargeable(item); }
+
 
 bool GenericGUIMenu::isItemAlterable(const Item* item)
 {
@@ -5602,6 +5740,9 @@ bool GenericGUIMenu::isItemAlterable(const Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemAlterable(GenericGUIMenu* self, const Item * item) { return self->isItemAlterable(item); }
+
+
 bool GenericGUIMenu::isItemRepairable(const Item* item, int repairScroll)
 {
 	if ( !item )
@@ -5704,6 +5845,9 @@ bool GenericGUIMenu::isItemRepairable(const Item* item, int repairScroll)
 			return false;
 	}
 }
+
+extern "C" bool GenericGUIMenu_isItemRepairable(GenericGUIMenu* self, const Item * item, int repairScroll) { return self->isItemRepairable(item, repairScroll); }
+
 
 // Generic GUI Code
 void GenericGUIMenu::rebuildGUIInventory()
@@ -5845,6 +5989,9 @@ void GenericGUIMenu::rebuildGUIInventory()
 		}*/
 	}
 }
+
+extern "C" void GenericGUIMenu_rebuildGUIInventory(GenericGUIMenu* self) { return self->rebuildGUIInventory(); }
+
 
 
 void GenericGUIMenu::updateGUI()
@@ -6312,6 +6459,9 @@ void GenericGUIMenu::updateGUI()
 	}
 }
 
+extern "C" void GenericGUIMenu_updateGUI(GenericGUIMenu* self) { return self->updateGUI(); }
+
+
 bool GenericGUIMenu::shouldDisplayItemInGUI(Item* item)
 {
 	if ( !item )
@@ -6450,6 +6600,9 @@ bool GenericGUIMenu::shouldDisplayItemInGUI(Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_shouldDisplayItemInGUI(GenericGUIMenu* self, Item * item) { return self->shouldDisplayItemInGUI(item); }
+
+
 void GenericGUIMenu::uncurseItem(Item* item)
 {
 	if ( !item )
@@ -6527,6 +6680,9 @@ void GenericGUIMenu::uncurseItem(Item* item)
 	}
 }
 
+extern "C" void GenericGUIMenu_uncurseItem(GenericGUIMenu* self, Item * item) { return self->uncurseItem(item); }
+
+
 void GenericGUIMenu::identifyItem(Item* item)
 {
 	if ( !item )
@@ -6561,6 +6717,9 @@ void GenericGUIMenu::identifyItem(Item* item)
 	messagePlayer(gui_player, MESSAGE_MISC, Language::get(320), item->description());
 	closeGUI();
 }
+
+extern "C" void GenericGUIMenu_identifyItem(GenericGUIMenu* self, Item * item) { return self->identifyItem(item); }
+
 
 bool GenericGUIMenu::ItemEffectGUI_t::consumeResourcesForTransmute()
 {
@@ -6657,6 +6816,9 @@ bool GenericGUIMenu::ItemEffectGUI_t::consumeResourcesForTransmute()
 	}
 	return false;
 }
+
+extern "C" bool ItemEffectGUI_t_consumeResourcesForTransmute(GenericGUIMenu::ItemEffectGUI_t* self) { return self->consumeResourcesForTransmute(); }
+
 
 int GenericGUIMenu::getAlterItemResultAtCycle(Item* item)
 {
@@ -6803,6 +6965,9 @@ int GenericGUIMenu::getAlterItemResultAtCycle(Item* item)
 
 	return -1;
 }
+
+extern "C" int GenericGUIMenu_getAlterItemResultAtCycle(GenericGUIMenu* self, Item * item) { return self->getAlterItemResultAtCycle(item); }
+
 
 void GenericGUIMenu::alterItem(Item* item)
 {
@@ -7116,6 +7281,9 @@ void GenericGUIMenu::alterItem(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_alterItem(GenericGUIMenu* self, Item * item) { return self->alterItem(item); }
+
+
 void GenericGUIMenu::enchantItem(Item* item)
 {
 	if ( !item )
@@ -7210,6 +7378,9 @@ void GenericGUIMenu::enchantItem(Item* item)
 	}
 	closeGUI();
 }
+
+extern "C" void GenericGUIMenu_enchantItem(GenericGUIMenu* self, Item * item) { return self->enchantItem(item); }
+
 
 void GenericGUIMenu::repairItem(Item* item)
 {
@@ -7370,6 +7541,9 @@ void GenericGUIMenu::repairItem(Item* item)
 	}
 }
 
+extern "C" void GenericGUIMenu_repairItem(GenericGUIMenu* self, Item * item) { return self->repairItem(item); }
+
+
 void GenericGUIMenu::closeGUI()
 {
 	bool wasOpen = guiActive;
@@ -7428,6 +7602,9 @@ void GenericGUIMenu::closeGUI()
 	workstationEntityUid = 0;
 	mailboxEntityUid = 0;
 }
+
+extern "C" void GenericGUIMenu_closeGUI(GenericGUIMenu* self) { return self->closeGUI(); }
+
 
 //inline Item* GenericGUIMenu::getItemInfo(int slot)
 //{
@@ -7723,6 +7900,18 @@ void GenericGUIMenu::openGUI(int type, Item* effectItem, int effectBeatitude, in
 	}
 	rebuildGUIInventory();
 }
+
+extern "C" void GenericGUIMenu_openGUI_4(GenericGUIMenu* self, int type, Entity * interactable) { return self->openGUI(type, interactable); }
+
+
+extern "C" void GenericGUIMenu_openGUI_3(GenericGUIMenu* self, int type, Item * itemOpenedWith) { return self->openGUI(type, itemOpenedWith); }
+
+
+extern "C" void GenericGUIMenu_openGUI_2(GenericGUIMenu* self, int type, bool experimenting, Item * itemOpenedWith) { return self->openGUI(type, experimenting, itemOpenedWith); }
+
+
+extern "C" void GenericGUIMenu_openGUI(GenericGUIMenu* self, int type, Item * effectItem, int effectBeatitude, int effectItemType, int usingSpellID) { return self->openGUI(type, effectItem, effectBeatitude, effectItemType, usingSpellID); }
+
 
 void GenericGUIMenu::openGUI(int type, bool experimenting, Item* itemOpenedWith)
 {
@@ -8034,6 +8223,9 @@ void GenericGUIMenu::sendItemToVoid(Item* item)
 	closeGUI();
 }
 
+extern "C" void GenericGUIMenu_sendItemToVoid(GenericGUIMenu* self, Item * item) { return self->sendItemToVoid(item); }
+
+
 void GenericGUIMenu::adorciseItem(Item* item)
 {
 	if ( !item || gui_player < 0 )
@@ -8086,6 +8278,9 @@ void GenericGUIMenu::adorciseItem(Item* item)
 	}
 	closeGUI();
 }
+
+extern "C" void GenericGUIMenu_adorciseItem(GenericGUIMenu* self, Item * item) { return self->adorciseItem(item); }
+
 
 void GenericGUIMenu::rechargeScepterUsingItem(Item* item)
 {
@@ -8163,6 +8358,9 @@ void GenericGUIMenu::rechargeScepterUsingItem(Item* item)
 	}
 	closeGUI();
 }
+
+extern "C" void GenericGUIMenu_rechargeScepterUsingItem(GenericGUIMenu* self, Item * item) { return self->rechargeScepterUsingItem(item); }
+
 
 bool GenericGUIMenu::executeOnItemClick(Item* item)
 {
@@ -8385,6 +8583,9 @@ bool GenericGUIMenu::executeOnItemClick(Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_executeOnItemClick(GenericGUIMenu* self, Item * item) { return self->executeOnItemClick(item); }
+
+
 bool GenericGUIMenu::isItemMixable(const Item* item)
 {
 	if ( !item )
@@ -8498,6 +8699,9 @@ bool GenericGUIMenu::isItemMixable(const Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemMixable(GenericGUIMenu* self, const Item * item) { return self->isItemMixable(item); }
+
+
 int GenericGUIMenu::isItemRationSeasoning(int type)
 {
 	if ( type >= WOODEN_SHIELD && type < NUMITEMS )
@@ -8513,6 +8717,9 @@ int GenericGUIMenu::isItemRationSeasoning(int type)
 
 	return 0;
 }
+
+extern "C" int GenericGUIMenu_isItemRationSeasoning(int type) { return GenericGUIMenu::isItemRationSeasoning(type); }
+
 
 bool GenericGUIMenu::isItemRation(int type)
 {
@@ -8531,6 +8738,9 @@ bool GenericGUIMenu::isItemRation(int type)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemRation(int type) { return GenericGUIMenu::isItemRation(type); }
+
 
 bool GenericGUIMenu::AlchemyGUI_t::alchemyMissingIngredientQty(Item* item)
 {
@@ -8568,6 +8778,9 @@ bool GenericGUIMenu::AlchemyGUI_t::alchemyMissingIngredientQty(Item* item)
 
 	return false;
 }
+
+extern "C" bool AlchemyGUI_t_alchemyMissingIngredientQty(GenericGUIMenu::AlchemyGUI_t* self, Item * item) { return self->alchemyMissingIngredientQty(item); }
+
 
 ItemType alchemyCookResult(int player, Item* potion1Item, Item* potion2Item, int& outCreateCount, Status& statusOut, 
 	int& outMissingPotion1Count, int& outMissingPotion2Count)
@@ -9503,6 +9716,9 @@ void GenericGUIMenu::alchemyCookCombination()
 	}
 }
 
+extern "C" void GenericGUIMenu_alchemyCookCombination(GenericGUIMenu* self) { return self->alchemyCookCombination(); }
+
+
 void GenericGUIMenu::alchemyCombinePotions()
 {
 	if ( !basePotion || !secondaryPotion )
@@ -10355,6 +10571,9 @@ void GenericGUIMenu::alchemyCombinePotions()
 	//closeGUI();
 }
 
+extern "C" void GenericGUIMenu_alchemyCombinePotions(GenericGUIMenu* self) { return self->alchemyCombinePotions(); }
+
+
 bool GenericGUIMenu::alchemyLearnRecipe(int type, bool increaseskill, bool notify)
 {
 	int index = 0;
@@ -10473,6 +10692,9 @@ bool GenericGUIMenu::alchemyLearnRecipe(int type, bool increaseskill, bool notif
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_alchemyLearnRecipe(GenericGUIMenu* self, int type, bool increaseskill, bool notify) { return self->alchemyLearnRecipe(type, increaseskill, notify); }
+
+
 bool GenericGUIMenu::isItemBaseIngredient(int type)
 {
 	switch ( type )
@@ -10490,6 +10712,9 @@ bool GenericGUIMenu::isItemBaseIngredient(int type)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemBaseIngredient(GenericGUIMenu* self, int type) { return self->isItemBaseIngredient(type); }
+
 
 bool GenericGUIMenu::isItemSecondaryIngredient(int type)
 {
@@ -10510,6 +10735,9 @@ bool GenericGUIMenu::isItemSecondaryIngredient(int type)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isItemSecondaryIngredient(GenericGUIMenu* self, int type) { return self->isItemSecondaryIngredient(type); }
+
 
 void GenericGUIMenu::alchemyLearnRecipeOnLevelUp(int skill)
 {
@@ -10546,6 +10774,9 @@ void GenericGUIMenu::alchemyLearnRecipeOnLevelUp(int skill)
 		alchemyLearnRecipe(potion, false);
 	}
 }
+
+extern "C" void GenericGUIMenu_alchemyLearnRecipeOnLevelUp(GenericGUIMenu* self, int skill) { return self->alchemyLearnRecipeOnLevelUp(skill); }
+
 
 void GenericGUIMenu::tinkeringCreateCraftableItemList()
 {
@@ -10663,6 +10894,9 @@ void GenericGUIMenu::tinkeringCreateCraftableItemList()
 	}
 }
 
+extern "C" void GenericGUIMenu_tinkeringCreateCraftableItemList(GenericGUIMenu* self) { return self->tinkeringCreateCraftableItemList(); }
+
+
 void GenericGUIMenu::tinkeringFreeLists()
 {
 	node_t* nextnode = nullptr;
@@ -10690,6 +10924,9 @@ void GenericGUIMenu::tinkeringFreeLists()
 	tinkeringTotalItems.last = nullptr;
 	tinkeringTotalLastCraftableNode = nullptr;
 }
+
+extern "C" void GenericGUIMenu_tinkeringFreeLists(GenericGUIMenu* self) { return self->tinkeringFreeLists(); }
+
 
 bool GenericGUIMenu::tinkeringCraftItem(Item* item)
 {
@@ -10732,6 +10969,9 @@ bool GenericGUIMenu::tinkeringCraftItem(Item* item)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringCraftItem(GenericGUIMenu* self, Item * item) { return self->tinkeringCraftItem(item); }
+
 
 bool GenericGUIMenu::tinkeringSalvageItem(Item* item, bool outsideInventory, int player)
 {
@@ -11048,6 +11288,9 @@ bool GenericGUIMenu::tinkeringSalvageItem(Item* item, bool outsideInventory, int
 	return true;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringSalvageItem(GenericGUIMenu* self, Item * item, bool outsideInventory, int player) { return self->tinkeringSalvageItem(item, outsideInventory, player); }
+
+
 bool GenericGUIMenu::isNodeFromPlayerInventory(node_t* node)
 {
 	if ( stats[gui_player] && node )
@@ -11056,6 +11299,9 @@ bool GenericGUIMenu::isNodeFromPlayerInventory(node_t* node)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_isNodeFromPlayerInventory(GenericGUIMenu* self, node_t * node) { return self->isNodeFromPlayerInventory(node); }
+
 
 bool GenericGUIMenu::isItemSalvageable(const Item* item, int player)
 {
@@ -11089,6 +11335,9 @@ bool GenericGUIMenu::isItemSalvageable(const Item* item, int player)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_isItemSalvageable(GenericGUIMenu* self, const Item * item, int player) { return self->isItemSalvageable(item, player); }
+
+
 bool GenericGUIMenu::tinkeringIsItemRepairable(Item* item, int player)
 {
 	if ( !item )
@@ -11113,6 +11362,9 @@ bool GenericGUIMenu::tinkeringIsItemRepairable(Item* item, int player)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringIsItemRepairable(GenericGUIMenu* self, Item * item, int player) { return self->tinkeringIsItemRepairable(item, player); }
+
+
 bool GenericGUIMenu::tinkeringPlayerCanAffordRepair(Item* item)
 {
 	if ( !item )
@@ -11135,6 +11387,9 @@ bool GenericGUIMenu::tinkeringPlayerCanAffordRepair(Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringPlayerCanAffordRepair(GenericGUIMenu* self, Item * item) { return self->tinkeringPlayerCanAffordRepair(item); }
+
+
 bool GenericGUIMenu::tinkeringPlayerCanAffordCraft(const Item* item)
 {
 	if ( !item )
@@ -11156,6 +11411,9 @@ bool GenericGUIMenu::tinkeringPlayerCanAffordCraft(const Item* item)
 	
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringPlayerCanAffordCraft(GenericGUIMenu* self, const Item * item) { return self->tinkeringPlayerCanAffordCraft(item); }
+
 
 Item* GenericGUIMenu::tinkeringCraftItemAndConsumeMaterials(const Item* item)
 {
@@ -11287,6 +11545,9 @@ Item* GenericGUIMenu::tinkeringCraftItemAndConsumeMaterials(const Item* item)
 	return nullptr;
 }
 
+extern "C" Item * GenericGUIMenu_tinkeringCraftItemAndConsumeMaterials(GenericGUIMenu* self, const Item * item) { return self->tinkeringCraftItemAndConsumeMaterials(item); }
+
+
 Uint32 GenericGUIMenu::tinkeringRetrieveLeastScrapStack(int type)
 {
 	if ( type == TOOL_METAL_SCRAP )
@@ -11328,6 +11589,9 @@ Uint32 GenericGUIMenu::tinkeringRetrieveLeastScrapStack(int type)
 	return 0;
 }
 
+extern "C" Uint32 GenericGUIMenu_tinkeringRetrieveLeastScrapStack(GenericGUIMenu* self, int type) { return self->tinkeringRetrieveLeastScrapStack(type); }
+
+
 int GenericGUIMenu::tinkeringCountScrapTotal(int type)
 {
 	int count = 0;
@@ -11361,6 +11625,9 @@ int GenericGUIMenu::tinkeringCountScrapTotal(int type)
 	}
 	return count;
 }
+
+extern "C" int GenericGUIMenu_tinkeringCountScrapTotal(GenericGUIMenu* self, int type) { return self->tinkeringCountScrapTotal(type); }
+
 
 bool GenericGUIMenu::tinkeringPlayerHasMaterialsInventory(int metal, int magic)
 {
@@ -11400,6 +11667,9 @@ bool GenericGUIMenu::tinkeringPlayerHasMaterialsInventory(int metal, int magic)
 	}
 	return hasMaterials;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringPlayerHasMaterialsInventory(GenericGUIMenu* self, int metal, int magic) { return self->tinkeringPlayerHasMaterialsInventory(metal, magic); }
+
 
 bool GenericGUIMenu::tinkeringGetCraftingCost(const Item* item, int* metal, int* magic)
 {
@@ -11474,6 +11744,9 @@ bool GenericGUIMenu::tinkeringGetCraftingCost(const Item* item, int* metal, int*
 
 	return true;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringGetCraftingCost(const Item * item, int * metal, int * magic) { return GenericGUIMenu::tinkeringGetCraftingCost(item, metal, magic); }
+
 
 bool GenericGUIMenu::tinkeringGetItemValue(const Item* item, int* metal, int* magic)
 {
@@ -12128,6 +12401,9 @@ bool GenericGUIMenu::tinkeringGetItemValue(const Item* item, int* metal, int* ma
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringGetItemValue(const Item * item, int * metal, int * magic) { return GenericGUIMenu::tinkeringGetItemValue(item, metal, magic); }
+
+
 void getGeneralItemRepairCostWithoutRequirements(const int player, Item* item, int& metal, int& magic)
 {
 	int metalSalvage = 0;
@@ -12218,6 +12494,9 @@ bool GenericGUIMenu::tinkeringGetRepairCost(Item* item, int* metal, int* magic)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringGetRepairCost(GenericGUIMenu* self, Item * item, int * metal, int * magic) { return self->tinkeringGetRepairCost(item, metal, magic); }
+
+
 int GenericGUIMenu::tinkeringRepairGeneralItemSkillRequirement(Item* item)
 {
 	if ( !item )
@@ -12271,6 +12550,9 @@ int GenericGUIMenu::tinkeringRepairGeneralItemSkillRequirement(Item* item)
 	return -1;
 }
 
+extern "C" int GenericGUIMenu_tinkeringRepairGeneralItemSkillRequirement(GenericGUIMenu* self, Item * item) { return self->tinkeringRepairGeneralItemSkillRequirement(item); }
+
+
 bool GenericGUIMenu::tinkeringIsItemUpgradeable(const Item* item)
 {
 	if ( !item )
@@ -12293,6 +12575,9 @@ bool GenericGUIMenu::tinkeringIsItemUpgradeable(const Item* item)
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringIsItemUpgradeable(GenericGUIMenu* self, const Item * item) { return self->tinkeringIsItemUpgradeable(item); }
+
 
 const int TINKER_MIN_ITEM_SKILL_REQ = 0;
 
@@ -12360,6 +12645,9 @@ int GenericGUIMenu::tinkeringPlayerHasSkillLVLToCraft(const Item* item)
 	return -1;
 }
 
+extern "C" int GenericGUIMenu_tinkeringPlayerHasSkillLVLToCraft(GenericGUIMenu* self, const Item * item) { return self->tinkeringPlayerHasSkillLVLToCraft(item); }
+
+
 bool GenericGUIMenu::tinkeringKitDegradeOnUse(int player)
 {
 	if ( players[player]->isLocalPlayer() )
@@ -12416,6 +12704,9 @@ bool GenericGUIMenu::tinkeringKitDegradeOnUse(int player)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringKitDegradeOnUse(GenericGUIMenu* self, int player) { return self->tinkeringKitDegradeOnUse(player); }
+
+
 Item* GenericGUIMenu::tinkeringKitFindInInventory()
 {
 	if ( tinkeringKitItem )
@@ -12441,6 +12732,9 @@ Item* GenericGUIMenu::tinkeringKitFindInInventory()
 	return nullptr;
 }
 
+extern "C" Item * GenericGUIMenu_tinkeringKitFindInInventory(GenericGUIMenu* self) { return self->tinkeringKitFindInInventory(); }
+
+
 bool GenericGUIMenu::tinkeringKitRollIfShouldBreak()
 {
 	if ( local_rng.rand() % 20 == 10 )
@@ -12449,6 +12743,9 @@ bool GenericGUIMenu::tinkeringKitRollIfShouldBreak()
 	}
 	return false;
 }
+
+extern "C" bool GenericGUIMenu_tinkeringKitRollIfShouldBreak(GenericGUIMenu* self) { return self->tinkeringKitRollIfShouldBreak(); }
+
 
 bool GenericGUIMenu::tinkeringRepairItem(Item* item)
 {
@@ -12816,6 +13113,9 @@ bool GenericGUIMenu::tinkeringRepairItem(Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringRepairItem(GenericGUIMenu* self, Item * item) { return self->tinkeringRepairItem(item); }
+
+
 int GenericGUIMenu::tinkeringUpgradeMaxStatus(Item* item)
 {
 	if ( !item )
@@ -12849,6 +13149,9 @@ int GenericGUIMenu::tinkeringUpgradeMaxStatus(Item* item)
 	}
 	return BROKEN;
 }
+
+extern "C" int GenericGUIMenu_tinkeringUpgradeMaxStatus(GenericGUIMenu* self, Item * item) { return self->tinkeringUpgradeMaxStatus(item); }
+
 
 bool GenericGUIMenu::tinkeringConsumeMaterialsForRepair(Item* item, bool upgradingItem)
 {
@@ -12939,6 +13242,9 @@ bool GenericGUIMenu::tinkeringConsumeMaterialsForRepair(Item* item, bool upgradi
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_tinkeringConsumeMaterialsForRepair(GenericGUIMenu* self, Item * item, bool upgradingItem) { return self->tinkeringConsumeMaterialsForRepair(item, upgradingItem); }
+
+
 void GenericGUIMenu::scribingCreateCraftableItemList()
 {
 	scribingFreeLists();
@@ -12982,6 +13288,9 @@ void GenericGUIMenu::scribingCreateCraftableItemList()
 	}
 }
 
+extern "C" void GenericGUIMenu_scribingCreateCraftableItemList(GenericGUIMenu* self) { return self->scribingCreateCraftableItemList(); }
+
+
 void GenericGUIMenu::scribingFreeLists()
 {
 	node_t* nextnode = nullptr;
@@ -13010,6 +13319,9 @@ void GenericGUIMenu::scribingFreeLists()
 	scribingLastUsageDisplayTimer = 0;
 	scribingLastUsageAmount = 0;
 }
+
+extern "C" void GenericGUIMenu_scribingFreeLists(GenericGUIMenu* self) { return self->scribingFreeLists(); }
+
 
 int GenericGUIMenu::scribingToolDegradeOnUse(Item* itemUsedWith)
 {
@@ -13091,6 +13403,9 @@ int GenericGUIMenu::scribingToolDegradeOnUse(Item* itemUsedWith)
 	return -1;
 }
 
+extern "C" int GenericGUIMenu_scribingToolDegradeOnUse(GenericGUIMenu* self, Item * itemUsedWith) { return self->scribingToolDegradeOnUse(itemUsedWith); }
+
+
 Item* GenericGUIMenu::scribingToolFindInInventory()
 {
 	if ( scribingToolItem )
@@ -13110,6 +13425,9 @@ Item* GenericGUIMenu::scribingToolFindInInventory()
 	}
 	return nullptr;
 }
+
+extern "C" Item * GenericGUIMenu_scribingToolFindInInventory(GenericGUIMenu* self) { return self->scribingToolFindInInventory(); }
+
 
 void GenericGUIMenu::scribingGetChargeCost(Item* itemUsedWith, int& outChargeCostMin, int& outChargeCostMax)
 {
@@ -13197,6 +13515,9 @@ void GenericGUIMenu::scribingGetChargeCost(Item* itemUsedWith, int& outChargeCos
 		}
 	}
 }
+
+extern "C" void GenericGUIMenu_scribingGetChargeCost(GenericGUIMenu* self, Item * itemUsedWith, int & outChargeCostMin, int & outChargeCostMax) { return self->scribingGetChargeCost(itemUsedWith, outChargeCostMin, outChargeCostMax); }
+
 
 bool GenericGUIMenu::scribingWriteItem(Item* item)
 {
@@ -13406,6 +13727,9 @@ bool GenericGUIMenu::scribingWriteItem(Item* item)
 	return false;
 }
 
+extern "C" bool GenericGUIMenu_scribingWriteItem(GenericGUIMenu* self, Item * item) { return self->scribingWriteItem(item); }
+
+
 void EnemyHPDamageBarHandler::cullExpiredHPBars()
 {
 	{
@@ -13453,6 +13777,9 @@ void EnemyHPDamageBarHandler::cullExpiredHPBars()
 		}
 	}
 }
+
+extern "C" void EnemyHPDamageBarHandler_cullExpiredHPBars(EnemyHPDamageBarHandler* self) { return self->cullExpiredHPBars(); }
+
 
 EnemyHPDamageBarHandler::EnemyHPDetails* EnemyHPDamageBarHandler::getMostRecentHPBar(int index)
 {
@@ -13512,6 +13839,9 @@ EnemyHPDamageBarHandler::EnemyHPDetails* EnemyHPDamageBarHandler::getMostRecentH
 	}
 	return nullptr;
 }
+
+extern "C" EnemyHPDamageBarHandler::EnemyHPDetails * EnemyHPDamageBarHandler_getMostRecentHPBar(EnemyHPDamageBarHandler* self, int index) { return self->getMostRecentHPBar(index); }
+
 
 void EnemyHPDamageBarHandler::displayCurrentHPBar(const int player)
 {
@@ -13662,6 +13992,9 @@ void EnemyHPDamageBarHandler::displayCurrentHPBar(const int player)
 	//}
 }
 
+extern "C" void EnemyHPDamageBarHandler_displayCurrentHPBar(EnemyHPDamageBarHandler* self, const int player) { return self->displayCurrentHPBar(player); }
+
+
 void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 {
 	Entity* entity = uidToEntity(enemy_uid);
@@ -13730,6 +14063,9 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::updateWorldCoordinates()
 		screenDistance = enemyBarSettings.getScreenDistanceOffset(entity);
 	}
 }
+
+extern "C" void EnemyHPDetails_updateWorldCoordinates(EnemyHPDamageBarHandler::EnemyHPDetails* self) { return self->updateWorldCoordinates(); }
+
 
 EnemyHPDamageBarHandler::EnemyHPDetails* EnemyHPDamageBarHandler::addEnemyToList(Sint32 HP, Sint32 maxHP, Sint32 oldHP, Uint32 uid, const char* name, bool isLowPriority, DamageGib gibDmgType)
 {
@@ -13849,6 +14185,9 @@ EnemyHPDamageBarHandler::EnemyHPDetails* EnemyHPDamageBarHandler::addEnemyToList
 	return details;
 }
 
+extern "C" EnemyHPDamageBarHandler::EnemyHPDetails * EnemyHPDamageBarHandler_addEnemyToList(EnemyHPDamageBarHandler* self, Sint32 HP, Sint32 maxHP, Sint32 oldHP, Uint32 uid, const char * name, bool isLowPriority, DamageGib gibDmgType) { return self->addEnemyToList(HP, maxHP, oldHP, uid, name, isLowPriority, gibDmgType); }
+
+
 const int GenericGUIMenu::TinkerGUI_t::MAX_TINKER_X = 5;
 const int GenericGUIMenu::TinkerGUI_t::MAX_TINKER_Y = 4;
 
@@ -13887,6 +14226,9 @@ void GenericGUIMenu::TinkerGUI_t::openTinkerMenu()
 	inputs.getUIInteraction(playernum)->selectedItemFromChest = 0;
 	clearItemDisplayed();
 }
+
+extern "C" void TinkerGUI_t_openTinkerMenu(GenericGUIMenu::TinkerGUI_t* self) { return self->openTinkerMenu(); }
+
 
 void GenericGUIMenu::TinkerGUI_t::closeTinkerMenu()
 {
@@ -13961,6 +14303,9 @@ void GenericGUIMenu::TinkerGUI_t::closeTinkerMenu()
 	parentGUI.workstationEntityUid = 0;
 }
 
+extern "C" void TinkerGUI_t_closeTinkerMenu(GenericGUIMenu::TinkerGUI_t* self) { return self->closeTinkerMenu(); }
+
+
 void onTinkerChangeTabAction(const int playernum, bool changingToNewTab = true)
 {
 	auto& tinkerGUI = GenericGUI[playernum].tinkerGUI;
@@ -14023,6 +14368,9 @@ bool GenericGUIMenu::TinkerGUI_t::tinkerGUIHasBeenCreated() const
 	return false;
 }
 
+extern "C" bool TinkerGUI_t_tinkerGUIHasBeenCreated(const GenericGUIMenu::TinkerGUI_t* self) { return self->tinkerGUIHasBeenCreated(); }
+
+
 bool GenericGUIMenu::TinkerGUI_t::isConstructMenuActive() const
 {
 	if ( !parentGUI.isGUIOpen() || !tinkerGUIHasBeenCreated() )
@@ -14036,6 +14384,9 @@ bool GenericGUIMenu::TinkerGUI_t::isConstructMenuActive() const
 	}
 	return false;
 }
+
+extern "C" bool TinkerGUI_t_isConstructMenuActive(const GenericGUIMenu::TinkerGUI_t* self) { return self->isConstructMenuActive(); }
+
 
 bool GenericGUIMenu::TinkerGUI_t::isSalvageOrRepairMenuActive() const
 {
@@ -14051,6 +14402,9 @@ bool GenericGUIMenu::TinkerGUI_t::isSalvageOrRepairMenuActive() const
 	}
 	return false;
 }
+
+extern "C" bool TinkerGUI_t_isSalvageOrRepairMenuActive(const GenericGUIMenu::TinkerGUI_t* self) { return self->isSalvageOrRepairMenuActive(); }
+
 
 void tinkerScrapChangeEvent(const int player, int metalAmount, int magicAmount, int realMetalScrap, int realMagicScrap)
 {
@@ -14264,6 +14618,9 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerScrapHeld(void* metalHeldText, voi
 		}
 	}
 }
+
+extern "C" void TinkerGUI_t_updateTinkerScrapHeld(GenericGUIMenu::TinkerGUI_t* self, void * metalHeldText, void * magicHeldText, int realMetalScrap, int realMagicScrap) { return self->updateTinkerScrapHeld(metalHeldText, magicHeldText, realMetalScrap, realMagicScrap); }
+
 
 void buttonTinkerUpdateSelectorOnHighlight(const int player, Button* button)
 {
@@ -15812,6 +16169,9 @@ void GenericGUIMenu::TinkerGUI_t::updateTinkerMenu()
 	}
 }
 
+extern "C" void TinkerGUI_t_updateTinkerMenu(GenericGUIMenu::TinkerGUI_t* self) { return self->updateTinkerMenu(); }
+
+
 const int kTinkerCraftSlotHeightOffset = 6; // slightly taller than normal slots
 
 void GenericGUIMenu::TinkerGUI_t::createTinkerMenu()
@@ -16256,6 +16616,9 @@ void GenericGUIMenu::TinkerGUI_t::createTinkerMenu()
 	}
 }
 
+extern "C" void TinkerGUI_t_createTinkerMenu(GenericGUIMenu::TinkerGUI_t* self) { return self->createTinkerMenu(); }
+
+
 bool GenericGUIMenu::TinkerGUI_t::isTinkerConstructItemSelected(Item* item)
 {
 	if ( !item || itemCategory(item) == SPELL_CAT )
@@ -16287,6 +16650,9 @@ bool GenericGUIMenu::TinkerGUI_t::isTinkerConstructItemSelected(Item* item)
 
 	return false;
 }
+
+extern "C" bool TinkerGUI_t_isTinkerConstructItemSelected(GenericGUIMenu::TinkerGUI_t* self, Item * item) { return self->isTinkerConstructItemSelected(item); }
+
 
 bool GenericGUIMenu::TinkerGUI_t::isSalvageOrRepairItemSelected(Item* item)
 {
@@ -16343,11 +16709,17 @@ bool GenericGUIMenu::TinkerGUI_t::isSalvageOrRepairItemSelected(Item* item)
 	return false;
 }
 
+extern "C" bool TinkerGUI_t_isSalvageOrRepairItemSelected(GenericGUIMenu::TinkerGUI_t* self, Item * item) { return self->isSalvageOrRepairItemSelected(item); }
+
+
 void GenericGUIMenu::TinkerGUI_t::selectTinkerSlot(const int x, const int y)
 {
 	selectedTinkerSlotX = x;
 	selectedTinkerSlotY = y;
 }
+
+extern "C" void TinkerGUI_t_selectTinkerSlot(GenericGUIMenu::TinkerGUI_t* self, const int x, const int y) { return self->selectTinkerSlot(x, y); }
+
 
 Frame* GenericGUIMenu::TinkerGUI_t::getTinkerSlotFrame(int x, int y) const
 {
@@ -16362,6 +16734,9 @@ Frame* GenericGUIMenu::TinkerGUI_t::getTinkerSlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * TinkerGUI_t_getTinkerSlotFrame(const GenericGUIMenu::TinkerGUI_t* self, int x, int y) { return self->getTinkerSlotFrame(x, y); }
+
 
 GenericGUIMenu::TinkerGUI_t::TinkerActions_t GenericGUIMenu::TinkerGUI_t::setItemDisplayNameAndPrice(Item* item, bool checkStatusOnly)
 {
@@ -16698,6 +17073,9 @@ GenericGUIMenu::TinkerGUI_t::TinkerActions_t GenericGUIMenu::TinkerGUI_t::setIte
 	return actionResult;
 }
 
+extern "C" GenericGUIMenu::TinkerGUI_t::TinkerActions_t TinkerGUI_t_setItemDisplayNameAndPrice(GenericGUIMenu::TinkerGUI_t* self, Item * item, bool checkResultOnly) { return self->setItemDisplayNameAndPrice(item, checkResultOnly); }
+
+
 bool GenericGUIMenu::TinkerGUI_t::warpMouseToSelectedTinkerItem(Item* snapToItem, Uint32 flags)
 {
 	if ( tinkerGUIHasBeenCreated() )
@@ -16734,6 +17112,9 @@ bool GenericGUIMenu::TinkerGUI_t::warpMouseToSelectedTinkerItem(Item* snapToItem
 	return false;
 }
 
+extern "C" bool TinkerGUI_t_warpMouseToSelectedTinkerItem(GenericGUIMenu::TinkerGUI_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedTinkerItem(snapToItem, flags); }
+
+
 void GenericGUIMenu::TinkerGUI_t::clearItemDisplayed()
 {
 	metalScrapPrice = -1;
@@ -16742,6 +17123,9 @@ void GenericGUIMenu::TinkerGUI_t::clearItemDisplayed()
 	itemType = -1;
 	itemRequirement = -1;
 }
+
+extern "C" void TinkerGUI_t_clearItemDisplayed(GenericGUIMenu::TinkerGUI_t* self) { return self->clearItemDisplayed(); }
+
 
 const int GenericGUIMenu::AlchemyGUI_t::MAX_ALCH_X = 4;
 const int GenericGUIMenu::AlchemyGUI_t::MAX_ALCH_Y = 6;
@@ -16778,6 +17162,9 @@ void GenericGUIMenu::AlchemyGUI_t::openAlchemyMenu(GenericGUIMenu::AlchemyGUI_t:
 	clearItemDisplayed();
 }
 
+extern "C" void AlchemyGUI_t_openAlchemyMenu(GenericGUIMenu::AlchemyGUI_t* self, GenericGUIMenu::AlchemyGUI_t::AlchemyView_t view) { return self->openAlchemyMenu(view); }
+
+
 void GenericGUIMenu::AlchemyGUI_t::changeCurrentView(GenericGUIMenu::AlchemyGUI_t::AlchemyView_t view)
 {
 	recipes.closeRecipePanel();
@@ -16796,6 +17183,9 @@ void GenericGUIMenu::AlchemyGUI_t::changeCurrentView(GenericGUIMenu::AlchemyGUI_
 
 	openAlchemyMenu(view);
 }
+
+extern "C" void AlchemyGUI_t_changeCurrentView(GenericGUIMenu::AlchemyGUI_t* self, GenericGUIMenu::AlchemyGUI_t::AlchemyView_t view) { return self->changeCurrentView(view); }
+
 
 void GenericGUIMenu::AlchemyGUI_t::closeAlchemyMenu()
 {
@@ -16880,6 +17270,9 @@ void GenericGUIMenu::AlchemyGUI_t::closeAlchemyMenu()
 	parentGUI.alembicEntityUid = 0;
 }
 
+extern "C" void AlchemyGUI_t_closeAlchemyMenu(GenericGUIMenu::AlchemyGUI_t* self) { return self->closeAlchemyMenu(); }
+
+
 int GenericGUIMenu::AlchemyGUI_t::heightOffsetWhenNotCompact = 150;
 const int alchemyBaseWidth = 206;
 
@@ -16905,6 +17298,9 @@ bool GenericGUIMenu::AlchemyGUI_t::alchemyGUIHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool AlchemyGUI_t_alchemyGUIHasBeenCreated(const GenericGUIMenu::AlchemyGUI_t* self) { return self->alchemyGUIHasBeenCreated(); }
+
 
 bool hideRecipeFromList(int type)
 {
@@ -19121,6 +19517,9 @@ void GenericGUIMenu::AlchemyGUI_t::updateAlchemyMenu()
 	}
 }
 
+extern "C" void AlchemyGUI_t_updateAlchemyMenu(GenericGUIMenu::AlchemyGUI_t* self) { return self->updateAlchemyMenu(); }
+
+
 const int kRecipeListHeight = 250;
 const int kRecipeListGridY = 0;
 const int kRecipeHeaderHeight = 46;
@@ -19667,11 +20066,17 @@ void GenericGUIMenu::AlchemyGUI_t::createAlchemyMenu()
 	activateSelectionPrompt->setOntop(true);
 }
 
+extern "C" void AlchemyGUI_t_createAlchemyMenu(GenericGUIMenu::AlchemyGUI_t* self) { return self->createAlchemyMenu(); }
+
+
 void GenericGUIMenu::AlchemyGUI_t::selectAlchemySlot(const int x, const int y)
 {
 	selectedAlchemySlotX = x;
 	selectedAlchemySlotY = y;
 }
+
+extern "C" void AlchemyGUI_t_selectAlchemySlot(GenericGUIMenu::AlchemyGUI_t* self, const int x, const int y) { return self->selectAlchemySlot(x, y); }
+
 
 Frame* GenericGUIMenu::AlchemyGUI_t::getAlchemySlotFrame(int x, int y) const
 {
@@ -19686,6 +20091,9 @@ Frame* GenericGUIMenu::AlchemyGUI_t::getAlchemySlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * AlchemyGUI_t_getAlchemySlotFrame(const GenericGUIMenu::AlchemyGUI_t* self, int x, int y) { return self->getAlchemySlotFrame(x, y); }
+
 
 void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPrice(Item* item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe)
 {
@@ -19709,6 +20117,9 @@ void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPrice(Item* item, const 
 	}
 	return;
 }
+
+extern "C" void AlchemyGUI_t_setItemDisplayNameAndPrice(GenericGUIMenu::AlchemyGUI_t* self, Item * item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe) { return self->setItemDisplayNameAndPrice(item, isTooltipForResultPotion, isTooltipForRecipe); }
+
 
 
 bool GenericGUIMenu::AlchemyGUI_t::inventoryItemAllowedInGUI(Item* item)
@@ -19786,6 +20197,9 @@ bool GenericGUIMenu::AlchemyGUI_t::inventoryItemAllowedInGUI(Item* item)
 
 	return false;
 }
+
+extern "C" bool AlchemyGUI_t_inventoryItemAllowedInGUI(GenericGUIMenu::AlchemyGUI_t* self, Item * item) { return self->inventoryItemAllowedInGUI(item); }
+
 
 void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceBrew(Item* item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe)
 {
@@ -20030,6 +20444,9 @@ void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceBrew(Item* item, co
 	}
 }
 
+extern "C" void AlchemyGUI_t_setItemDisplayNameAndPriceBrew(GenericGUIMenu::AlchemyGUI_t* self, Item * item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe) { return self->setItemDisplayNameAndPriceBrew(item, isTooltipForResultPotion, isTooltipForRecipe); }
+
+
 void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceCook(Item* item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe)
 {
 	itemTooltipForRecipe = isTooltipForRecipe;
@@ -20235,6 +20652,9 @@ void GenericGUIMenu::AlchemyGUI_t::setItemDisplayNameAndPriceCook(Item* item, co
 	}
 }
 
+extern "C" void AlchemyGUI_t_setItemDisplayNameAndPriceCook(GenericGUIMenu::AlchemyGUI_t* self, Item * item, const bool isTooltipForResultPotion, const bool isTooltipForRecipe) { return self->setItemDisplayNameAndPriceCook(item, isTooltipForResultPotion, isTooltipForRecipe); }
+
+
 bool GenericGUIMenu::AlchemyGUI_t::warpMouseToSelectedAlchemyItem(Item* snapToItem, Uint32 flags)
 {
 	if ( alchemyGUIHasBeenCreated() )
@@ -20271,6 +20691,9 @@ bool GenericGUIMenu::AlchemyGUI_t::warpMouseToSelectedAlchemyItem(Item* snapToIt
 	return false;
 }
 
+extern "C" bool AlchemyGUI_t_warpMouseToSelectedAlchemyItem(GenericGUIMenu::AlchemyGUI_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedAlchemyItem(snapToItem, flags); }
+
+
 void GenericGUIMenu::AlchemyGUI_t::clearItemDisplayed()
 {
 	itemType = -1;
@@ -20278,10 +20701,16 @@ void GenericGUIMenu::AlchemyGUI_t::clearItemDisplayed()
 	itemTooltipForRecipe = false;
 }
 
+extern "C" void AlchemyGUI_t_clearItemDisplayed(GenericGUIMenu::AlchemyGUI_t* self) { return self->clearItemDisplayed(); }
+
+
 int GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::getNumRecipesToDisplayVertical() const
 {
 	return kNumRecipesToDisplayVertical;
 }
+
+extern "C" int AlchemyRecipes_t_getNumRecipesToDisplayVertical(const GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self) { return self->getNumRecipesToDisplayVertical(); }
+
 void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::openRecipePanel()
 {
 	if ( !alchemy.recipesFrame )
@@ -20312,6 +20741,9 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::openRecipePanel()
 	activateRecipeIndex = -1;
 	bOpen = true;
 }
+
+extern "C" void AlchemyRecipes_t_openRecipePanel(GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self) { return self->openRecipePanel(); }
+
 void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::closeRecipePanel()
 {
 	if ( alchemy.recipesFrame )
@@ -20349,6 +20781,9 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::closeRecipePanel()
 		}
 	}
 }
+
+extern "C" void AlchemyRecipes_t_closeRecipePanel(GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self) { return self->closeRecipePanel(); }
+
 
 void buildRecipeList(const int player)
 {
@@ -21050,6 +21485,9 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::updateRecipePanel()
 	}
 }
 
+extern "C" void AlchemyRecipes_t_updateRecipePanel(GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self) { return self->updateRecipePanel(); }
+
+
 void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::scrollToSlot(int x, int y, bool instantly)
 {
 	int lowerY = currentScrollRow;
@@ -21102,6 +21540,9 @@ void GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::scrollToSlot(int x, int y, 
 	}
 }
 
+extern "C" void AlchemyRecipes_t_scrollToSlot(GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self, int x, int y, bool instantly) { return self->scrollToSlot(x, y, instantly); }
+
+
 bool GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::isSlotVisible(int x, int y) const
 {
 	if ( alchemy.recipesFrame )
@@ -21121,11 +21562,17 @@ bool GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::isSlotVisible(int x, int y)
 	return false;
 }
 
+extern "C" bool AlchemyRecipes_t_isSlotVisible(const GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self, int x, int y) { return self->isSlotVisible(x, y); }
+
+
 bool GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::isItemVisible(Item* item) const
 {
 	if ( !item ) { return false; }
 	return isSlotVisible(item->x, item->y);
 }
+
+extern "C" bool AlchemyRecipes_t_isItemVisible(const GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t* self, Item * item) { return self->isItemVisible(item); }
+
 
 const int GenericGUIMenu::FeatherGUI_t::MAX_FEATHER_X = 1;
 const int GenericGUIMenu::FeatherGUI_t::MAX_FEATHER_Y = NUMLABELS - 1;
@@ -21145,6 +21592,9 @@ bool GenericGUIMenu::FeatherGUI_t::scrollSortFunc(const SortedScrollEntry_t& lhs
 	}
 	return lhsVal < rhsVal;
 }
+
+extern "C" bool FeatherGUI_t_scrollSortFunc(GenericGUIMenu::FeatherGUI_t* self, const SortedScrollEntry_t & lhs, const SortedScrollEntry_t & rhs) { return self->scrollSortFunc(lhs, rhs); }
+
 
 void featherChangeChargeEvent(const int player, int chargeAmount, int realCharge)
 {
@@ -21276,6 +21726,9 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherCharge(void* featherChargeText, 
 	}
 }
 
+extern "C" void FeatherGUI_t_updateFeatherCharge(GenericGUIMenu::FeatherGUI_t* self, void * featherChargeText, void * featherChangeChargeText, int currentCharge) { return self->updateFeatherCharge(featherChargeText, featherChangeChargeText, currentCharge); }
+
+
 void GenericGUIMenu::FeatherGUI_t::sortScrolls()
 {
 	if ( sortedScrolls.empty() )
@@ -21315,6 +21768,9 @@ void GenericGUIMenu::FeatherGUI_t::sortScrolls()
 	}
 }
 
+extern "C" void FeatherGUI_t_sortScrolls(GenericGUIMenu::FeatherGUI_t* self) { return self->sortScrolls(); }
+
+
 void GenericGUIMenu::FeatherGUI_t::changeSortingType(GenericGUIMenu::FeatherGUI_t::SortTypes_t newType)
 {
 	if ( sortType != newType )
@@ -21323,6 +21779,9 @@ void GenericGUIMenu::FeatherGUI_t::changeSortingType(GenericGUIMenu::FeatherGUI_
 	}
 	sortType = newType;
 }
+
+extern "C" void FeatherGUI_t_changeSortingType(GenericGUIMenu::FeatherGUI_t* self, GenericGUIMenu::FeatherGUI_t::SortTypes_t newType) { return self->changeSortingType(newType); }
+
 
 void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 {
@@ -21507,6 +21966,9 @@ void GenericGUIMenu::FeatherGUI_t::updateScrolls()
 	}
 }
 
+extern "C" void FeatherGUI_t_updateScrolls(GenericGUIMenu::FeatherGUI_t* self) { return self->updateScrolls(); }
+
+
 void GenericGUIMenu::FeatherGUI_t::openFeatherMenu()
 {
 	const int playernum = parentGUI.getPlayer();
@@ -21545,6 +22007,9 @@ void GenericGUIMenu::FeatherGUI_t::openFeatherMenu()
 	sortedScrolls.clear();
 	scrollListRequiresSorting = true;
 }
+
+extern "C" void FeatherGUI_t_openFeatherMenu(GenericGUIMenu::FeatherGUI_t* self) { return self->openFeatherMenu(); }
+
 
 void GenericGUIMenu::FeatherGUI_t::closeFeatherMenu()
 {
@@ -21610,6 +22075,9 @@ void GenericGUIMenu::FeatherGUI_t::closeFeatherMenu()
 	sortedScrolls.clear();
 	scrollListRequiresSorting = true;
 }
+
+extern "C" void FeatherGUI_t_closeFeatherMenu(GenericGUIMenu::FeatherGUI_t* self) { return self->closeFeatherMenu(); }
+
 
 const int featherBaseWidth = 334;
 const int featherBaseHeight = 358;
@@ -23221,6 +23689,9 @@ void GenericGUIMenu::FeatherGUI_t::updateFeatherMenu()
 	drawerSlotsFrame->setActualSize(actualSize);
 }
 
+extern "C" void FeatherGUI_t_updateFeatherMenu(GenericGUIMenu::FeatherGUI_t* self) { return self->updateFeatherMenu(); }
+
+
 void GenericGUIMenu::FeatherGUI_t::createFeatherMenu()
 {
 	const int player = parentGUI.getPlayer();
@@ -23690,6 +24161,9 @@ void GenericGUIMenu::FeatherGUI_t::createFeatherMenu()
 	}
 }
 
+extern "C" void FeatherGUI_t_createFeatherMenu(GenericGUIMenu::FeatherGUI_t* self) { return self->createFeatherMenu(); }
+
+
 bool GenericGUIMenu::FeatherGUI_t::featherGUIHasBeenCreated() const
 {
 	if ( featherFrame )
@@ -23713,11 +24187,17 @@ bool GenericGUIMenu::FeatherGUI_t::featherGUIHasBeenCreated() const
 	return false;
 }
 
+extern "C" bool FeatherGUI_t_featherGUIHasBeenCreated(const GenericGUIMenu::FeatherGUI_t* self) { return self->featherGUIHasBeenCreated(); }
+
+
 void GenericGUIMenu::FeatherGUI_t::selectFeatherSlot(const int x, const int y)
 {
 	selectedFeatherSlotX = x;
 	selectedFeatherSlotY = y;
 }
+
+extern "C" void FeatherGUI_t_selectFeatherSlot(GenericGUIMenu::FeatherGUI_t* self, const int x, const int y) { return self->selectFeatherSlot(x, y); }
+
 
 Frame* GenericGUIMenu::FeatherGUI_t::getFeatherSlotFrame(int x, int y) const
 {
@@ -23732,6 +24212,9 @@ Frame* GenericGUIMenu::FeatherGUI_t::getFeatherSlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * FeatherGUI_t_getFeatherSlotFrame(const GenericGUIMenu::FeatherGUI_t* self, int x, int y) { return self->getFeatherSlotFrame(x, y); }
+
 
 GenericGUIMenu::FeatherGUI_t::FeatherActions_t GenericGUIMenu::FeatherGUI_t::setItemDisplayNameAndPrice(Item* item, bool checkResultOnly)
 {
@@ -23961,6 +24444,9 @@ GenericGUIMenu::FeatherGUI_t::FeatherActions_t GenericGUIMenu::FeatherGUI_t::set
 	return result;
 }
 
+extern "C" GenericGUIMenu::FeatherGUI_t::FeatherActions_t FeatherGUI_t_setItemDisplayNameAndPrice(GenericGUIMenu::FeatherGUI_t* self, Item * item, bool checkResultOnly) { return self->setItemDisplayNameAndPrice(item, checkResultOnly); }
+
+
 bool GenericGUIMenu::FeatherGUI_t::warpMouseToSelectedFeatherItem(Item* snapToItem, Uint32 flags)
 {
 	if ( featherGUIHasBeenCreated() )
@@ -24006,6 +24492,9 @@ bool GenericGUIMenu::FeatherGUI_t::warpMouseToSelectedFeatherItem(Item* snapToIt
 	return false;
 }
 
+extern "C" bool FeatherGUI_t_warpMouseToSelectedFeatherItem(GenericGUIMenu::FeatherGUI_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedFeatherItem(snapToItem, flags); }
+
+
 void GenericGUIMenu::FeatherGUI_t::clearItemDisplayed()
 {
 	itemType = -1;
@@ -24015,10 +24504,16 @@ void GenericGUIMenu::FeatherGUI_t::clearItemDisplayed()
 	currentHoveringInscriptionLabel = "";
 }
 
+extern "C" void FeatherGUI_t_clearItemDisplayed(GenericGUIMenu::FeatherGUI_t* self) { return self->clearItemDisplayed(); }
+
+
 int GenericGUIMenu::FeatherGUI_t::getNumInscriptionsToDisplayVertical() const
 {
 	return kNumInscriptionsToDisplayVertical;
 }
+
+extern "C" int FeatherGUI_t_getNumInscriptionsToDisplayVertical(const GenericGUIMenu::FeatherGUI_t* self) { return self->getNumInscriptionsToDisplayVertical(); }
+
 
 void GenericGUIMenu::FeatherGUI_t::scrollToSlot(int x, int y, bool instantly)
 {
@@ -24060,6 +24555,9 @@ void GenericGUIMenu::FeatherGUI_t::scrollToSlot(int x, int y, bool instantly)
 	}
 }
 
+extern "C" void FeatherGUI_t_scrollToSlot(GenericGUIMenu::FeatherGUI_t* self, int x, int y, bool instantly) { return self->scrollToSlot(x, y, instantly); }
+
+
 bool GenericGUIMenu::FeatherGUI_t::isSlotVisible(int x, int y) const
 {
 	if ( featherFrame )
@@ -24079,11 +24577,17 @@ bool GenericGUIMenu::FeatherGUI_t::isSlotVisible(int x, int y) const
 	return false;
 }
 
+extern "C" bool FeatherGUI_t_isSlotVisible(const GenericGUIMenu::FeatherGUI_t* self, int x, int y) { return self->isSlotVisible(x, y); }
+
+
 bool GenericGUIMenu::FeatherGUI_t::isItemVisible(Item* item) const
 {
 	if ( !item ) { return false; }
 	return isSlotVisible(item->x, item->y);
 }
+
+extern "C" bool FeatherGUI_t_isItemVisible(const GenericGUIMenu::FeatherGUI_t* self, Item * item) { return self->isItemVisible(item); }
+
 
 bool GenericGUIMenu::FeatherGUI_t::isInscriptionDrawerItemSelected(Item* item)
 {
@@ -24116,6 +24620,9 @@ bool GenericGUIMenu::FeatherGUI_t::isInscriptionDrawerItemSelected(Item* item)
 
 	return false;
 }
+
+extern "C" bool FeatherGUI_t_isInscriptionDrawerItemSelected(GenericGUIMenu::FeatherGUI_t* self, Item * item) { return self->isInscriptionDrawerItemSelected(item); }
+
 
 bool GenericGUIMenu::FeatherGUI_t::isItemSelectedToRepairOrInscribe(Item* item)
 {
@@ -24172,6 +24679,9 @@ bool GenericGUIMenu::FeatherGUI_t::isItemSelectedToRepairOrInscribe(Item* item)
 	return false;
 }
 
+extern "C" bool FeatherGUI_t_isItemSelectedToRepairOrInscribe(GenericGUIMenu::FeatherGUI_t* self, Item * item) { return self->isItemSelectedToRepairOrInscribe(item); }
+
+
 bool GenericGUIMenu::FeatherGUI_t::isInscriptionDrawerOpen() const
 {
 	if ( !parentGUI.isGUIOpen() || !featherGUIHasBeenCreated() )
@@ -24186,6 +24696,9 @@ bool GenericGUIMenu::FeatherGUI_t::isInscriptionDrawerOpen() const
 	}
 	return false;
 }
+
+extern "C" bool FeatherGUI_t_isInscriptionDrawerOpen(const GenericGUIMenu::FeatherGUI_t* self) { return self->isInscriptionDrawerOpen(); }
+
 
 bool GenericGUIMenu::FeatherGUI_t::isInscribeOrRepairActive() const
 {
@@ -24202,6 +24715,9 @@ bool GenericGUIMenu::FeatherGUI_t::isInscribeOrRepairActive() const
 	return false;
 }
 
+extern "C" bool FeatherGUI_t_isInscribeOrRepairActive(const GenericGUIMenu::FeatherGUI_t* self) { return self->isInscribeOrRepairActive(); }
+
+
 void GenericGUIMenu::ItemEffectGUI_t::clearItemDisplayed()
 {
 	itemType = -1;
@@ -24209,6 +24725,9 @@ void GenericGUIMenu::ItemEffectGUI_t::clearItemDisplayed()
 	costEffectMPAmount = 0;
 	itemActionType = ITEMFX_ACTION_NONE;
 }
+
+extern "C" void ItemEffectGUI_t_clearItemDisplayed(GenericGUIMenu::ItemEffectGUI_t* self) { return self->clearItemDisplayed(); }
+
 
 void GenericGUIMenu::ItemEffectGUI_t::getItemEffectCost(Item* itemUsedWith, int& goldCost, int& manaCost)
 {
@@ -24554,6 +25073,9 @@ void GenericGUIMenu::ItemEffectGUI_t::getItemEffectCost(Item* itemUsedWith, int&
 	}
 }
 
+extern "C" void ItemEffectGUI_t_getItemEffectCost(GenericGUIMenu::ItemEffectGUI_t* self, Item * itemUsedWith, int & goldCost, int & manaCost) { return self->getItemEffectCost(itemUsedWith, goldCost, manaCost); }
+
+
 bool GenericGUIMenu::ItemEffectGUI_t::modeHasTransmuteMenu()
 {
 	if ( currentMode == ITEMFX_MODE_ALTER_ARROW
@@ -24566,6 +25088,9 @@ bool GenericGUIMenu::ItemEffectGUI_t::modeHasTransmuteMenu()
 
 	return false;
 }
+
+extern "C" bool ItemEffectGUI_t_modeHasTransmuteMenu(GenericGUIMenu::ItemEffectGUI_t* self) { return self->modeHasTransmuteMenu(); }
+
 
 GenericGUIMenu::ItemEffectGUI_t::ItemEffectActions_t GenericGUIMenu::ItemEffectGUI_t::setItemDisplayNameAndPrice(Item* item, bool checkResultOnly)
 {
@@ -25161,6 +25686,9 @@ GenericGUIMenu::ItemEffectGUI_t::ItemEffectActions_t GenericGUIMenu::ItemEffectG
 	return result;
 }
 
+extern "C" GenericGUIMenu::ItemEffectGUI_t::ItemEffectActions_t ItemEffectGUI_t_setItemDisplayNameAndPrice(GenericGUIMenu::ItemEffectGUI_t* self, Item * item, bool checkResultOnly) { return self->setItemDisplayNameAndPrice(item, checkResultOnly); }
+
+
 bool GenericGUIMenu::ItemEffectGUI_t::isItemSelectedToEffect(Item* item)
 {
 	if ( !item || (itemCategory(item) == SPELL_CAT && currentMode != ITEMFX_MODE_SCEPTER_CHARGE) 
@@ -25236,6 +25764,9 @@ bool GenericGUIMenu::ItemEffectGUI_t::isItemSelectedToEffect(Item* item)
 	return false;
 }
 
+extern "C" bool ItemEffectGUI_t_isItemSelectedToEffect(GenericGUIMenu::ItemEffectGUI_t* self, Item * item) { return self->isItemSelectedToEffect(item); }
+
+
 void GenericGUIMenu::ItemEffectGUI_t::openItemEffectMenu(GenericGUIMenu::ItemEffectGUI_t::ItemEffectModes mode)
 {
 	const int playernum = parentGUI.getPlayer();
@@ -25307,6 +25838,9 @@ void GenericGUIMenu::ItemEffectGUI_t::openItemEffectMenu(GenericGUIMenu::ItemEff
 	parentGUI.transmuteItemScroll = 0;
 }
 
+extern "C" void ItemEffectGUI_t_openItemEffectMenu(GenericGUIMenu::ItemEffectGUI_t* self, GenericGUIMenu::ItemEffectGUI_t::ItemEffectModes mode) { return self->openItemEffectMenu(mode); }
+
+
 void GenericGUIMenu::ItemEffectGUI_t::closeItemEffectMenu()
 {
 	const int playernum = parentGUI.getPlayer();
@@ -25374,6 +25908,9 @@ void GenericGUIMenu::ItemEffectGUI_t::closeItemEffectMenu()
 	}
 }
 
+extern "C" void ItemEffectGUI_t_closeItemEffectMenu(GenericGUIMenu::ItemEffectGUI_t* self) { return self->closeItemEffectMenu(); }
+
+
 int GenericGUIMenu::ItemEffectGUI_t::heightOffsetWhenNotCompact = 170;
 const int itemEffectBaseWidth = 334;
 
@@ -25399,6 +25936,9 @@ bool GenericGUIMenu::ItemEffectGUI_t::ItemEffectHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool ItemEffectGUI_t_ItemEffectHasBeenCreated(const GenericGUIMenu::ItemEffectGUI_t* self) { return self->ItemEffectHasBeenCreated(); }
+
 
 void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 {
@@ -26993,6 +27533,9 @@ void GenericGUIMenu::ItemEffectGUI_t::updateItemEffectMenu()
 	}
 }
 
+extern "C" void ItemEffectGUI_t_updateItemEffectMenu(GenericGUIMenu::ItemEffectGUI_t* self) { return self->updateItemEffectMenu(); }
+
+
 bool GenericGUIMenu::ItemEffectGUI_t::isItemEffectMenuActive() const
 {
 	if ( !parentGUI.isGUIOpen() || !ItemEffectHasBeenCreated() )
@@ -27005,6 +27548,9 @@ bool GenericGUIMenu::ItemEffectGUI_t::isItemEffectMenuActive() const
 	}
 	return false;
 }
+
+extern "C" bool ItemEffectGUI_t_isItemEffectMenuActive(const GenericGUIMenu::ItemEffectGUI_t* self) { return self->isItemEffectMenuActive(); }
+
 
 void GenericGUIMenu::ItemEffectGUI_t::createItemEffectMenu()
 {
@@ -27337,6 +27883,9 @@ void GenericGUIMenu::ItemEffectGUI_t::createItemEffectMenu()
 	}
 }
 
+extern "C" void ItemEffectGUI_t_createItemEffectMenu(GenericGUIMenu::ItemEffectGUI_t* self) { return self->createItemEffectMenu(); }
+
+
 void CalloutRadialMenu::loadCalloutJSON()
 {
 	if ( !PHYSFS_getRealDir("/data/callout_wheel.json") )
@@ -27557,6 +28106,9 @@ void CalloutRadialMenu::loadCalloutJSON()
 	}
 }
 
+extern "C" void CalloutRadialMenu_loadCalloutJSON() { return CalloutRadialMenu::loadCalloutJSON(); }
+
+
 void setCalloutBannerTextFormatted(const int player, Field* field, Uint32 color, DynamicSetI32& highlights, char const* const text, ...)
 {
 	if ( !field ) { return; }
@@ -27688,6 +28240,9 @@ std::string CalloutRadialMenu::getCalloutMessage(const IconEntryText_t& text_map
 		}
 	}
 }
+
+extern "C" std::string CalloutRadialMenu_getCalloutMessage(CalloutRadialMenu* self, const CalloutRadialMenu::IconEntryText_t & text_map, const char * object, const int targetPlayer) { return self->getCalloutMessage(text_map, object, targetPlayer); }
+
 
 std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName, Uint32 color,
 	CalloutRadialMenu::CalloutCommand cmd, SetCalloutTextTypes setType, const int targetPlayer)
@@ -28876,6 +29431,9 @@ std::string CalloutRadialMenu::setCalloutText(Field* field, const char* iconName
 	return "";
 }
 
+extern "C" std::string CalloutRadialMenu_setCalloutText(CalloutRadialMenu* self, Field * field, const char * iconName, Uint32 color, CalloutRadialMenu::CalloutCommand cmd, CalloutRadialMenu::SetCalloutTextTypes setType, const int targetPlayer) { return self->setCalloutText(field, iconName, color, cmd, setType, targetPlayer); }
+
+
 void CalloutRadialMenu::initCalloutMenuGUICursor(bool openInventory)
 {
 	bool oldshootmode = players[gui_player]->shootmode;
@@ -28907,6 +29465,9 @@ void CalloutRadialMenu::initCalloutMenuGUICursor(bool openInventory)
 	}
 }
 
+extern "C" void CalloutRadialMenu_initCalloutMenuGUICursor(CalloutRadialMenu* self, bool openInventory) { return self->initCalloutMenuGUICursor(openInventory); }
+
+
 bool CalloutRadialMenu::calloutGUIHasBeenCreated() const
 {
 	if ( calloutFrame )
@@ -28929,6 +29490,9 @@ bool CalloutRadialMenu::calloutGUIHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool CalloutRadialMenu_calloutGUIHasBeenCreated(const CalloutRadialMenu* self) { return self->calloutGUIHasBeenCreated(); }
+
 
 void CalloutRadialMenu::createCalloutMenuGUI()
 {
@@ -29038,6 +29602,9 @@ void CalloutRadialMenu::createCalloutMenuGUI()
 	wheelStatImg->disabled = true;
 }
 
+extern "C" void CalloutRadialMenu_createCalloutMenuGUI(CalloutRadialMenu* self) { return self->createCalloutMenuGUI(); }
+
+
 bool CalloutRadialMenu::calloutMenuIsOpen()
 {
 	if ( selectMoveTo || bOpen )
@@ -29046,6 +29613,9 @@ bool CalloutRadialMenu::calloutMenuIsOpen()
 	}
 	return false;
 }
+
+extern "C" bool CalloutRadialMenu_calloutMenuIsOpen(CalloutRadialMenu* self) { return self->calloutMenuIsOpen(); }
+
 
 DynamicArrayT<CalloutRadialMenu::PanelEntry> CalloutRadialMenu::panelEntries;
 DynamicMapIconEntryCallout CalloutRadialMenu::iconEntries;
@@ -29356,6 +29926,9 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForEntity(const 
 	return type;
 }
 
+extern "C" CalloutRadialMenu::CalloutType CalloutRadialMenu_getCalloutTypeForEntity(const int player, Entity * parent) { return CalloutRadialMenu::getCalloutTypeForEntity(player, parent); }
+
+
 CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForUid(const int player, Uint32 uid)
 {
 	Entity* parent = uidToEntity(uid);
@@ -29366,6 +29939,9 @@ CalloutRadialMenu::CalloutType CalloutRadialMenu::getCalloutTypeForUid(const int
 
 	return CalloutRadialMenu::getCalloutTypeForEntity(player, parent);
 }
+
+extern "C" CalloutRadialMenu::CalloutType CalloutRadialMenu_getCalloutTypeForUid(const int player, Uint32 uid) { return CalloutRadialMenu::getCalloutTypeForUid(player, uid); }
+
 
 static CvarBool cvar_callout_debug("/callout_debug", false);
 bool CalloutRadialMenu::calloutMenuEnabledForGamemode()
@@ -29381,6 +29957,9 @@ bool CalloutRadialMenu::calloutMenuEnabledForGamemode()
 	return false;
 }
 
+extern "C" bool CalloutRadialMenu_calloutMenuEnabledForGamemode() { return CalloutRadialMenu::calloutMenuEnabledForGamemode(); }
+
+
 bool CalloutRadialMenu::uidMatchesPlayer(const int playernum, const Uint32 uid)
 {
 	if ( uid == 0 ) { return false; }
@@ -29395,6 +29974,9 @@ bool CalloutRadialMenu::uidMatchesPlayer(const int playernum, const Uint32 uid)
 	return false;
 }
 
+extern "C" bool CalloutRadialMenu_uidMatchesPlayer(const int playernum, const Uint32 uid) { return CalloutRadialMenu::uidMatchesPlayer(playernum, uid); }
+
+
 Uint32 CalloutRadialMenu::getPlayerUid(const int playernum)
 {
 	if ( players[playernum]->ghost.isActive() )
@@ -29406,6 +29988,9 @@ Uint32 CalloutRadialMenu::getPlayerUid(const int playernum)
 		return achievementObserver.playerUids[playernum];
 	}
 }
+
+extern "C" Uint32 CalloutRadialMenu_getPlayerUid(const int playernum) { return CalloutRadialMenu::getPlayerUid(playernum); }
+
 
 void CalloutRadialMenu::CalloutParticle_t::init(const int player)
 {
@@ -29437,6 +30022,9 @@ void CalloutRadialMenu::CalloutParticle_t::init(const int player)
 	type = CalloutRadialMenu::getCalloutTypeForEntity(player, parent);
 }
 
+extern "C" void CalloutParticle_t_init(CalloutRadialMenu::CalloutParticle_t* self, const int player) { return self->init(player); }
+
+
 void CalloutRadialMenu::closeCalloutMenuGUI()
 {
 	if ( calloutMenuIsOpen() )
@@ -29467,6 +30055,9 @@ void CalloutRadialMenu::closeCalloutMenuGUI()
 	animInvalidAction = 0.0;
 	animInvalidActionTicks = 0;
 }
+
+extern "C" void CalloutRadialMenu_closeCalloutMenuGUI(CalloutRadialMenu* self) { return self->closeCalloutMenuGUI(); }
+
 
 
 
@@ -29822,6 +30413,9 @@ void CalloutRadialMenu::drawCallouts(const int playernum)
 	}
 }
 
+extern "C" void CalloutRadialMenu_drawCallouts(const int playernum) { return CalloutRadialMenu::drawCallouts(playernum); }
+
+
 void CalloutRadialMenu::CalloutParticle_t::animate()
 {
 	static CvarFloat cvar_calloutanimspeed("/calloutanimspeed", 0.3);
@@ -29941,6 +30535,9 @@ void CalloutRadialMenu::CalloutParticle_t::animate()
 	}
 }
 
+extern "C" void CalloutParticle_t_animate(CalloutRadialMenu::CalloutParticle_t* self) { return self->animate(); }
+
+
 void CalloutRadialMenu::update()
 {
 	{
@@ -30029,6 +30626,9 @@ void CalloutRadialMenu::update()
 		}
 	}
 }
+
+extern "C" void CalloutRadialMenu_update(CalloutRadialMenu* self) { return self->update(); }
+
 
 int CalloutRadialMenu::CALLOUT_SFX_NEUTRAL = 605;
 int CalloutRadialMenu::CALLOUT_SFX_NEGATIVE = 607;
@@ -30159,6 +30759,12 @@ bool CalloutRadialMenu::createParticleCallout(Entity* entity, CalloutRadialMenu:
 
 	return callout.doMessage;
 }
+
+extern "C" bool CalloutRadialMenu_createParticleCallout_2(CalloutRadialMenu* self, Entity * entity, CalloutRadialMenu::CalloutCommand _cmd, Uint32 overrideUID) { return self->createParticleCallout(entity, _cmd, overrideUID); }
+
+
+extern "C" bool CalloutRadialMenu_createParticleCallout(CalloutRadialMenu* self, real_t x, real_t y, real_t z, Uint32 uid, CalloutRadialMenu::CalloutCommand _cmd) { return self->createParticleCallout(x, y, z, uid, _cmd); }
+
 bool CalloutRadialMenu::createParticleCallout(real_t x, real_t y, real_t z, Uint32 uid, CalloutRadialMenu::CalloutCommand _cmd)
 {
 	if ( _cmd == CALLOUT_CMD_CANCEL ) { return false; }
@@ -30324,6 +30930,9 @@ void CalloutRadialMenu::sendCalloutText(CalloutRadialMenu::CalloutCommand cmd)
 	}
 }
 
+extern "C" void CalloutRadialMenu_sendCalloutText(CalloutRadialMenu* self, CalloutRadialMenu::CalloutCommand cmd) { return self->sendCalloutText(cmd); }
+
+
 std::string CalloutRadialMenu::getCalloutKeyForCommand(CalloutRadialMenu::CalloutCommand cmd)
 {
 	if ( cmd == CALLOUT_CMD_LOOK )
@@ -30365,6 +30974,9 @@ std::string CalloutRadialMenu::getCalloutKeyForCommand(CalloutRadialMenu::Callou
 	return "";
 }
 
+extern "C" std::string CalloutRadialMenu_getCalloutKeyForCommand(CalloutRadialMenu::CalloutCommand cmd) { return CalloutRadialMenu::getCalloutKeyForCommand(cmd); }
+
+
 int CalloutRadialMenu::getPlayerForDirectPlayerCmd(const int player, const CalloutRadialMenu::CalloutCommand cmd)
 {
 	if ( cmd == CALLOUT_CMD_SOUTH )
@@ -30402,6 +31014,9 @@ int CalloutRadialMenu::getPlayerForDirectPlayerCmd(const int player, const Callo
 	}
 	return -1;
 }
+
+extern "C" int CalloutRadialMenu_getPlayerForDirectPlayerCmd(CalloutRadialMenu* self, const int player, const CalloutRadialMenu::CalloutCommand cmd) { return self->getPlayerForDirectPlayerCmd(player, cmd); }
+
 
 void CalloutRadialMenu::drawCalloutMenu()
 {
@@ -31439,6 +32054,9 @@ void CalloutRadialMenu::drawCalloutMenu()
 	}
 }
 
+extern "C" void CalloutRadialMenu_drawCalloutMenu(CalloutRadialMenu* self) { return self->drawCalloutMenu(); }
+
+
 bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updateInteractText)
 {
 	if ( optionSelected != CALLOUT_CMD_SELECT )
@@ -31849,6 +32467,9 @@ bool CalloutRadialMenu::allowedInteractEntity(Entity& selectedEntity, bool updat
 	return true;
 }
 
+extern "C" bool CalloutRadialMenu_allowedInteractEntity(CalloutRadialMenu* self, Entity & selectedEntity, bool updateInteractText) { return self->allowedInteractEntity(selectedEntity, updateInteractText); }
+
+
 const int GenericGUIMenu::AssistShrineGUI_t::MAX_ASSISTSHRINE_X = 4;
 const int GenericGUIMenu::AssistShrineGUI_t::MAX_ASSISTSHRINE_Y = 20;
 
@@ -31893,6 +32514,9 @@ void GenericGUIMenu::AssistShrineGUI_t::openAssistShrine(Entity* shrine)
 	inputs.getUIInteraction(playernum)->selectedItemFromChest = 0;
 	clearItemDisplayed();
 }
+
+extern "C" void AssistShrineGUI_t_openAssistShrine(GenericGUIMenu::AssistShrineGUI_t* self, Entity * shrine) { return self->openAssistShrine(shrine); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::changeCurrentView(GenericGUIMenu::AssistShrineGUI_t::AssistShrineView_t view)
 {
@@ -32079,6 +32703,9 @@ void GenericGUIMenu::AssistShrineGUI_t::changeCurrentView(GenericGUIMenu::Assist
 	}
 }
 
+extern "C" void AssistShrineGUI_t_changeCurrentView(GenericGUIMenu::AssistShrineGUI_t* self, GenericGUIMenu::AssistShrineGUI_t::AssistShrineView_t view) { return self->changeCurrentView(view); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::updateRaceSlots()
 {
 	if ( !assistShrineFrame || !assistShrineGUIHasBeenCreated() )
@@ -32225,6 +32852,9 @@ void GenericGUIMenu::AssistShrineGUI_t::updateRaceSlots()
 	}
 }
 
+extern "C" void AssistShrineGUI_t_updateRaceSlots(GenericGUIMenu::AssistShrineGUI_t* self) { return self->updateRaceSlots(); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 {
 	if ( !assistShrineFrame || !assistShrineGUIHasBeenCreated() )
@@ -32364,11 +32994,17 @@ void GenericGUIMenu::AssistShrineGUI_t::updateClassSlots()
 	}
 }
 
+extern "C" void AssistShrineGUI_t_updateClassSlots(GenericGUIMenu::AssistShrineGUI_t* self) { return self->updateClassSlots(); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::clearItemDisplayed()
 {
 	itemType = -1;
 	itemActionType = ASSIST_ITEM_NONE;
 }
+
+extern "C" void AssistShrineGUI_t_clearItemDisplayed(GenericGUIMenu::AssistShrineGUI_t* self) { return self->clearItemDisplayed(); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::closeAssistShrine()
 {
@@ -32446,6 +33082,9 @@ void GenericGUIMenu::AssistShrineGUI_t::closeAssistShrine()
 	shrineUID = 0;
 }
 
+extern "C" void AssistShrineGUI_t_closeAssistShrine(GenericGUIMenu::AssistShrineGUI_t* self) { return self->closeAssistShrine(); }
+
+
 int GenericGUIMenu::AssistShrineGUI_t::heightOffsetWhenNotCompact = 150;
 const int assistShrineBaseWidth = 266;
 
@@ -32471,6 +33110,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::assistShrineGUIHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_assistShrineGUIHasBeenCreated(const GenericGUIMenu::AssistShrineGUI_t* self) { return self->assistShrineGUIHasBeenCreated(); }
+
 
 void buttonAssistShrineUpdateSelectorOnHighlight(const int player, Button* button)
 {
@@ -32502,6 +33144,9 @@ void GenericGUIMenu::AssistShrineGUI_t::selectAssistShrineSlot(const int x, cons
 	selectedAssistShrineSlotY = y;
 }
 
+extern "C" void AssistShrineGUI_t_selectAssistShrineSlot(GenericGUIMenu::AssistShrineGUI_t* self, const int x, const int y) { return self->selectAssistShrineSlot(x, y); }
+
+
 Frame* GenericGUIMenu::AssistShrineGUI_t::getAssistShrineSlotFrame(int x, int y) const
 {
 	if ( assistShrineFrame )
@@ -32514,6 +33159,9 @@ Frame* GenericGUIMenu::AssistShrineGUI_t::getAssistShrineSlotFrame(int x, int y)
 	}
 	return nullptr;
 }
+
+extern "C" Frame * AssistShrineGUI_t_getAssistShrineSlotFrame(const GenericGUIMenu::AssistShrineGUI_t* self, int x, int y) { return self->getAssistShrineSlotFrame(x, y); }
+
 
 bool GenericGUIMenu::AssistShrineGUI_t::warpMouseToSelectedAssistShrineItem(Item* snapToItem, Uint32 flags)
 {
@@ -32550,6 +33198,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::warpMouseToSelectedAssistShrineItem(Item
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_warpMouseToSelectedAssistShrineItem(GenericGUIMenu::AssistShrineGUI_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedAssistShrineItem(snapToItem, flags); }
+
 
 static CvarInt cvar_assistClassListGridY("/assist_grid_y", 112);
 const int kAssistClassHeaderHeight = 46;
@@ -32611,6 +33262,9 @@ int GenericGUIMenu::AssistShrineGUI_t::getAssistPointFromItem(Item* item)
 	return 0;
 }
 
+extern "C" int AssistShrineGUI_t_getAssistPointFromItem(GenericGUIMenu::AssistShrineGUI_t* self, Item * item) { return self->getAssistPointFromItem(item); }
+
+
 int GenericGUIMenu::AssistShrineGUI_t::getAssistPointsSaved()
 {
 	int val = 0;
@@ -32631,6 +33285,9 @@ int GenericGUIMenu::AssistShrineGUI_t::getAssistPointsSaved()
 	}
 	return val;
 }
+
+extern "C" int AssistShrineGUI_t_getAssistPointsSaved(GenericGUIMenu::AssistShrineGUI_t* self) { return self->getAssistPointsSaved(); }
+
 
 int GenericGUIMenu::AssistShrineGUI_t::getAssistPointsPreview()
 {
@@ -32653,6 +33310,9 @@ int GenericGUIMenu::AssistShrineGUI_t::getAssistPointsPreview()
 
 	return val;
 }
+
+extern "C" int AssistShrineGUI_t_getAssistPointsPreview(GenericGUIMenu::AssistShrineGUI_t* self) { return self->getAssistPointsPreview(); }
+
 
 GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t* GenericGUIMenu::AssistShrineGUI_t::addNotification(DynamicString _title, DynamicString _body, DynamicString _img, AssistNotification_t::NotificationTypes _notifType)
 {
@@ -32702,6 +33362,9 @@ GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t* GenericGUIMenu::AssistS
 	return nullptr;
 }
 
+extern "C" GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t * AssistShrineGUI_t_addNotification(GenericGUIMenu::AssistShrineGUI_t* self, DynamicString _title, DynamicString _body, DynamicString _img, GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t::NotificationTypes _notifType) { return self->addNotification(_title, _body, _img, _notifType); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::serverUpdateStatFlagsForClients()
 {
 	if ( multiplayer != SERVER )
@@ -32725,6 +33388,9 @@ void GenericGUIMenu::AssistShrineGUI_t::serverUpdateStatFlagsForClients()
 		}
 	}
 }
+
+extern "C" void AssistShrineGUI_t_serverUpdateStatFlagsForClients() { return GenericGUIMenu::AssistShrineGUI_t::serverUpdateStatFlagsForClients(); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 {
@@ -32815,6 +33481,9 @@ void GenericGUIMenu::AssistShrineGUI_t::onCharacterChange()
 		}
 	}
 }
+
+extern "C" void AssistShrineGUI_t_onCharacterChange(GenericGUIMenu::AssistShrineGUI_t* self) { return self->onCharacterChange(); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 {
@@ -34458,6 +35127,9 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 	}
 }
 
+extern "C" void AssistShrineGUI_t_createAssistShrine(GenericGUIMenu::AssistShrineGUI_t* self) { return self->createAssistShrine(); }
+
+
 bool GenericGUIMenu::AssistShrineGUI_t::hasItemsToClaim()
 {
 	if ( !itemMask.itemHiddenFromShop
@@ -34483,6 +35155,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::hasItemsToClaim()
 	return false;
 }
 
+extern "C" bool AssistShrineGUI_t_hasItemsToClaim(GenericGUIMenu::AssistShrineGUI_t* self) { return self->hasItemsToClaim(); }
+
+
 bool GenericGUIMenu::AssistShrineGUI_t::classHasChanged()
 {
 	if ( selectedClass >= 0 )
@@ -34498,6 +35173,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::classHasChanged()
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_classHasChanged(GenericGUIMenu::AssistShrineGUI_t* self) { return self->classHasChanged(); }
+
 
 bool GenericGUIMenu::AssistShrineGUI_t::raceHasChanged()
 {
@@ -34541,6 +35219,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::raceHasChanged()
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_raceHasChanged(GenericGUIMenu::AssistShrineGUI_t* self) { return self->raceHasChanged(); }
+
 
 bool GenericGUIMenu::AssistShrineGUI_t::claimItems(bool* isEquipped)
 {
@@ -34705,6 +35386,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::claimItems(bool* isEquipped)
 	return success;
 }
 
+extern "C" bool AssistShrineGUI_t_claimItems(GenericGUIMenu::AssistShrineGUI_t* self, bool * isEquipped) { return self->claimItems(isEquipped); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::resetSavedCharacterChanges()
 {
 	selectedClass = -1;
@@ -34720,12 +35404,18 @@ void GenericGUIMenu::AssistShrineGUI_t::resetSavedCharacterChanges()
 	receivedCharacterChangeOK = false;
 }
 
+extern "C" void AssistShrineGUI_t_resetSavedCharacterChanges(GenericGUIMenu::AssistShrineGUI_t* self) { return self->resetSavedCharacterChanges(); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::onMainMenuEnd()
 {
 	resetSavedCharacterChanges();
 	resetItems();
 	shrineUID = 0;
 }
+
+extern "C" void AssistShrineGUI_t_onMainMenuEnd(GenericGUIMenu::AssistShrineGUI_t* self) { return self->onMainMenuEnd(); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::onGameStart()
 {
@@ -34760,6 +35450,9 @@ void GenericGUIMenu::AssistShrineGUI_t::onGameStart()
 
 	resetSavedCharacterChanges();
 }
+
+extern "C" void AssistShrineGUI_t_onGameStart(GenericGUIMenu::AssistShrineGUI_t* self) { return self->onGameStart(); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::resetItems()
 {
@@ -34800,6 +35493,9 @@ void GenericGUIMenu::AssistShrineGUI_t::resetItems()
 	itemRing.itemHiddenFromShop = true;
 }
 
+extern "C" void AssistShrineGUI_t_resetItems(GenericGUIMenu::AssistShrineGUI_t* self) { return self->resetItems(); }
+
+
 bool GenericGUIMenu::AssistShrineGUI_t::itemIsFromGUI(Item* item)
 {
 	if ( item )
@@ -34814,6 +35510,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::itemIsFromGUI(Item* item)
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_itemIsFromGUI(GenericGUIMenu::AssistShrineGUI_t* self, Item * item) { return self->itemIsFromGUI(item); }
+
 
 GenericGUIMenu::AssistShrineGUI_t::AssistItemActions_t GenericGUIMenu::AssistShrineGUI_t::setItemDisplayNameAndPrice(Item* item, bool checkResultOnly)
 {
@@ -34847,6 +35546,9 @@ GenericGUIMenu::AssistShrineGUI_t::AssistItemActions_t GenericGUIMenu::AssistShr
 	}
 	return result;
 }
+
+extern "C" GenericGUIMenu::AssistShrineGUI_t::AssistItemActions_t AssistShrineGUI_t_setItemDisplayNameAndPrice(GenericGUIMenu::AssistShrineGUI_t* self, Item * item, bool checkResultOnly) { return self->setItemDisplayNameAndPrice(item, checkResultOnly); }
+
 
 void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 {
@@ -38715,6 +39417,9 @@ void GenericGUIMenu::AssistShrineGUI_t::updateAssistShrine()
 	}
 }
 
+extern "C" void AssistShrineGUI_t_updateAssistShrine(GenericGUIMenu::AssistShrineGUI_t* self) { return self->updateAssistShrine(); }
+
+
 void GenericGUIMenu::AssistShrineGUI_t::scrollToSlot(int x, int y, bool instantly)
 {
 	auto& currentScrollRow = (currentView == ASSIST_SHRINE_VIEW_CLASSES ? currentScrollRow1 : currentScrollRow2);
@@ -38776,6 +39481,9 @@ void GenericGUIMenu::AssistShrineGUI_t::scrollToSlot(int x, int y, bool instantl
 	}
 }
 
+extern "C" void AssistShrineGUI_t_scrollToSlot(GenericGUIMenu::AssistShrineGUI_t* self, int x, int y, bool instantly) { return self->scrollToSlot(x, y, instantly); }
+
+
 bool GenericGUIMenu::AssistShrineGUI_t::isSlotVisible(int x, int y) const
 {
 	if ( assistShrineFrame )
@@ -38834,6 +39542,9 @@ bool GenericGUIMenu::AssistShrineGUI_t::isSlotVisible(int x, int y) const
 	}
 	return false;
 }
+
+extern "C" bool AssistShrineGUI_t_isSlotVisible(const GenericGUIMenu::AssistShrineGUI_t* self, int x, int y) { return self->isSlotVisible(x, y); }
+
 
 void GenericGUIMenu::MailboxGui_t::closeMailMenu()
 {
@@ -38911,6 +39622,9 @@ void GenericGUIMenu::MailboxGui_t::closeMailMenu()
 	parentGUI.mailboxEntityUid = 0;
 }
 
+extern "C" void MailboxGui_t_closeMailMenu(GenericGUIMenu::MailboxGui_t* self) { return self->closeMailMenu(); }
+
+
 int GenericGUIMenu::MailboxGui_t::heightOffsetWhenNotCompact = 150;
 const int mailBaseWidth = 206;
 
@@ -38950,6 +39664,9 @@ bool GenericGUIMenu::MailboxGui_t::mailGUIHasBeenCreated() const
 	}
 	return false;
 }
+
+extern "C" bool MailboxGui_t_mailGUIHasBeenCreated(const GenericGUIMenu::MailboxGui_t* self) { return self->mailGUIHasBeenCreated(); }
+
 
 void buttonMailUpdateSelectorOnHighlight(const int player, Button* button)
 {
@@ -38999,6 +39716,9 @@ void GenericGUIMenu::MailboxGui_t::openMailMenu()
 	inputs.getUIInteraction(playernum)->selectedItemFromChest = 0;
 	clearItemDisplayed();
 }
+
+extern "C" void MailboxGui_t_openMailMenu(GenericGUIMenu::MailboxGui_t* self) { return self->openMailMenu(); }
+
 
 void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 {
@@ -40384,6 +41104,9 @@ void GenericGUIMenu::MailboxGui_t::updateMailMenu()
 	}
 }
 
+extern "C" void MailboxGui_t_updateMailMenu(GenericGUIMenu::MailboxGui_t* self) { return self->updateMailMenu(); }
+
+
 void GenericGUIMenu::mailboxClaimItem()
 {
 	auto& item = mailboxGUI.mailReceiveItem;
@@ -40403,6 +41126,9 @@ void GenericGUIMenu::mailboxClaimItem()
 
 	mailboxGUI.mailReceiveItem.type = POTION_EMPTY;
 }
+
+extern "C" void GenericGUIMenu_mailboxClaimItem(GenericGUIMenu* self) { return self->mailboxClaimItem(); }
+
 
 void GenericGUIMenu::MailboxGui_t::createMailMenu()
 {
@@ -40606,11 +41332,17 @@ void GenericGUIMenu::MailboxGui_t::createMailMenu()
 	activateSelectionPrompt->setOntop(true);
 }
 
+extern "C" void MailboxGui_t_createMailMenu(GenericGUIMenu::MailboxGui_t* self) { return self->createMailMenu(); }
+
+
 void GenericGUIMenu::MailboxGui_t::selectMailSlot(const int x, const int y)
 {
 	selectedMailSlotX = x;
 	selectedMailSlotY = y;
 }
+
+extern "C" void MailboxGui_t_selectMailSlot(GenericGUIMenu::MailboxGui_t* self, const int x, const int y) { return self->selectMailSlot(x, y); }
+
 
 Frame* GenericGUIMenu::MailboxGui_t::getMailSlotFrame(int x, int y) const
 {
@@ -40624,6 +41356,9 @@ Frame* GenericGUIMenu::MailboxGui_t::getMailSlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * MailboxGui_t_getMailSlotFrame(const GenericGUIMenu::MailboxGui_t* self, int x, int y) { return self->getMailSlotFrame(x, y); }
+
 
 bool GenericGUIMenu::MailboxGui_t::inventoryItemAllowedInGUI(Item* item)
 {
@@ -40705,6 +41440,9 @@ bool GenericGUIMenu::MailboxGui_t::inventoryItemAllowedInGUI(Item* item)
 
 	return false;
 }
+
+extern "C" bool MailboxGui_t_inventoryItemAllowedInGUI(GenericGUIMenu::MailboxGui_t* self, Item * item) { return self->inventoryItemAllowedInGUI(item); }
+
 
 void GenericGUIMenu::MailboxGui_t::setItemDisplayNameAndPrice(Item* item, const bool isTooltipForRecvItem)
 {
@@ -40838,6 +41576,9 @@ void GenericGUIMenu::MailboxGui_t::setItemDisplayNameAndPrice(Item* item, const 
 	}
 }
 
+extern "C" void MailboxGui_t_setItemDisplayNameAndPrice(GenericGUIMenu::MailboxGui_t* self, Item * item, const bool isTooltipForRecvItem) { return self->setItemDisplayNameAndPrice(item, isTooltipForRecvItem); }
+
+
 bool GenericGUIMenu::MailboxGui_t::warpMouseToSelectedMailItem(Item* snapToItem, Uint32 flags)
 {
 	if ( mailGUIHasBeenCreated() )
@@ -40874,11 +41615,17 @@ bool GenericGUIMenu::MailboxGui_t::warpMouseToSelectedMailItem(Item* snapToItem,
 	return false;
 }
 
+extern "C" bool MailboxGui_t_warpMouseToSelectedMailItem(GenericGUIMenu::MailboxGui_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedMailItem(snapToItem, flags); }
+
+
 void GenericGUIMenu::MailboxGui_t::clearItemDisplayed()
 {
 	itemType = -1;
 	itemActionType = MAIL_ACTION_NONE;
 }
+
+extern "C" void MailboxGui_t_clearItemDisplayed(GenericGUIMenu::MailboxGui_t* self) { return self->clearItemDisplayed(); }
+
 
 bool GenericGUIMenu::isItemMailable(const Item* item)
 {
@@ -40900,7 +41647,13 @@ bool GenericGUIMenu::isItemMailable(const Item* item)
 	return true;
 }
 
+extern "C" bool GenericGUIMenu_isItemMailable(GenericGUIMenu* self, const Item * item) { return self->isItemMailable(item); }
+
+
 void GenericGUIMenu::setPlayer(const int p) { gui_player = p; }
+
+extern "C" void GenericGUIMenu_setPlayer(GenericGUIMenu* self, const int p) { return self->setPlayer(p); }
+
 
 inline bool GenericGUIMenu::isNodeTinkeringCraftableItem(node_t* node) {
 		if ( !node )
@@ -40910,6 +41663,9 @@ inline bool GenericGUIMenu::isNodeTinkeringCraftableItem(node_t* node) {
 		return (node->list == &tinkeringTotalItems);
 	}
 
+extern "C" bool GenericGUIMenu_isNodeTinkeringCraftableItem(GenericGUIMenu* self, node_t * node) { return self->isNodeTinkeringCraftableItem(node); }
+
+
 inline bool GenericGUIMenu::isNodeScribingCraftableItem(node_t* node) {
 		if ( !node )
 		{
@@ -40917,6 +41673,9 @@ inline bool GenericGUIMenu::isNodeScribingCraftableItem(node_t* node) {
 		}
 		return (node->list == &scribingTotalItems);
 	}
+
+extern "C" bool GenericGUIMenu_isNodeScribingCraftableItem(GenericGUIMenu* self, node_t * node) { return self->isNodeScribingCraftableItem(node); }
+
 
 bool GenericGUIMenu::isItemUsedForCurrentGUI(const Item& item) {
 		if ( &item == scribingToolItem || &item == tinkeringKitItem || &item == alembicItem
@@ -40928,6 +41687,9 @@ bool GenericGUIMenu::isItemUsedForCurrentGUI(const Item& item) {
 		}
 		return false;
 	}
+
+extern "C" bool GenericGUIMenu_isItemUsedForCurrentGUI(GenericGUIMenu* self, const Item & item) { return self->isItemUsedForCurrentGUI(item); }
+
 
 void GenericGUIMenu::clearCurrentGUIFromItem(const Item& item) {
 		if ( &item == scribingToolItem )
@@ -40964,6 +41726,15 @@ void GenericGUIMenu::clearCurrentGUIFromItem(const Item& item) {
 		}
 	}
 
+extern "C" void GenericGUIMenu_clearCurrentGUIFromItem(GenericGUIMenu* self, const Item & item) { return self->clearCurrentGUIFromItem(item); }
+
+
 void FollowerRadialMenu::setPlayer(const int p) { gui_player = p; }
 
+extern "C" void FollowerRadialMenu_setPlayer(FollowerRadialMenu* self, const int p) { return self->setPlayer(p); }
+
+
 void CalloutRadialMenu::setPlayer(const int p) { gui_player = p; }
+
+extern "C" void CalloutRadialMenu_setPlayer(CalloutRadialMenu* self, const int p) { return self->setPlayer(p); }
+

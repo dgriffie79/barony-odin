@@ -54,6 +54,9 @@ void Entity::setUID(Uint32 new_uid)
 	uid = new_uid;
 }
 
+extern "C" void Entity_setUID(Entity* self, Uint32 new_uid) { return self->setUID(new_uid); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::~Entity)
@@ -242,6 +245,9 @@ void Entity::setObituary(const char* obituary)
 	}
 	strncpy(tempStats->obituary, obituary, 127);
 }
+
+extern "C" void Entity_setObituary(Entity* self, const char * obituary) { return self->setObituary(obituary); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -510,6 +516,9 @@ void Entity::killedByMonsterObituary(Entity* victim, bool fromSpell)
 	hitstats->killer_name = myStats->name;
 }
 
+extern "C" void Entity_killedByMonsterObituary(Entity* self, Entity * victim, bool fromSpell) { return self->killedByMonsterObituary(victim, fromSpell); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::light
@@ -545,6 +554,9 @@ int Entity::entityLight()
 	return std::min(std::max(0, (int)(level)), 255);
 	//return std::min(std::max(0, (int)((light.x + light.y + light.z) / 3.f * 255.f)), 255);
 }
+
+extern "C" int Entity_entityLight(Entity* self) { return self->entityLight(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -670,6 +682,9 @@ int Entity::entityLightAfterReductions(Stat& myStats, Entity* observer)
 	}
 	return light;
 }
+
+extern "C" int Entity_entityLightAfterReductions(Entity* self, Stat & myStats, Entity * observer) { return self->entityLightAfterReductions(myStats, observer); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -2443,6 +2458,9 @@ void Entity::effectTimes()
 	}
 }
 
+extern "C" void Entity_effectTimes(Entity* self) { return self->effectTimes(); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::increaseSkill
@@ -2754,6 +2772,9 @@ bool Entity::increaseSkill(int skill, bool notify)
 	return increased;
 }
 
+extern "C" bool Entity_increaseSkill(Entity* self, int skill, bool notify) { return self->increaseSkill(skill, notify); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::stats
@@ -2789,6 +2810,9 @@ Stat* Entity::getStats() const
 
 	return nullptr;
 }
+
+extern "C" Stat * Entity_getStats(const Entity* self) { return self->getStats(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -3130,6 +3154,9 @@ void Entity::checkBetterEquipment(Stat* myStats)
 	}
 }
 
+extern "C" void Entity_checkBetterEquipment(Entity* self, Stat * myStats) { return self->checkBetterEquipment(myStats); }
+
+
 /*-------------------------------------------------------------------------------
 
 uidToEntity
@@ -3231,6 +3258,9 @@ void Entity::setHP(int amount)
 	}
 }
 
+extern "C" void Entity_setHP(Entity* self, int amount) { return self->setHP(amount); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::modHP
@@ -3326,6 +3356,9 @@ void Entity::modHP(int amount)
 	}
 }
 
+extern "C" void Entity_modHP(Entity* self, int amount) { return self->modHP(amount); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::setMP
@@ -3366,6 +3399,9 @@ void Entity::setMP(int amount, bool updateClients)
 	}
 }
 
+extern "C" void Entity_setMP(Entity* self, int amount, bool updateClients) { return self->setMP(amount, updateClients); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::modMP
@@ -3397,6 +3433,9 @@ int Entity::modMP(int amount, bool updateClients)
 	return entitystats->MP - oldMP;
 }
 
+extern "C" int Entity_modMP(Entity* self, int amount, bool updateClients) { return self->modMP(amount, updateClients); }
+
+
 int Entity::getMP()
 {
 	Stat* myStats = getStats();
@@ -3409,6 +3448,9 @@ int Entity::getMP()
 	return myStats->MP;
 }
 
+extern "C" int Entity_getMP(Entity* self) { return self->getMP(); }
+
+
 int Entity::getHP()
 {
 	Stat* myStats = getStats();
@@ -3420,6 +3462,9 @@ int Entity::getHP()
 
 	return myStats->HP;
 }
+
+extern "C" int Entity_getHP(Entity* self) { return self->getHP(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -3549,6 +3594,9 @@ void Entity::drainMP(int amount, bool notifyOverexpend)
 	}
 }
 
+extern "C" void Entity_drainMP(Entity* self, int amount, bool notifyOverexpend) { return self->drainMP(amount, notifyOverexpend); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::safeConsumeMP
@@ -3613,6 +3661,9 @@ bool Entity::safeConsumeMP(int amount)
 
 	return false;
 }
+
+extern "C" bool Entity_safeConsumeMP(Entity* self, int amount) { return self->safeConsumeMP(amount); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -3779,6 +3830,9 @@ int Entity::getHungerTickRate(Stat* myStats, bool isPlayer, bool checkItemsEffec
 	return hungerTickRate;
 }
 
+extern "C" int Entity_getHungerTickRate(Stat * myStats, bool isPlayer, bool checkItemsEffects) { return Entity::getHungerTickRate(myStats, isPlayer, checkItemsEffects); }
+
+
 void Entity::monsterRollLevelUpStats(int increasestat[3])
 {
 	// monsters use this.
@@ -3794,6 +3848,9 @@ void Entity::monsterRollLevelUpStats(int increasestat[3])
 	}
 	increasestat[2] = r;
 }
+
+extern "C" void Entity_monsterRollLevelUpStats(int increasestat[3]) { return Entity::monsterRollLevelUpStats(increasestat); }
+
 
 static CvarBool cvar_noxp("/noxp", false);
 
@@ -8138,6 +8195,9 @@ void Entity::handleEffects(Stat* myStats)
 	myStats->OLDHP = myStats->HP;
 }
 
+extern "C" void Entity_handleEffects(Entity* self, Stat * myStats) { return self->handleEffects(myStats); }
+
+
 real_t Entity::getACEffectiveness(Entity* my, Stat* myStats, bool isPlayer, Entity* attacker, Stat* attackerStats, int& outNumBlessings)
 {
 	if ( !myStats || !my )
@@ -8193,6 +8253,9 @@ real_t Entity::getACEffectiveness(Entity* my, Stat* myStats, bool isPlayer, Enti
 	outNumBlessings = blessings;
 	return std::max(0.0, std::min(1.0, .75 + 0.025 * blessings));
 }
+
+extern "C" real_t Entity_getACEffectiveness(Entity * my, Stat * myStats, bool isPlayer, Entity * attacker, Stat * attackerStats, int & outNumBlessings) { return Entity::getACEffectiveness(my, myStats, isPlayer, attacker, attackerStats, outNumBlessings); }
+
 
 real_t Entity::PlayerAttackMeleeStatFactor = 0.055;
 real_t Entity::PlayerAttackRangedStatFactor = 0.055;
@@ -8355,6 +8418,9 @@ Sint32 Entity::getAttack(Entity* my, Stat* myStats, bool isPlayer, int chargeMod
 	return attack;
 }
 
+extern "C" Sint32 Entity_getAttack(Entity * my, Stat * myStats, bool isPlayer, int chargeModifier, int * returnWeaponAttackValue) { return Entity::getAttack(my, myStats, isPlayer, chargeModifier, returnWeaponAttackValue); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::getRangedAttack
@@ -8403,6 +8469,9 @@ Sint32 Entity::getRangedAttack(int atkFromQuivers)
 
 	return attack;
 }
+
+extern "C" Sint32 Entity_getRangedAttack(Entity* self, int atkFromQuivers) { return self->getRangedAttack(atkFromQuivers); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -8489,6 +8558,9 @@ Sint32 Entity::getThrownAttack()
 	return attack;
 }
 
+extern "C" Sint32 Entity_getThrownAttack(Entity* self) { return self->getThrownAttack(); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::getBonusAttackOnTarget
@@ -8519,6 +8591,9 @@ Sint32 Entity::getBonusAttackOnTarget(Stat& hitstats)
 	return bonusAttack;
 }
 
+extern "C" Sint32 Entity_getBonusAttackOnTarget(Entity* self, Stat & hitstats) { return self->getBonusAttackOnTarget(hitstats); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::getSTR()
@@ -8537,6 +8612,9 @@ Sint32 Entity::getSTR()
 	}
 	return statGetSTR(entitystats, this);
 }
+
+extern "C" Sint32 Entity_getSTR(Entity* self) { return self->getSTR(); }
+
 
 Sint32 statGetSTR(Stat* entitystats, Entity* my)
 {
@@ -8762,6 +8840,9 @@ Sint32 Entity::getDEX()
 	}
 	return statGetDEX(entitystats, this);
 }
+
+extern "C" Sint32 Entity_getDEX(Entity* self) { return self->getDEX(); }
+
 
 Sint32 statGetDEX(Stat* entitystats, Entity* my)
 {
@@ -9083,6 +9164,9 @@ Sint32 Entity::getCON()
 	return statGetCON(entitystats, this);
 }
 
+extern "C" Sint32 Entity_getCON(Entity* self) { return self->getCON(); }
+
+
 Sint32 statGetCON(Stat* entitystats, Entity* my)
 {
 	Sint32 CON;
@@ -9268,6 +9352,9 @@ Sint32 Entity::getINT()
 	return statGetINT(entitystats, this);
 }
 
+extern "C" Sint32 Entity_getINT(Entity* self) { return self->getINT(); }
+
+
 Sint32 statGetINT(Stat* entitystats, Entity* my)
 {
 	Sint32 INT;
@@ -9386,6 +9473,9 @@ Sint32 Entity::getPER()
 	}
 	return statGetPER(entitystats, this);
 }
+
+extern "C" Sint32 Entity_getPER(Entity* self) { return self->getPER(); }
+
 
 Sint32 statGetPER(Stat* entitystats, Entity* my)
 {
@@ -9564,6 +9654,9 @@ Sint32 Entity::getCHR()
 	return statGetCHR(entitystats, this);
 }
 
+extern "C" Sint32 Entity_getCHR(Entity* self) { return self->getCHR(); }
+
+
 Sint32 statGetCHR(Stat* entitystats, Entity* my)
 {
 	Sint32 CHR;
@@ -9699,6 +9792,9 @@ bool Entity::isBlind()
 	return false;
 }
 
+extern "C" bool Entity_isBlind(Entity* self) { return self->isBlind(); }
+
+
 bool Entity::isWaterWalking() const
 {
 	if ( behavior == &actMonster )
@@ -9734,6 +9830,9 @@ bool Entity::isWaterWalking() const
 	}
 	return false;
 }
+
+extern "C" bool Entity_isWaterWalking(const Entity* self) { return self->isWaterWalking(); }
+
 bool Entity::isLavaWalking() const
 {
 	if ( behavior == &actMonster )
@@ -9768,6 +9867,9 @@ bool Entity::isLavaWalking() const
 	}
 	return false;
 }
+
+extern "C" bool Entity_isLavaWalking(const Entity* self) { return self->isLavaWalking(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -9840,6 +9942,9 @@ bool Entity::isInvisible() const
 
 	return false;
 }
+
+extern "C" bool Entity_isInvisible(const Entity* self) { return self->isInvisible(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -9953,6 +10058,9 @@ bool Entity::isMobile()
 
 	return true;
 }
+
+extern "C" bool Entity_isMobile(Entity* self) { return self->isMobile(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -16878,6 +16986,9 @@ void Entity::attack(int pose, int charge, Entity* target)
 	}
 }
 
+extern "C" void Entity_attack(Entity* self, int pose, int charge, Entity * target) { return self->attack(pose, charge, target); }
+
+
 /*-------------------------------------------------------------------------------
 
 AC
@@ -17170,6 +17281,9 @@ bool Entity::teleport(int tele_x, int tele_y)
 	return true;
 }
 
+extern "C" bool Entity_teleport(Entity* self, int x, int y) { return self->teleport(x, y); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::teleportRandom
@@ -17247,6 +17361,9 @@ bool Entity::teleportRandom(int x1, int x2, int y1, int y2)
 	}
 	return false;
 }
+
+extern "C" bool Entity_teleportRandom(Entity* self, int x1, int x2, int y1, int y2) { return self->teleportRandom(x1, x2, y1, y2); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -17651,6 +17768,9 @@ bool Entity::teleportAroundEntity(Entity* target, int dist, int effectType)
 	return teleport(tx, ty);
 }
 
+extern "C" bool Entity_teleportAroundEntity(Entity* self, Entity * target, int dist, int effectType) { return self->teleportAroundEntity(target, dist, effectType); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::teleporterMove
@@ -17717,6 +17837,9 @@ bool Entity::teleporterMove(int tele_x, int tele_y, int type)
 	}
 	return true;
 }
+
+extern "C" bool Entity_teleporterMove(Entity* self, int x, int y, int type) { return self->teleporterMove(x, y, type); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -18755,6 +18878,9 @@ void Entity::awardXP(Entity* src, bool share, bool root)
 	}
 }
 
+extern "C" void Entity_awardXP(Entity* self, Entity * src, bool share, bool root) { return self->awardXP(src, share, root); }
+
+
 /*-------------------------------------------------------------------------------
 
 Entity::checkEnemy
@@ -19367,6 +19493,9 @@ bool Entity::checkEnemy(Entity* your)
 	return result;
 }
 
+extern "C" bool Entity_checkEnemy(Entity* self, Entity * your) { return self->checkEnemy(your); }
+
+
 bool Entity::friendlyFireProtection(Entity* your)
 {
 	if ( !your ) { return false; }
@@ -19381,6 +19510,9 @@ bool Entity::friendlyFireProtection(Entity* your)
 
 	return false;
 }
+
+extern "C" bool Entity_friendlyFireProtection(Entity* self, Entity * your) { return self->friendlyFireProtection(your); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -19908,6 +20040,9 @@ bool Entity::checkFriend(Entity* your)
 
 	return result;
 }
+
+extern "C" bool Entity_checkFriend(Entity* self, Entity * your) { return self->checkFriend(your); }
+
 
 
 void createMonsterEquipment(Stat* stats, BaronyRNG& rng)
@@ -20482,6 +20617,9 @@ bool Entity::isBootSpriteShortArmor(Entity* leg)
 	return false;
 }
 
+extern "C" bool Entity_isBootSpriteShortArmor(Entity * leg) { return Entity::isBootSpriteShortArmor(leg); }
+
+
 bool Entity::setBootSprite(Entity* leg, int spriteOffset, bool forceShort)
 {
 	if ( multiplayer == CLIENT )
@@ -20752,6 +20890,9 @@ bool Entity::setBootSprite(Entity* leg, int spriteOffset, bool forceShort)
 	return true;
 }
 
+extern "C" bool Entity_setBootSprite(Entity* self, Entity * leg, int spriteOffset, bool forceShort) { return self->setBootSprite(leg, spriteOffset, forceShort); }
+
+
 
 /*-------------------------------------------------------------------------------
 
@@ -21006,6 +21147,9 @@ void Entity::setMeleeDamageSkillModifiers(Entity* my, Stat* myStats, int skill, 
 	return;
 }
 
+extern "C" void Entity_setMeleeDamageSkillModifiers(Entity * my, Stat * myStats, int skill, real_t & baseSkillModifier, real_t & variance, ItemType * itemType) { return Entity::setMeleeDamageSkillModifiers(my, myStats, skill, baseSkillModifier, variance, itemType); }
+
+
 
 int Entity::isEntityPlayer() const
 {
@@ -21019,6 +21163,9 @@ int Entity::isEntityPlayer() const
 
 	return -1;
 }
+
+extern "C" int Entity_isEntityPlayer(const Entity* self) { return self->isEntityPlayer(); }
+
 
 int Entity::getReflection() const
 {
@@ -21057,6 +21204,9 @@ int Entity::getReflection() const
 	}
 	return 0;
 }
+
+extern "C" int Entity_getReflection(const Entity* self) { return self->getReflection(); }
+
 
 int Entity::getAttackPose() const
 {
@@ -21548,6 +21698,9 @@ int Entity::getAttackPose() const
 	return pose;
 }
 
+extern "C" int Entity_getAttackPose(const Entity* self) { return self->getAttackPose(); }
+
+
 bool Entity::hasRangedWeapon(bool ignoreMonsterNPCType) const
 {
 	Stat *myStats = getStats();
@@ -21600,6 +21753,9 @@ bool Entity::hasRangedWeapon(bool ignoreMonsterNPCType) const
 
 	return false;
 }
+
+extern "C" bool Entity_hasRangedWeapon(const Entity* self, bool ignoreMonsterNPCType) { return self->hasRangedWeapon(ignoreMonsterNPCType); }
+
 
 /*void Entity::returnWeaponarmToNeutral(Entity* weaponarm, Entity* rightbody)
 {
@@ -22148,6 +22304,9 @@ void Entity::handleWeaponArmAttack(Entity* weaponarm)
 	return;
 }
 
+extern "C" void Entity_handleWeaponArmAttack(Entity* self, Entity * weaponarm) { return self->handleWeaponArmAttack(weaponarm); }
+
+
 void Entity::humanoidAnimateWalk(Entity* limb, node_t* bodypartNode, int bodypart, double walkSpeed, double dist, double distForFootstepSound)
 {
 	if ( bodypart == LIMB_HUMANOID_RIGHTLEG || bodypart == LIMB_HUMANOID_LEFTARM )
@@ -22313,6 +22472,9 @@ void Entity::humanoidAnimateWalk(Entity* limb, node_t* bodypartNode, int bodypar
 	return;
 }
 
+extern "C" void Entity_humanoidAnimateWalk(Entity* self, Entity * limb, node_t * bodypartNode, int bodypart, double walkSpeed, double dist, double distForFootstepSound) { return self->humanoidAnimateWalk(limb, bodypartNode, bodypart, walkSpeed, dist, distForFootstepSound); }
+
+
 Uint32 Entity::getMonsterFootstepSound(int footstepType, int bootSprite)
 {
 	int sound = -1;
@@ -22358,6 +22520,9 @@ Uint32 Entity::getMonsterFootstepSound(int footstepType, int bootSprite)
 	}
 	return static_cast<Uint32>(sound);
 }
+
+extern "C" Uint32 Entity_getMonsterFootstepSound(Entity* self, int footstepType, int bootSprite) { return self->getMonsterFootstepSound(footstepType, bootSprite); }
+
 
 void Entity::handleHumanoidWeaponLimb(Entity* weaponLimb, Entity* weaponArmLimb)
 {
@@ -23200,6 +23365,9 @@ void Entity::handleHumanoidWeaponLimb(Entity* weaponLimb, Entity* weaponArmLimb)
 	return;
 }
 
+extern "C" void Entity_handleHumanoidWeaponLimb(Entity* self, Entity * weaponLimb, Entity * weaponArmLimb) { return self->handleHumanoidWeaponLimb(weaponLimb, weaponArmLimb); }
+
+
 void doParticleEffectForTouchSpell(Entity& my, Entity* focalLimb, Monster monsterType)
 {
 	if ( my.behavior != &actPlayer )
@@ -23323,6 +23491,9 @@ void Entity::lookAtEntity(Entity& target)
 	monsterLookDir() = tangent;
 }
 
+extern "C" void Entity_lookAtEntity(Entity* self, Entity & target) { return self->lookAtEntity(target); }
+
+
 spell_t* Entity::getActiveMagicEffect(int spellID)
 {
 	Stat* myStats = getStats();
@@ -23346,6 +23517,9 @@ spell_t* Entity::getActiveMagicEffect(int spellID)
 
 	return spell;
 }
+
+extern "C" spell_t * Entity_getActiveMagicEffect(Entity* self, int spellID) { return self->getActiveMagicEffect(spellID); }
+
 
 void actAmbientParticleEffectIdle(Entity* my)
 {
@@ -23442,6 +23616,9 @@ Entity* Entity::spawnAmbientParticles2(int chance, int particleSprite, int durat
 	return nullptr;
 }
 
+extern "C" Entity * Entity_spawnAmbientParticles2(Entity* self, int chance, int particleSprite, int duration, double particleScale, bool shrink) { return self->spawnAmbientParticles2(chance, particleSprite, duration, particleScale, shrink); }
+
+
 Entity* Entity::spawnAmbientParticles(int chance, int particleSprite, int duration, double particleScale, bool shrink)
 {
 	if ( local_rng.rand() % chance == 0 )
@@ -23472,6 +23649,9 @@ Entity* Entity::spawnAmbientParticles(int chance, int particleSprite, int durati
 	}
 	return nullptr;
 }
+
+extern "C" Entity * Entity_spawnAmbientParticles(Entity* self, int chance, int particleSprite, int duration, double particleScale, bool shrink) { return self->spawnAmbientParticles(chance, particleSprite, duration, particleScale, shrink); }
+
 
 void Entity::handleEffectsClient()
 {
@@ -23902,6 +24082,9 @@ void Entity::handleEffectsClient()
 	}
 }
 
+extern "C" void Entity_handleEffectsClient(Entity* self) { return self->handleEffectsClient(); }
+
+
 void Entity::serverUpdateEffectsForEntity(bool guarantee)
 {
 	if ( multiplayer != SERVER )
@@ -23981,6 +24164,9 @@ void Entity::serverUpdateEffectsForEntity(bool guarantee)
 		clientsHaveItsStats = true;
 	}
 }
+
+extern "C" void Entity_serverUpdateEffectsForEntity(Entity* self, bool guarantee) { return self->serverUpdateEffectsForEntity(guarantee); }
+
 
 bool Entity::setEffect(int effect, std::variant<bool, Uint8> value, int duration, 
 	bool updateClients, bool guarantee, bool overrideEffectStrength,
@@ -24194,6 +24380,9 @@ bool Entity::setEffect(int effect, std::variant<bool, Uint8> value, int duration
 	return true;
 }
 
+extern "C" bool Entity_setEffect(Entity* self, int effect, std::variant<bool, Uint8> value, int duration, bool updateClients, bool guarantee, bool overrideEffectStrength, bool overrideDuration) { return self->setEffect(effect, value, duration, updateClients, guarantee, overrideEffectStrength, overrideDuration); }
+
+
 void Entity::giveClientStats()
 {
 	if ( !clientStats )
@@ -24202,6 +24391,9 @@ void Entity::giveClientStats()
 	}
     clientsHaveItsStats = true;
 }
+
+extern "C" void Entity_giveClientStats(Entity* self) { return self->giveClientStats(); }
+
 
 void Entity::monsterAcquireAttackTarget(const Entity& target, Sint32 state, bool monsterWasHit)
 {
@@ -24532,6 +24724,9 @@ void Entity::monsterAcquireAttackTarget(const Entity& target, Sint32 state, bool
 	}
 }
 
+extern "C" void Entity_monsterAcquireAttackTarget(Entity* self, const Entity & target, Sint32 state, bool monsterWasHit) { return self->monsterAcquireAttackTarget(target, state, monsterWasHit); }
+
+
 bool Entity::monsterReleaseAttackTarget(bool force)
 {
 	if ( !monsterTarget() )
@@ -24566,6 +24761,9 @@ bool Entity::monsterReleaseAttackTarget(bool force)
 
 	return true;
 }
+
+extern "C" bool Entity_monsterReleaseAttackTarget(Entity* self, bool force) { return self->monsterReleaseAttackTarget(force); }
+
 
 void Entity::checkGroundForItems()
 {
@@ -24619,6 +24817,9 @@ void Entity::checkGroundForItems()
 	}
 }
 
+extern "C" void Entity_checkGroundForItems(Entity* self) { return self->checkGroundForItems(); }
+
+
 bool Entity::canWieldItem(const Item& item) const
 {
 	Stat* myStats = getStats();
@@ -24643,6 +24844,9 @@ bool Entity::canWieldItem(const Item& item) const
 			return false;
 	}
 }
+
+extern "C" bool Entity_canWieldItem(const Entity* self, const Item & item) { return self->canWieldItem(item); }
+
 
 bool Entity::monsterAddNearbyItemToInventory(Stat* myStats, int rangeToFind, int maxInventoryItems, Entity* forcePickupItem)
 {
@@ -25070,6 +25274,9 @@ bool Entity::monsterAddNearbyItemToInventory(Stat* myStats, int rangeToFind, int
 	return pickedUpItemReturnValue;
 }
 
+extern "C" bool Entity_monsterAddNearbyItemToInventory(Entity* self, Stat * myStats, int rangeToFind, int maxInventoryItems, Entity * forcePickupItem) { return self->monsterAddNearbyItemToInventory(myStats, rangeToFind, maxInventoryItems, forcePickupItem); }
+
+
 node_t* Entity::addItemToMonsterInventory(Item* item)
 {
 	//TODO: Sort into inventory...that is, if an item of this type already exists and they can stack, stack 'em instead of creating a new node.
@@ -25130,6 +25337,9 @@ node_t* Entity::addItemToMonsterInventory(Item* item)
 
 	return item->node;
 }
+
+extern "C" node_t * Entity_addItemToMonsterInventory(Entity* self, Item * item) { return self->addItemToMonsterInventory(item); }
+
 
 bool Entity::shouldMonsterEquipThisWeapon(const Item& itemToEquip) const
 {
@@ -25196,6 +25406,9 @@ bool Entity::shouldMonsterEquipThisWeapon(const Item& itemToEquip) const
 
 	return true;
 }
+
+extern "C" bool Entity_shouldMonsterEquipThisWeapon(const Entity* self, const Item & itemToEquip) { return self->shouldMonsterEquipThisWeapon(itemToEquip); }
+
 
 bool Entity::monsterWantsItem(const Item& item, Item**& shouldEquip, node_t*& replaceInventoryItem) const
 {
@@ -25423,6 +25636,9 @@ bool Entity::monsterWantsItem(const Item& item, Item**& shouldEquip, node_t*& re
 	return false;
 }
 
+extern "C" bool Entity_monsterWantsItem(const Entity* self, const Item & item, Item **& shouldEquip, node_t *& replaceInventoryItem) { return self->monsterWantsItem(item, shouldEquip, replaceInventoryItem); }
+
+
 Item** Entity::shouldMonsterEquipThisArmor(const Item& item) const
 {
 	Stat* myStats = getStats();
@@ -25529,6 +25745,9 @@ Item** Entity::shouldMonsterEquipThisArmor(const Item& item) const
 	}
 }
 
+extern "C" Item ** Entity_shouldMonsterEquipThisArmor(const Entity* self, const Item & item) { return self->shouldMonsterEquipThisArmor(item); }
+
+
 double Entity::monsterRotate()
 {
 	double dir = yaw - monsterLookDir();
@@ -25598,6 +25817,9 @@ double Entity::monsterRotate()
 	return dir;
 }
 
+extern "C" double Entity_monsterRotate(Entity* self) { return self->monsterRotate(); }
+
+
 Item* Entity::getBestMeleeWeaponIHave() const
 {
 	Stat* myStats = getStats();
@@ -25637,6 +25859,9 @@ Item* Entity::getBestMeleeWeaponIHave() const
 	return currentBest;
 }
 
+extern "C" Item * Entity_getBestMeleeWeaponIHave(const Entity* self) { return self->getBestMeleeWeaponIHave(); }
+
+
 Item* Entity::getBestShieldIHave() const
 {
 	Stat* myStats = getStats();
@@ -25671,6 +25896,9 @@ Item* Entity::getBestShieldIHave() const
 
 	return currentBest;
 }
+
+extern "C" Item * Entity_getBestShieldIHave(const Entity* self) { return self->getBestShieldIHave(); }
+
 
 //static int broken = 0;
 //static ConsoleCommand ccmd_hiteverything("/hiteverything", "", [](int argc, const char** argv) {
@@ -25890,6 +26118,9 @@ bool Entity::degradeArmor(Stat& hitstats, Item& armor, int armornum)
 	return true;
 }
 
+extern "C" bool Entity_degradeArmor(Entity* self, Stat & hitstats, Item & armor, int armornum) { return self->degradeArmor(hitstats, armor, armornum); }
+
+
 void Entity::removeLightField()
 {
 	if ( this->light != nullptr )
@@ -25898,6 +26129,9 @@ void Entity::removeLightField()
 		this->light = nullptr;
 	}
 }
+
+extern "C" void Entity_removeLightField(Entity* self) { return self->removeLightField(); }
+
 
 bool Entity::shouldRetreat(Stat& myStats)
 {
@@ -26051,6 +26285,9 @@ bool Entity::shouldRetreat(Stat& myStats)
 	return false;
 }
 
+extern "C" bool Entity_shouldRetreat(Entity* self, Stat & myStats) { return self->shouldRetreat(myStats); }
+
+
 bool Entity::backupWithRangedWeapon(Stat& myStats, int dist, int hasrangedweapon)
 {
 	int distanceLimit = 100;
@@ -26120,6 +26357,9 @@ bool Entity::backupWithRangedWeapon(Stat& myStats, int dist, int hasrangedweapon
 	return true;
 }
 
+extern "C" bool Entity_backupWithRangedWeapon(Entity* self, Stat & myStats, int dist, int hasrangedweapon) { return self->backupWithRangedWeapon(myStats, dist, hasrangedweapon); }
+
+
 void Entity::monsterEquipItem(Item& item, Item** slot)
 {
 	if ( !slot )
@@ -26137,6 +26377,9 @@ void Entity::monsterEquipItem(Item& item, Item** slot)
 
 	*slot = &item;
 }
+
+extern "C" void Entity_monsterEquipItem(Entity* self, Item & item, Item ** slot) { return self->monsterEquipItem(item, slot); }
+
 
 bool Entity::monsterHasSpellbook(int spellbookType)
 {
@@ -26177,6 +26420,9 @@ bool Entity::monsterHasSpellbook(int spellbookType)
 
 	return false;
 }
+
+extern "C" bool Entity_monsterHasSpellbook(Entity* self, int spellbookType) { return self->monsterHasSpellbook(spellbookType); }
+
 
 void Entity::playerStatIncrease(int playerClass, int chosenStats[3])
 {
@@ -26321,6 +26567,9 @@ void Entity::playerStatIncrease(int playerClass, int chosenStats[3])
 
 	return;
 }
+
+extern "C" void Entity_playerStatIncrease(Entity* self, int playerClass, int chosenStats[3]) { return self->playerStatIncrease(playerClass, chosenStats); }
+
 
 void Entity::createPathBoundariesNPC(int maxTileDistance)
 {
@@ -26527,6 +26776,9 @@ void Entity::createPathBoundariesNPC(int maxTileDistance)
 	}
 }
 
+extern "C" void Entity_createPathBoundariesNPC(Entity* self, int maxTileDistance) { return self->createPathBoundariesNPC(maxTileDistance); }
+
+
 node_t* Entity::chooseAttackSpellbookFromInventory()
 {
 	Stat* myStats = getStats();
@@ -26577,6 +26829,9 @@ node_t* Entity::chooseAttackSpellbookFromInventory()
 	return spellbook;
 }
 
+extern "C" node_t * Entity_chooseAttackSpellbookFromInventory(Entity* self) { return self->chooseAttackSpellbookFromInventory(); }
+
+
 int Entity::getManaringFromEffects(Entity* my, Stat& myStats)
 {
 	int manaring = 0;
@@ -26590,6 +26845,9 @@ int Entity::getManaringFromEffects(Entity* my, Stat& myStats)
 	}
 	return manaring;
 }
+
+extern "C" int Entity_getManaringFromEffects(Entity * my, Stat & myStats) { return Entity::getManaringFromEffects(my, myStats); }
+
 
 int Entity::getManaringFromEquipment(Entity* my, Stat& myStats, bool isPlayer)
 {
@@ -26652,6 +26910,9 @@ int Entity::getManaringFromEquipment(Entity* my, Stat& myStats, bool isPlayer)
 	}
 	return manaring;
 }
+
+extern "C" int Entity_getManaringFromEquipment(Entity * my, Stat & myStats, bool isPlayer) { return Entity::getManaringFromEquipment(my, myStats, isPlayer); }
+
 
 int Entity::getManaRegenInterval(Entity* my, Stat& myStats, bool isPlayer, bool excludeItemsEffectsBonus)
 {
@@ -26782,6 +27043,9 @@ int Entity::getManaRegenInterval(Entity* my, Stat& myStats, bool isPlayer, bool 
 	return MAGIC_REGEN_TIME;
 }
 
+extern "C" int Entity_getManaRegenInterval(Entity * my, Stat & myStats, bool isPlayer, bool excludeItemsEffectsBonus) { return Entity::getManaRegenInterval(my, myStats, isPlayer, excludeItemsEffectsBonus); }
+
+
 int Entity::getHealringFromEffects(Entity* my, Stat& myStats)
 {
 	double healring = 0;
@@ -26816,6 +27080,9 @@ int Entity::getHealringFromEffects(Entity* my, Stat& myStats)
 	}
 	return (int)healring;
 }
+
+extern "C" int Entity_getHealringFromEffects(Entity * my, Stat & myStats) { return Entity::getHealringFromEffects(my, myStats); }
+
 
 int Entity::getHealringFromEquipment(Entity* my, Stat& myStats, bool isPlayer)
 {
@@ -26864,6 +27131,9 @@ int Entity::getHealringFromEquipment(Entity* my, Stat& myStats, bool isPlayer)
 	}
 	return healring;
 }
+
+extern "C" int Entity_getHealringFromEquipment(Entity * my, Stat & myStats, bool isPlayer) { return Entity::getHealringFromEquipment(my, myStats, isPlayer); }
+
 
 int Entity::getHealthRegenInterval(Entity* my, Stat& myStats, bool isPlayer, bool excludeItemsEffectsBonus)
 {
@@ -27059,6 +27329,9 @@ int Entity::getHealthRegenInterval(Entity* my, Stat& myStats, bool isPlayer, boo
 	}
 	return HEAL_TIME;
 }
+
+extern "C" int Entity_getHealthRegenInterval(Entity * my, Stat & myStats, bool isPlayer, bool excludeItemsEffectsBonus) { return Entity::getHealthRegenInterval(my, myStats, isPlayer, excludeItemsEffectsBonus); }
+
 
 int getBaseManaRegen(Entity* my, Stat& myStats, bool excludeItemsEffectsBonus)
 {
@@ -27336,6 +27609,9 @@ void Entity::setRangedProjectileAttack(Entity& marksman, Stat& myStats, int opti
 	this->arrowPower() = attack;
 }
 
+extern "C" void Entity_setRangedProjectileAttack(Entity* self, Entity & marksman, Stat & myStats, int optionalOverrideForArrowType) { return self->setRangedProjectileAttack(marksman, myStats, optionalOverrideForArrowType); }
+
+
 bool Entity::setArrowProjectileProperties(int weaponType)
 {
 	if ( weaponType == WOODEN_SHIELD )
@@ -27408,6 +27684,9 @@ bool Entity::setArrowProjectileProperties(int weaponType)
 	}
 	return false;
 }
+
+extern "C" bool Entity_setArrowProjectileProperties(Entity* self, int weaponType) { return self->setArrowProjectileProperties(weaponType); }
+
 
 /* SetEntityOnFire
  * Attempts to set the Entity on fire. Entities that are not Burnable or are already on fire will return before any processing
@@ -27532,6 +27811,9 @@ bool Entity::SetEntityOnFire(Entity* sourceOfFire)
 
 	return false; // The Entity can/should not be set on fire
 }
+
+extern "C" bool Entity_SetEntityOnFire(Entity* self, Entity * sourceOfFire) { return self->SetEntityOnFire(sourceOfFire); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -27774,6 +28056,9 @@ void Entity::setTorsoLimbOffset(Entity* torso)
 		torso->scalez += entry.scalez;
 	}
 }
+
+extern "C" void Entity_setTorsoLimbOffset(Entity* self, Entity * torso) { return self->setTorsoLimbOffset(torso); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -28127,6 +28412,9 @@ void Entity::setHelmetLimbOffset(Entity* helm)
 	}
 }
 
+extern "C" void Entity_setHelmetLimbOffset(Entity* self, Entity * helm) { return self->setHelmetLimbOffset(helm); }
+
+
 real_t Entity::yawDifferenceFromEntity(Entity* entity)
 {
 	if ( entity )
@@ -28144,6 +28432,9 @@ real_t Entity::yawDifferenceFromEntity(Entity* entity)
 	}
 	return 0.f;
 }
+
+extern "C" real_t Entity_yawDifferenceFromEntity(Entity* self, Entity * entity) { return self->yawDifferenceFromEntity(entity); }
+
 
 Entity* summonChest(long x, long y)
 {
@@ -28307,6 +28598,9 @@ void Entity::addToCreatureList(list_t *list)
 	}
 }
 
+extern "C" void Entity_addToCreatureList(Entity* self, list_t * list) { return self->addToCreatureList(list); }
+
+
 void Entity::addToWorldUIList(list_t *list)
 {
 	//printlog("*ATTEMPTING* to add Dennis to creature list.");
@@ -28324,6 +28618,9 @@ void Entity::addToWorldUIList(list_t *list)
 		//printlog("Added dennis to creature list.");
 	}
 }
+
+extern "C" void Entity_addToWorldUIList(Entity* self, list_t * list) { return self->addToWorldUIList(list); }
+
 
 real_t Entity::magicResistancePerPoint = 0.3;
 int Entity::getMagicResistance(Stat* myStats)
@@ -28375,6 +28672,9 @@ int Entity::getMagicResistance(Stat* myStats)
 	return resistance;
 }
 
+extern "C" int Entity_getMagicResistance(Stat * myStats) { return Entity::getMagicResistance(myStats); }
+
+
 void Entity::setHardcoreStats(Stat& stats)
 {
 	auto& rng = entity_rng ? *entity_rng : local_rng;
@@ -28420,6 +28720,9 @@ void Entity::setHardcoreStats(Stat& stats)
 	//messagePlayer(0, "LVL: %d", stats.LVL);
 	//messagePlayer(0, "GOLD: %d", stats.GOLD);
 }
+
+extern "C" void Entity_setHardcoreStats(Entity* self, Stat & stats) { return self->setHardcoreStats(stats); }
+
 
 int playerEntityMatchesUid(Uint32 uid)
 {
@@ -28494,6 +28797,9 @@ node_t* TileEntityListHandler::addEntity(Entity& entity)
 	return nullptr;
 }
 
+extern "C" node_t * TileEntityListHandler_addEntity(TileEntityListHandler* self, Entity & entity) { return self->addEntity(entity); }
+
+
 node_t* TileEntityListHandler::updateEntity(Entity& entity)
 {
 	if ( !entity.myTileListNode )
@@ -28516,10 +28822,16 @@ node_t* TileEntityListHandler::updateEntity(Entity& entity)
 	return nullptr;
 }
 
+extern "C" node_t * TileEntityListHandler_updateEntity(TileEntityListHandler* self, Entity & entity) { return self->updateEntity(entity); }
+
+
 void TileEntityListHandler::clearTile(int x, int y)
 {
 	list_FreeAll(&gridEntities[x][y]);
 }
+
+extern "C" void TileEntityListHandler_clearTile(TileEntityListHandler* self, int x, int y) { return self->clearTile(x, y); }
+
 
 void TileEntityListHandler::emptyGridEntities()
 {
@@ -28532,6 +28844,9 @@ void TileEntityListHandler::emptyGridEntities()
 	}
 }
 
+extern "C" void TileEntityListHandler_emptyGridEntities(TileEntityListHandler* self) { return self->emptyGridEntities(); }
+
+
 list_t* TileEntityListHandler::getTileList(int x, int y)
 {
 	if ( x >= 0 && x < kMaxMapDimension && y >= 0 && y < kMaxMapDimension )
@@ -28540,6 +28855,9 @@ list_t* TileEntityListHandler::getTileList(int x, int y)
 	}
 	return nullptr;
 }
+
+extern "C" list_t * TileEntityListHandler_getTileList(TileEntityListHandler* self, int x, int y) { return self->getTileList(x, y); }
+
 
 /* returns list of entities within a radius, e.g 1 radius is a 3x3 area around given center. */
 DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadius(int u, int v, int radius)
@@ -28560,6 +28878,9 @@ DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadius(int u, int
 	return return_val;
 }
 
+extern "C" DynamicArrayT<list_t *> TileEntityListHandler_getEntitiesWithinRadius(TileEntityListHandler* self, int u, int v, int radius) { return self->getEntitiesWithinRadius(u, v, radius); }
+
+
 /* returns list of entities within a radius around entity, e.g 1 radius is a 3x3 area around entity. */
 DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadiusAroundEntity(Entity* entity, int radius)
 {
@@ -28567,6 +28888,9 @@ DynamicArrayT<list_t*> TileEntityListHandler::getEntitiesWithinRadiusAroundEntit
 	int v = static_cast<int>(entity->y) >> 4;
 	return getEntitiesWithinRadius(u, v, radius);
 }
+
+extern "C" DynamicArrayT<list_t *> TileEntityListHandler_getEntitiesWithinRadiusAroundEntity(TileEntityListHandler* self, Entity * entity, int radius) { return self->getEntitiesWithinRadiusAroundEntity(entity, radius); }
+
 
 void Entity::setHumanoidLimbOffset(Entity* limb, Monster race, int limbType)
 {
@@ -29517,6 +29841,9 @@ void Entity::setHumanoidLimbOffset(Entity* limb, Monster race, int limbType)
 	}
 }
 
+extern "C" void Entity_setHumanoidLimbOffset(Entity* self, Entity * limb, Monster race, int limbType) { return self->setHumanoidLimbOffset(limb, race, limbType); }
+
+
 void Entity::handleHumanoidShieldLimb(Entity* shieldLimb, Entity* shieldArmLimb)
 {
 	if ( !shieldLimb || !shieldArmLimb )
@@ -30331,6 +30658,9 @@ void Entity::handleHumanoidShieldLimb(Entity* shieldLimb, Entity* shieldArmLimb)
 	}
 }
 
+extern "C" void Entity_handleHumanoidShieldLimb(Entity* self, Entity * shieldLimb, Entity * shieldArmLimb) { return self->handleHumanoidShieldLimb(shieldLimb, shieldArmLimb); }
+
+
 bool Entity::isSmiteWeakMonster()
 {
 	Stat* myStats = getStats();
@@ -30368,6 +30698,9 @@ bool Entity::isSmiteWeakMonster()
 	return false;
 }
 
+extern "C" bool Entity_isSmiteWeakMonster(Entity* self) { return self->isSmiteWeakMonster(); }
+
+
 bool Entity::isBossMonster()
 {
 	Stat* myStats = getStats();
@@ -30395,6 +30728,9 @@ bool Entity::isBossMonster()
 	}
 	return false;
 }
+
+extern "C" bool Entity_isBossMonster(Entity* self) { return self->isBossMonster(); }
+
 
 void Entity::handleKnockbackDamage(Stat& myStats, Entity* knockedInto)
 {
@@ -30548,6 +30884,9 @@ void Entity::handleKnockbackDamage(Stat& myStats, Entity* knockedInto)
 		}
 	}
 }
+
+extern "C" void Entity_handleKnockbackDamage(Entity* self, Stat & myStats, Entity * knockedInto) { return self->handleKnockbackDamage(myStats, knockedInto); }
+
 
 void Entity::setHelmetLimbOffsetWithMask(Entity* helm, Entity* mask)
 {
@@ -30746,6 +31085,9 @@ void Entity::setHelmetLimbOffsetWithMask(Entity* helm, Entity* mask)
 			break;
 	}
 }
+
+extern "C" void Entity_setHelmetLimbOffsetWithMask(Entity* self, Entity * helm, Entity * mask) { return self->setHelmetLimbOffsetWithMask(helm, mask); }
+
 
 bool monsterIsImmobileTurret(Entity* my, Stat* myStats)
 {
@@ -30964,6 +31306,9 @@ void Entity::handleQuiverThirdPersonModel(Stat& myStats, int mySprite)
 	}
 }
 
+extern "C" void Entity_handleQuiverThirdPersonModel(Entity* self, Stat & myStats, int mySprite) { return self->handleQuiverThirdPersonModel(myStats, mySprite); }
+
+
 Sint32 Entity::playerInsectoidExpectedManaFromHunger(Stat& myStats)
 {
 	real_t manaPercentFromHunger = myStats.HUNGER / 1000.f;
@@ -30978,11 +31323,17 @@ Sint32 Entity::playerInsectoidExpectedManaFromHunger(Stat& myStats)
 	return static_cast<Sint32>(expectedManaValue);
 }
 
+extern "C" Sint32 Entity_playerInsectoidExpectedManaFromHunger(Entity* self, Stat & myStats) { return self->playerInsectoidExpectedManaFromHunger(myStats); }
+
+
 Sint32 Entity::playerInsectoidHungerValueOfManaPoint(Stat& myStats)
 {
 	float manaPointPercentage = 1 / static_cast<float>(myStats.MAXMP);
 	return static_cast<Sint32>(1000 * manaPointPercentage);
 }
+
+extern "C" Sint32 Entity_playerInsectoidHungerValueOfManaPoint(Entity* self, Stat & myStats) { return self->playerInsectoidHungerValueOfManaPoint(myStats); }
+
 
 void Entity::playerInsectoidIncrementHungerToMP(int mpAmount)
 {
@@ -31008,6 +31359,9 @@ void Entity::playerInsectoidIncrementHungerToMP(int mpAmount)
 	}
 }
 
+extern "C" void Entity_playerInsectoidIncrementHungerToMP(Entity* self, int mpAmount) { return self->playerInsectoidIncrementHungerToMP(mpAmount); }
+
+
 real_t Entity::getDamageTableEquipmentMod(Stat& myStats, Item& item, real_t base, real_t mod)
 {
 	real_t bonus = base;
@@ -31022,6 +31376,9 @@ real_t Entity::getDamageTableEquipmentMod(Stat& myStats, Item& item, real_t base
 
 	return bonus;
 }
+
+extern "C" real_t Entity_getDamageTableEquipmentMod(Stat & myStats, Item & item, real_t base, real_t mod) { return Entity::getDamageTableEquipmentMod(myStats, item, base, mod); }
+
 
 real_t Entity::getDamageTableMultiplier(Entity* my, Stat& myStats, DamageTableType damageType, int* magicResistance, int* outNumSources)
 {
@@ -31240,6 +31597,9 @@ real_t Entity::getDamageTableMultiplier(Entity* my, Stat& myStats, DamageTableTy
 	return std::max(0.1, 1.0 + bonus);
 }
 
+extern "C" real_t Entity_getDamageTableMultiplier(Entity * my, Stat & myStats, DamageTableType damageType, int * magicResistance, int * outNumSources) { return Entity::getDamageTableMultiplier(my, myStats, damageType, magicResistance, outNumSources); }
+
+
 void Entity::createWorldUITooltip()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -31297,6 +31657,9 @@ void Entity::createWorldUITooltip()
 	}
 }
 
+extern "C" void Entity_createWorldUITooltip(Entity* self) { return self->createWorldUITooltip(); }
+
+
 bool Entity::bEntityTooltipRequiresButtonHeld() const
 {
 	if ( behavior == &actPortal || behavior == &actLadder
@@ -31307,6 +31670,9 @@ bool Entity::bEntityTooltipRequiresButtonHeld() const
 	}
 	return false;
 }
+
+extern "C" bool Entity_bEntityTooltipRequiresButtonHeld(const Entity* self) { return self->bEntityTooltipRequiresButtonHeld(); }
+
 
 bool Entity::bEntityHighlightedForPlayer(const int player) const
 {
@@ -31340,6 +31706,9 @@ bool Entity::bEntityHighlightedForPlayer(const int player) const
 	}
 	return false;
 }
+
+extern "C" bool Entity_bEntityHighlightedForPlayer(const Entity* self, const int player) { return self->bEntityHighlightedForPlayer(player); }
+
 
 int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerIntervals hungerInterval)
 {
@@ -31543,6 +31912,9 @@ void Entity::alertAlliesOnBeingHit(Entity* attacker, DynamicArrayT<Entity*>* ski
 	hit.entity = ohitentity;
 }
 
+extern "C" void Entity_alertAlliesOnBeingHit(Entity* self, Entity * attacker, DynamicArrayT<Entity *> * skipEntitiesToAlert) { return self->alertAlliesOnBeingHit(attacker, skipEntitiesToAlert); }
+
+
 
 
 bool Entity::entityCanVomit() const
@@ -31588,6 +31960,9 @@ bool Entity::entityCanVomit() const
 	return true;
 }
 
+extern "C" bool Entity_entityCanVomit(const Entity* self) { return self->entityCanVomit(); }
+
+
 int Entity::getFollowerBonusDamageResist()
 {
 	int resist = 0;
@@ -31626,6 +32001,9 @@ int Entity::getFollowerBonusDamageResist()
 	return resist;
 }
 
+extern "C" int Entity_getFollowerBonusDamageResist(Entity* self) { return self->getFollowerBonusDamageResist(); }
+
+
 int Entity::getMPRestoreOnLevelUp(Entity* entity, Stat* myStats, int baseMP, bool statCheckOnly)
 {
 	int mpMod = baseMP;
@@ -31651,6 +32029,9 @@ int Entity::getMPRestoreOnLevelUp(Entity* entity, Stat* myStats, int baseMP, boo
 	}*/
 	return mpMod;
 }
+
+extern "C" int Entity_getMPRestoreOnLevelUp(Entity * entity, Stat * myStats, int baseMP, bool statCheckOnly) { return Entity::getMPRestoreOnLevelUp(entity, myStats, baseMP, statCheckOnly); }
+
 
 int Entity::getHPRestoreOnLevelUp(Entity* entity, Stat* myStats, int baseHP, bool statCheckOnly)
 {
@@ -31721,6 +32102,9 @@ int Entity::getHPRestoreOnLevelUp(Entity* entity, Stat* myStats, int baseHP, boo
 	return hpMod;
 }
 
+extern "C" int Entity_getHPRestoreOnLevelUp(Entity * entity, Stat * myStats, int baseHP, bool statCheckOnly) { return Entity::getHPRestoreOnLevelUp(entity, myStats, baseHP, statCheckOnly); }
+
+
 int Entity::getFollowerBonusHPRegen()
 {
 	int regen = 0;
@@ -31759,6 +32143,9 @@ int Entity::getFollowerBonusHPRegen()
 	return regen;
 }
 
+extern "C" int Entity_getFollowerBonusHPRegen(Entity* self) { return self->getFollowerBonusHPRegen(); }
+
+
 bool Entity::onEntityTrapHitSacredPath(Entity* trap)
 {
 	if ( Stat* myStats = getStats() )
@@ -31784,6 +32171,9 @@ bool Entity::onEntityTrapHitSacredPath(Entity* trap)
 	}
 	return false;
 }
+
+extern "C" bool Entity_onEntityTrapHitSacredPath(Entity* self, Entity * trap) { return self->onEntityTrapHitSacredPath(trap); }
+
 
 int Entity::getEntityBonusTrapResist()
 {
@@ -31837,6 +32227,9 @@ int Entity::getEntityBonusTrapResist()
 	}
 	return std::min(100, std::max(-100, resist));
 }
+
+extern "C" int Entity_getEntityBonusTrapResist(Entity* self) { return self->getEntityBonusTrapResist(); }
+
 
 int Entity::getEntityInspirationFromAllies()
 {
@@ -31949,6 +32342,9 @@ int Entity::getEntityInspirationFromAllies()
 	}
 	return 0;
 }
+
+extern "C" int Entity_getEntityInspirationFromAllies(Entity* self) { return self->getEntityInspirationFromAllies(); }
+
 
 bool Entity::doSilkenBowOnAttack(Entity* attacker)
 {
@@ -32069,6 +32465,9 @@ bool Entity::doSilkenBowOnAttack(Entity* attacker)
 	return false;
 }
 
+extern "C" bool Entity_doSilkenBowOnAttack(Entity* self, Entity * attacker) { return self->doSilkenBowOnAttack(attacker); }
+
+
 bool Entity::windEffectsEntity(Entity* entity)
 {
 	if ( !entity ) { return false; }
@@ -32133,6 +32532,9 @@ bool Entity::windEffectsEntity(Entity* entity)
 	return false;
 }
 
+extern "C" bool Entity_windEffectsEntity(Entity* self, Entity * entity) { return self->windEffectsEntity(entity); }
+
+
 void Entity::processEntityWind()
 {
 	static real_t redirectionStrength = 0.1;
@@ -32193,6 +32595,9 @@ void Entity::processEntityWind()
 	}
 }
 
+extern "C" void Entity_processEntityWind(Entity* self) { return self->processEntityWind(); }
+
+
 real_t Entity::monsterGetWeightRatio()
 {
 	Stat* myStats = getStats();
@@ -32244,6 +32649,9 @@ real_t Entity::monsterGetWeightRatio()
 	weightratio = fmin(fmax(0, weightratio), 1);
 	return weightratio;
 }
+
+extern "C" real_t Entity_monsterGetWeightRatio(Entity* self) { return self->monsterGetWeightRatio(); }
+
 
 void Entity::creatureHandleLiftZ()
 {
@@ -32377,6 +32785,9 @@ void Entity::creatureHandleLiftZ()
 	}
 }
 
+extern "C" void Entity_creatureHandleLiftZ(Entity* self) { return self->creatureHandleLiftZ(); }
+
+
 bool Entity::degradeAmuletProc(Stat* myStats, ItemType type)
 {
 	if ( !myStats || (myStats && !myStats->amulet) ) { return false; }
@@ -32438,6 +32849,9 @@ bool Entity::degradeAmuletProc(Stat* myStats, ItemType type)
 	return false;
 }
 
+extern "C" bool Entity_degradeAmuletProc(Entity* self, Stat * myStats, ItemType type) { return self->degradeAmuletProc(myStats, type); }
+
+
 bool Entity::myconidReboundOnHit(Entity* attacker)
 {
 	if ( !attacker )
@@ -32465,6 +32879,9 @@ bool Entity::myconidReboundOnHit(Entity* attacker)
 
 	return false;
 }
+
+extern "C" bool Entity_myconidReboundOnHit(Entity* self, Entity * attacker) { return self->myconidReboundOnHit(attacker); }
+
 
 bool Entity::modifyDamageMultipliersFromEffects(Entity* hitentity, Entity* attacker,
 	real_t& damageMultiplier, DamageTableType damageTableType, Entity* projectile, int spellID)
@@ -32545,6 +32962,9 @@ bool Entity::modifyDamageMultipliersFromEffects(Entity* hitentity, Entity* attac
 	return result;
 }
 
+extern "C" bool Entity_modifyDamageMultipliersFromEffects(Entity * hitentity, Entity * attacker, real_t & damageMultiplier, DamageTableType damageTableType, Entity * projectile, int spellID) { return Entity::modifyDamageMultipliersFromEffects(hitentity, attacker, damageMultiplier, damageTableType, projectile, spellID); }
+
+
 real_t Entity::getHealingSpellPotionModifierFromEffects(bool processLevelup)
 {
 	real_t result = 1.0;
@@ -32574,8 +32994,14 @@ real_t Entity::getHealingSpellPotionModifierFromEffects(bool processLevelup)
 	return result;
 }
 
+extern "C" real_t Entity_getHealingSpellPotionModifierFromEffects(Entity* self, bool processLevelup) { return self->getHealingSpellPotionModifierFromEffects(processLevelup); }
+
+
 void Entity::stopEntitySound() {
 	}
+
+extern "C" void Entity_stopEntitySound(Entity* self) { return self->stopEntitySound(); }
+
 
 void Entity::setEntityString(const char* str) {
 		if ( string )
@@ -32592,16 +33018,25 @@ void Entity::setEntityString(const char* str) {
 		}
 	}
 
+extern "C" void Entity_setEntityString(Entity* self, const char * str) { return self->setEntityString(str); }
+
+
 bool Entity::entityHasString(const char* str) {
 		if ( !string ) { return false; }
 		return (!strcmp(string, str) ? true : false);
 	}
+
+extern "C" bool Entity_entityHasString(Entity* self, const char * str) { return self->entityHasString(str); }
+
 
 void Entity::setEntityShowOnMap(EntityShowMapSource source, int duration) {
 		entityShowOnMap() = 0;
 		entityShowOnMap() |= ((int)source & 0xFF) << 24;
 		entityShowOnMap() |= duration & 0xFFFFFF;
 	}
+
+extern "C" void Entity_setEntityShowOnMap(Entity* self, Entity::EntityShowMapSource source, int duration) { return self->setEntityShowOnMap(source, duration); }
+
 
 void Entity::entityShowOnMapTickDuration() {
 		auto duration = getEntityShowOnMapDuration();
@@ -32620,9 +33055,15 @@ void Entity::entityShowOnMapTickDuration() {
 		}
 	}
 
+extern "C" void Entity_entityShowOnMapTickDuration(Entity* self) { return self->entityShowOnMapTickDuration(); }
+
+
 Entity::EntityShowMapSource Entity::getEntityShowOnMapSource() {
 		return (EntityShowMapSource)((entityShowOnMap() >> 24) & 0xFF);
 	}
+
+extern "C" Entity::EntityShowMapSource Entity_getEntityShowOnMapSource(Entity* self) { return self->getEntityShowOnMapSource(); }
+
 
 Monster Entity::getRace() const {
 		Stat* myStats = getStats();
@@ -32635,6 +33076,9 @@ Monster Entity::getRace() const {
 		return myStats->type;
 	}
 
+extern "C" Monster Entity_getRace(const Entity* self) { return self->getRace(); }
+
+
 bool inline Entity::skillCapstoneUnlockedEntity(int proficiency) const {
 		if ( !getStats() )
 		{
@@ -32644,11 +33088,17 @@ bool inline Entity::skillCapstoneUnlockedEntity(int proficiency) const {
 		return (getStats()->getModifiedProficiency(proficiency) >= CAPSTONE_UNLOCK_LEVEL[proficiency]);
 	}
 
+extern "C" bool Entity_skillCapstoneUnlockedEntity(const Entity* self, int proficiency) { return self->skillCapstoneUnlockedEntity(proficiency); }
+
+
 
 
 bool Entity::monsterInMeleeRange(const Entity* target, double dist) const {
 		return (dist < STRIKERANGE);
 	}
+
+extern "C" bool Entity_monsterInMeleeRange(const Entity* self, const Entity * target, double dist) { return self->monsterInMeleeRange(target, dist); }
+
 
 bool TextSourceScript::containsOperator(char c) {
 		if ( c == '+' || c == '-' || c == '=' )
@@ -32657,6 +33107,9 @@ bool TextSourceScript::containsOperator(char c) {
 		}
 		return false;
 	}
+
+extern "C" bool TextSourceScript_containsOperator(TextSourceScript* self, char c) { return self->containsOperator(c); }
+
 
 void TextSourceScript::eraseTag(std::string& script, std::string& scriptTag, size_t tagIndex) {
 		if ( tagIndex + scriptTag.length() < script.length()
@@ -32670,32 +33123,53 @@ void TextSourceScript::eraseTag(std::string& script, std::string& scriptTag, siz
 		}
 	}
 
+extern "C" void TextSourceScript_eraseTag(TextSourceScript* self, std::string & script, std::string & scriptTag, size_t tagIndex) { return self->eraseTag(script, scriptTag, tagIndex); }
+
+
 int TextSourceScript::getScriptType(Sint32 skill) {
 		return (skill & 0xF);
 	}
+
+extern "C" int TextSourceScript_getScriptType(TextSourceScript* self, Sint32 skill) { return self->getScriptType(skill); }
+
 
 int TextSourceScript::getAttachedToEntityType(Sint32 skill) {
 		return ((skill & 0xFF0) >> 4);
 	}
 
+extern "C" int TextSourceScript_getAttachedToEntityType(TextSourceScript* self, Sint32 skill) { return self->getAttachedToEntityType(skill); }
+
+
 int TextSourceScript::getTriggerType(Sint32 skill) {
 		return ((skill & 0xF000) >> 12);
 	}
+
+extern "C" int TextSourceScript_getTriggerType(TextSourceScript* self, Sint32 skill) { return self->getTriggerType(skill); }
+
 
 void TextSourceScript::setScriptType(Sint32& skill, int setValue) {
 		skill &= 0xFFFFFFF0;
 		skill |= (setValue & 0xF);
 	}
 
+extern "C" void TextSourceScript_setScriptType(TextSourceScript* self, Sint32 & skill, int setValue) { return self->setScriptType(skill, setValue); }
+
+
 void TextSourceScript::setAttachedToEntityType(Sint32& skill, int setValue) {
 		skill &= 0xFFFFF00F;
 		skill |= ((setValue << 4) & 0xFF0);
 	}
 
+extern "C" void TextSourceScript_setAttachedToEntityType(TextSourceScript* self, Sint32 & skill, int setValue) { return self->setAttachedToEntityType(skill, setValue); }
+
+
 void TextSourceScript::setTriggerType(Sint32& skill, int setValue) {
 		skill &= 0xFFFF0FFF;
 		skill |= ((setValue << 12) & 0xF000);
 	}
+
+extern "C" void TextSourceScript_setTriggerType(TextSourceScript* self, Sint32 & skill, int setValue) { return self->setTriggerType(skill, setValue); }
+
 
 DynamicArrayT<Entity*> TextSourceScript::getScriptAttachedEntities(Entity& script) {
 		DynamicArrayT<Entity*> entities;
@@ -32710,6 +33184,9 @@ DynamicArrayT<Entity*> TextSourceScript::getScriptAttachedEntities(Entity& scrip
 		}
 		return entities;
 	}
+
+extern "C" DynamicArrayT<Entity *> TextSourceScript_getScriptAttachedEntities(TextSourceScript* self, Entity & script) { return self->getScriptAttachedEntities(script); }
+
 
 void Entity::chooseWeapon(const Entity* target, double dist) {
 		Stat* myStats = getStats();
@@ -32778,3 +33255,6 @@ void Entity::chooseWeapon(const Entity* target, double dist) {
 				break;
 		}
 	}
+
+extern "C" void Entity_chooseWeapon(Entity* self, const Entity * target, double dist) { return self->chooseWeapon(target, dist); }
+

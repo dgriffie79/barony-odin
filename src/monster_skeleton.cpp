@@ -2122,3 +2122,5 @@ void Entity::skeletonSummonSetEquipment(Stat* myStats, int rank)
 		}
 	}
 }
+
+extern "C" void Entity_skeletonSummonSetEquipment(Entity* self, Stat * myStats, int rank) { return self->skeletonSummonSetEquipment(myStats, rank); }

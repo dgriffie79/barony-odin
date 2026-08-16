@@ -1224,6 +1224,9 @@ const char* spell_t::getSpellName(bool lowercase)
 	return "";
 }
 
+extern "C" const char * spell_t_getSpellName(spell_t* self, bool lowercase) { return self->getSpellName(lowercase); }
+
+
 const char* spell_t::getSpellTierName()
 {
 	if ( difficulty < 20 )
@@ -1252,6 +1255,9 @@ const char* spell_t::getSpellTierName()
 	}
 	return "";
 }
+
+extern "C" const char * spell_t_getSpellTierName(spell_t* self) { return self->getSpellTierName(); }
+
 
 spell_t* getSpellFromID(int ID)
 {

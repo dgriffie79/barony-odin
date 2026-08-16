@@ -34,6 +34,9 @@ void Button::setIcon(const char* _icon) {
 	icon = _icon;
 }
 
+extern "C" void Button_setIcon(Button* self, const char * _icon) { return self->setIcon(_icon); }
+
+
 void Button::activate() {
 	if (style == STYLE_NORMAL || style == STYLE_RADIO) {
 		setPressed(true);
@@ -46,6 +49,9 @@ void Button::activate() {
 		printlog("button clicked with no callback");
 	}
 }
+
+extern "C" void Button_activate(Button* self) { return self->activate(); }
+
 
 static char* tokenize(char* str, const char* const delimiters) {
 	if (!str || !delimiters) {
@@ -319,6 +325,9 @@ next:
 	}
 }
 
+extern "C" void Button_draw(const Button* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets) { return self->draw(_size, _actualSize, selectedWidgets); }
+
+
 void Button::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
     const DynamicArrayT<Widget*>& selectedWidgets,
     const DynamicArrayT<Widget*>& searchParents) const {
@@ -334,6 +343,9 @@ void Button::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 	}
 	Widget::drawPost(_size, selectedWidgets, searchParents);
 }
+
+extern "C" void Button_drawPost(const Button* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets, const DynamicArrayT<Widget *> & searchParents) { return self->drawPost(_size, _actualSize, selectedWidgets, searchParents); }
+
 
 Button::result_t Button::process(SDL_Rect _size, SDL_Rect _actualSize, const bool usable) {
 	Widget::process();
@@ -446,6 +458,9 @@ Button::result_t Button::process(SDL_Rect _size, SDL_Rect _actualSize, const boo
 	return result;
 }
 
+extern "C" Button::result_t Button_process(Button* self, SDL_Rect _size, SDL_Rect _actualSize, const bool usable) { return self->process(_size, _actualSize, usable); }
+
+
 void Button::scrollParent() {
 	Frame* fparent = static_cast<Frame*>(parent);
 	auto fActualSize = fparent->getActualSize();
@@ -471,6 +486,9 @@ void Button::scrollParent() {
 	fparent->setActualSize(fActualSize);
 }
 
+extern "C" void Button_scrollParent(Button* self) { return self->scrollParent(); }
+
+
 SDL_Rect Button::getAbsoluteSize() const
 {
 	SDL_Rect _size{ size.x, size.y, size.w, size.h };
@@ -483,66 +501,165 @@ SDL_Rect Button::getAbsoluteSize() const
 	return _size;
 }
 
+extern "C" SDL_Rect Button_getAbsoluteSize(const Button* self) { return self->getAbsoluteSize(); }
+
+
 const char*					Button::getText() const { return text.c_str(); }
+
+extern "C" const char * Button_getText(const Button* self) { return self->getText(); }
+
 
 const char*					Button::getFont() const { return font.c_str(); }
 
+extern "C" const char * Button_getFont(const Button* self) { return self->getFont(); }
+
+
 const int					Button::getHJustify() const { return static_cast<int>(hjustify); }
+
+extern "C" const int Button_getHJustify(const Button* self) { return self->getHJustify(); }
+
 
 const int					Button::getVJustify() const { return static_cast<int>(vjustify); }
 
+extern "C" const int Button_getVJustify(const Button* self) { return self->getVJustify(); }
+
+
 const char*					Button::getBackground() const { return background.c_str(); }
+
+extern "C" const char * Button_getBackground(const Button* self) { return self->getBackground(); }
+
 
 const char*					Button::getBackgroundHighlighted() const { return backgroundHighlighted.c_str(); }
 
+extern "C" const char * Button_getBackgroundHighlighted(const Button* self) { return self->getBackgroundHighlighted(); }
+
+
 const char*					Button::getBackgroundActivated() const { return backgroundActivated.c_str(); }
+
+extern "C" const char * Button_getBackgroundActivated(const Button* self) { return self->getBackgroundActivated(); }
+
 
 SDL_Rect                    Button::getTextOffset() const { return textOffset; }
 
+extern "C" SDL_Rect Button_getTextOffset(const Button* self) { return self->getTextOffset(); }
+
+
 void	Button::setBorder(int _border) { border = _border; }
+
+extern "C" void Button_setBorder(Button* self, int _border) { return self->setBorder(_border); }
+
 
 void	Button::setPos(int x, int y) { size.x = x; size.y = y; }
 
+extern "C" void Button_setPos(Button* self, int x, int y) { return self->setPos(x, y); }
+
+
 void	Button::setSize(SDL_Rect _size) { size = _size; }
+
+extern "C" void Button_setSize(Button* self, SDL_Rect _size) { return self->setSize(_size); }
+
 
 void	Button::setColor(const Uint32& _color) { color = _color; }
 
+extern "C" void Button_setColor(Button* self, const Uint32 & _color) { return self->setColor(_color); }
+
+
 void	Button::setTextColor(const Uint32& _color) { textColor = _color; }
+
+extern "C" void Button_setTextColor(Button* self, const Uint32 & _color) { return self->setTextColor(_color); }
+
 
 void	Button::setTextHighlightColor(const Uint32& _color) { textHighlightColor = _color; }
 
+extern "C" void Button_setTextHighlightColor(Button* self, const Uint32 & _color) { return self->setTextHighlightColor(_color); }
+
+
 void	Button::setBorderColor(const Uint32& _color) { borderColor = _color; }
+
+extern "C" void Button_setBorderColor(Button* self, const Uint32 & _color) { return self->setBorderColor(_color); }
+
 
 void	Button::setHighlightColor(const Uint32& _color) { highlightColor = _color; }
 
+extern "C" void Button_setHighlightColor(Button* self, const Uint32 & _color) { return self->setHighlightColor(_color); }
+
+
 void	Button::setText(const char* _text) { text = _text; }
+
+extern "C" void Button_setText(Button* self, const char * _text) { return self->setText(_text); }
+
 
 void	Button::setFont(const char* _font) { font = _font; }
 
+extern "C" void Button_setFont(Button* self, const char * _font) { return self->setFont(_font); }
+
+
 void    Button::setIconColor(const Uint32& _color) { iconColor = _color; }
+
+extern "C" void Button_setIconColor(Button* self, const Uint32 & _color) { return self->setIconColor(_color); }
+
 
 void	Button::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
 
+extern "C" void Button_setTooltip(Button* self, const char * _tooltip) { return self->setTooltip(_tooltip); }
+
+
 void	Button::setStyle(int _style) { style = static_cast<style_t>(_style); }
+
+extern "C" void Button_setStyle(Button* self, int _style) { return self->setStyle(_style); }
+
 
 void	Button::setCallback(void (*const fn)(Button&)) { callback = fn; }
 
+extern "C" void Button_setCallback(Button* self, void (*fn)(Button &)) { return self->setCallback(fn); }
+
+
 void	Button::setBackground(const char* image) { background = image; }
+
+extern "C" void Button_setBackground(Button* self, const char * image) { return self->setBackground(image); }
+
 
 void	Button::setBackgroundHighlighted(const char* image) { backgroundHighlighted = image; }
 
+extern "C" void Button_setBackgroundHighlighted(Button* self, const char * image) { return self->setBackgroundHighlighted(image); }
+
+
 void	Button::setBackgroundActivated(const char* image) { backgroundActivated = image; }
+
+extern "C" void Button_setBackgroundActivated(Button* self, const char * image) { return self->setBackgroundActivated(image); }
+
 
 void	Button::setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
 
+extern "C" void Button_setJustify(Button* self, const int _justify) { return self->setJustify(_justify); }
+
+
 void	Button::setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
+
+extern "C" void Button_setHJustify(Button* self, const int _justify) { return self->setHJustify(_justify); }
+
 
 void	Button::setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
 
+extern "C" void Button_setVJustify(Button* self, const int _justify) { return self->setVJustify(_justify); }
+
+
 void    Button::setTextOffset(const SDL_Rect& offset) { textOffset = offset; }
+
+extern "C" void Button_setTextOffset(Button* self, const SDL_Rect & offset) { return self->setTextOffset(offset); }
+
 
 void	Button::setOntop(const bool _ontop) { ontop = _ontop; }
 
+extern "C" void Button_setOntop(Button* self, const bool _ontop) { return self->setOntop(_ontop); }
+
+
 void	Button::setPaddingPerTextLine(int padding) { paddingPerTextLine = padding; }
 
+extern "C" void Button_setPaddingPerTextLine(Button* self, int padding) { return self->setPaddingPerTextLine(padding); }
+
+
 void	Button::setScrollParentOffset(const SDL_Rect& offset) { scrollParentOffset = offset; }
+
+extern "C" void Button_setScrollParentOffset(Button* self, const SDL_Rect & offset) { return self->setScrollParentOffset(offset); }
+

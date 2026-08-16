@@ -524,6 +524,9 @@ bool CastSpellProps_t::setToMonsterCast(Entity* monster, int spellID)
 	return false;
 }
 
+extern "C" bool CastSpellProps_t_setToMonsterCast(CastSpellProps_t* self, Entity * monster, int spellID) { return self->setToMonsterCast(monster, spellID); }
+
+
 int getEffectiveSpellcastingAbility(Entity* caster, Stat* stat, spell_t* spell) // to check for fumbling
 {
 	if ( !caster || !stat || !spell )

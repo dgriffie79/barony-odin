@@ -158,6 +158,8 @@ private:
 	Frame::image_t* progressBar = nullptr;
 	Frame::image_t* progressBarBackground = nullptr;
 
+
+	public:
 	bool matchesAchievementName(const char* achName);
 };
 

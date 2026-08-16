@@ -212,6 +212,9 @@ void Entity::furnitureHandleDamageMagic(int damage, Entity& magicProjectile, Ent
 	}
 }
 
+extern "C" void Entity_furnitureHandleDamageMagic(Entity* self, int damage, Entity & magicProjectile, Entity * caster, bool messages, bool doSound) { return self->furnitureHandleDamageMagic(damage, magicProjectile, caster, messages, doSound); }
+
+
 void Entity::actFurniture()
 {
 
@@ -329,6 +332,9 @@ void Entity::actFurniture()
 	}
 }
 
+extern "C" void Entity_actFurniture(Entity* self) { return self->actFurniture(); }
+
+
 // an easter egg
 #define MCAXE_USED my->skill[0]
 
@@ -405,6 +411,9 @@ void Entity::actStalagFloor()
 
 }
 
+extern "C" void Entity_actStalagFloor(Entity* self) { return self->actStalagFloor(); }
+
+
 void actStalagCeiling(Entity* my)
 {
 	//TODO: something?
@@ -425,6 +434,9 @@ void Entity::actStalagCeiling()
 
 }
 
+extern "C" void Entity_actStalagCeiling(Entity* self) { return self->actStalagCeiling(); }
+
+
 void actStalagColumn(Entity* my)
 {
 	//TODO: something?
@@ -443,6 +455,9 @@ void Entity::actStalagColumn()
 {
 
 }
+
+extern "C" void Entity_actStalagColumn(Entity* self) { return self->actStalagColumn(); }
+
 
 void actStatue(Entity* my)
 {
@@ -576,6 +591,9 @@ void Entity::actColumn()
 
 }
 
+extern "C" void Entity_actColumn(Entity* self) { return self->actColumn(); }
+
+
 void actCeilingTile(Entity* my)
 {
 	if ( !my )
@@ -673,6 +691,9 @@ void Entity::actPistonCam()
 		}
 	}
 }
+
+extern "C" void Entity_actPistonCam(Entity* self) { return self->actPistonCam(); }
+
 
 int colliderGetSpellRange(Entity* my)
 {
@@ -1149,6 +1170,9 @@ bool Entity::isColliderShownAsWallOnMinimap() const
 	return colliderDmgType.showAsWallOnMinimap;
 }
 
+extern "C" bool Entity_isColliderShownAsWallOnMinimap(const Entity* self) { return self->isColliderShownAsWallOnMinimap(); }
+
+
 bool Entity::isColliderWeakToBoulders() const
 {
 	if ( !isDamageableCollider() ) { return false; }
@@ -1156,6 +1180,9 @@ bool Entity::isColliderWeakToBoulders() const
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.boulderDestroys;
 }
+
+extern "C" bool Entity_isColliderWeakToBoulders(const Entity* self) { return self->isColliderWeakToBoulders(); }
+
 
 bool Entity::isColliderWeakToSkill(const int proficiency) const
 {
@@ -1165,6 +1192,9 @@ bool Entity::isColliderWeakToSkill(const int proficiency) const
 	return colliderDmgType.proficiencyBonusDamage.contains(proficiency);
 }
 
+extern "C" bool Entity_isColliderWeakToSkill(const Entity* self, const int proficiency) { return self->isColliderWeakToSkill(proficiency); }
+
+
 bool Entity::isColliderResistToSkill(const int proficiency) const
 {
 	if ( !isDamageableCollider() ) { return false; }
@@ -1172,6 +1202,9 @@ bool Entity::isColliderResistToSkill(const int proficiency) const
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.proficiencyResistDamage.contains(proficiency);
 }
+
+extern "C" bool Entity_isColliderResistToSkill(const Entity* self, const int proficiency) { return self->isColliderResistToSkill(proficiency); }
+
 
 bool Entity::isColliderDamageableByMelee() const
 {
@@ -1181,6 +1214,9 @@ bool Entity::isColliderDamageableByMelee() const
 	return colliderDmgType.meleeAffects;
 }
 
+extern "C" bool Entity_isColliderDamageableByMelee(const Entity* self) { return self->isColliderDamageableByMelee(); }
+
+
 bool Entity::isColliderDamageableByMagic() const
 {
 	if ( !isDamageableCollider() ) { return false; }
@@ -1188,6 +1224,9 @@ bool Entity::isColliderDamageableByMagic() const
 	auto& colliderDmgType = EditorEntityData_t::colliderDmgTypes[colliderData.damageCalculationType];
 	return colliderDmgType.magicAffects;
 }
+
+extern "C" bool Entity_isColliderDamageableByMagic(const Entity* self) { return self->isColliderDamageableByMagic(); }
+
 
 bool Entity::isColliderAttachableToBombs() const
 {
@@ -1197,6 +1236,9 @@ bool Entity::isColliderAttachableToBombs() const
 	return colliderDmgType.bombsAttach;
 }
 
+extern "C" bool Entity_isColliderAttachableToBombs(const Entity* self) { return self->isColliderAttachableToBombs(); }
+
+
 bool Entity::isColliderPathableMonster(Monster type) const
 {
 	if ( !isDamageableCollider() ) { return false; }
@@ -1204,10 +1246,16 @@ bool Entity::isColliderPathableMonster(Monster type) const
 	return colliderData.pathableMonsters.find(type) != colliderData.pathableMonsters.end();
 }
 
+extern "C" bool Entity_isColliderPathableMonster(const Entity* self, Monster type) { return self->isColliderPathableMonster(type); }
+
+
 bool Entity::isDamageableCollider() const 
 { 
 	return behavior == &actColliderDecoration && colliderMaxHP() > 0;
 }
+
+extern "C" bool Entity_isDamageableCollider(const Entity* self) { return self->isDamageableCollider(); }
+
 
 bool Entity::isColliderWall() const
 {
@@ -1220,6 +1268,9 @@ bool Entity::isColliderWall() const
 	return false;
 }
 
+extern "C" bool Entity_isColliderWall(const Entity* self) { return self->isColliderWall(); }
+
+
 bool Entity::isColliderBreakableContainer() const
 {
 	if ( !isDamageableCollider() ) { return false; }
@@ -1230,6 +1281,9 @@ bool Entity::isColliderBreakableContainer() const
 	}
 	return false;
 }
+
+extern "C" bool Entity_isColliderBreakableContainer(const Entity* self) { return self->isColliderBreakableContainer(); }
+
 
 void Entity::colliderOnDestroy()
 {
@@ -1479,12 +1533,18 @@ void Entity::colliderOnDestroy()
 	}
 }
 
+extern "C" void Entity_colliderOnDestroy(Entity* self) { return self->colliderOnDestroy(); }
+
+
 int Entity::getColliderLangName() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
 	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.entityLangEntry;
 }
+
+extern "C" int Entity_getColliderLangName(const Entity* self) { return self->getColliderLangName(); }
+
 
 int Entity::getColliderOnHitLangEntry() const
 {
@@ -1493,12 +1553,18 @@ int Entity::getColliderOnHitLangEntry() const
 	return colliderData.hitMessageLangEntry;
 }
 
+extern "C" int Entity_getColliderOnHitLangEntry(const Entity* self) { return self->getColliderOnHitLangEntry(); }
+
+
 int Entity::getColliderOnBreakLangEntry() const
 {
 	if ( !isDamageableCollider() ) { return 1; }
 	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.breakMessageLangEntry;
 }
+
+extern "C" int Entity_getColliderOnBreakLangEntry(const Entity* self) { return self->getColliderOnBreakLangEntry(); }
+
 
 int Entity::getColliderOnJumpLangEntry() const
 {
@@ -1507,12 +1573,18 @@ int Entity::getColliderOnJumpLangEntry() const
 	return colliderData.colliderJumpLangEntry;
 }
 
+extern "C" int Entity_getColliderOnJumpLangEntry(const Entity* self) { return self->getColliderOnJumpLangEntry(); }
+
+
 int Entity::getColliderSfxOnHit() const
 {
 	if ( !isDamageableCollider() ) { return 0; }
 	auto& colliderData = EditorEntityData_t::colliderData[colliderDamageTypes()];
 	return colliderData.sfxHit;
 }
+
+extern "C" int Entity_getColliderSfxOnHit(const Entity* self) { return self->getColliderSfxOnHit(); }
+
 
 int Entity::getColliderSfxOnBreak() const
 {
@@ -1521,6 +1593,9 @@ int Entity::getColliderSfxOnBreak() const
 	if ( colliderData.sfxBreak.size() == 0 ) { return 0; }
 	return colliderData.sfxBreak[local_rng.rand() % colliderData.sfxBreak.size()];
 }
+
+extern "C" int Entity_getColliderSfxOnBreak(const Entity* self) { return self->getColliderSfxOnBreak(); }
+
 
 Entity* Entity::createBreakableCollider(int colliderDamageType, real_t _x, real_t _y, Entity* parent)
 {
@@ -1599,6 +1674,9 @@ Entity* Entity::createBreakableCollider(int colliderDamageType, real_t _x, real_
 	return breakable;
 }
 
+extern "C" Entity * Entity_createBreakableCollider(int colliderDamageType, real_t _x, real_t _y, Entity * parent) { return Entity::createBreakableCollider(colliderDamageType, _x, _y, parent); }
+
+
 void Entity::colliderSetServerSkillOnSpawned()
 {
 	Sint32 val = (1 << 31);
@@ -1607,6 +1685,9 @@ void Entity::colliderSetServerSkillOnSpawned()
 	val |= (Uint8)(colliderSpellEvent() % 1000) << 16;
 	skill[2] = val;
 }
+
+extern "C" void Entity_colliderSetServerSkillOnSpawned(Entity* self) { return self->colliderSetServerSkillOnSpawned(); }
+
 
 void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t* whichMap)
 {
@@ -1845,6 +1926,9 @@ void Entity::colliderAssignProperties(Entity* entity, bool mapGeneration, map_t*
 	}
 	entity->setUID(-3);*/
 }
+
+extern "C" void Entity_colliderAssignProperties(Entity * entity, bool mapGeneration, map_t * whichMap) { return Entity::colliderAssignProperties(entity, mapGeneration, whichMap); }
+
 
 std::set<Uint32> collidersToRaiseToHeight;
 void actColliderDecoration(Entity* my)
@@ -2415,6 +2499,9 @@ void Entity::colliderHandleDamageMagic(int damage, Entity &magicProjectile, Enti
 	}
 }
 
+extern "C" void Entity_colliderHandleDamageMagic(Entity* self, int damage, Entity & magicProjectile, Entity * caster, bool messages, bool doSound) { return self->colliderHandleDamageMagic(damage, magicProjectile, caster, messages, doSound); }
+
+
 void actFloorDecoration(Entity* my)
 {
 	if ( !my )
@@ -2946,6 +3033,12 @@ int TextSourceScript::textSourceProcessScriptTag(std::string& input, std::string
 	}
 	return k_ScriptError;
 }
+
+extern "C" int TextSourceScript_textSourceProcessScriptTag_2(TextSourceScript* self, DynamicString & input, std::string findTag, Entity & src) { return self->textSourceProcessScriptTag(input, findTag, src); }
+
+
+extern "C" int TextSourceScript_textSourceProcessScriptTag(TextSourceScript* self, std::string & input, std::string findTag, Entity & src) { return self->textSourceProcessScriptTag(input, findTag, src); }
+
 
 // DynamicString overload — bridges to the std::string version (which writes
 // into input), copying both ways.
@@ -4835,6 +4928,9 @@ void TextSourceScript::handleTextSourceScript(Entity& src, DynamicString input)
 	printlog("[SCRIPT]: Finished running.");
 }
 
+extern "C" void TextSourceScript_handleTextSourceScript(TextSourceScript* self, Entity & src, DynamicString input) { return self->handleTextSourceScript(src, input); }
+
+
 void Entity::actTextSource()
 {
 	if ( multiplayer == CLIENT )
@@ -5076,6 +5172,9 @@ void Entity::actTextSource()
 	}
 }
 
+extern "C" void Entity_actTextSource(Entity* self) { return self->actTextSource(); }
+
+
 void TextSourceScript::updateClientInformation(int player, bool clearInventory, bool clearStats, ClientInformationType updateType)
 {
 	if ( multiplayer != SERVER )
@@ -5152,6 +5251,9 @@ void TextSourceScript::updateClientInformation(int player, bool clearInventory, 
 	}
 }
 
+extern "C" void TextSourceScript_updateClientInformation(TextSourceScript* self, int player, bool clearInventory, bool clearStats, TextSourceScript::ClientInformationType updateType) { return self->updateClientInformation(player, clearInventory, clearStats, updateType); }
+
+
 void TextSourceScript::playerClearInventory(bool clearStats)
 {
 	players[clientnum]->hud.reset();
@@ -5176,6 +5278,9 @@ void TextSourceScript::playerClearInventory(bool clearStats)
 
 	this->hasClearedInventory = true;
 }
+
+extern "C" void TextSourceScript_playerClearInventory(TextSourceScript* self, bool clearStats) { return self->playerClearInventory(clearStats); }
+
 
 DynamicString TextSourceScript::getScriptFromEntity(Entity& src)
 {
@@ -5221,6 +5326,9 @@ DynamicString TextSourceScript::getScriptFromEntity(Entity& src)
 	return buf;
 }
 
+extern "C" DynamicString TextSourceScript_getScriptFromEntity(TextSourceScript* self, Entity & src) { return self->getScriptFromEntity(src); }
+
+
 Entity* TextSourceScript::createScriptEntityInMapGen(int x, int y, const char* text)
 {
 	Entity* scriptEntity = newEntity(132, 1, map.entities, nullptr); // text script
@@ -5236,6 +5344,9 @@ Entity* TextSourceScript::createScriptEntityInMapGen(int x, int y, const char* t
 
 	return scriptEntity;
 }
+
+extern "C" Entity * TextSourceScript_createScriptEntityInMapGen(TextSourceScript* self, int x, int y, const char * text) { return self->createScriptEntityInMapGen(x, y, text); }
+
 
 void TextSourceScript::addScriptToTextSource(Entity& src, const char* text)
 {
@@ -5266,6 +5377,9 @@ void TextSourceScript::addScriptToTextSource(Entity& src, const char* text)
 		}
 	}
 }
+
+extern "C" void TextSourceScript_addScriptToTextSource(TextSourceScript* self, Entity & src, const char * text) { return self->addScriptToTextSource(src, text); }
+
 
 void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 {
@@ -5366,6 +5480,9 @@ void TextSourceScript::parseScriptInMapGeneration(Entity& src)
 		}
 	}
 }
+
+extern "C" void TextSourceScript_parseScriptInMapGeneration(TextSourceScript* self, Entity & src) { return self->parseScriptInMapGeneration(src); }
+
 
 void bellAttractMonsters(Entity* my)
 {

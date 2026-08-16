@@ -41,6 +41,9 @@ void Widget::deselectBase() {
 	selected = false;
 }
 
+extern "C" void Widget_deselectBase(Widget* self) { return self->deselectBase(); }
+
+
 bool Widget::removeBase(const char* name) {
     for (int64_t i = 0; i < widgets.size(); ++i) {
         auto widget = widgets[i];
@@ -52,6 +55,9 @@ bool Widget::removeBase(const char* name) {
     return false;
 }
 
+extern "C" bool Widget_removeBase(Widget* self, const char * name) { return self->removeBase(name); }
+
+
 void Widget::removeSelf() {
     toBeDeleted = true;
     
@@ -61,6 +67,9 @@ void Widget::removeSelf() {
         widget->removeSelf();
     }
 }
+
+extern "C" void Widget_removeSelf(Widget* self) { return self->removeSelf(); }
+
 
 void Widget::select() {
 	if (selected) {
@@ -76,6 +85,9 @@ void Widget::select() {
 	}
 	selected = true;
 }
+
+extern "C" void Widget_select(Widget* self) { return self->select(); }
+
 
 void Widget::deselect() {
     switch (type) {
@@ -94,6 +106,9 @@ void Widget::deselect() {
     }
 }
 
+extern "C" void Widget_deselect(Widget* self) { return self->deselect(); }
+
+
 void Widget::activate() {
     switch (type) {
     case WIDGET_BUTTON:
@@ -111,6 +126,9 @@ void Widget::activate() {
     }
 }
 
+extern "C" void Widget_activate(Widget* self) { return self->activate(); }
+
+
 void Widget::process() {
 	if (!disabled && !toBeDeleted) {
 		if (tickCallback) {
@@ -118,6 +136,9 @@ void Widget::process() {
 		}
 	}
 }
+
+extern "C" void Widget_process(Widget* self) { return self->process(); }
+
 
 Frame* Widget::findSearchRoot() {
 	Widget* gui = findHead();
@@ -136,6 +157,12 @@ Frame* Widget::findSearchRoot() {
 		return nullptr;
 	}
 }
+
+extern "C" const Frame * Widget_findSearchRoot_2(const Widget* self) { return self->findSearchRoot(); }
+
+
+extern "C" Frame * Widget_findSearchRoot(Widget* self) { return self->findSearchRoot(); }
+
 
 const Frame* Widget::findSearchRoot() const {
 	const Widget* gui = findHead();
@@ -234,6 +261,9 @@ Widget* Widget::handleInput() {
 	return nullptr;
 }
 
+extern "C" Widget * Widget_handleInput(Widget* self) { return self->handleInput(); }
+
+
 Widget* Widget::findHead() {
     if (parent && parent->owner == owner) {
         return parent->findHead();
@@ -241,6 +271,12 @@ Widget* Widget::findHead() {
         return this;
     }
 }
+
+extern "C" const Widget * Widget_findHead_2(const Widget* self) { return self->findHead(); }
+
+
+extern "C" Widget * Widget_findHead(Widget* self) { return self->findHead(); }
+
 
 const Widget* Widget::findHead() const {
 	if (parent && parent->owner == owner) {
@@ -300,6 +336,12 @@ Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType 
 	return nullptr;
 }
 
+extern "C" const Widget * Widget_findWidget_2(const Widget* self, const char * name, bool recursive, Widget::SearchType searchType) { return self->findWidget(name, recursive, searchType); }
+
+
+extern "C" Widget * Widget_findWidget(Widget* self, const char * name, bool recursive, Widget::SearchType searchType) { return self->findWidget(name, recursive, searchType); }
+
+
 const Widget* Widget::findWidget(const char* name, bool recursive, Widget::SearchType searchType) const {
     if (searchType == Widget::SearchType::DEPTH_FIRST) {
 	    for (int64_t i = 0; i < widgets.size(); ++i) {
@@ -354,6 +396,12 @@ void Widget::findSelectedWidgets(DynamicArrayT<Widget*>& outResult) {
 	}
 }
 
+extern "C" void Widget_findSelectedWidgets_2(const Widget* self, DynamicArrayT<Widget *> & outResult) { return self->findSelectedWidgets(outResult); }
+
+
+extern "C" void Widget_findSelectedWidgets(Widget* self, DynamicArrayT<Widget *> & outResult) { return self->findSelectedWidgets(outResult); }
+
+
 void Widget::findSelectedWidgets(DynamicArrayT<Widget*>& outResult) const {
 	for (int c = 0; c < MAXPLAYERS; ++c) {
 	    if (_selectedWidgets[c] && _selectedWidgets[c]->isChildOf(*this)) {
@@ -375,6 +423,10 @@ Widget* Widget::findSelectedWidget(int owner) {
     return nullptr;
 }
 
+
+extern "C" Widget * Widget_findSelectedWidget(Widget* self, int owner) { return self->findSelectedWidget(owner); }
+
+
 bool Widget::isChildOf(const Widget& widget) const {
 	if (!parent) {
 		return false;
@@ -386,6 +438,9 @@ bool Widget::isChildOf(const Widget& widget) const {
 		return parent->isChildOf(widget);
 	}
 }
+
+extern "C" bool Widget_isChildOf(const Widget* self, const Widget & widget) { return self->isChildOf(widget); }
+
 
 void Widget::adoptWidget(Widget& widget) {
 	if (widget.parent) {
@@ -401,6 +456,9 @@ void Widget::adoptWidget(Widget& widget) {
 	widget.setOwner(this->getOwner());
 	widgets.push_back(&widget);
 }
+
+extern "C" void Widget_adoptWidget(Widget* self, Widget & widget) { return self->adoptWidget(widget); }
+
 
 void Widget::drawPost(const SDL_Rect size,
     const DynamicArrayT<Widget*>& selectedWidgets,
@@ -554,12 +612,18 @@ void Widget::drawPost(const SDL_Rect size,
 #endif
 }
 
+extern "C" void Widget_drawPost(const Widget* self, const SDL_Rect size, const DynamicArrayT<Widget *> & selectedWidgets, const DynamicArrayT<Widget *> & searchParents) { return self->drawPost(size, selectedWidgets, searchParents); }
+
+
 bool Widget::remove(const char* name) {
     if (type == WIDGET_FRAME) {
         return static_cast<Frame*>(this)->Frame::remove(name);
     }
     return removeBase(name);
 }
+
+extern "C" bool Widget_remove(Widget* self, const char * name) { return self->remove(name); }
+
 
 void Widget::scrollParent() {
     switch (type) {
@@ -578,66 +642,165 @@ void Widget::scrollParent() {
     }
 }
 
+extern "C" void Widget_scrollParent(Widget* self) { return self->scrollParent(); }
+
+
 const char*		    Widget::getName() const { return name.c_str(); }
+
+extern "C" const char * Widget_getName(const Widget* self) { return self->getName(); }
+
 
 const char*         Widget::getWidgetSearchParent() const { return widgetSearchParent.c_str(); }
 
+extern "C" const char * Widget_getWidgetSearchParent(const Widget* self) { return self->getWidgetSearchParent(); }
+
+
 SDL_Rect            Widget::getButtonsOffset() const { return buttonsOffset; }
+
+extern "C" SDL_Rect Widget_getButtonsOffset(const Widget* self) { return self->getButtonsOffset(); }
+
 
 SDL_Rect            Widget::getSelectorOffset() const { return selectorOffset; }
 
+extern "C" SDL_Rect Widget_getSelectorOffset(const Widget* self) { return self->getSelectorOffset(); }
+
+
 void	Widget::setName(const char* _name) { name = _name; }
+
+extern "C" void Widget_setName(Widget* self, const char * _name) { return self->setName(_name); }
+
 
 void	Widget::setPressed(bool _pressed) { reallyPressed = pressed = _pressed; }
 
+extern "C" void Widget_setPressed(Widget* self, bool _pressed) { return self->setPressed(_pressed); }
+
+
 void	Widget::setDisabled(bool _disabled) { disabled = _disabled; }
+
+extern "C" void Widget_setDisabled(Widget* self, bool _disabled) { return self->setDisabled(_disabled); }
+
 
 void    Widget::setInvisible(bool _invisible) { invisible = _invisible; }
 
+extern "C" void Widget_setInvisible(Widget* self, bool _invisible) { return self->setInvisible(_invisible); }
+
+
 void    Widget::setHideGlyphs(bool _hideGlyphs) { hideGlyphs = _hideGlyphs; }
+
+extern "C" void Widget_setHideGlyphs(Widget* self, bool _hideGlyphs) { return self->setHideGlyphs(_hideGlyphs); }
+
 
 void    Widget::setHideKeyboardGlyphs(bool _hideGlyphs) { hideKeyboardGlyphs = _hideGlyphs; }
 
+extern "C" void Widget_setHideKeyboardGlyphs(Widget* self, bool _hideGlyphs) { return self->setHideKeyboardGlyphs(_hideGlyphs); }
+
+
 void    Widget::setHideSelectors(bool _hideSelectors) { hideSelectors = _hideSelectors; }
+
+extern "C" void Widget_setHideSelectors(Widget* self, bool _hideSelectors) { return self->setHideSelectors(_hideSelectors); }
+
 
 void    Widget::setOwner(Sint32 _owner) { owner = _owner; }
 
+extern "C" void Widget_setOwner(Widget* self, Sint32 _owner) { return self->setOwner(_owner); }
+
+
 void	Widget::setTickCallback(void (*const fn)(Widget&)) { tickCallback = fn; }
+
+extern "C" void Widget_setTickCallback(Widget* self, void (*fn)(Widget &)) { return self->setTickCallback(fn); }
+
 
 void	Widget::setDrawCallback(void (*const fn)(const Widget&, const SDL_Rect)) { drawCallback = fn; }
 
+extern "C" void Widget_setDrawCallback(Widget* self, void (*fn)(const Widget &, const SDL_Rect)) { return self->setDrawCallback(fn); }
+
+
 void    Widget::setWidgetRight(const char* s) { widgetMovements["MenuRight"] = s; widgetMovements["AltMenuRight"] = s; }
+
+extern "C" void Widget_setWidgetRight(Widget* self, const char * s) { return self->setWidgetRight(s); }
+
 
 void    Widget::setWidgetDown(const char* s) { widgetMovements["MenuDown"] = s; widgetMovements["AltMenuDown"] = s; }
 
+extern "C" void Widget_setWidgetDown(Widget* self, const char * s) { return self->setWidgetDown(s); }
+
+
 void    Widget::setWidgetLeft(const char* s) { widgetMovements["MenuLeft"] = s; widgetMovements["AltMenuLeft"] = s; }
+
+extern "C" void Widget_setWidgetLeft(Widget* self, const char * s) { return self->setWidgetLeft(s); }
+
 
 void    Widget::setWidgetUp(const char* s) { widgetMovements["MenuUp"] = s; widgetMovements["AltMenuUp"] = s; }
 
+extern "C" void Widget_setWidgetUp(Widget* self, const char * s) { return self->setWidgetUp(s); }
+
+
 void    Widget::setWidgetPageLeft(const char* s) { widgetActions["MenuPageLeft"] = s; }
+
+extern "C" void Widget_setWidgetPageLeft(Widget* self, const char * s) { return self->setWidgetPageLeft(s); }
+
 
 void    Widget::setWidgetPageRight(const char* s) { widgetActions["MenuPageRight"] = s; }
 
+extern "C" void Widget_setWidgetPageRight(Widget* self, const char * s) { return self->setWidgetPageRight(s); }
+
+
 void    Widget::setWidgetBack(const char* s) { widgetActions["MenuCancel"] = s; }
+
+extern "C" void Widget_setWidgetBack(Widget* self, const char * s) { return self->setWidgetBack(s); }
+
 
 void    Widget::removeWidgetAction(const char* binding) { if ( widgetActions.find(binding) != widgetActions.end() ) { widgetActions.erase(binding); } }
 
+extern "C" void Widget_removeWidgetAction(Widget* self, const char * binding) { return self->removeWidgetAction(binding); }
+
+
 void    Widget::setWidgetSearchParent(const char* s) { widgetSearchParent = s; }
+
+extern "C" void Widget_setWidgetSearchParent(Widget* self, const char * s) { return self->setWidgetSearchParent(s); }
+
 
 void    Widget::addWidgetAction(const char* binding, const char* action) { widgetActions[binding] = action; }
 
+extern "C" void Widget_addWidgetAction(Widget* self, const char * binding, const char * action) { return self->addWidgetAction(binding, action); }
+
+
 void    Widget::addWidgetMovement(const char* binding, const char* action) { widgetMovements[binding] = action; }
+
+extern "C" void Widget_addWidgetMovement(Widget* self, const char * binding, const char * action) { return self->addWidgetMovement(binding, action); }
+
 
 void    Widget::setUserData(void* p) { userData = p; }
 
+extern "C" void Widget_setUserData(Widget* self, void * p) { return self->setUserData(p); }
+
+
 void    Widget::setButtonsOffset(SDL_Rect r) { buttonsOffset = r; }
+
+extern "C" void Widget_setButtonsOffset(Widget* self, SDL_Rect r) { return self->setButtonsOffset(r); }
+
 
 void    Widget::setSelectorOffset(SDL_Rect r) { selectorOffset = r; }
 
+extern "C" void Widget_setSelectorOffset(Widget* self, SDL_Rect r) { return self->setSelectorOffset(r); }
+
+
 void	Widget::setMenuConfirmControlType(int flags) { menuConfirmControlType = flags; }
+
+extern "C" void Widget_setMenuConfirmControlType(Widget* self, int flags) { return self->setMenuConfirmControlType(flags); }
+
 
 void    Widget::setGlyphPosition(glyph_position_t p) { glyphPosition = p; }
 
+extern "C" void Widget_setGlyphPosition(Widget* self, Widget::glyph_position_t p) { return self->setGlyphPosition(p); }
+
+
 void    Widget::setAlwaysShowGlyphs(bool b) { alwaysShowGlyphs = b; }
 
+extern "C" void Widget_setAlwaysShowGlyphs(Widget* self, bool b) { return self->setAlwaysShowGlyphs(b); }
+
+
 void    Widget::setDontSearchAncestors(bool b) { dontSearchAncestors = b; }
+
+extern "C" void Widget_setDontSearchAncestors(Widget* self, bool b) { return self->setDontSearchAncestors(b); }
+

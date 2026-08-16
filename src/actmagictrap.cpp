@@ -166,6 +166,9 @@ void Entity::actMagicTrapCeiling()
 	}
 }
 
+extern "C" void Entity_actMagicTrapCeiling(Entity* self) { return self->actMagicTrapCeiling(); }
+
+
 /*-------------------------------------------------------------------------------
 
 act*
@@ -480,6 +483,9 @@ void Entity::actTeleportShrine()
 		}
 	}
 }
+
+extern "C" void Entity_actTeleportShrine(Entity* self) { return self->actTeleportShrine(); }
+
 
 void actDaedalusShrine(Entity* my)
 {
@@ -831,6 +837,9 @@ void Entity::actDaedalusShrine()
 	}
 }
 
+extern "C" void Entity_actDaedalusShrine(Entity* self) { return self->actDaedalusShrine(); }
+
+
 void actAssistShrine(Entity* my)
 {
 	if ( !my )
@@ -1066,3 +1075,5 @@ void Entity::actAssistShrine()
 		}
 	}
 }
+
+extern "C" void Entity_actAssistShrine(Entity* self) { return self->actAssistShrine(); }

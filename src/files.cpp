@@ -6034,6 +6034,9 @@ size_t File::write(const void* src, size_t size, size_t count) {
 		return writeSize / size;
 	}
 
+extern "C" size_t File_write(File* self, const void * src, size_t size, size_t count) { return self->write(src, size, count); }
+
+
 size_t File::read(void* buffer, size_t size, size_t count) {
 		if (mode != FileMode::READ || nullptr == buffer)
 		{
@@ -6050,13 +6053,22 @@ size_t File::read(void* buffer, size_t size, size_t count) {
 		return readSize / size;
 	}
 
+extern "C" size_t File_read(File* self, void * buffer, size_t size, size_t count) { return self->read(buffer, size, count); }
+
+
 size_t File::size() {
 		return (size_t)data.len;
 	}
 
+extern "C" size_t File_size(File* self) { return self->size(); }
+
+
 bool File::eof() {
 		return pos >= size();
 	}
+
+extern "C" bool File_eof(File* self) { return self->eof(); }
+
 
 char* File::gets2(char* buf, int size) {
 		auto result = gets(buf, size);
@@ -6070,6 +6082,9 @@ char* File::gets2(char* buf, int size) {
 		}
 		return result;
 	}
+
+extern "C" char * File_gets2(File* self, char * buf, int size) { return self->gets2(buf, size); }
+
 
 char* File::gets(char* buf, int size) {
 		char* result = buf;
@@ -6097,12 +6112,18 @@ char* File::gets(char* buf, int size) {
 		return result;
 	}
 
+extern "C" char * File_gets(File* self, char * buf, int size) { return self->gets(buf, size); }
+
+
 int File::geti() {
 		char field[64];
 		gets(field, 64);
 		long result = strtol(field, nullptr, 10);
 		return (int)result;
 	}
+
+extern "C" int File_geti(File* self) { return self->geti(); }
+
 
 char File::getc() {
 		char result = '\0';
@@ -6113,14 +6134,23 @@ char File::getc() {
 		return result;
 	}
 
+extern "C" char File_getc(File* self) { return self->getc(); }
+
+
 int File::puts(const char* str) {
 		size_t size = strlen(str);
 		return write(str, sizeof(char), size) == size ? 0 : -1;
 	}
 
+extern "C" int File_puts(File* self, const char * str) { return self->puts(str); }
+
+
 int File::putc(char c) {
 		return write(&c, sizeof(char), 1) == 1 ? 0 : -1;
 	}
+
+extern "C" int File_putc(File* self, char c) { return self->putc(c); }
+
 
 int File::seek(ptrdiff_t offset, SeekMode mode) {
 		switch (mode) {
@@ -6135,13 +6165,22 @@ int File::seek(ptrdiff_t offset, SeekMode mode) {
 		}
 	}
 
+extern "C" int File_seek(File* self, ptrdiff_t offset, File::SeekMode mode) { return self->seek(offset, mode); }
+
+
 long int File::tell() {
 		return (long int)pos;
 	}
 
+extern "C" long File_tell(File* self) { return self->tell(); }
+
+
 void File::rewind() {
 		seek(0, File::SeekMode::SET);
 	}
+
+extern "C" void File_rewind(File* self) { return self->rewind(); }
+
 
 void File::close() {
 	    assert(fp);
@@ -6165,6 +6204,9 @@ void File::close() {
 		int result = fclose(fp);
 		assert(result == 0);
 	}
+
+extern "C" void File_close(File* self) { return self->close(); }
+
 
 File* FileIO::open(const char* path, const char* mode) {
 		if (!path || !mode)
@@ -6194,6 +6236,9 @@ File* FileIO::open(const char* path, const char* mode) {
 		}
 	}
 
+extern "C" File * FileIO_open(const char * path, const char * mode) { return FileIO::open(path, mode); }
+
+
 void FileIO::close(File* file) {
 		if (!file)
 		{
@@ -6202,3 +6247,6 @@ void FileIO::close(File* file) {
 		file->close();
 		delete file;
 	}
+
+extern "C" void FileIO_close(File * file) { return FileIO::close(file); }
+

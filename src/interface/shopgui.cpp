@@ -458,11 +458,17 @@ void Player::ShopGUI_t::openShop()
 	buybackView = false;
 }
 
+extern "C" void ShopGUI_t_openShop(Player::ShopGUI_t* self) { return self->openShop(); }
+
+
 void Player::ShopGUI_t::selectShopSlot(const int x, const int y)
 {
 	selectedShopSlotX = x;
 	selectedShopSlotY = y;
 }
+
+extern "C" void ShopGUI_t_selectShopSlot(Player::ShopGUI_t* self, const int x, const int y) { return self->selectShopSlot(x, y); }
+
 
 void Player::ShopGUI_t::closeShop()
 {
@@ -526,6 +532,9 @@ void Player::ShopGUI_t::closeShop()
 	chatTicks = 0;
 }
 
+extern "C" void ShopGUI_t_closeShop(Player::ShopGUI_t* self) { return self->closeShop(); }
+
+
 bool Player::ShopGUI_t::isShopSelected()
 {
 	if ( !bOpen )
@@ -544,6 +553,9 @@ bool Player::ShopGUI_t::isShopSelected()
 
 	return false;
 }
+
+extern "C" bool ShopGUI_t_isShopSelected(Player::ShopGUI_t* self) { return self->isShopSelected(); }
+
 
 int Player::ShopGUI_t::heightOffsetWhenNotCompact = 172;
 
@@ -866,6 +878,9 @@ void Player::ShopGUI_t::clearItemDisplayed()
 	itemUnknownPreventPurchase = false;
 }
 
+extern "C" void ShopGUI_t_clearItemDisplayed(Player::ShopGUI_t* self) { return self->clearItemDisplayed(); }
+
+
 void Player::ShopGUI_t::setItemDisplayNameAndPrice(Item* item)
 {
 	if ( !item || item->type == SPELL_ITEM )
@@ -1029,6 +1044,9 @@ void Player::ShopGUI_t::setItemDisplayNameAndPrice(Item* item)
 		item->count = oldQty;
 	}
 }
+
+extern "C" void ShopGUI_t_setItemDisplayNameAndPrice(Player::ShopGUI_t* self, Item * item) { return self->setItemDisplayNameAndPrice(item); }
+
 
 void buttonShopUpdateSelectorOnHighlight(const int player, Button* button)
 {
@@ -1801,6 +1819,9 @@ void Player::ShopGUI_t::updateShop()
 	updateShopGUIChatter(player.playernum, flipped);
 }
 
+extern "C" void ShopGUI_t_updateShop(Player::ShopGUI_t* self) { return self->updateShop(); }
+
+
 const bool Player::ShopGUI_t::isItemFromShop(Item* item) const
 {
 	if ( !item || !bOpen )
@@ -1820,6 +1841,9 @@ const bool Player::ShopGUI_t::isItemFromShop(Item* item) const
 	}
 	return false;
 }
+
+extern "C" const bool ShopGUI_t_isItemFromShop(const Player::ShopGUI_t* self, Item * item) { return self->isItemFromShop(item); }
+
 
 const bool Player::ShopGUI_t::isItemSelectedFromShop(Item* item) const
 {
@@ -1849,6 +1873,9 @@ const bool Player::ShopGUI_t::isItemSelectedFromShop(Item* item) const
 	return false;
 }
 
+extern "C" const bool ShopGUI_t_isItemSelectedFromShop(const Player::ShopGUI_t* self, Item * item) { return self->isItemSelectedFromShop(item); }
+
+
 const bool Player::ShopGUI_t::isItemSelectedToSellToShop(Item* item) const
 {
 	if ( !item || !bOpen )
@@ -1873,3 +1900,6 @@ const bool Player::ShopGUI_t::isItemSelectedToSellToShop(Item* item) const
 	}
 	return false;
 }
+
+extern "C" const bool ShopGUI_t_isItemSelectedToSellToShop(const Player::ShopGUI_t* self, Item * item) { return self->isItemSelectedToSellToShop(item); }
+

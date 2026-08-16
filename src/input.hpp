@@ -181,10 +181,14 @@ private:
 
 	//! converts the given input to a boolean value
 	//! @return the converted value
+
+	public:
 	static bool binaryOf(binding_t& binding);
 
 	//! converts the given input to a float value
 	//! @return the converted value
+
+	public:
 	static float analogOf(binding_t& binding);
 
 	//! mouse sensitivity
@@ -201,6 +205,8 @@ private:
 
 	//! map of scancodes to input names
 	static DynamicMapI32 keycodeNames;
+
+	public:
 	static SDL_Keycode getKeycodeFromName(const char* name);
 
 	//! number of game ticks to consider a button 'held' for long-press actions

@@ -396,6 +396,9 @@ void Entity::doorHandleDamageMagic(int damage, Entity &magicProjectile, Entity *
 	}
 }
 
+extern "C" void Entity_doorHandleDamageMagic(Entity* self, int damage, Entity & magicProjectile, Entity * caster, bool messages, bool doSound) { return self->doorHandleDamageMagic(damage, magicProjectile, caster, messages, doSound); }
+
+
 void actIronDoor(Entity* my)
 {
 	if ( my )
@@ -708,3 +711,6 @@ void Entity::actIronDoor()
 		}
 	}
 }
+
+extern "C" void Entity_actIronDoor(Entity* self) { return self->actIronDoor(); }
+

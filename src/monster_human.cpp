@@ -1965,6 +1965,9 @@ bool Entity::humanCanWieldItem(const Item& item) const
 	return false;
 }
 
+extern "C" bool Entity_humanCanWieldItem(const Entity* self, const Item & item) { return self->humanCanWieldItem(item); }
+
+
 void Entity::humanSetLimbsClient(int bodypart)
 {
 	int skinColor = 0;
@@ -2088,3 +2091,6 @@ void Entity::humanSetLimbsClient(int bodypart)
 			break;
 	}
 }
+
+extern "C" void Entity_humanSetLimbsClient(Entity* self, int bodypart) { return self->humanSetLimbsClient(bodypart); }
+

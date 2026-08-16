@@ -282,6 +282,9 @@ void Entity::initMonster(int mySprite)
 	return;
 }
 
+extern "C" void Entity_initMonster(Entity* self, int mySprite) { return self->initMonster(mySprite); }
+
+
 Monster Entity::getMonsterTypeFromSprite() const
 {
 	Sint32 mySprite = this->sprite;
@@ -298,6 +301,12 @@ Monster Entity::getMonsterTypeFromSprite() const
 	}
 	return result;
 }
+
+extern "C" Monster Entity_getMonsterTypeFromSprite_2(const int sprite) { return Entity::getMonsterTypeFromSprite(sprite); }
+
+
+extern "C" Monster Entity_getMonsterTypeFromSprite(const Entity* self) { return self->getMonsterTypeFromSprite(); }
+
 
 Monster Entity::getMonsterTypeFromSprite(const int sprite)
 {
@@ -395,6 +404,9 @@ void Entity::actMonsterLimb(bool processLight)
 	}
 }
 
+extern "C" void Entity_actMonsterLimb(Entity* self, bool processLight) { return self->actMonsterLimb(processLight); }
+
+
 void Entity::removeMonsterDeathNodes()
 {
 	if ( monsterCanTradeWith(-1) )
@@ -440,6 +452,9 @@ void Entity::removeMonsterDeathNodes()
 	}
 }
 
+extern "C" void Entity_removeMonsterDeathNodes(Entity* self) { return self->removeMonsterDeathNodes(); }
+
+
 void Entity::spawnBlood(int bloodSprite)
 {
 	if ( spawn_blood || bloodSprite != 160 )
@@ -464,6 +479,9 @@ void Entity::spawnBlood(int bloodSprite)
 		}
 	}
 }
+
+extern "C" void Entity_spawnBlood(Entity* self, int bloodsprite) { return self->spawnBlood(bloodsprite); }
+
 
 
 MonsterData_t monsterData;
@@ -498,6 +516,9 @@ int MonsterData_t::getSpriteFromKey(int sprite, DynamicString key, int type)
 	}
 }
 
+extern "C" int MonsterData_t_getSpriteFromKey(int sprite, DynamicString key, int type) { return MonsterData_t::getSpriteFromKey(sprite, key, type); }
+
+
 DynamicString MonsterData_t::getKeyFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
@@ -520,6 +541,9 @@ DynamicString MonsterData_t::getKeyFromSprite(int sprite, int type)
 		return find->second.key;
 	}
 }
+
+extern "C" DynamicString MonsterData_t_getKeyFromSprite(int sprite, int type) { return MonsterData_t::getKeyFromSprite(sprite, type); }
+
 DynamicString MonsterData_t::getAllyIconFromSprite(int sprite, int type)
 {
 	if ( type < NOTHING || type >= NUMMONSTERS )
@@ -541,6 +565,9 @@ DynamicString MonsterData_t::getAllyIconFromSprite(int sprite, int type)
     }
 }
 
+extern "C" DynamicString MonsterData_t_getAllyIconFromSprite(int sprite, int type) { return MonsterData_t::getAllyIconFromSprite(sprite, type); }
+
+
 int MonsterData_t::getSpecialNPCBaseModel(Stat& myStats)
 {
 	DynamicString npcValue = myStats.getAttribute("special_npc");
@@ -550,6 +577,9 @@ int MonsterData_t::getSpecialNPCBaseModel(Stat& myStats)
 	}
 	return 0;
 }
+
+extern "C" int MonsterData_t_getSpecialNPCBaseModel(Stat & myStats) { return MonsterData_t::getSpecialNPCBaseModel(myStats); }
+
 
 DynamicString MonsterData_t::getSpecialNPCName(Stat& myStats)
 {
@@ -561,6 +591,9 @@ DynamicString MonsterData_t::getSpecialNPCName(Stat& myStats)
 	return "";
 }
 
+extern "C" DynamicString MonsterData_t_getSpecialNPCName(Stat & myStats) { return MonsterData_t::getSpecialNPCName(myStats); }
+
+
 bool MonsterData_t::nameMatchesSpecialNPCName(Stat& myStats, DynamicString npcKey)
 {
 	auto& specialNPCs = monsterDataEntries[myStats.type].specialNPCs;
@@ -570,3 +603,6 @@ bool MonsterData_t::nameMatchesSpecialNPCName(Stat& myStats, DynamicString npcKe
 	}
 	return false;
 }
+
+extern "C" bool MonsterData_t_nameMatchesSpecialNPCName(Stat & myStats, DynamicString npcKey) { return MonsterData_t::nameMatchesSpecialNPCName(myStats, npcKey); }
+

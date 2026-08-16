@@ -3093,6 +3093,9 @@ void Chunk::build(const map_t& map, bool ceiling, int startX, int startY, int w,
     //printlog("built chunk with %d tris", indices);
 }
 
+extern "C" void Chunk_build(Chunk* self, const map_t & map, bool ceiling, int startX, int startY, int w, int h) { return self->build(map, ceiling, startX, startY, w, h); }
+
+
 void Chunk::buildBuffers(const std::vector<float>& positions, const std::vector<float>& texcoords, const std::vector<float>& colors) {
     // create buffers
 #ifdef VERTEX_ARRAYS_ENABLED
@@ -3140,6 +3143,9 @@ void Chunk::buildBuffers(const std::vector<float>& positions, const std::vector<
 #endif
 }
 
+extern "C" void Chunk_buildBuffers(Chunk* self, const std::vector<float> & positions, const std::vector<float> & texcoords, const std::vector<float> & colors) { return self->buildBuffers(positions, texcoords, colors); }
+
+
 void Chunk::destroyBuffers() {
     if (vao) {
         GL_CHECK_ERR(glDeleteVertexArrays(1, &vao));
@@ -3159,6 +3165,9 @@ void Chunk::destroyBuffers() {
     }
     indices = 0;
 }
+
+extern "C" void Chunk_destroyBuffers(Chunk* self) { return self->destroyBuffers(); }
+
 
 void Chunk::draw() {
     if (!indices) {
@@ -3191,6 +3200,9 @@ void Chunk::draw() {
 #endif
 }
 
+extern "C" void Chunk_draw(Chunk* self) { return self->draw(); }
+
+
 bool Chunk::isDirty(const map_t& map) {
     if (tiles.empty()) {
         return true;
@@ -3207,6 +3219,9 @@ bool Chunk::isDirty(const map_t& map) {
     }
     return false;
 }
+
+extern "C" bool Chunk_isDirty(Chunk* self, const map_t & map) { return self->isDirty(map); }
+
 
 void clearChunks() {
     chunks.clear();

@@ -110,6 +110,9 @@ void BookParser_t::deleteBooks()
 	numbooks = 0;
 }
 
+extern "C" void BookParser_t_deleteBooks(BookParser_t* self) { return self->deleteBooks(); }
+
+
 bool BookParser_t::readCompiledBooks()
 {
 	DynamicString compiledBooksPath = "books/compiled_books.json";
@@ -165,6 +168,9 @@ bool BookParser_t::readCompiledBooks()
 	}
 	return false;
 }
+
+extern "C" bool BookParser_t_readCompiledBooks(BookParser_t* self) { return self->readCompiledBooks(); }
+
 
 bool BookParser_t::booksRequireCompiling()
 {
@@ -235,6 +241,9 @@ bool BookParser_t::booksRequireCompiling()
 	}
 	return false;
 }
+
+extern "C" bool BookParser_t_booksRequireCompiling(BookParser_t* self) { return self->booksRequireCompiling(); }
+
 
 DynamicArrayStr BookParser_t::getListOfBooksAfterFiltering()
 {
@@ -323,6 +332,9 @@ DynamicArrayStr BookParser_t::getListOfBooksAfterFiltering()
 	return discoveredbooks;
 }
 
+extern "C" DynamicArrayStr BookParser_t_getListOfBooksAfterFiltering(BookParser_t* self) { return self->getListOfBooksAfterFiltering(); }
+
+
 void BookParser_t::readBooksIntoTemp()
 {
 	tempBookData.clear();
@@ -371,6 +383,9 @@ void BookParser_t::readBooksIntoTemp()
 	}
 }
 
+extern "C" void BookParser_t_readBooksIntoTemp(BookParser_t* self) { return self->readBooksIntoTemp(); }
+
+
 void BookParser_t::createBooks(bool forceCacheRebuild)
 {
 	deleteBooks(); // empty the old books array
@@ -402,6 +417,9 @@ void BookParser_t::createBooks(bool forceCacheRebuild)
 
 	writeCompiledBooks();
 }
+
+extern "C" void BookParser_t_createBooks(BookParser_t* self, bool forceCacheRebuild) { return self->createBooks(forceCacheRebuild); }
+
 
 void BookParser_t::writeCompiledBooks()
 {
@@ -493,6 +511,9 @@ void BookParser_t::writeCompiledBooks()
 	if (jsonReader) json_reader_destroy(jsonReader); else json_node_destroy(root);
 	printlog("[Books]: Successfully compiled books into file: '%s'", inputPath.c_str());
 }
+
+extern "C" void BookParser_t_writeCompiledBooks(BookParser_t* self) { return self->writeCompiledBooks(); }
+
 
 /*****createBook() helper functions******/
 
@@ -957,6 +978,9 @@ void BookParser_t::createBook(DynamicString filename)
 	//	newline = false;
 	//}
 }
+
+extern "C" void BookParser_t_createBook(BookParser_t* self, DynamicString filename) { return self->createBook(filename); }
+
 
 
 bool physfsSearchBooksToUpdate()

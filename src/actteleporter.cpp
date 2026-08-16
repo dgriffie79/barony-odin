@@ -183,3 +183,6 @@ void Entity::actTeleporter()
 		scalez = std::min(1.0, scalez + increment);
 	}
 }
+
+extern "C" void Entity_actTeleporter(Entity* self) { return self->actTeleporter(); }
+

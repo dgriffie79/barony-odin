@@ -267,9 +267,15 @@ void Text::render() {
 	num_text_lines = countNumTextLines();
 }
 
+extern "C" void Text_render(Text* self) { return self->render(); }
+
+
 void Text::draw(const SDL_Rect src, const SDL_Rect dest, const SDL_Rect viewport) const {
 	drawColor(src, dest, viewport, 0xffffffff);
 }
+
+extern "C" void Text_draw(const Text* self, const SDL_Rect src, const SDL_Rect dest, const SDL_Rect viewport) { return self->draw(src, dest, viewport); }
+
 
 void Text::drawColor(const SDL_Rect _src, const SDL_Rect _dest, const SDL_Rect viewport, const Uint32& color) const {
 	if (!surf || !texid) {
@@ -292,6 +298,9 @@ void Text::drawColor(const SDL_Rect _src, const SDL_Rect _dest, const SDL_Rect v
     Image::draw(texid, surf->w, surf->h, &src, dest, viewport, color);
 }
 
+extern "C" void Text_drawColor(const Text* self, const SDL_Rect src, const SDL_Rect dest, const SDL_Rect viewport, const Uint32 & color) { return self->drawColor(src, dest, viewport, color); }
+
+
 int Text::countNumTextLines() const {
 	int numLines = 1;
 	for (auto c : name) {
@@ -304,6 +313,9 @@ int Text::countNumTextLines() const {
 	}
 	return numLines;
 }
+
+extern "C" int Text_countNumTextLines(const Text* self) { return self->countNumTextLines(); }
+
 
 static std::unordered_map<std::string, Text*> hashed_text;
 static const size_t TEXT_BUDGET = 1 * 1024 * 1024 * 128; // in bytes
@@ -363,6 +375,9 @@ std::pair<size_t, const char*> Text::hash(const char* str, const char* font, Uin
 	return std::make_pair(hash(textAndFont), textAndFont);
 }
 
+extern "C" std::pair<size_t, const char *> Text_hash(const char * str, const char * font, Uint32 textColor, Uint32 outlineColor) { return Text::hash(str, font, textColor, outlineColor); }
+
+
 Text* Text::get(size_t hash, const char* key) {
 	if (!key) {
 		return nullptr;
@@ -409,6 +424,12 @@ Text* Text::get(size_t hash, const char* key) {
 	return text;
 }
 
+extern "C" Text * Text_get_2(size_t hash, const char * key) { return Text::get(hash, key); }
+
+
+extern "C" Text * Text_get(const char * str, const char * font, Uint32 textColor, Uint32 outlineColor) { return Text::get(str, font, textColor, outlineColor); }
+
+
 Text* Text::get(const char* str, const char* font, Uint32 textColor, Uint32 outlineColor) {
 	auto h = hash(str, font, textColor, outlineColor);
 	return get(h.first, h.second);
@@ -425,6 +446,9 @@ void Text::dumpCache() {
 	bRequireTextDump = false;
 }
 
+extern "C" void Text_dumpCache() { return Text::dumpCache(); }
+
+
 void Text::dumpCacheInMainLoop()
 {
 	if ( bRequireTextDump )
@@ -432,6 +456,9 @@ void Text::dumpCacheInMainLoop()
 		dumpCache();
 	}
 }
+
+extern "C" void Text_dumpCacheInMainLoop() { return Text::dumpCacheInMainLoop(); }
+
 
 #ifndef EDITOR
 #include "../net.hpp"
@@ -449,6 +476,15 @@ static ConsoleCommand dump("/text_cache_dump", "dump text cache",
 
 const char*				Text::getName() const { return name.c_str(); }
 
+extern "C" const char * Text_getName(const Text* self) { return self->getName(); }
+
+
 void Text::addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
 
+extern "C" void Text_addWordToHighlight(Text* self, int word, Uint32 color) { return self->addWordToHighlight(word, color); }
+
+
 void Text::clearWordsToHighlight() { wordsToHighlight.clear(); }
+
+extern "C" void Text_clearWordsToHighlight(Text* self) { return self->clearWordsToHighlight(); }
+

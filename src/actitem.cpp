@@ -1397,3 +1397,5 @@ void Entity::attractItem(Entity& itemEntity)
 		}
 	}
 }
+
+extern "C" void Entity_attractItem(Entity* self, Entity & itemEntity) { return self->attractItem(itemEntity); }

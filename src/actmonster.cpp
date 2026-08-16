@@ -331,6 +331,9 @@ void ShopkeeperPlayerHostility_t::reset()
 		playerHostility[i].clear();
 	}
 }
+
+extern "C" void ShopkeeperPlayerHostility_t_reset(ShopkeeperPlayerHostility_t* self) { return self->reset(); }
+
 ShopkeeperPlayerHostility_t::ShopkeeperPlayerHostility_t()
 {
 	reset();
@@ -405,6 +408,9 @@ void ShopkeeperPlayerHostility_t::resetPlayerHostility(const int player, bool cl
 	}
 }
 
+extern "C" void ShopkeeperPlayerHostility_t_resetPlayerHostility(ShopkeeperPlayerHostility_t* self, const int player, bool clearAll) { return self->resetPlayerHostility(player, clearAll); }
+
+
 bool ShopkeeperPlayerHostility_t::isPlayerEnemy(const int player)
 {
 	if ( player < 0 || player >= MAXPLAYERS ) { return false; }
@@ -420,6 +426,9 @@ bool ShopkeeperPlayerHostility_t::isPlayerEnemy(const int player)
 	}
 	return false;
 }
+
+extern "C" bool ShopkeeperPlayerHostility_t_isPlayerEnemy(ShopkeeperPlayerHostility_t* self, const int player) { return self->isPlayerEnemy(player); }
+
 
 bool ShopkeeperPlayerHostility_t::playerRaceCheckHostility(const int player, const Monster type) const
 {
@@ -437,6 +446,9 @@ bool ShopkeeperPlayerHostility_t::playerRaceCheckHostility(const int player, con
 	}
 	return true;
 }
+
+extern "C" bool ShopkeeperPlayerHostility_t_playerRaceCheckHostility(const ShopkeeperPlayerHostility_t* self, const int player, const Monster type) { return self->playerRaceCheckHostility(player, type); }
+
 
 ShopkeeperPlayerHostility_t::PlayerRaceHostility_t* ShopkeeperPlayerHostility_t::getPlayerHostility(const int player, Uint32 overrideType)
 {
@@ -494,6 +506,9 @@ ShopkeeperPlayerHostility_t::PlayerRaceHostility_t* ShopkeeperPlayerHostility_t:
 	return &playerHostility[player][type];
 }
 
+extern "C" ShopkeeperPlayerHostility_t::PlayerRaceHostility_t * ShopkeeperPlayerHostility_t_getPlayerHostility(ShopkeeperPlayerHostility_t* self, const int player, Uint32 overrideType) { return self->getPlayerHostility(player, overrideType); }
+
+
 ShopkeeperPlayerHostility_t::WantedLevel ShopkeeperPlayerHostility_t::getWantedLevel(const int player)
 {
 	if ( player < 0 || player >= MAXPLAYERS ) { return NO_WANTED_LEVEL; }
@@ -505,6 +520,9 @@ ShopkeeperPlayerHostility_t::WantedLevel ShopkeeperPlayerHostility_t::getWantedL
 	}
 	return NO_WANTED_LEVEL;
 }
+
+extern "C" ShopkeeperPlayerHostility_t::WantedLevel ShopkeeperPlayerHostility_t_getWantedLevel(ShopkeeperPlayerHostility_t* self, const int player) { return self->getWantedLevel(player); }
+
 
 void ShopkeeperPlayerHostility_t::setWantedLevel(ShopkeeperPlayerHostility_t::PlayerRaceHostility_t& h, 
 	ShopkeeperPlayerHostility_t::WantedLevel wantedLevel, Entity* shopkeeper, bool primaryPlayerCheck)
@@ -626,6 +644,9 @@ void ShopkeeperPlayerHostility_t::setWantedLevel(ShopkeeperPlayerHostility_t::Pl
 	}
 }
 
+extern "C" void ShopkeeperPlayerHostility_t_setWantedLevel(ShopkeeperPlayerHostility_t* self, ShopkeeperPlayerHostility_t::PlayerRaceHostility_t & h, ShopkeeperPlayerHostility_t::WantedLevel wantedLevel, Entity * shopkeeper, bool primaryPlayerCheck) { return self->setWantedLevel(h, wantedLevel, shopkeeper, primaryPlayerCheck); }
+
+
 void ShopkeeperPlayerHostility_t::onShopkeeperDeath(Entity* my, Stat* myStats, Entity* attacker)
 {
 	if ( shopIsMysteriousShopkeeper(my) ) { return; }
@@ -649,6 +670,9 @@ void ShopkeeperPlayerHostility_t::onShopkeeperDeath(Entity* my, Stat* myStats, E
 		}
 	}
 }
+
+extern "C" void ShopkeeperPlayerHostility_t_onShopkeeperDeath(ShopkeeperPlayerHostility_t* self, Entity * my, Stat * myStats, Entity * attacker) { return self->onShopkeeperDeath(my, myStats, attacker); }
+
 void ShopkeeperPlayerHostility_t::onShopkeeperHit(Entity* my, Stat* myStats, Entity* attacker)
 {
 	if ( shopIsMysteriousShopkeeper(my) ) { return; }
@@ -665,6 +689,9 @@ void ShopkeeperPlayerHostility_t::onShopkeeperHit(Entity* my, Stat* myStats, Ent
 		}
 	}
 }
+
+extern "C" void ShopkeeperPlayerHostility_t_onShopkeeperHit(ShopkeeperPlayerHostility_t* self, Entity * my, Stat * myStats, Entity * attacker) { return self->onShopkeeperHit(my, myStats, attacker); }
+
 
 void ShopkeeperPlayerHostility_t::updateShopkeeperActMonster(Entity& my, Stat& myStats, bool ringconflict)
 {
@@ -689,6 +716,9 @@ void ShopkeeperPlayerHostility_t::updateShopkeeperActMonster(Entity& my, Stat& m
 		}
 	}
 }
+
+extern "C" void ShopkeeperPlayerHostility_t_updateShopkeeperActMonster(ShopkeeperPlayerHostility_t* self, Entity & my, Stat & myStats, bool ringconflict) { return self->updateShopkeeperActMonster(my, myStats, ringconflict); }
+
 
 void ShopkeeperPlayerHostility_t::serverSendClientUpdate(const bool force)
 {
@@ -725,6 +755,9 @@ void ShopkeeperPlayerHostility_t::serverSendClientUpdate(const bool force)
 	}
 }
 
+extern "C" void ShopkeeperPlayerHostility_t_serverSendClientUpdate(ShopkeeperPlayerHostility_t* self, const bool force) { return self->serverSendClientUpdate(force); }
+
+
 ShopkeeperPlayerHostility_t ShopkeeperPlayerHostility;
 
 bool Entity::monsterAlertBeforeHit(Entity* attacker)
@@ -757,6 +790,9 @@ bool Entity::monsterAlertBeforeHit(Entity* attacker)
 
 	return alertTarget;
 }
+
+extern "C" bool Entity_monsterAlertBeforeHit(Entity* self, Entity * attacker) { return self->monsterAlertBeforeHit(attacker); }
+
 
 void Entity::updateEntityOnHit(Entity* attacker, bool alertTarget)
 {
@@ -825,6 +861,9 @@ void Entity::updateEntityOnHit(Entity* attacker, bool alertTarget)
 	}
 }
 
+extern "C" void Entity_updateEntityOnHit(Entity* self, Entity * attacker, bool alertTarget) { return self->updateEntityOnHit(attacker, alertTarget); }
+
+
 MonsterAllyFormation_t monsterAllyFormations;
 bool MonsterAllyFormation_t::getFollowLocation(Uint32 uid, Uint32 leaderUid, std::pair<int, int>& outPos)
 {
@@ -859,6 +898,9 @@ bool MonsterAllyFormation_t::getFollowLocation(Uint32 uid, Uint32 leaderUid, std
 
 	return found;
 }
+
+extern "C" bool MonsterAllyFormation_t_getFollowLocation(MonsterAllyFormation_t* self, Uint32 uid, Uint32 leaderUid, std::pair<int, int> & outPos) { return self->getFollowLocation(uid, leaderUid, outPos); }
+
 
 void MonsterAllyFormation_t::updateOnPathFail(Uint32 uid, Entity* entity)
 {
@@ -908,6 +950,9 @@ void MonsterAllyFormation_t::updateOnPathFail(Uint32 uid, Entity* entity)
 	}
 }
 
+extern "C" void MonsterAllyFormation_t_updateOnPathFail(MonsterAllyFormation_t* self, Uint32 uid, Entity * entity) { return self->updateOnPathFail(uid, entity); }
+
+
 void MonsterAllyFormation_t::updateOnPathSucceed(Uint32 uid, Entity* entity)
 {
 	if ( !entity )
@@ -945,6 +990,9 @@ void MonsterAllyFormation_t::updateOnPathSucceed(Uint32 uid, Entity* entity)
 		}
 	}
 }
+
+extern "C" void MonsterAllyFormation_t_updateOnPathSucceed(MonsterAllyFormation_t* self, Uint32 uid, Entity * entity) { return self->updateOnPathSucceed(uid, entity); }
+
 
 void MonsterAllyFormation_t::updateOnFollowCommand(Uint32 uid, Entity* entity)
 {
@@ -984,6 +1032,9 @@ void MonsterAllyFormation_t::updateOnFollowCommand(Uint32 uid, Entity* entity)
 	}
 }
 
+extern "C" void MonsterAllyFormation_t_updateOnFollowCommand(MonsterAllyFormation_t* self, Uint32 uid, Entity * entity) { return self->updateOnFollowCommand(uid, entity); }
+
+
 int MonsterAllyFormation_t::getFollowerChaseLeaderInterval(Entity& my, Stat& myStats)
 {
 	if ( myStats.leader_uid != 0 )
@@ -1003,6 +1054,9 @@ int MonsterAllyFormation_t::getFollowerChaseLeaderInterval(Entity& my, Stat& myS
 	}
 	return TICKS_PER_SECOND;
 }
+
+extern "C" int MonsterAllyFormation_t_getFollowerChaseLeaderInterval(MonsterAllyFormation_t* self, Entity & my, Stat & myStats) { return self->getFollowerChaseLeaderInterval(my, myStats); }
+
 
 int MonsterAllyFormation_t::getFollowerPathingDelay(Entity& my, Stat& myStats)
 {
@@ -1024,6 +1078,9 @@ int MonsterAllyFormation_t::getFollowerPathingDelay(Entity& my, Stat& myStats)
 	return 0;
 }
 
+extern "C" int MonsterAllyFormation_t_getFollowerPathingDelay(MonsterAllyFormation_t* self, Entity & my, Stat & myStats) { return self->getFollowerPathingDelay(my, myStats); }
+
+
 int MonsterAllyFormation_t::getFollowerTryExtendedPathSearch(Entity& my, Stat& myStats)
 {
 	if ( myStats.leader_uid != 0 )
@@ -1043,6 +1100,9 @@ int MonsterAllyFormation_t::getFollowerTryExtendedPathSearch(Entity& my, Stat& m
 	}
 	return 0;
 }
+
+extern "C" int MonsterAllyFormation_t_getFollowerTryExtendedPathSearch(MonsterAllyFormation_t* self, Entity & my, Stat & myStats) { return self->getFollowerTryExtendedPathSearch(my, myStats); }
+
 
 void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpdateUid)
 {
@@ -1244,6 +1304,9 @@ void MonsterAllyFormation_t::updateFormation(Uint32 leaderUid, Uint32 monsterUpd
 		}
 	}
 }
+
+extern "C" void MonsterAllyFormation_t_updateFormation(MonsterAllyFormation_t* self, Uint32 leaderUid, Uint32 monsterUpdateUid) { return self->updateFormation(leaderUid, monsterUpdateUid); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -10708,6 +10771,9 @@ void Entity::handleMonsterAttack(Stat* myStats, Entity* target, double dist)
 	return;
 }
 
+extern "C" void Entity_handleMonsterAttack(Entity* self, Stat * myStats, Entity * target, double dist) { return self->handleMonsterAttack(myStats, target, dist); }
+
+
 int limbAnimateWithOvershoot(Entity* limb, int axis, double setpointRate, double setpoint, double endpointRate, double endpoint, int dir)
 {
 	double speedMultiplier = 1.0;
@@ -12068,6 +12134,9 @@ bool Entity::handleMonsterSpecialAttack(Stat* myStats, Entity* target, double di
 	return true;
 }
 
+extern "C" bool Entity_handleMonsterSpecialAttack(Entity* self, Stat * myStats, Entity * target, double dist, bool forceDeinit) { return self->handleMonsterSpecialAttack(myStats, target, dist, forceDeinit); }
+
+
 void getTargetsAroundEntity(Entity* my, Entity* originalTarget, double distToFind, real_t angleToSearch, int searchType, list_t** list)
 {
 	Entity* entity = nullptr;
@@ -12376,6 +12445,9 @@ void Entity::monsterMoveBackwardsAndPath(bool trySidesFirst)
 	monsterState() = MONSTER_STATE_HUNT; // hunt state
 }
 
+extern "C" void Entity_monsterMoveBackwardsAndPath(Entity* self, bool trySidesFirst) { return self->monsterMoveBackwardsAndPath(trySidesFirst); }
+
+
 bool Entity::monsterHasLeader()
 {
 	Stat* myStats = this->getStats();
@@ -12388,6 +12460,9 @@ bool Entity::monsterHasLeader()
 	}
 	return false;
 }
+
+extern "C" bool Entity_monsterHasLeader(Entity* self) { return self->monsterHasLeader(); }
+
 
 void Entity::monsterAllySendCommand(int command, int destX, int destY, Uint32 uid)
 {
@@ -13067,6 +13142,9 @@ void Entity::monsterAllySendCommand(int command, int destX, int destY, Uint32 ui
 	//messagePlayer(0, "received: %d", command);
 }
 
+extern "C" void Entity_monsterAllySendCommand(Entity* self, int command, int destX, int destY, Uint32 uid) { return self->monsterAllySendCommand(command, destX, destY, uid); }
+
+
 bool Entity::monsterAllySetInteract()
 {
 	if ( multiplayer == CLIENT )
@@ -13112,6 +13190,9 @@ bool Entity::monsterAllySetInteract()
 	return true;
 }
 
+extern "C" bool Entity_monsterAllySetInteract(Entity* self) { return self->monsterAllySetInteract(); }
+
+
 bool Entity::isInteractWithMonster()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -13139,6 +13220,9 @@ bool Entity::isInteractWithMonster()
 	return false;
 }
 
+extern "C" bool Entity_isInteractWithMonster(Entity* self) { return self->isInteractWithMonster(); }
+
+
 void Entity::clearMonsterInteract()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -13150,6 +13234,9 @@ void Entity::clearMonsterInteract()
 	}
 	interactedByMonster() = 0;
 }
+
+extern "C" void Entity_clearMonsterInteract(Entity* self) { return self->clearMonsterInteract(); }
+
 
 bool Entity::monsterSetPathToLocation(int destX, int destY, int adjacentTilesToCheck, int pathingType, bool tryRandomSpot, bool shortByShortest)
 {
@@ -13247,6 +13334,9 @@ bool Entity::monsterSetPathToLocation(int destX, int destY, int adjacentTilesToC
 	return true;
 }
 
+extern "C" bool Entity_monsterSetPathToLocation(Entity* self, int destX, int destY, int adjacentTilesToCheck, int pathingType, bool tryRandomSpot, bool shortByShortest) { return self->monsterSetPathToLocation(destX, destY, adjacentTilesToCheck, pathingType, tryRandomSpot, shortByShortest); }
+
+
 bool Entity::gyrobotSetPathToReturnLocation(int destX, int destY, int adjacentTilesToCheck, bool tryRandomSpot)
 {
 	int u, v;
@@ -13318,6 +13408,9 @@ bool Entity::gyrobotSetPathToReturnLocation(int destX, int destY, int adjacentTi
 	}
 	return true;
 }
+
+extern "C" bool Entity_gyrobotSetPathToReturnLocation(Entity* self, int destX, int destY, int adjacentTilesToCheck, bool tryRandomSpot) { return self->gyrobotSetPathToReturnLocation(destX, destY, adjacentTilesToCheck, tryRandomSpot); }
+
 
 void Entity::handleNPCInteractDialogue(Stat& myStats, AllyNPCChatter event)
 {
@@ -13729,6 +13822,9 @@ void Entity::handleNPCInteractDialogue(Stat& myStats, AllyNPCChatter event)
 	}
 }
 
+extern "C" void Entity_handleNPCInteractDialogue(Entity* self, Stat & myStats, AllyNPCChatter event) { return self->handleNPCInteractDialogue(myStats, event); }
+
+
 int Entity::shouldMonsterDefend(Stat& myStats, const Entity& target, const Stat& targetStats, int targetDist, bool hasrangedweapon)
 {
 	if ( behavior != &actMonster )
@@ -13873,6 +13969,9 @@ int Entity::shouldMonsterDefend(Stat& myStats, const Entity& target, const Stat&
 
 	return false;
 }
+
+extern "C" int Entity_shouldMonsterDefend(Entity* self, Stat & myStats, const Entity & target, const Stat & targetStats, int targetDist, bool hasrangedweapon) { return self->shouldMonsterDefend(myStats, target, targetStats, targetDist, hasrangedweapon); }
+
 
 bool Entity::monsterConsumeFoodEntity(Entity* food, Stat* myStats)
 {
@@ -14076,6 +14175,9 @@ bool Entity::monsterConsumeFoodEntity(Entity* food, Stat* myStats)
 	return foodEntityConsumed;
 }
 
+extern "C" bool Entity_monsterConsumeFoodEntity(Entity* self, Entity * food, Stat * myStats) { return self->monsterConsumeFoodEntity(food, myStats); }
+
+
 Entity* Entity::monsterAllyGetPlayerLeader() const
 {
 	if ( behavior != &actMonster )
@@ -14091,6 +14193,9 @@ Entity* Entity::monsterAllyGetPlayerLeader() const
 	}
 	return nullptr;
 }
+
+extern "C" Entity * Entity_monsterAllyGetPlayerLeader(const Entity* self) { return self->monsterAllyGetPlayerLeader(); }
+
 
 bool Entity::monsterAllyEquipmentInClass(const Item& item) const
 {
@@ -14305,6 +14410,9 @@ bool Entity::monsterAllyEquipmentInClass(const Item& item) const
 	return false;
 }
 
+extern "C" bool Entity_monsterAllyEquipmentInClass(const Entity* self, const Item & item) { return self->monsterAllyEquipmentInClass(item); }
+
+
 bool Entity::monsterIsTinkeringCreation()
 {
 	int race = this->getMonsterTypeFromSprite();
@@ -14318,6 +14426,9 @@ bool Entity::monsterIsTinkeringCreation()
 	}
 	return false;
 }
+
+extern "C" bool Entity_monsterIsTinkeringCreation(Entity* self) { return self->monsterIsTinkeringCreation(); }
+
 
 void Entity::monsterHandleKnockbackVelocity(real_t monsterFacingTangent, real_t weightratio)
 {
@@ -14353,6 +14464,9 @@ void Entity::monsterHandleKnockbackVelocity(real_t monsterFacingTangent, real_t 
 	}
 }
 
+extern "C" void Entity_monsterHandleKnockbackVelocity(Entity* self, real_t monsterFacingTangent, real_t weightratio) { return self->monsterHandleKnockbackVelocity(monsterFacingTangent, weightratio); }
+
+
 int Entity::monsterGetDexterityForMovement()
 {
 	int myDex = this->getDEX();
@@ -14374,6 +14488,9 @@ int Entity::monsterGetDexterityForMovement()
 	}
 	return myDex;
 }
+
+extern "C" int Entity_monsterGetDexterityForMovement(Entity* self) { return self->monsterGetDexterityForMovement(); }
+
 
 void Entity::monsterGenerateQuiverItem(Stat* myStats, bool lesserMonster)
 {
@@ -14618,6 +14735,9 @@ void Entity::monsterGenerateQuiverItem(Stat* myStats, bool lesserMonster)
 	}
 }
 
+extern "C" void Entity_monsterGenerateQuiverItem(Entity* self, Stat * myStats, bool lesserMonster) { return self->monsterGenerateQuiverItem(myStats, lesserMonster); }
+
+
 int Entity::getMonsterEffectiveDistanceOfRangedWeapon(Item* weapon)
 {
 	int distance = 160;
@@ -14670,6 +14790,9 @@ int Entity::getMonsterEffectiveDistanceOfRangedWeapon(Item* weapon)
 	return distance;
 }
 
+extern "C" int Entity_getMonsterEffectiveDistanceOfRangedWeapon(Entity* self, Item * weapon) { return self->getMonsterEffectiveDistanceOfRangedWeapon(weapon); }
+
+
 bool Entity::isFollowerFreeToPathToPlayer(Stat* myStats)
 {
 	Entity* currentTarget = uidToEntity(monsterTarget());
@@ -14689,6 +14812,9 @@ bool Entity::isFollowerFreeToPathToPlayer(Stat* myStats)
 	return true;
 }
 
+extern "C" bool Entity_isFollowerFreeToPathToPlayer(Entity* self, Stat * myStats) { return self->isFollowerFreeToPathToPlayer(myStats); }
+
+
 bool Entity::isInertMimic() const
 {
 	if ( behavior == &actMonster && getMonsterTypeFromSprite() == MIMIC )
@@ -14700,6 +14826,9 @@ bool Entity::isInertMimic() const
 	}
 	return false;
 }
+
+extern "C" bool Entity_isInertMimic(const Entity* self) { return self->isInertMimic(); }
+
 
 bool Entity::isUntargetableBat(real_t* outDist) const
 {
@@ -14720,6 +14849,9 @@ bool Entity::isUntargetableBat(real_t* outDist) const
 	}
 	return false;
 }
+
+extern "C" bool Entity_isUntargetableBat(const Entity* self, real_t * outDist) { return self->isUntargetableBat(outDist); }
+
 
 bool Entity::monsterIsTargetable(bool targetInertMimics) const
 {
@@ -14757,6 +14889,9 @@ bool Entity::monsterIsTargetable(bool targetInertMimics) const
 	}
 	return true;
 }
+
+extern "C" bool Entity_monsterIsTargetable(const Entity* self, bool targetInertMimics) { return self->monsterIsTargetable(targetInertMimics); }
+
 
 void batResetIdle(Entity* my)
 {
@@ -15386,4 +15521,10 @@ bool Entity::monsterCanTradeWith(int player)  const
 	return false;
 }
 
+extern "C" bool Entity_monsterCanTradeWith(const Entity* self, int player) { return self->monsterCanTradeWith(player); }
+
+
 void MonsterAllyFormation_t::reset() { units.clear(); }
+
+extern "C" void MonsterAllyFormation_t_reset(MonsterAllyFormation_t* self) { return self->reset(); }
+

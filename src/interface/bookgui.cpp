@@ -137,6 +137,9 @@ void Player::BookGUI_t::createBookGUI()
 	//bookBackground->addImage(bookRightColumnText->getSize(), 0xFFFF00FF, "images/system/white.png", "debug img");
 }
 
+extern "C" void BookGUI_t_createBookGUI(Player::BookGUI_t* self) { return self->createBookGUI(); }
+
+
 /*-------------------------------------------------------------------------------
 
 	updateBookGUI
@@ -481,6 +484,9 @@ void Player::BookGUI_t::updateBookGUI()
 	rightColumn->setText(pages[1].c_str());*/
 }
 
+extern "C" void BookGUI_t_updateBookGUI(Player::BookGUI_t* self) { return self->updateBookGUI(); }
+
+
 /*-------------------------------------------------------------------------------
 
 	closeBookGUI
@@ -502,6 +508,9 @@ void Player::BookGUI_t::closeBookGUI()
 
 	player.GUI.returnToPreviousActiveModule();
 }
+
+extern "C" void BookGUI_t_closeBookGUI(Player::BookGUI_t* self) { return self->closeBookGUI(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -580,6 +589,9 @@ void Player::BookGUI_t::openBook(int index, Item* item)
 	}
 }
 
+extern "C" void BookGUI_t_openBook(Player::BookGUI_t* self, int index, Item * item) { return self->openBook(index, item); }
+
+
 void Player::SignGUI_t::openSign(std::string name, Uint32 uid)
 {
 	if ( ScriptTextParser.allEntries.find(name) == ScriptTextParser.allEntries.end() )
@@ -619,6 +631,9 @@ void Player::SignGUI_t::openSign(std::string name, Uint32 uid)
 	}
 }
 
+extern "C" void SignGUI_t_openSign(Player::SignGUI_t* self, std::string name, Uint32 uid) { return self->openSign(name, uid); }
+
+
 void Player::SignGUI_t::closeSignGUI()
 {
 	bool wasOpen = bSignOpen;
@@ -641,6 +656,9 @@ void Player::SignGUI_t::closeSignGUI()
 		player.closeAllGUIs(CloseGUIShootmode::CLOSEGUI_ENABLE_SHOOTMODE, CloseGUIIgnore::CLOSEGUI_CLOSE_ALL);
 	}
 }
+
+extern "C" void SignGUI_t_closeSignGUI(Player::SignGUI_t* self) { return self->closeSignGUI(); }
+
 
 void Player::SignGUI_t::createSignGUI()
 {
@@ -742,6 +760,9 @@ void Player::SignGUI_t::createSignGUI()
 	});
 #endif // USE_THEORA_VIDEO
 }
+
+extern "C" void SignGUI_t_createSignGUI(Player::SignGUI_t* self) { return self->createSignGUI(); }
+
 
 void Player::SignGUI_t::updateSignGUI()
 {
@@ -1195,3 +1216,5 @@ void Player::SignGUI_t::updateSignGUI()
 	}
 	return;
 }
+
+extern "C" void SignGUI_t_updateSignGUI(Player::SignGUI_t* self) { return self->updateSignGUI(); }

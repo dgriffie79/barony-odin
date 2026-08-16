@@ -470,3 +470,6 @@ void Entity::actLightSource()
 		}
 	}
 }
+
+extern "C" void Entity_actLightSource(Entity* self) { return self->actLightSource(); }
+

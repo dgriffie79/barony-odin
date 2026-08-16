@@ -1247,3 +1247,5 @@ void Entity::mothChooseWeapon(const Entity* target, double dist)
 		}
 	}
 }
+
+extern "C" void Entity_mothChooseWeapon(Entity* self, const Entity * target, double dist) { return self->mothChooseWeapon(target, dist); }

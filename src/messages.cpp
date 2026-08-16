@@ -129,12 +129,18 @@ void Player::MessageZone_t::addMessage(Uint32 color, const char* content)
 	}
 }
 
+extern "C" void MessageZone_t_addMessage(Player::MessageZone_t* self, Uint32 color, const char * content) { return self->addMessage(color, content); }
+
+
 static CvarInt cvar_messages_max_lines("/messages_max_lines", 7);
 
 int Player::MessageZone_t::getMaxTotalLines()
 {
 	return *cvar_messages_max_lines;
 }
+
+extern "C" int MessageZone_t_getMaxTotalLines(Player::MessageZone_t* self) { return self->getMaxTotalLines(); }
+
 
 void Player::MessageZone_t::startMessages()
 {
@@ -143,6 +149,9 @@ void Player::MessageZone_t::startMessages()
 		players[i]->messageZone.old_sdl_ticks = SDL_GetTicks();
 	}
 }
+
+extern "C" void MessageZone_t_startMessages() { return Player::MessageZone_t::startMessages(); }
+
 
 void Player::MessageZone_t::updateMessages()
 {
@@ -204,6 +213,9 @@ void Player::MessageZone_t::updateMessages()
 	}
 }
 
+extern "C" void MessageZone_t_updateMessages(Player::MessageZone_t* self) { return self->updateMessages(); }
+
+
 void Player::MessageZone_t::drawMessages()
 {
 	return;
@@ -264,11 +276,17 @@ void Player::MessageZone_t::drawMessages()
 	//}
 }
 
+extern "C" void MessageZone_t_drawMessages(Player::MessageZone_t* self) { return self->drawMessages(); }
+
+
 void Player::MessageZone_t::deleteAllNotificationMessages()
 {
 	std::for_each(notification_messages.begin(), notification_messages.end(), messageDeconstructor);
 	notification_messages.clear();
 }
+
+extern "C" void MessageZone_t_deleteAllNotificationMessages(Player::MessageZone_t* self) { return self->deleteAllNotificationMessages(); }
+
 
 DynamicString messageSanitizePercentSign(DynamicString src, int* percentSignsFound)
 {

@@ -1432,6 +1432,9 @@ bool Entity::shadowCanWieldItem(const Item& item) const
 	}
 }
 
+extern "C" bool Entity_shadowCanWieldItem(const Entity* self, const Item & item) { return self->shadowCanWieldItem(item); }
+
+
 void Entity::shadowSpecialAbility(bool initialMimic)
 {
 	//1. Turn invisible.
@@ -1689,6 +1692,9 @@ void Entity::shadowSpecialAbility(bool initialMimic)
 	//shadowTeleportToTarget(target);
 }
 
+extern "C" void Entity_shadowSpecialAbility(Entity* self, bool initialMimic) { return self->shadowSpecialAbility(initialMimic); }
+
+
 bool Entity::shadowCanMimickSpell(int spellID)
 {
 	switch ( spellID )
@@ -1710,6 +1716,9 @@ bool Entity::shadowCanMimickSpell(int spellID)
 	}
 }
 
+extern "C" bool Entity_shadowCanMimickSpell(Entity* self, int spellID) { return self->shadowCanMimickSpell(spellID); }
+
+
 void Entity::shadowTeleportToTarget(const Entity* target, int range)
 {
 	Entity* spellTimer = createParticleTimer(this, 60, 625);
@@ -1728,6 +1737,9 @@ void Entity::shadowTeleportToTarget(const Entity* target, int range)
 		serverSpawnMiscParticles(this, PARTICLE_EFFECT_SHADOW_TELEPORT, 625);
 	}
 }
+
+extern "C" void Entity_shadowTeleportToTarget(Entity* self, const Entity * target, int range) { return self->shadowTeleportToTarget(target, range); }
+
 
 void Entity::shadowChooseWeapon(const Entity* target, double dist)
 {
@@ -1842,6 +1854,9 @@ void Entity::shadowChooseWeapon(const Entity* target, double dist)
 	}
 	return;
 }
+
+extern "C" void Entity_shadowChooseWeapon(Entity* self, const Entity * target, double dist) { return self->shadowChooseWeapon(target, dist); }
+
 
 
 

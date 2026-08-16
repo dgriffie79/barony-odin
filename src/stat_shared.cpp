@@ -1770,6 +1770,9 @@ void Stat::setAttribute(DynamicString key, DynamicString value)
 	attributes[key] = value.c_str();
 }
 
+extern "C" void Stat_setAttribute(Stat* self, DynamicString key, DynamicString value) { return self->setAttribute(key, value); }
+
+
 Sint32 Stat::getProficiency(int skill) const {
 		if ( skill >= 0 && skill < NUMPROFICIENCIES )
 		{
@@ -1777,15 +1780,24 @@ Sint32 Stat::getProficiency(int skill) const {
 		}
 		return 0;
 	}
+
+extern "C" Sint32 Stat_getProficiency(const Stat* self, int skill) { return self->getProficiency(skill); }
+
 void Stat::setProficiency(int skill, int value) {
 		if ( skill >= 0 && skill < NUMPROFICIENCIES )
 		{
 			PROFICIENCIES[skill] = std::min(std::max(0, value), 100);
 		}
 	}
+
+extern "C" void Stat_setProficiency(Stat* self, int skill, int value) { return self->setProficiency(skill, value); }
+
 void Stat::setProficiencyUnsafe(int skill, int value) {
 		PROFICIENCIES[skill] = value;
 	}
+
+extern "C" void Stat_setProficiencyUnsafe(Stat* self, int skill, int value) { return self->setProficiencyUnsafe(skill, value); }
+
 const Uint8& Stat::getEffectActive(int effect) const {
 		if ( effect >= 0 && effect < NUMEFFECTS )
 		{
@@ -1793,12 +1805,18 @@ const Uint8& Stat::getEffectActive(int effect) const {
 		}
 		return Stat::nullEffectValue;
 	}
+
+extern "C" const Uint8 & Stat_getEffectActive(const Stat* self, int effect) { return self->getEffectActive(effect); }
+
 void Stat::clearEffect(int effect) {
 		if ( effect >= 0 && effect < NUMEFFECTS )
 		{
 			EFFECTS[effect] = 0;
 		}
 	}
+
+extern "C" void Stat_clearEffect(Stat* self, int effect) { return self->clearEffect(effect); }
+
 void Stat::setEffectActive(int effect, Uint8 effectStrength) {
 #ifndef EDITOR
 		assert(effectStrength > 0);
@@ -1808,12 +1826,18 @@ void Stat::setEffectActive(int effect, Uint8 effectStrength) {
 			EFFECTS[effect] = std::max(EFFECTS[effect], effectStrength); // strongest value remains
 		}
 	}
+
+extern "C" void Stat_setEffectActive(Stat* self, int effect, Uint8 effectStrength) { return self->setEffectActive(effect, effectStrength); }
+
 void Stat::setEffectValueUnsafe(int effect, Uint8 effectStrength) {
 		if ( effect >= 0 && effect < NUMEFFECTS )
 		{
 			EFFECTS[effect] = effectStrength;
 		}
 	}
+
+extern "C" void Stat_setEffectValueUnsafe(Stat* self, int effect, Uint8 effectStrength) { return self->setEffectValueUnsafe(effect, effectStrength); }
+
 DynamicString Stat::getAttribute(DynamicString key) const { 
 		if ( attributes.contains(key) )
 		{
@@ -1824,3 +1848,6 @@ DynamicString Stat::getAttribute(DynamicString key) const {
 			return "";
 		}
 	}
+
+extern "C" DynamicString Stat_getAttribute(const Stat* self, DynamicString key) { return self->getAttribute(key); }
+

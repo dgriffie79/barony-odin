@@ -1386,6 +1386,9 @@ void Entity::lichIceSetNextAttack(Stat& myStats)
 	}
 }
 
+extern "C" void Entity_lichIceSetNextAttack(Entity* self, Stat & myStats) { return self->lichIceSetNextAttack(myStats); }
+
+
 void Entity::lichIceTeleport()
 {
 	monsterLichTeleportTimer() = 0;
@@ -1407,6 +1410,9 @@ void Entity::lichIceTeleport()
 	}
 }
 
+extern "C" void Entity_lichIceTeleport(Entity* self) { return self->lichIceTeleport(); }
+
+
 void Entity::lichIceCreateCannon()
 {
 	//spellTimer->particleTimerCountdownAction = PARTICLE_TIMER_ACTION_SHOOT_PARTICLES;
@@ -1422,6 +1428,9 @@ void Entity::lichIceCreateCannon()
 		serverSpawnMiscParticles(this, PARTICLE_EFFECT_RISING_DROP, 678);
 	}
 }
+
+extern "C" void Entity_lichIceCreateCannon(Entity* self) { return self->lichIceCreateCannon(); }
+
 
 Entity* Entity::lichThrowProjectile(real_t angle)
 {
@@ -1450,6 +1459,9 @@ Entity* Entity::lichThrowProjectile(real_t angle)
 
 	return projectile;
 }
+
+extern "C" Entity * Entity_lichThrowProjectile(Entity* self, real_t angle) { return self->lichThrowProjectile(angle); }
+
 
 void Entity::lichIceSummonMonster(Monster creature)
 {
@@ -1496,3 +1508,6 @@ void Entity::lichIceSummonMonster(Monster creature)
 		}
 	}
 }
+
+extern "C" void Entity_lichIceSummonMonster(Entity* self, Monster creature) { return self->lichIceSummonMonster(creature); }
+

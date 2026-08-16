@@ -2335,5 +2335,8 @@ void Entity::monsterMChooseWeapon(const Entity* target, double dist)
 	return;
 }
 
+extern "C" void Entity_monsterMChooseWeapon(Entity* self, const Entity * target, double dist) { return self->monsterMChooseWeapon(target, dist); }
+
+
 
 

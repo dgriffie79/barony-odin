@@ -759,6 +759,9 @@ void Mesh::init() {
 	printlog("initialized mesh with %llu vertices", numVertices);
 }
 
+extern "C" void Mesh_init(Mesh* self) { return self->init(); }
+
+
 void Mesh::destroy() {
     if (vao) {
         GL_CHECK_ERR(glDeleteVertexArrays(1, &vao));
@@ -771,6 +774,9 @@ void Mesh::destroy() {
 		}
 	}
 }
+
+extern "C" void Mesh_destroy(Mesh* self) { return self->destroy(); }
+
 
 void Mesh::draw(GLenum type, int numVertices) const {
     // NOTE: OpenGL 2.1 does not support vertex arrays!
@@ -808,6 +814,9 @@ void Mesh::draw(GLenum type, int numVertices) const {
     GL_CHECK_ERR(glBindBuffer(GL_ARRAY_BUFFER, 0));
 #endif
 }
+
+extern "C" void Mesh_draw(const Mesh* self, int type, int numVertices) { return self->draw(type, numVertices); }
+
 
 void framebuffer::init(unsigned int _xsize, unsigned int _ysize, GLint minFilter, GLint magFilter) {
     if (fbo) {
@@ -849,6 +858,9 @@ void framebuffer::init(unsigned int _xsize, unsigned int _ysize, GLint minFilter
     GL_CHECK_ERR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
+extern "C" void framebuffer_init(framebuffer* self, unsigned int _xsize, unsigned int _ysize, int minFilter, int magFilter) { return self->init(_xsize, _ysize, minFilter, magFilter); }
+
+
 GLhalf* framebuffer::lock() {
     if (!fbo || mapped) {
         return nullptr;
@@ -866,6 +878,9 @@ GLhalf* framebuffer::lock() {
 		return nullptr;
 	}
 }
+
+extern "C" GLhalf * framebuffer_lock(framebuffer* self) { return self->lock(); }
+
 
 void framebuffer::unlock() {
     if (!fbo) {
@@ -892,6 +907,9 @@ void framebuffer::unlock() {
     GL_CHECK_ERR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
 }
 
+extern "C" void framebuffer_unlock(framebuffer* self) { return self->unlock(); }
+
+
 void framebuffer::destroy() {
 	if (mapped) {
 		GL_CHECK_ERR(glUnmapBuffer(GL_PIXEL_PACK_BUFFER));
@@ -917,6 +935,9 @@ void framebuffer::destroy() {
     }
 }
 
+extern "C" void framebuffer_destroy(framebuffer* self) { return self->destroy(); }
+
+
 static std::vector<framebuffer*> fbStack;
 
 void framebuffer::bindForWriting() {
@@ -929,16 +950,25 @@ void framebuffer::bindForWriting() {
     }
 }
 
+extern "C" void framebuffer_bindForWriting(framebuffer* self) { return self->bindForWriting(); }
+
+
 void framebuffer::bindForReading() const {
     GL_CHECK_ERR(glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo));
     GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, fbo_color));
 }
+
+extern "C" void framebuffer_bindForReading(const framebuffer* self) { return self->bindForReading(); }
+
 
 void framebuffer::draw(float brightness) {
 	shader.bind();
     GL_CHECK_ERR(glUniform1f(shader.uniform("uBrightness"), brightness));
 	mesh.draw();
 }
+
+extern "C" void framebuffer_draw(framebuffer* self, float brightness) { return self->draw(brightness); }
+
 
 void framebuffer::hdrDraw(const Vector4& brightness, float gamma, float exposure) {
     hdrShader.bind();
@@ -947,6 +977,9 @@ void framebuffer::hdrDraw(const Vector4& brightness, float gamma, float exposure
     GL_CHECK_ERR(glUniform1f(hdrShader.uniform("uExposure"), exposure));
     mesh.draw();
 }
+
+extern "C" void framebuffer_hdrDraw(framebuffer* self, const Vector4 & brightness, float gamma, float exposure) { return self->hdrDraw(brightness, gamma, exposure); }
+
 
 void framebuffer::unbindForWriting() {
     if (!fbStack.empty()) {
@@ -962,15 +995,24 @@ void framebuffer::unbindForWriting() {
     }
 }
 
+extern "C" void framebuffer_unbindForWriting() { return framebuffer::unbindForWriting(); }
+
+
 void framebuffer::unbindForReading() {
     GL_CHECK_ERR(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
+extern "C" void framebuffer_unbindForReading() { return framebuffer::unbindForReading(); }
+
+
 void framebuffer::unbindAll() {
     unbindForWriting();
     unbindForReading();
 }
+
+extern "C" void framebuffer_unbindAll() { return framebuffer::unbindAll(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -4157,6 +4199,9 @@ void TempTexture::setParameters(bool clamp, bool point) {
         GL_CHECK_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, point ? GL_NEAREST : GL_LINEAR));
     }
 
+extern "C" void TempTexture_setParameters(TempTexture* self, bool clamp, bool point) { return self->setParameters(clamp, point); }
+
+
 void TempTexture::load(SDL_Surface* surf, bool clamp, bool point) {
         SDL_LockSurface(surf);
         GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
@@ -4167,6 +4212,9 @@ void TempTexture::load(SDL_Surface* surf, bool clamp, bool point) {
         SDL_UnlockSurface(surf);
     }
 
+extern "C" void TempTexture_load(TempTexture* self, SDL_Surface * surf, bool clamp, bool point) { return self->load(surf, clamp, point); }
+
+
 void TempTexture::loadFloat(float* data, int width, int height, bool clamp, bool point) {
         GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
         GL_CHECK_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, GL_FLOAT, data));
@@ -4175,8 +4223,17 @@ void TempTexture::loadFloat(float* data, int width, int height, bool clamp, bool
         h = height;
     }
 
+extern "C" void TempTexture_loadFloat(TempTexture* self, float * data, int width, int height, bool clamp, bool point) { return self->loadFloat(data, width, height, clamp, point); }
+
+
 void TempTexture::bind() {
         GL_CHECK_ERR(glBindTexture(GL_TEXTURE_2D, texid));
     }
 
+extern "C" void TempTexture_bind(TempTexture* self) { return self->bind(); }
+
+
 bool Mesh::isInitialized() const { return vbo[0] != 0; }
+
+extern "C" bool Mesh_isInitialized(const Mesh* self) { return self->isInitialized(); }
+

@@ -217,3 +217,6 @@ void Entity::actGate()
 	//	}
 	//}
 }
+
+extern "C" void Entity_actGate(Entity* self) { return self->actGate(); }
+

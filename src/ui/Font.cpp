@@ -64,6 +64,9 @@ int Font::sizeText(const char* str, int* out_w, int* out_h) const {
 	}
 }
 
+extern "C" int Font_sizeText(const Font* self, const char * str, int * out_w, int * out_h) { return self->sizeText(str, out_w, out_h); }
+
+
 int Font::height(bool withOutline) const {
 	if (font) {
 		if (withOutline) {
@@ -75,6 +78,9 @@ int Font::height(bool withOutline) const {
 		return 0;
 	}
 }
+
+extern "C" int Font_height(const Font* self, bool withOutline) { return self->height(withOutline); }
+
 
 static std::unordered_map<std::string, Font*> hashed_fonts;
 static const int FONT_BUDGET = 50;
@@ -98,12 +104,18 @@ Font* Font::get(const char* name) {
 	return font;
 }
 
+extern "C" Font * Font_get(const char * name) { return Font::get(name); }
+
+
 void Font::dumpCache() {
 	for (auto font : hashed_fonts) {
 		delete font.second;
 	}
 	hashed_fonts.clear();
 }
+
+extern "C" void Font_dumpCache() { return Font::dumpCache(); }
+
 
 #ifndef EDITOR
 #include "../net.hpp"
@@ -120,3 +132,6 @@ static ConsoleCommand dump("/fonts_cache_dump", "dump font cache",
 #endif
 
 const char*		Font::getName() const { return name.c_str(); }
+
+extern "C" const char * Font_getName(const Font* self) { return self->getName(); }
+

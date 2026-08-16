@@ -184,12 +184,18 @@ void TreasureRoomGenerator::init()
 	orb_floors[18] = "orb_blue";
 }
 
+extern "C" void TreasureRoomGenerator_init(TreasureRoomGenerator* self) { return self->init(); }
+
+
 bool TreasureRoomGenerator::bForceStationSpawnForCurrentFloor(int secretlevelexit)
 {
 	auto& floor = secretlevel ? station_secret_floors : station_floors;
 
 	return floor.find(currentlevel) != floor.end();
 }
+
+extern "C" bool TreasureRoomGenerator_bForceStationSpawnForCurrentFloor(TreasureRoomGenerator* self, int secretlevelexit) { return self->bForceStationSpawnForCurrentFloor(secretlevelexit); }
+
 
 bool TreasureRoomGenerator::bForceSpawnForCurrentFloor(int secretlevelexit, bool minotaur, BaronyRNG& mapRNG)
 {
@@ -234,6 +240,9 @@ bool TreasureRoomGenerator::bForceSpawnForCurrentFloor(int secretlevelexit, bool
 	}
 	return false;
 }
+
+extern "C" bool TreasureRoomGenerator_bForceSpawnForCurrentFloor(TreasureRoomGenerator* self, int secretlevelexit, bool minotaur, BaronyRNG & mapRNG) { return self->bForceSpawnForCurrentFloor(secretlevelexit, minotaur, mapRNG); }
+
 
 Sint32 doorFrameSprite() {
     if (stringStr(map.name, "Caves", sizeof(map_t::name), 5)) {
@@ -11275,6 +11284,9 @@ bool map_t::tileHasAttribute(int x, int y, int layer, Uint32 attribute)
 	return false;
 }
 
+extern "C" bool map_t_tileHasAttribute(map_t* self, int x, int y, int layer, Uint32 attribute) { return self->tileHasAttribute(x, y, layer, attribute); }
+
+
 void map_t::setMapHDRSettings()
 {
 	if ( !strncmp(map.filename, "fortress", 8) )
@@ -11299,3 +11311,5 @@ void map_t::setMapHDRSettings()
 		*cvar_hdrLimitLow = defaultLimitLow;
 	}
 }
+
+extern "C" void map_t_setMapHDRSettings(map_t* self) { return self->setMapHDRSettings(); }

@@ -83,9 +83,15 @@ void Field::activate() {
 	}
 }
 
+extern "C" void Field_activate(Field* self) { return self->activate(); }
+
+
 void Field::deselect() {
 	deselectBase();
 }
+
+extern "C" void Field_deselect(Field* self) { return self->deselect(); }
+
 
 void Field::deactivate() {
 	activated = false;
@@ -96,6 +102,9 @@ void Field::deactivate() {
 		SDL_StopTextInput();
 	}
 }
+
+extern "C" void Field_deactivate(Field* self) { return self->deactivate(); }
+
 
 char* Field::tokenize(char* str, const char* const delimiters) {
 	if (!str || !delimiters) {
@@ -114,6 +123,9 @@ char* Field::tokenize(char* str, const char* const delimiters) {
 		}
 	}
 }
+
+extern "C" char * Field_tokenize(char * str, const char *const delimiters) { return Field::tokenize(str, delimiters); }
+
 
 static bool bWordHighlightMapAreSame(const DynamicMapI32T<Uint32>& textMap, const DynamicMapI32T<Uint32>& fieldMap, int currentLine)
 {
@@ -213,6 +225,9 @@ void Field::buildCache() {
 		free(buf);
 	}
 }
+
+extern "C" void Field_buildCache(Field* self) { return self->buildCache(); }
+
 
 void Field::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget*>& selectedWidgets) const {
 	if ( invisible || isDisabled() ) {
@@ -459,6 +474,9 @@ void Field::draw(SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widge
 	}
 }
 
+extern "C" void Field_draw(const Field* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets) { return self->draw(_size, _actualSize, selectedWidgets); }
+
+
 void Field::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
     const DynamicArrayT<Widget*>& selectedWidgets,
     const DynamicArrayT<Widget*>& searchParents) const {
@@ -475,6 +493,9 @@ void Field::drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 	}
 	Widget::drawPost(rect, selectedWidgets, searchParents);
 }
+
+extern "C" void Field_drawPost(const Field* self, SDL_Rect _size, SDL_Rect _actualSize, const DynamicArrayT<Widget *> & selectedWidgets, const DynamicArrayT<Widget *> & searchParents) { return self->drawPost(_size, _actualSize, selectedWidgets, searchParents); }
+
 
 Field::result_t Field::process(SDL_Rect _size, SDL_Rect _actualSize, const bool usable) {
 	Widget::process();
@@ -577,6 +598,9 @@ Field::result_t Field::process(SDL_Rect _size, SDL_Rect _actualSize, const bool 
 	return result;
 }
 
+extern "C" Field::result_t Field_process(Field* self, SDL_Rect _size, SDL_Rect _actualSize, const bool usable) { return self->process(_size, _actualSize, usable); }
+
+
 void Field::setText(const char* _text) {
 	if ( _text == nullptr ) {
 		return;
@@ -587,6 +611,9 @@ void Field::setText(const char* _text) {
 		dirty = true;
 	}
 }
+
+extern "C" void Field_setText(Field* self, const char * _text) { return self->setText(_text); }
+
 
 void Field::scrollParent() {
 	Frame* fparent = static_cast<Frame*>(parent);
@@ -606,6 +633,9 @@ void Field::scrollParent() {
 	}
 	fparent->setActualSize(fActualSize);
 }
+
+extern "C" void Field_scrollParent(Field* self) { return self->scrollParent(); }
+
 
 void reflowTextLine(std::string& input, int width, const char* font, std::vector<DynamicString>& result)
 {
@@ -728,6 +758,9 @@ std::string Field::getLongestLine()
 	return longestLine;
 }
 
+extern "C" std::string Field_getLongestLine(Field* self) { return self->getLongestLine(); }
+
+
 int Field::getLastLineThatFitsWithinHeight()
 {
 	if ( text == nullptr || textlen <= 1 ) {
@@ -771,6 +804,9 @@ int Field::getLastLineThatFitsWithinHeight()
 	setText(originalText.c_str()); // make sure to replace the original text field, as tokenize will modify it
 	return -1;
 }
+
+extern "C" int Field_getLastLineThatFitsWithinHeight(Field* self) { return self->getLastLineThatFitsWithinHeight(); }
+
 
 void Field::reflowTextToFit(const int characterOffset, bool check) {
 	if ( text == nullptr || textlen <= 1 ) {
@@ -876,9 +912,15 @@ void Field::reflowTextToFit(const int characterOffset, bool check) {
 	setText(reflowText.c_str());
 }
 
+extern "C" void Field_reflowTextToFit(Field* self, const int characterOffset, bool check) { return self->reflowTextToFit(characterOffset, check); }
+
+
 int Field::getNumTextLines() const {
 	return Text::get(text, font.c_str(), textColor, outlineColor)->getNumTextLines();
 }
+
+extern "C" int Field_getNumTextLines(const Field* self) { return self->getNumTextLines(); }
+
 
 SDL_Rect Field::getAbsoluteSize() const
 {
@@ -892,71 +934,173 @@ SDL_Rect Field::getAbsoluteSize() const
 	return _size;
 }
 
+extern "C" SDL_Rect Field_getAbsoluteSize(const Field* self) { return self->getAbsoluteSize(); }
+
+
 Text* Field::getTextObject() const
 {
 	return Text::get(getText(), getFont(), getTextColor(), getOutlineColor());
 }
 
+extern "C" Text * Field_getTextObject(const Field* self) { return self->getTextObject(); }
+
+
 void Field::addWordToHighlight(int word, Uint32 color) { wordsToHighlight[word] = color; }
+
+extern "C" void Field_addWordToHighlight(Field* self, int word, Uint32 color) { return self->addWordToHighlight(word, color); }
+
 
 void Field::clearWordsToHighlight() { wordsToHighlight.clear(); }
 
+extern "C" void Field_clearWordsToHighlight(Field* self) { return self->clearWordsToHighlight(); }
+
+
 void Field::addColorToLine(int line, Uint32 color) { linesToColor[line] = color; }
+
+extern "C" void Field_addColorToLine(Field* self, int line, Uint32 color) { return self->addColorToLine(line, color); }
+
 
 void Field::clearLinesToColor() { linesToColor.clear(); }
 
+extern "C" void Field_clearLinesToColor(Field* self) { return self->clearLinesToColor(); }
+
+
 void Field::clearIndividualLinePadding() { individualLinePadding.clear(); }
+
+extern "C" void Field_clearIndividualLinePadding(Field* self) { return self->clearIndividualLinePadding(); }
+
 
 const char*					Field::getFont() const { return font.c_str(); }
 
+extern "C" const char * Field_getFont(const Field* self) { return self->getFont(); }
+
+
 const SDL_Rect				Field::getSize() const { return size; }
+
+extern "C" const SDL_Rect Field_getSize(const Field* self) { return self->getSize(); }
+
 
 const int					Field::getHJustify() const { return static_cast<int>(hjustify); }
 
+extern "C" const int Field_getHJustify(const Field* self) { return self->getHJustify(); }
+
+
 const int					Field::getVJustify() const { return static_cast<int>(vjustify); }
+
+extern "C" const int Field_getVJustify(const Field* self) { return self->getVJustify(); }
+
 
 const char*					Field::getGuide() const { return guide.c_str(); }
 
+extern "C" const char * Field_getGuide(const Field* self) { return self->getGuide(); }
+
+
 const char*                 Field::getTooltip() const { return tooltip.c_str(); }
+
+extern "C" const char * Field_getTooltip(const Field* self) { return self->getTooltip(); }
+
 
 void	Field::setPos(const int x, const int y) { size.x = x; size.y = y; }
 
+extern "C" void Field_setPos(Field* self, const int x, const int y) { return self->setPos(x, y); }
+
+
 void	Field::setSize(const SDL_Rect _size) { size = _size; }
+
+extern "C" void Field_setSize(Field* self, const SDL_Rect _size) { return self->setSize(_size); }
+
 
 void	Field::setColor(const Uint32 _color) { color = _color; }
 
+extern "C" void Field_setColor(Field* self, const Uint32 _color) { return self->setColor(_color); }
+
+
 void	Field::setTextColor(const Uint32 _color) { if (textColor != _color) { textColor = _color; dirty = true; } }
+
+extern "C" void Field_setTextColor(Field* self, const Uint32 _color) { return self->setTextColor(_color); }
+
 
 void	Field::setOutlineColor(const Uint32 _color) { if (outlineColor != _color) { outlineColor = _color; dirty = true; } }
 
+extern "C" void Field_setOutlineColor(Field* self, const Uint32 _color) { return self->setOutlineColor(_color); }
+
+
 void	Field::setBackgroundColor(const Uint32 _color) { backgroundColor = _color; }
+
+extern "C" void Field_setBackgroundColor(Field* self, const Uint32 _color) { return self->setBackgroundColor(_color); }
+
 
 void	Field::setBackgroundActivatedColor(const Uint32 _color) { backgroundActivatedColor = _color; }
 
+extern "C" void Field_setBackgroundActivatedColor(Field* self, const Uint32 _color) { return self->setBackgroundActivatedColor(_color); }
+
+
 void	Field::setBackgroundSelectAllColor(const Uint32 _color) { backgroundSelectAllColor = _color; }
+
+extern "C" void Field_setBackgroundSelectAllColor(Field* self, const Uint32 _color) { return self->setBackgroundSelectAllColor(_color); }
+
 
 void	Field::setEditable(const bool _editable) { editable = _editable; }
 
+extern "C" void Field_setEditable(Field* self, const bool _editable) { return self->setEditable(_editable); }
+
+
 void	Field::setNumbersOnly(const bool _numbersOnly) { numbersOnly = _numbersOnly; }
+
+extern "C" void Field_setNumbersOnly(Field* self, const bool _numbersOnly) { return self->setNumbersOnly(_numbersOnly); }
+
 
 void	Field::setJustify(const int _justify) { hjustify = vjustify = static_cast<justify_t>(_justify); }
 
+extern "C" void Field_setJustify(Field* self, const int _justify) { return self->setJustify(_justify); }
+
+
 void	Field::setHJustify(const int _justify) { hjustify = static_cast<justify_t>(_justify); }
+
+extern "C" void Field_setHJustify(Field* self, const int _justify) { return self->setHJustify(_justify); }
+
 
 void	Field::setVJustify(const int _justify) { vjustify = static_cast<justify_t>(_justify); }
 
+extern "C" void Field_setVJustify(Field* self, const int _justify) { return self->setVJustify(_justify); }
+
+
 void	Field::setScroll(const bool _scroll) { scroll = _scroll; }
+
+extern "C" void Field_setScroll(Field* self, const bool _scroll) { return self->setScroll(_scroll); }
+
 
 void	Field::setCallback(void (*const fn)(Field&)) { callback = fn; }
 
+extern "C" void Field_setCallback(Field* self, void (*fn)(Field &)) { return self->setCallback(fn); }
+
+
 void	Field::setFont(const char* _font) { if (font != _font) { font = _font; dirty = true; } }
+
+extern "C" void Field_setFont(Field* self, const char * _font) { return self->setFont(_font); }
+
 
 void	Field::setGuide(const char* _guide) { guide = _guide; }
 
+extern "C" void Field_setGuide(Field* self, const char * _guide) { return self->setGuide(_guide); }
+
+
 void	Field::setTooltip(const char* _tooltip) { tooltip = _tooltip; }
+
+extern "C" void Field_setTooltip(Field* self, const char * _tooltip) { return self->setTooltip(_tooltip); }
+
 
 void	Field::setOntop(const bool _ontop) { ontop = _ontop; }
 
+extern "C" void Field_setOntop(Field* self, const bool _ontop) { return self->setOntop(_ontop); }
+
+
 void	Field::setPaddingPerLine(const int _padding) {	paddingPerLine = _padding; }
 
+extern "C" void Field_setPaddingPerLine(Field* self, const int _padding) { return self->setPaddingPerLine(_padding); }
+
+
 void	Field::setIndividualLinePadding(const int _line, const int _padding) { individualLinePadding[_line] = _padding; }
+
+extern "C" void Field_setIndividualLinePadding(Field* self, const int _line, const int _padding) { return self->setIndividualLinePadding(_line, _padding); }
+

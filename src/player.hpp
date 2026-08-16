@@ -328,6 +328,8 @@ class Inputs
 	int playerControllerIds[MAXPLAYERS];
 	int playerUsingKeyboardControl = 0;
 
+
+	public:
 	class VirtualMouse
 	{
 	public:

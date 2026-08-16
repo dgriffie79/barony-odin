@@ -271,6 +271,8 @@ private:
 	JsonReaderState* jsonReader = nullptr;
 
 	// binary string length-prefixed write/read (used when format == Binary)
+
+	public:
 	bool writeStringInternalBinary(const std::string& v);
 	bool readStringInternalBinary(std::string& v);
 	bool writeStringInternalBinary(const DynamicString& v);
@@ -286,6 +288,7 @@ public:
 	static bool writeObject(const char * filename, EFileFormat format, T & v) {
 		using std::placeholders::_1;
 		SerializationFunc serialize = std::bind(&T::serialize, &v, _1);
+
 		return writeObjectInternal(filename, format, serialize);
 	}
 
@@ -296,12 +299,13 @@ public:
 	static bool readObject(const char * filename, T & v) {
 		using std::placeholders::_1;
 		SerializationFunc serialize = std::bind(&T::serialize, &v, _1);
+
 		return readObjectInternal(filename, serialize);
 	}
 
 	typedef std::function<bool(FileInterface*)> SerializationFunc;
 
-private:
+	public:
 
 	static bool writeObjectInternal(const char * filename, EFileFormat format, const SerializationFunc& serialize);
 	static bool readObjectInternal(const char * filename, const SerializationFunc& serialize);

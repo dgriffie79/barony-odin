@@ -1122,6 +1122,9 @@ char* Item::description() const
 	return tempstr;
 }
 
+extern "C" char * Item_description(const Item* self) { return self->description(); }
+
+
 /*-------------------------------------------------------------------------------
 
 	itemCategory
@@ -1188,6 +1191,9 @@ char* Item::getName() const
 	}
 	return tempstr;
 }
+
+extern "C" char * Item_getName(const Item* self) { return self->getName(); }
+
 
 int getItemVariationFromSpellbookOrTome(const Item& item)
 {
@@ -4126,6 +4132,9 @@ int Item::getMaxStackLimit(int player) const
 	return maxStack;
 }
 
+extern "C" int Item_getMaxStackLimit(const Item* self, int player) { return self->getMaxStackLimit(player); }
+
+
 ItemStackResult getItemStackingBehaviorIndividualItemCheck(const int player, Item* itemToCheck, Item* itemDestinationStack, int& newQtyForCheckedItem, int& newQtyForDestItem)
 {
 	ItemStackResult itemStackResult;
@@ -4923,6 +4932,9 @@ Sint32 Item::weaponGetAttack(const Stat* const wielder) const
 	return attack;
 }
 
+extern "C" Sint32 Item_weaponGetAttack(const Item* self, const Stat * wielder) { return self->weaponGetAttack(wielder); }
+
+
 bool Item::doesItemProvideBeatitudeAC(ItemType type)
 {
 	if ( itemTypeIsQuiver(type) || items[type].category == SPELLBOOK
@@ -4966,6 +4978,9 @@ bool Item::doesItemProvideBeatitudeAC(ItemType type)
 	return true;
 }
 
+extern "C" bool Item_doesItemProvideBeatitudeAC(ItemType type) { return Item::doesItemProvideBeatitudeAC(type); }
+
+
 bool Item::doesPotionHarmAlliesOnThrown() const
 {
 	switch ( type )
@@ -4988,6 +5003,9 @@ bool Item::doesPotionHarmAlliesOnThrown() const
 	}
 	return true;
 }
+
+extern "C" bool Item_doesPotionHarmAlliesOnThrown(const Item* self) { return self->doesPotionHarmAlliesOnThrown(); }
+
 
 Sint32 Item::potionGetEffectHealth(Entity* my, Stat* myStats) const
 {
@@ -5039,6 +5057,9 @@ Sint32 Item::potionGetEffectHealth(Entity* my, Stat* myStats) const
 
 	return heal;
 }
+
+extern "C" Sint32 Item_potionGetEffectHealth(const Item* self, Entity * my, Stat * myStats) { return self->potionGetEffectHealth(my, myStats); }
+
 Sint32 Item::potionGetEffectDamage(Entity* my, Stat* myStats) const
 {
 	if ( itemCategory(this) != POTION )
@@ -5066,6 +5087,9 @@ Sint32 Item::potionGetEffectDamage(Entity* my, Stat* myStats) const
 
 	return damage;
 }
+
+extern "C" Sint32 Item_potionGetEffectDamage(const Item* self, Entity * my, Stat * myStats) { return self->potionGetEffectDamage(my, myStats); }
+
 
 Sint32 Item::potionGetEffectDurationMinimum(Entity* my, Stat* myStats) const
 {
@@ -5145,6 +5169,9 @@ Sint32 Item::potionGetEffectDurationMinimum(Entity* my, Stat* myStats) const
 	return duration;
 }
 
+extern "C" Sint32 Item_potionGetEffectDurationMinimum(const Item* self, Entity * my, Stat * myStats) { return self->potionGetEffectDurationMinimum(my, myStats); }
+
+
 Sint32 Item::potionGetEffectDurationMaximum(Entity* my, Stat* myStats) const
 {
 	if ( type == GREASE_BALL )
@@ -5223,11 +5250,17 @@ Sint32 Item::potionGetEffectDurationMaximum(Entity* my, Stat* myStats) const
 	return duration;
 }
 
+extern "C" Sint32 Item_potionGetEffectDurationMaximum(const Item* self, Entity * my, Stat * myStats) { return self->potionGetEffectDurationMaximum(my, myStats); }
+
+
 Sint32 Item::potionGetEffectDurationRandom(Entity* my, Stat* myStats) const
 {
 	Sint32 range = std::max(1, potionGetEffectDurationMaximum(my, myStats) - potionGetEffectDurationMinimum(my, myStats));
 	return potionGetEffectDurationMinimum(my, myStats) + (local_rng.rand() % (range));
 }
+
+extern "C" Sint32 Item_potionGetEffectDurationRandom(const Item* self, Entity * my, Stat * myStats) { return self->potionGetEffectDurationRandom(my, myStats); }
+
 
 Sint32 Item::potionGetCursedEffectDurationMinimum(Entity* my, Stat* myStats) const
 {
@@ -5293,6 +5326,9 @@ Sint32 Item::potionGetCursedEffectDurationMinimum(Entity* my, Stat* myStats) con
 	return duration;
 }
 
+extern "C" Sint32 Item_potionGetCursedEffectDurationMinimum(const Item* self, Entity * my, Stat * myStats) { return self->potionGetCursedEffectDurationMinimum(my, myStats); }
+
+
 Sint32 Item::potionGetCursedEffectDurationMaximum(Entity* my, Stat* myStats) const
 {
 	if ( itemCategory(this) != POTION )
@@ -5357,11 +5393,17 @@ Sint32 Item::potionGetCursedEffectDurationMaximum(Entity* my, Stat* myStats) con
 	return duration;
 }
 
+extern "C" Sint32 Item_potionGetCursedEffectDurationMaximum(const Item* self, Entity * my, Stat * myStats) { return self->potionGetCursedEffectDurationMaximum(my, myStats); }
+
+
 Sint32 Item::potionGetCursedEffectDurationRandom(Entity* my, Stat* myStats) const
 {
 	Sint32 range = std::max(1, potionGetCursedEffectDurationMaximum(my, myStats) - potionGetCursedEffectDurationMinimum(my, myStats));
 	return potionGetCursedEffectDurationMinimum(my, myStats) + (local_rng.rand() % (range));
 }
+
+extern "C" Sint32 Item_potionGetCursedEffectDurationRandom(const Item* self, Entity * my, Stat * myStats) { return self->potionGetCursedEffectDurationRandom(my, myStats); }
+
 
 Sint32 Item::getGoldValue() const
 {
@@ -5427,6 +5469,9 @@ Sint32 Item::getGoldValue() const
 	return 0;
 }
 
+extern "C" Sint32 Item_getGoldValue(const Item* self) { return self->getGoldValue(); }
+
+
 Sint32 Item::getWeight() const
 {
 	if ( type >= 0 && type < NUMITEMS )
@@ -5442,6 +5487,9 @@ Sint32 Item::getWeight() const
 	}
 	return 0;
 }
+
+extern "C" Sint32 Item_getWeight(const Item* self) { return self->getWeight(); }
+
 
 void Item::foodTinGetDescriptionIndices(int* a, int* b, int* c) const
 {
@@ -5460,6 +5508,9 @@ void Item::foodTinGetDescriptionIndices(int* a, int* b, int* c) const
 	}
 }
 
+extern "C" void Item_foodTinGetDescriptionIndices(const Item* self, int * a, int * b, int * c) { return self->foodTinGetDescriptionIndices(a, b, c); }
+
+
 void Item::foodTinGetDescription(DynamicString& cookingMethod, DynamicString& protein, DynamicString& sides) const
 {
 	int a, b, c;
@@ -5468,6 +5519,9 @@ void Item::foodTinGetDescription(DynamicString& cookingMethod, DynamicString& pr
 	protein = Language::get(934 + b);
 	sides = Language::get(950 + c);
 }
+
+extern "C" void Item_foodTinGetDescription(const Item* self, DynamicString & cookingMethod, DynamicString & protein, DynamicString & sides) { return self->foodTinGetDescription(cookingMethod, protein, sides); }
+
 
 int Item::foodGetPukeChance(Stat* eater) const
 {
@@ -5505,6 +5559,9 @@ int Item::foodGetPukeChance(Stat* eater) const
 
 	return pukeChance;
 }
+
+extern "C" int Item_foodGetPukeChance(const Item* self, Stat * eater) { return self->foodGetPukeChance(eater); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -5862,6 +5919,9 @@ Sint32 Item::armorGetAC(const Stat* const wielder) const
 	return armor;
 }
 
+extern "C" Sint32 Item_armorGetAC(const Item* self, const Stat * wielder) { return self->armorGetAC(wielder); }
+
+
 /*-------------------------------------------------------------------------------
 
 	Item::canUnequip
@@ -5946,6 +6006,9 @@ bool Item::canUnequip(const Stat* const wielder)
 	return true;
 }
 
+extern "C" bool Item_canUnequip(Item* self, const Stat * wielder) { return self->canUnequip(wielder); }
+
+
 /*-------------------------------------------------------------------------------
 
 	Item::buyValue
@@ -6014,6 +6077,9 @@ int Item::buyValue(const int player) const
 	return std::max(value, this->getGoldValue());
 }
 
+extern "C" int Item_buyValue(const Item* self, int player) { return self->buyValue(player); }
+
+
 /*-------------------------------------------------------------------------------
 
 	Item::sellValue
@@ -6066,6 +6132,9 @@ int Item::sellValue(const int player) const
 
 	return std::min(value, this->getGoldValue());
 }
+
+extern "C" int Item_sellValue(const Item* self, int player) { return self->sellValue(player); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -6129,6 +6198,9 @@ void Item::apply(const int player, Entity* const entity)
 		applyEmptyPotion(player, *entity);
 	}
 }
+
+extern "C" void Item_apply(Item* self, int player, Entity * entity) { return self->apply(player, entity); }
+
 
 void Item::applyLockpickToWall(const int player, const int x, const int y) const
 {
@@ -6253,6 +6325,9 @@ void Item::applyLockpickToWall(const int player, const int x, const int y) const
 		messagePlayer(player, MESSAGE_HINT, Language::get(3873));
 	}
 }
+
+extern "C" void Item_applyLockpickToWall(const Item* self, int player, int x, int y) { return self->applyLockpickToWall(player, x, y); }
+
 
 SummonProperties::SummonProperties() = default;
 
@@ -6582,6 +6657,9 @@ bool Item::isShield() const
 	return true;
 }
 
+extern "C" bool Item_isShield(const Item* self) { return self->isShield(); }
+
+
 bool swapMonsterWeaponWithInventoryItem(Entity* const my, Stat* const myStats, node_t* const inventoryNode, const bool moveStack,  const bool overrideCursed)
 {
 	//TODO: Does this work with multiplayer?
@@ -6816,6 +6894,9 @@ bool Item::isThisABetterWeapon(const Item& newWeapon, const Item* const weaponAl
 	return false;
 }
 
+extern "C" bool Item_isThisABetterWeapon(const Item & newWeapon, const Item * weaponAlreadyHave) { return Item::isThisABetterWeapon(newWeapon, weaponAlreadyHave); }
+
+
 bool Item::isThisABetterArmor(const Item& newArmor, const Item* const armorAlreadyHave )
 {
 	if ( !armorAlreadyHave )
@@ -6854,6 +6935,9 @@ bool Item::isThisABetterArmor(const Item& newArmor, const Item* const armorAlrea
 
 	return false;
 }
+
+extern "C" bool Item_isThisABetterArmor(const Item & newArmor, const Item * armorAlreadyHave) { return Item::isThisABetterArmor(newArmor, armorAlreadyHave); }
+
 
 bool Item::shouldItemStack(const int player, bool ignoreStackLimit) const
 {
@@ -6941,6 +7025,9 @@ bool Item::shouldItemStack(const int player, bool ignoreStackLimit) const
 	return false;
 }
 
+extern "C" bool Item_shouldItemStack(const Item* self, int player, bool ignoreStackLimit) { return self->shouldItemStack(player, ignoreStackLimit); }
+
+
 bool Item::shouldItemStackInShop(bool ignoreStackLimit)
 {
 	node_t* itemNode = node;
@@ -6949,6 +7036,9 @@ bool Item::shouldItemStackInShop(bool ignoreStackLimit)
 	node = itemNode;
 	return result;
 }
+
+extern "C" bool Item_shouldItemStackInShop(Item* self, bool ignoreStackLimit) { return self->shouldItemStackInShop(ignoreStackLimit); }
+
 
 
 bool shouldInvertEquipmentBeatitude(const Stat* const wielder)
@@ -7026,6 +7116,9 @@ bool Item::usableWhileShapeshifted(const Stat* const wielder) const
 	return false;
 }
 
+extern "C" bool Item_usableWhileShapeshifted(const Item* self, const Stat * wielder) { return self->usableWhileShapeshifted(wielder); }
+
+
 int Item::getTomeSpellID() const
 {
 	if ( type == TOME_SORCERY )
@@ -7058,6 +7151,9 @@ int Item::getTomeSpellID() const
 	return SPELL_NONE;
 }
 
+extern "C" int Item_getTomeSpellID(const Item* self) { return self->getTomeSpellID(); }
+
+
 const char* Item::getTomeLabel() const
 {
 	if ( itemCategory(this) == TOME_SPELL )
@@ -7070,6 +7166,9 @@ const char* Item::getTomeLabel() const
 	}
 	return "";
 }
+
+extern "C" const char * Item_getTomeLabel(const Item* self) { return self->getTomeLabel(); }
+
 
 char* Item::getScrollLabel() const
 {
@@ -7103,6 +7202,9 @@ char* Item::getScrollLabel() const
 	}
 	return scroll_label[chosenLabel];
 }
+
+extern "C" char * Item_getScrollLabel(const Item* self) { return self->getScrollLabel(); }
+
 
 bool itemSpriteIsFociThirdPersonModel(const int sprite)
 {
@@ -7379,6 +7481,9 @@ bool Item::unableToEquipDueToSwapWeaponTimer(const int player) const
 	return false;*/
 }
 
+extern "C" bool Item_unableToEquipDueToSwapWeaponTimer(const Item* self, const int player) { return self->unableToEquipDueToSwapWeaponTimer(player); }
+
+
 bool Item::tinkeringBotIsMaxHealth() const
 {
 	if ( type == TOOL_GYROBOT || type == TOOL_DUMMYBOT || type == TOOL_SENTRYBOT || type == TOOL_SPELLBOT )
@@ -7391,6 +7496,9 @@ bool Item::tinkeringBotIsMaxHealth() const
 	return false;
 }
 
+extern "C" bool Item_tinkeringBotIsMaxHealth(const Item* self) { return self->tinkeringBotIsMaxHealth(); }
+
+
 bool Item::isTinkeringItemWithThrownLimit() const
 {
 	if ( type == TOOL_SENTRYBOT || type == TOOL_SPELLBOT || type == TOOL_DUMMYBOT || type == TOOL_GYROBOT )
@@ -7399,6 +7507,9 @@ bool Item::isTinkeringItemWithThrownLimit() const
 	}
 	return false;
 }
+
+extern "C" bool Item_isTinkeringItemWithThrownLimit(const Item* self) { return self->isTinkeringItemWithThrownLimit(); }
+
 
 int maximumTinkeringBotsCanBeDeployed(const Stat* const myStats)
 {
@@ -7686,10 +7797,16 @@ int Item::getDuckPlayer() const
 	return (int)(appearance % items[type].variations) % MAXPLAYERS;
 }
 
+extern "C" int Item_getDuckPlayer(const Item* self) { return self->getDuckPlayer(); }
+
+
 int Item::getLootBagPlayer() const
 {
 	return (int)(appearance & 0xF) % MAXPLAYERS;
 }
+
+extern "C" int Item_getLootBagPlayer(const Item* self) { return self->getLootBagPlayer(); }
+
 int Item::getLootBagNumItems() const
 {
 	if ( multiplayer == CLIENT )
@@ -7708,6 +7825,9 @@ int Item::getLootBagNumItems() const
 	}
 	return 0;
 }
+
+extern "C" int Item_getLootBagNumItems(const Item* self) { return self->getLootBagNumItems(); }
+
 
 void Item::itemFindUniqueAppearance(Item* tempItem, DynamicSetI32& appearancesOfSimilarItems)
 {
@@ -7786,6 +7906,9 @@ void Item::itemFindUniqueAppearance(Item* tempItem, DynamicSetI32& appearancesOf
 	}
 }
 
+extern "C" void Item_itemFindUniqueAppearance(Item * tempItem, DynamicSetI32 & appearancesOfSimilarItems) { return Item::itemFindUniqueAppearance(tempItem, appearancesOfSimilarItems); }
+
+
 void Item::onItemIdentified(int player, Item* tempItem)
 {
 	if ( player >= 0 && player < MAXPLAYERS && players[player]->isLocalPlayer() && stats[player] )
@@ -7811,15 +7934,30 @@ void Item::onItemIdentified(int player, Item* tempItem)
 	}
 }
 
+extern "C" void Item_onItemIdentified(int player, Item * tempItem) { return Item::onItemIdentified(player, tempItem); }
+
+
 
 
 const char* ItemGeneric::getIdentifiedName() const { return item_name_identified.c_str(); }
 
+extern "C" const char * ItemGeneric_getIdentifiedName(const ItemGeneric* self) { return self->getIdentifiedName(); }
+
+
 const char* ItemGeneric::getUnidentifiedName() const { return item_name_unidentified.c_str(); }
+
+extern "C" const char * ItemGeneric_getUnidentifiedName(const ItemGeneric* self) { return self->getUnidentifiedName(); }
+
 
 void ItemGeneric::setIdentifiedName(DynamicString name) { item_name_identified = name; }
 
+extern "C" void ItemGeneric_setIdentifiedName(ItemGeneric* self, DynamicString name) { return self->setIdentifiedName(name); }
+
+
 void ItemGeneric::setUnidentifiedName(DynamicString name) { item_name_unidentified = name; }
+
+extern "C" void ItemGeneric_setUnidentifiedName(ItemGeneric* self, DynamicString name) { return self->setUnidentifiedName(name); }
+
 
 bool ItemGeneric::hasAttribute(DynamicString attribute) {
 		if ( attributes.size() > 0 )
@@ -7835,4 +7973,7 @@ bool ItemGeneric::hasAttribute(DynamicString attribute) {
 			return false;
 		}
 	}
+
+extern "C" bool ItemGeneric_hasAttribute(ItemGeneric* self, DynamicString attribute) { return self->hasAttribute(attribute); }
+
 

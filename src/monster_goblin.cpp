@@ -1254,3 +1254,6 @@ bool Entity::goblinCanWieldItem(const Item& item) const
 
 	return false;
 }
+
+extern "C" bool Entity_goblinCanWieldItem(const Entity* self, const Item & item) { return self->goblinCanWieldItem(item); }
+

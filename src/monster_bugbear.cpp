@@ -1267,6 +1267,9 @@ void Entity::bugbearChooseWeapon(const Entity* target, double dist)
 	}
 }
 
+extern "C" void Entity_bugbearChooseWeapon(Entity* self, const Entity * target, double dist) { return self->bugbearChooseWeapon(target, dist); }
+
+
 void Entity::setBugbearStrafeDir(bool forceDirection)
 {
 	Stat* myStats = getStats();
@@ -1406,3 +1409,5 @@ void Entity::setBugbearStrafeDir(bool forceDirection)
 
 	//messagePlayer(0, MESSAGE_DEBUG, "pickdir: %d", monsterStrafeDirection);
 }
+
+extern "C" void Entity_setBugbearStrafeDir(Entity* self, bool forceDirection) { return self->setBugbearStrafeDir(forceDirection); }

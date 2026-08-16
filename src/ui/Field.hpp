@@ -190,6 +190,8 @@ private:
 	int paddingPerLine = 0;								//!< +/- pixel padding for multiple lines
 	DynamicMapI32T<int> individualLinePadding;			//!< lines that have a particular padding
 
+
+	public:
 	void buildCache();
 	DynamicArrayT<FieldCacheEntry_t> cache;			//!< cached lines of text
 };

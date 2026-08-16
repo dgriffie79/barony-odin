@@ -276,6 +276,9 @@ bool Entity::disturbBat(Entity* touched, bool takenDamage, bool doMessage)
 	return false;
 }
 
+extern "C" bool Entity_disturbBat(Entity* self, Entity * touched, bool takenDamage, bool doMessage) { return self->disturbBat(touched, takenDamage, doMessage); }
+
+
 void batAnimate(Entity* my, Stat* myStats, double dist)
 {
 	node_t* node;

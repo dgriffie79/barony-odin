@@ -266,6 +266,9 @@ void Item::applySkeletonKey(int player, Entity& entity)
 	}
 }
 
+extern "C" void Item_applySkeletonKey(Item* self, int player, Entity & entity) { return self->applySkeletonKey(player, entity); }
+
+
 
 void Item::applyLockpick(int player, Entity& entity)
 {
@@ -962,6 +965,9 @@ void Item::applyLockpick(int player, Entity& entity)
 	}
 }
 
+extern "C" void Item_applyLockpick(Item* self, int player, Entity & entity) { return self->applyLockpick(player, entity); }
+
+
 void Item::applyOrb(int player, ItemType type, Entity& entity)
 {
 	if ( entity.behavior == &actPedestalBase && entity.pedestalHasOrb() == 0 )
@@ -1076,6 +1082,9 @@ void Item::applyOrb(int player, ItemType type, Entity& entity)
 		messagePlayer(player, MESSAGE_HINT, Language::get(2371));
 	}
 }
+
+extern "C" void Item_applyOrb(Item* self, int player, ItemType type, Entity & entity) { return self->applyOrb(player, type, entity); }
+
 
 void Item::applyEmptyPotion(int player, Entity& entity)
 {
@@ -1437,6 +1446,9 @@ void Item::applyEmptyPotion(int player, Entity& entity)
 		messagePlayer(player, MESSAGE_HINT, Language::get(2371));
 	}
 }
+
+extern "C" void Item_applyEmptyPotion(Item* self, int player, Entity & entity) { return self->applyEmptyPotion(player, entity); }
+
 
 void Item::applyBomb(Entity* parent, ItemType type, ItemBombPlacement placement, ItemBombFacingDirection dir, Entity* thrown, Entity* onEntity)
 {
@@ -1886,6 +1898,9 @@ void Item::applyBomb(Entity* parent, ItemType type, ItemBombPlacement placement,
 	}
 }
 
+extern "C" void Item_applyBomb(Item* self, Entity * parent, ItemType type, Item::ItemBombPlacement placement, Item::ItemBombFacingDirection dir, Entity * thrown, Entity * onEntity) { return self->applyBomb(parent, type, placement, dir, thrown, onEntity); }
+
+
 void Item::applyDuck(Uint32 parentUid, real_t x, real_t y, Entity* hitentity, bool onLevelRespawn)
 {
 	bool tryExactLocation = true;
@@ -2018,6 +2033,9 @@ void Item::applyDuck(Uint32 parentUid, real_t x, real_t y, Entity* hitentity, bo
 	}
 }
 
+extern "C" void Item_applyDuck(Item* self, Uint32 parentUid, real_t x, real_t y, Entity * hitentity, bool onLevelRespawn) { return self->applyDuck(parentUid, x, y, hitentity, onLevelRespawn); }
+
+
 void Item::applyTinkeringCreation(Entity* parent, Entity* thrown)
 {
 	if ( !thrown )
@@ -2136,6 +2154,9 @@ void Item::applyTinkeringCreation(Entity* parent, Entity* thrown)
 		}
 	}
 }
+
+extern "C" void Item_applyTinkeringCreation(Item* self, Entity * parent, Entity * thrown) { return self->applyTinkeringCreation(parent, thrown); }
+
 
 bool itemIsThrowableTinkerTool(const Item* item)
 {

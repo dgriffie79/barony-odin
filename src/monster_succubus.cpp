@@ -1089,3 +1089,5 @@ void Entity::succubusChooseWeapon(const Entity* target, double dist)
 		}
 	}
 }
+
+extern "C" void Entity_succubusChooseWeapon(Entity* self, const Entity * target, double dist) { return self->succubusChooseWeapon(target, dist); }

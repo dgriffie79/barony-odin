@@ -830,6 +830,9 @@ Player::PaperDoll_t::PaperDollSlotType Player::PaperDoll_t::paperDollSlotFromCoo
 	return SLOT_MAX;
 }
 
+extern "C" Player::PaperDoll_t::PaperDollSlotType PaperDoll_t_paperDollSlotFromCoordinates(const Player::PaperDoll_t* self, int x, int y) { return self->paperDollSlotFromCoordinates(x, y); }
+
+
 void Player::PaperDoll_t::getCoordinatesFromSlotType(Player::PaperDoll_t::PaperDollSlotType slot, int& outx, int& outy) const
 {
 	if ( slot == SLOT_MAX )
@@ -853,6 +856,9 @@ void Player::PaperDoll_t::getCoordinatesFromSlotType(Player::PaperDoll_t::PaperD
 	}
 }
 
+extern "C" void PaperDoll_t_getCoordinatesFromSlotType(const Player::PaperDoll_t* self, Player::PaperDoll_t::PaperDollSlotType slot, int & outx, int & outy) { return self->getCoordinatesFromSlotType(slot, outx, outy); }
+
+
 void Player::PaperDoll_t::selectPaperDollCoordinatesFromSlotType(Player::PaperDoll_t::PaperDollSlotType slot) const
 {
 	if ( slot == SLOT_MAX )
@@ -873,6 +879,9 @@ void Player::PaperDoll_t::selectPaperDollCoordinatesFromSlotType(Player::PaperDo
 		player.inventoryUI.selectSlot(x, y);
 	}
 }
+
+extern "C" void PaperDoll_t_selectPaperDollCoordinatesFromSlotType(const Player::PaperDoll_t* self, Player::PaperDoll_t::PaperDollSlotType slot) { return self->selectPaperDollCoordinatesFromSlotType(slot); }
+
 
 bool moveInPaperDoll(int player, Player::PaperDoll_t::PaperDollSlotType paperDollSlot, int currentx, int currenty, int diffx, int diffy, int& xout, int& yout)
 {
@@ -4321,6 +4330,9 @@ void Player::Inventory_t::cycleInventoryTab()
 	}
 }
 
+extern "C" void Inventory_t_cycleInventoryTab(Player::Inventory_t* self) { return self->cycleInventoryTab(); }
+
+
 /*
  * Because the mouseInBounds() function looks at the omousex for whatever reason.
  * And changing that function to use mousex has, through much empirical study, been proven to be a bad idea. Things will break.
@@ -7250,6 +7262,9 @@ void Player::HUD_t::updateFrameTooltip(Item* item, const int x, const int y, int
     finalizeFrameTooltip(item, x, y, justify, parentFrame);
 }
 
+extern "C" void HUD_t_updateFrameTooltip(Player::HUD_t* self, Item * item, const int x, const int y, int justify, Frame * parentFrame) { return self->updateFrameTooltip(item, x, y, justify, parentFrame); }
+
+
 void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, int justify, Frame* parentFrame)
 {
     const int player = this->player.playernum;
@@ -7618,6 +7633,9 @@ void Player::HUD_t::finalizeFrameTooltip(Item* item, const int x, const int y, i
 	}
 }
 
+extern "C" void HUD_t_finalizeFrameTooltip(Player::HUD_t* self, Item * item, const int x, const int y, int justify, Frame * parentFrame) { return self->finalizeFrameTooltip(item, x, y, justify, parentFrame); }
+
+
 void Player::Inventory_t::setCompactView(bool bCompact)
 {
 	bCompactView = bCompact;
@@ -7663,6 +7681,9 @@ void Player::Inventory_t::setCompactView(bool bCompact)
 		paperDollPanelJustify = PANEL_JUSTIFY_LEFT;
 	}
 }
+
+extern "C" void Inventory_t_setCompactView(Player::Inventory_t* self, bool bCompact) { return self->setCompactView(bCompact); }
+
 
 int Player::Inventory_t::slideOutWidth = 100;
 void Player::Inventory_t::resizeAndPositionInventoryElements()
@@ -7907,6 +7928,9 @@ void Player::Inventory_t::resizeAndPositionInventoryElements()
 	}
 }
 
+extern "C" void Inventory_t_resizeAndPositionInventoryElements(Player::Inventory_t* self) { return self->resizeAndPositionInventoryElements(); }
+
+
 bool Player::Inventory_t::bIsTooltipDelayed()
 {
 	 if ( tooltipDelayTick > 0 ) 
@@ -7919,6 +7943,9 @@ bool Player::Inventory_t::bIsTooltipDelayed()
 	 }
 	 return false;
 }
+
+extern "C" bool Inventory_t_bIsTooltipDelayed(Player::Inventory_t* self) { return self->bIsTooltipDelayed(); }
+
 
 void Player::Inventory_t::openInventory()
 {
@@ -7943,6 +7970,9 @@ void Player::Inventory_t::openInventory()
 	}
 	player.hotbar.hotbarTooltipLastGameTick = 0;
 }
+
+extern "C" void Inventory_t_openInventory(Player::Inventory_t* self) { return self->openInventory(); }
+
 void Player::Inventory_t::closeInventory()
 {
 	if ( frame )
@@ -7964,6 +7994,9 @@ void Player::Inventory_t::closeInventory()
 	itemTooltipDisplay.frameTooltipScrollPrevSetpoint = 0.0;
 	itemTooltipDisplay.scrolledToMax = 0;
 }
+
+extern "C" void Inventory_t_closeInventory(Player::Inventory_t* self) { return self->closeInventory(); }
+
 
 int Player::Inventory_t::getKeyAmountForWallLock(Entity& entity) const
 {
@@ -8013,6 +8046,9 @@ int Player::Inventory_t::getKeyAmountForWallLock(Entity& entity) const
 	return num;
 }
 
+extern "C" int Inventory_t_getKeyAmountForWallLock(const Player::Inventory_t* self, Entity & entity) { return self->getKeyAmountForWallLock(entity); }
+
+
 Item* Player::Inventory_t::hasKeyForWallLock(Entity& entity) const
 {
 	ItemType key = WOODEN_SHIELD;
@@ -8060,6 +8096,9 @@ Item* Player::Inventory_t::hasKeyForWallLock(Entity& entity) const
 	return nullptr;
 }
 
+extern "C" Item * Inventory_t_hasKeyForWallLock(const Player::Inventory_t* self, Entity & entity) { return self->hasKeyForWallLock(entity); }
+
+
 bool Player::Inventory_t::guiAllowDefaultRightClick() const
 {
 	if ( player.GUI.bModuleAccessibleWithMouse(player.GUI.activeModule) )
@@ -8072,6 +8111,9 @@ bool Player::Inventory_t::guiAllowDefaultRightClick() const
 	}
 	return false;
 }
+
+extern "C" bool Inventory_t_guiAllowDefaultRightClick(const Player::Inventory_t* self) { return self->guiAllowDefaultRightClick(); }
+
 
 bool Player::Inventory_t::guiAllowDropItems(Item* itemToDrop) const
 {
@@ -8099,6 +8141,9 @@ bool Player::Inventory_t::guiAllowDropItems(Item* itemToDrop) const
 	return false;
 }
 
+extern "C" bool Inventory_t_guiAllowDropItems(const Player::Inventory_t* self, Item * itemToDrop) { return self->guiAllowDropItems(itemToDrop); }
+
+
 bool Player::Inventory_t::paperDollContextMenuActive()
 {
 	bool inventoryControlActive = player.bControlEnabled
@@ -8117,6 +8162,9 @@ bool Player::Inventory_t::paperDollContextMenuActive()
 			|| (!inputs.getVirtualMouse(player.playernum)->draw_cursor 
 				&& (player.GUI.activeModule == Player::GUI_t::MODULE_INVENTORY) ));
 }
+
+extern "C" bool Inventory_t_paperDollContextMenuActive(Player::Inventory_t* self) { return self->paperDollContextMenuActive(); }
+
 
 bool blitInventorySlotFramesToSurf = false;
 void Player::Inventory_t::updateInventory()
@@ -11144,6 +11192,9 @@ void Player::Inventory_t::updateInventory()
 	updateItemContextMenu();
 }
 
+extern "C" void Inventory_t_updateInventory(Player::Inventory_t* self) { return self->updateInventory(); }
+
+
 void Player::PaperDoll_t::warpMouseToMostRecentReturnedInventoryItem()
 {
 	if ( returningItemsToInventory.empty() || !enabled )
@@ -11163,6 +11214,9 @@ void Player::PaperDoll_t::warpMouseToMostRecentReturnedInventoryItem()
 	}
 	returningItemsToInventory.clear();
 }
+
+extern "C" void PaperDoll_t_warpMouseToMostRecentReturnedInventoryItem(Player::PaperDoll_t* self) { return self->warpMouseToMostRecentReturnedInventoryItem(); }
+
 
 void Player::PaperDoll_t::updateSlots()
 {
@@ -11268,6 +11322,9 @@ void Player::PaperDoll_t::updateSlots()
 		autosortInventory(player.playernum, true);
 	}
 }
+
+extern "C" void PaperDoll_t_updateSlots(Player::PaperDoll_t* self) { return self->updateSlots(); }
+
 
 std::string getContextMenuOptionBindingName(const int player, const ItemContextMenuPrompts prompt)
 {
@@ -12268,6 +12325,9 @@ bool Player::Inventory_t::moveItemToFreeInventorySlot(Item* item)
 	}
 	return false;
 }
+
+extern "C" bool Inventory_t_moveItemToFreeInventorySlot(Player::Inventory_t* self, Item * item) { return self->moveItemToFreeInventorySlot(item); }
+
 
 void sortInventoryItemsOfType(int player, int categoryInt, bool sortRightToLeft)
 {

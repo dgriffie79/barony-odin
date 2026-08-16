@@ -483,6 +483,9 @@ std::string EnemyBarSettings_t::getEnemyBarSpriteName(Entity* entity)
 	return "default";
 }
 
+extern "C" std::string EnemyBarSettings_t_getEnemyBarSpriteName(EnemyBarSettings_t* self, Entity * entity) { return self->getEnemyBarSpriteName(entity); }
+
+
 const DynamicArrayStr Player::GUI_t::tooltipEffectBackgroundImages =
 {
 	"9x9 bg top left",
@@ -510,6 +513,9 @@ void Player::GUI_t::imageSetWidthHeight9x9(Frame* container, const DynamicArrayS
 		}
 	}
 }
+
+extern "C" void GUI_t_imageSetWidthHeight9x9(Frame * container, const DynamicArrayStr & imgNames) { return Player::GUI_t::imageSetWidthHeight9x9(container, imgNames); }
+
 
 // for 9x9 images stretched to fit a container
 void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensionsToFill, const DynamicArrayStr& imgNames)
@@ -550,6 +556,9 @@ void Player::GUI_t::imageResizeToContainer9x9(Frame* container, SDL_Rect dimensi
 	mm->pos.w = dimensionsToFill.w - ml->pos.w - mr->pos.w;
 	mm->pos.h = ml->pos.h;
 }
+
+extern "C" void GUI_t_imageResizeToContainer9x9(Frame * container, SDL_Rect dimensionsToFill, const DynamicArrayStr & imgNames) { return Player::GUI_t::imageResizeToContainer9x9(container, dimensionsToFill, imgNames); }
+
 
 static CvarBool cvar_mp_flash_whole_bar("/mp_flash_whole_bar", true);
 struct MPBarPaths_t
@@ -1688,6 +1697,9 @@ int Player::HUD_t::FollowerDisplay_t::getNumEntriesToShow(const int playernum)
 	}
 }
 
+extern "C" int FollowerDisplay_t_getNumEntriesToShow(const int playernum) { return Player::HUD_t::FollowerDisplay_t::getNumEntriesToShow(playernum); }
+
+
 bool Player::HUD_t::FollowerDisplay_t::getCompactMode(const int playernum)
 {
 	auto& hud_t = players[playernum]->hud;
@@ -1718,6 +1730,9 @@ bool Player::HUD_t::FollowerDisplay_t::getCompactMode(const int playernum)
 		}
 	}
 }
+
+extern "C" bool FollowerDisplay_t_getCompactMode(Player::HUD_t::FollowerDisplay_t* self, const int playernum) { return self->getCompactMode(playernum); }
+
 
 Frame* getAllyBarTitleFrameEntry(const int player)
 {
@@ -5187,6 +5202,9 @@ void Player::HUD_t::updateUINavigation()
 	}
 }
 
+extern "C" void HUD_t_updateUINavigation(Player::HUD_t* self) { return self->updateUINavigation(); }
+
+
 bool StatusEffectQueue_t::insertEffect(int effectID, int spellID)
 {
 	if ( spellID >= 0 && spellID < NUM_SPELLS )
@@ -5236,6 +5254,9 @@ bool StatusEffectQueue_t::insertEffect(int effectID, int spellID)
 	return true;
 }
 
+extern "C" bool StatusEffectQueue_t_insertEffect(StatusEffectQueue_t* self, int effectID, int spellID) { return self->insertEffect(effectID, spellID); }
+
+
 std::string StatusEffectQueue_t::StatusEffectDefinitions_t::getEffectImgPath(StatusEffectQueue_t::EffectDefinitionEntry_t& entry, int variation)
 {
 	if ( entry.imgPath == "" )
@@ -5271,6 +5292,9 @@ std::string StatusEffectQueue_t::StatusEffectDefinitions_t::getEffectImgPath(Sta
 	return entry.imgPath;
 }
 
+extern "C" std::string StatusEffectDefinitions_t_getEffectImgPath(StatusEffectQueue_t::EffectDefinitionEntry_t & entry, int variation) { return StatusEffectQueue_t::StatusEffectDefinitions_t::getEffectImgPath(entry, variation); }
+
+
 void StatusEffectQueueEntry_t::setAnimatePosition(int destx, int desty, int destw, int desth)
 {
 	animateStartX = pos.x;
@@ -5286,6 +5310,12 @@ void StatusEffectQueueEntry_t::setAnimatePosition(int destx, int desty, int dest
 	animateW = 0.0;
 	animateH = 0.0;
 }
+
+extern "C" void StatusEffectQueueEntry_t_setAnimatePosition_2(StatusEffectQueueEntry_t* self, int destx, int desty, int destw, int desth) { return self->setAnimatePosition(destx, desty, destw, desth); }
+
+
+extern "C" void StatusEffectQueueEntry_t_setAnimatePosition(StatusEffectQueueEntry_t* self, int destx, int desty) { return self->setAnimatePosition(destx, desty); }
+
 
 void StatusEffectQueueEntry_t::setAnimatePosition(int destx, int desty)
 {
@@ -5321,6 +5351,9 @@ void StatusEffectQueueEntry_t::animate()
 	pos.x = animateStartX + destX * animateX;
 	pos.y = animateStartY + destY * animateY;
 }
+
+extern "C" void StatusEffectQueueEntry_t_animate(StatusEffectQueueEntry_t* self) { return self->animate(); }
+
 
 void StatusEffectQueue_t::loadStatusEffectsJSON()
 {
@@ -5600,6 +5633,9 @@ void StatusEffectQueue_t::loadStatusEffectsJSON()
 	}
 }
 
+extern "C" void StatusEffectQueue_t_loadStatusEffectsJSON() { return StatusEffectQueue_t::loadStatusEffectsJSON(); }
+
+
 int StatusEffectQueue_t::getBaseEffectPosX()
 {
 	if ( players[player]->bUseCompactGUIHeight() )
@@ -5608,6 +5644,9 @@ int StatusEffectQueue_t::getBaseEffectPosX()
 	}
 	return statusEffectFrame->getSize().w / 2 - 100;
 }
+
+extern "C" int StatusEffectQueue_t_getBaseEffectPosX(StatusEffectQueue_t* self) { return self->getBaseEffectPosX(); }
+
 int StatusEffectQueue_t::getBaseEffectPosY()
 {
 	if ( players[player]->bUseCompactGUIHeight() )
@@ -5620,6 +5659,9 @@ int StatusEffectQueue_t::getBaseEffectPosY()
 	}
 	return statusEffectFrame->getSize().h / 2 - 50;
 }
+
+extern "C" int StatusEffectQueue_t_getBaseEffectPosY(StatusEffectQueue_t* self) { return self->getBaseEffectPosY(); }
+
 
 static CvarInt cvar_statusfx_spell_size("/statusfx_spell_size", 36);
 int StatusEffectQueueEntry_t::getEffectSpriteNormalWidth()
@@ -5656,6 +5698,9 @@ int StatusEffectQueueEntry_t::getEffectSpriteNormalWidth()
 	}
 	return 32;
 }
+
+extern "C" int StatusEffectQueueEntry_t_getEffectSpriteNormalWidth(StatusEffectQueueEntry_t* self) { return self->getEffectSpriteNormalWidth(); }
+
 int StatusEffectQueueEntry_t::getEffectSpriteNormalHeight()
 {
 	if ( effect == StatusEffectQueue_t::kEffectBread
@@ -5690,6 +5735,9 @@ int StatusEffectQueueEntry_t::getEffectSpriteNormalHeight()
 	return 32;
 }
 
+extern "C" int StatusEffectQueueEntry_t_getEffectSpriteNormalHeight(StatusEffectQueueEntry_t* self) { return self->getEffectSpriteNormalHeight(); }
+
+
 int getStatusEffectMovementAmount(int player)
 {
 	int movementAmount = 50;
@@ -5711,6 +5759,9 @@ real_t StatusEffectQueueEntry_t::getStatusEffectLargestScaling(int player)
 	return 3.0;
 }
 
+extern "C" real_t StatusEffectQueueEntry_t_getStatusEffectLargestScaling(StatusEffectQueueEntry_t* self, int player) { return self->getStatusEffectLargestScaling(player); }
+
+
 real_t StatusEffectQueueEntry_t::getStatusEffectMidScaling(int player)
 {
 	if ( effect == StatusEffectQueue_t::kEffectBread 
@@ -5721,6 +5772,9 @@ real_t StatusEffectQueueEntry_t::getStatusEffectMidScaling(int player)
 	}
 	return 2.0;
 }
+
+extern "C" real_t StatusEffectQueueEntry_t_getStatusEffectMidScaling(StatusEffectQueueEntry_t* self, int player) { return self->getStatusEffectMidScaling(player); }
+
 
 void StatusEffectQueueEntry_t::animateNotification(int player)
 {
@@ -5832,6 +5886,9 @@ void StatusEffectQueueEntry_t::animateNotification(int player)
 	pos.w = animateStartW + destW * animateW;
 	pos.h = animateStartH + destH * animateH;
 }
+
+extern "C" void StatusEffectQueueEntry_t_animateNotification(StatusEffectQueueEntry_t* self, int player) { return self->animateNotification(player); }
+
 
 static CvarBool cvar_statusfx_align_text_right("/statusfx_align_text_right", false);
 void draw_status_effect_numbers_fn(const Widget& widget, SDL_Rect pos) {
@@ -6698,6 +6755,9 @@ DynamicString& StatusEffectQueue_t::EffectDefinitionEntry_t::getName(int variati
 	return name;
 }
 
+extern "C" DynamicString & EffectDefinitionEntry_t_getName(StatusEffectQueue_t::EffectDefinitionEntry_t* self, int variation) { return self->getName(variation); }
+
+
 DynamicString& StatusEffectQueue_t::EffectDefinitionEntry_t::getDesc(int variation)
 {
 	if ( variation >= 0 )
@@ -6706,6 +6766,9 @@ DynamicString& StatusEffectQueue_t::EffectDefinitionEntry_t::getDesc(int variati
 	}
 	return desc;
 }
+
+extern "C" DynamicString & EffectDefinitionEntry_t_getDesc(StatusEffectQueue_t::EffectDefinitionEntry_t* self, int variation) { return self->getDesc(variation); }
+
 
 void StatusEffectQueue_t::createStatusEffectTooltip()
 {
@@ -6762,10 +6825,16 @@ void StatusEffectQueue_t::createStatusEffectTooltip()
 	}
 }
 
+extern "C" void StatusEffectQueue_t_createStatusEffectTooltip(StatusEffectQueue_t* self) { return self->createStatusEffectTooltip(); }
+
+
 void Player::HUD_t::updateStatusEffectTooltip()
 {
 	StatusEffectQueue[player.playernum].createStatusEffectTooltip();
 }
+
+extern "C" void HUD_t_updateStatusEffectTooltip(Player::HUD_t* self) { return self->updateStatusEffectTooltip(); }
+
 
 void Player::HUD_t::closeStatusFxWindow()
 {
@@ -6787,6 +6856,9 @@ void Player::HUD_t::closeStatusFxWindow()
 		player.GUI.returnToPreviousActiveModule();
 	}
 }
+
+extern "C" void HUD_t_closeStatusFxWindow(Player::HUD_t* self) { return self->closeStatusFxWindow(); }
+
 
 void Player::HUD_t::updateStatusEffectFocusedWindow()
 {
@@ -7171,6 +7243,9 @@ void Player::HUD_t::updateStatusEffectFocusedWindow()
 	return;
 }
 
+extern "C" void HUD_t_updateStatusEffectFocusedWindow(Player::HUD_t* self) { return self->updateStatusEffectFocusedWindow(); }
+
+
 void StatusEffectQueue_t::animateStatusEffectTooltip(bool showTooltip)
 {
 	if ( !statusEffectTooltipFrame )
@@ -7229,6 +7304,9 @@ void StatusEffectQueue_t::animateStatusEffectTooltip(bool showTooltip)
 	tooltipFrame->setOpacity(100.0);
 	tooltipDeselectedTick = ticks;
 }
+
+extern "C" void StatusEffectQueue_t_animateStatusEffectTooltip(StatusEffectQueue_t* self, bool showTooltip) { return self->animateStatusEffectTooltip(showTooltip); }
+
 
 bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry, SDL_Rect pos)
 {
@@ -7794,6 +7872,9 @@ bool StatusEffectQueue_t::doStatusEffectTooltip(StatusEffectQueueEntry_t& entry,
 	return true;
 }
 
+extern "C" bool StatusEffectQueue_t_doStatusEffectTooltip(StatusEffectQueue_t* self, StatusEffectQueueEntry_t & entry, SDL_Rect pos) { return self->doStatusEffectTooltip(entry, pos); }
+
+
 const int StatusEffectQueue_t::kEffectBread = -2;
 const int StatusEffectQueue_t::kEffectBloodHunger = -3;
 const int StatusEffectQueue_t::kEffectAutomatonHunger = -4;
@@ -7830,6 +7911,9 @@ Frame* StatusEffectQueue_t::getStatusEffectFrame()
 {
 	return statusEffectFrame;
 }
+
+extern "C" Frame * StatusEffectQueue_t_getStatusEffectFrame(StatusEffectQueue_t* self) { return self->getStatusEffectFrame(); }
+
 
 void StatusEffectQueue_t::handleNavigation(DynamicMapI32T<StatusEffectQueueEntry_t*>& grid, 
 	bool& tooltipShowing, const bool hungerEffectInEffectQueue)
@@ -8059,6 +8143,9 @@ void StatusEffectQueue_t::handleNavigation(DynamicMapI32T<StatusEffectQueueEntry
 		}
 	}
 }
+
+extern "C" void StatusEffectQueue_t_handleNavigation(StatusEffectQueue_t* self, DynamicMapI32T<StatusEffectQueueEntry_t *> & grid, bool & tooltipShowing, const bool hungerEffectInEffectQueue) { return self->handleNavigation(grid, tooltipShowing, hungerEffectInEffectQueue); }
+
 
 const bool kAllowGhostStatusEffects = false;
 
@@ -9253,6 +9340,9 @@ void StatusEffectQueue_t::updateAllQueuedEffects()
 	requiresAnimUpdate = false;
 }
 
+extern "C" void StatusEffectQueue_t_updateAllQueuedEffects(StatusEffectQueue_t* self) { return self->updateAllQueuedEffects(); }
+
+
 void StatusEffectQueue_t::updateEntryImage(StatusEffectQueueEntry_t& entry, Frame::image_t* img)
 {
 	if ( img )
@@ -9387,6 +9477,9 @@ void StatusEffectQueue_t::updateEntryImage(StatusEffectQueueEntry_t& entry, Fram
 		}
 	}
 }
+
+extern "C" void StatusEffectQueue_t_updateEntryImage(StatusEffectQueue_t* self, StatusEffectQueueEntry_t & entry, Frame::image_t * img) { return self->updateEntryImage(entry, img); }
+
 
 void updateStatusEffectQueue(const int player)
 {
@@ -9833,6 +9926,9 @@ void Player::Inventory_t::updateInventoryMiscTooltip()
 	}
 }
 
+extern "C" void Inventory_t_updateInventoryMiscTooltip(Player::Inventory_t* self) { return self->updateInventoryMiscTooltip(); }
+
+
 void createWorldTooltipPrompts(const int player)
 {
 	auto& hud_t = players[player]->hud;
@@ -9960,6 +10056,9 @@ const char* Player::HUD_t::getCrosshairPath()
 			break;
 	}
 }
+
+extern "C" const char * HUD_t_getCrosshairPath(Player::HUD_t* self) { return self->getCrosshairPath(); }
+
 
 void Player::HUD_t::updateWorldTooltipPrompts()
 {
@@ -11148,6 +11247,9 @@ void Player::HUD_t::updateWorldTooltipPrompts()
 	worldTooltipFrame->setDisabled(false);
 }
 
+extern "C" void HUD_t_updateWorldTooltipPrompts(Player::HUD_t* self) { return self->updateWorldTooltipPrompts(); }
+
+
 DynamicString actionPromptBackingIconPath00 = "";
 DynamicString actionPromptBackingIconPath20 = "";
 DynamicString actionPromptBackingIconPath60 = "";
@@ -11837,6 +11939,9 @@ void Player::HUD_t::updateActionPrompts()
 	}
 }
 
+extern "C" void HUD_t_updateActionPrompts(Player::HUD_t* self) { return self->updateActionPrompts(); }
+
+
 static Frame* createMinimap(int player);
 
 void createGameTimerFrame(const int player)
@@ -12244,6 +12349,9 @@ void Player::HUD_t::processHUD()
 	updateStatusEffectQueue(player.playernum);
 }
 
+extern "C" void HUD_t_processHUD(Player::HUD_t* self) { return self->processHUD(); }
+
+
 void Player::MessageZone_t::createChatbox()
 {
 	char name[32];
@@ -12277,6 +12385,9 @@ void Player::MessageZone_t::createChatbox()
 		}
 	}
 }
+
+extern "C" void MessageZone_t_createChatbox(Player::MessageZone_t* self) { return self->createChatbox(); }
+
 
 static CvarInt cvar_log_lineheight_offset("/log_lineheight_offset", -6);
 static CvarInt cvar_log_lineheight_min("/log_lineheight_minimum", 24);
@@ -12555,6 +12666,9 @@ void Player::MessageZone_t::processChatbox()
 	messageBoxFrame->setSize(messageBoxSize);
 }
 
+extern "C" void MessageZone_t_processChatbox(Player::MessageZone_t* self) { return self->processChatbox(); }
+
+
 CvarBool shareMinimap("/shareminimap", true);
 CvarBool cvar_minimap_prompt_vertical("/minimap_prompt_vertical", false);
 Frame* minimapFrame = nullptr; // shared minimap
@@ -12817,6 +12931,9 @@ void Player::MessageZone_t::processLogFrame()
 			players[player.playernum]->camera_virtualHeight() });
 	}
 }
+
+extern "C" void MessageZone_t_processLogFrame(Player::MessageZone_t* self) { return self->processLogFrame(); }
+
 void Player::Minimap_t::processMapFrame()
 {
 	if ( !mapParentFrame )
@@ -12853,6 +12970,9 @@ void Player::Minimap_t::processMapFrame()
 			players[player.playernum]->camera_virtualHeight() });
 	}
 }
+
+extern "C" void Minimap_t_processMapFrame(Player::Minimap_t* self) { return self->processMapFrame(); }
+
 
 void openMapWindow(int player) {
 	if ( !players[player]->minimap.mapParentFrame )
@@ -13932,6 +14052,9 @@ void Player::CharacterSheet_t::loadCharacterSheetJSON()
 	}
 }
 
+extern "C" void CharacterSheet_t_loadCharacterSheetJSON() { return Player::CharacterSheet_t::loadCharacterSheetJSON(); }
+
+
 const int NUM_CHARSHEET_TOOLTIP_BACKING_FRAMES = 9;
 const int NUM_CHARSHEET_TOOLTIP_TEXT_FIELDS = 16;
 std::map<int, Field*> characterSheetTooltipTextFields[MAXPLAYERS];
@@ -15007,6 +15130,9 @@ void Player::CharacterSheet_t::createCharacterSheet()
 	}
 }
 
+extern "C" void CharacterSheet_t_createCharacterSheet(Player::CharacterSheet_t* self) { return self->createCharacterSheet(); }
+
+
 void Player::GUIDropdown_t::activateSelection(const DynamicString& name, const int option)
 {
 	auto& dropdown = allDropDowns[name];
@@ -15092,6 +15218,9 @@ void Player::GUIDropdown_t::activateSelection(const DynamicString& name, const i
 	}
 }
 
+extern "C" void GUIDropdown_t_activateSelection(Player::GUIDropdown_t* self, const DynamicString & name, int option) { return self->activateSelection(name, option); }
+
+
 bool Player::GUIDropdown_t::getDropDownAlignRight(const DynamicString& name)
 {
 	bool invert = false;
@@ -15154,6 +15283,9 @@ bool Player::GUIDropdown_t::getDropDownAlignRight(const DynamicString& name)
 	}
 	return (invert ? !allDropDowns[name].alignRight : allDropDowns[name].alignRight);
 }
+
+extern "C" bool GUIDropdown_t_getDropDownAlignRight(Player::GUIDropdown_t* self, const DynamicString & name) { return self->getDropDownAlignRight(name); }
+
 
 void Player::CharacterSheet_t::processCharacterSheet()
 {
@@ -15550,6 +15682,9 @@ void Player::CharacterSheet_t::processCharacterSheet()
 	updateCharacterInfo();
 }
 
+extern "C" void CharacterSheet_t_processCharacterSheet(Player::CharacterSheet_t* self) { return self->processCharacterSheet(); }
+
+
 DynamicMapStrT<Player::GUIDropdown_t::DropDown_t> Player::GUIDropdown_t::allDropDowns;
 
 bool Player::GUIDropdown_t::set(const DynamicString name)
@@ -15567,6 +15702,9 @@ bool Player::GUIDropdown_t::set(const DynamicString name)
 	currentName = name;
 	return true;
 }
+
+extern "C" bool GUIDropdown_t_set(Player::GUIDropdown_t* self, const DynamicString name) { return self->set(name); }
+
 
 void Player::GUIDropdown_t::process()
 {
@@ -16044,6 +16182,9 @@ void Player::GUIDropdown_t::process()
 	}
 }
 
+extern "C" void GUIDropdown_t_process(Player::GUIDropdown_t* self) { return self->process(); }
+
+
 void Player::GUIDropdown_t::close()
 {
 	if ( dropdownFrame )
@@ -16066,6 +16207,9 @@ void Player::GUIDropdown_t::close()
 	bClosedThisTick = true;
 }
 
+extern "C" void GUIDropdown_t_close(Player::GUIDropdown_t* self) { return self->close(); }
+
+
 
 void Player::GUI_t::closeDropdowns()
 {
@@ -16079,6 +16223,9 @@ void Player::GUI_t::closeDropdowns()
 		player.inventoryUI.updateItemContextMenu();
 	}
 }
+
+extern "C" void GUI_t_closeDropdowns(Player::GUI_t* self) { return self->closeDropdowns(); }
+
 bool Player::GUI_t::isDropdownActive()
 {
 	if ( dropdownMenu.bOpen )
@@ -16091,6 +16238,9 @@ bool Player::GUI_t::isDropdownActive()
 	}
 	return false;
 }
+
+extern "C" bool GUI_t_isDropdownActive(Player::GUI_t* self) { return self->isDropdownActive(); }
+
 
 void Player::GUIDropdown_t::open(const DynamicString name)
 {
@@ -16161,6 +16311,9 @@ void Player::GUIDropdown_t::open(const DynamicString name)
 		player.hud.cursor.lastUpdateTick = ticks;
 	}
 }
+
+extern "C" void GUIDropdown_t_open(Player::GUIDropdown_t* self, const DynamicString name) { return self->open(name); }
+
 
 void Player::GUIDropdown_t::create(const DynamicString name)
 {
@@ -16291,6 +16444,9 @@ void Player::GUIDropdown_t::create(const DynamicString name)
 		prevGlyphPos = interactGlyph->pos;
 	}
 }
+
+extern "C" void GUIDropdown_t_create(Player::GUIDropdown_t* self, const DynamicString name) { return self->create(name); }
+
 
 void Player::CharacterSheet_t::selectElement(SheetElements element, bool usingMouse, bool moveCursor)
 {
@@ -16545,6 +16701,9 @@ void Player::CharacterSheet_t::selectElement(SheetElements element, bool usingMo
 	}
 }
 
+extern "C" void CharacterSheet_t_selectElement(Player::CharacterSheet_t* self, Player::CharacterSheet_t::SheetElements element, bool usingMouse, bool moveCursor) { return self->selectElement(element, usingMouse, moveCursor); }
+
+
 void Player::CharacterSheet_t::updateGameTimer()
 {
 	auto characterInfoFrame = sheetFrame->findFrame("character info");
@@ -16581,6 +16740,9 @@ void Player::CharacterSheet_t::updateGameTimer()
 	}
 }
 
+extern "C" void CharacterSheet_t_updateGameTimer(Player::CharacterSheet_t* self) { return self->updateGameTimer(); }
+
+
 DynamicString& Player::CharacterSheet_t::getHoverTextString(std::string key)
 {
 	if ( hoverTextStrings.contains(key) )
@@ -16589,6 +16751,9 @@ DynamicString& Player::CharacterSheet_t::getHoverTextString(std::string key)
 	}
 	return defaultString;
 }
+
+extern "C" DynamicString & CharacterSheet_t_getHoverTextString(std::string key) { return Player::CharacterSheet_t::getHoverTextString(key); }
+
 
 bool getAttackTooltipLines(int playernum, AttackHoverText_t& attackHoverTextInfo, int lineNumber, char titleBuf[128], char valueBuf[128])
 {
@@ -21015,6 +21180,9 @@ void Player::CharacterSheet_t::updateCharacterSheetTooltip(SheetElements element
 	}
 }
 
+extern "C" void CharacterSheet_t_updateCharacterSheetTooltip(Player::CharacterSheet_t* self, Player::CharacterSheet_t::SheetElements element, SDL_Rect pos, Player::PanelJustify_t tooltipJustify) { return self->updateCharacterSheetTooltip(element, pos, tooltipJustify); }
+
+
 void Player::CharacterSheet_t::updateCharacterInfo()
 {
 	auto characterInfoFrame = sheetFrame->findFrame("character info");
@@ -21382,6 +21550,9 @@ void Player::CharacterSheet_t::updateCharacterInfo()
 	}
 }
 
+extern "C" void CharacterSheet_t_updateCharacterInfo(Player::CharacterSheet_t* self) { return self->updateCharacterInfo(); }
+
+
 void Player::CharacterSheet_t::updateStats()
 {
 	auto characterInfoFrame = sheetFrame->findFrame("character info");
@@ -21690,6 +21861,9 @@ void Player::CharacterSheet_t::updateStats()
 	}
 }
 
+extern "C" void CharacterSheet_t_updateStats(Player::CharacterSheet_t* self) { return self->updateStats(); }
+
+
 void Player::CharacterSheet_t::updateAttributes()
 {
 	auto attributesFrame = sheetFrame->findFrame("attributes");
@@ -21931,6 +22105,9 @@ void Player::CharacterSheet_t::updateAttributes()
 	}
 }
 
+extern "C" void CharacterSheet_t_updateAttributes(Player::CharacterSheet_t* self) { return self->updateAttributes(); }
+
+
 void Player::Hotbar_t::processHotbar()
 {
 	if ( inputs.hasController(player.playernum) )
@@ -21970,6 +22147,9 @@ void Player::Hotbar_t::processHotbar()
 
 	updateHotbar();
 }
+
+extern "C" void Hotbar_t_processHotbar(Player::Hotbar_t* self) { return self->processHotbar(); }
+
 
 void Player::Inventory_t::Appraisal_t::updateAppraisalAnim()
 {
@@ -22011,6 +22191,9 @@ void Player::Inventory_t::Appraisal_t::updateAppraisalAnim()
 		spellLearnAnim = 1.0 - 0.25 * std::max(0.0, sin((ticks % interval) * PI / (real_t)interval));
 	}
 }
+
+extern "C" void Appraisal_t_updateAppraisalAnim(Player::Inventory_t::Appraisal_t* self) { return self->updateAppraisalAnim(); }
+
 
 void drawClockwiseSquareMesh(const char* texture, float lerp, SDL_Rect rect, Uint32 color) {
     auto image = Image::get(texture);
@@ -25391,6 +25574,9 @@ void Player::SkillSheet_t::loadSkillSheetJSON()
 	}
 }
 
+extern "C" void SkillSheet_t_loadSkillSheetJSON() { return Player::SkillSheet_t::loadSkillSheetJSON(); }
+
+
 void loadHUDSettingsJSON()
 {
 	if ( !PHYSFS_getRealDir("/data/HUD_settings.json") )
@@ -28110,6 +28296,9 @@ void Player::Inventory_t::updateSelectedSlotAnimation(int destx, int desty, int 
 	//messagePlayer(player.playernum, "%d %d", destx, desty);
 }
 
+extern "C" void Inventory_t_updateSelectedSlotAnimation(Player::Inventory_t* self, int destx, int desty, int width, int height, bool usingMouse) { return self->updateSelectedSlotAnimation(destx, desty, width, height, usingMouse); }
+
+
 void Player::Inventory_t::updateItemContextMenu()
 {
 	Uint32& itemMenuItem = inputs.getUIInteraction(player.playernum)->itemMenuItem;
@@ -28549,6 +28738,9 @@ void Player::Inventory_t::updateItemContextMenu()
 		interactFrame->setDisabled(true);
 	}
 }
+
+extern "C" void Inventory_t_updateItemContextMenu(Player::Inventory_t* self) { return self->updateItemContextMenu(); }
+
 
 void Player::Inventory_t::activateItemContextMenuOption(Item* item, ItemContextMenuPrompts prompt)
 {
@@ -29238,6 +29430,9 @@ void Player::Inventory_t::activateItemContextMenuOption(Item* item, ItemContextM
 	}
 }
 
+extern "C" void Inventory_t_activateItemContextMenuOption(Player::Inventory_t* self, Item * item, ItemContextMenuPrompts prompt) { return self->activateItemContextMenuOption(item, prompt); }
+
+
 void Player::Hotbar_t::updateSelectedSlotAnimation(int destx, int desty, int width, int height, bool usingMouse)
 {
 	if ( hotbarFrame )
@@ -29277,6 +29472,9 @@ void Player::Hotbar_t::updateSelectedSlotAnimation(int destx, int desty, int wid
 	}
 }
 
+extern "C" void Hotbar_t_updateSelectedSlotAnimation(Player::Hotbar_t* self, int destx, int desty, int width, int height, bool usingMouse) { return self->updateSelectedSlotAnimation(destx, desty, width, height, usingMouse); }
+
+
 void Player::Inventory_t::updateSelectedItemAnimation()
 {
 	if ( !player.isLocalPlayer() )
@@ -29312,6 +29510,9 @@ void Player::Inventory_t::updateSelectedItemAnimation()
 		selectedItemAnimate.animateY = 0.0;
 	}
 }
+
+extern "C" void Inventory_t_updateSelectedItemAnimation(Player::Inventory_t* self) { return self->updateSelectedItemAnimation(); }
+
 
 void Player::Inventory_t::updateInventoryItemTooltip(Frame* parentFrame)
 {
@@ -29436,6 +29637,9 @@ void Player::Inventory_t::updateInventoryItemTooltip(Frame* parentFrame)
 	}
 }
 
+extern "C" void Inventory_t_updateInventoryItemTooltip(Player::Inventory_t* self, Frame * parentFrame) { return self->updateInventoryItemTooltip(parentFrame); }
+
+
 void Player::Inventory_t::ItemTooltipDisplay_t::updateItem(const int player, Item* newItem)
 {
 	if ( newItem && player >= 0 && player < MAXPLAYERS && stats[player] )
@@ -29478,6 +29682,9 @@ void Player::Inventory_t::ItemTooltipDisplay_t::updateItem(const int player, Ite
 		}
 	}
 }
+
+extern "C" void ItemTooltipDisplay_t_updateItem(Player::Inventory_t::ItemTooltipDisplay_t* self, const int player, Item * newItem) { return self->updateItem(player, newItem); }
+
 
 bool Player::Inventory_t::ItemTooltipDisplay_t::isItemSameAsCurrent(const int player, Item* newItem)
 {
@@ -29523,6 +29730,9 @@ bool Player::Inventory_t::ItemTooltipDisplay_t::isItemSameAsCurrent(const int pl
 	}
 	return false;
 }
+
+extern "C" bool ItemTooltipDisplay_t_isItemSameAsCurrent(Player::Inventory_t::ItemTooltipDisplay_t* self, const int player, Item * newItem) { return self->isItemSameAsCurrent(player, newItem); }
+
 
 Player::Inventory_t::ItemTooltipDisplay_t::ItemTooltipDisplay_t()
 {
@@ -29582,6 +29792,9 @@ void Player::Inventory_t::updateItemContextMenuClickFrame()
 		}
 	}
 }
+
+extern "C" void Inventory_t_updateItemContextMenuClickFrame(Player::Inventory_t* self) { return self->updateItemContextMenuClickFrame(); }
+
 
 void Player::Inventory_t::updateCursor()
 {
@@ -29933,6 +30146,9 @@ void Player::Inventory_t::updateCursor()
 	}
 }
 
+extern "C" void Inventory_t_updateCursor(Player::Inventory_t* self) { return self->updateCursor(); }
+
+
 void Player::HUD_t::updateCursorAnimation(int destx, int desty, int width, int height, bool usingMouse)
 {
 	if ( cursorFrame )
@@ -29986,6 +30202,9 @@ void Player::HUD_t::updateCursorAnimation(int destx, int desty, int width, int h
 		}
 	}
 }
+
+extern "C" void HUD_t_updateCursorAnimation(Player::HUD_t* self, int destx, int desty, int width, int height, bool usingMouse) { return self->updateCursorAnimation(destx, desty, width, height, usingMouse); }
+
 
 void Player::HUD_t::updateCursor()
 {
@@ -30107,6 +30326,9 @@ void Player::HUD_t::updateCursor()
 		}
 	}
 }
+
+extern "C" void HUD_t_updateCursor(Player::HUD_t* self) { return self->updateCursor(); }
+
 
 void Player::Hotbar_t::updateCursor()
 {
@@ -30231,6 +30453,9 @@ void Player::Hotbar_t::updateCursor()
 	}
 }
 
+extern "C" void Hotbar_t_updateCursor(Player::Hotbar_t* self) { return self->updateCursor(); }
+
+
 void Player::Inventory_t::processInventory()
 {
 	if ( !player.characterSheet.sheetFrame )
@@ -30269,6 +30494,9 @@ void Player::Inventory_t::processInventory()
 	}
 }
 
+extern "C" void Inventory_t_processInventory(Player::Inventory_t* self) { return self->processInventory(); }
+
+
 void Player::HUD_t::resetBars()
 {
 	xpInfo.cycleProcessedOnTick = 0;
@@ -30305,6 +30533,9 @@ void Player::HUD_t::resetBars()
 		MPBar.flashTicks = 0;
 	}
 }
+
+extern "C" void HUD_t_resetBars(Player::HUD_t* self) { return self->resetBars(); }
+
 
 
 void Player::HUD_t::updateMinimapPrompts()
@@ -30550,6 +30781,9 @@ void Player::HUD_t::updateMinimapPrompts()
 	mapPromptFrame->setSize(pos);
 }
 
+extern "C" void HUD_t_updateMinimapPrompts(Player::HUD_t* self) { return self->updateMinimapPrompts(); }
+
+
 static CvarBool cvar_showmapseed("/showmapseed", false);
 
 void Player::HUD_t::updateGameTimer()
@@ -30642,6 +30876,9 @@ void Player::HUD_t::updateGameTimer()
 	gameTimerFrame->setSize(pos);
 	timerText->setText(buf);
 }
+
+extern "C" void HUD_t_updateGameTimer(Player::HUD_t* self) { return self->updateGameTimer(); }
+
 
 void Player::HUD_t::updateXPBar()
 {
@@ -31082,6 +31319,9 @@ void Player::HUD_t::updateXPBar()
 	xpProgressClipFrameImg->pos.x = -(xpProgressClipFrameImg->pos.w - pos.w) / 2;
 }
 
+extern "C" void HUD_t_updateXPBar(Player::HUD_t* self) { return self->updateXPBar(); }
+
+
 bool EnemyHPDamageBarHandler::bEnemyBarSimpleBlit = false;
 static CvarBool cvar_enemybar_simple_blit("/enemybar_simple_blit", true);
 
@@ -31487,6 +31727,9 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBar(const int pla
 	}
 	return sprite;
 }
+
+extern "C" SDL_Surface * EnemyHPDetails_blitEnemyBar(EnemyHPDamageBarHandler::EnemyHPDetails* self, const int player, SDL_Surface * statusEffectSprite) { return self->blitEnemyBar(player, statusEffectSprite); }
+
 
 SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(const int player)
 {
@@ -31916,6 +32159,9 @@ SDL_Surface* EnemyHPDamageBarHandler::EnemyHPDetails::blitEnemyBarStatusEffects(
 	return sprite;
 }
 
+extern "C" SDL_Surface * EnemyHPDetails_blitEnemyBarStatusEffects(EnemyHPDamageBarHandler::EnemyHPDetails* self, const int player) { return self->blitEnemyBarStatusEffects(player); }
+
+
 EnemyHPDamageBarHandler::EnemyHPDetails::~EnemyHPDetails()
 {
 	freeWorldTextures();
@@ -31940,6 +32186,9 @@ void EnemyHPDamageBarHandler::EnemyHPDetails::freeWorldTextures()
 		}
 	}
 }
+
+extern "C" void EnemyHPDetails_freeWorldTextures(EnemyHPDamageBarHandler::EnemyHPDetails* self) { return self->freeWorldTextures(); }
+
 
 void Player::HUD_t::updateEnemyBar2(Frame* whichFrame, void* enemyHPDetails)
 {
@@ -32457,6 +32706,9 @@ void Player::HUD_t::updateEnemyBar2(Frame* whichFrame, void* enemyHPDetails)
 	}
 }
 
+extern "C" void HUD_t_updateEnemyBar2(Player::HUD_t* self, Frame * whichFrame, void * enemyHPDetails) { return self->updateEnemyBar2(whichFrame, enemyHPDetails); }
+
+
 static ConsoleCommand ccmd_enemybar_dump_cache("/enemybar_dump_cache", "Dumps cached enemy bars",
 	[](int argc, const char** argv) {
 	EnemyHPDamageBarHandler::dumpCache();
@@ -32475,6 +32727,9 @@ void EnemyHPDamageBarHandler::dumpCache()
 		enemyHPDamageBarHandler[i].HPBars.clear();
 	}
 }
+
+extern "C" void EnemyHPDamageBarHandler_dumpCache() { return EnemyHPDamageBarHandler::dumpCache(); }
+
 
 void Player::HUD_t::updateEnemyBar(Frame* whichFrame)
 {
@@ -32843,6 +33098,9 @@ void Player::HUD_t::updateEnemyBar(Frame* whichFrame)
 	whichFrame->setDisabled(true);
 }
 
+extern "C" void HUD_t_updateEnemyBar(Player::HUD_t* self, Frame * whichFrame) { return self->updateEnemyBar(whichFrame); }
+
+
 const int HPMPdividerThresholdInterval = 20;
 const int kHPMPWidthReduce2pWideClippedActionPrompts = 60;
 //static CvarInt cvar_hpanimdebug("/hpmpanimdebug", 1);
@@ -33196,6 +33454,9 @@ void Player::HUD_t::updateHPBar()
 
 	hpFrame->setDisabled(player.ghost.isActive() && !player.entity);
 }
+
+extern "C" void HUD_t_updateHPBar(Player::HUD_t* self) { return self->updateHPBar(); }
+
 
 void Player::HUD_t::updateMPBar()
 {
@@ -33748,6 +34009,9 @@ void Player::HUD_t::updateMPBar()
 	mpFrame->setDisabled(player.ghost.isActive() && !player.entity);
 }
 
+extern "C" void HUD_t_updateMPBar(Player::HUD_t* self) { return self->updateMPBar(); }
+
+
 bool hotbar_slot_t::matchesExactLastItem(int player, Item* item)
 {
 	if ( !item ) { return false; }
@@ -33769,6 +34033,9 @@ bool hotbar_slot_t::matchesExactLastItem(int player, Item* item)
 	return false;
 }
 
+extern "C" bool hotbar_slot_t_matchesExactLastItem(hotbar_slot_t* self, int player, Item * item) { return self->matchesExactLastItem(player, item); }
+
+
 void hotbar_slot_t::resetLastItem()
 {
 	lastCategory = -1;
@@ -33779,6 +34046,9 @@ void hotbar_slot_t::resetLastItem()
 	lastItem.identified = false;
 	lastItem.uid = 0;
 }
+
+extern "C" void hotbar_slot_t_resetLastItem(hotbar_slot_t* self) { return self->resetLastItem(); }
+
 
 void hotbar_slot_t::storeLastItem(Item* item)
 {
@@ -33792,6 +34062,9 @@ void hotbar_slot_t::storeLastItem(Item* item)
 	lastItem.uid = item->uid;
 	lastCategory = itemCategory(item);
 }
+
+extern "C" void hotbar_slot_t_storeLastItem(hotbar_slot_t* self, Item * item) { return self->storeLastItem(item); }
+
 
 std::string hotbarSlotBindingText(const int player, const int slotnum, const Input::binding_t& binding)
 {
@@ -34442,6 +34715,9 @@ void Player::Hotbar_t::updateHotbar()
 	}
 }
 
+extern "C" void Hotbar_t_updateHotbar(Player::Hotbar_t* self) { return self->updateHotbar(); }
+
+
 bool Player::Hotbar_t::warpMouseToHotbar(const int hotbarSlot, Uint32 flags)
 {
 	if ( !hotbarFrame || hotbarSlot < 0 || hotbarSlot >= NUM_HOTBAR_SLOTS )
@@ -34456,6 +34732,9 @@ bool Player::Hotbar_t::warpMouseToHotbar(const int hotbarSlot, Uint32 flags)
 	return false;
 }
 
+extern "C" bool Hotbar_t_warpMouseToHotbar(Player::Hotbar_t* self, const int hotbarSlot, Uint32 flags) { return self->warpMouseToHotbar(hotbarSlot, flags); }
+
+
 Frame* Player::Hotbar_t::getHotbarSlotFrame(const int hotbarSlot)
 {
 	if ( !hotbarFrame || hotbarSlot < 0 || hotbarSlot >= NUM_HOTBAR_SLOTS )
@@ -34465,6 +34744,9 @@ Frame* Player::Hotbar_t::getHotbarSlotFrame(const int hotbarSlot)
 
 	return hotbarSlotFrames[hotbarSlot];
 }
+
+extern "C" Frame * Hotbar_t_getHotbarSlotFrame(Player::Hotbar_t* self, const int hotbarSlot) { return self->getHotbarSlotFrame(hotbarSlot); }
+
 
 static void drawConsoleCommandBuffer() {
     if (!command) {
@@ -35084,6 +35366,9 @@ void Player::SkillSheet_t::createSkillSheet()
 	promptScrollImg->ontop = true;
 }
 
+extern "C" void SkillSheet_t_createSkillSheet(Player::SkillSheet_t* self) { return self->createSkillSheet(); }
+
+
 struct SkillSheetCache_t
 {
 	int proficiencyLevelCached;
@@ -35117,6 +35402,9 @@ void Player::SkillSheet_t::resetSkillDisplay()
 	}
 }
 
+extern "C" void SkillSheet_t_resetSkillDisplay(Player::SkillSheet_t* self) { return self->resetSkillDisplay(); }
+
+
 void Player::SkillSheet_t::closeSkillSheet()
 {
 	bSkillSheetOpen = false;
@@ -35135,6 +35423,9 @@ void Player::SkillSheet_t::closeSkillSheet()
 		player.GUI.returnToPreviousActiveModule();
 	}
 }
+
+extern "C" void SkillSheet_t_closeSkillSheet(Player::SkillSheet_t* self) { return self->closeSkillSheet(); }
+
 
 static CvarBool cvar_skillsheet_blit("/skillsheet_blit", true);
 void Player::SkillSheet_t::openSkillSheet()
@@ -35188,6 +35479,9 @@ void Player::SkillSheet_t::openSkillSheet()
 		}
 	}
 }
+
+extern "C" void SkillSheet_t_openSkillSheet(Player::SkillSheet_t* self) { return self->openSkillSheet(); }
+
 
 std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue)
 {
@@ -36609,6 +36903,9 @@ std::string Player::SkillSheet_t::getSkillNameFromID(int skillID, bool shortName
 	return "";
 }
 
+extern "C" std::string SkillSheet_t_getSkillNameFromID(int skillID, bool shortName) { return Player::SkillSheet_t::getSkillNameFromID(skillID, shortName); }
+
+
 void Player::SkillSheet_t::selectSkill(int skill)
 {
 	selectedSkill = skill;
@@ -36616,6 +36913,9 @@ void Player::SkillSheet_t::selectSkill(int skill)
 	openTick = ticks;
 	resetSkillDisplay();
 }
+
+extern "C" void SkillSheet_t_selectSkill(Player::SkillSheet_t* self, int skill) { return self->selectSkill(skill); }
+
 
 //void positionSkillSheetBlitField(Field* f, Text* tex, SDL_Rect& pos, int yoff = 0)
 //{
@@ -38666,6 +38966,9 @@ void Player::SkillSheet_t::processSkillSheet()
 	//DebugTimers.addTimePoint("skill 1", "end");
 }
 
+extern "C" void SkillSheet_t_processSkillSheet(Player::SkillSheet_t* self) { return self->processSkillSheet(); }
+
+
 void Player::Inventory_t::SpellPanel_t::openSpellPanel()
 {
 	if ( player.inventoryUI.spellFrame )
@@ -38688,6 +38991,9 @@ void Player::Inventory_t::SpellPanel_t::openSpellPanel()
 		bOpen = true;
 	}
 }
+
+extern "C" void SpellPanel_t_openSpellPanel(Player::Inventory_t::SpellPanel_t* self) { return self->openSpellPanel(); }
+
 
 void Player::Inventory_t::SpellPanel_t::closeSpellPanel()
 {
@@ -38714,6 +39020,9 @@ void Player::Inventory_t::SpellPanel_t::closeSpellPanel()
 	bFirstTimeSnapCursor = false;
 }
 
+extern "C" void SpellPanel_t_closeSpellPanel(Player::Inventory_t::SpellPanel_t* self) { return self->closeSpellPanel(); }
+
+
 int Player::Inventory_t::SpellPanel_t::getNumSpellsToDisplayVertical() const
 {
 	if ( !player.bUseCompactGUIHeight() )
@@ -38725,6 +39034,9 @@ int Player::Inventory_t::SpellPanel_t::getNumSpellsToDisplayVertical() const
 		return kNumSpellsToDisplayVertical;
 	}
 }
+
+extern "C" int SpellPanel_t_getNumSpellsToDisplayVertical(const Player::Inventory_t::SpellPanel_t* self) { return self->getNumSpellsToDisplayVertical(); }
+
 
 void buttonSpellUpdateSelectorOnHighlight(const int player, Button* button)
 {
@@ -39181,6 +39493,9 @@ void Player::Inventory_t::SpellPanel_t::updateSpellPanel()
 	spellSlotsFrame->setActualSize(actualSize);
 }
 
+extern "C" void SpellPanel_t_updateSpellPanel(Player::Inventory_t::SpellPanel_t* self) { return self->updateSpellPanel(); }
+
+
 bool Player::Inventory_t::SpellPanel_t::isSlotVisible(int x, int y) const
 {
 	if ( player.inventoryUI.spellFrame )
@@ -39200,11 +39515,17 @@ bool Player::Inventory_t::SpellPanel_t::isSlotVisible(int x, int y) const
 	return false;
 }
 
+extern "C" bool SpellPanel_t_isSlotVisible(const Player::Inventory_t::SpellPanel_t* self, int x, int y) { return self->isSlotVisible(x, y); }
+
+
 bool Player::Inventory_t::SpellPanel_t::isItemVisible(Item* item) const
 {
 	if ( !item ) { return false; }
 	return isSlotVisible(item->x, item->y);
 }
+
+extern "C" bool SpellPanel_t_isItemVisible(const Player::Inventory_t::SpellPanel_t* self, Item * item) { return self->isItemVisible(item); }
+
 
 void Player::Inventory_t::SpellPanel_t::scrollToSlot(int x, int y, bool instantly)
 {
@@ -39253,6 +39574,9 @@ void Player::Inventory_t::SpellPanel_t::scrollToSlot(int x, int y, bool instantl
 	}
 }
 
+extern "C" void SpellPanel_t_scrollToSlot(Player::Inventory_t::SpellPanel_t* self, int x, int y, bool instantly) { return self->scrollToSlot(x, y, instantly); }
+
+
 void Player::Inventory_t::ChestGUI_t::openChest(bool _voidChest)
 {
 	if ( player.inventoryUI.chestFrame )
@@ -39286,6 +39610,9 @@ void Player::Inventory_t::ChestGUI_t::openChest(bool _voidChest)
 	inputs.getUIInteraction(player.playernum)->selectedItemFromChest = 0;
 }
 
+extern "C" void ChestGUI_t_openChest(Player::Inventory_t::ChestGUI_t* self, bool _voidChest) { return self->openChest(_voidChest); }
+
+
 bool Player::Inventory_t::ChestGUI_t::isChestSelected()
 {
 	if ( !bOpen )
@@ -39304,6 +39631,9 @@ bool Player::Inventory_t::ChestGUI_t::isChestSelected()
 
 	return false;
 }
+
+extern "C" bool ChestGUI_t_isChestSelected(Player::Inventory_t::ChestGUI_t* self) { return self->isChestSelected(); }
+
 
 void Player::Inventory_t::ChestGUI_t::closeChest()
 {
@@ -39343,16 +39673,25 @@ void Player::Inventory_t::ChestGUI_t::closeChest()
 	}
 }
 
+extern "C" void ChestGUI_t_closeChest(Player::Inventory_t::ChestGUI_t* self) { return self->closeChest(); }
+
+
 int Player::Inventory_t::ChestGUI_t::getNumItemsToDisplayVertical() const
 {
 	return kNumItemsToDisplayVertical;
 }
+
+extern "C" int ChestGUI_t_getNumItemsToDisplayVertical(const Player::Inventory_t::ChestGUI_t* self) { return self->getNumItemsToDisplayVertical(); }
+
 
 void Player::Inventory_t::selectChestSlot(const int x, const int y)
 {
 	chestGUI.selectedChestSlotX = x;
 	chestGUI.selectedChestSlotY = y;
 }
+
+extern "C" void Inventory_t_selectChestSlot(Player::Inventory_t* self, const int x, const int y) { return self->selectChestSlot(x, y); }
+
 
 const bool Player::Inventory_t::isItemFromChest(Item* item) const
 {
@@ -39382,6 +39721,9 @@ const bool Player::Inventory_t::isItemFromChest(Item* item) const
 	}
 	return false;
 }
+
+extern "C" const bool Inventory_t_isItemFromChest(const Player::Inventory_t* self, Item * item) { return self->isItemFromChest(item); }
+
 
 int Player::Inventory_t::ChestGUI_t::heightOffsetWhenNotCompact = 0;
 void Player::Inventory_t::ChestGUI_t::updateChest()
@@ -39785,6 +40127,9 @@ void Player::Inventory_t::ChestGUI_t::updateChest()
 	}
 }
 
+extern "C" void ChestGUI_t_updateChest(Player::Inventory_t::ChestGUI_t* self) { return self->updateChest(); }
+
+
 bool Player::Inventory_t::ChestGUI_t::isSlotVisible(int x, int y) const
 {
 	if ( player.inventoryUI.chestFrame )
@@ -39804,11 +40149,17 @@ bool Player::Inventory_t::ChestGUI_t::isSlotVisible(int x, int y) const
 	return false;
 }
 
+extern "C" bool ChestGUI_t_isSlotVisible(const Player::Inventory_t::ChestGUI_t* self, int x, int y) { return self->isSlotVisible(x, y); }
+
+
 bool Player::Inventory_t::ChestGUI_t::isItemVisible(Item* item) const
 {
 	if ( !item ) { return false; }
 	return isSlotVisible(item->x, item->y);
 }
+
+extern "C" bool ChestGUI_t_isItemVisible(const Player::Inventory_t::ChestGUI_t* self, Item * item) { return self->isItemVisible(item); }
+
 
 void Player::Inventory_t::ChestGUI_t::scrollToSlot(int x, int y, bool instantly)
 {
@@ -39857,6 +40208,9 @@ void Player::Inventory_t::ChestGUI_t::scrollToSlot(int x, int y, bool instantly)
 	}
 }
 
+extern "C" void ChestGUI_t_scrollToSlot(Player::Inventory_t::ChestGUI_t* self, int x, int y, bool instantly) { return self->scrollToSlot(x, y, instantly); }
+
+
 void MinotaurWarning_t::deinit()
 {
 	started = false;
@@ -39873,11 +40227,17 @@ void MinotaurWarning_t::deinit()
 	animFlash = 0.0;
 }
 
+extern "C" void MinotaurWarning_t_deinit(MinotaurWarning_t* self) { return self->deinit(); }
+
+
 void MinotaurWarning_t::init()
 {
 	deinit();
 	started = true;
 }
+
+extern "C" void MinotaurWarning_t_init(MinotaurWarning_t* self) { return self->init(); }
+
 
 void MinotaurWarning_t::setAnimatePosition(const int destx, const int desty, const int destw, const int desth)
 {
@@ -39894,6 +40254,12 @@ void MinotaurWarning_t::setAnimatePosition(const int destx, const int desty, con
 	animateW = 0.0;
 	animateH = 0.0;
 }
+
+extern "C" void MinotaurWarning_t_setAnimatePosition_2(MinotaurWarning_t* self, int destx, int desty) { return self->setAnimatePosition(destx, desty); }
+
+
+extern "C" void MinotaurWarning_t_setAnimatePosition(MinotaurWarning_t* self, const int destx, const int desty, const int destw, const int desth) { return self->setAnimatePosition(destx, desty, destw, desth); }
+
 
 void MinotaurWarning_t::setAnimatePosition(int destx, int desty)
 {
@@ -40519,6 +40885,9 @@ void Player::HUD_t::updateMinotaurWarning()
 	m.animBg = std::max(0.0, m.animBg);
 }
 
+extern "C" void HUD_t_updateMinotaurWarning(Player::HUD_t* self) { return self->updateMinotaurWarning(); }
+
+
 bool Player::WorldUI_t::WorldTooltipItem_t::isItemSameAsCurrent(Item* item)
 {
 	if ( !item ) 
@@ -40537,6 +40906,9 @@ bool Player::WorldUI_t::WorldTooltipItem_t::isItemSameAsCurrent(Item* item)
 	}
 	return false;
 }
+
+extern "C" bool WorldTooltipItem_t_isItemSameAsCurrent(Player::WorldUI_t::WorldTooltipItem_t* self, Item * item) { return self->isItemSameAsCurrent(item); }
+
 
 
 SDL_Surface* Player::WorldUI_t::WorldTooltipItem_t::blitItemWorldTooltip(Item* item)
@@ -40995,6 +41367,9 @@ SDL_Surface* Player::WorldUI_t::WorldTooltipItem_t::blitItemWorldTooltip(Item* i
 	return itemWorldTooltipSurface;
 }
 
+extern "C" SDL_Surface * WorldTooltipItem_t_blitItemWorldTooltip(Player::WorldUI_t::WorldTooltipItem_t* self, Item * item) { return self->blitItemWorldTooltip(item); }
+
+
 void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::deactivate()
 {
 	parent = 0;
@@ -41020,6 +41395,9 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::deactivate()
 	}
 }
 
+extern "C" void Dialogue_t_deactivate(Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t* self) { return self->deactivate(); }
+
+
 void Player::WorldUI_t::WorldTooltipDialogue_t::update()
 {
 	playerDialogue.update();
@@ -41041,6 +41419,9 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::update()
 		sharedDialogues.erase(key);
 	}
 }
+
+extern "C" void WorldTooltipDialogue_t_update(Player::WorldUI_t::WorldTooltipDialogue_t* self) { return self->update(); }
+
 
 void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::updateWorldCoordinates()
 {
@@ -41068,6 +41449,9 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::updateWorldCoordinat
 		z = parentEnt->z + setting.offsetZ;
 	}
 }
+
+extern "C" void Dialogue_t_updateWorldCoordinates(Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t* self) { return self->updateWorldCoordinates(); }
+
 
 void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::update()
 {
@@ -41173,6 +41557,9 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::update()
 	}
 	updatedThisTick = ticks;
 }
+
+extern "C" void Dialogue_t_update(Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t* self) { return self->update(); }
+
 
 void Player::WorldUI_t::WorldTooltipDialogue_t::createDialogueTooltip(Uint32 uid, 
 	Player::WorldUI_t::WorldTooltipDialogue_t::DialogueType_t type, char const * const message, ...)
@@ -41329,6 +41716,9 @@ void Player::WorldUI_t::WorldTooltipDialogue_t::createDialogueTooltip(Uint32 uid
 		d->dialogueField->setText(d->dialogueStrFull.c_str());
 	}
 }
+
+extern "C" void WorldTooltipDialogue_t_createDialogueTooltip(Player::WorldUI_t::WorldTooltipDialogue_t* self, Uint32 uid, Player::WorldUI_t::WorldTooltipDialogue_t::DialogueType_t type, const char *const message) { return self->createDialogueTooltip(uid, type, message); }
+
 
 SDL_Surface* Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::blitDialogueTooltip()
 {
@@ -41693,6 +42083,9 @@ SDL_Surface* Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t::blitDialogue
 	return dialogueTooltipSurface;
 }
 
+extern "C" SDL_Surface * Dialogue_t_blitDialogueTooltip(Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t* self) { return self->blitDialogueTooltip(); }
+
+
 void handleDamageIndicatorTicks()
 {
 	for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -41730,6 +42123,9 @@ void DamageIndicatorHandler_t::update()
 		}
 	}
 }
+
+extern "C" void DamageIndicatorHandler_t_update(DamageIndicatorHandler_t* self) { return self->update(); }
+
 void DamageIndicatorHandler_t::insert(const int player, const real_t _x, const real_t _y, const bool damaged)
 {
 	for ( int64_t _di = 0; _di < dynarray_size<DamageIndicatorHandler_t::DamageIndicator_t>(indicators[player]); ++_di )
@@ -41757,6 +42153,9 @@ void DamageIndicatorHandler_t::insert(const int player, const real_t _x, const r
 	i.flashAnimState = -1;
 	i.hitDealtDamage = damaged;
 }
+
+extern "C" void DamageIndicatorHandler_t_insert(DamageIndicatorHandler_t* self, const int player, const real_t _x, const real_t _y, const bool damaged) { return self->insert(player, _x, _y, damaged); }
+
 
 static CvarInt cvar_indicatoranimdebug("/indicatoranimdebug", 1);
 
@@ -41894,6 +42293,9 @@ void DamageIndicatorHandler_t::DamageIndicator_t::process()
 	}
 }
 
+extern "C" void DamageIndicator_t_process(DamageIndicatorHandler_t::DamageIndicator_t* self) { return self->process(); }
+
+
 void createLevelUpFrame(const int player)
 {
 	auto& hud_t = players[player]->hud;
@@ -41998,6 +42400,9 @@ void LevelUpAnimation_t::addLevelUp(const int currentLvl, const int increaseLvl,
 	}
 }
 
+extern "C" void LevelUpAnimation_t_addLevelUp(LevelUpAnimation_t* self, const int currentLvl, const int addLvl, DynamicArrayT<LevelUpAnimation_t::LevelUp_t::StatUp_t> & statInfo) { return self->addLevelUp(currentLvl, addLvl, statInfo); }
+
+
 void LevelUpAnimation_t::LevelUp_t::StatUp_t::setAnimatePosition(int destx, int desty, int destw, int desth)
 {
 	animateStartX = pos.x;
@@ -42013,6 +42418,12 @@ void LevelUpAnimation_t::LevelUp_t::StatUp_t::setAnimatePosition(int destx, int 
 	animateW = 0.0;
 	animateH = 0.0;
 }
+
+extern "C" void StatUp_t_setAnimatePosition_2(LevelUpAnimation_t::LevelUp_t::StatUp_t* self, int destx, int desty, int destw, int desth) { return self->setAnimatePosition(destx, desty, destw, desth); }
+
+
+extern "C" void StatUp_t_setAnimatePosition(LevelUpAnimation_t::LevelUp_t::StatUp_t* self, int destx, int desty) { return self->setAnimatePosition(destx, desty); }
+
 
 void LevelUpAnimation_t::LevelUp_t::StatUp_t::setAnimatePosition(int destx, int desty)
 {
@@ -42076,6 +42487,9 @@ bool SkillUpAnimation_t::soundIndexUsedForNotification(const int index)
 	}
 	return false;
 }
+
+extern "C" bool SkillUpAnimation_t_soundIndexUsedForNotification(const int index) { return SkillUpAnimation_t::soundIndexUsedForNotification(index); }
+
 
 void LevelUpAnimation_t::LevelUp_t::StatUp_t::animateNotification(const int player)
 {
@@ -42234,6 +42648,9 @@ void LevelUpAnimation_t::LevelUp_t::StatUp_t::animateNotification(const int play
 	pos.h = animateStartH + destH * animateH;
 }
 
+extern "C" void StatUp_t_animateNotification(LevelUpAnimation_t::LevelUp_t::StatUp_t* self, const int player) { return self->animateNotification(player); }
+
+
 void LevelUpAnimation_t::LevelUp_t::animateTitle(SDL_Rect basePos)
 {
 	if ( ticksActive == 0 )
@@ -42267,6 +42684,9 @@ void LevelUpAnimation_t::LevelUp_t::animateTitle(SDL_Rect basePos)
 		titleAnimatePos.y += animTitleFade * titleAnimatePos.h;
 	}
 }
+
+extern "C" void LevelUp_t_animateTitle(LevelUpAnimation_t::LevelUp_t* self, SDL_Rect basePos) { return self->animateTitle(basePos); }
+
 
 void updateLevelUpFrame(const int player)
 {
@@ -42696,6 +43116,12 @@ void SkillUpAnimation_t::SkillUp_t::setAnimatePosition(int destx, int desty, int
 	animateH = 0.0;
 }
 
+extern "C" void SkillUp_t_setAnimatePosition_2(SkillUpAnimation_t::SkillUp_t* self, int destx, int desty, int destw, int desth) { return self->setAnimatePosition(destx, desty, destw, desth); }
+
+
+extern "C" void SkillUp_t_setAnimatePosition(SkillUpAnimation_t::SkillUp_t* self, int destx, int desty) { return self->setAnimatePosition(destx, desty); }
+
+
 void SkillUpAnimation_t::SkillUp_t::setAnimatePosition(int destx, int desty)
 {
 	animateStartX = pos.x;
@@ -42716,6 +43142,9 @@ int SkillUpAnimation_t::SkillUp_t::getIconNominalSize()
 {
 	return isSpell ? 32 : 24;
 }
+
+extern "C" int SkillUp_t_getIconNominalSize(SkillUpAnimation_t::SkillUp_t* self) { return self->getIconNominalSize(); }
+
 
 void SkillUpAnimation_t::SkillUp_t::animateNotification(const int player)
 {
@@ -42885,10 +43314,16 @@ void SkillUpAnimation_t::SkillUp_t::animateNotification(const int player)
 	pos.h = animateStartH + destH * animateH;
 }
 
+extern "C" void SkillUp_t_animateNotification(SkillUpAnimation_t::SkillUp_t* self, const int player) { return self->animateNotification(player); }
+
+
 SkillUpAnimation_t::SkillUp_t& SkillUpAnimation_t::getSkillUpToDisplay()
 {
 	return skillUps.at(getSkillUpIndexToDisplay());
 }
+
+extern "C" SkillUpAnimation_t::SkillUp_t & SkillUpAnimation_t_getSkillUpToDisplay(SkillUpAnimation_t* self) { return self->getSkillUpToDisplay(); }
+
 
 size_t SkillUpAnimation_t::getSkillUpIndexToDisplay()
 {
@@ -42942,11 +43377,17 @@ size_t SkillUpAnimation_t::getSkillUpIndexToDisplay()
 	return priority.top().second;
 }
 
+extern "C" size_t SkillUpAnimation_t_getSkillUpIndexToDisplay(SkillUpAnimation_t* self) { return self->getSkillUpIndexToDisplay(); }
+
+
 void SkillUpAnimation_t::addSpellLearned(const int _spellID)
 {
 	skillUps.push_back(SkillUp_t(_spellID));
 	skillUps.at(skillUps.size() - 1).ticksToLive = 5 * TICKS_PER_SECOND;
 }
+
+extern "C" void SkillUpAnimation_t_addSpellLearned(SkillUpAnimation_t* self, const int _spellID) { return self->addSpellLearned(_spellID); }
+
 
 void SkillUpAnimation_t::addSkillUp(const int _numSkill, const int _currentSkill, const int _increaseSkill)
 {
@@ -43024,6 +43465,9 @@ void SkillUpAnimation_t::addSkillUp(const int _numSkill, const int _currentSkill
 	}
 	skillUps.at(skillUps.size() - 1).ticksToLive = ticksToLive;
 }
+
+extern "C" void SkillUpAnimation_t_addSkillUp(SkillUpAnimation_t* self, const int _numSkill, const int _currentSkill, const int _increaseSkill) { return self->addSkillUp(_numSkill, _currentSkill, _increaseSkill); }
+
 
 void updateSkillUpFrame(const int player)
 {
@@ -43591,16 +44035,25 @@ float EnemyBarSettings_t::getHeightOffset(Entity* entity) {
 		return heightOffsets[getEnemyBarSpriteName(entity)];
 	}
 
+extern "C" float EnemyBarSettings_t_getHeightOffset(EnemyBarSettings_t* self, Entity * entity) { return self->getHeightOffset(entity); }
+
+
 float EnemyBarSettings_t::getScreenDistanceOffset(Entity* entity) {
 		if ( !entity ) { return 0.f; }
 		return screenDistanceOffsets[getEnemyBarSpriteName(entity)];
 	}
+
+extern "C" float EnemyBarSettings_t_getScreenDistanceOffset(EnemyBarSettings_t* self, Entity * entity) { return self->getScreenDistanceOffset(entity); }
+
 
 void StatusEffectQueue_t::resetQueue() {
 		requiresAnimUpdate = true;
 		effectQueue.clear();
 		notificationQueue.clear();
 	}
+
+extern "C" void StatusEffectQueue_t_resetQueue(StatusEffectQueue_t* self) { return self->resetQueue(); }
+
 
 void StatusEffectQueue_t::deleteEffect(int effect) {
 		for ( auto it = effectQueue.begin(); it != effectQueue.end(); )
@@ -43615,15 +44068,27 @@ void StatusEffectQueue_t::deleteEffect(int effect) {
 		}
 	}
 
+extern "C" void StatusEffectQueue_t_deleteEffect(StatusEffectQueue_t* self, int effect) { return self->deleteEffect(effect); }
+
+
 void StatusEffectQueue_t::StatusEffectDefinitions_t::reset() {
 			allEffects.clear();
 			allSustainedSpells.clear();
 		}
 
+extern "C" void StatusEffectDefinitions_t_reset() { return StatusEffectQueue_t::StatusEffectDefinitions_t::reset(); }
+
+
 StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(int effectID) {
 			return allEffects[effectID];
 		}
 
+extern "C" StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectDefinitions_t_getEffect(int effectID) { return StatusEffectQueue_t::StatusEffectDefinitions_t::getEffect(effectID); }
+
+
 StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectQueue_t::StatusEffectDefinitions_t::getSustainedSpell(int spellID) {
 			return allSustainedSpells[spellID];
 		}
+
+extern "C" StatusEffectQueue_t::EffectDefinitionEntry_t & StatusEffectDefinitions_t_getSustainedSpell(int spellID) { return StatusEffectQueue_t::StatusEffectDefinitions_t::getSustainedSpell(spellID); }
+

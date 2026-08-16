@@ -181,6 +181,8 @@ public:
 
 protected:
     //! base (common) deselect behavior: clear selection state, no per-type logic
+
+    public:
     void deselectBase();
 
     //! base (generic) widget removal: search children by name

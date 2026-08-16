@@ -1689,6 +1689,9 @@ void Entity::goatmanChooseWeapon(const Entity* target, double dist)
 	return;
 }
 
+extern "C" void Entity_goatmanChooseWeapon(Entity* self, const Entity * target, double dist) { return self->goatmanChooseWeapon(target, dist); }
+
+
 bool Entity::goatmanCanWieldItem(const Item& item) const
 {
 	Stat* myStats = getStats();
@@ -1740,6 +1743,9 @@ bool Entity::goatmanCanWieldItem(const Item& item) const
 
 	return false;
 }
+
+extern "C" bool Entity_goatmanCanWieldItem(const Entity* self, const Item & item) { return self->goatmanCanWieldItem(item); }
+
 
 
 

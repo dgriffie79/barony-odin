@@ -173,6 +173,9 @@ void Input::defaultBindings() {
 	}
 }
 
+extern "C" void Input_defaultBindings() { return Input::defaultBindings(); }
+
+
 float Input::analog(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].analog(binding);
@@ -183,6 +186,9 @@ float Input::analog(const char* binding) const {
 	bindings.get(binding, _b);
 	return _b.analog;
 }
+
+extern "C" float Input_analog(const Input* self, const char * binding) { return self->analog(binding); }
+
 
 bool Input::binary(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
@@ -199,6 +205,9 @@ bool Input::binary(const char* binding) const {
 	//return b != bindings.end() ? _b.binary : false;
 }
 
+extern "C" bool Input_binary(const Input* self, const char * binding) { return self->binary(binding); }
+
+
 bool Input::binaryToggle(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].binaryToggle(binding);
@@ -214,6 +223,9 @@ bool Input::binaryToggle(const char* binding) const {
 	//return b != bindings.end() ? _b.binary && !_b.consumed : false;
 }
 
+extern "C" bool Input_binaryToggle(const Input* self, const char * binding) { return self->binaryToggle(binding); }
+
+
 bool Input::consumeBinary(const char* binding) {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].consumeBinary(binding);
@@ -225,6 +237,9 @@ bool Input::consumeBinary(const char* binding) {
 		return false;
 	}
 }
+
+extern "C" bool Input_consumeBinary(Input* self, const char * binding) { return self->consumeBinary(binding); }
+
 
 bool Input::consumeBinaryToggle(const char* binding) {
 	if (multiplayer != SINGLE && player != 0) {
@@ -238,6 +253,9 @@ bool Input::consumeBinaryToggle(const char* binding) {
 	}
 }
 
+extern "C" bool Input_consumeBinaryToggle(Input* self, const char * binding) { return self->consumeBinaryToggle(binding); }
+
+
 bool Input::binaryHeldToggle(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].binaryHeldToggle(binding);
@@ -249,6 +267,9 @@ bool Input::binaryHeldToggle(const char* binding) const {
 	return (_b.binary && !_b.consumed && (ticks - _b.heldTicks) > BUTTON_HELD_TICKS);
 }
 
+extern "C" bool Input_binaryHeldToggle(const Input* self, const char * binding) { return self->binaryHeldToggle(binding); }
+
+
 const char* Input::binding(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].binding(binding);
@@ -258,6 +279,9 @@ const char* Input::binding(const char* binding) const {
 	bindings.get(binding, _b);
 	return _b.input.c_str();
 }
+
+extern "C" const char * Input_binding(const Input* self, const char * binding) { return self->binding(binding); }
+
 
 void Input::refresh() {
 	bindings.clear();
@@ -337,6 +361,9 @@ void Input::refresh() {
 #endif // !EDITOR
 }
 
+extern "C" void Input_refresh(Input* self) { return self->refresh(); }
+
+
 Input::binding_t Input::input(const char* binding) const {
 	if (multiplayer != SINGLE && player != 0) {
 		return inputs[0].input(binding);
@@ -347,9 +374,18 @@ Input::binding_t Input::input(const char* binding) const {
 	return _b;
 }
 
+extern "C" Input::binding_t Input_input(const Input* self, const char * binding) { return self->input(binding); }
+
+
 Input::ControllerType Input::getControllerType() const {
     return getControllerType(player);
 }
+
+extern "C" Input::ControllerType Input_getControllerType_2(const Input* self) { return self->getControllerType(); }
+
+
+extern "C" Input::ControllerType Input_getControllerType(int index) { return Input::getControllerType(index); }
+
 
 #ifndef EDITOR
 static CvarInt cvar_forceGlyphs("/forceglyphs", -1, "Force use of specific controller glyphs");
@@ -386,6 +422,12 @@ const char* Input::getKeyboardGlyph(int index) {
     return "*#images/ui/Glyphs/G_Control_KBM_01.png";
 }
 
+extern "C" const char * Input_getKeyboardGlyph_2(const Input* self) { return self->getKeyboardGlyph(); }
+
+
+extern "C" const char * Input_getKeyboardGlyph(int index) { return Input::getKeyboardGlyph(index); }
+
+
 const char* Input::getKeyboardGlyph() const {
     return "*#images/ui/Glyphs/G_Control_KBM_01.png";
 }
@@ -401,6 +443,12 @@ const char* Input::getControllerGlyph(int index) {
         return "*#images/ui/Glyphs/G_Control_PS5_01.png";
     }
 }
+
+extern "C" const char * Input_getControllerGlyph_2(const Input* self) { return self->getControllerGlyph(); }
+
+
+extern "C" const char * Input_getControllerGlyph(int index) { return Input::getControllerGlyph(index); }
+
 
 const char* Input::getControllerGlyph() const {
     return getControllerGlyph(player);
@@ -596,6 +644,9 @@ std::string Input::getGlyphPathForInput(const char* input, bool pressed, Control
 	return GlyphHelper.getGlyphPath(keycode, pressed);
 }
 
+extern "C" std::string Input_getGlyphPathForInput(const char * input, bool pressed, Input::ControllerType type) { return Input::getGlyphPathForInput(input, pressed, type); }
+
+
 std::string Input::getGlyphPathForBinding(const char* binding, bool pressed) const
 {
 #ifndef EDITOR
@@ -605,6 +656,12 @@ std::string Input::getGlyphPathForBinding(const char* binding, bool pressed) con
 #endif
 	return getGlyphPathForBinding(input(binding), pressed);
 }
+
+extern "C" std::string Input_getGlyphPathForBinding_2(const Input* self, const char * binding, bool pressed) { return self->getGlyphPathForBinding(binding, pressed); }
+
+
+extern "C" std::string Input_getGlyphPathForBinding(const Input::binding_t & binding, bool pressed) { return Input::getGlyphPathForBinding(binding, pressed); }
+
 
 std::string Input::getGlyphPathForBinding(const binding_t& binding, bool pressed)
 {
@@ -870,6 +927,9 @@ void Input::bind(const char* binding, const char* input) {
 	}
 }
 
+extern "C" void Input_bind(Input* self, const char * binding, const char * input) { return self->bind(binding, input); }
+
+
 void Input::update() {
 	std::vector<const char*> _keys;
 	bindings.keys(_keys);
@@ -891,6 +951,9 @@ void Input::update() {
 		}
 	}
 }
+
+extern "C" void Input_update(Input* self) { return self->update(); }
+
 
 bool Input::binaryOf(binding_t& binding) {
 	if (binding.type == binding_t::CONTROLLER_AXIS ||
@@ -932,6 +995,9 @@ bool Input::binaryOf(binding_t& binding) {
 
 	return false;
 }
+
+extern "C" bool Input_binaryOf(Input::binding_t & binding) { return Input::binaryOf(binding); }
+
 
 float Input::analogOf(binding_t& binding) {
 	if (binding.type == binding_t::CONTROLLER_AXIS ||
@@ -978,6 +1044,9 @@ float Input::analogOf(binding_t& binding) {
 	return 0.f;
 }
 
+extern "C" float Input_analogOf(Input::binding_t & binding) { return Input::analogOf(binding); }
+
+
 SDL_Keycode Input::getKeycodeFromName(const char* name) {
 	auto search = keycodeNames.find(name);
 	if (search == keycodeNames.end()) {
@@ -990,6 +1059,9 @@ SDL_Keycode Input::getKeycodeFromName(const char* name) {
 		return search->second;
 	}
 }
+
+extern "C" SDL_Keycode Input_getKeycodeFromName(const char * name) { return Input::getKeycodeFromName(name); }
+
 
 Input::playerControlType_t Input::getPlayerControlType()
 {
@@ -1008,6 +1080,9 @@ Input::playerControlType_t Input::getPlayerControlType()
 #endif // !EDITOR
 	return Input::PLAYER_CONTROLLED_BY_INVALID;
 }
+
+extern "C" Input::playerControlType_t Input_getPlayerControlType(Input* self) { return self->getPlayerControlType(); }
+
 
 DynamicArrayStr Input::getBindingsForInput(const char* input) const {
     DynamicArrayStr result;
@@ -1031,6 +1106,9 @@ DynamicArrayStr Input::getBindingsForInput(const char* input) const {
     }
     return result;
 }
+
+extern "C" DynamicArrayStr Input_getBindingsForInput(const Input* self, const char * input) { return self->getBindingsForInput(input); }
+
 
 bool Input::bindingIsSharedWithKeyboardSystemBinding(const char* binding)
 {
@@ -1074,6 +1152,9 @@ bool Input::bindingIsSharedWithKeyboardSystemBinding(const char* binding)
 #endif
 	return false;
 }
+
+extern "C" bool Input_bindingIsSharedWithKeyboardSystemBinding(Input* self, const char * binding) { return self->bindingIsSharedWithKeyboardSystemBinding(binding); }
+
 
 void Input::consumeBindingsSharedWithBinding(const char* binding)
 {
@@ -1170,6 +1251,9 @@ void Input::consumeBindingsSharedWithBinding(const char* binding)
 	}
 #endif
 }
+
+extern "C" void Input_consumeBindingsSharedWithBinding(Input* self, const char * binding) { return self->consumeBindingsSharedWithBinding(binding); }
+
 
 void Input::consumeBindingsSharedWithFaceHotbar()
 {
@@ -1283,10 +1367,25 @@ void Input::consumeBindingsSharedWithFaceHotbar()
 #endif
 }
 
+extern "C" void Input_consumeBindingsSharedWithFaceHotbar(Input* self) { return self->consumeBindingsSharedWithFaceHotbar(); }
+
+
 void Input::setKeyboardBindings(DynamicMapStr& toSet) { kb_bindings = toSet; }
+
+extern "C" void Input_setKeyboardBindings(Input* self, DynamicMapStr & toSet) { return self->setKeyboardBindings(toSet); }
+
 
 void Input::setGamepadBindings(DynamicMapStr& toSet) { gamepad_bindings = toSet; }
 
+extern "C" void Input_setGamepadBindings(Input* self, DynamicMapStr & toSet) { return self->setGamepadBindings(toSet); }
+
+
 void Input::setJoystickBindings(DynamicMapStr& toSet) { joystick_bindings = toSet; }
 
+extern "C" void Input_setJoystickBindings(Input* self, DynamicMapStr & toSet) { return self->setJoystickBindings(toSet); }
+
+
 void Input::setDisabled(bool _disabled) { disabled = _disabled; }
+
+extern "C" void Input_setDisabled(Input* self, bool _disabled) { return self->setDisabled(_disabled); }
+

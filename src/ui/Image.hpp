@@ -19,6 +19,8 @@ private:
 	Image& operator=(Image&&) = delete;
 
 	//! finish loading on main thread
+
+	public:
 	bool finalize();
 
 public:
@@ -135,5 +137,7 @@ private:
     static Mesh clockwiseMesh;
     static Shader shader;
     
+
+    public:
     static void setupGL(GLuint texid, const Uint32& color);
 };

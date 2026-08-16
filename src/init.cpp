@@ -734,11 +734,17 @@ const char* Language::get(const int line)
 	}
 	return entries[line].c_str();
 }
+
+extern "C" const char * Language_get(const int line) { return Language::get(line); }
+
 void Language::reset()
 {
 	entries.clear();
 	tmpEntries.clear();
 }
+
+extern "C" void Language_reset() { return Language::reset(); }
+
 
 /*-------------------------------------------------------------------------------
 
@@ -958,6 +964,9 @@ int Language::loadLanguage(char const * const lang, bool forceLoadBaseDirectory)
 	return 0;
 }
 
+extern "C" int Language_loadLanguage(const char *const lang, bool forceLoadBaseDirectory) { return Language::loadLanguage(lang, forceLoadBaseDirectory); }
+
+
 /*-------------------------------------------------------------------------------
 
 	reloadLanguage
@@ -978,6 +987,9 @@ int Language::reloadLanguage()
 	}
 	return loadLanguage(languageCode.c_str(), false);
 }
+
+extern "C" int Language_reloadLanguage() { return Language::reloadLanguage(); }
+
 
 /*-------------------------------------------------------------------------------
 

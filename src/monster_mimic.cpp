@@ -1147,6 +1147,9 @@ bool Entity::disturbMimic(Entity* touched, bool takenDamage, bool doMessage)
 	return true;
 }
 
+extern "C" bool Entity_disturbMimic(Entity* self, Entity * touched, bool takenDamage, bool doMessage) { return self->disturbMimic(touched, takenDamage, doMessage); }
+
+
 void Entity::mimicSetStats(Stat* myStats)
 {
 	if ( !myStats )
@@ -1174,6 +1177,9 @@ void Entity::mimicSetStats(Stat* myStats)
 	myStats->MAXHP = myStats->HP;
 	myStats->OLDHP = myStats->HP;
 }
+
+extern "C" void Entity_mimicSetStats(Stat * myStats) { return Entity::mimicSetStats(myStats); }
+
 
 MimicGenerator mimic_generator;
 
@@ -1215,6 +1221,9 @@ void MimicGenerator::init()
 	}
 }
 
+extern "C" void MimicGenerator_init(MimicGenerator* self) { return self->init(); }
+
+
 bool MimicGenerator::bForceSpawnForCurrentFloor()
 {
 	if ( secretlevel )
@@ -1226,6 +1235,9 @@ bool MimicGenerator::bForceSpawnForCurrentFloor()
 		return mimic_floors.find(currentlevel) != mimic_floors.end();
 	}
 }
+
+extern "C" bool MimicGenerator_bForceSpawnForCurrentFloor(MimicGenerator* self) { return self->bForceSpawnForCurrentFloor(); }
+
 
 void mimicSpecialEat(Entity* my, Stat* myStats)
 {

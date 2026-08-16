@@ -62,6 +62,9 @@ int Stat::getGoldWeight() const
 	return weight;
 }
 
+extern "C" int Stat_getGoldWeight(const Stat* self) { return self->getGoldWeight(); }
+
+
 int Stat::maxEquipmentBonusToSkill = 25;
 Sint32 Stat::getModifiedProficiency(int skill) const
 {
@@ -222,6 +225,9 @@ Sint32 Stat::getModifiedProficiency(int skill) const
 	return result;
 }
 
+extern "C" Sint32 Stat_getModifiedProficiency(const Stat* self, int skill) { return self->getModifiedProficiency(skill); }
+
+
 Sint32 Stat::getThaumProficiencySpellStatBonus(int whichStat, Sint32 currentBonus)
 {
 	Sint32 bonus = 0;
@@ -259,6 +265,9 @@ Sint32 Stat::getThaumProficiencySpellStatBonus(int whichStat, Sint32 currentBonu
 	}
 	return bonus;
 }
+
+extern "C" Sint32 Stat_getThaumProficiencySpellStatBonus(Stat* self, int whichStat, Sint32 currentBonus) { return self->getThaumProficiencySpellStatBonus(whichStat, currentBonus); }
+
 
 //Destructor
 Stat::~Stat()
@@ -485,6 +494,9 @@ void Stat::clearStats()
 	list_FreeAll(&this->void_chest_inventory);
 }
 
+extern "C" void Stat_clearStats(Stat* self) { return self->clearStats(); }
+
+
 /*-------------------------------------------------------------------------------
 
 freePlayerEquipment
@@ -616,6 +628,9 @@ void Stat::freePlayerEquipment()
 		this->mask = NULL;
 	}
 }
+
+extern "C" void Stat_freePlayerEquipment(Stat* self) { return self->freePlayerEquipment(); }
+
 
 
 /*-------------------------------------------------------------------------------
@@ -892,6 +907,9 @@ Stat* Stat::copyStats()
 	return newStat;
 }
 
+extern "C" Stat * Stat_copyStats(Stat* self) { return self->copyStats(); }
+
+
 void Stat::printStats()
 {
 	printlog("type = %d\n", this->type);
@@ -926,6 +944,9 @@ void Stat::printStats()
 	}
 }
 
+extern "C" void Stat_printStats(Stat* self) { return self->printStats(); }
+
+
 int Stat::pickRandomEquippedItemToDegradeOnHit(Item** returnItem, bool excludeWeapon, bool excludeShield, bool excludeArmor, bool excludeJewelry)
 {
 	if ( getEffectActive(EFF_SHAPESHIFT) )
@@ -954,6 +975,9 @@ int Stat::pickRandomEquippedItemToDegradeOnHit(Item** returnItem, bool excludeWe
 	mask = maskItem;
 	return result;
 }
+
+extern "C" int Stat_pickRandomEquippedItemToDegradeOnHit(Stat* self, Item ** returnItem, bool excludeWeapon, bool excludeShield, bool excludeArmor, bool excludeJewelry) { return self->pickRandomEquippedItemToDegradeOnHit(returnItem, excludeWeapon, excludeShield, excludeArmor, excludeJewelry); }
+
 
 int Stat::pickRandomEquippedItem(Item** returnItem, bool excludeWeapon, bool excludeShield, bool excludeArmor, bool excludeJewelry)
 {
@@ -1077,6 +1101,9 @@ int Stat::pickRandomEquippedItem(Item** returnItem, bool excludeWeapon, bool exc
 
 	return equipNum[roll];
 }
+
+extern "C" int Stat_pickRandomEquippedItem(Stat* self, Item ** returnItem, bool excludeWeapon, bool excludeShield, bool excludeArmor, bool excludeJewelry) { return self->pickRandomEquippedItem(returnItem, excludeWeapon, excludeShield, excludeArmor, excludeJewelry); }
+
 
 const char* getSkillLangEntry(int skill)
 {
@@ -1485,6 +1512,9 @@ void Stat::copyNPCStatsAndInventoryFrom(Stat& src)
 	intro = oldIntro;
 }
 
+extern "C" void Stat_copyNPCStatsAndInventoryFrom(Stat* self, Stat & src) { return self->copyNPCStatsAndInventoryFrom(src); }
+
+
 int Stat::getActiveShieldBonus(bool checkShield, bool excludeSkill, Item* shieldItem, bool checkNonShieldBonus) const
 {
 	Item* item = shieldItem;
@@ -1525,6 +1555,9 @@ int Stat::getActiveShieldBonus(bool checkShield, bool excludeSkill, Item* shield
 	}
 }
 
+extern "C" int Stat_getActiveShieldBonus(const Stat* self, bool checkShield, bool excludeSkill, Item * shieldItem, bool checkNonShieldBonus) { return self->getActiveShieldBonus(checkShield, excludeSkill, shieldItem, checkNonShieldBonus); }
+
+
 int Stat::getParryingACBonus(Stat* myStats, Item* myWeapon, bool checkWeapon, bool excludeSkill, int weaponSkill)
 {
 	if ( !checkWeapon )
@@ -1557,6 +1590,9 @@ int Stat::getParryingACBonus(Stat* myStats, Item* myWeapon, bool checkWeapon, bo
 	}
 }
 
+extern "C" int Stat_getParryingACBonus(Stat * myStats, Item * myWeapon, bool checkWeapon, bool excludeSkill, int weaponSkill) { return Stat::getParryingACBonus(myStats, myWeapon, checkWeapon, excludeSkill, weaponSkill); }
+
+
 int Stat::getPassiveShieldBonus(bool checkShield, bool excludeSkill) const
 {
 	if ( !checkShield )
@@ -1586,6 +1622,9 @@ int Stat::getPassiveShieldBonus(bool checkShield, bool excludeSkill) const
 		return 0;
 	}
 }
+
+extern "C" int Stat_getPassiveShieldBonus(const Stat* self, bool checkShield, bool excludeSkill) { return self->getPassiveShieldBonus(checkShield, excludeSkill); }
+
 
 int Stat::numShillelaghDebuffsActive(Entity* my)
 {
@@ -1638,6 +1677,9 @@ int Stat::numShillelaghDebuffsActive(Entity* my)
 	return result;
 }
 
+extern "C" int Stat_numShillelaghDebuffsActive(Stat* self, Entity * my) { return self->numShillelaghDebuffsActive(my); }
+
+
 bool Stat::statusEffectRemovedByCureAilment(const int effect, Entity* my)
 {
 	switch ( effect )
@@ -1688,6 +1730,9 @@ bool Stat::statusEffectRemovedByCureAilment(const int effect, Entity* my)
 	return false;
 }
 
+extern "C" bool Stat_statusEffectRemovedByCureAilment(Stat* self, const int effect, Entity * my) { return self->statusEffectRemovedByCureAilment(effect, my); }
+
+
 Uint32 Stat::getLootingBagKey(const int player)
 {
 	Uint32 lootingBagKey = player & 0xF;
@@ -1697,6 +1742,9 @@ Uint32 Stat::getLootingBagKey(const int player)
 
 	return lootingBagKey;
 }
+
+extern "C" Uint32 Stat_getLootingBagKey(Stat* self, const int player) { return self->getLootingBagKey(player); }
+
 
 void Stat::addItemToLootingBag(const int player, const real_t x, const real_t y, Item& item)
 {
@@ -1751,6 +1799,9 @@ void Stat::addItemToLootingBag(const int player, const real_t x, const real_t y,
 		}
 	}
 }
+
+extern "C" void Stat_addItemToLootingBag(Stat* self, const int player, const real_t x, const real_t y, Item & item) { return self->addItemToLootingBag(player, x, y, item); }
+
 
 bool Stat::emptyLootingBag(const int player, Uint32 key)
 {
@@ -1815,6 +1866,9 @@ bool Stat::emptyLootingBag(const int player, Uint32 key)
 	}
 	return false;
 }
+
+extern "C" bool Stat_emptyLootingBag(const int player, Uint32 key) { return Stat::emptyLootingBag(player, key); }
+
 
 real_t Stat::getEnsembleEffectBonus(Stat::EnsembleEffectsBonusType bonusType, int checkEffectStrength)
 {
@@ -2171,6 +2225,9 @@ real_t Stat::getEnsembleEffectBonus(Stat::EnsembleEffectsBonusType bonusType, in
 	return result;
 }
 
+extern "C" real_t Stat_getEnsembleEffectBonus(Stat* self, Stat::EnsembleEffectsBonusType bonusType, int checkEffectStrength) { return self->getEnsembleEffectBonus(bonusType, checkEffectStrength); }
+
+
 int Stat::getMaxAttackCharge(Stat* myStats)
 {
 	int charge = MAXCHARGE;
@@ -2181,6 +2238,9 @@ int Stat::getMaxAttackCharge(Stat* myStats)
 	}
 	return std::max(5, charge); // failsafe min 5
 }
+
+extern "C" int Stat_getMaxAttackCharge(Stat * myStats) { return Stat::getMaxAttackCharge(myStats); }
+
 
 real_t Stat::MonsterRangedAccuracy::getAccuracy(Uint32 target)
 {
@@ -2197,6 +2257,9 @@ real_t Stat::MonsterRangedAccuracy::getAccuracy(Uint32 target)
 	return accuracy;
 }
 
+extern "C" real_t MonsterRangedAccuracy_getAccuracy(Stat::MonsterRangedAccuracy* self, Uint32 target) { return self->getAccuracy(target); }
+
+
 void Stat::MonsterRangedAccuracy::incrementAccuracy()
 {
 	accuracy += 10.0;
@@ -2206,6 +2269,9 @@ void Stat::MonsterRangedAccuracy::incrementAccuracy()
 	}
 	accuracy = std::min(100.0, accuracy);
 }
+
+extern "C" void MonsterRangedAccuracy_incrementAccuracy(Stat::MonsterRangedAccuracy* self) { return self->incrementAccuracy(); }
+
 void Stat::MonsterRangedAccuracy::modifyProjectile(Entity& my, Entity& projectile)
 {
 	Stat* myStats = my.getStats();
@@ -2294,3 +2360,6 @@ void Stat::MonsterRangedAccuracy::modifyProjectile(Entity& my, Entity& projectil
 		}
 	}
 }
+
+extern "C" void MonsterRangedAccuracy_modifyProjectile(Stat::MonsterRangedAccuracy* self, Entity & my, Entity & projectile) { return self->modifyProjectile(my, projectile); }
+

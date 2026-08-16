@@ -50,6 +50,9 @@ void Entity::circuitPowerOn()
 	}
 }
 
+extern "C" void Entity_circuitPowerOn(Entity* self) { return self->circuitPowerOn(); }
+
+
 void Entity::circuitPowerOff()
 {
 	if (behavior == actCircuit && circuit_status() != CIRCUIT_OFF)
@@ -60,6 +63,9 @@ void Entity::circuitPowerOff()
 		updateCircuitNeighbors(); //Send the poweroff signal to all neighbors.
 	}
 }
+
+extern "C" void Entity_circuitPowerOff(Entity* self) { return self->circuitPowerOff(); }
+
 
 void Entity::updateCircuitNeighbors()
 {
@@ -139,6 +145,9 @@ void Entity::updateCircuitNeighbors()
 	}
 }
 
+extern "C" void Entity_updateCircuitNeighbors(Entity* self) { return self->updateCircuitNeighbors(); }
+
+
 
 
 
@@ -159,6 +168,9 @@ void Entity::mechanismPowerOn()
 	}
 }
 
+extern "C" void Entity_mechanismPowerOn(Entity* self) { return self->mechanismPowerOn(); }
+
+
 void Entity::mechanismPowerOff()
 {
 	//if (skill)
@@ -166,6 +178,9 @@ void Entity::mechanismPowerOff()
 		circuit_status() = CIRCUIT_OFF;    //Power off.
 	}
 }
+
+extern "C" void Entity_mechanismPowerOff(Entity* self) { return self->mechanismPowerOff(); }
+
 
 
 /*
@@ -769,6 +784,9 @@ void Entity::toggleSwitch(int skillIndexForPower)
 	}
 }
 
+extern "C" void Entity_toggleSwitch(Entity* self, int skillIndexForPower) { return self->toggleSwitch(skillIndexForPower); }
+
+
 void Entity::switchUpdateNeighbors()
 {
 	list_t* neighbors = getPowerableNeighbors(); //Grab a list of all neighboring circuits and mechanisms.
@@ -848,6 +866,9 @@ void Entity::switchUpdateNeighbors()
 	}
 }
 
+extern "C" void Entity_switchUpdateNeighbors(Entity* self) { return self->switchUpdateNeighbors(); }
+
+
 void getPowerablesOnTile(int x, int y, list_t** list)
 {
 
@@ -921,6 +942,9 @@ list_t* Entity::getPowerableNeighbors()
 	return return_val;
 }
 
+extern "C" list_t * Entity_getPowerableNeighbors(Entity* self) { return self->getPowerableNeighbors(); }
+
+
 void actSoundSource(Entity* my)
 {
 	if ( !my )
@@ -987,6 +1011,9 @@ void Entity::actSoundSource()
 	}
 #endif // SOUND
 }
+
+extern "C" void Entity_actSoundSource(Entity* self) { return self->actSoundSource(); }
+
 
 #define SIGNALTIMER_DELAYCOUNT skill[6]
 #define SIGNALTIMER_TIMERCOUNT skill[7]
@@ -1192,6 +1219,9 @@ void Entity::actSignalTimer()
 		}
 	}
 }
+
+extern "C" void Entity_actSignalTimer(Entity* self) { return self->actSignalTimer(); }
+
 
 void actSignalGateAND(Entity* my)
 {
@@ -1490,6 +1520,9 @@ void Entity::actSignalGateAND()
 	}
 }
 
+extern "C" void Entity_actSignalGateAND(Entity* self) { return self->actSignalGateAND(); }
+
+
 void actWallButton(Entity* my)
 {
 	if ( !my )
@@ -1779,6 +1812,9 @@ void Entity::actWallButton()
 		}
 	}
 }
+
+extern "C" void Entity_actWallButton(Entity* self) { return self->actWallButton(); }
+
 
 void actWallLock(Entity* my)
 {
@@ -2186,6 +2222,9 @@ void Entity::actWallLock()
 	}
 }
 
+extern "C" void Entity_actWallLock(Entity* self) { return self->actWallLock(); }
+
+
 void actWind(Entity* my)
 {
 	if ( !my )
@@ -2379,3 +2418,5 @@ void Entity::actWind()
 		}
 	}
 }
+
+extern "C" void Entity_actWind(Entity* self) { return self->actWind(); }

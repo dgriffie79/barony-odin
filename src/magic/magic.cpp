@@ -3482,6 +3482,9 @@ bool Entity::spellEffectPreserveItem(Item* item)
 	return false;
 }
 
+extern "C" bool Entity_spellEffectPreserveItem(Entity* self, Item * item) { return self->spellEffectPreserveItem(item); }
+
+
 int thaumSpellArmorProc(Entity* my, Stat& myStats, bool checkEffectActiveOnly, Entity* attacker, int effectID)
 {
 	int player = -1;
@@ -3657,6 +3660,9 @@ bool Entity::pinpointDamageProc(Entity* attacker, int damage)
 	return false;
 }
 
+extern "C" bool Entity_pinpointDamageProc(Entity* self, Entity * attacker, int damage) { return self->pinpointDamageProc(attacker, damage); }
+
+
 bool Entity::defyFleshProc(Entity* attacker)
 {
 	if ( multiplayer == CLIENT ) { return false; }
@@ -3709,6 +3715,9 @@ bool Entity::defyFleshProc(Entity* attacker)
 
 	return false;
 }
+
+extern "C" bool Entity_defyFleshProc(Entity* self, Entity * attacker) { return self->defyFleshProc(attacker); }
+
 
 bool Entity::mistFormDodge(bool checkEffectActiveOnly, Entity* attacker)
 {
@@ -3774,6 +3783,9 @@ bool Entity::mistFormDodge(bool checkEffectActiveOnly, Entity* attacker)
 	}
 	return false;
 }
+
+extern "C" bool Entity_mistFormDodge(Entity* self, bool checkEffectActiveOnly, Entity * attacker) { return self->mistFormDodge(checkEffectActiveOnly, attacker); }
+
 
 bool applyGenericMagicDamage(Entity* caster, Entity* hitentity, Entity& damageSourceProjectile, int spellID, 
 	int damage, bool alertMonsters, bool monsterCollisionOnly, int usingSpellbookID)
@@ -4588,21 +4600,48 @@ void updateEntityOldHPBeforeMagicHit(Entity& my, Entity& projectile)
 
 void spellElement_t::setDamage(int _damage) { damage = _damage; }
 
+extern "C" void spellElement_t_setDamage(spellElement_t* self, int _damage) { return self->setDamage(_damage); }
+
+
 void spellElement_t::setDamageSecondary(int _damage) { damage2 = _damage; }
+
+extern "C" void spellElement_t_setDamageSecondary(spellElement_t* self, int _damage) { return self->setDamageSecondary(_damage); }
+
 
 void spellElement_t::setDurationSecondary(int _duration) { duration2 = _duration; }
 
+extern "C" void spellElement_t_setDurationSecondary(spellElement_t* self, int _duration) { return self->setDurationSecondary(_duration); }
+
+
 void spellElement_t::setDamageMult(real_t _mult) { damage_mult = _mult; }
+
+extern "C" void spellElement_t_setDamageMult(spellElement_t* self, real_t _mult) { return self->setDamageMult(_mult); }
+
 
 void spellElement_t::setDamageSecondaryMult(real_t _mult) { damage2_mult = _mult; }
 
+extern "C" void spellElement_t_setDamageSecondaryMult(spellElement_t* self, real_t _mult) { return self->setDamageSecondaryMult(_mult); }
+
+
 void spellElement_t::setDurationMult(real_t _mult) { duration_mult = _mult; }
+
+extern "C" void spellElement_t_setDurationMult(spellElement_t* self, real_t _mult) { return self->setDurationMult(_mult); }
+
 
 void spellElement_t::setDurationSecondaryMult(real_t _mult) { duration2_mult = _mult; }
 
+extern "C" void spellElement_t_setDurationSecondaryMult(spellElement_t* self, real_t _mult) { return self->setDurationSecondaryMult(_mult); }
+
+
 void spellElement_t::setChanneledManaDuration(int _duration) { channeledMana_duration = _duration; }
 
+extern "C" void spellElement_t_setChanneledManaDuration(spellElement_t* self, int _duration) { return self->setChanneledManaDuration(_duration); }
+
+
 void spellElement_t::setChanneledManaMult(real_t _mult) { channeledMana_mult = _mult; }
+
+extern "C" void spellElement_t_setChanneledManaMult(spellElement_t* self, real_t _mult) { return self->setChanneledManaMult(_mult); }
+
 
 TempTexture* AOEIndicators_t::getTexture(Uint32 uid) {
 		auto find = indicators.find(uid);
@@ -4613,6 +4652,9 @@ TempTexture* AOEIndicators_t::getTexture(Uint32 uid) {
 		return nullptr;
 	}
 
+extern "C" TempTexture * AOEIndicators_t_getTexture(Uint32 uid) { return AOEIndicators_t::getTexture(uid); }
+
+
 SDL_Surface* AOEIndicators_t::getSurface(Uint32 uid) {
 		auto find = indicators.find(uid);
 		if ( find != indicators.end() )
@@ -4622,6 +4664,9 @@ SDL_Surface* AOEIndicators_t::getSurface(Uint32 uid) {
 		return nullptr;
 	}
 
+extern "C" SDL_Surface * AOEIndicators_t_getSurface(Uint32 uid) { return AOEIndicators_t::getSurface(uid); }
+
+
 AOEIndicators_t::Indicator_t * AOEIndicators_t::getIndicator(Uint32 uid) {
 		auto find = indicators.find(uid);
 		if ( find != indicators.end() )
@@ -4630,3 +4675,6 @@ AOEIndicators_t::Indicator_t * AOEIndicators_t::getIndicator(Uint32 uid) {
 		}
 		return nullptr;
 	}
+
+extern "C" AOEIndicators_t::Indicator_t * AOEIndicators_t_getIndicator(Uint32 uid) { return AOEIndicators_t::getIndicator(uid); }
+

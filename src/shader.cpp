@@ -14,6 +14,9 @@ void Shader::init(const char* name) {
     }
 }
 
+extern "C" void Shader_init(Shader* self, const char * name) { return self->init(name); }
+
+
 void Shader::destroy() {
     if (program) {
         for (auto shader: shaders) {
@@ -29,6 +32,9 @@ void Shader::destroy() {
     }
 }
 
+extern "C" void Shader_destroy(Shader* self) { return self->destroy(); }
+
+
 static unsigned int currentActiveShader = 0;
 
 bool Shader::bind() {
@@ -39,12 +45,18 @@ bool Shader::bind() {
     return program != 0;
 }
 
+extern "C" bool Shader_bind(Shader* self) { return self->bind(); }
+
+
 void Shader::unbind() {
     if (currentActiveShader) {
         GL_CHECK_ERR(glUseProgram(0));
         currentActiveShader = 0;
     }
 }
+
+extern "C" void Shader_unbind() { return Shader::unbind(); }
+
 
 int Shader::uniform(const char* name) {
     if ( !uniforms.contains(name) ) {
@@ -59,9 +71,15 @@ int Shader::uniform(const char* name) {
     }
 }
 
+extern "C" int Shader_uniform(Shader* self, const char * name) { return self->uniform(name); }
+
+
 void Shader::bindAttribLocation(const char* attribute, int location) {
     GL_CHECK_ERR(glBindAttribLocation(program, location, attribute));
 }
+
+extern "C" void Shader_bindAttribLocation(Shader* self, const char * attribute, int location) { return self->bindAttribLocation(attribute, location); }
+
 
 bool Shader::compile(const char* source, size_t len, Shader::Type type) {
     GLenum glType;
@@ -101,6 +119,9 @@ bool Shader::compile(const char* source, size_t len, Shader::Type type) {
     }
 }
 
+extern "C" bool Shader_compile(Shader* self, const char * source, size_t len, Shader::Type type) { return self->compile(source, len, type); }
+
+
 bool Shader::link() {
     uniforms.clear();
     GL_CHECK_ERR(glLinkProgram(program));
@@ -118,4 +139,10 @@ bool Shader::link() {
     }
 }
 
+extern "C" bool Shader_link(Shader* self) { return self->link(); }
+
+
 bool Shader::isInitialized() const { return program != 0; }
+
+extern "C" bool Shader_isInitialized(const Shader* self) { return self->isInitialized(); }
+

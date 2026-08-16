@@ -283,13 +283,28 @@ light_t* addLight(Sint32 x, Sint32 y, const char* name, int range_bonus, int ind
 
 bool DynamicMapLightDef::contains(const char* key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key), &v, MK_LightDef); }
 
+extern "C" bool DynamicMapLightDef_contains_3(const DynamicMapLightDef* self, const std::string & key) { return self->contains(key); }
+
+
+extern "C" bool DynamicMapLightDef_contains_2(const DynamicMapLightDef* self, const DynamicString & key) { return self->contains(key); }
+
+
+extern "C" bool DynamicMapLightDef_contains(const DynamicMapLightDef* self, const char * key) { return self->contains(key); }
+
+
 bool DynamicMapLightDef::contains(const DynamicString& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), key, &v, MK_LightDef); }
 
 bool DynamicMapLightDef::contains(const std::string& key) const { LightDef v; return barony_dynamic_map_str_get(const_cast<DynamicMapRaw*>(&raw), DynamicString(key.c_str()), &v, MK_LightDef); }
 
 bool DynamicMapLightDef::empty() const { return size() == 0; }
 
+extern "C" bool DynamicMapLightDef_empty(const DynamicMapLightDef* self) { return self->empty(); }
+
+
 void DynamicMapLightDef::clear() { barony_dynamic_map_str_clear(&raw, MK_LightDef); }
+
+extern "C" void DynamicMapLightDef_clear(DynamicMapLightDef* self) { return self->clear(); }
+
 
 DynamicMapLightDef::Iterator DynamicMapLightDef::find(const char* key) const {
         Iterator it;
@@ -306,6 +321,15 @@ DynamicMapLightDef::Iterator DynamicMapLightDef::find(const char* key) const {
         return it;
     }
 
+extern "C" DynamicMapLightDef::Iterator DynamicMapLightDef_find_2(const DynamicMapLightDef* self, const std::string & key) { return self->find(key); }
+
+
+extern "C" DynamicMapLightDef::Iterator DynamicMapLightDef_find(const DynamicMapLightDef* self, const char * key) { return self->find(key); }
+
+
 DynamicMapLightDef::Iterator DynamicMapLightDef::find(const std::string& key) const { return find(key.c_str()); }
 
 DynamicMapLightDef::Iterator DynamicMapLightDef::end() const { return Iterator{}; }
+
+extern "C" DynamicMapLightDef::Iterator DynamicMapLightDef_end(const DynamicMapLightDef* self) { return self->end(); }
+

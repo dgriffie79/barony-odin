@@ -3515,6 +3515,9 @@ void AchievementObserver::getCurrentPlayerUids()
 	}
 }
 
+extern "C" void AchievementObserver_getCurrentPlayerUids(AchievementObserver* self) { return self->getCurrentPlayerUids(); }
+
+
 bool AchievementObserver::updateOnLevelChange()
 {
 	if ( levelObserved != currentlevel )
@@ -3541,6 +3544,9 @@ bool AchievementObserver::updateOnLevelChange()
 	return false;
 }
 
+extern "C" bool AchievementObserver_updateOnLevelChange(AchievementObserver* self) { return self->updateOnLevelChange(); }
+
+
 int AchievementObserver::checkUidIsFromPlayer(Uint32 uid)
 {
 	if ( uid == 0 ) { return -1; }
@@ -3553,6 +3559,9 @@ int AchievementObserver::checkUidIsFromPlayer(Uint32 uid)
 	}
 	return -1;
 }
+
+extern "C" int AchievementObserver_checkUidIsFromPlayer(AchievementObserver* self, Uint32 uid) { return self->checkUidIsFromPlayer(uid); }
+
 
 void AchievementObserver::updateClientBounties(bool firstSend)
 {
@@ -3667,6 +3676,9 @@ void AchievementObserver::updateClientBounties(bool firstSend)
 	}
 }
 
+extern "C" void AchievementObserver_updateClientBounties(AchievementObserver* self, bool firstSend) { return self->updateClientBounties(firstSend); }
+
+
 void AchievementObserver::updateData()
 {
 	PlayerAchievements::allPlayersDeadEvent = false;
@@ -3776,6 +3788,9 @@ void AchievementObserver::updateData()
 	updateClientBounties(true);
 }
 
+extern "C" void AchievementObserver_updateData(AchievementObserver* self) { return self->updateData(); }
+
+
 bool AchievementObserver::addEntityAchievementTimer(Entity* entity, int achievement, int ticks, bool resetTimerIfActive, int optionalIncrement)
 {
 	if ( !entity )
@@ -3816,6 +3831,9 @@ bool AchievementObserver::addEntityAchievementTimer(Entity* entity, int achievem
 	}
 }
 
+extern "C" bool AchievementObserver_addEntityAchievementTimer(AchievementObserver* self, Entity * entity, int achievement, int ticks, bool resetTimerIfActive, int optionalIncrement) { return self->addEntityAchievementTimer(entity, achievement, ticks, resetTimerIfActive, optionalIncrement); }
+
+
 void AchievementObserver::printActiveAchievementTimers()
 {
 	entityAchievementsToProcess.forEach([&](Uint32 uid, DynamicMapI32IntPair& inner) {
@@ -3824,6 +3842,9 @@ void AchievementObserver::printActiveAchievementTimers()
 		});
 	});
 }
+
+extern "C" void AchievementObserver_printActiveAchievementTimers(AchievementObserver* self) { return self->printActiveAchievementTimers(); }
+
 
 void AchievementObserver::achievementTimersTickDown()
 {
@@ -3866,6 +3887,9 @@ void AchievementObserver::achievementTimersTickDown()
 
 	//printActiveAchievementTimers();
 }
+
+extern "C" void AchievementObserver_achievementTimersTickDown(AchievementObserver* self) { return self->achievementTimersTickDown(); }
+
 
 void AchievementObserver::awardAchievementIfActive(int player, Entity* entity, int achievement)
 {
@@ -3917,6 +3941,9 @@ void AchievementObserver::awardAchievementIfActive(int player, Entity* entity, i
 	}
 }
 
+extern "C" void AchievementObserver_awardAchievementIfActive(AchievementObserver* self, int player, Entity * entity, int achievement) { return self->awardAchievementIfActive(player, entity, achievement); }
+
+
 void AchievementObserver::checkMapScriptsOnVariableSet()
 {
 	DynamicMapI32::Entry entries[64];
@@ -3939,6 +3966,9 @@ void AchievementObserver::checkMapScriptsOnVariableSet()
 		}
 	}
 }
+
+extern "C" void AchievementObserver_checkMapScriptsOnVariableSet(AchievementObserver* self) { return self->checkMapScriptsOnVariableSet(); }
+
 
 std::map<ItemType, Uint32> dapperItems;
 DynamicSetI32 AchievementObserver::PlayerAchievements::startingClassItems =
@@ -4000,6 +4030,9 @@ int AchievementObserver::PlayerAchievements::getItemIndexForDapperAchievement(It
 	}
 	return -1;
 }
+
+extern "C" int PlayerAchievements_getItemIndexForDapperAchievement(AchievementObserver::PlayerAchievements* self, Item * item) { return self->getItemIndexForDapperAchievement(item); }
+
 
 void AchievementObserver::updatePlayerAchievement(int player, Achievement achievement, AchievementEvent achEvent)
 {
@@ -4385,6 +4418,9 @@ void AchievementObserver::updatePlayerAchievement(int player, Achievement achiev
 #endif
 }
 
+extern "C" void AchievementObserver_updatePlayerAchievement(AchievementObserver* self, int player, AchievementObserver::Achievement achievement, AchievementObserver::AchievementEvent achEvent) { return self->updatePlayerAchievement(player, achievement, achEvent); }
+
+
 bool AchievementObserver::PlayerAchievements::allPlayersDeadEvent = false;
 
 void AchievementObserver::clearPlayerAchievementData()
@@ -4433,6 +4469,9 @@ void AchievementObserver::clearPlayerAchievementData()
 		playerAchievements[i].ticksByTheBookViewed = 0;
 	}
 }
+
+extern "C" void AchievementObserver_clearPlayerAchievementData(AchievementObserver* self) { return self->clearPlayerAchievementData(); }
+
 
 void AchievementObserver::awardAchievement(int player, int achievement)
 {
@@ -4541,6 +4580,9 @@ void AchievementObserver::awardAchievement(int player, int achievement)
 	}
 }
 
+extern "C" void AchievementObserver_awardAchievement(AchievementObserver* self, int player, int achievement) { return self->awardAchievement(player, achievement); }
+
+
 bool AchievementObserver::PlayerAchievements::checkPathBetweenObjects(Entity* player, Entity* target, int achievement)
 {
 	if ( !player )
@@ -4625,6 +4667,9 @@ bool AchievementObserver::PlayerAchievements::checkPathBetweenObjects(Entity* pl
 	return false;
 }
 
+extern "C" bool PlayerAchievements_checkPathBetweenObjects(AchievementObserver::PlayerAchievements* self, Entity * player, Entity * target, int achievement) { return self->checkPathBetweenObjects(player, target, achievement); }
+
+
 bool AchievementObserver::PlayerAchievements::checkTraditionKill(Entity* player, Entity* target)
 {
 	if ( tradition )
@@ -4668,6 +4713,9 @@ bool AchievementObserver::PlayerAchievements::checkTraditionKill(Entity* player,
 	return true;
 }
 
+extern "C" bool PlayerAchievements_checkTraditionKill(AchievementObserver::PlayerAchievements* self, Entity * player, Entity * target) { return self->checkTraditionKill(player, target); }
+
+
 void AchievementObserver::updateGlobalStat(int index, int player)
 {
 	if ( multiplayer == CLIENT )
@@ -4683,6 +4731,11 @@ void AchievementObserver::updateGlobalStat(int index, int player)
 	}
 #endif
 }
+
+extern "C" void AchievementObserver_updateGlobalStat(AchievementObserver* self, int index, int player) { return self->updateGlobalStat(index, player); }
+
+
+
 
 SteamGlobalStatIndexes getIndexForDeathType(int type)
 {
@@ -4959,6 +5012,9 @@ void SaveGameInfo::computeHash(const int playernum, Uint32& hash)
 	hash += (Uint32)((Uint32)players[playernum].baseSpellMPUsedThaumaturgy << (shift % 32)); ++shift;
 }
 
+extern "C" void SaveGameInfo_computeHash(SaveGameInfo* self, const int playernum, Uint32 & hash) { return self->computeHash(playernum, hash); }
+
+
 void SaveGameInfo::Player::stat_t::item_t::computeHash(Uint32& hash, Uint32& shift)
 {
 	hash += (Uint32)((Uint32)type << (shift % 32)); ++shift;
@@ -4970,6 +5026,9 @@ void SaveGameInfo::Player::stat_t::item_t::computeHash(Uint32& hash, Uint32& shi
 	hash += (Uint32)((Uint32)x << (shift % 32)); ++shift;
 	hash += (Uint32)((Uint32)y << (shift % 32)); ++shift;
 }
+
+extern "C" void item_t_computeHash(SaveGameInfo::Player::stat_t::item_t* self, Uint32 & hash, Uint32 & shift) { return self->computeHash(hash, shift); }
+
 
 int SaveGameInfo::populateFromSession(const int playernum)
 {
@@ -5471,6 +5530,9 @@ int SaveGameInfo::populateFromSession(const int playernum)
 	return 0;
 }
 
+extern "C" int SaveGameInfo_populateFromSession(SaveGameInfo* self, const int playernum) { return self->populateFromSession(playernum); }
+
+
 int saveGame(int saveIndex) {
 	if (!gameModeManager.allowsSaves()) {
 		return 1; // can't save tutorial games
@@ -5596,6 +5658,9 @@ int SaveGameInfo::getTotalScore(const int playernum, const int victory)
 
 	return amount;
 }
+
+extern "C" int SaveGameInfo_getTotalScore(SaveGameInfo* self, const int playernum, const int victory) { return self->getTotalScore(playernum, victory); }
+
 
 DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const int victory)
 {
@@ -5774,6 +5839,9 @@ DynamicString SaveGameInfo::serializeToOnlineHiscore(const int playernum, const 
 	json_string_free(json);
 	return result;
 }
+
+extern "C" DynamicString SaveGameInfo_serializeToOnlineHiscore(SaveGameInfo* self, const int playernum, const int victory) { return self->serializeToOnlineHiscore(playernum, victory); }
+
 
 int loadGame(int player, const SaveGameInfo& info) {
 	if (player < 0 || player >= MAXPLAYERS) {
@@ -6644,6 +6712,9 @@ int SaveGameInfo::Player::isCharacterValidFromDLC()
 	return INVALID_CHARACTER;
 }
 
+extern "C" int Player_isCharacterValidFromDLC(SaveGameInfo::Player* self) { return self->isCharacterValidFromDLC(); }
+
+
 bool SaveGameInfo::serialize(FileInterface* fp) {
 		fp->property("magic_cookie", magic_cookie);
 		fp->property("game_version", game_version);
@@ -6667,6 +6738,9 @@ bool SaveGameInfo::serialize(FileInterface* fp) {
 		fp->property("map_messages", map_messages);
 		return true;
 	}
+
+extern "C" bool SaveGameInfo_serialize(SaveGameInfo* self, FileInterface * fp) { return self->serialize(fp); }
+
 
 bool SaveGameInfo::Player::serialize(FileInterface* fp) {
 			fp->property("char_class", char_class);
@@ -6724,6 +6798,9 @@ bool SaveGameInfo::Player::serialize(FileInterface* fp) {
 			return true;
 		}
 
+extern "C" bool Player_serialize(SaveGameInfo::Player* self, FileInterface * fp) { return self->serialize(fp); }
+
+
 bool SaveGameInfo::Player::PlayerRaceHostility_t::serialize(FileInterface* fp) {
 				fp->property("wanted_level", wantedLevel);
 				fp->property("player_race", playerRace);
@@ -6736,6 +6813,11 @@ bool SaveGameInfo::Player::PlayerRaceHostility_t::serialize(FileInterface* fp) {
 				fp->property("num_accessories", numAccessories);
 				return true;
 			}
+
+extern "C" bool PlayerRaceHostility_t_serialize(SaveGameInfo::Player::PlayerRaceHostility_t* self, FileInterface * fp) { return self->serialize(fp); }
+
+
+
 
 bool SaveGameInfo::Player::stat_t::serialize(FileInterface* fp) {
 				fp->property("name", name);
@@ -6770,6 +6852,9 @@ bool SaveGameInfo::Player::stat_t::serialize(FileInterface* fp) {
 				return true;
 			}
 
+extern "C" bool stat_t_serialize(SaveGameInfo::Player::stat_t* self, FileInterface * fp) { return self->serialize(fp); }
+
+
 bool SaveGameInfo::Player::stat_t::item_t::serialize(FileInterface* fp) {
 					fp->property("type", type);
 					fp->property("status", status);
@@ -6782,6 +6867,9 @@ bool SaveGameInfo::Player::stat_t::item_t::serialize(FileInterface* fp) {
 					return true;
 				}
 
+extern "C" bool item_t_serialize(SaveGameInfo::Player::stat_t::item_t* self, FileInterface * fp) { return self->serialize(fp); }
+
+
 bool SaveGameInfo::Player::stat_t::lootbag_t::serialize(FileInterface* fp) {
 					fp->property("spawn_x", spawn_x);
 					fp->property("spawn_y", spawn_y);
@@ -6790,6 +6878,9 @@ bool SaveGameInfo::Player::stat_t::lootbag_t::serialize(FileInterface* fp) {
 					fp->propertyName("items"); fp->valueArray<item_t>(items);
 					return true;
 				}
+
+extern "C" bool lootbag_t_serialize(SaveGameInfo::Player::stat_t::lootbag_t* self, FileInterface * fp) { return self->serialize(fp); }
+
 
 bool AchievementObserver::bIsAchievementAllowedDuringTutorial(DynamicString achievementStr) {
 		if ( !achievementStr.compare("BARONY_ACH_TEACHABLE_MOMENT") )
@@ -6823,6 +6914,9 @@ bool AchievementObserver::bIsAchievementAllowedDuringTutorial(DynamicString achi
 		return false;
 	}
 
+extern "C" bool AchievementObserver_bIsAchievementAllowedDuringTutorial(AchievementObserver* self, DynamicString achievementStr) { return self->bIsAchievementAllowedDuringTutorial(achievementStr); }
+
+
 bool AchievementObserver::bIsStatisticAllowedDuringTutorial(SteamStatIndexes statistic) {
 		switch ( statistic )
 		{
@@ -6838,3 +6932,6 @@ bool AchievementObserver::bIsStatisticAllowedDuringTutorial(SteamStatIndexes sta
 				break;
 		}
 	}
+
+extern "C" bool AchievementObserver_bIsStatisticAllowedDuringTutorial(AchievementObserver* self, SteamStatIndexes statistic) { return self->bIsStatisticAllowedDuringTutorial(statistic); }
+

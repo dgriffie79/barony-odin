@@ -700,6 +700,9 @@ bool Entity::devilSummonMonster(Entity* summonOnEntity, Monster creature, int ra
 	return false;
 }
 
+extern "C" bool Entity_devilSummonMonster(Entity* self, Entity * summonOnEntity, Monster creature, int radiusFromCenter, int playerToTarget) { return self->devilSummonMonster(summonOnEntity, creature, radiusFromCenter, playerToTarget); }
+
+
 int Entity::devilGetNumMonstersInArena(Monster creature)
 {
 	int hellArena_x0 = 15;
@@ -724,6 +727,9 @@ int Entity::devilGetNumMonstersInArena(Monster creature)
 	}
 	return numMonstersActiveInArena;
 }
+
+extern "C" int Entity_devilGetNumMonstersInArena(Entity* self, Monster creature) { return self->devilGetNumMonstersInArena(creature); }
+
 
 bool Entity::devilBoulderSummonIfPlayerIsHiding(int player)
 {
@@ -797,3 +803,5 @@ bool Entity::devilBoulderSummonIfPlayerIsHiding(int player)
 	}
 	return false;
 }
+
+extern "C" bool Entity_devilBoulderSummonIfPlayerIsHiding(Entity* self, int player) { return self->devilBoulderSummonIfPlayerIsHiding(player); }

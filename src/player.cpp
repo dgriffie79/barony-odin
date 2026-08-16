@@ -97,6 +97,9 @@ void GameController::close()
 	initBindings(); // clear status of all values
 }
 
+extern "C" void GameController_close(GameController* self) { return self->close(); }
+
+
 void GameController::reinitHaptic()
 {
 	return; // using SDL_GameControllerRumble instead..
@@ -128,6 +131,9 @@ void GameController::reinitHaptic()
 		printlog("Controller name is \"%s\", haptics disabled", name.c_str());
 	}
 }
+
+extern "C" void GameController_reinitHaptic(GameController* self) { return self->reinitHaptic(); }
+
 
 bool GameController::open(int sdl_which, int index)
 {
@@ -192,6 +198,9 @@ bool GameController::open(int sdl_which, int index)
 	return (sdl_device != nullptr);
 }
 
+extern "C" bool GameController_open(GameController* self, int sdl_which, int index) { return self->open(sdl_which, index); }
+
+
 void GameController::initBindings() 
 {
 	for ( int i = SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_A; i < SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX; ++i )
@@ -231,10 +240,16 @@ void GameController::initBindings()
 	this->radialSelection.consumed = false;
 }
 
+extern "C" void GameController_initBindings(GameController* self) { return self->initBindings(); }
+
+
 const bool GameController::isActive()
 {
 	return (sdl_device != nullptr);
 }
+
+extern "C" const bool GameController_isActive(GameController* self) { return self->isActive(); }
+
 
 real_t getGamepadMenuXSensitivity(int player)
 {
@@ -545,6 +560,9 @@ void GameController::handleAnalog(int player)
 	}
 }
 
+extern "C" void GameController_handleAnalog(GameController* self, int player) { return self->handleAnalog(player); }
+
+
 int GameController::getRightXMove(int player) // with sensitivity
 {
 	if (!isActive())
@@ -556,6 +574,9 @@ int GameController::getRightXMove(int player) // with sensitivity
 	x *= getGamepadRightXSensitivity(player);
 	return x;
 }
+
+extern "C" int GameController_getRightXMove(GameController* self, int player) { return self->getRightXMove(player); }
+
 
 int GameController::getRightYMove(int player) // with sensitivity
 {
@@ -569,8 +590,17 @@ int GameController::getRightYMove(int player) // with sensitivity
 	return y;
 }
 
-int GameController::getLeftTrigger() { return getRawLeftTrigger(); } //No sensitivity taken into account (yet)
-int GameController::getRightTrigger() { return getRawRightTrigger(); } //No sensitivity taken into account (yet)
+extern "C" int GameController_getRightYMove(GameController* self, int player) { return self->getRightYMove(player); }
+
+
+int GameController::getLeftTrigger() { return getRawLeftTrigger(); }
+
+extern "C" int GameController_getLeftTrigger(GameController* self) { return self->getLeftTrigger(); }
+ //No sensitivity taken into account (yet)
+int GameController::getRightTrigger() { return getRawRightTrigger(); }
+
+extern "C" int GameController_getRightTrigger(GameController* self) { return self->getRightTrigger(); }
+ //No sensitivity taken into account (yet)
 
 int GameController::getRawLeftXMove(int player) // no sensitivity
 {
@@ -598,6 +628,9 @@ int GameController::getRawLeftXMove(int player) // no sensitivity
 	return (!gamepad_leftx_invert) ? x : -x;
 }
 
+extern "C" int GameController_getRawLeftXMove(GameController* self, int player) { return self->getRawLeftXMove(player); }
+
+
 int GameController::getRawLeftYMove(int player) // no sensitivity
 {
 	if (!isActive())
@@ -623,6 +656,9 @@ int GameController::getRawLeftYMove(int player) // no sensitivity
 	}
 	return (!gamepad_lefty_invert) ? -y : y;
 }
+
+extern "C" int GameController_getRawLeftYMove(GameController* self, int player) { return self->getRawLeftYMove(player); }
+
 
 int GameController::getRawRightXMove(int player) // no sensitivity
 {
@@ -650,6 +686,9 @@ int GameController::getRawRightXMove(int player) // no sensitivity
 	return (!gamepad_rightx_invert) ? x : -x;
 }
 
+extern "C" int GameController_getRawRightXMove(GameController* self, int player) { return self->getRawRightXMove(player); }
+
+
 int GameController::getRawRightYMove(int player) // no sensitivity
 {
 	if (!isActive())
@@ -676,6 +715,9 @@ int GameController::getRawRightYMove(int player) // no sensitivity
 	return (!gamepad_righty_invert) ? y : -y;
 }
 
+extern "C" int GameController_getRawRightYMove(GameController* self, int player) { return self->getRawRightYMove(player); }
+
+
 int GameController::getRawLeftTrigger()
 {
 	if (!isActive())
@@ -690,6 +732,9 @@ int GameController::getRawLeftTrigger()
 	n -= gamepad_trigger_deadzone;
 	return n;
 }
+
+extern "C" int GameController_getRawLeftTrigger(GameController* self) { return self->getRawLeftTrigger(); }
+
 
 int GameController::getRawRightTrigger()
 {
@@ -706,6 +751,9 @@ int GameController::getRawRightTrigger()
 	return n;
 }
 
+extern "C" int GameController_getRawRightTrigger(GameController* self) { return self->getRawRightTrigger(); }
+
+
 float GameController::getLeftXPercentForPlayerMovement(int player)
 {
 	float x_force = getLeftXPercent(player);
@@ -719,6 +767,9 @@ float GameController::getLeftXPercentForPlayerMovement(int player)
 	}
 	return x_force;
 }
+
+extern "C" float GameController_getLeftXPercentForPlayerMovement(GameController* self, int player) { return self->getLeftXPercentForPlayerMovement(player); }
+
 float GameController::getLeftYPercentForPlayerMovement(int player)
 {
 	float y_force = getLeftYPercent(player);
@@ -733,21 +784,60 @@ float GameController::getLeftYPercentForPlayerMovement(int player)
 	return y_force;
 }
 
+extern "C" float GameController_getLeftYPercentForPlayerMovement(GameController* self, int player) { return self->getLeftYPercentForPlayerMovement(player); }
+
+
 float GameController::getLeftXPercent(int player) { return (float)getRawLeftXMove(player) / (float)maxLeftXMove(player); }
+
+extern "C" float GameController_getLeftXPercent(GameController* self, int player) { return self->getLeftXPercent(player); }
+
 float GameController::getLeftYPercent(int player) { return (float)getRawLeftYMove(player) / (float)maxLeftYMove(player); }
+
+extern "C" float GameController_getLeftYPercent(GameController* self, int player) { return self->getLeftYPercent(player); }
+
 float GameController::getRightXPercent(int player) { return (float)getRawRightXMove(player) / (float)maxRightXMove(player); }
+
+extern "C" float GameController_getRightXPercent(GameController* self, int player) { return self->getRightXPercent(player); }
+
 float GameController::getRightYPercent(int player) { return (float)getRawRightYMove(player) / (float)maxRightYMove(player); }
 
+extern "C" float GameController_getRightYPercent(GameController* self, int player) { return self->getRightYPercent(player); }
+
+
 float GameController::getLeftTriggerPercent() { return (float)getRawLeftTrigger() / (float)maxLeftTrigger(); }
+
+extern "C" float GameController_getLeftTriggerPercent(GameController* self) { return self->getLeftTriggerPercent(); }
+
 float GameController::getRightTriggerPercent() { return (float)getRawRightTrigger() / (float)maxRightTrigger(); }
+
+extern "C" float GameController_getRightTriggerPercent(GameController* self) { return self->getRightTriggerPercent(); }
+
 
 //Ya, it's pretty constant in SDL2.
 int GameController::maxLeftXMove(int player) { return 32767 - (leftStickDeadzoneType == DEADZONE_PER_AXIS ? playerSettings[multiplayer ? 0 : player].leftStickDeadzone : 0); }
+
+extern "C" int GameController_maxLeftXMove(GameController* self, int player) { return self->maxLeftXMove(player); }
+
 int GameController::maxLeftYMove(int player) { return 32767 - (leftStickDeadzoneType == DEADZONE_PER_AXIS ? playerSettings[multiplayer ? 0 : player].leftStickDeadzone : 0); }
+
+extern "C" int GameController_maxLeftYMove(GameController* self, int player) { return self->maxLeftYMove(player); }
+
 int GameController::maxRightXMove(int player) { return 32767 - (rightStickDeadzoneType == DEADZONE_PER_AXIS ? playerSettings[multiplayer ? 0 : player].rightStickDeadzone : 0); }
+
+extern "C" int GameController_maxRightXMove(GameController* self, int player) { return self->maxRightXMove(player); }
+
 int GameController::maxRightYMove(int player) { return 32767 - (rightStickDeadzoneType == DEADZONE_PER_AXIS ? playerSettings[multiplayer ? 0 : player].rightStickDeadzone : 0); }
+
+extern "C" int GameController_maxRightYMove(GameController* self, int player) { return self->maxRightYMove(player); }
+
 int GameController::maxLeftTrigger() { return 32767 - gamepad_deadzone; }
+
+extern "C" int GameController_maxLeftTrigger(GameController* self) { return self->maxLeftTrigger(); }
+
 int GameController::maxRightTrigger() {	return 32767 - gamepad_deadzone; }
+
+extern "C" int GameController_maxRightTrigger(GameController* self) { return self->maxRightTrigger(); }
+
 
 const bool hotbarGamepadControlEnabled(const int player)
 {
@@ -781,6 +871,9 @@ bool Player::CharacterSheet_t::isSheetElementAllowedToNavigateTo(Player::Charact
 		return true;
 	}
 }
+
+extern "C" bool CharacterSheet_t_isSheetElementAllowedToNavigateTo(Player::CharacterSheet_t* self, Player::CharacterSheet_t::SheetElements element) { return self->isSheetElementAllowedToNavigateTo(element); }
+
 
 bool Player::GUI_t::handleCharacterSheetMovement()
 {
@@ -1137,6 +1230,9 @@ bool Player::GUI_t::handleCharacterSheetMovement()
 	return false;
 }
 
+extern "C" bool GUI_t_handleCharacterSheetMovement(Player::GUI_t* self) { return self->handleCharacterSheetMovement(); }
+
+
 bool Player::GUI_t::isGameoverActive()
 {
 	if ( gameUIFrame[player.playernum] )
@@ -1151,6 +1247,9 @@ bool Player::GUI_t::isGameoverActive()
 	}
 	return false;
 }
+
+extern "C" bool GUI_t_isGameoverActive(Player::GUI_t* self) { return self->isGameoverActive(); }
+
 
 bool Player::GUI_t::bModuleAccessibleWithMouse(GUIModules moduleToAccess)
 {
@@ -1201,6 +1300,9 @@ bool Player::GUI_t::bModuleAccessibleWithMouse(GUIModules moduleToAccess)
 	return true;
 }
 
+extern "C" bool GUI_t_bModuleAccessibleWithMouse(Player::GUI_t* self, Player::GUI_t::GUIModules moduleToAccess) { return self->bModuleAccessibleWithMouse(moduleToAccess); }
+
+
 bool Player::GUI_t::returnToPreviousActiveModule()
 {
 	if ( previousModule == MODULE_NONE )
@@ -1246,6 +1348,9 @@ bool Player::GUI_t::returnToPreviousActiveModule()
 	previousModule = MODULE_NONE;
 	return true;
 }
+
+extern "C" bool GUI_t_returnToPreviousActiveModule(Player::GUI_t* self) { return self->returnToPreviousActiveModule(); }
+
 
 Player::GUI_t::GUIModules Player::GUI_t::handleModuleNavigation(bool checkDestinationOnly, bool checkLeftNavigation)
 {
@@ -2059,41 +2164,65 @@ Player::GUI_t::GUIModules Player::GUI_t::handleModuleNavigation(bool checkDestin
 	return MODULE_NONE;
 }
 
+extern "C" Player::GUI_t::GUIModules GUI_t_handleModuleNavigation(Player::GUI_t* self, bool checkDestinationOnly, bool checkLeftNavigation) { return self->handleModuleNavigation(checkDestinationOnly, checkLeftNavigation); }
+
+
 static CvarInt cvar_game_ui_sfx_volume("/game_ui_sfx_volume", 32);
 void Player::soundMovement()
 {
 	playSound(604, *cvar_game_ui_sfx_volume);
 }
 
+extern "C" void Player_soundMovement() { return Player::soundMovement(); }
+
+
 void Player::soundHotbarShootmodeMovement()
 {
 	playSound(604, *cvar_game_ui_sfx_volume);
 }
+
+extern "C" void Player_soundHotbarShootmodeMovement() { return Player::soundHotbarShootmodeMovement(); }
+
 
 void Player::soundModuleNavigation()
 {
 	playSound(494, *cvar_game_ui_sfx_volume);
 }
 
+extern "C" void Player_soundModuleNavigation() { return Player::soundModuleNavigation(); }
+
+
 void Player::soundActivate() 
 {
 	playSound(493, *cvar_game_ui_sfx_volume);
 }
+
+extern "C" void Player_soundActivate() { return Player::soundActivate(); }
+
 
 void Player::soundCancel() 
 {
 	playSound(499, *cvar_game_ui_sfx_volume);
 }
 
+extern "C" void Player_soundCancel() { return Player::soundCancel(); }
+
+
 void Player::soundStatusOpen()
 {
 	//playSound(494, *cvar_game_ui_sfx_volume);
 }
 
+extern "C" void Player_soundStatusOpen() { return Player::soundStatusOpen(); }
+
+
 void Player::soundStatusClose()
 {
 	playSound(494, *cvar_game_ui_sfx_volume);
 }
+
+extern "C" void Player_soundStatusClose() { return Player::soundStatusClose(); }
+
 
 bool Player::GUI_t::handleInventoryMovement()
 {
@@ -2689,6 +2818,9 @@ bool Player::GUI_t::handleInventoryMovement()
 	return false;
 }
 
+extern "C" bool GUI_t_handleInventoryMovement(Player::GUI_t* self) { return self->handleInventoryMovement(); }
+
+
 void initGameControllers()
 {
 	inputs.setPlayerIDAllowedKeyboard(0);
@@ -2724,6 +2856,9 @@ SDL_GameControllerButton GameController::getSDLButtonFromImpulse(const unsigned 
 	return static_cast<SDL_GameControllerButton>(joyimpulses[controllerImpulse] - 301);
 }
 
+extern "C" SDL_GameControllerButton GameController_getSDLButtonFromImpulse(const unsigned int controllerImpulse) { return GameController::getSDLButtonFromImpulse(controllerImpulse); }
+
+
 SDL_GameControllerAxis GameController::getSDLTriggerFromImpulse(const unsigned controllerImpulse)
 {
 	if ( controllerImpulse >= NUM_JOY_IMPULSES )
@@ -2738,6 +2873,9 @@ SDL_GameControllerAxis GameController::getSDLTriggerFromImpulse(const unsigned c
 
 	return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_INVALID;
 }
+
+extern "C" SDL_GameControllerAxis GameController_getSDLTriggerFromImpulse(const unsigned int controllerImpulse) { return GameController::getSDLTriggerFromImpulse(controllerImpulse); }
+
 
 GameController::Haptic_t::Haptic_t()
 {
@@ -2830,6 +2968,9 @@ GameController::Haptic_t::HapticEffect* GameController::handleRumble()
 	return nullptr;
 }
 
+extern "C" GameController::Haptic_t::HapticEffect * GameController_handleRumble(GameController* self) { return self->handleRumble(); }
+
+
 void GameController::addRumble(Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid)
 {
 	if ( !haptics.vibrationEnabled )
@@ -2873,6 +3014,9 @@ void GameController::addRumble(Haptic_t::RumblePattern pattern, Uint16 smallMagn
 	dynarray_pair_at<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles, dynarray_pair_size<std::pair<Uint32, Haptic_t::Rumble>>(haptics.activeRumbles) - 1)->second.pattern = pattern;
 }
 
+extern "C" void GameController_addRumble(GameController* self, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid) { return self->addRumble(pattern, smallMagnitude, largeMagnitude, length, srcEntityUid); }
+
+
 void Inputs::addRumbleForPlayerHPLoss(const int player, Sint32 damageAmount)
 {
 	if ( player >= 0 && players[player]->isLocalPlayer() && stats[player] && stats[player]->OLDHP >= stats[player]->HP )
@@ -2910,6 +3054,9 @@ void Inputs::addRumbleForPlayerHPLoss(const int player, Sint32 damageAmount)
 	}
 }
 
+extern "C" void Inputs_addRumbleForPlayerHPLoss(Inputs* self, const int player, Sint32 damageAmount) { return self->addRumbleForPlayerHPLoss(player, damageAmount); }
+
+
 const Uint32 Inputs::HAPTIC_SFX_BOULDER_BOUNCE_VOL = 1;
 const Uint32 Inputs::HAPTIC_SFX_BOULDER_ROLL_LOW_VOL = 2;
 const Uint32 Inputs::HAPTIC_SFX_BOULDER_ROLL_HIGH_VOL = 3;
@@ -2935,6 +3082,9 @@ void Inputs::addRumbleRemotePlayer(const int player, Uint32 hapticType, Uint32 u
 	}
 }
 
+extern "C" void Inputs_addRumbleRemotePlayer(Inputs* self, const int player, Uint32 hapticType, Uint32 uid) { return self->addRumbleRemotePlayer(player, hapticType, uid); }
+
+
 void Inputs::addRumbleForHapticType(const int player, Uint32 hapticType, Uint32 uid)
 {
 	if ( hapticType == HAPTIC_SFX_BOULDER_BOUNCE_VOL )
@@ -2954,6 +3104,9 @@ void Inputs::addRumbleForHapticType(const int player, Uint32 hapticType, Uint32 
 		rumble(player, GameController::Haptic_t::RUMBLE_BOULDER, 0, 32000, TICKS_PER_SECOND, uid);
 	}
 }
+
+extern "C" void Inputs_addRumbleForHapticType(Inputs* self, const int player, Uint32 hapticType, Uint32 uid) { return self->addRumbleForHapticType(player, hapticType, uid); }
+
 
 GameController::Haptic_t::HapticEffect* GameController::doRumble(Haptic_t::Rumble* r)
 {
@@ -3109,6 +3262,9 @@ GameController::Haptic_t::HapticEffect* GameController::doRumble(Haptic_t::Rumbl
 	}
 	return nullptr;
 }
+
+extern "C" GameController::Haptic_t::HapticEffect * GameController_doRumble(GameController* self, GameController::Haptic_t::Rumble * r) { return self->doRumble(r); }
+
 void GameController::stopRumble()
 {
 	if (!sdl_haptic) {
@@ -3117,6 +3273,9 @@ void GameController::stopRumble()
 	SDL_HapticStopEffect(sdl_haptic, haptics.hapticEffectId);
 	haptics.hapticEffectId = -1;
 }
+
+extern "C" void GameController_stopRumble(GameController* self) { return self->stopRumble(); }
+
 
 Player::Player(int in_playernum, bool in_local_host) :
 	GUI(*this),
@@ -3196,6 +3355,9 @@ void Player::init() // for use on new/restart game, UI related
 	inventoryUI.appraisal.manual_appraised_item = 0;
 }
 
+extern "C" void Player_init(Player* self) { return self->init(); }
+
+
 void Player::cleanUpOnEntityRemoval()
 {
 	if ( isLocalPlayer() )
@@ -3234,14 +3396,23 @@ void Player::cleanUpOnEntityRemoval()
 	mechanics.donationClaimed = false;
 }
 
+extern "C" void Player_cleanUpOnEntityRemoval(Player* self) { return self->cleanUpOnEntityRemoval(); }
+
+
 const bool Player::isLocalPlayer() const
 {
 	return ((splitscreen && bSplitscreen) || playernum == clientnum || (intro && multiplayer == SINGLE));
 }
+
+extern "C" const bool Player_isLocalPlayer(const Player* self) { return self->isLocalPlayer(); }
+
 const bool Player::isLocalPlayerAlive() const
 {
 	return (isLocalPlayer() && entity && !client_disconnected[playernum]);
 }
+
+extern "C" const bool Player_isLocalPlayerAlive(const Player* self) { return self->isLocalPlayerAlive(); }
+
 
 Entity* Player::getPlayerInteractEntity(const int playernum) 
 {
@@ -3256,6 +3427,9 @@ Entity* Player::getPlayerInteractEntity(const int playernum)
 	return players[playernum]->ghost.isActive() ? players[playernum]->ghost.my : players[playernum]->entity;
 }
 
+extern "C" Entity * Player_getPlayerInteractEntity(const int playernum) { return Player::getPlayerInteractEntity(playernum); }
+
+
 void Player::PlayerMovement_t::reset()
 {
 	quickTurnRotation = 0.0;
@@ -3265,6 +3439,9 @@ void Player::PlayerMovement_t::reset()
 	selectedEntityGimpTimer = 0;
 	insectoidLevitating = false;
 }
+
+extern "C" void PlayerMovement_t_reset(Player::PlayerMovement_t* self) { return self->reset(); }
+
 
 real_t Player::WorldUI_t::tooltipHeightOffsetZ = 0.0;
 void Player::WorldUI_t::reset()
@@ -3281,6 +3458,9 @@ void Player::WorldUI_t::reset()
 	bTooltipInView = false;
 	uidForActiveTooltip = 0;
 }
+
+extern "C" void WorldUI_t_reset(Player::WorldUI_t* self) { return self->reset(); }
+
 
 bool monsterIsFriendlyForTooltip(const int player, Entity& entity)
 {
@@ -3937,6 +4117,9 @@ real_t Player::WorldUI_t::tooltipInRange(Entity& tooltip)
 	return 0.0;
 }
 
+extern "C" real_t WorldUI_t_tooltipInRange(Player::WorldUI_t* self, Entity & tooltip) { return self->tooltipInRange(tooltip); }
+
+
 void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 {
 	tooltip.setUID(UID_TOOLTIP_ACTIVE);
@@ -4364,6 +4547,9 @@ void Player::WorldUI_t::setTooltipActive(Entity& tooltip)
 	bTooltipInView = true;
 	uidForActiveTooltip = tooltip.parent;
 }
+
+extern "C" void WorldUI_t_setTooltipActive(Player::WorldUI_t* self, Entity & tooltip) { return self->setTooltipActive(tooltip); }
+
 void Player::WorldUI_t::setTooltipDisabled(Entity& tooltip)
 {
 	tooltip.setUID(UID_TOOLTIP_DISABLED);
@@ -4373,10 +4559,16 @@ void Player::WorldUI_t::setTooltipDisabled(Entity& tooltip)
 		uidForActiveTooltip = 0;
 	}
 }
+
+extern "C" void WorldUI_t_setTooltipDisabled(Player::WorldUI_t* self, Entity & tooltip) { return self->setTooltipDisabled(tooltip); }
+
 bool Player::WorldUI_t::bTooltipActiveForPlayer(Entity& tooltip)
 {
 	return (tooltip.worldTooltipActive() == 1 && tooltip.worldTooltipPlayer() == player.playernum);
 }
+
+extern "C" bool WorldUI_t_bTooltipActiveForPlayer(Player::WorldUI_t* self, Entity & tooltip) { return self->bTooltipActiveForPlayer(tooltip); }
+
 
 void Player::WorldUI_t::cycleToNextTooltip()
 {
@@ -4416,6 +4608,9 @@ void Player::WorldUI_t::cycleToNextTooltip()
 	}
 }
 
+extern "C" void WorldUI_t_cycleToNextTooltip(Player::WorldUI_t* self) { return self->cycleToNextTooltip(); }
+
+
 void Player::WorldUI_t::cycleToPreviousTooltip()
 {
 	if ( dynarray_pair_size<std::pair<Entity*, real_t>>(tooltipsInRange) == 0 )
@@ -4453,6 +4648,9 @@ void Player::WorldUI_t::cycleToPreviousTooltip()
 		setTooltipActive(*dynarray_pair_at<std::pair<Entity*, real_t>>(tooltipsInRange, newIndex - 1)->first);
 	}
 }
+
+extern "C" void WorldUI_t_cycleToPreviousTooltip(Player::WorldUI_t* self) { return self->cycleToPreviousTooltip(); }
+
 
 bool entityBlocksTooltipInteraction(const int player, Entity& entity)
 {
@@ -5044,6 +5242,9 @@ void Player::WorldUI_t::handleTooltips()
 	//DebugTimers.addTimePoint("tooltip", "tooltip end");
 }
 
+extern "C" void WorldUI_t_handleTooltips() { return Player::WorldUI_t::handleTooltips(); }
+
+
 void Player::Hotbar_t::selectHotbarSlot(int slot)
 {
 	if ( slot < 0 )
@@ -5057,6 +5258,9 @@ void Player::Hotbar_t::selectHotbarSlot(int slot)
 	current_hotbar = slot;
 	player.GUI.activateModule(GUI_t::MODULE_HOTBAR);
 }
+
+extern "C" void Hotbar_t_selectHotbarSlot(Player::Hotbar_t* self, int slot) { return self->selectHotbarSlot(slot); }
+
 
 void Player::Hotbar_t::initFaceButtonHotbar()
 {
@@ -5244,6 +5448,9 @@ void Player::Hotbar_t::initFaceButtonHotbar()
 	faceButtonTopYPosition = std::min(faceButtonPositions[4].y, faceButtonTopYPosition);
 }
 
+extern "C" void Hotbar_t_initFaceButtonHotbar(Player::Hotbar_t* self) { return self->initFaceButtonHotbar(); }
+
+
 Player::Hotbar_t::FaceMenuGroup Player::Hotbar_t::getFaceMenuGroupForSlot(int hotbarSlot)
 {
 	if ( hotbarSlot < 3 )
@@ -5260,6 +5467,9 @@ Player::Hotbar_t::FaceMenuGroup Player::Hotbar_t::getFaceMenuGroupForSlot(int ho
 	}
 	return FaceMenuGroup::GROUP_NONE;
 }
+
+extern "C" Player::Hotbar_t::FaceMenuGroup Hotbar_t_getFaceMenuGroupForSlot(Player::Hotbar_t* self, int hotbarSlot) { return self->getFaceMenuGroupForSlot(hotbarSlot); }
+
 
 const int Player::HUD_t::getActionIconForPlayer(ActionPrompts prompt, std::string& promptString) const
 {
@@ -5466,6 +5676,9 @@ const int Player::HUD_t::getActionIconForPlayer(ActionPrompts prompt, std::strin
 	}
 }
 
+extern "C" const int HUD_t_getActionIconForPlayer(const Player::HUD_t* self, Player::HUD_t::ActionPrompts prompt, std::string & promptString) { return self->getActionIconForPlayer(prompt, promptString); }
+
+
 const int Player::Inventory_t::getPlayerItemInventoryX() const
 {
 	int x = DEFAULT_INVENTORY_SIZEX;
@@ -5475,6 +5688,9 @@ const int Player::Inventory_t::getPlayerItemInventoryX() const
 	}
 	return x;
 }
+
+extern "C" const int Inventory_t_getPlayerItemInventoryX(const Player::Inventory_t* self) { return self->getPlayerItemInventoryX(); }
+
 
 const int Player::Inventory_t::getPlayerItemInventoryY() const
 {
@@ -5491,6 +5707,9 @@ const int Player::Inventory_t::getPlayerItemInventoryY() const
 	}
 	return y;
 }
+
+extern "C" const int Inventory_t_getPlayerItemInventoryY(const Player::Inventory_t* self) { return self->getPlayerItemInventoryY(); }
+
 
 bool Player::Inventory_t::warpMouseToSelectedItem(Item* snapToItem, Uint32 flags)
 {
@@ -5540,6 +5759,9 @@ bool Player::Inventory_t::warpMouseToSelectedItem(Item* snapToItem, Uint32 flags
 	return false;
 }
 
+extern "C" bool Inventory_t_warpMouseToSelectedItem(Player::Inventory_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedItem(snapToItem, flags); }
+
+
 bool Player::Inventory_t::warpMouseToSelectedSpell(Item* snapToItem, Uint32 flags)
 {
 	if ( spellFrame )
@@ -5582,6 +5804,9 @@ bool Player::Inventory_t::warpMouseToSelectedSpell(Item* snapToItem, Uint32 flag
 	}
 	return false;
 }
+
+extern "C" bool Inventory_t_warpMouseToSelectedSpell(Player::Inventory_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedSpell(snapToItem, flags); }
+
 
 bool Player::Inventory_t::warpMouseToSelectedChestSlot(Item* snapToItem, Uint32 flags)
 {
@@ -5626,6 +5851,9 @@ bool Player::Inventory_t::warpMouseToSelectedChestSlot(Item* snapToItem, Uint32 
 	return false;
 }
 
+extern "C" bool Inventory_t_warpMouseToSelectedChestSlot(Player::Inventory_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedChestSlot(snapToItem, flags); }
+
+
 bool Player::ShopGUI_t::warpMouseToSelectedShopItem(Item* snapToItem, Uint32 flags)
 {
 	if ( shopFrame )
@@ -5660,6 +5888,9 @@ bool Player::ShopGUI_t::warpMouseToSelectedShopItem(Item* snapToItem, Uint32 fla
 	return false;
 }
 
+extern "C" bool ShopGUI_t_warpMouseToSelectedShopItem(Player::ShopGUI_t* self, Item * snapToItem, Uint32 flags) { return self->warpMouseToSelectedShopItem(snapToItem, flags); }
+
+
 Frame* Player::Inventory_t::getInventorySlotFrame(int x, int y) const
 {
 	//printlog("%d %d inv", x, y);
@@ -5680,6 +5911,9 @@ Frame* Player::Inventory_t::getInventorySlotFrame(int x, int y) const
 	return nullptr;
 }
 
+extern "C" Frame * Inventory_t_getInventorySlotFrame(const Player::Inventory_t* self, int x, int y) { return self->getInventorySlotFrame(x, y); }
+
+
 Frame* Player::Inventory_t::getSpellSlotFrame(int x, int y) const
 {
 	//printlog("%d %d spell", x, y);
@@ -5692,6 +5926,9 @@ Frame* Player::Inventory_t::getSpellSlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * Inventory_t_getSpellSlotFrame(const Player::Inventory_t* self, int x, int y) { return self->getSpellSlotFrame(x, y); }
+
 
 Frame* Player::Inventory_t::getChestSlotFrame(int x, int y) const
 {
@@ -5707,6 +5944,9 @@ Frame* Player::Inventory_t::getChestSlotFrame(int x, int y) const
 	return nullptr;
 }
 
+extern "C" Frame * Inventory_t_getChestSlotFrame(const Player::Inventory_t* self, int x, int y) { return self->getChestSlotFrame(x, y); }
+
+
 Frame* Player::ShopGUI_t::getShopSlotFrame(int x, int y) const
 {
 	if ( shopFrame )
@@ -5720,6 +5960,9 @@ Frame* Player::ShopGUI_t::getShopSlotFrame(int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * ShopGUI_t_getShopSlotFrame(const Player::ShopGUI_t* self, int x, int y) { return self->getShopSlotFrame(x, y); }
+
 
 
 Frame* Player::Inventory_t::getItemSlotFrame(Item* item, int x, int y) const
@@ -5746,6 +5989,9 @@ Frame* Player::Inventory_t::getItemSlotFrame(Item* item, int x, int y) const
 	}
 	return nullptr;
 }
+
+extern "C" Frame * Inventory_t_getItemSlotFrame(const Player::Inventory_t* self, Item * item, int x, int y) { return self->getItemSlotFrame(item, x, y); }
+
 
 const bool Player::Inventory_t::bItemInventoryHasFreeSlot() const
 {
@@ -5779,6 +6025,9 @@ const bool Player::Inventory_t::bItemInventoryHasFreeSlot() const
 	return itemCount < numSlots;
 }
 
+extern "C" const bool Inventory_t_bItemInventoryHasFreeSlot(const Player::Inventory_t* self) { return self->bItemInventoryHasFreeSlot(); }
+
+
 Player::PaperDoll_t::PaperDollSlotType Player::PaperDoll_t::getSlotForItem(const Item& item) const
 {
 	for ( auto& slot : dollSlots )
@@ -5791,11 +6040,17 @@ Player::PaperDoll_t::PaperDollSlotType Player::PaperDoll_t::getSlotForItem(const
 	return SLOT_MAX;
 }
 
+extern "C" Player::PaperDoll_t::PaperDollSlotType PaperDoll_t_getSlotForItem(const Player::PaperDoll_t* self, const Item & item) { return self->getSlotForItem(item); }
+
+
 void Player::PaperDoll_t::drawSlots()
 {
 	updateSlots();
 	return;
 }
+
+extern "C" void PaperDoll_t_drawSlots(Player::PaperDoll_t* self) { return self->drawSlots(); }
+
 
 bool Player::Magic_t::doQuickCastTome() { 
 	if ( quick_cast_tome != 0 )
@@ -5807,6 +6062,9 @@ bool Player::Magic_t::doQuickCastTome() {
 	}
 	return false;
 }
+
+extern "C" bool Magic_t_doQuickCastTome(Player::Magic_t* self) { return self->doQuickCastTome(); }
+
 
 void Player::Magic_t::setQuickCastTomeFromInventory(Item* item)
 {
@@ -5823,6 +6081,9 @@ void Player::Magic_t::setQuickCastTomeFromInventory(Item* item)
 	}
 }
 
+extern "C" void Magic_t_setQuickCastTomeFromInventory(Player::Magic_t* self, Item * item) { return self->setQuickCastTomeFromInventory(item); }
+
+
 void Player::Magic_t::setQuickCastSpellFromInventory(Item* item)
 {
 	if ( quick_cast_spell ) // spell already queued, ignore.
@@ -5837,6 +6098,9 @@ void Player::Magic_t::setQuickCastSpellFromInventory(Item* item)
 	quick_cast_spell = getSpellFromItem(player.playernum, item, true);
 }
 
+extern "C" void Magic_t_setQuickCastSpellFromInventory(Player::Magic_t* self, Item * item) { return self->setQuickCastSpellFromInventory(item); }
+
+
 const bool Player::bUseCompactGUIWidth() const
 {
 	if ( splitscreen )
@@ -5848,6 +6112,9 @@ const bool Player::bUseCompactGUIWidth() const
 	}
 	return false;
 }
+
+extern "C" const bool Player_bUseCompactGUIWidth(const Player* self) { return self->bUseCompactGUIWidth(); }
+
 const bool Player::bUseCompactGUIHeight() const
 {
 	if ( splitscreen )
@@ -5860,6 +6127,9 @@ const bool Player::bUseCompactGUIHeight() const
 	return false;
 }
 
+extern "C" const bool Player_bUseCompactGUIHeight(const Player* self) { return self->bUseCompactGUIHeight(); }
+
+
 const bool Player::usingCommand() const
 {
 	if ( command )
@@ -5868,6 +6138,9 @@ const bool Player::usingCommand() const
 	}
 	return false;
 }
+
+extern "C" const bool Player_usingCommand(const Player* self) { return self->usingCommand(); }
+
 
 const bool Player::bAlignGUINextToInventoryCompact() const
 {
@@ -5881,6 +6154,9 @@ const bool Player::bAlignGUINextToInventoryCompact() const
 	}
 	return false;
 }
+
+extern "C" const bool Player_bAlignGUINextToInventoryCompact(const Player* self) { return self->bAlignGUINextToInventoryCompact(); }
+
 
 DynamicArrayStringPair Player::Minimap_t::mapDetails;
 
@@ -5943,6 +6219,9 @@ void Inputs::setMouse(const int player, MouseInputs input, Sint32 value)
 	}
 }
 
+extern "C" void Inputs_setMouse(Inputs* self, const int player, Inputs::MouseInputs input, Sint32 value) { return self->setMouse(player, input, value); }
+
+
 const Sint32 Inputs::getMouse(const int player, MouseInputs input)
 {
 	if ( bPlayerUsingKeyboardControl(player) &&
@@ -5999,6 +6278,9 @@ const Sint32 Inputs::getMouse(const int player, MouseInputs input)
 	}
 	return 0;
 }
+
+extern "C" const Sint32 Inputs_getMouse(Inputs* self, const int player, Inputs::MouseInputs input) { return self->getMouse(player, input); }
+
 
 const real_t Inputs::getMouseFloat(const int player, MouseInputs input)
 {
@@ -6087,6 +6369,9 @@ const real_t Inputs::getMouseFloat(const int player, MouseInputs input)
 	return 0;
 }
 
+extern "C" const real_t Inputs_getMouseFloat(Inputs* self, const int player, Inputs::MouseInputs input) { return self->getMouseFloat(player, input); }
+
+
 void Inputs::warpMouse(const int player, const Sint32 x, const Sint32 y, Uint32 flags)
 {
 	if ( inputs.bPlayerUsingKeyboardControl(player) && (flags & SET_MOUSE) )
@@ -6139,6 +6424,9 @@ void Inputs::warpMouse(const int player, const Sint32 x, const Sint32 y, Uint32 
 	}
 }
 
+extern "C" void Inputs_warpMouse(Inputs* self, const int player, const Sint32 x, const Sint32 y, Uint32 flags) { return self->warpMouse(player, x, y, flags); }
+
+
 GameController* Inputs::getController(int player) const
 {
 	if ( player < 0 || player >= MAXPLAYERS )
@@ -6160,6 +6448,9 @@ GameController* Inputs::getController(int player) const
 	}
 	return nullptr;
 }
+
+extern "C" GameController * Inputs_getController(const Inputs* self, int player) { return self->getController(player); }
+
 
 const bool Inputs::bControllerRawInputPressed(int player, const unsigned button) const
 {
@@ -6183,6 +6474,9 @@ const bool Inputs::bControllerRawInputPressed(int player, const unsigned button)
 	}
 }
 
+extern "C" const bool Inputs_bControllerRawInputPressed(const Inputs* self, const int player, const unsigned int button) { return self->bControllerRawInputPressed(player, button); }
+
+
 const bool Inputs::bControllerRawInputReleased(int player, const unsigned button) const
 {
 	if ( button < 299 || button >= (301 + SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX) )
@@ -6205,6 +6499,9 @@ const bool Inputs::bControllerRawInputReleased(int player, const unsigned button
 		return controller->binaryReleaseToggle(static_cast<SDL_GameControllerButton>(button - 301));
 	}
 }
+
+extern "C" const bool Inputs_bControllerRawInputReleased(const Inputs* self, const int player, const unsigned int button) { return self->bControllerRawInputReleased(player, button); }
+
 
 const bool Inputs::bControllerInputPressed(int player, const unsigned controllerImpulse) const
 {
@@ -6240,6 +6537,9 @@ const bool Inputs::bControllerInputPressed(int player, const unsigned controller
 	}
 }
 
+extern "C" const bool Inputs_bControllerInputPressed(const Inputs* self, const int player, const unsigned int controllerImpulse) { return self->bControllerInputPressed(player, controllerImpulse); }
+
+
 const bool Inputs::bControllerInputHeld(int player, const unsigned controllerImpulse) const
 {
 	if ( controllerImpulse >= NUM_JOY_IMPULSES )
@@ -6265,6 +6565,9 @@ const bool Inputs::bControllerInputHeld(int player, const unsigned controllerImp
 		return controller->buttonHeldToggle(GameController::getSDLButtonFromImpulse(controllerImpulse));
 	}
 }
+
+extern "C" const bool Inputs_bControllerInputHeld(const Inputs* self, int player, const unsigned int controllerImpulse) { return self->bControllerInputHeld(player, controllerImpulse); }
+
 
 const bool Inputs::bMouseLeft(int player) const
 {
@@ -6293,6 +6596,9 @@ const bool Inputs::bMouseLeft(int player) const
 	return false;
 }
 
+extern "C" const bool Inputs_bMouseLeft(const Inputs* self, const int player) { return self->bMouseLeft(player); }
+
+
 const bool Inputs::bMouseRight(int player) const
 {
 	if ( !bPlayerIsControllable(player) )
@@ -6306,6 +6612,9 @@ const bool Inputs::bMouseRight(int player) const
 	return false;
 }
 
+extern "C" const bool Inputs_bMouseRight(const Inputs* self, const int player) { return self->bMouseRight(player); }
+
+
 const bool Inputs::bMouseHeldLeft(int player) const
 {
 	if ( bMouseLeft(player) )
@@ -6315,6 +6624,9 @@ const bool Inputs::bMouseHeldLeft(int player) const
 	return false;
 }
 
+extern "C" const bool Inputs_bMouseHeldLeft(const Inputs* self, const int player) { return self->bMouseHeldLeft(player); }
+
+
 const bool Inputs::bMouseHeldRight(int player) const
 {
 	if ( bMouseRight(player) )
@@ -6323,6 +6635,9 @@ const bool Inputs::bMouseHeldRight(int player) const
 	}
 	return false;
 }
+
+extern "C" const bool Inputs_bMouseHeldRight(const Inputs* self, const int player) { return self->bMouseHeldRight(player); }
+
 
 const void Inputs::mouseClearLeft(int player)
 {
@@ -6343,6 +6658,9 @@ const void Inputs::mouseClearLeft(int player)
 	//}
 }
 
+extern "C" const void Inputs_mouseClearLeft(Inputs* self, int player) { return self->mouseClearLeft(player); }
+
+
 const void Inputs::mouseClearRight(int player)
 {
 	if ( !bPlayerIsControllable(player) )
@@ -6356,6 +6674,9 @@ const void Inputs::mouseClearRight(int player)
 	getVirtualMouse(player)->mouseRightHeld = false;
 	getVirtualMouse(player)->mouseRightHeldTicks = 0;
 }
+
+extern "C" const void Inputs_mouseClearRight(Inputs* self, int player) { return self->mouseClearRight(player); }
+
 
 void Inputs::controllerClearRawInput(int player, const unsigned button)
 {
@@ -6383,6 +6704,9 @@ void Inputs::controllerClearRawInput(int player, const unsigned button)
 	}
 }
 
+extern "C" void Inputs_controllerClearRawInput(Inputs* self, const int player, const unsigned int button) { return self->controllerClearRawInput(player, button); }
+
+
 void Inputs::controllerClearRawInputRelease(int player, const unsigned button)
 {
 	if ( button < 299 || button >= (301 + SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX) )
@@ -6408,6 +6732,9 @@ void Inputs::controllerClearRawInputRelease(int player, const unsigned button)
 		controller->consumeBinaryReleaseToggle(static_cast<SDL_GameControllerButton>(button - 301));
 	}
 }
+
+extern "C" void Inputs_controllerClearRawInputRelease(Inputs* self, const int player, const unsigned int button) { return self->controllerClearRawInputRelease(player, button); }
+
 
 void Inputs::controllerClearInput(int player, const unsigned controllerImpulse)
 {
@@ -6435,6 +6762,9 @@ void Inputs::controllerClearInput(int player, const unsigned controllerImpulse)
 	}
 }
 
+extern "C" void Inputs_controllerClearInput(Inputs* self, const int player, const unsigned int controllerImpulse) { return self->controllerClearInput(player, controllerImpulse); }
+
+
 const bool Inputs::bPlayerIsControllable(int player) const
 {
 	if ( player < 0 || player >= MAXPLAYERS )
@@ -6459,6 +6789,9 @@ const bool Inputs::bPlayerIsControllable(int player) const
 	return false;
 }
 
+extern "C" const bool Inputs_bPlayerIsControllable(const Inputs* self, int player) { return self->bPlayerIsControllable(player); }
+
+
 void Inputs::controllerHandleMouse(int player)
 {
 	if ( !bPlayerIsControllable(player) )
@@ -6473,6 +6806,9 @@ void Inputs::controllerHandleMouse(int player)
 
 	controller->handleAnalog(player);
 }
+
+extern "C" void Inputs_controllerHandleMouse(Inputs* self, const int player) { return self->controllerHandleMouse(player); }
+
 
 SDL_Rect Inputs::getGlyphRectForInput(const int player, bool pressed, const unsigned keyboardImpulse, const unsigned controllerImpulse)
 {
@@ -6596,6 +6932,9 @@ SDL_Rect Inputs::getGlyphRectForInput(const int player, bool pressed, const unsi
 	return defaultRect;
 }
 
+extern "C" SDL_Rect Inputs_getGlyphRectForInput(Inputs* self, const int player, bool pressed, const unsigned int keyboardImpulse, const unsigned int controllerImpulse) { return self->getGlyphRectForInput(player, pressed, keyboardImpulse, controllerImpulse); }
+
+
 bool GameController::binaryOf(Binding_t& binding) 
 {
 	if ( binding.type == Binding_t::CONTROLLER_AXIS || binding.type == Binding_t::CONTROLLER_BUTTON || binding.type == Binding_t::VIRTUAL_DPAD )
@@ -6626,6 +6965,9 @@ bool GameController::binaryOf(Binding_t& binding)
 	return false;
 }
 
+extern "C" bool GameController_binaryOf(GameController* self, GameController::Binding_t & binding) { return self->binaryOf(binding); }
+
+
 float GameController::analogOf(Binding_t& binding) 
 {
 	if ( binding.type == Binding_t::CONTROLLER_AXIS || binding.type == Binding_t::CONTROLLER_BUTTON ) 
@@ -6654,6 +6996,9 @@ float GameController::analogOf(Binding_t& binding)
 	return 0.f;
 }
 
+extern "C" float GameController_analogOf(GameController* self, GameController::Binding_t & binding) { return self->analogOf(binding); }
+
+
 void GameController::updateButtonsReleased()
 {
 	if ( !isActive() )
@@ -6666,6 +7011,9 @@ void GameController::updateButtonsReleased()
 		buttons[i].binaryReleaseConsumed = true;
 	}
 }
+
+extern "C" void GameController_updateButtonsReleased(GameController* self) { return self->updateButtonsReleased(); }
+
 
 void GameController::updateButtons()
 {
@@ -6728,6 +7076,9 @@ void GameController::updateButtons()
 	}
 }
 
+extern "C" void GameController_updateButtons(GameController* self) { return self->updateButtons(); }
+
+
 void GameController::updateAxis()
 {
 	if ( !isActive() )
@@ -6769,6 +7120,9 @@ void GameController::updateAxis()
 	}
 }
 
+extern "C" void GameController_updateAxis(GameController* self) { return self->updateAxis(); }
+
+
 float GameController::analog(SDL_GameControllerButton binding) const
 {
 	if ( binding <= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID || binding >= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX )
@@ -6777,6 +7131,12 @@ float GameController::analog(SDL_GameControllerButton binding) const
 	}
 	return buttons[binding].analog;
 }
+
+extern "C" float GameController_analog_2(const GameController* self, SDL_GameControllerAxis binding) { return self->analog(binding); }
+
+
+extern "C" float GameController_analog(const GameController* self, SDL_GameControllerButton binding) { return self->analog(binding); }
+
 
 bool GameController::binaryToggle(SDL_GameControllerButton binding) const
 {
@@ -6787,6 +7147,12 @@ bool GameController::binaryToggle(SDL_GameControllerButton binding) const
 	return (buttons[binding].binary && !buttons[binding].consumed);
 }
 
+extern "C" bool GameController_binaryToggle_2(const GameController* self, SDL_GameControllerAxis binding) { return self->binaryToggle(binding); }
+
+
+extern "C" bool GameController_binaryToggle(const GameController* self, SDL_GameControllerButton binding) { return self->binaryToggle(binding); }
+
+
 bool GameController::binaryReleaseToggle(SDL_GameControllerButton binding) const
 {
 	if ( binding <= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID || binding >= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX )
@@ -6795,6 +7161,9 @@ bool GameController::binaryReleaseToggle(SDL_GameControllerButton binding) const
 	}
 	return (buttons[binding].binaryRelease && !buttons[binding].binaryReleaseConsumed);
 }
+
+extern "C" bool GameController_binaryReleaseToggle(const GameController* self, SDL_GameControllerButton binding) { return self->binaryReleaseToggle(binding); }
+
 
 bool GameController::buttonHeldToggle(SDL_GameControllerButton binding) const
 {
@@ -6805,6 +7174,12 @@ bool GameController::buttonHeldToggle(SDL_GameControllerButton binding) const
 	return (buttons[binding].binary && !buttons[binding].consumed && (ticks - buttons[binding].buttonHeldTicks) > GameController::BUTTON_HELD_TICKS);
 }
 
+extern "C" bool GameController_buttonHeldToggle_2(const GameController* self, SDL_GameControllerAxis binding) { return self->buttonHeldToggle(binding); }
+
+
+extern "C" bool GameController_buttonHeldToggle(const GameController* self, SDL_GameControllerButton binding) { return self->buttonHeldToggle(binding); }
+
+
 bool GameController::binary(SDL_GameControllerButton binding) const
 {
 	if ( binding <= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID || binding >= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX )
@@ -6813,6 +7188,12 @@ bool GameController::binary(SDL_GameControllerButton binding) const
 	}
 	return buttons[binding].binary;
 }
+
+extern "C" bool GameController_binary_2(const GameController* self, SDL_GameControllerAxis binding) { return self->binary(binding); }
+
+
+extern "C" bool GameController_binary(const GameController* self, SDL_GameControllerButton binding) { return self->binary(binding); }
+
 
 void GameController::consumeBinaryReleaseToggle(SDL_GameControllerButton binding)
 {
@@ -6826,6 +7207,9 @@ void GameController::consumeBinaryReleaseToggle(SDL_GameControllerButton binding
 	}
 }
 
+extern "C" void GameController_consumeBinaryReleaseToggle(GameController* self, SDL_GameControllerButton binding) { return self->consumeBinaryReleaseToggle(binding); }
+
+
 void GameController::consumeBinaryToggle(SDL_GameControllerButton binding)
 {
 	if ( binding <= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID || binding >= SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX )
@@ -6837,6 +7221,12 @@ void GameController::consumeBinaryToggle(SDL_GameControllerButton binding)
 		buttons[binding].consumed = true;
 	}
 }
+
+extern "C" void GameController_consumeBinaryToggle_2(GameController* self, SDL_GameControllerAxis binding) { return self->consumeBinaryToggle(binding); }
+
+
+extern "C" void GameController_consumeBinaryToggle(GameController* self, SDL_GameControllerButton binding) { return self->consumeBinaryToggle(binding); }
+
 
 float GameController::analog(SDL_GameControllerAxis binding) const
 {
@@ -6895,15 +7285,24 @@ GameController::DpadDirection GameController::dpadDirToggle() const
 	return DpadDirection::INVALID;
 }
 
+extern "C" GameController::DpadDirection GameController_dpadDirToggle(const GameController* self) { return self->dpadDirToggle(); }
+
+
 GameController::DpadDirection GameController::dpadDir() const
 {
 	return virtualDpad.padVirtualDpad;
 }
 
+extern "C" GameController::DpadDirection GameController_dpadDir(const GameController* self) { return self->dpadDir(); }
+
+
 void GameController::consumeDpadDirToggle()
 {
 	virtualDpad.consumed = true;
 }
+
+extern "C" void GameController_consumeDpadDirToggle(GameController* self) { return self->consumeDpadDirToggle(); }
+
 
 void Player::clearGUIPointers()
 {
@@ -7046,6 +7445,9 @@ void Player::clearGUIPointers()
 	players[playernum]->inventoryUI.compendiumItemTooltipDisplay.reset();
 }
 
+extern "C" void Player_clearGUIPointers(Player* self) { return self->clearGUIPointers(); }
+
+
 const char* Player::getAccountName() const {
     const char* unknown = "...";
     if (directConnect) {
@@ -7064,6 +7466,9 @@ const char* Player::getAccountName() const {
 	}
     return unknown;
 }
+
+extern "C" const char * Player_getAccountName(const Player* self) { return self->getAccountName(); }
+
 
 void Player::PlayerMechanics_t::onItemDegrade(Item* item)
 {
@@ -7084,6 +7489,9 @@ void Player::PlayerMechanics_t::onItemDegrade(Item* item)
 		itemDegradeRng[item->type] = 0;
 	}
 }
+
+extern "C" void PlayerMechanics_t_onItemDegrade(Player::PlayerMechanics_t* self, Item * item) { return self->onItemDegrade(item); }
+
 
 bool Player::PlayerMechanics_t::itemDegradeRoll(Item* item, int skillID, int* checkInterval)
 {
@@ -7221,6 +7629,9 @@ bool Player::PlayerMechanics_t::itemDegradeRoll(Item* item, int skillID, int* ch
 	return false;
 }
 
+extern "C" bool PlayerMechanics_t_itemDegradeRoll(Player::PlayerMechanics_t* self, Item * item, int skillID, int * checkInterval) { return self->itemDegradeRoll(item, skillID, checkInterval); }
+
+
 void Player::PlayerMechanics_t::sustainedSpellIncrementMP(int mpChange, int skillID)
 {
 	if ( skillID == PRO_SORCERY )
@@ -7237,6 +7648,9 @@ void Player::PlayerMechanics_t::sustainedSpellIncrementMP(int mpChange, int skil
 	}
 }
 
+extern "C" void PlayerMechanics_t_sustainedSpellIncrementMP(Player::PlayerMechanics_t* self, int mpChange, int skillID) { return self->sustainedSpellIncrementMP(mpChange, skillID); }
+
+
 void Player::PlayerMechanics_t::baseSpellIncrementMP(int mpChange, int skillID)
 {
 	if ( skillID == PRO_SORCERY )
@@ -7252,6 +7666,9 @@ void Player::PlayerMechanics_t::baseSpellIncrementMP(int mpChange, int skillID)
 		baseSpellMPUsedThaumaturgy += std::max(0, mpChange);
 	}
 }
+
+extern "C" void PlayerMechanics_t_baseSpellIncrementMP(Player::PlayerMechanics_t* self, int mpChange, int skillID) { return self->baseSpellIncrementMP(mpChange, skillID); }
+
 
 bool Player::PlayerMechanics_t::sustainedSpellLevelChance(int skillID)
 {
@@ -7281,6 +7698,9 @@ bool Player::PlayerMechanics_t::sustainedSpellLevelChance(int skillID)
 	return false;
 }
 
+extern "C" bool PlayerMechanics_t_sustainedSpellLevelChance(Player::PlayerMechanics_t* self, int skillID) { return self->sustainedSpellLevelChance(skillID); }
+
+
 int Player::PlayerMechanics_t::baseSpellMPSpent(int skillID)
 {
 	int counter = 0;
@@ -7303,6 +7723,9 @@ int Player::PlayerMechanics_t::baseSpellMPSpent(int skillID)
 
 	return counter;
 }
+
+extern "C" int PlayerMechanics_t_baseSpellMPSpent(Player::PlayerMechanics_t* self, int skillID) { return self->baseSpellMPSpent(skillID); }
+
 
 int Player::PlayerMechanics_t::baseSpellLevelChance(int skillID)
 {
@@ -7328,6 +7751,9 @@ int Player::PlayerMechanics_t::baseSpellLevelChance(int skillID)
 	return counter / threshold;
 }
 
+extern "C" int PlayerMechanics_t_baseSpellLevelChance(Player::PlayerMechanics_t* self, int skillID) { return self->baseSpellLevelChance(skillID); }
+
+
 void Player::PlayerMechanics_t::sustainedSpellClearMP(int skillID)
 {
 	if ( skillID == PRO_SORCERY )
@@ -7343,6 +7769,9 @@ void Player::PlayerMechanics_t::sustainedSpellClearMP(int skillID)
 		sustainedSpellMPUsedThaumaturgy = 0;
 	}
 }
+
+extern "C" void PlayerMechanics_t_sustainedSpellClearMP(Player::PlayerMechanics_t* self, int skillID) { return self->sustainedSpellClearMP(skillID); }
+
 
 bool Player::PlayerMechanics_t::updateSustainedSpellEvent(int spellID, real_t value, real_t scaleValue, Entity* hitentity)
 {
@@ -7518,6 +7947,9 @@ bool Player::PlayerMechanics_t::updateSustainedSpellEvent(int spellID, real_t va
 	return false;
 }
 
+extern "C" bool PlayerMechanics_t_updateSustainedSpellEvent(Player::PlayerMechanics_t* self, int spellID, real_t value, real_t scaleValue, Entity * hitEntity) { return self->updateSustainedSpellEvent(spellID, value, scaleValue, hitEntity); }
+
+
 void Player::PlayerMechanics_t::baseSpellClearMP(int skillID)
 {
 	int threshold = 20 + stats[player.playernum]->getProficiency(skillID) / 5;
@@ -7539,6 +7971,9 @@ void Player::PlayerMechanics_t::baseSpellClearMP(int skillID)
 	}
 }
 
+extern "C" void PlayerMechanics_t_baseSpellClearMP(Player::PlayerMechanics_t* self, int skillID) { return self->baseSpellClearMP(skillID); }
+
+
 bool Player::PlayerMechanics_t::allowedRaiseBlockingAgainstEntity(Entity& attacker)
 {
 	if ( attacker.behavior != &actMonster )
@@ -7554,6 +7989,9 @@ bool Player::PlayerMechanics_t::allowedRaiseBlockingAgainstEntity(Entity& attack
 	return enemyRaisedBlockingAgainst[attacker.getUID()] < 1;
 }
 
+extern "C" bool PlayerMechanics_t_allowedRaiseBlockingAgainstEntity(Player::PlayerMechanics_t* self, Entity & attacker) { return self->allowedRaiseBlockingAgainstEntity(attacker); }
+
+
 bool Player::PlayerMechanics_t::allowedRaiseStealthAgainstEntity(Entity& attacker)
 {
 	if ( attacker.behavior != &actMonster )
@@ -7562,6 +8000,9 @@ bool Player::PlayerMechanics_t::allowedRaiseStealthAgainstEntity(Entity& attacke
 	}
 	return enemyRaisedStealthAgainst[attacker.getUID()] < 1;
 }
+
+extern "C" bool PlayerMechanics_t_allowedRaiseStealthAgainstEntity(Player::PlayerMechanics_t* self, Entity & attacker) { return self->allowedRaiseStealthAgainstEntity(attacker); }
+
 
 void Player::PlayerMechanics_t::ensembleMusicUpdateServer()
 {
@@ -7697,6 +8138,9 @@ void Player::PlayerMechanics_t::ensembleMusicUpdateServer()
 	}
 }
 
+extern "C" void PlayerMechanics_t_ensembleMusicUpdateServer() { return Player::PlayerMechanics_t::ensembleMusicUpdateServer(); }
+
+
 
 void Player::PlayerMechanics_t::ensembleMusicUpdate()
 {
@@ -7706,6 +8150,9 @@ void Player::PlayerMechanics_t::ensembleMusicUpdate()
 	}
 
 }
+
+extern "C" void PlayerMechanics_t_ensembleMusicUpdate() { return Player::PlayerMechanics_t::ensembleMusicUpdate(); }
+
 
 int Player::PlayerMechanics_t::getBreakableCounterTier()
 {
@@ -7735,6 +8182,9 @@ int Player::PlayerMechanics_t::getBreakableCounterTier()
 
 	return 0;
 }
+
+extern "C" int PlayerMechanics_t_getBreakableCounterTier(Player::PlayerMechanics_t* self) { return self->getBreakableCounterTier(); }
+
 
 void Player::PlayerMechanics_t::incrementBreakableCounter(Player::PlayerMechanics_t::BreakableEvent eventType, Entity* entity)
 {
@@ -7800,6 +8250,9 @@ void Player::PlayerMechanics_t::incrementBreakableCounter(Player::PlayerMechanic
 	}
 }
 
+extern "C" void PlayerMechanics_t_incrementBreakableCounter(Player::PlayerMechanics_t* self, Player::PlayerMechanics_t::BreakableEvent eventType, Entity * entity) { return self->incrementBreakableCounter(eventType, entity); }
+
+
 void Player::PlayerMechanics_t::updateBreakableCounterClient(Player::PlayerMechanics_t::BreakableEvent eventType)
 {
 	if ( multiplayer == CLIENT )
@@ -7820,6 +8273,9 @@ void Player::PlayerMechanics_t::updateBreakableCounterClient(Player::PlayerMecha
 	}
 }
 
+extern "C" void PlayerMechanics_t_updateBreakableCounterClient(Player::PlayerMechanics_t* self, Player::PlayerMechanics_t::BreakableEvent eventType) { return self->updateBreakableCounterClient(eventType); }
+
+
 void Player::PlayerMechanics_t::updateBreakableCounterServer()
 {
 	if ( multiplayer == SERVER && player.playernum > 0 && !player.isLocalPlayer() && !client_disconnected[player.playernum] )
@@ -7833,6 +8289,9 @@ void Player::PlayerMechanics_t::updateBreakableCounterServer()
 		sendPacketSafe(net_sock, -1, net_packet, i - 1);
 	}
 }
+
+extern "C" void PlayerMechanics_t_updateBreakableCounterServer(Player::PlayerMechanics_t* self) { return self->updateBreakableCounterServer(); }
+
 
 std::map<int, real_t> prng_tables
 {
@@ -7920,6 +8379,9 @@ bool Player::PlayerMechanics_t::rollRngProc(Player::PlayerMechanics_t::RngRollTy
 	return false;
 }
 
+extern "C" bool PlayerMechanics_t_rollRngProc(Player::PlayerMechanics_t* self, Player::PlayerMechanics_t::RngRollTypes rngType, int chance, int spellID) { return self->rollRngProc(rngType, chance, spellID); }
+
+
 int Player::PlayerMechanics_t::getWealthTier()
 {
 	if ( stats[player.playernum]->type == GNOME )
@@ -7944,9 +8406,15 @@ int Player::PlayerMechanics_t::getWealthTier()
 	return 0;
 }
 
+extern "C" int PlayerMechanics_t_getWealthTier(Player::PlayerMechanics_t* self) { return self->getWealthTier(); }
+
+
 void PlayerSettings_t::init(const int _player) {
 		player = _player;
 	}
+
+extern "C" void PlayerSettings_t_init(PlayerSettings_t* self, const int _player) { return self->init(_player); }
+
 
 const void Inputs::setPlayerIDAllowedKeyboard(const int player) {
 		if (multiplayer != SINGLE && player != 0) {
@@ -7956,6 +8424,9 @@ const void Inputs::setPlayerIDAllowedKeyboard(const int player) {
 	    printlog("giving keyboard to player %d", player);
 		playerUsingKeyboardControl = player;
 	}
+
+extern "C" const void Inputs_setPlayerIDAllowedKeyboard(Inputs* self, const int player) { return self->setPlayerIDAllowedKeyboard(player); }
+
 
 const int Inputs::getPlayerIDAllowedKeyboard() {
 		if (multiplayer != SINGLE)
@@ -7968,9 +8439,15 @@ const int Inputs::getPlayerIDAllowedKeyboard() {
 		}
 	}
 
+extern "C" const int Inputs_getPlayerIDAllowedKeyboard(Inputs* self) { return self->getPlayerIDAllowedKeyboard(); }
+
+
 const bool Inputs::bPlayerUsingKeyboardControl(const int player) const {
 		return player == playerUsingKeyboardControl || multiplayer != SINGLE;
 	}
+
+extern "C" const bool Inputs_bPlayerUsingKeyboardControl(const Inputs* self, const int player) { return self->bPlayerUsingKeyboardControl(player); }
+
 
 void Inputs::removeControllerWithDeviceID(const int id) {
 		for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -7982,6 +8459,9 @@ void Inputs::removeControllerWithDeviceID(const int id) {
 			}
 		}
 	}
+
+extern "C" void Inputs_removeControllerWithDeviceID(Inputs* self, const int id) { return self->removeControllerWithDeviceID(id); }
+
 
 Inputs::VirtualMouse * Inputs::getVirtualMouse(int player) {
 		if (multiplayer != SINGLE && player != 0) {
@@ -7995,6 +8475,9 @@ Inputs::VirtualMouse * Inputs::getVirtualMouse(int player) {
 		return &vmouse[player];
 	}
 
+extern "C" Inputs::VirtualMouse * Inputs_getVirtualMouse(Inputs* self, int player) { return self->getVirtualMouse(player); }
+
+
 Inputs::UIStatus * Inputs::getUIInteraction(int player) {
 		if ( player < 0 || player >= MAXPLAYERS )
 		{
@@ -8004,12 +8487,18 @@ Inputs::UIStatus * Inputs::getUIInteraction(int player) {
 		return &uiStatus[player];
 	}
 
+extern "C" Inputs::UIStatus * Inputs_getUIInteraction(Inputs* self, int player) { return self->getUIInteraction(player); }
+
+
 void Inputs::hideMouseCursors() {
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
 			getVirtualMouse(i)->draw_cursor = false;
 		}
 	}
+
+extern "C" void Inputs_hideMouseCursors(Inputs* self) { return self->hideMouseCursors(); }
+
 
 const int Inputs::getControllerID(int player) const {
 		if (multiplayer != SINGLE && player != 0) {
@@ -8023,6 +8512,9 @@ const int Inputs::getControllerID(int player) const {
 		return playerControllerIds[player];
 	}
 
+extern "C" const int Inputs_getControllerID(const Inputs* self, int player) { return self->getControllerID(player); }
+
+
 const bool Inputs::hasController(int player) const {
 		if (multiplayer != SINGLE && player != 0) {
 			return hasController(0);
@@ -8035,6 +8527,9 @@ const bool Inputs::hasController(int player) const {
 		return playerControllerIds[player] != -1 && getController(player);
 	}
 
+extern "C" const bool Inputs_hasController(const Inputs* self, int player) { return self->hasController(player); }
+
+
 void Inputs::setControllerID(int player, const int id) {
 		if (multiplayer != SINGLE && player != 0) {
 			return setControllerID(0, id);
@@ -8046,12 +8541,18 @@ void Inputs::setControllerID(int player, const int id) {
 		playerControllerIds[player] = id;
 	}
 
+extern "C" void Inputs_setControllerID(Inputs* self, int player, const int id) { return self->setControllerID(player, id); }
+
+
 void Inputs::updateAllMouse() {
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
 			controllerHandleMouse(i);
 		}
 	}
+
+extern "C" void Inputs_updateAllMouse(Inputs* self) { return self->updateAllMouse(); }
+
 
 void Inputs::updateAllOMouse() {
 		for ( int i = 0; i < MAXPLAYERS; ++i )
@@ -8085,6 +8586,9 @@ void Inputs::updateAllOMouse() {
 			vmouse[3].ox, vmouse[3].oy);*/
 	}
 
+extern "C" void Inputs_updateAllOMouse(Inputs* self) { return self->updateAllOMouse(); }
+
+
 void Inputs::updateAllRelMouse() {
 		for ( int i = 0; i < MAXPLAYERS; ++i )
 		{
@@ -8094,6 +8598,9 @@ void Inputs::updateAllRelMouse() {
 			vmouse[i].floatyrel = 0.0;
 		}
 	}
+
+extern "C" void Inputs_updateAllRelMouse(Inputs* self) { return self->updateAllRelMouse(); }
+
 
 void Inputs::rumble(const int player, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid) {
 		if (multiplayer != SINGLE && player != 0) {
@@ -8107,6 +8614,9 @@ void Inputs::rumble(const int player, GameController::Haptic_t::RumblePattern pa
 		getController(player)->addRumble(pattern, smallMagnitude, largeMagnitude, length, srcEntityUid);
 	}
 
+extern "C" void Inputs_rumble(Inputs* self, const int player, GameController::Haptic_t::RumblePattern pattern, Uint16 smallMagnitude, Uint16 largeMagnitude, Uint32 length, Uint32 srcEntityUid) { return self->rumble(player, pattern, smallMagnitude, largeMagnitude, length, srcEntityUid); }
+
+
 void Inputs::rumbleStop(const int player) {
 		if (multiplayer != SINGLE && player != 0) {
 			rumbleStop(0);
@@ -8119,6 +8629,9 @@ void Inputs::rumbleStop(const int player) {
 		getController(player)->stopRumble();
 	}
 
+extern "C" void Inputs_rumbleStop(Inputs* self, const int player) { return self->rumbleStop(player); }
+
+
 void Inputs::VirtualMouse::warpMouseInCamera(const view_t& camera, const Sint32 newx, const Sint32 newy) {
 			x = std::max(camera.winx, std::min(camera.winx + camera.winw, x + newx));
 			y = std::max(camera.winy, std::min(camera.winy + camera.winh, y + newy));
@@ -8126,6 +8639,9 @@ void Inputs::VirtualMouse::warpMouseInCamera(const view_t& camera, const Sint32 
 			yrel += newy;
 			moved = true;
 		}
+
+extern "C" void VirtualMouse_warpMouseInCamera(Inputs::VirtualMouse* self, const view_t & camera, const Sint32 newx, const Sint32 newy) { return self->warpMouseInCamera(camera, newx, newy); }
+
 
 void Inputs::VirtualMouse::warpMouseInScreen(SDL_Window*& window, const Sint32 newx, const Sint32 newy) {
 			int w, h;
@@ -8137,29 +8653,68 @@ void Inputs::VirtualMouse::warpMouseInScreen(SDL_Window*& window, const Sint32 n
 			moved = true;
 		}
 
+extern "C" void VirtualMouse_warpMouseInScreen(Inputs::VirtualMouse* self, SDL_Window *& window, const Sint32 newx, const Sint32 newy) { return self->warpMouseInScreen(window, newx, newy); }
+
+
 view_t& Player::camera() const { return *cam; }
+
+extern "C" view_t & Player_camera(const Player* self) { return self->camera(); }
+
 
 const int Player::camera_x2() const { return cam->winx + cam->winw; }
 
+extern "C" const int Player_camera_x2(const Player* self) { return self->camera_x2(); }
+
+
 const int Player::camera_y2() const { return cam->winy + cam->winh; }
+
+extern "C" const int Player_camera_y2(const Player* self) { return self->camera_y2(); }
+
 
 const int Player::camera_midx() const { return camera_x1() + camera_width() / 2; }
 
+extern "C" const int Player_camera_midx(const Player* self) { return self->camera_midx(); }
+
+
 const int Player::camera_midy() const { return camera_y1() + camera_height() / 2; }
+
+extern "C" const int Player_camera_midy(const Player* self) { return self->camera_midy(); }
+
 
 const int Player::Inventory_t::getTotalSize() const { return sizex * sizey; }
 
+extern "C" const int Inventory_t_getTotalSize(const Player::Inventory_t* self) { return self->getTotalSize(); }
+
+
 const int Player::Inventory_t::getSlotSize() const { return 40; }
+
+extern "C" const int Inventory_t_getSlotSize(const Player::Inventory_t* self) { return self->getSlotSize(); }
+
 
 const int Player::Inventory_t::getItemSpriteSize() const { return 36; }
 
+extern "C" const int Inventory_t_getItemSpriteSize(const Player::Inventory_t* self) { return self->getItemSpriteSize(); }
+
+
 void Player::Inventory_t::setSizeY(int size) { sizey = size; }
+
+extern "C" void Inventory_t_setSizeY(Player::Inventory_t* self, int size) { return self->setSizeY(size); }
+
 
 void Player::Inventory_t::selectSlot(const int x, const int y) { selectedSlotX = x; selectedSlotY = y; }
 
+extern "C" void Inventory_t_selectSlot(Player::Inventory_t* self, const int x, const int y) { return self->selectSlot(x, y); }
+
+
 void Player::Inventory_t::selectSpell(const int x, const int y) { selectedSpellX = x; selectedSpellY = y; }
 
+extern "C" void Inventory_t_selectSpell(Player::Inventory_t* self, const int x, const int y) { return self->selectSpell(x, y); }
+
+
 const bool Player::Inventory_t::selectedSlotInPaperDoll() const { return selectedSlotY < 0; }
+
+extern "C" const bool Inventory_t_selectedSlotInPaperDoll(const Player::Inventory_t* self) { return self->selectedSlotInPaperDoll(); }
+
 
 void Player::Inventory_t::resetInventory() {
 			if ( bNewInventoryLayout )
@@ -8176,11 +8731,17 @@ void Player::Inventory_t::resetInventory() {
 			sizey = DEFAULT_INVENTORY_SIZEY;
 		}
 
+extern "C" void Inventory_t_resetInventory(Player::Inventory_t* self) { return self->resetInventory(); }
+
+
 const int Player::Inventory_t::freeVisibleInventorySlots() const {
 			int x = getPlayerItemInventoryX();
 			int y = getPlayerItemInventoryY();
 			return x * y;
 		}
+
+extern "C" const int Inventory_t_freeVisibleInventorySlots(const Player::Inventory_t* self) { return self->freeVisibleInventorySlots(); }
+
 
 const int Player::Inventory_t::getPlayerBackpackBonusSizeY() const {
 			if ( bNewInventoryLayout )
@@ -8189,6 +8750,9 @@ const int Player::Inventory_t::getPlayerBackpackBonusSizeY() const {
 			}
 			return 1;
 		}
+
+extern "C" const int Inventory_t_getPlayerBackpackBonusSizeY(const Player::Inventory_t* self) { return self->getPlayerBackpackBonusSizeY(); }
+
 
 void Player::Inventory_t::ItemTooltipDisplay_t::reset() {
 				type = WOODEN_SHIELD;
@@ -8211,13 +8775,22 @@ void Player::Inventory_t::ItemTooltipDisplay_t::reset() {
 				playerCHR = -1;
 			}
 
+extern "C" void ItemTooltipDisplay_t_reset(Player::Inventory_t::ItemTooltipDisplay_t* self) { return self->reset(); }
+
+
 void Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::setSkillName(std::string name) {
 					skillName = name;
 				}
 
+extern "C" void SkillEntry_t_setSkillName(Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t* self, std::string name) { return self->setSkillName(name); }
+
+
 void Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::setSkillShortName(std::string name) {
 					skillShortName = name;
 				}
+
+extern "C" void SkillEntry_t_setSkillShortName(Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t* self, std::string name) { return self->setSkillShortName(name); }
+
 
 const char* Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::getSkillName(bool shortName ) {
 					if ( shortName )
@@ -8229,6 +8802,9 @@ const char* Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t::getSkillName(b
 					}
 					return skillName.c_str();
 				}
+
+extern "C" const char * SkillEntry_t_getSkillName(Player::SkillSheet_t::SkillSheetData_t::SkillEntry_t* self, bool shortName) { return self->getSkillName(shortName); }
+
 
 void Player::HUD_t::reset() {
 			swapWeaponGimpTimer = 0;
@@ -8243,12 +8819,21 @@ void Player::HUD_t::reset() {
 			shieldSwitch = false;
 		}
 
+extern "C" void HUD_t_reset(Player::HUD_t* self) { return self->reset(); }
+
+
 void Player::HUD_t::setCursorDisabled(bool disabled) { if ( cursorFrame ) { cursorFrame->setDisabled(disabled); } }
+
+extern "C" void HUD_t_setCursorDisabled(Player::HUD_t* self, bool disabled) { return self->setCursorDisabled(disabled); }
+
 
 void Player::Magic_t::flashNoMana() {
 			noManaFeedbackTicks = 0;
 			noManaProcessedOnTick = ticks;
 		}
+
+extern "C" void Magic_t_flashNoMana(Player::Magic_t* self) { return self->flashNoMana(); }
+
 
 void Player::Magic_t::clearSelectedSpells() {
 			selected_spell = nullptr;
@@ -8260,24 +8845,48 @@ void Player::Magic_t::clearSelectedSpells() {
 			quick_cast_spell = nullptr;
 		}
 
+extern "C" void Magic_t_clearSelectedSpells(Player::Magic_t* self) { return self->clearSelectedSpells(); }
+
+
 void Player::Magic_t::equipSpell(spell_t* spell) { 
 			selected_spell = spell; 
 		}
 
+extern "C" void Magic_t_equipSpell(Player::Magic_t* self, spell_t * spell) { return self->equipSpell(spell); }
+
+
 bool Player::Magic_t::doQuickCastSpell() { return quick_cast_spell != nullptr; }
+
+extern "C" bool Magic_t_doQuickCastSpell(Player::Magic_t* self) { return self->doQuickCastSpell(); }
+
 
 void Player::Magic_t::resetQuickCastSpell() { quick_cast_spell = nullptr; }
 
+extern "C" void Magic_t_resetQuickCastSpell(Player::Magic_t* self) { return self->resetQuickCastSpell(); }
+
+
 void Player::Magic_t::resetQuickCastTome() { quick_cast_tome = 0; }
+
+extern "C" void Magic_t_resetQuickCastTome(Player::Magic_t* self) { return self->resetQuickCastTome(); }
+
 
 int Player::MessageZone_t::fontSize() { return getHeightOfFont(font); }
 
+extern "C" int MessageZone_t_fontSize(Player::MessageZone_t* self) { return self->fontSize(); }
+
+
 void Player::WorldUI_t::enable() { bEnabled = true; }
+
+extern "C" void WorldUI_t_enable(Player::WorldUI_t* self) { return self->enable(); }
+
 
 void Player::WorldUI_t::disable() { 
 			bEnabled = false; 
 			reset();
 		}
+
+extern "C" void WorldUI_t_disable(Player::WorldUI_t* self) { return self->disable(); }
+
 
 void Player::PaperDoll_t::initSlots() {
 			returningItemsToInventory.clear();
@@ -8288,6 +8897,9 @@ void Player::PaperDoll_t::initSlots() {
 			}
 		}
 
+extern "C" void PaperDoll_t_initSlots(Player::PaperDoll_t* self) { return self->initSlots(); }
+
+
 void Player::PaperDoll_t::clear() {
 			returningItemsToInventory.clear();
 			for ( int i = 0; i < kNumPaperDollSlots; ++i )
@@ -8296,7 +8908,13 @@ void Player::PaperDoll_t::clear() {
 			}
 		}
 
+extern "C" void PaperDoll_t_clear(Player::PaperDoll_t* self) { return self->clear(); }
+
+
 bool Player::PaperDoll_t::isItemOnDoll(const Item& item) const { return getSlotForItem(item) != SLOT_MAX; }
+
+extern "C" bool PaperDoll_t_isItemOnDoll(const Player::PaperDoll_t* self, const Item & item) { return self->isItemOnDoll(item); }
+
 
 void Player::PaperDoll_t::resetPortrait() {
 			portraitRotationInertia = 0.0;
@@ -8304,11 +8922,23 @@ void Player::PaperDoll_t::resetPortrait() {
 			portraitYaw = (330) * PI / 180;
 		}
 
+extern "C" void PaperDoll_t_resetPortrait(Player::PaperDoll_t* self) { return self->resetPortrait(); }
+
+
 const int Player::Hotbar_t::getSlotSize() const { return 48; }
+
+extern "C" const int Hotbar_t_getSlotSize(const Player::Hotbar_t* self) { return self->getSlotSize(); }
+
 
 const int Player::Hotbar_t::getHotbarStartY1() const { return -106; }
 
+extern "C" const int Hotbar_t_getHotbarStartY1(const Player::Hotbar_t* self) { return self->getHotbarStartY1(); }
+
+
 const int Player::Hotbar_t::getHotbarStartY2() const { return -96; }
+
+extern "C" const int Hotbar_t_getHotbarStartY2(const Player::Hotbar_t* self) { return self->getHotbarStartY2(); }
+
 
 void Player::Hotbar_t::clear() {
 			faceButtonTopYPosition = yres;
@@ -8333,3 +8963,6 @@ void Player::Hotbar_t::clear() {
 				}
 			}
 		}
+
+extern "C" void Hotbar_t_clear(Player::Hotbar_t* self) { return self->clear(); }
+

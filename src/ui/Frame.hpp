@@ -136,10 +136,14 @@ public:
 	static void postdraw();
 
 	//! draws the frame and all of its subelements
+
+	public:
 	void draw() const;
 
 	//! handle clicks and other events
 	//! @return compiled results of frame processing
+
+	public:
 	result_t process();
 
 	//! to be performed recursively on every frame after process()
@@ -429,6 +433,8 @@ private:
 
 	//! activate the given list entry
 	//! @param entry the entry to activate
+
+	public:
 	void activateEntry(entry_t& entry);
 
 	//! draws the frame and all of its subelements
@@ -441,6 +447,8 @@ private:
 	//! @param _size real position of the frame onscreen
 	//! @param _actualSize offset into the frame space (scroll)
 	//! @param selectedWidgets the currently selected widgets, if any
+
+	public:
 	void drawPost(SDL_Rect _size, SDL_Rect _actualSize,
 	    const DynamicArrayT<Widget*>& selectedWidgets,
 	    const DynamicArrayT<Widget*>& searchParents) const;
@@ -452,12 +460,22 @@ private:
 	//! @return compiled results of frame processing
 	result_t process(SDL_Rect _size, SDL_Rect actualSize, const bool usable);
 
+
+	public:
 	bool capturesMouseImpl(SDL_Rect& _size, SDL_Rect& _actualSize, bool realtime) const;
 
+
+	public:
 	SDL_Rect getRelativeMousePositionImpl(SDL_Rect& _size, SDL_Rect& _actualSize, bool realtime) const;
 
+
+	public:
 	void processField(const SDL_Rect& _size, Field& field, Widget*& destWidget, result_t& result);
+
+	public:
 	void processButton(const SDL_Rect& _size, Button& button, Widget*& destWidget, result_t& result);
+
+	public:
 	void processSlider(const SDL_Rect& _size, Slider& slider, Widget*& destWidget, result_t& result);
 };
 

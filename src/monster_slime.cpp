@@ -758,3 +758,5 @@ void Entity::slimeChooseWeapon(const Entity* target, double dist)
 		}
 	}
 }
+
+extern "C" void Entity_slimeChooseWeapon(Entity* self, const Entity * target, double dist) { return self->slimeChooseWeapon(target, dist); }

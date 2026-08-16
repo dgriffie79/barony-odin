@@ -618,6 +618,8 @@ public:
 		SPELL_TAG_BONUS_AS_EFFECT_POWER
 	};
 private:
+
+	public:
 	struct spellItem_t
 	{
 		Sint32 id;

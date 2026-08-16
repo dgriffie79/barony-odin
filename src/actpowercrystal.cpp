@@ -215,6 +215,9 @@ void Entity::actPowerCrystal()
 	return;
 }
 
+extern "C" void Entity_actPowerCrystal(Entity* self) { return self->actPowerCrystal(); }
+
+
 // ambient particle effects.
 void actPowerCrystalParticleIdle(Entity* my)
 {
@@ -310,3 +313,6 @@ void Entity::powerCrystalCreateElectricityNodes()
 
 	return;
 }
+
+extern "C" void Entity_powerCrystalCreateElectricityNodes(Entity* self) { return self->powerCrystalCreateElectricityNodes(); }
+

@@ -1611,6 +1611,9 @@ void Entity::incubusChooseWeapon(const Entity* target, double dist)
 	return;
 }
 
+extern "C" void Entity_incubusChooseWeapon(Entity* self, const Entity * target, double dist) { return self->incubusChooseWeapon(target, dist); }
+
+
 void Entity::incubusTeleportToTarget(const Entity* target)
 {
 	Entity* spellTimer = createParticleTimer(this, 40, 593);
@@ -1629,6 +1632,9 @@ void Entity::incubusTeleportToTarget(const Entity* target)
 	}
 }
 
+extern "C" void Entity_incubusTeleportToTarget(Entity* self, const Entity * target) { return self->incubusTeleportToTarget(target); }
+
+
 void Entity::incubusTeleportRandom()
 {
 	Entity* spellTimer = createParticleTimer(this, 80, 593);
@@ -1642,3 +1648,6 @@ void Entity::incubusTeleportRandom()
 		serverSpawnMiscParticles(this, PARTICLE_EFFECT_INCUBUS_TELEPORT_STEAL, 593);
 	}
 }
+
+extern "C" void Entity_incubusTeleportRandom(Entity* self) { return self->incubusTeleportRandom(); }
+
