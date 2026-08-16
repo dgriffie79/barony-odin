@@ -8,8 +8,9 @@ the green reference; Odin is the target. Read this before doing port work.
 Port Barony from C++ to Odin, file-by-file. Odin is the executable
 (`barony.exe`/`editor.exe`); the C++ builds as static libs
 (`libbarony_game.a`/`libbarony_editor.a`) linked into the Odin exe. The C++
-tree stays green and runnable until each file is ported, then the ported file's
-C++ version is DELETED (replace, never wrap).
+tree stays green and runnable until each file is ported, then the ported
+file's C++ version is DELETED — except class methods, which flatten to a
+one-line forward (see "Porting strategy" below).
 
 ## Architecture
 
@@ -18,7 +19,8 @@ C++ version is DELETED (replace, never wrap).
   - `main.odin` — driver: calls `barony_main`, `run_barony()` argv marshaling
   - `game.odin` / `editor.odin` — foreign decls for `barony_main`
     (game vs editor selected by `when #config(EDITOR, false)`)
-  - `prng.odin` — ported RNG (RC4), verified byte-exact (unused yet)
+  - `prng.odin` — ported RNG (RC4), single `@(export)` implementation,
+    verified byte-exact against retail (game seeds reproduce)
   - `containers/` — container shims (see below)
 - `builddir/` — Meson build output (gitignored)
 
@@ -31,12 +33,86 @@ no methods. Crossings are `extern "C"` + plain types.
 primitives, the shared container types below). Non-C-mappable functions (STL
 in signature, templates, lambdas) never cross — they port with their callers.
 
-**Rule (replace, never wrap):** when porting a function, DELETE the C++ version
-and write the Odin proc. Never keep a C++ shell that delegates to Odin.
-
 **Reverse calls:** with static linking, C++ objects can call Odin `@(export)`
 procs (one-way C++→Odin). This is how ported leaves are used before their
-callers port. The rejected pattern is a *surviving C++ API* that delegates.
+callers port.
+
+## Porting strategy (functions, methods, globals)
+
+There is exactly ONE owner for every symbol at any time; the other side only
+*references* it. A port is a flip of ownership from C++ to Odin. The mechanism
+differs by symbol kind because C++ name-mangles methods but not free functions:
+
+### 1. Free functions (`entityDist`, `entityClicked`, ...)
+
+Delete the C++ definition entirely and write the Odin `@(export) proc "c"`
+under the SAME name. Add `extern "C"` to the header declaration so C++ callers
+link to the unmangled symbol. NO forwarding function, NO wrapper.
+
+```cpp
+// collision.hpp
+real_t entityDist(Entity* my, Entity* your);      // ->  extern "C" real_t entityDist(Entity* my, Entity* your);
+// collision.cpp: delete the body
+```
+```odin
+// collision.odin — the single owner
+@(export)
+entityDist :: proc "c" (my, your: ^Entity) -> f64 { ... }
+```
+
+### 2. Class methods (`BaronyRNG::getU32`, `Input::update`, ...)
+
+C++ methods are name-mangled, so they can NEVER be `extern "C"`. To make a
+method callable from Odin regardless of port order, first FLATTEN it to a
+C-linkage free function, then port the body into that flat function.
+
+**Prep (flatten, one-time per class):** `tools/flatten_methods.py` generates
+a `extern "C" Class_method` forwarder next to each method definition, relabels
+`private:` -> `public:` where needed (layout-safe), and emits the Odin
+`foreign _barony` block. The method body stays in C++ — this is additive, no
+behavior change.
+
+**Port (per-symbol):** move the method body into Odin as the SAME flat name;
+the C++ method becomes a one-line forward.
+
+```cpp
+// prng.cpp (after port)
+uint32_t BaronyRNG::getU32() { return BaronyRNG_getU32(this); }  // method forwards
+```
+```odin
+// prng.odin — single implementation, NO Odin wrapper layer
+@(export)
+BaronyRNG_getU32 :: proc "c" (self: ^Barony_RNG) -> u32 { ... }
+```
+
+The `Class_method` name is the SEAM: it never changes; only which side owns the
+body. There is NO Odin shim-to-self (the `@(export)` IS the implementation).
+
+**Flatten rules** (`flatten_methods.py`): operators -> readable suffixes
+(`operator==` -> `Class_eq`), overloads auto-disambiguated (`_2`, `_3`),
+static methods take no `self`, const methods take `const Class* self`,
+trivial inline accessors are SKIPPED (no symbol; Odin reads fields directly),
+deleted/defaulted ctors+operators are SKIPPED. `private:`->`public:` is
+layout-safe (verified byte-identical); never drop/reorder members.
+
+### 3. Globals (`players`, `stats`, the ~800 externs)
+
+A global can't be forwarded (two arrays = two objects). Ownership flips
+atomically: Odin defines it as `@(export)`, C++ declares it `extern "C"`.
+
+```cpp
+// header
+int players[4];         // ->  extern "C" int players[4];
+// .cpp: delete the definition
+```
+```odin
+@(export)
+players : [4]Player
+```
+
+Odin reads a still-C++-owned global via `foreign _barony { x : i32 }`;
+C++ reads an Odin-owned global via `extern "C" int x;`. (Both directions
+verified at link time.)
 
 ## Container shims (odin/containers/) — the de-STL foundation
 
@@ -188,15 +264,22 @@ first live members to leave std::string. ~25 call sites. Required:
 ## Porting rules (from experience)
 
 1. Port leaves first (self-contained, C-mappable); the RNG (`prng.odin`) is the
-   verified example.
+   verified example — single `@(export)` implementation, byte-exact against
+   retail on fixed seeds.
 2. Every ported proc: `@(export)` + verified against a C++ harness (byte-exact
    where deterministic — RNG is the model).
 3. Shared structs must share memory/layout with Odin — use the container
    mirrors, never keep std:: containers in a struct that crosses.
-4. Delete the C++ function when ported; never leave a delegating shell.
-5. `std::async`/`std::future` vectors are local, not shared — port with their
+4. **Free functions:** delete the C++ definition, `@(export)` the Odin proc
+   under the same name, add `extern "C"` to the header. **No forwarding.**
+5. **Class methods:** flatten first (`flatten_methods.py`), then port the body
+   into the flat `Class_method` name; the C++ method becomes a one-line
+   forward. This is the ONLY place a C++ shell survives, and only because
+   mangling forces it — never a surviving API for its own sake.
+6. **Globals:** single-owner flip — Odin `@(export)` + C++ `extern "C"`.
+7. `std::async`/`std::future` vectors are local, not shared — port with their
    file (don't de-STL them).
-6. When in doubt, verify the behavior against the C++ reference (simulate in
+8. When in doubt, verify the behavior against the C++ reference (simulate in
    tests, don't guess).
 
 ## Next steps (in order)
@@ -219,4 +302,10 @@ first live members to leave std::string. ~25 call sites. Required:
    the string pass: element type becomes DynamicString.)
 4. **Map replacement** — native `map[[4]byte]V` / `map[string]V` (string keys
    ride on DynamicString after the string pass).
-5. Then port files bottom-up, deleting C++ as callers dry up.
+5. **Flatten prep (all classes)** — run `tools/flatten_methods.py --apply`
+   across every class to install the `Class_method` forwarders + Odin
+   `foreign _barony` block, so any method is callable from Odin regardless of
+   port order.
+6. **Global ownership flip** — move the ~800 `extern` globals to Odin as
+   `@(export)` (single-owner flip; C++ declares `extern "C"`).
+7. Then port files bottom-up, deleting C++ as callers dry up.
