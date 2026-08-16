@@ -1,7 +1,6 @@
 // files.odin — Odin mirrors of files.hpp.
 package main
 
-import "containers"
 
 // enum class FileMode : Uint8
 FileMode :: enum u8 {

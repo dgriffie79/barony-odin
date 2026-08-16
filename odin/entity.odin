@@ -1,7 +1,6 @@
 // entity.odin — Odin mirrors of entity.hpp.
 package main
 
-import "containers"
 
 // struct Dither (entity.hpp, used as DynamicMapPtrT value)
 Dither_t :: struct {

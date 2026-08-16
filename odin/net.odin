@@ -1,7 +1,6 @@
 // net.odin — Odin mirrors of net.hpp.
 package main
 
-import "containers"
 
 // struct SteamPacketWrapper — 16 bytes
 SteamPacketWrapper :: struct {

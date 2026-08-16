@@ -1,7 +1,6 @@
 // collision.odin — Odin mirrors of collision.hpp.
 package main
 
-import "containers"
 
 // struct MonsterTrapIgnoreEntities_t — 40 bytes
 // { DynamicSetI32 ignoreEntities (32B); Uint32 parent; }

@@ -7,7 +7,6 @@
 // emits the symbol reference; /WHOLEARCHIVE guarantees all objects are pulled
 // in (so ported Odin procs can be called from C++ and vice versa).
 package main
-import "containers"
 import "json_shim"
 
 when !#config(EDITOR, false) {

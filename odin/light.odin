@@ -1,7 +1,6 @@
 // light.odin — Odin mirrors of light.hpp.
 package main
 
-import "containers"
 
 // typedef struct light_t — 32 bytes
 // { Sint32 x,y; Sint32 radius; vec4_t* tiles; int index; node_t* node; }

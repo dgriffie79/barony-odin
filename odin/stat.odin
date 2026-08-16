@@ -1,7 +1,6 @@
 // stat.odin — Odin mirrors of stat.hpp.
 package main
 
-import "containers"
 
 
 // constants (stat.hpp)
@@ -74,7 +73,7 @@ Stat :: struct {
 	killer_uid:          u32,
 	killer_monster:      Monster,
 	killer_item:         ItemType,
-	killer_name:         containers.DynamicString, // 16B
+	killer_name:         string, // 16B
 	hp:                  i32, // HP
 	maxhp:               i32,
 	oldhp:               i32,
@@ -124,7 +123,7 @@ Stat :: struct {
 	mask:                ^Item,
 	monster_sound:       rawptr, // void* (former FMOD/OpenAL channel)
 	monster_idlevar:     i32,
-	attributes:          map[string]containers.DynamicString, // DynamicMapStr (string-keyed)
+	attributes:          map[string]string, // DynamicMapStr (string-keyed)
 	player_lootbags:     map[[4]byte]Lootbag_t, // DynamicMapI32T<Lootbag_t> (i32-keyed)
 	void_chest_inventory: list_t,
 	magic_effects:       list_t,

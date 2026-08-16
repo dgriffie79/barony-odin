@@ -1,7 +1,6 @@
 // player.odin — Odin mirrors of player.hpp.
 package main
 
-import "containers"
 
 // struct PlayerSettings_t (player.hpp:53, file scope) — 80 bytes.
 // NOTE: distinct from the nested Player::PlayerSettings_t (16B, mirrored below
@@ -316,7 +315,7 @@ Game_Controller :: struct {
 	sdl_device:          rawptr, // SDL_GameController*
 	sdl_haptic:          rawptr, // SDL_Haptic*
 	id:                  i32,
-	name:                containers.DynamicString,
+	name:                string,
 	haptics:             Haptic_T,
 	buttons:             [21]Binding_T, // NUM_JOY_STATUS
 	axis:                [6]Binding_T,  // NUM_JOY_AXIS_STATUS
@@ -387,7 +386,7 @@ Inputs_Struct :: struct {
 // struct MonsterStringPair_t — 24 bytes
 Monster_String_Pair_T :: struct {
 	first:  i32, // Monster
-	second: containers.DynamicString,
+	second: string,
 }
 #assert(size_of(Monster_String_Pair_T) == 24)
 
@@ -421,13 +420,41 @@ Int_U32_Pair :: struct {
 #assert(size_of(Int_U32_Pair) == 8)
 
 // struct Player::GUIDropdown_t::DropDown_t — 88 bytes
+// --- core container mirrors (containers is shim-only; these live in core) ---
+
+// SDL_Rect — 16 bytes
+SDL_Rect :: struct {
+	x: i32,
+	y: i32,
+	w: i32,
+	h: i32,
+}
+#assert(size_of(SDL_Rect) == 16)
+
+// IntPair_T — 8B POD (std::pair<int,int>)
+IntPair_T :: struct {
+	first:  i32,
+	second: i32,
+}
+#assert(size_of(IntPair_T) == 8)
+
+// DropdownOption_T — 64B (DropdownOption_tMirror: 4 strings)
+DropdownOption_T :: struct {
+	text:            string,
+	keyboard_glyph:  string,
+	controller_glyph: string,
+	action:          string,
+}
+#assert(size_of(DropdownOption_T) == 64)
+
+
 Drop_Down_T :: struct {
-	title:         containers.DynamicString,
-	internal_name: containers.DynamicString,
+	title:         string,
+	internal_name: string,
 	align_right:   bool,
 	module:        i32,
 	default_option: i32,
-	options:       [dynamic]containers.DropdownOption_t, // DynamicArrayOption
+	options:       [dynamic]DropdownOption_T, // DynamicArrayOption
 }
 #assert(size_of(Drop_Down_T) == 88)
 
@@ -440,7 +467,7 @@ GUI_Dropdown_T :: struct {
 	drop_down_option_selected:   i32,
 	drop_down_item:              u32,
 	b_open:                      bool,
-	current_name:                containers.DynamicString,
+	current_name:                string,
 	dropdown_block_click_frame:  rawptr, // Frame*
 	dropdown_frame:              rawptr, // Frame*
 	drop_down_toggle_click:      bool,
@@ -648,10 +675,10 @@ Shop_GUI_T :: struct {
 	b_first_time_snap_cursor: bool,
 	chat_ticks:             u32,
 	chat_string_length:     i64, // size_t
-	chat_str_full:          containers.DynamicString,
+	chat_str_full:          string,
 	item_price:             i32,
 	item_unknown_prevent_purchase: bool,
-	item_desc:              containers.DynamicString,
+	item_desc:              string,
 	item_requires_title_reflow: bool,
 	player_current_gold:    i32,
 	player_change_gold:     i32,
@@ -677,7 +704,7 @@ Book_GUI_T :: struct {
 	offsety:                 i32,
 	b_book_open:             bool,
 	open_book_item:          ^Item,
-	open_book_name:          containers.DynamicString,
+	open_book_name:          string,
 	current_book_page:       i32,
 }
 #assert(size_of(Book_GUI_T) == 72)
@@ -691,7 +718,7 @@ Sign_GUI_T :: struct {
 	sign_world_coord_y:      f64,
 	sign_frame:              rawptr, // Frame*
 	b_sign_open:             bool,
-	sign_name:               containers.DynamicString,
+	sign_name:               string,
 	current_sign_page:       i32,
 	sign_uid:                u32,
 }
@@ -719,11 +746,11 @@ Character_Sheet_T :: struct {
 
 // struct Player::SkillSheet_t::SkillEffect_t — 160 bytes
 Skill_Effect_T :: struct {
-	tag:                        containers.DynamicString,
-	title:                      containers.DynamicString,
-	title_short:                containers.DynamicString,
-	raw_value:                  containers.DynamicString,
-	value:                      containers.DynamicString,
+	tag:                        string,
+	title:                      string,
+	title_short:                string,
+	raw_value:                  string,
+	value:                      string,
 	value_custom_width_offset:  i32,
 	b_allow_auto_resize_value:  bool,
 	b_allow_realtime_update:    bool,
@@ -739,16 +766,16 @@ Skill_Effect_T :: struct {
 
 // struct Player::SkillSheet_t::SkillEntry_t — 208 bytes
 Skill_Entry_T :: struct {
-	skill_name:               containers.DynamicString,
-	skill_short_name:         containers.DynamicString,
+	skill_name:               string,
+	skill_short_name:         string,
 	skill_id:                 i32,
-	skill_icon_path:          containers.DynamicString,
-	skill_icon_path_legend:   containers.DynamicString,
-	skill_icon_path_32px:     containers.DynamicString,
-	skill_icon_path_legend_32px: containers.DynamicString,
-	stat_icon_path:           containers.DynamicString,
-	description:              containers.DynamicString,
-	legendary_description:    containers.DynamicString,
+	skill_icon_path:          string,
+	skill_icon_path_legend:   string,
+	skill_icon_path_32px:     string,
+	skill_icon_path_legend_32px: string,
+	stat_icon_path:           string,
+	description:              string,
+	legendary_description:    string,
 	skill_sfx:                i32,
 	effect_start_offset_x:    i32,
 	effect_background_offset_x: i32,
@@ -764,19 +791,19 @@ Skill_Sheet_Data_T :: struct {
 	expert_text_color:             u32,
 	legend_text_color:             u32,
 	skill_entries:                 [dynamic]Skill_Entry_T, // DynamicArrayT<SkillEntry_t>
-	icon_bg_path_default:          containers.DynamicString,
-	icon_bg_path_novice:           containers.DynamicString,
-	icon_bg_path_expert:           containers.DynamicString,
-	icon_bg_path_legend:           containers.DynamicString,
-	icon_bg_selected_path_default: containers.DynamicString,
-	icon_bg_selected_path_novice:  containers.DynamicString,
-	icon_bg_selected_path_expert:  containers.DynamicString,
-	icon_bg_selected_path_legend:  containers.DynamicString,
-	highlight_skill_img:           containers.DynamicString,
-	select_skill_img:              containers.DynamicString,
-	highlight_skill_img_right:     containers.DynamicString,
-	select_skill_img_right:        containers.DynamicString,
-	potion_names_to_filter:        [dynamic]containers.DynamicString, // DynamicArrayStr
+	icon_bg_path_default:          string,
+	icon_bg_path_novice:           string,
+	icon_bg_path_expert:           string,
+	icon_bg_path_legend:           string,
+	icon_bg_selected_path_default: string,
+	icon_bg_selected_path_novice:  string,
+	icon_bg_selected_path_expert:  string,
+	icon_bg_selected_path_legend:  string,
+	highlight_skill_img:           string,
+	select_skill_img:              string,
+	highlight_skill_img_right:     string,
+	select_skill_img_right:        string,
+	potion_names_to_filter:        [dynamic]string, // DynamicArrayStr
 	leadership_ally_table_base:    map[[4]byte][dynamic]i32, // DynamicMapI32T<DynamicArrayS32> (i32-keyed)
 	leadership_ally_table_legendary: map[[4]byte][dynamic]i32, // DynamicMapI32T<DynamicArrayS32> (i32-keyed)
 	leadership_ally_table_special_recruitment: map[[4]byte][dynamic]Monster_String_Pair_T, // DynamicMapI32T<DynamicArrayT<MonsterStringPair_t>> (i32-keyed)
@@ -872,8 +899,8 @@ Follower_Bar_T :: struct {
 	anim_fade_scroll:     f64,
 	anim_fade_scroll_dummy: f64,
 	b_init:               bool,
-	name:                 containers.DynamicString,
-	custom_portrait_path: containers.DynamicString,
+	name:                 string,
+	custom_portrait_path: string,
 	level:                i32,
 	model:                i32,
 	monster_type:         i32,
@@ -1113,8 +1140,8 @@ Dialogue_T :: struct {
 	expiry_ticks:             u32,
 	dialogue_field:           rawptr, // Field*
 	dialogue_string_length:   i64, // size_t
-	dialogue_str_full:        containers.DynamicString,
-	dialogue_str_current:     containers.DynamicString,
+	dialogue_str_full:        string,
+	dialogue_str_current:     string,
 	dialogue_type:            i32, // DialogueType_t enum
 	dialogue_tooltip_surface: rawptr, // SDL_Surface*
 }
@@ -1142,7 +1169,7 @@ World_UI_T :: struct {
 	gimp_display_timer:         i32,
 	b_tooltip_in_view:          bool,
 	uid_for_active_tooltip:     u32,
-	interact_text:              containers.DynamicString,
+	interact_text:              string,
 }
 #assert(size_of(World_UI_T) == 352)
 
@@ -1200,7 +1227,7 @@ Hotbar_T :: struct {
 	magic_boomerang_hotbar_slot:     i32,
 	magic_duck_hotbar_slot:          i32,
 	hotbar_tooltip_last_game_tick:   u32,
-	hotbar_box:                      containers.SDL_Rect,
+	hotbar_box:                      SDL_Rect,
 	hotbar_frame:                    rawptr, // Frame*
 	selected_slot_animate_current_value: f64,
 	is_interactable:                 bool,
@@ -1217,7 +1244,7 @@ Hotbar_T :: struct {
 	radial_hotbar_progress:          i32,
 	old_slot_frame_track_slot:       i32,
 	anim_hide:                       f64,
-	face_button_positions:           [10]containers.SDL_Rect,
+	face_button_positions:           [10]SDL_Rect,
 }
 #assert(size_of(Hotbar_T) == 4720)
 
@@ -1229,7 +1256,7 @@ Minimap_T :: struct {
 	scale:                 f64,
 	scale_ang:             f64,
 	animating:             bool,
-	minimap_pos:           containers.SDL_Rect,
+	minimap_pos:           SDL_Rect,
 	map_parent_frame:      rawptr, // Frame*
 	map_window:            rawptr, // Frame*
 	b_scale_prompt_enabled: bool,
@@ -1258,7 +1285,7 @@ Player_Mechanics_T :: struct {
 	player:                       rawptr, // Player&
 	item_degrade_rng:             map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
 	learned_spells:               map[i32]struct{}, // DynamicSetI32
-	ducks_in_a_row:               [dynamic]containers.IntPair_t, // vector<pair<int,int>>
+	ducks_in_a_row:               [dynamic]IntPair_T, // vector<pair<int,int>>
 	pending_ducks:                [dynamic]Int_U32_Pair, // vector<pair<int,Uint32>>
 	favorite_books_achievement:   map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
 	num_fishing_caught:           i32,

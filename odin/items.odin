@@ -1,7 +1,6 @@
 // items.odin — Odin mirrors of items.hpp.
 package main
 
-import "containers"
 
 // enums (items.hpp)
 
@@ -73,8 +72,8 @@ Item :: struct {
 
 // class ItemGeneric — 152 bytes
 ItemGeneric :: struct {
-	item_name_identified:   containers.DynamicString, // 16B
-	item_name_unidentified: containers.DynamicString,
+	item_name_identified:   string, // 16B
+	item_name_unidentified: string,
 	index:                  i32,
 	index_short:            i32, // indexShort
 	fpindex:                i32,
@@ -87,7 +86,7 @@ ItemGeneric :: struct {
 	level:                  i32,
 	item_slot:              Item_Equippable_Slot,
 	attributes:             map[string]i32, // DynamicMapI32 = DynamicMapStrT<int32_t> (string-keyed)
-	tooltip:                containers.DynamicString,
+	tooltip:                string,
 }
 
 #assert(size_of(ItemGeneric) == 152)

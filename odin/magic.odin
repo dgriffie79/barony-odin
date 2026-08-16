@@ -1,7 +1,6 @@
 // magic.odin — Odin mirrors of magic/magic.hpp.
 package main
 
-import "containers"
 
 // struct ParticleEmitterHit_t — 8 bytes
 ParticleEmitterHit_t :: struct {

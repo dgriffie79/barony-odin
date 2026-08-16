@@ -1,28 +1,39 @@
 // monster.odin — Odin mirrors of monster.hpp.
 package main
 
-import "containers"
 
 // Monster enum is huge; referenced as i32 for layout (full mirror later).
 Monster :: i32
 
 // struct MonsterDataEntry_t::IconLookup_t — 32 bytes
+// SpecialNPCEntry_T — 104B (SpecialNPCEntry_tMirror)
+SpecialNPCEntry_T :: struct {
+	internal_name: string,
+	name:          string,
+	shortname:     string,
+	model_indexes: map[i32]struct{},
+	base_model:    i32,
+	unique_icon:   string,
+}
+#assert(size_of(SpecialNPCEntry_T) == 104)
+
+
 MonsterData_IconLookup_t :: struct {
-	key:      containers.DynamicString,
-	icon_path: containers.DynamicString,
+	key:      string,
+	icon_path: string,
 }
 #assert(size_of(MonsterData_IconLookup_t) == 32)
 
 // struct MonsterData_t::MonsterDataEntry_t — 200 bytes
 MonsterDataEntry_t :: struct {
 	monster_type:            i32,
-	default_icon_path:       containers.DynamicString,
+	default_icon_path:       string,
 	icon_sprites_and_paths:  map[[4]byte]MonsterData_IconLookup_t, // DynamicMapI32T<IconLookup_t> (i32-keyed)
 	key_to_sprite_lookup:    map[string][dynamic]i32, // DynamicMapStrT<DynamicArrayS32> (string-keyed)
 	model_indexes:           map[i32]struct{}, // DynamicSetI32
 	player_model_indexes:    map[i32]struct{}, // DynamicSetI32
-	default_short_display_name: containers.DynamicString,
-	special_npcs:            map[string]containers.SpecialNPCEntry_t, // DynamicMapSpecialNPC (string-keyed)
+	default_short_display_name: string,
+	special_npcs:            map[string]SpecialNPCEntry_T, // DynamicMapSpecialNPC (string-keyed)
 }
 #assert(size_of(MonsterDataEntry_t) == 200)
 
@@ -85,7 +96,7 @@ FormationInfo_t :: struct {
 // { DynamicMapI32T<MonsterAllies_t> units; DynamicArrayT<pair<int,int>> formationShape; }
 MonsterAllyFormation_t :: struct {
 	units:           map[[4]byte]MonsterAllies_t, // DynamicMapI32T<MonsterAllies_t> (i32-keyed)
-	formation_shape: [dynamic]containers.IntPair_t, // DynamicArrayT<pair<int,int>> (POD pair)
+	formation_shape: [dynamic]IntPair_T, // DynamicArrayT<pair<int,int>> (POD pair)
 }
 #assert(size_of(MonsterAllyFormation_t) == 72)
 

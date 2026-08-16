@@ -11,11 +11,15 @@
 
 package main
 
+// Blank-import the containers shim package: the C++ static lib calls its
+// @(export) procs (barony_dynamic_*), so the package must stay linked even
+// though core mirrors use native types (string/[dynamic]T/map[K]V).
+import _ "containers"
+
 import "core:c"
 import "core:fmt"
 import "core:mem"
 import "core:os"
-import "containers"
 
 main :: proc() {
 	rc := run_barony()

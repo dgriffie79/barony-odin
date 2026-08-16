@@ -1,7 +1,6 @@
 // draw.odin — Odin mirrors of draw.hpp.
 package main
 
-import "containers"
 
 // enum class ClipResult::Direction
 Clip_Result_Direction :: enum i32 {
