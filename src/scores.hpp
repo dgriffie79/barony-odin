@@ -433,7 +433,7 @@ score_t* scoreConstructor(int player);
 extern "C" void scoreDeconstructor(void* data);
 extern "C" int saveScore(int player);
 extern "C" int totalScore(score_t* score);
-void loadScore(int score);
+void loadScoreByIndex(int score);
 void loadScore(score_t* score);
 extern "C" bool deleteScore(bool multiplayer, int index);
 extern "C" void saveAllScores(const DynamicString& scoresfilename);
@@ -454,7 +454,7 @@ extern "C" DynamicString setSaveGameFileName(bool singleplayer, SaveFileType typ
 extern "C" int deleteSaveGame(int gametype, int saveIndex = savegameCurrentFileIndex);
 extern "C" bool saveGameExists(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
 bool anySaveFileExists(bool singleplayer);
-bool anySaveFileExists();
+bool anySaveFileExistsAny();
 
 struct SaveGameInfo {
 	DynamicString magic_cookie = "BARONYJSONSAVE";
@@ -671,7 +671,7 @@ extern "C" int saveGame(int saveIndex = savegameCurrentFileIndex);
 extern "C" int loadGame(int player, const SaveGameInfo& info);
 extern "C" list_t* loadGameFollowers(const SaveGameInfo& info);
 
-score_t* scoreConstructor(int player, SaveGameInfo& info);
+score_t* scoreConstructorFromInfo(int player, SaveGameInfo& info);
 extern "C" SaveGameInfo getSaveGameInfo(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
 extern "C" const char* getSaveGameName(const SaveGameInfo& info);
 extern "C" int getSaveGameType(const SaveGameInfo& info);

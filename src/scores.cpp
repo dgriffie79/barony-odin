@@ -249,7 +249,7 @@ score_t* scoreConstructor(int player)
 	return score;
 }
 
-score_t* scoreConstructor(int player, SaveGameInfo& info)
+score_t* scoreConstructorFromInfo(int player, SaveGameInfo& info)
 {
 	// for online leaderboard loading
 	if ( loadGame(player, info) == 0 )
@@ -608,7 +608,7 @@ void loadScore(score_t* score)
 	}
 }
 
-void loadScore(int scorenum)
+void loadScoreByIndex(int scorenum)
 {
 	node_t* node = nullptr;
 	if ( scoreDisplayMultiplayer )
@@ -3313,7 +3313,7 @@ bool anySaveFileExists(bool singleplayer)
 	return false;
 }
 
-bool anySaveFileExists()
+bool anySaveFileExistsAny()
 {
 	for ( int fileNumber = 0; fileNumber < SAVE_GAMES_MAX; ++fileNumber )
 	{

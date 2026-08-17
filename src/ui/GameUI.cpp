@@ -309,7 +309,7 @@ void updateLevelUpFrame(const int player);
 void updateSkillUpFrame(const int player);
 void drawClockwiseSquareMesh(const char* texture, float lerp, SDL_Rect rect, Uint32 color);
 
-void capitalizeString(std::string& str)
+void capitalizeStringStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return; }
 	char letter = str[0];
@@ -319,7 +319,7 @@ void capitalizeString(std::string& str)
 	}
 }
 
-void uppercaseString(std::string& str)
+void uppercaseStringStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return; }
 	for ( auto& letter : str )
@@ -331,7 +331,7 @@ void uppercaseString(std::string& str)
 	}
 }
 
-void lowercaseString(std::string& str)
+void lowercaseStringStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return; }
 	for ( auto& letter : str )
@@ -343,7 +343,7 @@ void lowercaseString(std::string& str)
 	}
 }
 
-void camelCaseString(std::string& str)
+void camelCaseStringStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return; }
 	char prevLetter = ' ';
@@ -405,7 +405,7 @@ bool stringStartsWithVowel(DynamicString& str)
 	return false;
 }
 
-bool stringStartsWithVowel(std::string& str)
+bool stringStartsWithVowelStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return false; }
 	switch ( str[0] )

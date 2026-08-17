@@ -955,7 +955,7 @@ void ItemTooltips_t::setSpellValueIfKeyPresent(ItemTooltips_t::spellItem_t& t, J
 }
 
 #ifdef EDITOR
-void lowercaseString(std::string& str)
+void lowercaseStringStd(std::string& str)
 {
 	if ( str.size() < 1 ) { return; }
 	for ( auto& letter : str )
@@ -15446,19 +15446,19 @@ std::string Compendium_t::Events_t::formatEventRecordText(Sint32 value, const ch
 					else if ( !strcmp(formatType, "class") )
 					{
 						std::string tmp = playerClassLangEntry(formatVal, 0);
-						camelCaseString(tmp);
+						camelCaseStringStd(tmp);
 						output += tmp;
 					}
 					else if ( !strcmp(formatType, "race") )
 					{
 						std::string tmp = getMonsterLocalizedName(getMonsterFromPlayerRace(formatVal));
-						camelCaseString(tmp);
+						camelCaseStringStd(tmp);
 						output += tmp;
 					}
 					else if ( !strcmp(formatType, "skills") )
 					{
 						std::string tmp = Player::SkillSheet_t::getSkillNameFromID(formatVal, true);
-						camelCaseString(tmp);
+						camelCaseStringStd(tmp);
 						output += tmp;
 					}
 				}

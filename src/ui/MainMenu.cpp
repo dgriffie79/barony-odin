@@ -19012,7 +19012,7 @@ extern "C" void ClassDescriptions_update_stat_growths(Frame & card, int classnum
 		banner_title->setFont(smallfont_outline);
 		banner_title->setJustify(Field::justify_t::CENTER);
 
-		bool continueAvailable = anySaveFileExists();
+		bool continueAvailable = anySaveFileExistsAny();
 
 		auto hall_of_trials_button = window->addButton("hall_of_trials");
 		hall_of_trials_button->setSize(SDL_Rect{ 134, 176, 168, 52 });

@@ -302,15 +302,15 @@ extern Frame* minimapFrame; // shared minimap
 extern "C" void openMapWindow(int player);
 extern "C" void openLogWindow(int player);
 
-void capitalizeString(std::string& str);
+void capitalizeStringStd(std::string& str);
 void capitalizeString(DynamicString& str);
-void lowercaseString(std::string& str);
+void lowercaseStringStd(std::string& str);
 void lowercaseString(DynamicString& str);
-void uppercaseString(std::string& str);
+void uppercaseStringStd(std::string& str);
 void uppercaseString(DynamicString& str);
-void camelCaseString(std::string& str);
+void camelCaseStringStd(std::string& str);
 void camelCaseString(DynamicString& str);
-bool stringStartsWithVowel(std::string& str);
+bool stringStartsWithVowelStd(std::string& str);
 bool stringStartsWithVowel(DynamicString& str);
 
 struct MinotaurWarning_t

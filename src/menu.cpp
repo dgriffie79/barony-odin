@@ -384,7 +384,7 @@ bool isAchievementUnlockedForClassUnlock(int race)
 	return false;
 }
 
-int isCharacterValidFromDLC(int player, int characterClass, int race, int appearance)
+int isCharacterValidFromDLCDirect(int player, int characterClass, int race, int appearance)
 {
 	if ( player < 0 || player >= MAXPLAYERS )
 	{
@@ -998,7 +998,7 @@ static void handleMainMenu(bool mode)
 					}
 					else
 					{
-						if ( anySaveFileExists() )
+						if ( anySaveFileExistsAny() )
 						{
 							//openLoadGameWindow(NULL);
 							openNewLoadGameWindow(nullptr);
@@ -5505,7 +5505,7 @@ static void handleMainMenu(bool mode)
 		if ( gameModeManager.Tutorial.FirstTimePrompt.doButtonSkipPrompt )
 		{
 			gameModeManager.Tutorial.FirstTimePrompt.doButtonSkipPrompt = false;
-			if ( anySaveFileExists() )
+			if ( anySaveFileExistsAny() )
 			{
 				openNewLoadGameWindow(nullptr);
 			}
@@ -9024,7 +9024,7 @@ void buttonScoreNext(button_t* my)
 	{
 		score_window = std::min<int>(score_window + 1, std::max<Uint32>(1, list_Size(&topscores_json)));
 	}
-	loadScore(score_window - 1);
+	loadScoreByIndex(score_window - 1);
 	camera_charsheet_offsetyaw = (330) * PI / 180;
 }
 
@@ -9032,7 +9032,7 @@ void buttonScoreNext(button_t* my)
 void buttonScorePrev(button_t* my)
 {
 	score_window = std::max(score_window - 1, 1);
-	loadScore(score_window - 1);
+	loadScoreByIndex(score_window - 1);
 	camera_charsheet_offsetyaw = (330) * PI / 180;
 }
 
@@ -9041,7 +9041,7 @@ void buttonScoreToggle(button_t* my)
 	score_window = 1;
 	camera_charsheet_offsetyaw = (330) * PI / 180;
 	scoreDisplayMultiplayer = !scoreDisplayMultiplayer;
-	loadScore(score_window - 1);
+	loadScoreByIndex(score_window - 1);
 }
 
 
@@ -9753,7 +9753,7 @@ void buttonGamemodsStartModdedGame(button_t* my)
 //	if ( gamemods_modPreload )
 //	{
 //		// look for a save game
-//		if ( anySaveFileExists() )
+//		if ( anySaveFileExistsAny() )
 //		{
 //			openNewLoadGameWindow(nullptr);
 //		}
@@ -9925,7 +9925,7 @@ void buttonGamemodsStartModdedGame(button_t* my)
 //	}
 //
 //	// look for a save game
-//	if ( anySaveFileExists() )
+//	if ( anySaveFileExistsAny() )
 //	{
 //		//openLoadGameWindow(NULL);
 //		openNewLoadGameWindow(nullptr);

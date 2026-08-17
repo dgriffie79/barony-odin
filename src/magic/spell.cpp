@@ -633,7 +633,7 @@ void spellDeconstructor(void* data)
 	}
 }
 
-void spellElementInit(spellElement_t* element)
+void spellElementConstructor(spellElement_t* element)
 {
 	//element->mana = 0;
 	//element->base_mana = 0;

@@ -32556,7 +32556,7 @@ void GenericGUIMenu::AssistShrineGUI_t::changeCurrentView(GenericGUIMenu::Assist
 			}
 		}
 
-		auto result = isCharacterValidFromDLC(parentGUI.gui_player, i, playerRace, appearance);
+		auto result = isCharacterValidFromDLCDirect(parentGUI.gui_player, i, playerRace, appearance);
 
 		if ( result == CharacterDLCValidation::VALID_OK_CHARACTER )
 		{
@@ -33972,7 +33972,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 					}
 				}
 
-				if ( isCharacterValidFromDLC(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
+				if ( isCharacterValidFromDLCDirect(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
 					!= VALID_OK_CHARACTER )
 				{
 					// reset race
@@ -33980,7 +33980,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 					{
 						gui.savedRace = RACE_HUMAN;
 						gui.savedAppearance = local_rng.rand() % NUMAPPEARANCES;
-						if ( isCharacterValidFromDLC(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
+						if ( isCharacterValidFromDLCDirect(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
 							!= VALID_OK_CHARACTER )
 						{
 							// reset class
@@ -34159,7 +34159,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 				{
 					classToChange = gui.savedClass;
 				}
-				if ( isCharacterValidFromDLC(button.getOwner(), classToChange, gui.savedRace, gui.savedAppearance)
+				if ( isCharacterValidFromDLCDirect(button.getOwner(), classToChange, gui.savedRace, gui.savedAppearance)
 					!= VALID_OK_CHARACTER )
 				{
 					// reset class
@@ -34168,7 +34168,7 @@ void GenericGUIMenu::AssistShrineGUI_t::createAssistShrine()
 					gui.addNotification(Language::get(6338), Language::get(6333), "",
 						GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t::NOTIF_CLASS_RESET);
 
-					if ( isCharacterValidFromDLC(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
+					if ( isCharacterValidFromDLCDirect(button.getOwner(), gui.savedClass, gui.savedRace, gui.savedAppearance)
 						!= VALID_OK_CHARACTER )
 					{
 						// reset race
