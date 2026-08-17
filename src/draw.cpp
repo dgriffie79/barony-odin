@@ -4237,3 +4237,6 @@ bool Mesh::isInitialized() const { return vbo[0] != 0; }
 
 extern "C" bool Mesh_isInitialized(const Mesh* self) { return self->isInitialized(); }
 
+
+// Chunk::operator=(Chunk&&) is inline in draw.hpp; forward it.
+extern "C" Chunk & Chunk_assign(Chunk* self, Chunk && rhs) { return self->operator=(static_cast<Chunk&&>(rhs)); }

@@ -191,3 +191,5 @@ void LobbyHandler_t::setP2PType(LobbyServiceType type) {
 
 extern "C" void LobbyHandler_t_setP2PType(LobbyHandler_t* self, LobbyHandler_t::LobbyServiceType type) { return self->setP2PType(type); }
 
+
+// LobbyHandler_t::logError is inline in lobbies.hpp; forward it.

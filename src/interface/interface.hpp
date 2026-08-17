@@ -354,7 +354,6 @@ public:
 	bool isItemMailable(const Item* item);
 	Uint32 mailboxEntityUid = 0;
 	void mailboxClaimItem();
-	bool mailboxSendItem();
 
 	// Misc item/spell effects
 	Item* itemEffectScrollItem;

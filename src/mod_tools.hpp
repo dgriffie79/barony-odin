@@ -1377,7 +1377,6 @@ struct Compendium_t
 		static std::set<std::pair<std::string, std::string>, Comparator> achievementNamesSorted;
 		static DynamicMapStrArrayStringPair achievementCategories;
 		static DynamicSetStr achievementUnlockedLookup;
-		static void onAchievementUnlock(const char* ach);
 		static DynamicMapStrArrayStringPair contents;
 		static DynamicMapStr contentsMap;
 		static DynamicMapI32 unlocks;

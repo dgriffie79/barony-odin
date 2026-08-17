@@ -10282,3 +10282,6 @@ size_t serialHash(const std::string& input)
 }
 
 LastCreatedCharacter LastCreatedCharacterSettings;
+
+// resolution::operator== is inline in menu.hpp; forward it.
+extern "C" bool resolution_eq(const resolution* self, const resolution & rhs) { return self->operator==(rhs); }

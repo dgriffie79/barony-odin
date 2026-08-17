@@ -113,7 +113,6 @@ public:
 	void update();
 
 	//! updates the state of release consumed variable on bindings (needs to happen exactly once per game tick)
-	void updateReleaseConsumed();
 
 	//! if true, Y axis for mouse/gamepads/joysticks is inverted
 	bool inverted = false;

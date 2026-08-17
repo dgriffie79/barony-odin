@@ -1364,7 +1364,6 @@ public:
 	void actTeleportShrine();
 	void actDaedalusShrine();
 	void actAssistShrine();
-	void actSpellShrine();
 	bool magicFallingCollision();
 	bool magicOrbitingCollision();
 	void actFurniture();
@@ -1561,8 +1560,6 @@ public:
 	// special magic functions/trickery
 	void castFallingMagicMissile(int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int heightDelay);
 	Entity* castOrbitingMagicMissile(int spellID, real_t distFromCaster, real_t angleFromCasterDirection, int duration);
-	Entity* castStationaryOrbitingMagicMissile(Entity* parent, int spellID, real_t centerx, real_t centery, 
-		real_t distFromCenter, real_t angleFromCenterDirection, int duration);
 	void lichFireSetNextAttack(Stat& myStats);
 	void lichIceSetNextAttack(Stat& myStats);
 

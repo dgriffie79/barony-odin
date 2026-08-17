@@ -146,3 +146,6 @@ bool Shader::isInitialized() const { return program != 0; }
 
 extern "C" bool Shader_isInitialized(const Shader* self) { return self->isInitialized(); }
 
+
+// Shader::operator== is inline in shader.hpp; forward it.
+extern "C" bool Shader_eq(const Shader* self, const Shader & rhs) { return self->operator==(rhs); }

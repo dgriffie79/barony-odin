@@ -333,3 +333,8 @@ DynamicMapLightDef::Iterator DynamicMapLightDef::end() const { return Iterator{}
 
 extern "C" DynamicMapLightDef::Iterator DynamicMapLightDef_end(const DynamicMapLightDef* self) { return self->end(); }
 
+
+// DynamicMapLightDef operators + Iterator::operator-> are inline in light.hpp.
+extern "C" DynamicMapLightDef & DynamicMapLightDef_assign(DynamicMapLightDef* self, const DynamicMapLightDef & o) { return self->operator=(o); }
+extern "C" DynamicMapLightDef & DynamicMapLightDef_assign_2(DynamicMapLightDef* self, DynamicMapLightDef && o) { return self->operator=(static_cast<DynamicMapLightDef&&>(o)); }
+extern "C" const DynamicMapLightDef::KV * DynamicMapLightDef_Iterator_arrow(const DynamicMapLightDef::Iterator* self) { return self->operator->(); }

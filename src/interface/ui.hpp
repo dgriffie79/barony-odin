@@ -197,7 +197,6 @@ public:
 	void createLeaderboardNotification(std::string info);
 	void createStatisticUpdateNotification(const char* name, int currentValue, int maxValue);
 	void createNewSeedNotification();
-	void undockAllCards();
 
 	/// @param image nullptr for default barony icon
 	UIToastNotification* addNotification(const char* image);

@@ -22268,3 +22268,6 @@ void Compendium_t::CompendiumEntityCurrent::set(std::string _contentsName, std::
 
 extern "C" void CompendiumEntityCurrent_set(Compendium_t::CompendiumEntityCurrent* self, std::string _contentsName, std::string _modelName, int _modelIndex) { return self->set(_contentsName, _modelName, _modelIndex); }
 
+
+// MonsterCurveCustomManager::printCurve is inline in mod_tools.hpp; forward it.
+extern "C" void MonsterCurveCustomManager_printCurve(MonsterCurveCustomManager* self, DynamicArrayT<MonsterCurveCustomManager::LevelCurve> toPrint) { return self->printCurve(toPrint); }

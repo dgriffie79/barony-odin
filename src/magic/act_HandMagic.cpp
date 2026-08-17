@@ -61,6 +61,9 @@ void spellcasting_animation_manager_t::resetRangefinder()
 	rangefinder = RANGEFINDER_NONE;
 }
 
+extern "C" void spellcastingAnimationManager_resetRangefinder(spellcasting_animation_manager_t* self) { return self->resetRangefinder(); }
+
+
 bool spellcasting_animation_manager_t::hideShieldFromBasicCast()
 {
 	if ( player < 0 || player >= MAXPLAYERS ) { return false; }
@@ -79,6 +82,9 @@ bool spellcasting_animation_manager_t::hideShieldFromBasicCast()
 	}
 	return false;
 }
+
+extern "C" bool spellcastingAnimationManager_hideShieldFromBasicCast(spellcasting_animation_manager_t* self) { return self->hideShieldFromBasicCast(); }
+
 
 static CvarInt cvar_vibe_spell_x("/vibe_spell_x", 4000);
 static CvarInt cvar_vibe_spell_y("/vibe_spell_y", 0);
@@ -182,6 +188,9 @@ void spellcasting_animation_manager_t::executeAttackSpell(bool swingweapon)
 	}
 }
 
+extern "C" void spellcastingAnimationManager_executeAttackSpell(spellcasting_animation_manager_t* self, bool swingweapon) { return self->executeAttackSpell(swingweapon); }
+
+
 bool spellcasting_animation_manager_t::spellWaitingAttackInput()
 {
 	if ( (active || active_spellbook)
@@ -195,6 +204,9 @@ bool spellcasting_animation_manager_t::spellWaitingAttackInput()
 	return false;
 }
 
+extern "C" bool spellcastingAnimationManager_spellWaitingAttackInput(spellcasting_animation_manager_t* self) { return self->spellWaitingAttackInput(); }
+
+
 bool spellcasting_animation_manager_t::spellIgnoreAttack()
 {
 	if ( (active || active_spellbook)
@@ -207,6 +219,9 @@ bool spellcasting_animation_manager_t::spellIgnoreAttack()
 	}
 	return false;
 }
+
+extern "C" bool spellcastingAnimationManager_spellIgnoreAttack(spellcasting_animation_manager_t* self) { return self->spellIgnoreAttack(); }
+
 
 bool rangefinderTargetEnemyType(spell_t& spell, Entity& entity)
 {
@@ -814,6 +829,9 @@ void spellcasting_animation_manager_t::setRangeFinderLocation()
 		}
 	}
 }
+
+extern "C" void spellcastingAnimationManager_setRangeFinderLocation(spellcasting_animation_manager_t* self) { return self->setRangeFinderLocation(); }
+
 
 void spellcastAnimationUpdate(int player, int attackPose, int castTime)
 {

@@ -6630,3 +6630,12 @@ namespace ConsoleCommands {
 	});
 }
 
+
+// ConsoleCommand::operator() is inline in consolecommand.hpp; forward it.
+extern "C" void ConsoleCommand_call(ConsoleCommand* self, int argc, const char ** argv) { return self->operator()(argc, argv); }
+// Cvar*::operator-> are inline in consolecommand.hpp; forward them.
+extern "C" bool * CvarBool_arrow(CvarBool* self) { return self->operator->(); }
+extern "C" int * CvarInt_arrow(CvarInt* self) { return self->operator->(); }
+extern "C" float * CvarFloat_arrow(CvarFloat* self) { return self->operator->(); }
+extern "C" DynamicString * CvarString_arrow(CvarString* self) { return self->operator->(); }
+extern "C" Vector4 * CvarVector4_arrow(CvarVector4* self) { return self->operator->(); }

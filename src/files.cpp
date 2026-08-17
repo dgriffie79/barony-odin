@@ -6250,3 +6250,5 @@ void FileIO::close(File* file) {
 
 extern "C" void FileIO_close(File * file) { return FileIO::close(file); }
 
+
+// File::printf is inline in files.hpp; forward it.
