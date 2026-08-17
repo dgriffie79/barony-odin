@@ -125,6 +125,7 @@ when !#config(EDITOR, false) {
     clearUndos :: proc "c" () ---
     undo :: proc "c" () ---
     redo :: proc "c" () ---
+    buttonExit :: proc "c" (my: ^button_t) ---
     buttonExitConfirm :: proc "c" (my: ^button_t) ---
     buttonIconify :: proc "c" (my: ^button_t) ---
     buttonTilePalette :: proc "c" (my: ^button_t) ---
@@ -671,8 +672,6 @@ when !#config(EDITOR, false) {
     barony_dynamic_map_str_destroy :: proc "c" (arg: ^rawptr, value_kind: i32) ---
     barony_dynamic_map_str_entry :: proc "c" (arg: ^rawptr, arg_: string, value_kind: i32) -> rawptr ---
     barony_dynamic_map_str_entries :: proc "c" (arg: ^rawptr, key_ptrs: rawptr, key_lens: ^i32, val_ptrs: rawptr, count: i32, value_kind: i32) -> i32 ---
-    ne :: proc "c" (a: ^rawptr, b: ^rawptr) -> bool ---
-    eq :: proc "c" (a: ^rawptr, b: ^rawptr) -> bool ---
     getParticleEmitterHitProps :: proc "c" (emitterUid: u32, hitentity: ^Entity) -> ^ParticleEmitterHit_t ---
     addSpell :: proc "c" (spell: i32, player: i32, ignoreSkill: bool) -> bool ---
     setupSpells :: proc "c" () ---
@@ -1456,6 +1455,7 @@ when #config(EDITOR, false) {
     clearUndos :: proc "c" () ---
     undo :: proc "c" () ---
     redo :: proc "c" () ---
+    buttonExit :: proc "c" (my: ^button_t) ---
     buttonExitConfirm :: proc "c" (my: ^button_t) ---
     buttonIconify :: proc "c" (my: ^button_t) ---
     buttonTilePalette :: proc "c" (my: ^button_t) ---
@@ -2002,8 +2002,6 @@ when #config(EDITOR, false) {
     barony_dynamic_map_str_destroy :: proc "c" (arg: ^rawptr, value_kind: i32) ---
     barony_dynamic_map_str_entry :: proc "c" (arg: ^rawptr, arg_: string, value_kind: i32) -> rawptr ---
     barony_dynamic_map_str_entries :: proc "c" (arg: ^rawptr, key_ptrs: rawptr, key_lens: ^i32, val_ptrs: rawptr, count: i32, value_kind: i32) -> i32 ---
-    ne :: proc "c" (a: ^rawptr, b: ^rawptr) -> bool ---
-    eq :: proc "c" (a: ^rawptr, b: ^rawptr) -> bool ---
     getParticleEmitterHitProps :: proc "c" (emitterUid: u32, hitentity: ^Entity) -> ^ParticleEmitterHit_t ---
     addSpell :: proc "c" (spell: i32, player: i32, ignoreSkill: bool) -> bool ---
     setupSpells :: proc "c" () ---

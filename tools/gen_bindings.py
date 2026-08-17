@@ -291,6 +291,15 @@ def main():
                 continue
             if f.spelling in PORTED:
                 continue  # Odin-owned @(export) impl; not a C++-owned free fn
+            # friend fns (nested-class friends escape is_inside_class) - skip
+            try:
+                srclines = open(h, encoding='utf-8', errors='ignore').read().split('\n')
+                decl_line = srclines[f.location.line - 1] if f.location.line else ''
+            except Exception:
+                decl_line = ''
+            head = decl_line.strip().split('(')[0].split(';')[0].split('{')[0][:40]
+            if 'friend' in head:
+                continue  # friend operator/fn inside class body
             decls.append(proc_decl(f))
     # dedupe (same fn may be declared in multiple headers) - keep first
     seen = set()

@@ -35,7 +35,6 @@ extern Uint32 impulses[NUMIMPULSES];
 extern Uint32 joyimpulses[NUM_JOY_IMPULSES]; //Joystick/gamepad only impulses.
 
 extern "C" bool handleEvents(void);
-void startMessages();
 
 // net packet send
 typedef struct packetsend_t
@@ -331,7 +330,6 @@ extern "C" void actWallButton(Entity* my);
 extern "C" void actWind(Entity* my);
 extern "C" void createWaterSplash(real_t x, real_t y, int lifetime);
 
-void startMessages();
 extern "C" bool frameRateLimit(Uint32 maxFrameRate, bool resetAccumulator = true, bool sleep = false);
 extern Uint32 networkTickrate;
 extern bool gameloopFreezeEntities;

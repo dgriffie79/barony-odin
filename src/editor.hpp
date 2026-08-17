@@ -167,7 +167,6 @@ extern "C" void buttonOpen(button_t* my);
 extern "C" void buttonSaveConfirm(button_t* my);
 extern "C" void buttonSave(button_t* my);
 extern "C" void buttonSaveAs(button_t* my);
-void buttonExit(button_t* my);
 extern "C" void buttonEdit(button_t* my);
 extern "C" void buttonCut(button_t* my);
 extern "C" void buttonCopy(button_t* my);
