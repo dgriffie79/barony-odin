@@ -708,7 +708,24 @@ void TimerExperiments::updateClocks()
 	double alpha = std::chrono::duration<double>{ accumulator } / dt;
 	for ( int i = 0; i < MAXPLAYERS; ++i )
 	{
-		cameraRenderState[i] = cameraCurrentState[i] * alpha + cameraPreviousState[i] * (1.0 - alpha);
+		cameraRenderState[i].x.acceleration = cameraCurrentState[i].x.acceleration * alpha + cameraPreviousState[i].x.acceleration * (1.0 - alpha);
+		cameraRenderState[i].x.velocity = cameraCurrentState[i].x.velocity * alpha + cameraPreviousState[i].x.velocity * (1.0 - alpha);
+		cameraRenderState[i].x.position = cameraCurrentState[i].x.position * alpha + cameraPreviousState[i].x.position * (1.0 - alpha);
+		cameraRenderState[i].y.acceleration = cameraCurrentState[i].y.acceleration * alpha + cameraPreviousState[i].y.acceleration * (1.0 - alpha);
+		cameraRenderState[i].y.velocity = cameraCurrentState[i].y.velocity * alpha + cameraPreviousState[i].y.velocity * (1.0 - alpha);
+		cameraRenderState[i].y.position = cameraCurrentState[i].y.position * alpha + cameraPreviousState[i].y.position * (1.0 - alpha);
+		cameraRenderState[i].z.acceleration = cameraCurrentState[i].z.acceleration * alpha + cameraPreviousState[i].z.acceleration * (1.0 - alpha);
+		cameraRenderState[i].z.velocity = cameraCurrentState[i].z.velocity * alpha + cameraPreviousState[i].z.velocity * (1.0 - alpha);
+		cameraRenderState[i].z.position = cameraCurrentState[i].z.position * alpha + cameraPreviousState[i].z.position * (1.0 - alpha);
+		cameraRenderState[i].yaw.acceleration = cameraCurrentState[i].yaw.acceleration * alpha + cameraPreviousState[i].yaw.acceleration * (1.0 - alpha);
+		cameraRenderState[i].yaw.velocity = cameraCurrentState[i].yaw.velocity * alpha + cameraPreviousState[i].yaw.velocity * (1.0 - alpha);
+		cameraRenderState[i].yaw.position = cameraCurrentState[i].yaw.position * alpha + cameraPreviousState[i].yaw.position * (1.0 - alpha);
+		cameraRenderState[i].pitch.acceleration = cameraCurrentState[i].pitch.acceleration * alpha + cameraPreviousState[i].pitch.acceleration * (1.0 - alpha);
+		cameraRenderState[i].pitch.velocity = cameraCurrentState[i].pitch.velocity * alpha + cameraPreviousState[i].pitch.velocity * (1.0 - alpha);
+		cameraRenderState[i].pitch.position = cameraCurrentState[i].pitch.position * alpha + cameraPreviousState[i].pitch.position * (1.0 - alpha);
+		cameraRenderState[i].roll.acceleration = cameraCurrentState[i].roll.acceleration * alpha + cameraPreviousState[i].roll.acceleration * (1.0 - alpha);
+		cameraRenderState[i].roll.velocity = cameraCurrentState[i].roll.velocity * alpha + cameraPreviousState[i].roll.velocity * (1.0 - alpha);
+		cameraRenderState[i].roll.position = cameraCurrentState[i].roll.position * alpha + cameraPreviousState[i].roll.position * (1.0 - alpha);
 		// make sure these are limited to prevent large jumps
 		cameraCurrentState[i].yaw.normalize(0, 2 * PI);
 		cameraCurrentState[i].roll.normalize(0, 2 * PI);
@@ -733,7 +750,24 @@ void TimerExperiments::updateClocks()
 	}
 	for ( auto& entity : entitiesToInterpolate )
 	{
-		entity->lerpRenderState = entity->lerpCurrentState * alpha + entity->lerpPreviousState * (1.0 - alpha);
+		entity->lerpRenderState.x.acceleration = entity->lerpCurrentState.x.acceleration * alpha + entity->lerpPreviousState.x.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.x.velocity = entity->lerpCurrentState.x.velocity * alpha + entity->lerpPreviousState.x.velocity * (1.0 - alpha);
+		entity->lerpRenderState.x.position = entity->lerpCurrentState.x.position * alpha + entity->lerpPreviousState.x.position * (1.0 - alpha);
+		entity->lerpRenderState.y.acceleration = entity->lerpCurrentState.y.acceleration * alpha + entity->lerpPreviousState.y.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.y.velocity = entity->lerpCurrentState.y.velocity * alpha + entity->lerpPreviousState.y.velocity * (1.0 - alpha);
+		entity->lerpRenderState.y.position = entity->lerpCurrentState.y.position * alpha + entity->lerpPreviousState.y.position * (1.0 - alpha);
+		entity->lerpRenderState.z.acceleration = entity->lerpCurrentState.z.acceleration * alpha + entity->lerpPreviousState.z.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.z.velocity = entity->lerpCurrentState.z.velocity * alpha + entity->lerpPreviousState.z.velocity * (1.0 - alpha);
+		entity->lerpRenderState.z.position = entity->lerpCurrentState.z.position * alpha + entity->lerpPreviousState.z.position * (1.0 - alpha);
+		entity->lerpRenderState.yaw.acceleration = entity->lerpCurrentState.yaw.acceleration * alpha + entity->lerpPreviousState.yaw.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.yaw.velocity = entity->lerpCurrentState.yaw.velocity * alpha + entity->lerpPreviousState.yaw.velocity * (1.0 - alpha);
+		entity->lerpRenderState.yaw.position = entity->lerpCurrentState.yaw.position * alpha + entity->lerpPreviousState.yaw.position * (1.0 - alpha);
+		entity->lerpRenderState.pitch.acceleration = entity->lerpCurrentState.pitch.acceleration * alpha + entity->lerpPreviousState.pitch.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.pitch.velocity = entity->lerpCurrentState.pitch.velocity * alpha + entity->lerpPreviousState.pitch.velocity * (1.0 - alpha);
+		entity->lerpRenderState.pitch.position = entity->lerpCurrentState.pitch.position * alpha + entity->lerpPreviousState.pitch.position * (1.0 - alpha);
+		entity->lerpRenderState.roll.acceleration = entity->lerpCurrentState.roll.acceleration * alpha + entity->lerpPreviousState.roll.acceleration * (1.0 - alpha);
+		entity->lerpRenderState.roll.velocity = entity->lerpCurrentState.roll.velocity * alpha + entity->lerpPreviousState.roll.velocity * (1.0 - alpha);
+		entity->lerpRenderState.roll.position = entity->lerpCurrentState.roll.position * alpha + entity->lerpPreviousState.roll.position * (1.0 - alpha);
 		// make sure these are limited to prevent large jumps
 		entity->lerpCurrentState.yaw.normalize(0, 2 * PI);
 		entity->lerpCurrentState.roll.normalize(0, 2 * PI);

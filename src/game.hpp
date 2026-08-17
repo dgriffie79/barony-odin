@@ -578,25 +578,6 @@ public:
 		void resetPosition();
 	};
 
-	friend EntityStates operator+(EntityStates lhs, EntityStates rhs)
-	{
-		return{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, 
-			lhs.yaw + rhs.yaw, lhs.pitch + rhs.pitch, lhs.roll + rhs.roll };
-	}
-	friend EntityStates operator*(EntityStates lhs, double rhs)
-	{
-		return{ lhs.x * rhs, lhs.y * rhs, lhs.z * rhs,
-			lhs.yaw * rhs, lhs.pitch * rhs, lhs.roll * rhs };
-	}
-	friend State operator+(State x, State y)
-	{
-		return{ x.acceleration + y.acceleration, x.velocity + y.velocity, x.position + y.position };
-	}
-	friend State operator*(State x, double y)
-	{
-		return{ x.acceleration * y, x.velocity * y, x.position * y };
-	}
-
 	static void
 		integrate(State& state,
 			std::chrono::time_point<Clock, std::chrono::duration<double>>,
