@@ -632,6 +632,8 @@ when !#config(EDITOR, false) {
     itemIsConsumableByAutomaton :: proc "c" (item: ^Item) -> bool ---
     itemCompare :: proc "c" (item1: ^Item, item2: ^Item, checkAppearance: bool, comparisonUsedForStacking: bool) -> i32 ---
     isPotionBad :: proc "c" (potion: ^Item) -> bool ---
+    isRangedWeapon :: proc "c" (item: ^Item) -> bool ---
+    isRangedWeaponType :: proc "c" (type_: ItemType) -> bool ---
     isMeleeWeapon :: proc "c" (item: ^Item) -> bool ---
     itemIsThrowableTinkerTool :: proc "c" (item: ^Item) -> bool ---
     createCustomInventory :: proc "c" (stats: ^Stat, itemLimit: i32, rng: ^rawptr) ---
@@ -737,6 +739,8 @@ when !#config(EDITOR, false) {
     createParticleAestheticOrbit :: proc "c" (parent: ^Entity, sprite: i32, duration: i32, particleType: i32) -> ^Entity ---
     createParticleRock :: proc "c" (parent: ^Entity, sprite: i32, light: bool) ---
     createParticleShatteredGem :: proc "c" (x: f64, y: f64, z: f64, sprite: i32, parent: ^Entity) ---
+    createParticleErupt :: proc "c" (parent: ^Entity, sprite: i32) ---
+    createParticleEruptAt :: proc "c" (x: f64, y: f64, sprite: i32) ---
     createParticleBoobyTrapExplode :: proc "c" (caster: ^Entity, x: f64, y: f64) -> ^Entity ---
     createParticleShatterObjects :: proc "c" (caster: ^Entity) -> ^Entity ---
     createParticleIgnite :: proc "c" (caster: ^Entity) -> ^Entity ---
@@ -779,8 +783,14 @@ when !#config(EDITOR, false) {
     spawnMagicTower :: proc "c" (parent: ^Entity, x: f64, y: f64, spellID: i32, autoHitTarget: ^Entity, castedSpell: bool) ---
     magicDig :: proc "c" (parent: ^Entity, projectile: ^Entity, numRocks: i32, randRocks: i32) -> bool ---
     copySpell :: proc "c" (spell: ^spell_t, subElementToCopy: i32) -> ^spell_t ---
+    spellConstructor :: proc "c" (spell: ^spell_t, ID: i32) ---
+    spellConstructorNew :: proc "c" (ID: i32, difficulty: i32, internal_name: ^u8, elements: [dynamic]i32) -> ^spell_t ---
     spellDeconstructor :: proc "c" (data: rawptr) ---
     spellChanneledClientDeconstructor :: proc "c" (data: rawptr) ---
+    copySpellElementInto :: proc "c" (spellElement: ^spellElement_t, spellElementToSet: ^spellElement_t) ---
+    copySpellElement :: proc "c" (spellElement: ^spellElement_t) -> ^spellElement_t ---
+    spellElementConstructor :: proc "c" (element: ^spellElement_t) ---
+    spellElementInit :: proc "c" (elementID: i32, mana: i32, base_mana: i32, overload_mult: i32, damage: i32, duration: i32, internal_name: ^u8) ---
     spellElementDeconstructor :: proc "c" (data: rawptr) ---
     getCostOfSpell :: proc "c" (spell: ^spell_t, caster: ^Entity) -> i32 ---
     getGoldCostOfSpell :: proc "c" (spell: ^spell_t, player: i32) -> i32 ---
@@ -829,6 +839,8 @@ when !#config(EDITOR, false) {
     getSpellDamageSecondaryFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64, applyingDamageOnCast: bool) -> i32 ---
     getSpellEffectDurationFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
     getSpellEffectDurationSecondaryFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
+    getSpellPropertyFloatFromID :: proc "c" (prop: rawptr, spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> f64 ---
+    getSpellPropertyIntFromID :: proc "c" (prop: rawptr, spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
     getSpellDamageFromStatic :: proc "c" (spellID: i32, hitstats: ^Stat) -> i32 ---
     updateEntityOldHPBeforeMagicHit :: proc "c" (my: ^Entity, projectile: ^Entity) ---
     absorbMagicEvent :: proc "c" (entity: ^Entity, parent: ^Entity, damageSourceProjectile: ^Entity, spellID: i32, result: ^f64, damageMultiplier: ^f64, dmgGib: ^DamageGib) -> bool ---
@@ -848,6 +860,7 @@ when !#config(EDITOR, false) {
     stringCat :: proc "c" (dest: ^u8, src: ^u8, dest_size: uint, src_size: uint) -> ^u8 ---
     stringCmp :: proc "c" (str1: ^u8, str2: ^u8, str1_size: uint, str2_size: uint) -> i32 ---
     stringLen :: proc "c" (str: ^u8, size: uint) -> uint ---
+    stringStr :: proc "c" (str1: ^u8, str2: ^u8, str1_size: uint, str2_size: uint) -> ^u8 ---
     gl_error_string :: proc "c" (err: u32) -> ^u8 ---
     sgn :: proc "c" (x: f64) -> i32 ---
     numdigits_sint16 :: proc "c" (x: i16) -> i32 ---
@@ -954,6 +967,8 @@ when !#config(EDITOR, false) {
     buttonAcceptResolution :: proc "c" (my: ^button_t) ---
     buttonRevertResolution :: proc "c" (my: ^button_t) ---
     revertResolution :: proc "c" () ---
+    isCharacterValidFromDLC :: proc "c" (myStats: ^Stat, characterClass: i32) -> i32 ---
+    isCharacterValidFromDLCDirect :: proc "c" (player: i32, characterClass: i32, race: i32, appearance: i32) -> i32 ---
     doQuitGame :: proc "c" () ---
     doNewGame :: proc "c" (makeHighscore: bool) ---
     doCredits :: proc "c" () ---
@@ -1239,18 +1254,24 @@ when !#config(EDITOR, false) {
     SDL_SavePNG_RW :: proc "c" (surface: ^rawptr, rw: ^rawptr, freedst: i32) -> i32 ---
     SDL_PNGFormatAlpha :: proc "c" (src: ^rawptr) -> ^rawptr ---
     getIndexForDeathType :: proc "c" (type_: i32) -> i32 ---
+    scoreConstructor :: proc "c" (player: i32) -> ^score_t ---
     scoreDeconstructor :: proc "c" (data: rawptr) ---
     saveScore :: proc "c" (player: i32) -> i32 ---
     totalScore :: proc "c" (score: ^score_t) -> i32 ---
+    loadScoreByIndex :: proc "c" (score: i32) ---
+    loadScore :: proc "c" (score: ^score_t) ---
     deleteScore :: proc "c" (multiplayer: bool, index: i32) -> bool ---
     saveAllScores :: proc "c" (scoresfilename: ^string) ---
     loadAllScores :: proc "c" (scoresfilename: ^string) ---
     setSaveGameFileName :: proc "c" (singleplayer: bool, type_: i32, saveIndex: i32) -> string ---
     deleteSaveGame :: proc "c" (gametype: i32, saveIndex: i32) -> i32 ---
     saveGameExists :: proc "c" (singleplayer: bool, saveIndex: i32) -> bool ---
+    anySaveFileExists :: proc "c" (singleplayer: bool) -> bool ---
+    anySaveFileExistsAny :: proc "c" () -> bool ---
     saveGame :: proc "c" (saveIndex: i32) -> i32 ---
     loadGame :: proc "c" (player: i32, info: ^SaveGameInfo) -> i32 ---
     loadGameFollowers :: proc "c" (info: ^SaveGameInfo) -> ^list_t ---
+    scoreConstructorFromInfo :: proc "c" (player: i32, info: ^SaveGameInfo) -> ^score_t ---
     getSaveGameInfo :: proc "c" (singleplayer: bool, saveIndex: i32) -> SaveGameInfo ---
     getSaveGameName :: proc "c" (info: ^SaveGameInfo) -> ^u8 ---
     getSaveGameType :: proc "c" (info: ^SaveGameInfo) -> i32 ---
@@ -1297,6 +1318,16 @@ when !#config(EDITOR, false) {
     openMinimap :: proc "c" (player: i32) ---
     openMapWindow :: proc "c" (player: i32) ---
     openLogWindow :: proc "c" (player: i32) ---
+    capitalizeStringStd :: proc "c" (str: ^rawptr) ---
+    capitalizeString :: proc "c" (str: ^string) ---
+    lowercaseStringStd :: proc "c" (str: ^rawptr) ---
+    lowercaseString :: proc "c" (str: ^string) ---
+    uppercaseStringStd :: proc "c" (str: ^rawptr) ---
+    uppercaseString :: proc "c" (str: ^string) ---
+    camelCaseStringStd :: proc "c" (str: ^rawptr) ---
+    camelCaseString :: proc "c" (str: ^string) ---
+    stringStartsWithVowelStd :: proc "c" (str: ^rawptr) -> bool ---
+    stringStartsWithVowel :: proc "c" (str: ^string) -> bool ---
     updateLevelUpFrame :: proc "c" (player: i32) ---
     updateSkillUpFrame :: proc "c" (player: i32) ---
     createLoadingScreen :: proc "c" (progress: f64) ---
@@ -1962,6 +1993,8 @@ when #config(EDITOR, false) {
     itemIsConsumableByAutomaton :: proc "c" (item: ^Item) -> bool ---
     itemCompare :: proc "c" (item1: ^Item, item2: ^Item, checkAppearance: bool, comparisonUsedForStacking: bool) -> i32 ---
     isPotionBad :: proc "c" (potion: ^Item) -> bool ---
+    isRangedWeapon :: proc "c" (item: ^Item) -> bool ---
+    isRangedWeaponType :: proc "c" (type_: ItemType) -> bool ---
     isMeleeWeapon :: proc "c" (item: ^Item) -> bool ---
     itemIsThrowableTinkerTool :: proc "c" (item: ^Item) -> bool ---
     createCustomInventory :: proc "c" (stats: ^Stat, itemLimit: i32, rng: ^rawptr) ---
@@ -2067,6 +2100,8 @@ when #config(EDITOR, false) {
     createParticleAestheticOrbit :: proc "c" (parent: ^Entity, sprite: i32, duration: i32, particleType: i32) -> ^Entity ---
     createParticleRock :: proc "c" (parent: ^Entity, sprite: i32, light: bool) ---
     createParticleShatteredGem :: proc "c" (x: f64, y: f64, z: f64, sprite: i32, parent: ^Entity) ---
+    createParticleErupt :: proc "c" (parent: ^Entity, sprite: i32) ---
+    createParticleEruptAt :: proc "c" (x: f64, y: f64, sprite: i32) ---
     createParticleBoobyTrapExplode :: proc "c" (caster: ^Entity, x: f64, y: f64) -> ^Entity ---
     createParticleShatterObjects :: proc "c" (caster: ^Entity) -> ^Entity ---
     createParticleIgnite :: proc "c" (caster: ^Entity) -> ^Entity ---
@@ -2109,8 +2144,14 @@ when #config(EDITOR, false) {
     spawnMagicTower :: proc "c" (parent: ^Entity, x: f64, y: f64, spellID: i32, autoHitTarget: ^Entity, castedSpell: bool) ---
     magicDig :: proc "c" (parent: ^Entity, projectile: ^Entity, numRocks: i32, randRocks: i32) -> bool ---
     copySpell :: proc "c" (spell: ^spell_t, subElementToCopy: i32) -> ^spell_t ---
+    spellConstructor :: proc "c" (spell: ^spell_t, ID: i32) ---
+    spellConstructorNew :: proc "c" (ID: i32, difficulty: i32, internal_name: ^u8, elements: [dynamic]i32) -> ^spell_t ---
     spellDeconstructor :: proc "c" (data: rawptr) ---
     spellChanneledClientDeconstructor :: proc "c" (data: rawptr) ---
+    copySpellElementInto :: proc "c" (spellElement: ^spellElement_t, spellElementToSet: ^spellElement_t) ---
+    copySpellElement :: proc "c" (spellElement: ^spellElement_t) -> ^spellElement_t ---
+    spellElementConstructor :: proc "c" (element: ^spellElement_t) ---
+    spellElementInit :: proc "c" (elementID: i32, mana: i32, base_mana: i32, overload_mult: i32, damage: i32, duration: i32, internal_name: ^u8) ---
     spellElementDeconstructor :: proc "c" (data: rawptr) ---
     getCostOfSpell :: proc "c" (spell: ^spell_t, caster: ^Entity) -> i32 ---
     getGoldCostOfSpell :: proc "c" (spell: ^spell_t, player: i32) -> i32 ---
@@ -2159,6 +2200,8 @@ when #config(EDITOR, false) {
     getSpellDamageSecondaryFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64, applyingDamageOnCast: bool) -> i32 ---
     getSpellEffectDurationFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
     getSpellEffectDurationSecondaryFromID :: proc "c" (spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
+    getSpellPropertyFloatFromID :: proc "c" (prop: rawptr, spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> f64 ---
+    getSpellPropertyIntFromID :: proc "c" (prop: rawptr, spellID: i32, parent: ^Entity, parentStats: ^Stat, magicSourceParticle: ^Entity, addSpellBonus: f64) -> i32 ---
     getSpellDamageFromStatic :: proc "c" (spellID: i32, hitstats: ^Stat) -> i32 ---
     updateEntityOldHPBeforeMagicHit :: proc "c" (my: ^Entity, projectile: ^Entity) ---
     absorbMagicEvent :: proc "c" (entity: ^Entity, parent: ^Entity, damageSourceProjectile: ^Entity, spellID: i32, result: ^f64, damageMultiplier: ^f64, dmgGib: ^DamageGib) -> bool ---
@@ -2178,6 +2221,7 @@ when #config(EDITOR, false) {
     stringCat :: proc "c" (dest: ^u8, src: ^u8, dest_size: uint, src_size: uint) -> ^u8 ---
     stringCmp :: proc "c" (str1: ^u8, str2: ^u8, str1_size: uint, str2_size: uint) -> i32 ---
     stringLen :: proc "c" (str: ^u8, size: uint) -> uint ---
+    stringStr :: proc "c" (str1: ^u8, str2: ^u8, str1_size: uint, str2_size: uint) -> ^u8 ---
     gl_error_string :: proc "c" (err: u32) -> ^u8 ---
     sgn :: proc "c" (x: f64) -> i32 ---
     numdigits_sint16 :: proc "c" (x: i16) -> i32 ---
@@ -2284,6 +2328,8 @@ when #config(EDITOR, false) {
     buttonAcceptResolution :: proc "c" (my: ^button_t) ---
     buttonRevertResolution :: proc "c" (my: ^button_t) ---
     revertResolution :: proc "c" () ---
+    isCharacterValidFromDLC :: proc "c" (myStats: ^Stat, characterClass: i32) -> i32 ---
+    isCharacterValidFromDLCDirect :: proc "c" (player: i32, characterClass: i32, race: i32, appearance: i32) -> i32 ---
     doQuitGame :: proc "c" () ---
     doNewGame :: proc "c" (makeHighscore: bool) ---
     doCredits :: proc "c" () ---
@@ -2569,18 +2615,24 @@ when #config(EDITOR, false) {
     SDL_SavePNG_RW :: proc "c" (surface: ^rawptr, rw: ^rawptr, freedst: i32) -> i32 ---
     SDL_PNGFormatAlpha :: proc "c" (src: ^rawptr) -> ^rawptr ---
     getIndexForDeathType :: proc "c" (type_: i32) -> i32 ---
+    scoreConstructor :: proc "c" (player: i32) -> ^score_t ---
     scoreDeconstructor :: proc "c" (data: rawptr) ---
     saveScore :: proc "c" (player: i32) -> i32 ---
     totalScore :: proc "c" (score: ^score_t) -> i32 ---
+    loadScoreByIndex :: proc "c" (score: i32) ---
+    loadScore :: proc "c" (score: ^score_t) ---
     deleteScore :: proc "c" (multiplayer: bool, index: i32) -> bool ---
     saveAllScores :: proc "c" (scoresfilename: ^string) ---
     loadAllScores :: proc "c" (scoresfilename: ^string) ---
     setSaveGameFileName :: proc "c" (singleplayer: bool, type_: i32, saveIndex: i32) -> string ---
     deleteSaveGame :: proc "c" (gametype: i32, saveIndex: i32) -> i32 ---
     saveGameExists :: proc "c" (singleplayer: bool, saveIndex: i32) -> bool ---
+    anySaveFileExists :: proc "c" (singleplayer: bool) -> bool ---
+    anySaveFileExistsAny :: proc "c" () -> bool ---
     saveGame :: proc "c" (saveIndex: i32) -> i32 ---
     loadGame :: proc "c" (player: i32, info: ^SaveGameInfo) -> i32 ---
     loadGameFollowers :: proc "c" (info: ^SaveGameInfo) -> ^list_t ---
+    scoreConstructorFromInfo :: proc "c" (player: i32, info: ^SaveGameInfo) -> ^score_t ---
     getSaveGameInfo :: proc "c" (singleplayer: bool, saveIndex: i32) -> SaveGameInfo ---
     getSaveGameName :: proc "c" (info: ^SaveGameInfo) -> ^u8 ---
     getSaveGameType :: proc "c" (info: ^SaveGameInfo) -> i32 ---
@@ -2627,6 +2679,16 @@ when #config(EDITOR, false) {
     openMinimap :: proc "c" (player: i32) ---
     openMapWindow :: proc "c" (player: i32) ---
     openLogWindow :: proc "c" (player: i32) ---
+    capitalizeStringStd :: proc "c" (str: ^rawptr) ---
+    capitalizeString :: proc "c" (str: ^string) ---
+    lowercaseStringStd :: proc "c" (str: ^rawptr) ---
+    lowercaseString :: proc "c" (str: ^string) ---
+    uppercaseStringStd :: proc "c" (str: ^rawptr) ---
+    uppercaseString :: proc "c" (str: ^string) ---
+    camelCaseStringStd :: proc "c" (str: ^rawptr) ---
+    camelCaseString :: proc "c" (str: ^string) ---
+    stringStartsWithVowelStd :: proc "c" (str: ^rawptr) -> bool ---
+    stringStartsWithVowel :: proc "c" (str: ^string) -> bool ---
     updateLevelUpFrame :: proc "c" (player: i32) ---
     updateSkillUpFrame :: proc "c" (player: i32) ---
     createLoadingScreen :: proc "c" (progress: f64) ---
