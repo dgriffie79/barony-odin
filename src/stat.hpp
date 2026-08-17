@@ -504,7 +504,7 @@ public:
 // MapValueKindOf for Stat::Lootbag_t (owns a POD Item array) — kind 24 = MK_Lootbag
 template <> struct MapValueKindOf<Stat::Lootbag_t> { static constexpr int value = MK_Lootbag; };
 
-extern Stat* stats[MAXPLAYERS];
+extern "C" Stat* stats[MAXPLAYERS];
 
 inline bool skillCapstoneUnlocked(int player, int proficiency)
 {

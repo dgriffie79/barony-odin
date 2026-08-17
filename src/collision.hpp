@@ -42,7 +42,7 @@ struct MonsterTrapIgnoreEntities_t
 	DynamicSetI32 ignoreEntities;
 	Uint32 parent = 0;
 };
-extern DynamicMapI32T<MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
+extern "C" DynamicMapI32T<MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
 
 // MapValueKindOf for MonsterTrapIgnoreEntities_t (owns a DynamicSetI32)
 template <> struct MapValueKindOf<MonsterTrapIgnoreEntities_t> { static constexpr int value = MK_MonsterTrapIgnore; };

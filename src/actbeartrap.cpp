@@ -42,7 +42,6 @@
 #define BEARTRAP_IDENTIFIED my->skill[15]
 #define BEARTRAP_OWNER my->skill[17]
 
-DynamicMapI32T<MonsterTrapIgnoreEntities_t> monsterTrapIgnoreEntities;
 
 void actBeartrap(Entity* my)
 {

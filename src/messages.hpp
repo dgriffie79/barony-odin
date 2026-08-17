@@ -54,4 +54,4 @@ typedef struct Message
 */
 extern "C" DynamicString messageSanitizePercentSign(DynamicString src, int* percentSignsFound);
 
-extern const int MESSAGE_LIST_SIZE_CAP;
+extern "C" const int MESSAGE_LIST_SIZE_CAP;

@@ -22,8 +22,6 @@
 #include "mod_tools.hpp"
 #include "collision.hpp"
 
-Stat* stats[MAXPLAYERS];
-
 int Stat::getGoldWeight() const
 {
 	bool cursedItemIsBuff = false;

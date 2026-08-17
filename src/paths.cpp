@@ -21,9 +21,7 @@
 #include "magic/magic.hpp"
 #include "mod_tools.hpp"
 
-int* pathMapFlying = NULL;
-int* pathMapGrounded = NULL;
-int pathMapZone = 1;
+
 
 #define STRAIGHTCOST 10
 #define DIAGONALCOST 14
@@ -419,7 +417,6 @@ static Uint32 updatedOnTick = 0;
 static CvarInt cvar_pathlimit("/pathlimit", 200);
 static CvarBool cvar_pathing_debug("/pathing_debug", false);
 static CvarBool cvar_pathing_collider_npc("/pathing_collider_npc", true);
-int lastGeneratePathTries = 0;
 list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target, GeneratePathTypes pathingType, bool lavaIsPassable)
 {
 	if ( *cvar_pathing_debug )

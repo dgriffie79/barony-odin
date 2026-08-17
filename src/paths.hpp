@@ -11,9 +11,9 @@
 
 #pragma once
 
-extern int* pathMapFlying;
-extern int* pathMapGrounded;
-extern int pathMapZone;
+extern "C" int* pathMapFlying;
+extern "C" int* pathMapGrounded;
+extern "C" int pathMapZone;
 
 // pathnode struct
 typedef struct pathnode
@@ -43,7 +43,7 @@ enum GeneratePathTypes
 	GENERATE_PATH_MOVEASIDE,
 	GENERATE_PATH_ACHIEVEMENT
 };
-extern int lastGeneratePathTries;
+extern "C" int lastGeneratePathTries;
 extern "C" list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target, GeneratePathTypes pathingType, bool lavaIsPassable = false);
 extern "C" void generatePathMaps();
 // return true if an entity is blocks pathing

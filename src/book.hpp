@@ -21,7 +21,7 @@ public:
 	DynamicString default_name = "";
 	DynamicArrayStr formattedPages;
 };
-extern DynamicArrayT<Book_t> allBooks;
+extern "C" DynamicArrayT<Book_t> allBooks;
 
 // DynamicArrayKindOf for Book_t (owning: DynamicString text/default_name +
 // DynamicArrayStr formattedPages) — must be at namespace scope
@@ -42,12 +42,12 @@ public:
 	void readBooksIntoTemp();
 	DynamicArrayStr getListOfBooksAfterFiltering();
 };
-extern BookParser_t bookParser_t;
+extern "C" BookParser_t bookParser_t;
 
 extern "C" int getBook(DynamicString bookTitle);
 extern "C" DynamicString getBookDefaultNameFromIndex(int index, bool censored = true);
 extern "C" DynamicString getBookLocalizedNameFromIndex(int index, bool censored = true);
-extern int numbooks;
+extern "C" int numbooks;
 
 static const char* banned_books[] = {
 	"The Lusty Goblin Maid"
