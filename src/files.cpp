@@ -6252,3 +6252,22 @@ extern "C" void FileIO_close(File * file) { return FileIO::close(file); }
 
 
 // File::printf is inline in files.hpp; forward it.
+int File::vprintf(const char* fmt, va_list args)
+{
+	char buf[1024];
+	int result = vsnprintf(buf, 1024, fmt, args);
+	buf[1023] = '\0';
+	write(buf, sizeof(char), result);
+	return result;
+}
+
+int File::printf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	int result = vprintf(fmt, args);
+	va_end(args);
+	return result;
+}
+
+extern "C" int File_vprintf(File* self, const char* fmt, va_list ap) { return self->vprintf(fmt, ap); }

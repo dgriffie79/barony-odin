@@ -193,3 +193,19 @@ extern "C" void LobbyHandler_t_setP2PType(LobbyHandler_t* self, LobbyHandler_t::
 
 
 // LobbyHandler_t::logError is inline in lobbies.hpp; forward it.
+void LobbyHandler_t::vlogError(const char* str, va_list argptr)
+{
+	char newstr[1024] = { 0 };
+	vsnprintf(newstr, 1023, str, argptr);
+	printlog("[Lobbies Error]: %s", newstr);
+}
+
+void LobbyHandler_t::logError(const char* str, ...)
+{
+	va_list argptr;
+	va_start(argptr, str);
+	vlogError(str, argptr);
+	va_end(argptr);
+}
+
+extern "C" void LobbyHandler_t_vlogError(const char* str, va_list ap) { LobbyHandler_t::vlogError(str, ap); }

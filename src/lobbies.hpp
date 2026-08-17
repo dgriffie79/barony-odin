@@ -75,17 +75,8 @@ public:
 	void setHostingType(LobbyServiceType type);
 	void setLobbyJoinType(LobbyServiceType type);
 	void setP2PType(LobbyServiceType type);
-	static void logError(const char* str, ...)
-	{
-		char newstr[1024] = { 0 };
-		va_list argptr;
-
-		// format the content
-		va_start(argptr, str);
-		vsnprintf(newstr, 1023, str, argptr);
-		va_end(argptr);
-		printlog("[Lobbies Error]: %s", newstr);
-	}
+	static void logError(const char* str, ...);
+	static void vlogError(const char* str, va_list argptr);
 	static std::string getLobbyJoinFailedConnectString(int result);
 	enum EResult_LobbyFailures : int
 	{

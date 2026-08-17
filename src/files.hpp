@@ -75,21 +75,8 @@ public:
 	// @param fmt the string to format
 	// @param ... variadic string format arguments
 	// @return the number of characters written to the file
-	int printf(const char* fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-
-		char buf[1024];
-		int result = vsnprintf(buf, 1024, fmt, args);
-		buf[1023] = '\0';
-
-		write(buf, sizeof(char), result);
-
-		va_end(args);
-
-		return result;
-	}
+	int printf(const char* fmt, ...);
+	int vprintf(const char* fmt, va_list args);
 
 	// write the given string to the file
 	// @param str the string to write
