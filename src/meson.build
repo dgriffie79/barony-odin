@@ -404,6 +404,7 @@ if host_system == 'windows'
         odin_root / 'engine_audio_sound.odin',
         odin_root / 'mod_tools.odin',
         odin_root / 'json_shim' / 'json_shim.odin',
+        odin_root / 'bindings.odin',
       ],
       depends : [barony_game_lib],
       command : [
@@ -465,6 +466,7 @@ if host_system == 'windows'
           odin_root / 'engine_audio_sound.odin',
           odin_root / 'mod_tools.odin',
         odin_root / 'json_shim' / 'json_shim.odin',
+        odin_root / 'bindings.odin',
         ],
         depends : [barony_editor_lib],
         command : [
