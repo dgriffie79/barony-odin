@@ -1048,7 +1048,7 @@ void actArrow(Entity* my)
 								{
 									Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_RANGED_DMG_TOTAL, (ItemType)my->arrowQuiverType(), oldHP - hitstats->HP);
 								}
-								if ( isRangedWeapon((ItemType)my->arrowShotByWeapon()) )
+								if ( isRangedWeaponType((ItemType)my->arrowShotByWeapon()) )
 								{
 									Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_RANGED_DMG_TOTAL, (ItemType)my->arrowShotByWeapon(), oldHP - hitstats->HP);
 								}
@@ -1062,7 +1062,7 @@ void actArrow(Entity* my)
 								Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_DMG_MAX, (ItemType)my->arrowQuiverType(), damage);
 								Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_AMMO_HIT, (ItemType)my->arrowQuiverType(), 1);
 							}
-							if ( isRangedWeapon((ItemType)my->arrowShotByWeapon()) )
+							if ( isRangedWeaponType((ItemType)my->arrowShotByWeapon()) )
 							{
 								Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_DMG_MAX, (ItemType)my->arrowShotByWeapon(), damage);
 								Compendium_t::Events_t::eventUpdate(parent->skill[2], Compendium_t::CPDM_SHOTS_HIT, (ItemType)my->arrowShotByWeapon(), 1);

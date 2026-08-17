@@ -48,7 +48,6 @@ extern "C" char* stringCopyUnsafe(char* dest, const char* src, size_t dest_size)
 extern "C" char* stringCat(char* dest, const char* src, size_t dest_size, size_t src_size);
 extern "C" int stringCmp(const char* str1, const char* str2, size_t str1_size, size_t str2_size);
 extern "C" size_t stringLen(const char* str, size_t size);
-const char* stringStr(const char* str1, const char* str2, size_t str1_size, size_t str2_size);
 char* stringStr(char* str1, const char* str2, size_t str1_size, size_t str2_size);
 
 #include <iostream>

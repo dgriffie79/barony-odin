@@ -1034,7 +1034,7 @@ extern "C" Entity* createParticleAestheticOrbit(Entity* parent, int sprite, int 
 extern "C" void createParticleRock(Entity* parent, int sprite = -1, bool light = false);
 extern "C" void createParticleShatteredGem(real_t x, real_t y, real_t z, int sprite, Entity* parent);
 void createParticleErupt(Entity* parent, int sprite);
-void createParticleErupt(real_t x, real_t y, int sprite);
+void createParticleEruptAt(real_t x, real_t y, int sprite);
 extern "C" Entity* createParticleBoobyTrapExplode(Entity* caster, real_t x, real_t y);
 extern "C" Entity* createParticleShatterObjects(Entity* caster);
 extern "C" Entity* createParticleIgnite(Entity* caster);
@@ -1087,10 +1087,10 @@ void spellConstructor(spell_t* spell, int ID);
 spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements);
 extern "C" void spellDeconstructor(void* data);
 extern "C" void spellChanneledClientDeconstructor(void* data);
-void copySpellElement(spellElement_t* spellElement, spellElement_t* spellElementToSet);
+void copySpellElementInto(spellElement_t* spellElement, spellElement_t* spellElementToSet);
 spellElement_t* copySpellElement(spellElement_t* spellElement);
 void spellElementConstructor(spellElement_t* element);
-void spellElementConstructor(int elementID, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name);
+void spellElementInit(int elementID, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name);
 extern "C" void spellElementDeconstructor(void* data);
 
 extern "C" int getCostOfSpell(spell_t* spell, Entity* caster = nullptr);

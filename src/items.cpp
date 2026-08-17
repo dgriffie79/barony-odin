@@ -6613,10 +6613,10 @@ node_t* getMeleeWeaponItemNodeInInventory(const Stat* const myStats)
 
 bool isRangedWeapon(const Item& item)
 {
-	return isRangedWeapon(item.type);
+	return isRangedWeaponType(item.type);
 }
 
-bool isRangedWeapon(const ItemType type)
+bool isRangedWeaponType(const ItemType type)
 {
 	switch ( type )
 	{

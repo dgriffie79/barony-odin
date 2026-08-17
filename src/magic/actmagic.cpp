@@ -10104,7 +10104,7 @@ void actParticleTest(Entity* my)
 	}
 }
 
-void createParticleErupt(real_t x, real_t y, int sprite)
+void createParticleEruptAt(real_t x, real_t y, int sprite)
 {
 	real_t yaw = 0;
 	int numParticles = 8;
@@ -10145,7 +10145,7 @@ void createParticleErupt(Entity* parent, int sprite)
 		return;
 	}
 
-	createParticleErupt(parent->x, parent->y, sprite);
+	createParticleEruptAt(parent->x, parent->y, sprite);
 }
 
 Entity* createParticleSapCenter(Entity* parent, Entity* target, int spell, int sprite, int endSprite)
@@ -13733,7 +13733,7 @@ void actParticleTimer(Entity* my)
 						auto& data = findEffect->second;
 						if ( data.effectType == ParticleTimerEffect_t::EFFECT_TEST_1 )
 						{
-							createParticleErupt(data.x, data.y, 592);
+							createParticleEruptAt(data.x, data.y, 592);
 						}
 						else if ( data.effectType == ParticleTimerEffect_t::EFFECT_ICE_WAVE )
 						{

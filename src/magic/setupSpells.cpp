@@ -57,8 +57,8 @@ void setupSpells()   ///TODO: Verify this function.
 	spellElement_missile.duration = 75; //1.25 seconds.
 	//spellElement_missile.name = "Missile";
 	strcpy(spellElement_missile.element_internal_name, "spell_element_missile");
-	copySpellElement(&spellElement_missile, &spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE]);
-	copySpellElement(&spellElement_missile, &spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST]);
+	copySpellElementInto(&spellElement_missile, &spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE]);
+	copySpellElementInto(&spellElement_missile, &spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST]);
 	//spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST].mana = 0;
 	//spellElementMap[SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST].base_mana = 0;
 
@@ -1457,7 +1457,7 @@ void setupSpells()   ///TODO: Verify this function.
 
 	spell_t* spell = nullptr;
 
-	spellElementConstructor(SPELL_ELEMENT_PROPULSION_FOCI_SPRAY,
+	spellElementInit(SPELL_ELEMENT_PROPULSION_FOCI_SPRAY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1465,7 +1465,7 @@ void setupSpells()   ///TODO: Verify this function.
 		100,	// duration
 		"spell_element_foci_spray");
 
-	spellElementConstructor(SPELL_FOCI_FIRE,
+	spellElementInit(SPELL_FOCI_FIRE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1481,7 +1481,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_SNOW,
+	spellElementInit(SPELL_FOCI_SNOW,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1497,7 +1497,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_NEEDLES,
+	spellElementInit(SPELL_FOCI_NEEDLES,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1513,7 +1513,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_ARCS,
+	spellElementInit(SPELL_FOCI_ARCS,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1529,7 +1529,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_SANDBLAST,
+	spellElementInit(SPELL_FOCI_SANDBLAST,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1545,7 +1545,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_ELEMENT_METEOR_FLAMES,
+	spellElementInit(SPELL_ELEMENT_METEOR_FLAMES,
 		5,		// mana
 		5,		// base mana
 		1,		// overload
@@ -1556,7 +1556,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spellElementMap[SPELL_ELEMENT_METEOR_FLAMES].duration = 250;
 	spellElementMap[SPELL_ELEMENT_METEOR_FLAMES].setDurationMult(1.0);
 
-	spellElementConstructor(SPELL_METEOR,
+	spellElementInit(SPELL_METEOR,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1573,7 +1573,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_METEOR_SHOWER,
+	spellElementInit(SPELL_METEOR_SHOWER,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1590,7 +1590,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_ELEMENT_SPRITE_FLAMES,
+	spellElementInit(SPELL_ELEMENT_SPRITE_FLAMES,
 		2,		// mana
 		2,		// base mana
 		1,		// overload
@@ -1606,14 +1606,14 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_ELEMENT_PROPULSION_FLOOR_TILE,
+	spellElementInit(SPELL_ELEMENT_PROPULSION_FLOOR_TILE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
 		0,		// damage
 		50,	// duration
 		"spell_element_propulsion_floor_tile");
-	//spellElementConstructor(SPELL_ICE_WAVE,
+	//spellElementInit(SPELL_ICE_WAVE,
 	//	5,		// mana
 	//	5,		// base mana
 	//	1,		// overload
@@ -1944,7 +1944,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_INCOHERENCE,
+	spellElementInit(SPELL_INCOHERENCE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1983,7 +1983,7 @@ void setupSpells()   ///TODO: Verify this function.
 		1);
 	spell->sustainEffectDissipate = EFF_ENVENOM_WEAPON;
 
-	spellElementConstructor(SPELL_PSYCHIC_SPEAR,
+	spellElementInit(SPELL_PSYCHIC_SPEAR,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -1998,7 +1998,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE, SPELL_PSYCHIC_SPEAR }
 	);
 
-	spellElementConstructor(SPELL_DEFY_FLESH,
+	spellElementInit(SPELL_DEFY_FLESH,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2013,14 +2013,14 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE, SPELL_DEFY_FLESH }
 	);
 
-	spellElementConstructor(SPELL_ELEMENT_PROPULSION_MAGIC_SPRAY,
+	spellElementInit(SPELL_ELEMENT_PROPULSION_MAGIC_SPRAY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
 		0,		// damage
 		100,	// duration
 		"spell_element_propulsion_magic_spray");
-	spellElementConstructor(SPELL_GREASE_SPRAY,
+	spellElementInit(SPELL_GREASE_SPRAY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2035,7 +2035,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MAGIC_SPRAY, SPELL_GREASE_SPRAY }
 	);
 
-	spellElementConstructor(SPELL_BLOOD_WAVES,
+	spellElementInit(SPELL_BLOOD_WAVES,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2212,7 +2212,7 @@ void setupSpells()   ///TODO: Verify this function.
 		1, // duration
 		"spell_adorcism");
 
-	spellElementConstructor(SPELL_LEAD_BOLT,
+	spellElementInit(SPELL_LEAD_BOLT,
 		0,		// mana
 		0,		// base mana
 		1,		// overload
@@ -2227,7 +2227,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST, SPELL_LEAD_BOLT }
 	);
 
-	spellElementConstructor(SPELL_MERCURY_BOLT,
+	spellElementInit(SPELL_MERCURY_BOLT,
 		10,		// mana
 		10,		// base mana
 		1,		// overload
@@ -2242,7 +2242,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE_NOCOST, SPELL_MERCURY_BOLT }
 	);
 
-	spellElementConstructor(SPELL_NUMBING_BOLT,
+	spellElementInit(SPELL_NUMBING_BOLT,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2338,7 +2338,7 @@ void setupSpells()   ///TODO: Verify this function.
 		"spell_deep_shade",
 		1);
 
-	spellElementConstructor(SPELL_SHADE_BOLT,
+	spellElementInit(SPELL_SHADE_BOLT,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2353,7 +2353,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE, SPELL_SHADE_BOLT }
 	);
 
-	spellElementConstructor(SPELL_WONDERLIGHT,
+	spellElementInit(SPELL_WONDERLIGHT,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2380,7 +2380,7 @@ void setupSpells()   ///TODO: Verify this function.
 		1);
 	spell->sustainEffectDissipate = EFF_SPORES;
 
-	spellElementConstructor(SPELL_SPORE_BOMB,
+	spellElementInit(SPELL_SPORE_BOMB,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2581,7 +2581,7 @@ void setupSpells()   ///TODO: Verify this function.
 	//spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH;
 	//spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_SPLINTER_GEAR,
+	spellElementInit(SPELL_SPLINTER_GEAR,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2680,7 +2680,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_SPHERE_SILENCE,
+	spellElementInit(SPELL_SPHERE_SILENCE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2739,7 +2739,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_SPIN,
+	spellElementInit(SPELL_SPIN,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -2754,7 +2754,7 @@ void setupSpells()   ///TODO: Verify this function.
 		{ SPELL_ELEMENT_PROPULSION_MISSILE, SPELL_SPIN }
 	);
 
-	spellElementConstructor(SPELL_DIZZY,
+	spellElementInit(SPELL_DIZZY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3035,7 +3035,7 @@ void setupSpells()   ///TODO: Verify this function.
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 	spell->distance = 64.0;
 
-	spellElementConstructor(SPELL_MYCELIUM_BOMB,
+	spellElementInit(SPELL_MYCELIUM_BOMB,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3133,7 +3133,7 @@ void setupSpells()   ///TODO: Verify this function.
 		4);
 	spell->sustainEffectDissipate = EFF_BASTION_ROOTS;
 
-	spellElementConstructor(SPELL_FOCI_DARK_LIFE,
+	spellElementInit(SPELL_FOCI_DARK_LIFE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3149,7 +3149,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_DARK_RIFT,
+	spellElementInit(SPELL_FOCI_DARK_RIFT,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3165,7 +3165,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_DARK_SILENCE,
+	spellElementInit(SPELL_FOCI_DARK_SILENCE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3181,7 +3181,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_DARK_VENGEANCE,
+	spellElementInit(SPELL_FOCI_DARK_VENGEANCE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3197,7 +3197,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_DARK_SUPPRESS,
+	spellElementInit(SPELL_FOCI_DARK_SUPPRESS,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3213,7 +3213,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_LIGHT_PEACE,
+	spellElementInit(SPELL_FOCI_LIGHT_PEACE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3229,7 +3229,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_LIGHT_JUSTICE,
+	spellElementInit(SPELL_FOCI_LIGHT_JUSTICE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3245,7 +3245,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_LIGHT_PROVIDENCE,
+	spellElementInit(SPELL_FOCI_LIGHT_PROVIDENCE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3261,7 +3261,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_LIGHT_PURITY,
+	spellElementInit(SPELL_FOCI_LIGHT_PURITY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3277,7 +3277,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_FOCI_LIGHT_SANCTUARY,
+	spellElementInit(SPELL_FOCI_LIGHT_SANCTUARY,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3293,7 +3293,7 @@ void setupSpells()   ///TODO: Verify this function.
 	);
 	spell->hide_from_ui = true;
 
-	spellElementConstructor(SPELL_SCEPTER_BLAST,
+	spellElementInit(SPELL_SCEPTER_BLAST,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3349,7 +3349,7 @@ void setupSpells()   ///TODO: Verify this function.
 		1, // duration
 		"spell_project_spirit");
 
-	spellElementConstructor(SPELL_BREATHE_FIRE,
+	spellElementInit(SPELL_BREATHE_FIRE,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3407,7 +3407,7 @@ void setupSpells()   ///TODO: Verify this function.
 		"spell_sanctuary");
 	spell->rangefinder = SpellRangefinderType::RANGEFINDER_TOUCH_FLOOR_TILE;
 
-	spellElementConstructor(SPELL_HOLY_BEAM,
+	spellElementInit(SPELL_HOLY_BEAM,
 		1,		// mana
 		1,		// base mana
 		1,		// overload
@@ -3549,7 +3549,7 @@ spell_t* createSimpleSpell(int spellID, int difficulty, int mana, int base_mana,
 			elementName.insert(find + strlen("spell_"), "element_");
 		}
 	}
-	spellElementConstructor(spellID,
+	spellElementInit(spellID,
 		mana,		// mana
 		base_mana,		// base mana
 		overload_mult,		// overload

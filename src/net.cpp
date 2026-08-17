@@ -3598,7 +3598,7 @@ static std::unordered_map<Uint32, void(*)()> clientPacketHandlers = {
 				createParticleShatteredGem(particle_x, particle_y, 7.5, sprite, nullptr);
 				break;
 			case PARTICLE_EFFECT_ERUPT:
-				createParticleErupt(particle_x, particle_y, sprite);
+				createParticleEruptAt(particle_x, particle_y, sprite);
 				break;
 			case PARTICLE_EFFECT_BOOBY_TRAP:
 				createParticleBoobyTrapExplode(nullptr, particle_x, particle_y);

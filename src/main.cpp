@@ -147,26 +147,6 @@ size_t stringLen(const char* str, size_t size) {
     return len;
 }
 
-const char* stringStr(const char* str1, const char* str2, size_t str1_size, size_t str2_size) {
-    // verify input
-    assert(str1);
-    assert(str2);
-    if (!str1 || !str2) {
-	    return nullptr;
-    }
-
-    // scan str1 for a match of str2
-    for (size_t s = 0; s < str1_size && str1[s] != '\0'; ++s) {
-        const char* ptr = str1 + s;
-        if (!stringCmp(ptr, str2, str1_size - s, str2_size)) {
-            return ptr;
-        }
-    }
-
-    // no match found
-    return nullptr;
-}
-
 char* stringStr(char* str1, const char* str2, size_t str1_size, size_t str2_size) {
     // verify input
     assert(str1);

@@ -633,7 +633,7 @@ void spellDeconstructor(void* data)
 	}
 }
 
-void spellElementConstructor(spellElement_t* element)
+void spellElementInit(spellElement_t* element)
 {
 	//element->mana = 0;
 	//element->base_mana = 0;
@@ -649,7 +649,7 @@ void spellElementConstructor(spellElement_t* element)
 	element->channeledMana = 0;
 }
 
-void spellElementConstructor(int elementID, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name)
+void spellElementInit(int elementID, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name)
 {
 	assert(spellElementMap.find(elementID) == spellElementMap.end());
 
@@ -723,7 +723,7 @@ spell_t* copySpell(spell_t* spell, int subElementIndexToCopy)
 	return result;
 }
 
-void copySpellElement(spellElement_t* spellElement, spellElement_t* spellElementToSet)
+void copySpellElementInto(spellElement_t* spellElement, spellElement_t* spellElementToSet)
 {
 	if ( !spellElement || !spellElementToSet )
 	{

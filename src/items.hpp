@@ -964,7 +964,7 @@ extern "C" int itemCompare(const Item* item1, const Item* item2, bool checkAppea
  */
 extern "C" bool isPotionBad(const Item& potion);
 bool isRangedWeapon(const Item& item);
-bool isRangedWeapon(const ItemType type);
+bool isRangedWeaponType(const ItemType type);
 extern "C" bool isMeleeWeapon(const Item& item);
 extern "C" bool itemIsThrowableTinkerTool(const Item* item);
 
