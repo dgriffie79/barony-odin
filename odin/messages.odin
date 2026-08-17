@@ -9,3 +9,10 @@ Message :: struct {
 	alpha:          i16,
 }
 #assert(size_of(Message) == 16)
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+@(export)
+MESSAGE_LIST_SIZE_CAP : i32 = 400

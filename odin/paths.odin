@@ -19,3 +19,19 @@ Generate_Path_Types :: enum i32 {
 	GENERATE_PATH_SOKOBAN,
 	GENERATE_PATH_TREASURE_ROOM,
 }
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+@(export)
+pathMapFlying : ^i32
+
+@(export)
+pathMapGrounded : ^i32
+
+@(export)
+pathMapZone : i32
+
+@(export)
+lastGeneratePathTries : i32

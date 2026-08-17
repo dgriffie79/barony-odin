@@ -405,11 +405,6 @@ if host_system == 'windows'
         odin_root / 'mod_tools.odin',
         odin_root / 'json_shim' / 'json_shim.odin',
         odin_root / 'bindings.odin',
-        odin_root / 'globals_book.odin',
-        odin_root / 'globals_paths.odin',
-        odin_root / 'globals_collision.odin',
-        odin_root / 'globals_messages.odin',
-        odin_root / 'globals_stat.odin',
       ],
       depends : [barony_game_lib],
       command : [
@@ -472,11 +467,6 @@ if host_system == 'windows'
           odin_root / 'mod_tools.odin',
         odin_root / 'json_shim' / 'json_shim.odin',
         odin_root / 'bindings.odin',
-        odin_root / 'globals_book.odin',
-        odin_root / 'globals_paths.odin',
-        odin_root / 'globals_collision.odin',
-        odin_root / 'globals_messages.odin',
-        odin_root / 'globals_stat.odin',
         ],
         depends : [barony_editor_lib],
         command : [

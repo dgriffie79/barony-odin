@@ -10,3 +10,10 @@ MonsterTrap_Ignore_Entities_t :: struct {
 }
 
 #assert(size_of(MonsterTrap_Ignore_Entities_t) == 40)
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+@(export)
+monsterTrapIgnoreEntities : map[[4]byte]MonsterTrap_Ignore_Entities_t

@@ -158,3 +158,10 @@ stat_bleed_inflicted_by    :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[17] 
 stat_burning_inflicted_by  :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[18] }
 stat_monster_no_drop_items :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[19] }
 stat_monster_force_allegiance :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[20] }
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+@(export)
+stats : [4]^Stat

@@ -17,3 +17,16 @@ BookParser_t :: struct {
 	temp_book_data: map[string]string, // DynamicMapStr (32B)
 }
 #assert(size_of(BookParser_t) == 40)
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+@(export)
+allBooks : [dynamic]Book_t
+
+@(export)
+bookParser_t : BookParser_t
+
+@(export)
+numbooks : i32 = 0
