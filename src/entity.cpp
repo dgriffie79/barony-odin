@@ -5785,7 +5785,7 @@ void Entity::handleEffects(Stat* myStats)
 						{
 							chargeTimeInit *= *cvar_foci_charge_init;
 						}
-						chargeTimeInit *= getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_FOCI_CAST_TIME, spellID,
+						chargeTimeInit *= getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_FOCI_CAST_TIME, spellID,
 							this, myStats, this);
 						if ( defendTime >= chargeTimeInit )
 						{
@@ -5803,7 +5803,7 @@ void Entity::handleEffects(Stat* myStats)
 							}
 
 							static CvarFloat cvar_foci_charge("/foci_charge", 1.f);
- 							int chargeTime = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spellID,
+ 							int chargeTime = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spellID,
 								this, myStats, this);
 							if ( svFlags & SV_FLAG_CHEATS )
 							{
@@ -5833,7 +5833,7 @@ void Entity::handleEffects(Stat* myStats)
 									if ( (defendTime - chargeTimeInit) > 0 )
 									{
 										// subsequent casts
-										mpcost = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_SECONDARY_MANA_COST, spellID,
+										mpcost = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_SECONDARY_MANA_COST, spellID,
 											this, myStats, this);
 
 										if ( bless < 0 )

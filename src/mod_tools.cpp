@@ -5628,12 +5628,12 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 						{
 							baseDamage = element->getDamageSecondary();
 						}
-						mult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_SECONDARY_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
+						mult = getSpellPropertyFloatFromID(spell_t::SPELLPROP_DAMAGE_SECONDARY_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
 						snprintf(buf, sizeof(buf), str.c_str(), (int)(baseDamage * (1.0 + bonusINTPercent * mult / 100.0)));
 					}
 					else
 					{
-						mult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
+						mult = getSpellPropertyFloatFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
 						std::string damageOrHealing = adjectives["spell_strings"]["damage"];
 						/*std::string statName = getItemStatShortName("INT");
 						if ( spell->skillID == PRO_MYSTICISM )
@@ -5769,7 +5769,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 						abs(item.beatitude) :
 						std::max((Sint16)0, item.beatitude);
 
-					mpCost = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_SECONDARY_MANA_COST, spellID,
+					mpCost = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_SECONDARY_MANA_COST, spellID,
 						caster, myStats, caster);
 
 					int tier = bless > 0 ? std::min(2, bless) : 0;
@@ -5830,7 +5830,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 					if ( element )
 					{
 						int result = element->getChanneledManaDuration();
-						int modifiedResult = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spellID,
+						int modifiedResult = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spellID,
 							caster, myStats, caster);
 
 						chargeRefire = (100.0 - (100.0 * modifiedResult / (real_t)result));
@@ -6046,7 +6046,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 
 					int baseDamage = getSpellDamageOrHealAmount(-1, spell, nullptr, compendiumTooltipIntro);
 
-					real_t mult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
+					real_t mult = getSpellPropertyFloatFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
 
 					real_t bonusINTPercent = 100.0 * getBonusFromCasterOfSpellElement(
 						compendiumTooltipIntro ? nullptr : players[player]->entity,
@@ -6460,7 +6460,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 			Entity* caster = compendiumTooltipIntro ? nullptr : players[player]->entity;
 			Stat* casterStats = compendiumTooltipIntro ? nullptr : stats[player];
 			real_t baseCastTime = spell->cast_time * 20;
-			real_t modifiedCastTime = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_SPELL_CAST_TIME, spell->ID, caster, casterStats, nullptr) * 20;
+			real_t modifiedCastTime = getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_SPELL_CAST_TIME, spell->ID, caster, casterStats, nullptr) * 20;
 			real_t diff = -(baseCastTime - modifiedCastTime);
 			if ( abs(diff) < 0.001 )
 			{
@@ -6480,7 +6480,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 				Entity* caster = compendiumTooltipIntro ? nullptr : players[player]->entity;
 				Stat* casterStats = compendiumTooltipIntro ? nullptr : stats[player];
 				dist = spell->distance;
-				real_t modifiedDistance = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, casterStats, nullptr);
+				real_t modifiedDistance = getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, casterStats, nullptr);
 				diff = (modifiedDistance - dist);
 				if ( abs(diff) < 0.001 )
 				{
@@ -6504,7 +6504,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 
 			int baseDamage = getSpellDamageOrHealAmount(-1, spell, nullptr, compendiumTooltipIntro);
 
-			real_t mult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
+			real_t mult = getSpellPropertyFloatFromID(spell_t::SPELLPROP_DAMAGE_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
 
 			/*real_t bonusEquipPercent = 100.0 * getBonusFromCasterOfSpellElement(
 				compendiumTooltipIntro ? nullptr : players[player]->entity, 
@@ -6550,7 +6550,7 @@ void ItemTooltips_t::formatItemDetails(const int player, std::string tooltipType
 				int damage = getSpellDamageFromID(SPELL_HOLY_BEAM, nullptr, nullptr, nullptr, 0.0, false);
 				real_t damageMult = mult;
 				int healing = getSpellDamageSecondaryFromID(SPELL_HOLY_BEAM, nullptr, nullptr, nullptr, 0.0, false);
-				real_t healingMult = getSpellPropertyFromID(spell_t::SPELLPROP_DAMAGE_SECONDARY_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
+				real_t healingMult = getSpellPropertyFloatFromID(spell_t::SPELLPROP_DAMAGE_SECONDARY_MULT, spell->ID, compendiumTooltipIntro ? nullptr : players[player]->entity, nullptr, nullptr);
 				snprintf(buf, sizeof(buf), templates["template_spell_damage_bonus_pwr_dual"].at(0).c_str(), adjectives["spell_strings"]["effect"].c_str(), damage, adjectives["spell_strings"]["damage"].c_str(),
 					bonusINTPercent * damageMult, adjectives["spell_strings"]["damage"].c_str(),
 					healing, adjectives["spell_strings"]["healing"].c_str(),

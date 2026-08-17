@@ -460,7 +460,7 @@ void spellcasting_animation_manager_t::setRangeFinderLocation()
 	int index = 0;
 	wallDir = 0;
 
-	real_t spellDistance = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, nullptr, caster);
+	real_t spellDistance = getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, nullptr, caster);
 	static CvarBool cvar_rangefinder_linetrace("/rangefinder_linetrace", true);
 
 	if ( rangefinder == RANGEFINDER_TOUCH_WALL_TILE )
@@ -1045,7 +1045,7 @@ void fireOffSpellAnimation(spellcasting_animation_manager_t* animation_manager, 
 	animation_manager->circle_count = 0;
 	animation_manager->throw_count = 0;
 	animation_manager->active_count = 0;
-	animation_manager->times_to_circle = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_SPELL_CAST_TIME, spell->ID, caster, nullptr, caster) * HANDMAGIC_TICKS_PER_CIRCLE;// (spellCost / 10) + 1; //Circle once for every 10 mana the spell costs.
+	animation_manager->times_to_circle = getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_SPELL_CAST_TIME, spell->ID, caster, nullptr, caster) * HANDMAGIC_TICKS_PER_CIRCLE;// (spellCost / 10) + 1; //Circle once for every 10 mana the spell costs.
 	animation_manager->mana_left = spellCost;
 	animation_manager->mana_cost = spellCost;
 	animation_manager->consumeMana = true;

@@ -4271,7 +4271,7 @@ int getSpellEffectDurationSecondaryFromID(int spellID, Entity* parent, Stat* par
 	return duration;
 }
 
-real_t getSpellPropertyFromID(spell_t::SpellBasePropertiesFloat prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus)
+real_t getSpellPropertyFloatFromID(spell_t::SpellBasePropertiesFloat prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus)
 {
 	spellElement_t* element = nullptr;
 	spell_t* spell = nullptr;
@@ -4435,7 +4435,7 @@ real_t getSpellPropertyFromID(spell_t::SpellBasePropertiesFloat prop, int spellI
 	return result;
 }
 
-int getSpellPropertyFromID(spell_t::SpellBasePropertiesInt prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus)
+int getSpellPropertyIntFromID(spell_t::SpellBasePropertiesInt prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus)
 {
 	spellElement_t* element = nullptr;
 	spell_t* spell = nullptr;

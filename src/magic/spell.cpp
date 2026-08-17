@@ -518,7 +518,7 @@ void spellConstructor(spell_t* spell, int ID)
 	allGameSpells[ID] = spell;
 }
 
-spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements)
+spell_t* spellConstructorNew(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements)
 {
 	spell_t* spell = (spell_t*)malloc(sizeof(spell_t));
 	if ( spell )

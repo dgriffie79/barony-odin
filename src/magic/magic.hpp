@@ -1084,7 +1084,7 @@ extern "C" bool magicDig(Entity* parent, Entity* projectile, int numRocks, int r
 
 extern "C" spell_t* copySpell(spell_t* spell, int subElementToCopy = -1);
 void spellConstructor(spell_t* spell, int ID);
-spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements);
+spell_t* spellConstructorNew(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements);
 extern "C" void spellDeconstructor(void* data);
 extern "C" void spellChanneledClientDeconstructor(void* data);
 void copySpellElementInto(spellElement_t* spellElement, spellElement_t* spellElementToSet);
@@ -1198,8 +1198,8 @@ extern "C" int getSpellDamageFromID(int spellID, Entity* parent, Stat* parentSta
 extern "C" int getSpellDamageSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0, bool applyingDamageOnCast = true);
 extern "C" int getSpellEffectDurationFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
 extern "C" int getSpellEffectDurationSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
-real_t getSpellPropertyFromID(spell_t::SpellBasePropertiesFloat prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
-int getSpellPropertyFromID(spell_t::SpellBasePropertiesInt prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
+real_t getSpellPropertyFloatFromID(spell_t::SpellBasePropertiesFloat prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
+int getSpellPropertyIntFromID(spell_t::SpellBasePropertiesInt prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
 extern "C" int getSpellDamageFromStatic(int spellID, Stat* hitstats);
 extern "C" void updateEntityOldHPBeforeMagicHit(Entity& my, Entity& projectile);
 extern "C" bool absorbMagicEvent(Entity* entity, Entity* parent, Entity& damageSourceProjectile, int spellID, real_t* result, real_t& damageMultiplier, DamageGib& dmgGib);

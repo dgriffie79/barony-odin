@@ -1472,7 +1472,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_fire");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_FIRE,											// ID
 		100,														// difficulty
 		"spell_foci_fire",											// internal name
@@ -1488,7 +1488,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_snow");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_SNOW,											// ID
 		100,														// difficulty
 		"spell_foci_snow",											// internal name
@@ -1504,7 +1504,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_needles");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_NEEDLES,											// ID
 		100,														// difficulty
 		"spell_foci_needles",										// internal name
@@ -1520,7 +1520,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_arcs");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_ARCS,											// ID
 		100,														// difficulty
 		"spell_foci_arcs",											// internal name
@@ -1536,7 +1536,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_sandblast");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_SANDBLAST,										// ID
 		100,														// difficulty
 		"spell_foci_sandblast",										// internal name
@@ -1563,7 +1563,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_meteor");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_METEOR,										// ID
 		100,												// difficulty
 		"spell_meteor",										// internal name
@@ -1580,7 +1580,7 @@ void setupSpells()   ///TODO: Verify this function.
 		10,		// damage
 		0,		// duration
 		"spell_element_meteor_shower");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_METEOR_SHOWER,										// ID
 		100,												// difficulty
 		"spell_meteor_shower",										// internal name
@@ -1597,7 +1597,7 @@ void setupSpells()   ///TODO: Verify this function.
 		2,		// damage
 		0,		// duration
 		"spell_element_flames");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FLAMES,										// ID
 		100,												// difficulty
 		"spell_flames",										// internal name
@@ -1621,7 +1621,7 @@ void setupSpells()   ///TODO: Verify this function.
 	//	50,	// duration
 	//	"spell_element_ice_wave");
 
-	//spell = spellConstructor(
+	//spell = spellConstructorNew(
 	//	SPELL_ICE_WAVE,										// ID
 	//	100,												// difficulty
 	//	"spell_ice_wave",										// internal name
@@ -1951,7 +1951,7 @@ void setupSpells()   ///TODO: Verify this function.
 		50,		// damage
 		0,		// duration
 		"spell_element_incoherence");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_INCOHERENCE,										// ID
 		100,												// difficulty
 		"spell_incoherence",										// internal name
@@ -1990,7 +1990,7 @@ void setupSpells()   ///TODO: Verify this function.
 		50,		// damage
 		0,		// duration
 		"spell_element_psychic_spear");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_PSYCHIC_SPEAR,										// ID
 		100,												// difficulty
 		"spell_psychic_spear",										// internal name
@@ -2005,7 +2005,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_defy_flesh");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_DEFY_FLESH,										// ID
 		100,												// difficulty
 		"spell_defy_flesh",										// internal name
@@ -2027,7 +2027,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		50,	// duration
 		"spell_element_grease_spray");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_GREASE_SPRAY,										// ID
 		100,												// difficulty
 		"spell_grease_spray",										// internal name
@@ -2042,7 +2042,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_blood_waves");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_BLOOD_WAVES,										// ID
 		100,												// difficulty
 		"spell_blood_waves",										// internal name
@@ -2219,7 +2219,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_lead_bolt");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_LEAD_BOLT,										// ID
 		100,												// difficulty
 		"spell_lead_bolt",										// internal name
@@ -2234,7 +2234,7 @@ void setupSpells()   ///TODO: Verify this function.
 		10,		// damage
 		0,		// duration
 		"spell_element_mercury_bolt");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_MERCURY_BOLT,										// ID
 		100,												// difficulty
 		"spell_mercury_bolt",										// internal name
@@ -2249,7 +2249,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_numbing_bolt");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_NUMBING_BOLT,										// ID
 		100,												// difficulty
 		"spell_numbing_bolt",										// internal name
@@ -2345,7 +2345,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_shade_bolt");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SHADE_BOLT,										// ID
 		100,												// difficulty
 		"spell_shade_bolt",										// internal name
@@ -2360,7 +2360,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_wonderlight");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_WONDERLIGHT,										// ID
 		100,												// difficulty
 		"spell_wonderlight",										// internal name
@@ -2387,7 +2387,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_spore_bomb");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SPORE_BOMB,										// ID
 		100,												// difficulty
 		"spell_spore_bomb",										// internal name
@@ -2588,7 +2588,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_splinter_gear");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SPLINTER_GEAR,		// ID
 		100,						// difficulty
 		"spell_splinter_gear",		// internal name
@@ -2687,7 +2687,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_sphere_silence");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SPHERE_SILENCE,										// ID
 		100,												// difficulty
 		"spell_sphere_silence",										// internal name
@@ -2746,7 +2746,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_spin");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SPIN,										// ID
 		100,												// difficulty
 		"spell_spin",										// internal name
@@ -2761,7 +2761,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		0,		// duration
 		"spell_element_dizzy");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_DIZZY,										// ID
 		100,												// difficulty
 		"spell_dizzy",										// internal name
@@ -3042,7 +3042,7 @@ void setupSpells()   ///TODO: Verify this function.
 		5,		// damage
 		0,		// duration
 		"spell_element_mycelium_bomb");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_MYCELIUM_BOMB,										// ID
 		100,												// difficulty
 		"spell_mycelium_bomb",										// internal name
@@ -3140,7 +3140,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_dark_life");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_DARK_LIFE,											// ID
 		100,														// difficulty
 		"spell_foci_dark_life",											// internal name
@@ -3156,7 +3156,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_dark_rift");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_DARK_RIFT,											// ID
 		100,														// difficulty
 		"spell_foci_dark_rift",											// internal name
@@ -3172,7 +3172,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_dark_silence");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_DARK_SILENCE,											// ID
 		100,														// difficulty
 		"spell_foci_dark_silence",											// internal name
@@ -3188,7 +3188,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_dark_vengeance");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_DARK_VENGEANCE,											// ID
 		100,														// difficulty
 		"spell_foci_dark_vengeance",											// internal name
@@ -3204,7 +3204,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_dark_suppress");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_DARK_SUPPRESS,											// ID
 		100,														// difficulty
 		"spell_foci_dark_suppress",											// internal name
@@ -3220,7 +3220,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_light_peace");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_LIGHT_PEACE,											// ID
 		100,														// difficulty
 		"spell_foci_light_peace",											// internal name
@@ -3236,7 +3236,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_light_justice");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_LIGHT_JUSTICE,											// ID
 		100,														// difficulty
 		"spell_foci_light_justice",											// internal name
@@ -3252,7 +3252,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_light_providence");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_LIGHT_PROVIDENCE,											// ID
 		100,														// difficulty
 		"spell_foci_light_providence",											// internal name
@@ -3268,7 +3268,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_light_purity");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_LIGHT_PURITY,											// ID
 		100,														// difficulty
 		"spell_foci_light_purity",											// internal name
@@ -3284,7 +3284,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_foci_light_sanctuary");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_FOCI_LIGHT_SANCTUARY,											// ID
 		100,														// difficulty
 		"spell_foci_light_sanctuary",											// internal name
@@ -3300,7 +3300,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_scepter_blast");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_SCEPTER_BLAST,											// ID
 		100,														// difficulty
 		"spell_scepter_blast",											// internal name
@@ -3356,7 +3356,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		50,	// duration
 		"spell_element_breathe_fire");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_BREATHE_FIRE,										// ID
 		100,												// difficulty
 		"spell_breathe_fire",										// internal name
@@ -3414,7 +3414,7 @@ void setupSpells()   ///TODO: Verify this function.
 		0,		// damage
 		100,	// duration
 		"spell_element_holy_beam");
-	spell = spellConstructor(
+	spell = spellConstructorNew(
 		SPELL_HOLY_BEAM,											// ID
 		100,														// difficulty
 		"spell_holy_beam",											// internal name
@@ -3557,7 +3557,7 @@ spell_t* createSimpleSpell(int spellID, int difficulty, int mana, int base_mana,
 		duration,		// duration
 		elementName.c_str());
 	spellElementMap[spellID].channeledMana = sustainedMP;
-	spell_t* spell = spellConstructor(
+	spell_t* spell = spellConstructorNew(
 		// ID
 		spellID,
 		// difficulty

@@ -4026,7 +4026,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 					int index = -1;
 					real_t dist = sqrt(pow(castSpellProps->target_x - castSpellProps->caster_x, 2)
 						+ pow(castSpellProps->target_y - castSpellProps->caster_y, 2));
-					dist = std::min(getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, nullptr, caster) + 16.0, dist + 16.0);
+					dist = std::min(getSpellPropertyFloatFromID(spell_t::SPELLPROP_MODIFIED_DISTANCE, spell->ID, caster, nullptr, caster) + 16.0, dist + 16.0);
 					real_t minDist = 20.0;
 					while ( lifetime_tick <= lifetime )
 					{
@@ -7725,7 +7725,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 					bool newCast = charge == 1 && !(castSpellProps->optionalData & (1 << 7));
 					bool finishCast = (castSpellProps->optionalData & (1 << 7));
 					node_t* nextnode = nullptr;
-					int radius = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_RADIUS, spell->ID, caster, nullptr, caster);
+					int radius = getSpellPropertyIntFromID(spell_t::SPELLPROP_MODIFIED_RADIUS, spell->ID, caster, nullptr, caster);
 					if ( finishCast )
 					{
 						real_t x = caster->x;
@@ -7771,7 +7771,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 									duration += element->duration;
 									duration = std::max(element->duration * charge, duration);
 									entity->skill[0] = duration;
-									entity->actRadiusMagicAutoPulseTick = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spell->ID,
+									entity->actRadiusMagicAutoPulseTick = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spell->ID,
 										caster, nullptr, caster);
 									if ( castSpellProps->optionalData & (1 << 7) )
 									{
@@ -7798,7 +7798,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 						if ( Entity* fx = createRadiusMagic(spell->ID, caster,
 							x, y, radius, duration, nullptr) )
 						{
-							fx->actRadiusMagicAutoPulseTick = getSpellPropertyFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spell->ID,
+							fx->actRadiusMagicAutoPulseTick = getSpellPropertyIntFromID(spell_t::SPELLPROP_FOCI_REFIRE_TICKS, spell->ID,
 								caster, nullptr, caster);
 							if ( castSpellProps->optionalData & (1 << 7) )
 							{
@@ -7862,7 +7862,7 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 						}
 						particle = 169;
 
-						int radius = getSpellPropertyFromID(spell_t::SPELLPROP_MODIFIED_RADIUS, spell->ID, caster, nullptr, caster);
+						int radius = getSpellPropertyIntFromID(spell_t::SPELLPROP_MODIFIED_RADIUS, spell->ID, caster, nullptr, caster);
 
 						if ( effectID > 0 )
 						{
