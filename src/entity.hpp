@@ -1649,13 +1649,13 @@ public:
 	void playerShakeGrowthHelmet();
 };
 
-Monster getMonsterFromPlayerRace(int playerRace); // convert playerRace into the relevant monster type
-Sint32 statGetSTR(Stat* entitystats, Entity* my);
-Sint32 statGetDEX(Stat* entitystats, Entity* my);
-Sint32 statGetCON(Stat* entitystats, Entity* my);
-Sint32 statGetINT(Stat* entitystats, Entity* my);
-Sint32 statGetPER(Stat* entitystats, Entity* my);
-Sint32 statGetCHR(Stat* entitystats, Entity* my);
+extern "C" Monster getMonsterFromPlayerRace(int playerRace); // convert playerRace into the relevant monster type
+extern "C" Sint32 statGetSTR(Stat* entitystats, Entity* my);
+extern "C" Sint32 statGetDEX(Stat* entitystats, Entity* my);
+extern "C" Sint32 statGetCON(Stat* entitystats, Entity* my);
+extern "C" Sint32 statGetINT(Stat* entitystats, Entity* my);
+extern "C" Sint32 statGetPER(Stat* entitystats, Entity* my);
+extern "C" Sint32 statGetCHR(Stat* entitystats, Entity* my);
 extern Uint32 entity_uids, lastEntityUIDs;
 //extern Entity *players[4];
 extern Uint32 nummonsters;
@@ -1665,28 +1665,28 @@ class Item;
 extern bool swornenemies[NUMMONSTERS][NUMMONSTERS];
 extern bool monsterally[NUMMONSTERS][NUMMONSTERS];
 
-int AC(Stat* stat);
+extern "C" int AC(Stat* stat);
 
-Entity* uidToEntity(Sint32 uidnum);
-list_t* checkTileForEntity(int x, int y); //Don't forget to free the list returned when you're done with it. Also, provide x and y in map, not entity, units.
+extern "C" Entity* uidToEntity(Sint32 uidnum);
+extern "C" list_t* checkTileForEntity(int x, int y); //Don't forget to free the list returned when you're done with it. Also, provide x and y in map, not entity, units.
 /*
  * Don't forget to free the list returned when you're done with it.
  * Provide x and y in map, not entity, units.
  * The list parameter is a pointer to the list all the items found will be appended to.
  */
-void getItemsOnTile(int x, int y, list_t** list);
+extern "C" void getItemsOnTile(int x, int y, list_t** list);
 
 // get mana regen from stats and proficiencies only.
-int getBaseManaRegen(Entity* my, Stat& myStats, bool excludeItemsEffectsBonus = false);
+extern "C" int getBaseManaRegen(Entity* my, Stat& myStats, bool excludeItemsEffectsBonus = false);
 
 //--- Entity act* functions ---
-void actMonster(Entity* my);
-int playerHeadSprite(Monster race, sex_t sex, int appearance, int frame = 0, int player = -1);
-void actPlayer(Entity* my);
-void actPlayerXP(Entity* my);
-void spawnPlayerXP(real_t x, real_t y, int player, int xpAmount);
-void playerAnimateRat(Entity* my);
-void playerAnimateSpider(Entity* my);
+extern "C" void actMonster(Entity* my);
+extern "C" int playerHeadSprite(Monster race, sex_t sex, int appearance, int frame = 0, int player = -1);
+extern "C" void actPlayer(Entity* my);
+extern "C" void actPlayerXP(Entity* my);
+extern "C" void spawnPlayerXP(real_t x, real_t y, int player, int xpAmount);
+extern "C" void playerAnimateRat(Entity* my);
+extern "C" void playerAnimateSpider(Entity* my);
 
 /*
  * NOTE: Potion effects
@@ -1707,19 +1707,19 @@ void playerAnimateSpider(Entity* my);
  * value 14 = POTION_PARALYSIS
  */
 //TODO: Allow for cursed fountains. Any fountain that has a negative effect has, say, skill[4] set to 1 to indicate cursed. Used for monster behavior and for effects of things like healing potions.
-void actFountain(Entity* my);
-void actSink(Entity* my);
+extern "C" void actFountain(Entity* my);
+extern "C" void actSink(Entity* my);
 
 //--- Mechanism functions ---
-void actCircuit(Entity* my);
-void actSwitch(Entity* my); //Needs to be called periodically to ensure network's powered state is correct.
-void getPowerablesOnTile(int x, int y, list_t** list); //Stores a list of all circuits and mechanisms, on the tile (in map coordinates), in list.
-void actGate(Entity* my);
-void actArrowTrap(Entity* my);
-void actTrap(Entity* my);
-void actTrapPermanent(Entity* my);
-void actSwitchWithTimer(Entity* my);
-void actIronDoor(Entity* my);
+extern "C" void actCircuit(Entity* my);
+extern "C" void actSwitch(Entity* my); //Needs to be called periodically to ensure network's powered state is correct.
+extern "C" void getPowerablesOnTile(int x, int y, list_t** list); //Stores a list of all circuits and mechanisms, on the tile (in map coordinates), in list.
+extern "C" void actGate(Entity* my);
+extern "C" void actArrowTrap(Entity* my);
+extern "C" void actTrap(Entity* my);
+extern "C" void actTrapPermanent(Entity* my);
+extern "C" void actSwitchWithTimer(Entity* my);
+extern "C" void actIronDoor(Entity* my);
 
 /*
  * Note: Circuits and mechanisms use skill[28] to signify powered state.
@@ -1730,40 +1730,40 @@ void actIronDoor(Entity* my);
  */
 
 //---Chest/container functions---
-void actChest(Entity* my);
-void actChestLid(Entity* my);
-void closeChestClientside(const int player); //Called by the client to manage all clientside stuff relating to closing a chest.
-Item* addItemToChestClientside(const int player, Item* item, bool forceNewStack, Item* specificDestinationStack); //Called by the client to manage all clientside stuff relating to adding an item to a chest.
-void createChestInventory(Entity* my, int chestType);
+extern "C" void actChest(Entity* my);
+extern "C" void actChestLid(Entity* my);
+extern "C" void closeChestClientside(const int player); //Called by the client to manage all clientside stuff relating to closing a chest.
+extern "C" Item* addItemToChestClientside(const int player, Item* item, bool forceNewStack, Item* specificDestinationStack); //Called by the client to manage all clientside stuff relating to adding an item to a chest.
+extern "C" void createChestInventory(Entity* my, int chestType);
 
 //---Stalag functions---
-void actStalagFloor(Entity* my);
-void actStalagCeiling(Entity* my);
-void actStalagColumn(Entity* my);
+extern "C" void actStalagFloor(Entity* my);
+extern "C" void actStalagCeiling(Entity* my);
+extern "C" void actStalagColumn(Entity* my);
 
 //---Ceiling Tile functions---
-void actCeilingTile(Entity* my);
+extern "C" void actCeilingTile(Entity* my);
 
 //--Piston functions--
-void actPistonBase(Entity* my);
-void actPistonCam(Entity* my);
+extern "C" void actPistonBase(Entity* my);
+extern "C" void actPistonCam(Entity* my);
 
-void actColumn(Entity* my);
+extern "C" void actColumn(Entity* my);
 
 //--Floor vegetation--
-void actFloorDecoration(Entity* my);
+extern "C" void actFloorDecoration(Entity* my);
 
 //--Collider decoration--
-void actColliderDecoration(Entity* my);
+extern "C" void actColliderDecoration(Entity* my);
 
 //---Magic entity functions---
-void actMagiclightBall(Entity* my);
-void actMagiclightMoving(Entity* my);
+extern "C" void actMagiclightBall(Entity* my);
+extern "C" void actMagiclightMoving(Entity* my);
 
 //---Misc act functions---
-void actAmbientParticleEffectIdle(Entity* my);
+extern "C" void actAmbientParticleEffectIdle(Entity* my);
 
-void actTextSource(Entity* my);
+extern "C" void actTextSource(Entity* my);
 
 //checks if a sprite falls in certain sprite ranges
 
@@ -1778,36 +1778,36 @@ static const int FURNITURE_BED = 2;
 static const int FURNITURE_BUNKBED = 3;
 static const int FURNITURE_PODIUM = 4;
 
-int checkSpriteType(Sint32 sprite);
-Monster editorSpriteTypeToMonster(Sint32 sprite);
+extern "C" int checkSpriteType(Sint32 sprite);
+extern "C" Monster editorSpriteTypeToMonster(Sint32 sprite);
 extern DynamicArray spriteEditorNameStrings;  // vector<const char*> (non-owning)
 extern char tileEditorNameStrings[NUM_EDITOR_TILES][44];
 extern char monsterEditorNameStrings[NUMMONSTERS][32];
 extern char itemStringsByType[10][NUM_ITEM_STRINGS_BY_TYPE][32];
 extern char itemNameStrings[NUM_ITEM_STRINGS][32];
-int canWearEquip(Entity* entity, int category);
-void createMonsterEquipment(Stat* stats, BaronyRNG& rng);
-int countCustomItems(Stat* stats);
-int countDefaultItems(Stat* stats);
-void copyMonsterStatToPropertyStrings(Stat* tmpSpriteStats);
-void setRandomMonsterStats(Stat* stats, BaronyRNG& rng);
+extern "C" int canWearEquip(Entity* entity, int category);
+extern "C" void createMonsterEquipment(Stat* stats, BaronyRNG& rng);
+extern "C" int countCustomItems(Stat* stats);
+extern "C" int countDefaultItems(Stat* stats);
+extern "C" void copyMonsterStatToPropertyStrings(Stat* tmpSpriteStats);
+extern "C" void setRandomMonsterStats(Stat* stats, BaronyRNG& rng);
 
-int checkEquipType(const Item *ITEM);
+extern "C" int checkEquipType(const Item *ITEM);
 
 static const int SPRITE_GLOVE_RIGHT_OFFSET = 0;
 static const int SPRITE_GLOVE_LEFT_OFFSET = 4;
 static const int SPRITE_BOOT_RIGHT_OFFSET = 0;
 static const int SPRITE_BOOT_LEFT_OFFSET = 2;
 
-int setGloveSprite(Stat * myStats, Entity* ent, int spriteOffset);
-bool isLevitating(Stat * myStats);
-int getWeaponSkill(const Item* weapon);
-int getStatForProficiency(int skill);
-void setSpriteAttributes(Entity* entityToSet, Entity* entityToCopy, Entity* entityStatToCopy);
-bool monsterIsImmobileTurret(Entity* my, Stat* myStats);
-bool monsterChangesColorWhenAlly(Stat* myStats, Entity* entity = nullptr);
-int monsterTinkeringConvertHPToAppearance(Stat* myStats);
-int monsterTinkeringConvertAppearanceToHP(Stat* myStats, int appearance);
+extern "C" int setGloveSprite(Stat * myStats, Entity* ent, int spriteOffset);
+extern "C" bool isLevitating(Stat * myStats);
+extern "C" int getWeaponSkill(const Item* weapon);
+extern "C" int getStatForProficiency(int skill);
+extern "C" void setSpriteAttributes(Entity* entityToSet, Entity* entityToCopy, Entity* entityStatToCopy);
+extern "C" bool monsterIsImmobileTurret(Entity* my, Stat* myStats);
+extern "C" bool monsterChangesColorWhenAlly(Stat* myStats, Entity* entity = nullptr);
+extern "C" int monsterTinkeringConvertHPToAppearance(Stat* myStats);
+extern "C" int monsterTinkeringConvertAppearanceToHP(Stat* myStats, int appearance);
 
 static const int MSG_DESCRIPTION = 0;
 static const int MSG_COMBAT = 1;
@@ -1817,29 +1817,29 @@ static const int MSG_ATTACKS = 4;
 static const int MSG_STEAL_WEAPON = 5;
 static const int MSG_TOOL_BOMB = 6;
 static const int MSG_COMBAT_BASIC = 7;
-void messagePlayerMonsterEvent(int player, Uint32 color, Stat& monsterStats, const char* msgGeneric, const char* msgNamed, int detailType, Entity* optionalEntity = nullptr);
-char const * playerClassLangEntry(int classnum, int playernum);
+extern "C" void messagePlayerMonsterEvent(int player, Uint32 color, Stat& monsterStats, const char* msgGeneric, const char* msgNamed, int detailType, Entity* optionalEntity = nullptr);
+extern "C" char const * playerClassLangEntry(int classnum, int playernum);
 
 //Some testing functions/commands.
-Entity* summonChest(long x, long y);
+extern "C" Entity* summonChest(long x, long y);
 
 //Various settings variables regarding entities.
 extern bool flickerLights;
 
 //Boulder functions.
-void boulderSokobanOnDestroy(bool pushedOffLedge);
-void boulderLavaOrArcaneOnDestroy(Entity* my, int sprite, Entity* boulderHitEntity);
+extern "C" void boulderSokobanOnDestroy(bool pushedOffLedge);
+extern "C" void boulderLavaOrArcaneOnDestroy(Entity* my, int sprite, Entity* boulderHitEntity);
 
-int playerEntityMatchesUid(Uint32 uid); // Returns >= 0 if player uid matches uid.
-bool monsterNameIsGeneric(Stat& monsterStats); // returns true if a monster's name is a generic decription rather than a miniboss.
-bool shieldSpriteAllowedImpForm(int sprite);
-bool weaponSpriteAllowedImpForm(int sprite);
+extern "C" int playerEntityMatchesUid(Uint32 uid); // Returns >= 0 if player uid matches uid.
+extern "C" bool monsterNameIsGeneric(Stat& monsterStats); // returns true if a monster's name is a generic decription rather than a miniboss.
+extern "C" bool shieldSpriteAllowedImpForm(int sprite);
+extern "C" bool weaponSpriteAllowedImpForm(int sprite);
 
-bool playerRequiresBloodToSustain(int player); // vampire type or accursed class
-void spawnBloodVialOnMonsterDeath(Entity* entity, Stat* hitstats, Entity* killer);
+extern "C" bool playerRequiresBloodToSustain(int player); // vampire type or accursed class
+extern "C" void spawnBloodVialOnMonsterDeath(Entity* entity, Stat* hitstats, Entity* killer);
 
-void shrineDaedalusRevealMap(Entity& my);
-void daedalusShrineInteract(Entity* my, Entity* touched);
+extern "C" void shrineDaedalusRevealMap(Entity& my);
+extern "C" void daedalusShrineInteract(Entity* my, Entity* touched);
 
 enum EntityHungerIntervals : int
 {
@@ -1850,12 +1850,12 @@ enum EntityHungerIntervals : int
 	HUNGER_INTERVAL_AUTOMATON_SUPERHEATED,
 	HUNGER_INTERVAL_AUTOMATON_CRITICAL
 };
-int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerIntervals hungerInterval);
+extern "C" int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerIntervals hungerInterval);
 
 //Fountain potion drop chance variables.
 extern const DynamicArrayU32 fountainPotionDropChances;
 extern const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap;
-std::pair<int, int> fountainGeneratePotionDrop(BaronyRNG& rng);
+extern "C" std::pair<int, int> fountainGeneratePotionDrop(BaronyRNG& rng);
 
 class TextSourceScript
 {

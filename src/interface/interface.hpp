@@ -224,15 +224,15 @@ extern int itemscroll;
 extern view_t camera_charsheet;
 extern real_t camera_charsheet_offsetyaw;
 
-void select_inventory_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_spell_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_chest_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_shop_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_tinkering_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_alchemy_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_feather_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_assistshrine_slot(int player, int currentx, int currenty, int diffx, int diffy);
-void select_mail_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_inventory_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_spell_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_chest_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_shop_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_tinkering_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_alchemy_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_feather_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_assistshrine_slot(int player, int currentx, int currenty, int diffx, int diffy);
+extern "C" void select_mail_slot(int player, int currentx, int currenty, int diffx, int diffy);
 
 extern Entity* openedChest[MAXPLAYERS]; //One for each client. //TODO: Clientside, [0] will always point to something other than NULL when a chest is open and it will be NULL when a chest is closed.
 extern list_t chestInv[MAXPLAYERS]; //This is just for the client, so that it can populate the chest inventory on its end.
@@ -243,39 +243,39 @@ extern list_t chestInv[MAXPLAYERS]; //This is just for the client, so that it ca
 //extern int buttonclick;
 
 // function prototypes
-void takeScreenshot(const char* output_path = nullptr);
-bool loadInterfaceResources();
-void freeInterfaceResources();
-void clickDescription(const int player, Entity* entity);
-void consoleCommand(char const * const command);
-void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap);
+extern "C" void takeScreenshot(const char* output_path = nullptr);
+extern "C" bool loadInterfaceResources();
+extern "C" void freeInterfaceResources();
+extern "C" void clickDescription(const int player, Entity* entity);
+extern "C" void consoleCommand(char const * const command);
+extern "C" void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap);
 struct MinimapHighlight_t
 {
 	Uint32 ticks = 0;
 };
 extern DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
-void handleDamageIndicatorTicks();
-void drawStatus(const int player);
-void drawStatusNew(const int player);
-void saveCommand(char* content);
-int loadConfig(char* filename);
-int saveConfig(char const * const filename);
-void defaultConfig();
-void updateChestInventory(const int player);
-Item* takeItemFromChest(int player, Item* item, int amount, Item* addToSpecificInventoryItem, bool forceNewStack, bool bDoPickupMessage = true);
-void updateShopWindow(const int player);
-bool getShopFreeSlot(const int player, list_t* shopInventory, Item* itemToSell, int& xout, int& yout, Item*& itemToStackInto);
+extern "C" void handleDamageIndicatorTicks();
+extern "C" void drawStatus(const int player);
+extern "C" void drawStatusNew(const int player);
+extern "C" void saveCommand(char* content);
+extern "C" int loadConfig(char* filename);
+extern "C" int saveConfig(char const * const filename);
+extern "C" void defaultConfig();
+extern "C" void updateChestInventory(const int player);
+extern "C" Item* takeItemFromChest(int player, Item* item, int amount, Item* addToSpecificInventoryItem, bool forceNewStack, bool bDoPickupMessage = true);
+extern "C" void updateShopWindow(const int player);
+extern "C" bool getShopFreeSlot(const int player, list_t* shopInventory, Item* itemToSell, int& xout, int& yout, Item*& itemToStackInto);
 
-void updateEnemyBar(Entity* source, Entity* target, const char* name, Sint32 hp, Sint32 maxhp, 
+extern "C" void updateEnemyBar(Entity* source, Entity* target, const char* name, Sint32 hp, Sint32 maxhp, 
 	bool lowPriorityTick, DamageGib gibType);
 
-bool autoAddHotbarFilter(const Item& item);
-void quickStackItems(const int player);
-void sortInventoryItemsOfType(const int player, int categoryInt, bool sortRightToLeft); // sort inventory items matching category. -1 is everything, -2 is only equipped items.
-void autosortInventory(const int player, bool sortPaperDoll = false);
-bool mouseInsidePlayerInventory(const int player);
-bool mouseInsidePlayerHotbar(const int player);
-bool playerLearnedSpellbook(const int player, Item* current_item);
+extern "C" bool autoAddHotbarFilter(const Item& item);
+extern "C" void quickStackItems(const int player);
+extern "C" void sortInventoryItemsOfType(const int player, int categoryInt, bool sortRightToLeft); // sort inventory items matching category. -1 is everything, -2 is only equipped items.
+extern "C" void autosortInventory(const int player, bool sortPaperDoll = false);
+extern "C" bool mouseInsidePlayerInventory(const int player);
+extern "C" bool mouseInsidePlayerHotbar(const int player);
+extern "C" bool playerLearnedSpellbook(const int player, Item* current_item);
 
 /*
  * Used for two purposes:
@@ -290,7 +290,7 @@ static const int INVENTORY_MODE_SPELL = 1;
 extern bool restrictPaperDollMovement;
 
 //Chest GUI definitions.
-int numItemsInChest(const int player);
+extern "C" int numItemsInChest(const int player);
 
 //Magic GUI definitions.
 //extern SDL_Surface* magicspellList_bmp;
@@ -312,8 +312,8 @@ extern int magic_GUI_state;
 extern SDL_Rect magic_gui_pos; //The position of the magic GUI is stored here.
 extern SDL_Surface* sustained_spell_generic_icon; //The goto icon when no other is available.
 
-void renderMagicGUI(int winx, int winy, int winw, int winh);
-void updateMagicGUI();
+extern "C" void renderMagicGUI(int winx, int winy, int winw, int winh);
+extern "C" void updateMagicGUI();
 #define SUST_DIR_HORZ 0
 #define SUST_DIR_VERT 1
 #define SUST_SPELLS_DIRECTION SUST_DIR_VERT //0 = horizontal, 1 = vertical.
@@ -322,7 +322,7 @@ void updateMagicGUI();
 #define SUST_SPELLS_Y 32
 #define SUST_SPELLS_RIGHT_ALIGN true //If true, overrides settings and makes the sustained spells draw alongside the right edge of the screen, vertically.
 
-void drawSustainedSpells(const int player); //Draws an icon for every sustained spell.
+extern "C" void drawSustainedSpells(const int player); //Draws an icon for every sustained spell.
 
 enum GUICurrentType
 {
@@ -1365,7 +1365,7 @@ extern GenericGUIMenu GenericGUI[MAXPLAYERS];
 /*
  * Returns true if the mouse is in the specified bounds, with x1 and y1 specifying the top left corner, and x2 and y2 specifying the bottom right corner.
  */
-bool mouseInBounds(const int player, int x1, int x2, int y1, int y2);
+extern "C" bool mouseInBounds(const int player, int x1, int x2, int y1, int y2);
 
 //Right sidebar defines.
 //#define RIGHTSIDEBAR_X (xres - rightsidebar_titlebar_img->w)
@@ -1377,7 +1377,7 @@ bool mouseInBounds(const int player, int x1, int x2, int y1, int y2);
 //extern SDL_Surface* rightsidebar_slot_grayedout_img;
 //extern int rightsidebar_height;
 
-void updateRightSidebar(); //Updates the sidebar on the right side of the screen, the one containing spells, skills, etc.
+extern "C" void updateRightSidebar(); //Updates the sidebar on the right side of the screen, the one containing spells, skills, etc.
 
 //------book_t Defines-----
 //extern SDL_Surface* bookgui_img;
@@ -1417,9 +1417,9 @@ typedef struct hotbar_slot_t
 
 // Returns a pointer to a hotbar slot if the mouse is over a hotbar slot
 // Used for such things as dragging and dropping items. Uses realtime (mousex/mousey) coords as may be dragging
-hotbar_slot_t* getCurrentHotbarUnderMouse(int player, int* outSlotNum = nullptr);
+extern "C" hotbar_slot_t* getCurrentHotbarUnderMouse(int player, int* outSlotNum = nullptr);
 
-bool warpMouseToSelectedHotbarSlot(const int player);
+extern "C" bool warpMouseToSelectedHotbarSlot(const int player);
 
 /*
  * True = automatically place items you pick up in your hotbar.
@@ -1443,9 +1443,9 @@ extern bool hide_playertags;
 
 extern bool show_skill_values;
 
-const char* getInputName(Uint32 scancode);
-Sint8* inputPressed(Uint32 scancode);
-Sint8* inputPressedForPlayer(int player, Uint32 scancode);
+extern "C" const char* getInputName(Uint32 scancode);
+extern "C" Sint8* inputPressed(Uint32 scancode);
+extern "C" Sint8* inputPressedForPlayer(int player, Uint32 scancode);
 
 enum CloseGUIShootmode : int
 {
@@ -1464,7 +1464,7 @@ enum CloseGUIIgnore : int
 
 static const int SCANCODE_UNASSIGNED_BINDING = 399;
 
-const bool hotbarGamepadControlEnabled(const int player);
+extern "C" const bool hotbarGamepadControlEnabled(const int player);
 
 struct AttackHoverText_t
 {
@@ -1497,7 +1497,7 @@ struct AttackHoverText_t
 	Sint32 equipmentAndEffectBonus = 0;
 	int proficiency = -1;
 };
-Sint32 displayAttackPower(const int player, AttackHoverText_t& output);
+extern "C" Sint32 displayAttackPower(const int player, AttackHoverText_t& output);
 
 class MinimapPing
 {
@@ -1538,8 +1538,8 @@ public:
 		pingType(pingType) {}
 };
 
-extern DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
-void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPing);
+extern "C" extern DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
+extern "C" void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPing);
 extern int minimapPingGimpTimer[MAXPLAYERS];
 extern SDL_Rect minimaps[MAXPLAYERS];
 
@@ -1901,7 +1901,7 @@ template <> struct DynamicArrayKindOf<CalloutRadialMenu::PanelEntry> { static co
 template <> struct DynamicArrayKindOf<std::pair<Uint32, GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t>> { static constexpr int value = Kind_AssistNotifPair; };
 template <> struct DynamicArrayKindOf<std::pair<Uint32, GenericGUIMenu::AlchemyGUI_t::AlchNotification_t>> { static constexpr int value = Kind_AlchNotifPair; };
 
-std::string getItemSpritePath(const int player, Item& item);
+extern "C" std::string getItemSpritePath(const int player, Item& item);
 
 enum ItemContextMenuPrompts {
 	PROMPT_EQUIP,
@@ -1933,8 +1933,8 @@ enum ItemContextMenuPrompts {
 	PROMPT_SCEPTER_CHARGE
 };
 
-DynamicArrayS32 getContextMenuOptionsForItem(const int player, Item* item);
-DynamicArrayS32 getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem);
-const char* getContextMenuLangEntry(const int player, const ItemContextMenuPrompts prompt, Item& item);
-std::string getContextMenuOptionBindingName(const int player, const ItemContextMenuPrompts prompt);
-void cleanupMinimapTextures();
+extern "C" DynamicArrayS32 getContextMenuOptionsForItem(const int player, Item* item);
+extern "C" DynamicArrayS32 getContextTooltipOptionsForItem(const int player, Item* item, int useDropdownMenu, bool hotbarItem);
+extern "C" const char* getContextMenuLangEntry(const int player, const ItemContextMenuPrompts prompt, Item& item);
+extern "C" std::string getContextMenuOptionBindingName(const int player, const ItemContextMenuPrompts prompt);
+extern "C" void cleanupMinimapTextures();

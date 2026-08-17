@@ -18,7 +18,7 @@
  * Returns 0 success or -1 on failure, the error message is then retrievable
  * via SDL_GetError().
  */
-int SDL_SavePNG(SDL_Surface *surface, const char *file);
+extern "C" int SDL_SavePNG(SDL_Surface *surface, const char *file);
 
 /*
  * Save an SDL_Surface as a PNG file, using writable RWops.
@@ -30,10 +30,10 @@ int SDL_SavePNG(SDL_Surface *surface, const char *file);
  * Returns 0 success or -1 on failure, the error message is then retrievable
  * via SDL_GetError().
  */
-extern int SDL_SavePNG_RW(SDL_Surface* surface, SDL_RWops* rw, int freedst);
+extern "C" extern int SDL_SavePNG_RW(SDL_Surface* surface, SDL_RWops* rw, int freedst);
 
 /*
  * Return new SDL_Surface with a format suitable for PNG output.
  */
-extern SDL_Surface* SDL_PNGFormatAlpha(SDL_Surface* src);
+extern "C" extern SDL_Surface* SDL_PNGFormatAlpha(SDL_Surface* src);
 

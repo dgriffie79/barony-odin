@@ -82,45 +82,45 @@ namespace MainMenu {
 		HallOfTrials,       // used to launch a hall-of-trials map
 	};
 
-    const char* getUsername();              // get local account name
-    const char* getHostname();              // get local host name
-    void setUsername(const char* name);     // set local account name
-    void setHostname(const char* name);     // set local hostname
-	void randomizeUsername();				// randomize the username
-	void randomizeHostname();				// randomize the hostname
-	void logoutOfEpic();					// log out of epic online services
+extern "C"     const char* getUsername();              // get local account name
+extern "C"     const char* getHostname();              // get local host name
+extern "C"     void setUsername(const char* name);     // set local account name
+extern "C"     void setHostname(const char* name);     // set local hostname
+extern "C" 	void randomizeUsername();				// randomize the username
+extern "C" 	void randomizeHostname();				// randomize the hostname
+extern "C" 	void logoutOfEpic();					// log out of epic online services
 
-	int getMenuOwner();					// get current pause menu owner
-    bool isPlayerSignedIn(int index);   // checks whether a player is signed into a given slot
-	bool isPlayerSlotLocked(int index);	// checks whether a player slot has been locked out for joining
-    bool isCutsceneActive();            // checks whether we are playing a cutscene
-	bool isMenuOpen();					// checks whether the menu is open
-	void beginFade(FadeDestination);    // begins a fade transition to a specific destination
+extern "C" 	int getMenuOwner();					// get current pause menu owner
+extern "C"     bool isPlayerSignedIn(int index);   // checks whether a player is signed into a given slot
+extern "C" 	bool isPlayerSlotLocked(int index);	// checks whether a player slot has been locked out for joining
+extern "C"     bool isCutsceneActive();            // checks whether we are playing a cutscene
+extern "C" 	bool isMenuOpen();					// checks whether the menu is open
+extern "C" 	void beginFade(FadeDestination);    // begins a fade transition to a specific destination
 
-	void settingsApply();					// write settings to global variables (true if video mode changed)
-	void settingsMount(bool video = true);	// read settings from global variables
-	bool settingsSave();					// write settings to disk (true if succeeded)
-	bool settingsLoad();					// read settings from disk (true if succeeded)
-	void settingsReset();					// default settings
+extern "C" 	void settingsApply();					// write settings to global variables (true if video mode changed)
+extern "C" 	void settingsMount(bool video = true);	// read settings from global variables
+extern "C" 	bool settingsSave();					// write settings to disk (true if succeeded)
+extern "C" 	bool settingsLoad();					// read settings from disk (true if succeeded)
+extern "C" 	void settingsReset();					// default settings
 
-	void doMainMenu(bool ingame);           // call in a loop to update the menu
-	void createTitleScreen();               // creates a fresh title screen
-	void createMainMenu(bool ingame);       // creates a fresh main menu
-	void destroyMainMenu();                 // destroys the main menu tree
-	void createDummyMainMenu();             // creates a main menu devoid of widgets
-	void closeMainMenu();                   // closes the menu and unpauses the game
+extern "C" 	void doMainMenu(bool ingame);           // call in a loop to update the menu
+extern "C" 	void createTitleScreen();               // creates a fresh title screen
+extern "C" 	void createMainMenu(bool ingame);       // creates a fresh main menu
+extern "C" 	void destroyMainMenu();                 // destroys the main menu tree
+extern "C" 	void createDummyMainMenu();             // creates a main menu devoid of widgets
+extern "C" 	void closeMainMenu();                   // closes the menu and unpauses the game
 
 	// special events:
 
-    void controllerDisconnected(int player);                        // controller disconnect prompt, eg if a player unplugs a controller
-	void tutorialFirstTimeCompleted();								// tutorial first level completed event
-    void openGameoverWindow(int player, bool tutorial = false);     // opens gameover window, used when player dies
-	void openCompendium();
-	void disconnectedFromServer(const char* text);                  // called when the player is disconnected from the server, prompts them to end the game
-	void receivedInvite(void*);                                     // called when a player receives an invite to a lobby (EOS or Steam)
-	void setupSplitscreen();                                        // used to resize player game views, for example if a player drops or we change the aspect ratio
-	void crossplayPrompt();                                         // user chose to activate crossplay
-	void timedOut();												// special disconnection event that may display a system error message
+extern "C"     void controllerDisconnected(int player);                        // controller disconnect prompt, eg if a player unplugs a controller
+extern "C" 	void tutorialFirstTimeCompleted();								// tutorial first level completed event
+extern "C"     void openGameoverWindow(int player, bool tutorial = false);     // opens gameover window, used when player dies
+extern "C" 	void openCompendium();
+extern "C" 	void disconnectedFromServer(const char* text);                  // called when the player is disconnected from the server, prompts them to end the game
+extern "C" 	void receivedInvite(void*);                                     // called when a player receives an invite to a lobby (EOS or Steam)
+extern "C" 	void setupSplitscreen();                                        // used to resize player game views, for example if a player drops or we change the aspect ratio
+extern "C" 	void crossplayPrompt();                                         // user chose to activate crossplay
+extern "C" 	void timedOut();												// special disconnection event that may display a system error message
 
 	struct ClassDescriptions
 	{

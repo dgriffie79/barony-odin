@@ -465,7 +465,7 @@ public:
 	void addRumbleRemotePlayer(const int player, Uint32 hapticType, Uint32 uid);
 };
 extern Inputs inputs;
-void initGameControllers();
+extern "C" void initGameControllers();
 
 static const unsigned NUM_HOTBAR_SLOTS = 10; //NOTE: If you change this, you must dive into drawstatus.c and update the hotbar code. It expects 10.
 static const unsigned NUM_HOTBAR_ALTERNATES = 5;

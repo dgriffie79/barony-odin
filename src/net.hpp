@@ -24,41 +24,41 @@ extern char lobbyChatbox[LOBBY_CHATBOX_LENGTH];
 extern list_t lobbyChatboxMessages;
 
 // function prototypes for net.c:
-int power(int a, int b);
-int sendPacket(UDPsocket sock, int channel, UDPpacket* packet, int hostnum, bool tryReliable = false);
-int sendPacketSafe(UDPsocket sock, int channel, UDPpacket* packet, int hostnum);
+extern "C" int power(int a, int b);
+extern "C" int sendPacket(UDPsocket sock, int channel, UDPpacket* packet, int hostnum, bool tryReliable = false);
+extern "C" int sendPacketSafe(UDPsocket sock, int channel, UDPpacket* packet, int hostnum);
 bool messagePlayer(int player, Uint32 type, char const * const message, ...);
 bool messageLocalPlayers(Uint32 type, char const * const message, ...);
 bool messagePlayerColor(int player, Uint32 type, Uint32 color, char const * const message, ...);
 bool messageLocalPlayersColor(Uint32 color, Uint32 type, char const * const message, ...);
-void sendEntityUDP(Entity* entity, int c, bool guarantee);
-void sendEntityTCP(Entity* entity, int c);
-void sendMapSeedTCP(int c);
-void sendMapTCP(int c);
-void serverUpdateEntitySprite(Entity* entity);
-void serverUpdateEntitySkill(Entity* entity, int skill);
-void serverUpdateEntityFSkill(Entity* entity, int fskill);
-void serverUpdateEntityStatFlag(Entity* entity, int flag);
-void serverSpawnMiscParticles(Entity* entity, int particleType, int particleSprite, Uint32 optionalUid = 0, Uint32 duration = 0, Uint32 optionalData = 0);
-void serverSpawnMiscParticlesAtLocation(Sint16 x, Sint16 y, Sint16 z, int particleType, int particleSprite, Uint32 duration = 0, Uint32 optionalData = 0, Uint32 optionalUid = 0);
-void serverUpdateEntityFlag(Entity* entity, int flag);
-void serverUpdateMapTileFlag(Sint16 x, Sint16 y, int layer, Uint32 flagSet, Uint32 flagRemove);
-void serverUpdateBodypartIDs(Entity* entity);
-void serverUpdateEntityBodypart(Entity* entity, int bodypart);
-void serverUpdateEffects(int player);
-void serverUpdateHunger(int player);
-void serverUpdateSexChange(int player);
-void serverUpdatePlayerStats();
-void serverUpdatePlayerGameplayStats(int player, int gameplayStat, int changeval);
-void serverUpdatePlayerConduct(int player, int conduct, int value);
-void serverUpdatePlayerLVL();
-void serverRemoveClientFollower(int player, Uint32 uidToRemove);
-void serverSendItemToPickupAndEquip(int player, Item* item);
-void serverUpdateAllyStat(int player, Uint32 uidToUpdate, int LVL, int HP, int MAXHP, int type);
-void serverUpdatePlayerSummonStrength(int player);
-void serverUpdateAllyHP(int player, Uint32 uidToUpdate, int HP, int MAXHP, bool guarantee = false);
-void sendMinimapPing(Uint8 player, Uint8 x, Uint8 y, Uint8 pingType = 0, bool radius = false);
-void sendAllyCommandClient(int player, Uint32 uid, int command, Uint8 x, Uint8 y, Uint32 targetUid = 0);
+extern "C" void sendEntityUDP(Entity* entity, int c, bool guarantee);
+extern "C" void sendEntityTCP(Entity* entity, int c);
+extern "C" void sendMapSeedTCP(int c);
+extern "C" void sendMapTCP(int c);
+extern "C" void serverUpdateEntitySprite(Entity* entity);
+extern "C" void serverUpdateEntitySkill(Entity* entity, int skill);
+extern "C" void serverUpdateEntityFSkill(Entity* entity, int fskill);
+extern "C" void serverUpdateEntityStatFlag(Entity* entity, int flag);
+extern "C" void serverSpawnMiscParticles(Entity* entity, int particleType, int particleSprite, Uint32 optionalUid = 0, Uint32 duration = 0, Uint32 optionalData = 0);
+extern "C" void serverSpawnMiscParticlesAtLocation(Sint16 x, Sint16 y, Sint16 z, int particleType, int particleSprite, Uint32 duration = 0, Uint32 optionalData = 0, Uint32 optionalUid = 0);
+extern "C" void serverUpdateEntityFlag(Entity* entity, int flag);
+extern "C" void serverUpdateMapTileFlag(Sint16 x, Sint16 y, int layer, Uint32 flagSet, Uint32 flagRemove);
+extern "C" void serverUpdateBodypartIDs(Entity* entity);
+extern "C" void serverUpdateEntityBodypart(Entity* entity, int bodypart);
+extern "C" void serverUpdateEffects(int player);
+extern "C" void serverUpdateHunger(int player);
+extern "C" void serverUpdateSexChange(int player);
+extern "C" void serverUpdatePlayerStats();
+extern "C" void serverUpdatePlayerGameplayStats(int player, int gameplayStat, int changeval);
+extern "C" void serverUpdatePlayerConduct(int player, int conduct, int value);
+extern "C" void serverUpdatePlayerLVL();
+extern "C" void serverRemoveClientFollower(int player, Uint32 uidToRemove);
+extern "C" void serverSendItemToPickupAndEquip(int player, Item* item);
+extern "C" void serverUpdateAllyStat(int player, Uint32 uidToUpdate, int LVL, int HP, int MAXHP, int type);
+extern "C" void serverUpdatePlayerSummonStrength(int player);
+extern "C" void serverUpdateAllyHP(int player, Uint32 uidToUpdate, int HP, int MAXHP, bool guarantee = false);
+extern "C" void sendMinimapPing(Uint8 player, Uint8 x, Uint8 y, Uint8 pingType = 0, bool radius = false);
+extern "C" void sendAllyCommandClient(int player, Uint32 uid, int command, Uint8 x, Uint8 y, Uint32 targetUid = 0);
 enum NetworkingLobbyJoinRequestResult : int
 {
 	NET_LOBBY_JOIN_P2P_FAILURE,
@@ -66,15 +66,15 @@ enum NetworkingLobbyJoinRequestResult : int
 	NET_LOBBY_JOIN_DIRECTIP_FAILURE,
 	NET_LOBBY_JOIN_DIRECTIP_SUCCESS
 };
-NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool lockedSlots[4]);
-Entity* receiveEntity(Entity* entity);
-void clientActions(Entity* entity);
-void clientHandleMessages(Uint32 framerateBreakInterval);
-void serverHandleMessages(Uint32 framerateBreakInterval);
-bool handleSafePacket();
+extern "C" NetworkingLobbyJoinRequestResult lobbyPlayerJoinRequest(int& outResult, bool lockedSlots[4]);
+extern "C" Entity* receiveEntity(Entity* entity);
+extern "C" void clientActions(Entity* entity);
+extern "C" void clientHandleMessages(Uint32 framerateBreakInterval);
+extern "C" void serverHandleMessages(Uint32 framerateBreakInterval);
+extern "C" bool handleSafePacket();
 
-void pollNetworkForShutdown();
-void closeNetworkInterfaces();
+extern "C" void pollNetworkForShutdown();
+extern "C" void closeNetworkInterfaces();
 
 // server/game flags
 extern Uint32 svFlags;
@@ -138,12 +138,12 @@ extern NetHandler* net_handler;
 extern bool disableMultithreadedSteamNetworking;
 extern bool disableFPSLimitOnNetworkMessages;
 
-int steamPacketThread(void* data);
-int EOSPacketThread(void* data);
+extern "C" int steamPacketThread(void* data);
+extern "C" int EOSPacketThread(void* data);
 
-void deleteMultiplayerSaveGames(); //Server function, deletes its own save and broadcasts delete packet to clients.
+extern "C" void deleteMultiplayerSaveGames(); //Server function, deletes its own save and broadcasts delete packet to clients.
 
-void handleScanPacket(); // when we receive a SCAN packet (request for lobby info)
+extern "C" void handleScanPacket(); // when we receive a SCAN packet (request for lobby info)
 
 struct PingNetworkStatus_t
 {

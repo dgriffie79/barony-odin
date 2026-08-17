@@ -483,11 +483,11 @@ template <> struct MapValueKindOf<DynamicMapI32T<ParticleEmitterHit_t>> { static
 using DynamicMapU32MapEmitterHit = DynamicMapI32T<DynamicMapI32T<ParticleEmitterHit_t>>;
 extern DynamicMapU32MapEmitterHit particleTimerEmitterHitEntities;
 extern DynamicMapI32T<ParticleTimerEffect_t> particleTimerEffects;
-ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hitentity);
+extern "C" ParticleEmitterHit_t* getParticleEmitterHitProps(Uint32 emitterUid, Entity* hitentity);
 template <> struct MapValueKindOf<ParticleTimerEffect_t::Effect_t> { static constexpr int value = MK_Effect; };
 template <> struct MapValueKindOf<ParticleTimerEffect_t::EffectLocations_t> { static constexpr int value = MK_EffectLocations; };
 
-bool addSpell(int spell, int player, bool ignoreSkill = false); //Adds a spell to the client's spell list. Note: Do not use this to add custom spells.
+extern "C" bool addSpell(int spell, int player, bool ignoreSkill = false); //Adds a spell to the client's spell list. Note: Do not use this to add custom spells.
 
 //TODO: Create a spell class which has the basic spell(s) involved, the mana to use etc. All of those important details. This should support vanilla spells and custom spells with just one data type. The addSpell function gives the player a vanilla spell if they don't already have it.
 
@@ -966,155 +966,155 @@ struct CastSpellProps_t
 	bool setToMonsterCast(Entity* monster, int spellID);
 };
 
-void setupSpells();
-void equipSpell(spell_t* spell, int playernum, Item* spellItem);
-Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool trap, bool usingSpellbook = false, CastSpellProps_t* castSpellProps = nullptr, bool usingFoci = false);
-void castSpellInit(Uint32 caster_uid, spell_t* spell, bool usingSpellbook, bool usingTome); //Initiates the spell animation, then hands off the torch to it, which, when finished, calls castSpell.
-int spellGetCastSound(spell_t* spell);
+extern "C" void setupSpells();
+extern "C" void equipSpell(spell_t* spell, int playernum, Item* spellItem);
+extern "C" Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool trap, bool usingSpellbook = false, CastSpellProps_t* castSpellProps = nullptr, bool usingFoci = false);
+extern "C" void castSpellInit(Uint32 caster_uid, spell_t* spell, bool usingSpellbook, bool usingTome); //Initiates the spell animation, then hands off the torch to it, which, when finished, calls castSpell.
+extern "C" int spellGetCastSound(spell_t* spell);
 #ifndef EDITOR // editor doesn't know about stat*
-int getSpellcastingAbilityFromUsingSpellbook(spell_t* spell, Entity* caster, Stat* casterStats);
-bool isSpellcasterBeginnerFromSpellbook(int player, Entity* caster, Stat* stat, spell_t* spell, Item* spellbookItem);
-int getSpellbookBonusPercent(Entity* caster, Stat* stat, Item* spellbookItem);
-real_t getBonusFromCasterOfSpellElement(Entity* caster, Stat* casterStats, spellElement_t* spellElement, int spellID, int proficiencyWhenNoSpell);
-real_t getSpellBonusFromCasterINT(Entity* caster, Stat* casterStats, int skillID);
-int getSpellbookBaseINTBonus(Entity* caster, Stat* casterStats, int skillID);
-void magicOnEntityHit(Entity* parent, Entity* particle, Entity* hitentity, Stat* hitstats, Sint32 preResistanceDamage, Sint32 damage, Sint32 oldHP, int spellID, int selfCastUsingItem = 0);
-void magicTrapOnHit(Entity* parent, Entity* hitentity, Stat* hitstats, Sint32 oldHP, int spellID);
-bool applyGenericMagicDamage(Entity* caster, Entity* hitentity, Entity& damageSourceProjectile, int spellID, int damage, bool alertMonsters,
+extern "C" int getSpellcastingAbilityFromUsingSpellbook(spell_t* spell, Entity* caster, Stat* casterStats);
+extern "C" bool isSpellcasterBeginnerFromSpellbook(int player, Entity* caster, Stat* stat, spell_t* spell, Item* spellbookItem);
+extern "C" int getSpellbookBonusPercent(Entity* caster, Stat* stat, Item* spellbookItem);
+extern "C" real_t getBonusFromCasterOfSpellElement(Entity* caster, Stat* casterStats, spellElement_t* spellElement, int spellID, int proficiencyWhenNoSpell);
+extern "C" real_t getSpellBonusFromCasterINT(Entity* caster, Stat* casterStats, int skillID);
+extern "C" int getSpellbookBaseINTBonus(Entity* caster, Stat* casterStats, int skillID);
+extern "C" void magicOnEntityHit(Entity* parent, Entity* particle, Entity* hitentity, Stat* hitstats, Sint32 preResistanceDamage, Sint32 damage, Sint32 oldHP, int spellID, int selfCastUsingItem = 0);
+extern "C" void magicTrapOnHit(Entity* parent, Entity* hitentity, Stat* hitstats, Sint32 oldHP, int spellID);
+extern "C" bool applyGenericMagicDamage(Entity* caster, Entity* hitentity, Entity& damageSourceProjectile, int spellID, int damage, bool alertMonsters,
 	bool monsterCollisionOnly = false, int usingSpellbookID = 0);
 #endif
-bool isSpellcasterBeginner(int player, Entity* caster, int skillID);
-void actMagicTrap(Entity* my);
-void actMagicStatusEffect(Entity* my);
-void actMagicMissile(Entity* my);
-void actMagicClient(Entity* my);
-void actMagicClientNoLight(Entity* my);
-void actMagicParticle(Entity* my);
-void actHUDMagicParticle(Entity* my);
-void actTouchCastThirdPersonParticle(Entity* my);
-void actHUDMagicParticleCircling(Entity* my);
-void actMagicParticleCircling2(Entity* my);
-void actMagicParticleEnsembleCircling(Entity* my);
-void createEnsembleHUDParticleCircling(Entity* parent);
-void createEnsembleTargetParticleCircling(Entity* parent);
-Entity* spawnMagicParticle(Entity* parentent);
-Entity* spawnMagicParticleCustom(Entity* parentent, int sprite, real_t scale, real_t spreadReduce);
-void spawnMagicEffectParticles(Sint16 x, Sint16 y, Sint16 z, Uint32 sprite);
-void spawnMagicEffectParticlesBell(Entity* bell, Uint32 sprite);
-void createParticleCircling(Entity* parent, int duration, int sprite);
-void actParticleCircle(Entity* my);
-void actParticleDot(Entity* my);
-void actParticleRock(Entity* my);
-void actParticleTest(Entity* my);
-void actParticleErupt(Entity* my);
-void actParticleTimer(Entity* my);
-void actParticleSap(Entity* my);
-void actParticleSapCenter(Entity* my);
-void actParticleExplosionCharge(Entity* my);
-void actParticleFollowerCommand(Entity* my);
-void actParticleCharmMonster(Entity* my);
-void actParticleAestheticOrbit(Entity* my);
-void actParticleBolas(Entity* my);
-void actParticleShadowTag(Entity* my);
-void actParticlePinpointTarget(Entity* my);
-void actParticleFloorMagic(Entity* my);
-void actParticleVortex(Entity* my);
-void actParticleWave(Entity* my);
-void actParticleRoot(Entity* my);
-void actParticleDemesneDoor(Entity* my);
-void actRadiusMagic(Entity* my);
-void actRadiusMagicBadge(Entity* my);
-void actParticleShatterEarth(Entity* my);
-void actParticleShatterEarthRock(Entity* my);
+extern "C" bool isSpellcasterBeginner(int player, Entity* caster, int skillID);
+extern "C" void actMagicTrap(Entity* my);
+extern "C" void actMagicStatusEffect(Entity* my);
+extern "C" void actMagicMissile(Entity* my);
+extern "C" void actMagicClient(Entity* my);
+extern "C" void actMagicClientNoLight(Entity* my);
+extern "C" void actMagicParticle(Entity* my);
+extern "C" void actHUDMagicParticle(Entity* my);
+extern "C" void actTouchCastThirdPersonParticle(Entity* my);
+extern "C" void actHUDMagicParticleCircling(Entity* my);
+extern "C" void actMagicParticleCircling2(Entity* my);
+extern "C" void actMagicParticleEnsembleCircling(Entity* my);
+extern "C" void createEnsembleHUDParticleCircling(Entity* parent);
+extern "C" void createEnsembleTargetParticleCircling(Entity* parent);
+extern "C" Entity* spawnMagicParticle(Entity* parentent);
+extern "C" Entity* spawnMagicParticleCustom(Entity* parentent, int sprite, real_t scale, real_t spreadReduce);
+extern "C" void spawnMagicEffectParticles(Sint16 x, Sint16 y, Sint16 z, Uint32 sprite);
+extern "C" void spawnMagicEffectParticlesBell(Entity* bell, Uint32 sprite);
+extern "C" void createParticleCircling(Entity* parent, int duration, int sprite);
+extern "C" void actParticleCircle(Entity* my);
+extern "C" void actParticleDot(Entity* my);
+extern "C" void actParticleRock(Entity* my);
+extern "C" void actParticleTest(Entity* my);
+extern "C" void actParticleErupt(Entity* my);
+extern "C" void actParticleTimer(Entity* my);
+extern "C" void actParticleSap(Entity* my);
+extern "C" void actParticleSapCenter(Entity* my);
+extern "C" void actParticleExplosionCharge(Entity* my);
+extern "C" void actParticleFollowerCommand(Entity* my);
+extern "C" void actParticleCharmMonster(Entity* my);
+extern "C" void actParticleAestheticOrbit(Entity* my);
+extern "C" void actParticleBolas(Entity* my);
+extern "C" void actParticleShadowTag(Entity* my);
+extern "C" void actParticlePinpointTarget(Entity* my);
+extern "C" void actParticleFloorMagic(Entity* my);
+extern "C" void actParticleVortex(Entity* my);
+extern "C" void actParticleWave(Entity* my);
+extern "C" void actParticleRoot(Entity* my);
+extern "C" void actParticleDemesneDoor(Entity* my);
+extern "C" void actRadiusMagic(Entity* my);
+extern "C" void actRadiusMagicBadge(Entity* my);
+extern "C" void actParticleShatterEarth(Entity* my);
+extern "C" void actParticleShatterEarthRock(Entity* my);
 
-void createParticleDropRising(Entity* parent, int sprite, double scale);
-void createParticleDot(Entity* parent);
-Entity* createParticleBolas(Entity* parent, int sprite, int duration, Item* item);
-Entity* createParticleAestheticOrbit(Entity* parent, int sprite, int duration, int particleType);
-void createParticleRock(Entity* parent, int sprite = -1, bool light = false);
-void createParticleShatteredGem(real_t x, real_t y, real_t z, int sprite, Entity* parent);
+extern "C" void createParticleDropRising(Entity* parent, int sprite, double scale);
+extern "C" void createParticleDot(Entity* parent);
+extern "C" Entity* createParticleBolas(Entity* parent, int sprite, int duration, Item* item);
+extern "C" Entity* createParticleAestheticOrbit(Entity* parent, int sprite, int duration, int particleType);
+extern "C" void createParticleRock(Entity* parent, int sprite = -1, bool light = false);
+extern "C" void createParticleShatteredGem(real_t x, real_t y, real_t z, int sprite, Entity* parent);
 void createParticleErupt(Entity* parent, int sprite);
 void createParticleErupt(real_t x, real_t y, int sprite);
-Entity* createParticleBoobyTrapExplode(Entity* caster, real_t x, real_t y);
-Entity* createParticleShatterObjects(Entity* caster);
-Entity* createParticleIgnite(Entity* caster);
-Entity* createParticleSapCenter(Entity* parent, Entity* target, int spell, int sprite, int endSprite);
-Entity* createParticleTimer(Entity* parent, int duration, int sprite);
-void createParticleSap(Entity* parent);
-void createParticleExplosionCharge(Entity* parent, int sprite, int particleCount, double scale);
-void createParticleFollowerCommand(real_t x, real_t y, real_t z, int sprite, Uint32 uid);
-Entity* createParticleCastingIndicator(Entity* parent, real_t x, real_t y, real_t z, Uint32 lifetime, Uint32 followUid);
-Entity* createParticleAOEIndicator(Entity* parent, real_t x, real_t y, real_t z, Uint32 lifetime, int size);
+extern "C" Entity* createParticleBoobyTrapExplode(Entity* caster, real_t x, real_t y);
+extern "C" Entity* createParticleShatterObjects(Entity* caster);
+extern "C" Entity* createParticleIgnite(Entity* caster);
+extern "C" Entity* createParticleSapCenter(Entity* parent, Entity* target, int spell, int sprite, int endSprite);
+extern "C" Entity* createParticleTimer(Entity* parent, int duration, int sprite);
+extern "C" void createParticleSap(Entity* parent);
+extern "C" void createParticleExplosionCharge(Entity* parent, int sprite, int particleCount, double scale);
+extern "C" void createParticleFollowerCommand(real_t x, real_t y, real_t z, int sprite, Uint32 uid);
+extern "C" Entity* createParticleCastingIndicator(Entity* parent, real_t x, real_t y, real_t z, Uint32 lifetime, Uint32 followUid);
+extern "C" Entity* createParticleAOEIndicator(Entity* parent, real_t x, real_t y, real_t z, Uint32 lifetime, int size);
 static const int FOLLOWER_SELECTED_PARTICLE = 1229;
 static const int FOLLOWER_TARGET_PARTICLE = 1230;
-void createParticleCharmMonster(Entity* parent);
-void createParticleShadowTag(Entity* parent, Uint32 casterUid, int duration);
+extern "C" void createParticleCharmMonster(Entity* parent);
+extern "C" void createParticleShadowTag(Entity* parent, Uint32 casterUid, int duration);
 static const int PINPOINT_PARTICLE_START = 1767;
 static const int PINPOINT_PARTICLE_END = 1782;
-Entity* createParticleSpellPinpointTarget(Entity* parent, Uint32 casterUid, int sprite, int duration, int spellID);
-Entity* createFloorMagic(ParticleTimerEffect_t::EffectType particleType, int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
-Entity* createRadiusMagic(int spellID, Entity* caster, real_t x, real_t y, real_t radius, Uint32 lifetime, Entity* follow);
-void floorMagicClientReceive(Entity* my);
-void particleWaveClientReceive(Entity* my);
-void radiusMagicClientReceive(Entity* entity);
-Entity* floorMagicSetLightningParticle(Entity* my);
-void floorMagicCreateLightningSequence(Entity* spellTimer, int startTickOffset);
-void floorMagicCreateSpores(Entity* spawnOnEntity, real_t x, real_t y, Entity* caster, int damage, int spellID, bool magicstaff = false);
-Entity* floorMagicCreateRoots(real_t x, real_t y, Entity* caster, int damage, int spellID, int duration, int particleTimerAction);
-Entity* createVortexMagic(int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
-Entity* createParticleWave(ParticleTimerEffect_t::EffectType particleType, int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime, bool light);
-Entity* createParticleRoot(int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
-void createMushroomSpellEffect(Entity* caster, real_t x, real_t y);
-Entity* createWindMagic(Uint32 casterUID, int x, int y, int duration, int dir, int length);
-void createParticleDemesneDoor(real_t x, real_t y, real_t dir);
-Entity* createTunnelPortal(real_t x, real_t y, int duration, int dir, Entity* caster);
-void tunnelPortalSetAttributes(Entity* portal, int duration, int dir);
-Entity* createSpellExplosionArea(int spellID, Entity* caster, real_t x, real_t y, real_t z, real_t radius, int damage, Entity* ohitentity);
-void doSpellExplosionArea(int spellID, Entity* my, Entity* caster, real_t x, real_t y, real_t z, real_t radius);
-void createParticleSpin(Entity* entity);
-void createParticleShatterEarth(Entity* my, Entity* caster, real_t _x, real_t _y, int spellID);
-void actEarthElementalDeathGib(Entity* my);
-void actLeafParticle(Entity* my);
-void actLeafPile(Entity* my);
-Entity* spawnLeafPile(real_t x, real_t y, bool trap);
-int thaumSpellArmorProc(Entity* my, Stat& myStats, bool checkEffectActiveOnly, Entity* attacker, int effectID);
+extern "C" Entity* createParticleSpellPinpointTarget(Entity* parent, Uint32 casterUid, int sprite, int duration, int spellID);
+extern "C" Entity* createFloorMagic(ParticleTimerEffect_t::EffectType particleType, int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
+extern "C" Entity* createRadiusMagic(int spellID, Entity* caster, real_t x, real_t y, real_t radius, Uint32 lifetime, Entity* follow);
+extern "C" void floorMagicClientReceive(Entity* my);
+extern "C" void particleWaveClientReceive(Entity* my);
+extern "C" void radiusMagicClientReceive(Entity* entity);
+extern "C" Entity* floorMagicSetLightningParticle(Entity* my);
+extern "C" void floorMagicCreateLightningSequence(Entity* spellTimer, int startTickOffset);
+extern "C" void floorMagicCreateSpores(Entity* spawnOnEntity, real_t x, real_t y, Entity* caster, int damage, int spellID, bool magicstaff = false);
+extern "C" Entity* floorMagicCreateRoots(real_t x, real_t y, Entity* caster, int damage, int spellID, int duration, int particleTimerAction);
+extern "C" Entity* createVortexMagic(int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
+extern "C" Entity* createParticleWave(ParticleTimerEffect_t::EffectType particleType, int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime, bool light);
+extern "C" Entity* createParticleRoot(int sprite, real_t x, real_t y, real_t z, real_t dir, Uint32 lifetime);
+extern "C" void createMushroomSpellEffect(Entity* caster, real_t x, real_t y);
+extern "C" Entity* createWindMagic(Uint32 casterUID, int x, int y, int duration, int dir, int length);
+extern "C" void createParticleDemesneDoor(real_t x, real_t y, real_t dir);
+extern "C" Entity* createTunnelPortal(real_t x, real_t y, int duration, int dir, Entity* caster);
+extern "C" void tunnelPortalSetAttributes(Entity* portal, int duration, int dir);
+extern "C" Entity* createSpellExplosionArea(int spellID, Entity* caster, real_t x, real_t y, real_t z, real_t radius, int damage, Entity* ohitentity);
+extern "C" void doSpellExplosionArea(int spellID, Entity* my, Entity* caster, real_t x, real_t y, real_t z, real_t radius);
+extern "C" void createParticleSpin(Entity* entity);
+extern "C" void createParticleShatterEarth(Entity* my, Entity* caster, real_t _x, real_t _y, int spellID);
+extern "C" void actEarthElementalDeathGib(Entity* my);
+extern "C" void actLeafParticle(Entity* my);
+extern "C" void actLeafPile(Entity* my);
+extern "C" Entity* spawnLeafPile(real_t x, real_t y, bool trap);
+extern "C" int thaumSpellArmorProc(Entity* my, Stat& myStats, bool checkEffectActiveOnly, Entity* attacker, int effectID);
 
-void spawnMagicTower(Entity* parent, real_t x, real_t y, int spellID, Entity* autoHitTarget, bool castedSpell = false); // autoHitTarget is to immediate damage an entity, as all 3 tower magics hitting is unreliable
-bool magicDig(Entity* parent, Entity* projectile, int numRocks, int randRocks);
+extern "C" void spawnMagicTower(Entity* parent, real_t x, real_t y, int spellID, Entity* autoHitTarget, bool castedSpell = false); // autoHitTarget is to immediate damage an entity, as all 3 tower magics hitting is unreliable
+extern "C" bool magicDig(Entity* parent, Entity* projectile, int numRocks, int randRocks);
 
-spell_t* copySpell(spell_t* spell, int subElementToCopy = -1);
+extern "C" spell_t* copySpell(spell_t* spell, int subElementToCopy = -1);
 void spellConstructor(spell_t* spell, int ID);
 spell_t* spellConstructor(int ID, int difficulty, const char* internal_name, DynamicArrayS32 elements);
-void spellDeconstructor(void* data);
-void spellChanneledClientDeconstructor(void* data);
+extern "C" void spellDeconstructor(void* data);
+extern "C" void spellChanneledClientDeconstructor(void* data);
 void copySpellElement(spellElement_t* spellElement, spellElement_t* spellElementToSet);
 spellElement_t* copySpellElement(spellElement_t* spellElement);
 void spellElementConstructor(spellElement_t* element);
 void spellElementConstructor(int elementID, int mana, int base_mana, int overload_mult, int damage, int duration, const char* internal_name);
-void spellElementDeconstructor(void* data);
+extern "C" void spellElementDeconstructor(void* data);
 
-int getCostOfSpell(spell_t* spell, Entity* caster = nullptr);
-int getGoldCostOfSpell(spell_t* spell, int player);
-int getSustainCostOfSpell(spell_t* spell, Entity* caster);
-bool spell_isChanneled(spell_t* spell);
-bool spellElement_isChanneled(spellElement_t* spellElement);
+extern "C" int getCostOfSpell(spell_t* spell, Entity* caster = nullptr);
+extern "C" int getGoldCostOfSpell(spell_t* spell, int player);
+extern "C" int getSustainCostOfSpell(spell_t* spell, Entity* caster);
+extern "C" bool spell_isChanneled(spell_t* spell);
+extern "C" bool spellElement_isChanneled(spellElement_t* spellElement);
 
-spell_t* getSpellFromID(int ID);
-int getSpellbookFromSpellID(int spellID);
+extern "C" spell_t* getSpellFromID(int ID);
+extern "C" int getSpellbookFromSpellID(int spellID);
 
-bool spellInList(list_t* list, spell_t* spell);
+extern "C" bool spellInList(list_t* list, spell_t* spell);
 
 //-----Implementations of spell effects-----
-void spell_magicMap(int player, int radius, int x, int y); //Magics the map. I mean maps the magic. I mean magically maps the level.
-void spell_detectFoodEffectOnMap(int player);
-void spell_summonFamiliar(int player); // summons some familiars.
-void spell_changeHealth(Entity* entity, int amount, bool overdrewFromHP = false, bool doMessage = true); //This function changes an entity's health.
+extern "C" void spell_magicMap(int player, int radius, int x, int y); //Magics the map. I mean maps the magic. I mean magically maps the level.
+extern "C" void spell_detectFoodEffectOnMap(int player);
+extern "C" void spell_summonFamiliar(int player); // summons some familiars.
+extern "C" void spell_changeHealth(Entity* entity, int amount, bool overdrewFromHP = false, bool doMessage = true); //This function changes an entity's health.
 
 //-----Spell Casting Animation-----
 //The two hand animation functions.
-void actLeftHandMagic(Entity* my);
-void actRightHandMagic(Entity* my);
-void actMagicRangefinder(Entity* my);
+extern "C" void actLeftHandMagic(Entity* my);
+extern "C" void actRightHandMagic(Entity* my);
+extern "C" void actMagicRangefinder(Entity* my);
 
 typedef struct spellcastingAnimationManager
 {
@@ -1161,59 +1161,59 @@ typedef struct spellcastingAnimationManager
 } spellcasting_animation_manager_t;
 extern spellcasting_animation_manager_t cast_animation[MAXPLAYERS];
 
-void fireOffSpellAnimation(spellcasting_animation_manager_t* animation_manager, Uint32 caster_uid, spell_t* spell, bool usingSpellbook, bool usingTome);
-void spellcastingAnimationManager_deactivate(spellcasting_animation_manager_t* animation_manager);
-void spellcastAnimationUpdateReceive(int player, int attackPose, int castTime);
-void spellcastAnimationUpdate(int player, int attackPose, int castTime);
+extern "C" void fireOffSpellAnimation(spellcasting_animation_manager_t* animation_manager, Uint32 caster_uid, spell_t* spell, bool usingSpellbook, bool usingTome);
+extern "C" void spellcastingAnimationManager_deactivate(spellcasting_animation_manager_t* animation_manager);
+extern "C" void spellcastAnimationUpdateReceive(int player, int attackPose, int castTime);
+extern "C" void spellcastAnimationUpdate(int player, int attackPose, int castTime);
 
 class Item;
 
-spell_t* getSpellFromItem(const int player, Item* item, bool usePlayerInventory);
-int getSpellIDFromSpellbook(int spellbookType);
-int getSpellIDFromFoci(int fociType);
-int canUseShapeshiftSpellInCurrentForm(const int player, Item& item);
+extern "C" spell_t* getSpellFromItem(const int player, Item* item, bool usePlayerInventory);
+extern "C" int getSpellIDFromSpellbook(int spellbookType);
+extern "C" int getSpellIDFromFoci(int fociType);
+extern "C" int canUseShapeshiftSpellInCurrentForm(const int player, Item& item);
 
 //Spell implementation stuff.
-bool spellEffectDominate(Entity& my, spellElement_t& element, Entity& caster, Entity* parent);
-void spellEffectAcid(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
-void spellEffectStealWeapon(Entity& my, spellElement_t& element, Entity* parent, int resistance);
-void spellEffectDrainSoul(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
-spell_t* spellEffectVampiricAura(Entity* caster, spell_t* spell);
-int getCharmMonsterDifficulty(Entity& my, Stat& myStats);
-void spellEffectCharmMonster(Entity& my, spellElement_t& element, Entity* parent, int resistance, bool magicstaff);
-Entity* spellEffectPolymorph(Entity* target, Entity* parent, bool fromMagicSpell, int customDuration = 0, Monster customMonster = NOTHING); // returns nullptr if target was monster, otherwise returns pointer to new creature
-void spellEffectPoison(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
-void spellEffectSprayWeb(Entity& my, spellElement_t& element, Entity* parent, int resistance);
-bool spellEffectFear(Entity* my, spellElement_t& element, Entity* forceParent, Entity* target, int resistance);
-bool spellEffectTeleportPull(Entity* my, spellElement_t& element, Entity* parent, Entity* target, int resistance);
-void spellEffectShadowTag(Entity& my, spellElement_t& element, Entity* parent, int resistance);
-bool spellEffectDemonIllusion(Entity& my, spellElement_t& element, Entity* parent, Entity* target, int resistance);
-Entity* spellEffectAdorcise(Entity& caster, spellElement_t& element, real_t x, real_t y, Item* itemToAdorcise);
-Entity* spellEffectFlameSprite(Entity& caster, spellElement_t& element, real_t x, real_t y);
-Entity* spellEffectHologram(Entity& caster, spellElement_t& element, real_t x, real_t y);
-Entity* spellEffectDemesneDoor(Entity& caster, Entity& doorFrame);
-void magicSetResistance(Entity* entity, Entity* parent, int& resistance, real_t& damageMultiplier, DamageGib& dmgGib, int& trapResist, int spellID);
-Sint32 convertResistancePointsToMagicValue(Sint32 value, int resistance);
-int getSpellDamageFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0, bool applyingDamageOnCast = true);
-int getSpellDamageSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0, bool applyingDamageOnCast = true);
-int getSpellEffectDurationFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
-int getSpellEffectDurationSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
+extern "C" bool spellEffectDominate(Entity& my, spellElement_t& element, Entity& caster, Entity* parent);
+extern "C" void spellEffectAcid(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
+extern "C" void spellEffectStealWeapon(Entity& my, spellElement_t& element, Entity* parent, int resistance);
+extern "C" void spellEffectDrainSoul(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
+extern "C" spell_t* spellEffectVampiricAura(Entity* caster, spell_t* spell);
+extern "C" int getCharmMonsterDifficulty(Entity& my, Stat& myStats);
+extern "C" void spellEffectCharmMonster(Entity& my, spellElement_t& element, Entity* parent, int resistance, bool magicstaff);
+extern "C" Entity* spellEffectPolymorph(Entity* target, Entity* parent, bool fromMagicSpell, int customDuration = 0, Monster customMonster = NOTHING); // returns nullptr if target was monster, otherwise returns pointer to new creature
+extern "C" void spellEffectPoison(Entity& my, spellElement_t& element, Entity* parent, int damage, int resistance);
+extern "C" void spellEffectSprayWeb(Entity& my, spellElement_t& element, Entity* parent, int resistance);
+extern "C" bool spellEffectFear(Entity* my, spellElement_t& element, Entity* forceParent, Entity* target, int resistance);
+extern "C" bool spellEffectTeleportPull(Entity* my, spellElement_t& element, Entity* parent, Entity* target, int resistance);
+extern "C" void spellEffectShadowTag(Entity& my, spellElement_t& element, Entity* parent, int resistance);
+extern "C" bool spellEffectDemonIllusion(Entity& my, spellElement_t& element, Entity* parent, Entity* target, int resistance);
+extern "C" Entity* spellEffectAdorcise(Entity& caster, spellElement_t& element, real_t x, real_t y, Item* itemToAdorcise);
+extern "C" Entity* spellEffectFlameSprite(Entity& caster, spellElement_t& element, real_t x, real_t y);
+extern "C" Entity* spellEffectHologram(Entity& caster, spellElement_t& element, real_t x, real_t y);
+extern "C" Entity* spellEffectDemesneDoor(Entity& caster, Entity& doorFrame);
+extern "C" void magicSetResistance(Entity* entity, Entity* parent, int& resistance, real_t& damageMultiplier, DamageGib& dmgGib, int& trapResist, int spellID);
+extern "C" Sint32 convertResistancePointsToMagicValue(Sint32 value, int resistance);
+extern "C" int getSpellDamageFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0, bool applyingDamageOnCast = true);
+extern "C" int getSpellDamageSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0, bool applyingDamageOnCast = true);
+extern "C" int getSpellEffectDurationFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
+extern "C" int getSpellEffectDurationSecondaryFromID(int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
 real_t getSpellPropertyFromID(spell_t::SpellBasePropertiesFloat prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
 int getSpellPropertyFromID(spell_t::SpellBasePropertiesInt prop, int spellID, Entity* parent, Stat* parentStats, Entity* magicSourceParticle, real_t addSpellBonus = 0.0);
-int getSpellDamageFromStatic(int spellID, Stat* hitstats);
-void updateEntityOldHPBeforeMagicHit(Entity& my, Entity& projectile);
-bool absorbMagicEvent(Entity* entity, Entity* parent, Entity& damageSourceProjectile, int spellID, real_t* result, real_t& damageMultiplier, DamageGib& dmgGib);
-void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y);
-int getSpellFromSummonedEntityForSpellEvent(Entity* summon);
-const char* magicLightColorForSprite(Entity* my, int sprite, bool darker);
-void doParticleEffectForTouchSpell(Entity& my, Entity* focalLimb, Monster monsterType);
-bool magicOnSpellCastEvent(Entity* parent, Entity* projectile, Entity* hitentity, int spellID, Uint32 eventType, int eventValue, bool allowedLevelup = true); // return true on level up
-void freeSpells();
-void createParticleFociLight(Entity* entity, int spellID, bool updateClients);
-void createParticleFociDark(Entity* entity, int spellID, bool updateClients);
-bool jewelItemRecruit(Entity* parent, Entity* entity, int itemStatus, const char** msg);
-bool entityWantsJewel(int tier, Entity& entity, Stat& stats, bool checkTypeOnly);
-bool spellIsNaturallyLearnedByRaceOrClass(Entity* caster, Stat& stat, int spellID, int player = -1);
+extern "C" int getSpellDamageFromStatic(int spellID, Stat* hitstats);
+extern "C" void updateEntityOldHPBeforeMagicHit(Entity& my, Entity& projectile);
+extern "C" bool absorbMagicEvent(Entity* entity, Entity* parent, Entity& damageSourceProjectile, int spellID, real_t* result, real_t& damageMultiplier, DamageGib& dmgGib);
+extern "C" void thrownItemUpdateSpellTrail(Entity& my, real_t _x, real_t _y);
+extern "C" int getSpellFromSummonedEntityForSpellEvent(Entity* summon);
+extern "C" const char* magicLightColorForSprite(Entity* my, int sprite, bool darker);
+extern "C" void doParticleEffectForTouchSpell(Entity& my, Entity* focalLimb, Monster monsterType);
+extern "C" bool magicOnSpellCastEvent(Entity* parent, Entity* projectile, Entity* hitentity, int spellID, Uint32 eventType, int eventValue, bool allowedLevelup = true); // return true on level up
+extern "C" void freeSpells();
+extern "C" void createParticleFociLight(Entity* entity, int spellID, bool updateClients);
+extern "C" void createParticleFociDark(Entity* entity, int spellID, bool updateClients);
+extern "C" bool jewelItemRecruit(Entity* parent, Entity* entity, int itemStatus, const char** msg);
+extern "C" bool entityWantsJewel(int tier, Entity& entity, Stat& stats, bool checkTypeOnly);
+extern "C" bool spellIsNaturallyLearnedByRaceOrClass(Entity* caster, Stat& stat, int spellID, int player = -1);
 
 struct AOEIndicators_t
 {

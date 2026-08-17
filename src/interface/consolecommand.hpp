@@ -13,7 +13,7 @@
 
 #include "../../odin/containers/dynamic_string.hpp"
 
-const char* FindConsoleCommand(const char* str, int index);
+extern "C" const char* FindConsoleCommand(const char* str, int index);
 
 /*
  * How to define a console command:
@@ -52,11 +52,11 @@ struct Vector4 {
 // Registers an entry (command or cvar) into the single console registry.
 // Defined in consolecommand.cpp; called by the constructors below. The registry
 // is append-only at startup and lazily sorted on first lookup.
-void register_console_entry(class ConsoleCommand* e);
+extern "C" void register_console_entry(class ConsoleCommand* e);
 
 // Unified setter for every cvar. Dispatched by all Cvar* entries; looks the
 // cvar up by argv[0] and applies argv[1..] per the entry's type tag.
-void cvar_setter(int argc, const char** argv);
+extern "C" void cvar_setter(int argc, const char** argv);
 
 class ConsoleCommand {
 public:

@@ -27,16 +27,16 @@ extern char shopkeepername_client[MAXPLAYERS][64];
 extern DynamicMapI32T<int> hamletShopkeeperSkillLimit[MAXPLAYERS];
 static const int hamletTradingSkillLimit = 7;
 
-void startTradingServer(Entity* entity, int player);
-bool isItemSellableToShop(const int player, Item* item);
-bool hideItemFromShopView(Item& item);
-bool buyItemFromShop(const int player, Item* item, bool& bOutConsumedEntireStack);
-bool sellItemToShop(const int player, Item* item);
-bool shopIsMysteriousShopkeeper(Entity* entity);
+extern "C" void startTradingServer(Entity* entity, int player);
+extern "C" bool isItemSellableToShop(const int player, Item* item);
+extern "C" bool hideItemFromShopView(Item& item);
+extern "C" bool buyItemFromShop(const int player, Item* item, bool& bOutConsumedEntireStack);
+extern "C" bool sellItemToShop(const int player, Item* item);
+extern "C" bool shopIsMysteriousShopkeeper(Entity* entity);
 extern DynamicMapI32T<DynamicSetI32> shopkeeperMysteriousItems;
-void buyItemFromMysteriousShopkeepConsumeOrb(const int player, Entity& entity, Item& boughtItem);
-void closeShop(const int player);
-void shopChangeGoldEvent(const int player, Sint32 amount);
+extern "C" void buyItemFromMysteriousShopkeepConsumeOrb(const int player, Entity& entity, Item& boughtItem);
+extern "C" void closeShop(const int player);
+extern "C" void shopChangeGoldEvent(const int player, Sint32 amount);
 
 static const int SHOP_TYPE_ARMS_ARMOR = 0;
 static const int SHOP_TYPE_HAT = 1;

@@ -482,7 +482,7 @@ private:
 // root frame object
 extern Frame* gui;
 extern bool drawingGui;
-void createTestUI();
+extern "C" void createTestUI();
 extern float uiScale;
 
 #ifndef EDITOR

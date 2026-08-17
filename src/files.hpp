@@ -185,8 +185,8 @@ enum HolidayTheme {
     THEME_MAX
 };
 extern const char* holidayThemeDirs[HolidayTheme::THEME_MAX];
-HolidayTheme getCurrentHoliday(bool force = false);
-bool isCurrentHoliday(bool force = false);
+extern "C" HolidayTheme getCurrentHoliday(bool force = false);
+extern "C" bool isCurrentHoliday(bool force = false);
 
 #ifndef EDITOR
 #include "interface/consolecommand.hpp"
@@ -196,46 +196,46 @@ extern CvarBool cvar_disableHoliday;
 
 extern char datadir[PATH_MAX]; //PATH_MAX as defined in main.hpp -- maybe define in Config.hpp?
 extern char outputdir[PATH_MAX];
-void glLoadTexture(SDL_Surface* image, int texnum);
-SDL_Surface* loadImage(char const * const filename);
-voxel_t* loadVoxel(char* filename2);
-bool verifyMapHash(const char* filename, int hash, bool* fileExistsInTable = nullptr);
-int loadMap(const char* filename, map_t* destmap, list_t* entlist, list_t* creatureList, int *checkMapHash = nullptr);
-int loadConfig(char* filename);
-int loadDefaultConfig();
-int saveMap(const char* filename);
-char* readFile(char* filename);
-DynamicArrayStr directoryContents(const char* directory, bool includeSubdirectory, bool includeFiles, const char* base = datadir);
-File *openDataFile(const char *const filename, const char * const mode);
-DIR * openDataDir(const char *const);
-bool dataPathExists(const char *const, bool complete = true);
-bool completePath(char *dest, const char * const path, const char *base = datadir);
-void openLogFile();
-DynamicArrayStr getLinesFromDataFile(DynamicString filename);
-int loadMainMenuMap(bool blessedAdditionMaps, bool forceVictoryMap, int forcemap = -1);
-int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int *checkMapHash = nullptr);
-DynamicArrayStr physfsGetFileNamesInDirectory(const char* dir);
-DynamicString physfsFormatMapName(char const * const levelfilename);
-bool physfsModelIndexUpdate(int &start, int &end);
-bool physfsSearchModelsToUpdate();
-bool physfsSearchSoundsToUpdate();
-void physfsReloadSounds(bool reloadAll);
-void physfsReloadBooks();
-bool physfsSearchBooksToUpdate();
-bool physfsSearchMusicToUpdate();
-void physfsReloadMusic(bool &introMusicChanged, bool reloadAll);
-void physfsReloadTiles(bool reloadAll);
-bool physfsSearchTilesToUpdate();
-void physfsReloadSprites(bool reloadAll);
-bool physfsSearchSpritesToUpdate();
-bool physfsIsMapLevelListModded();
-bool physfsSearchItemSpritesToUpdate();
-void physfsReloadItemSprites(bool reloadAll);
-bool physfsSearchMonsterLimbFilesToUpdate();
-void physfsReloadMonsterLimbFiles();
-void physfsReloadSystemImages();
-bool physfsSearchSystemImagesToUpdate();
-void gamemodsUnloadCustomThemeMusic();
+extern "C" void glLoadTexture(SDL_Surface* image, int texnum);
+extern "C" SDL_Surface* loadImage(char const * const filename);
+extern "C" voxel_t* loadVoxel(char* filename2);
+extern "C" bool verifyMapHash(const char* filename, int hash, bool* fileExistsInTable = nullptr);
+extern "C" int loadMap(const char* filename, map_t* destmap, list_t* entlist, list_t* creatureList, int *checkMapHash = nullptr);
+extern "C" int loadConfig(char* filename);
+extern "C" int loadDefaultConfig();
+extern "C" int saveMap(const char* filename);
+extern "C" char* readFile(char* filename);
+extern "C" DynamicArrayStr directoryContents(const char* directory, bool includeSubdirectory, bool includeFiles, const char* base = datadir);
+extern "C" File *openDataFile(const char *const filename, const char * const mode);
+extern "C" DIR * openDataDir(const char *const);
+extern "C" bool dataPathExists(const char *const, bool complete = true);
+extern "C" bool completePath(char *dest, const char * const path, const char *base = datadir);
+extern "C" void openLogFile();
+extern "C" DynamicArrayStr getLinesFromDataFile(DynamicString filename);
+extern "C" int loadMainMenuMap(bool blessedAdditionMaps, bool forceVictoryMap, int forcemap = -1);
+extern "C" int physfsLoadMapFile(int levelToLoad, Uint32 seed, bool useRandSeed, int *checkMapHash = nullptr);
+extern "C" DynamicArrayStr physfsGetFileNamesInDirectory(const char* dir);
+extern "C" DynamicString physfsFormatMapName(char const * const levelfilename);
+extern "C" bool physfsModelIndexUpdate(int &start, int &end);
+extern "C" bool physfsSearchModelsToUpdate();
+extern "C" bool physfsSearchSoundsToUpdate();
+extern "C" void physfsReloadSounds(bool reloadAll);
+extern "C" void physfsReloadBooks();
+extern "C" bool physfsSearchBooksToUpdate();
+extern "C" bool physfsSearchMusicToUpdate();
+extern "C" void physfsReloadMusic(bool &introMusicChanged, bool reloadAll);
+extern "C" void physfsReloadTiles(bool reloadAll);
+extern "C" bool physfsSearchTilesToUpdate();
+extern "C" void physfsReloadSprites(bool reloadAll);
+extern "C" bool physfsSearchSpritesToUpdate();
+extern "C" bool physfsIsMapLevelListModded();
+extern "C" bool physfsSearchItemSpritesToUpdate();
+extern "C" void physfsReloadItemSprites(bool reloadAll);
+extern "C" bool physfsSearchMonsterLimbFilesToUpdate();
+extern "C" void physfsReloadMonsterLimbFiles();
+extern "C" void physfsReloadSystemImages();
+extern "C" bool physfsSearchSystemImagesToUpdate();
+extern "C" void gamemodsUnloadCustomThemeMusic();
 
 enum MapParameterIndices : int
 {

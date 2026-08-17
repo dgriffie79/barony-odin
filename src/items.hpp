@@ -791,56 +791,56 @@ public:
 extern ItemGeneric items[NUMITEMS];
 
 //----------Item usage functions----------
-bool item_PotionWater(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionBooze(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
-bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionSickness(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionConfusion(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionGrease(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionCureAilment(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionBlindness(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionHealing(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
-bool item_PotionExtraHealing(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
-bool item_PotionRestoreMagic(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionInvisibility(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionLevitation(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionSpeed(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionStrength(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionAcid(Item*& item, Entity* entity, Entity* usedBy);
-bool item_PotionUnstableStorm(Item*& item, Entity* entity, Entity* usedBy, Entity* thrownPotion);
-bool item_PotionParalysis(Item*& item, Entity* entity, Entity* usedBy);
-Entity* item_PotionPolymorph(Item*& item, Entity* entity, Entity* usedBy);
-void item_ScrollMail(Item*& item, int player);
-void item_ScrollIdentify(Item*& item, int player);
-void item_ScrollLight(Item*& item, int player);
-void item_ScrollBlank(Item*& item, int player);
-void item_ScrollEnchantWeapon(Item*& item, int player);
-void item_ScrollEnchantArmor(Item*& item, int player);
-void item_ScrollRemoveCurse(Item*& item, int player);
-bool item_ScrollFire(Item*& item, int player); // return true if exploded into fire.
-void item_ScrollFood(Item*& item, int player);
-void item_ScrollConjureArrow(Item*& item, int player);
-void item_ScrollMagicMapping(Item*& item, int player);
-void item_ScrollRepair(Item*& item, int player);
-void item_ScrollDestroyArmor(Item*& item, int player);
-void item_ScrollTeleportation(Item*& item, int player);
-void item_ScrollSummon(Item*& item, int player);
-void item_AmuletSexChange(Item*& item, int player);
-void item_ToolTowel(Item*& item, int player);
-void item_ToolTinOpener(Item*& item, int player);
-void item_ToolMirror(Item*& item, int player);
-Entity* item_ToolBeartrap(Item*& item, Entity* usedBy);
-void item_Food(Item*& item, int player);
-void item_FoodTin(Item*& item, int player);
-void item_FoodAutomaton(Item*& item, int player);
-void item_Spellbook(Item*& item, int player);
-void item_ToolLootBag(Item*& item, int player);
+extern "C" bool item_PotionWater(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionBooze(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
+extern "C" bool item_PotionJuice(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionSickness(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionConfusion(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionGrease(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionCureAilment(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionBlindness(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionHealing(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
+extern "C" bool item_PotionExtraHealing(Item*& item, Entity* entity, Entity* usedBy, bool shouldConsumeItem = true);
+extern "C" bool item_PotionRestoreMagic(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionInvisibility(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionLevitation(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionSpeed(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionStrength(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionAcid(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" bool item_PotionUnstableStorm(Item*& item, Entity* entity, Entity* usedBy, Entity* thrownPotion);
+extern "C" bool item_PotionParalysis(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" Entity* item_PotionPolymorph(Item*& item, Entity* entity, Entity* usedBy);
+extern "C" void item_ScrollMail(Item*& item, int player);
+extern "C" void item_ScrollIdentify(Item*& item, int player);
+extern "C" void item_ScrollLight(Item*& item, int player);
+extern "C" void item_ScrollBlank(Item*& item, int player);
+extern "C" void item_ScrollEnchantWeapon(Item*& item, int player);
+extern "C" void item_ScrollEnchantArmor(Item*& item, int player);
+extern "C" void item_ScrollRemoveCurse(Item*& item, int player);
+extern "C" bool item_ScrollFire(Item*& item, int player); // return true if exploded into fire.
+extern "C" void item_ScrollFood(Item*& item, int player);
+extern "C" void item_ScrollConjureArrow(Item*& item, int player);
+extern "C" void item_ScrollMagicMapping(Item*& item, int player);
+extern "C" void item_ScrollRepair(Item*& item, int player);
+extern "C" void item_ScrollDestroyArmor(Item*& item, int player);
+extern "C" void item_ScrollTeleportation(Item*& item, int player);
+extern "C" void item_ScrollSummon(Item*& item, int player);
+extern "C" void item_AmuletSexChange(Item*& item, int player);
+extern "C" void item_ToolTowel(Item*& item, int player);
+extern "C" void item_ToolTinOpener(Item*& item, int player);
+extern "C" void item_ToolMirror(Item*& item, int player);
+extern "C" Entity* item_ToolBeartrap(Item*& item, Entity* usedBy);
+extern "C" void item_Food(Item*& item, int player);
+extern "C" void item_FoodTin(Item*& item, int player);
+extern "C" void item_FoodAutomaton(Item*& item, int player);
+extern "C" void item_Spellbook(Item*& item, int player);
+extern "C" void item_ToolLootBag(Item*& item, int player);
 
 //General functions.
-Item* newItem(ItemType type, Status status, Sint16 beatitude, Sint16 count, Uint32 appearance, bool identified, list_t* inventory);
-Item* uidToItem(Uint32 uid);
-ItemType itemLevelCurveEntity(Entity& my, Category cat, int minLevel, int maxLevel, BaronyRNG& rng);
-bool itemLevelCurvePostProcess(Entity* my, Item* item, BaronyRNG& rng, 
+extern "C" Item* newItem(ItemType type, Status status, Sint16 beatitude, Sint16 count, Uint32 appearance, bool identified, list_t* inventory);
+extern "C" Item* uidToItem(Uint32 uid);
+extern "C" ItemType itemLevelCurveEntity(Entity& my, Category cat, int minLevel, int maxLevel, BaronyRNG& rng);
+extern "C" bool itemLevelCurvePostProcess(Entity* my, Item* item, BaronyRNG& rng, 
 #ifdef EDITOR
 	int itemLevel = 0
 #else
@@ -848,19 +848,19 @@ bool itemLevelCurvePostProcess(Entity* my, Item* item, BaronyRNG& rng,
 #endif
 	, int* lastItemType = nullptr, int* lastItemSpellType = nullptr
 );
-ItemType itemLevelCurve(Category cat, int minLevel, int maxLevel, BaronyRNG& rng);
-Item* newItemFromEntity(const Entity* entity, bool discardUid = false); //Make sure to call free(item). discardUid will free the new items uid if this is for temp purposes
-Entity* dropItemMonster(Item* item, Entity* monster, Stat* monsterStats, Sint16 count = 1);
-Item** itemSlot(Stat* myStats, Item* item);
+extern "C" ItemType itemLevelCurve(Category cat, int minLevel, int maxLevel, BaronyRNG& rng);
+extern "C" Item* newItemFromEntity(const Entity* entity, bool discardUid = false); //Make sure to call free(item). discardUid will free the new items uid if this is for temp purposes
+extern "C" Entity* dropItemMonster(Item* item, Entity* monster, Stat* monsterStats, Sint16 count = 1);
+extern "C" Item** itemSlot(Stat* myStats, Item* item);
 
-enum Category itemCategory(const Item* item);
-Sint32 itemModel(const Item* item, bool shortModel = false, Entity* creature = nullptr);
-Sint32 itemModelFirstperson(const Item* item);
-void consumeItem(Item*& item, int player); //NOTE: Items have to be unequipped before calling this function on them. NOTE: THIS CAN FREE THE ITEM POINTER. Sets item to nullptr if it does.
-bool dropItem(Item* item, int player, const bool notifyMessage = true, const bool dropAll = false); // return true on free'd item
-bool playerGreasyDropItem(const int player, Item* const item);
-bool playerThrowDuck(const int player, Item* const item, int charge);
-void useItem(Item* item, int player, Entity* usedBy = nullptr, bool unequipForDropping = false, bool serverCheckUse = false);
+extern "C" enum Category itemCategory(const Item* item);
+extern "C" Sint32 itemModel(const Item* item, bool shortModel = false, Entity* creature = nullptr);
+extern "C" Sint32 itemModelFirstperson(const Item* item);
+extern "C" void consumeItem(Item*& item, int player); //NOTE: Items have to be unequipped before calling this function on them. NOTE: THIS CAN FREE THE ITEM POINTER. Sets item to nullptr if it does.
+extern "C" bool dropItem(Item* item, int player, const bool notifyMessage = true, const bool dropAll = false); // return true on free'd item
+extern "C" bool playerGreasyDropItem(const int player, Item* const item);
+extern "C" bool playerThrowDuck(const int player, Item* const item, int charge);
+extern "C" void useItem(Item* item, int player, Entity* usedBy = nullptr, bool unequipForDropping = false, bool serverCheckUse = false);
 enum EquipItemResult : int
 {
 	EQUIP_ITEM_FAIL_CANT_UNEQUIP,
@@ -881,13 +881,13 @@ enum EquipItemSendToServerSlot : int
 	EQUIP_ITEM_SLOT_AMULET,
 	EQUIP_ITEM_SLOT_RING
 };
-void playerTryEquipItemAndUpdateServer(const int player, Item* item, bool checkInventorySpaceForPaperDoll);
-void clientSendEquipUpdateToServer(EquipItemSendToServerSlot slot, EquipItemResult equipType, int player,
+extern "C" void playerTryEquipItemAndUpdateServer(const int player, Item* item, bool checkInventorySpaceForPaperDoll);
+extern "C" void clientSendEquipUpdateToServer(EquipItemSendToServerSlot slot, EquipItemResult equipType, int player,
 	ItemType type, Status status, Sint16 beatitude, int count, Uint32 appearance, bool identified);
-void clientUnequipSlotAndUpdateServer(const int player, EquipItemSendToServerSlot slot, Item* item);
-void clientSendAppearanceUpdateToServer(const int player, Item* item, const bool onIdentify);
-void clientSendItemTypeUpdateToServer(const int player, Item* item, ItemType prevItemType);
-EquipItemResult equipItem(Item* item, Item** slot, int player, bool checkInventorySpaceForPaperDoll);
+extern "C" void clientUnequipSlotAndUpdateServer(const int player, EquipItemSendToServerSlot slot, Item* item);
+extern "C" void clientSendAppearanceUpdateToServer(const int player, Item* item, const bool onIdentify);
+extern "C" void clientSendItemTypeUpdateToServer(const int player, Item* item, ItemType prevItemType);
+extern "C" EquipItemResult equipItem(Item* item, Item** slot, int player, bool checkInventorySpaceForPaperDoll);
 enum ItemStackResults : int
 {
 	ITEM_STACKING_ERROR,
@@ -903,15 +903,15 @@ struct ItemStackResult
 	Item* itemToStackInto = nullptr;
 };
 // checks inventory order for stacking items (the first item in the list that is stackable will be returned)
-ItemStackResult getItemStackingBehavior(const int player, Item* itemToCheck, Item* itemDestinationStack, int& newQtyForCheckedItem, int& newQtyForDestItem);
+extern "C" ItemStackResult getItemStackingBehavior(const int player, Item* itemToCheck, Item* itemDestinationStack, int& newQtyForCheckedItem, int& newQtyForDestItem);
 // checks chest inventory order for dropping all items into (the first item in the list that is stackable will be returned)
-ItemStackResult getItemStackingBehaviorIntoChest(const int player, Item* itemToCheck, Item* itemDestinationStack, int& newQtyForCheckedItem, int& newQtyForDestItem);
-void getItemEmptySlotStackingBehavior(const int player, Item& itemToCheck, int& newQtyForCheckedItem, int& newQtyForDestItem);
-Item* itemPickup(int player, Item* item, Item* addToSpecificInventoryItem = nullptr, bool forceNewStack = false);
-bool itemIsEquipped(const Item* item, int player);
-bool shouldInvertEquipmentBeatitude(const Stat* wielder);
-bool isItemEquippableInShieldSlot(const Item* item);
-bool itemIsConsumableByAutomaton(const Item& item);
+extern "C" ItemStackResult getItemStackingBehaviorIntoChest(const int player, Item* itemToCheck, Item* itemDestinationStack, int& newQtyForCheckedItem, int& newQtyForDestItem);
+extern "C" void getItemEmptySlotStackingBehavior(const int player, Item& itemToCheck, int& newQtyForCheckedItem, int& newQtyForDestItem);
+extern "C" Item* itemPickup(int player, Item* item, Item* addToSpecificInventoryItem = nullptr, bool forceNewStack = false);
+extern "C" bool itemIsEquipped(const Item* item, int player);
+extern "C" bool shouldInvertEquipmentBeatitude(const Stat* wielder);
+extern "C" bool isItemEquippableInShieldSlot(const Item* item);
+extern "C" bool itemIsConsumableByAutomaton(const Item& item);
 
 extern const real_t potionDamageSkillMultipliers[6];
 extern const real_t thrownDamageSkillMultipliers[6];
@@ -957,40 +957,40 @@ static const int TOME_APPEARANCE_MAX = 1024;
 /*
  * Only compares items of the same type.
  */
-int itemCompare(const Item* item1, const Item* item2, bool checkAppearance, bool comparisonUsedForStacking = true);
+extern "C" int itemCompare(const Item* item1, const Item* item2, bool checkAppearance, bool comparisonUsedForStacking = true);
 
 /*
  * Returns true if potion is harmful to the player.
  */
-bool isPotionBad(const Item& potion);
+extern "C" bool isPotionBad(const Item& potion);
 bool isRangedWeapon(const Item& item);
 bool isRangedWeapon(const ItemType type);
-bool isMeleeWeapon(const Item& item);
-bool itemIsThrowableTinkerTool(const Item* item);
+extern "C" bool isMeleeWeapon(const Item& item);
+extern "C" bool itemIsThrowableTinkerTool(const Item* item);
 
-void createCustomInventory(Stat* stats, int itemLimit, BaronyRNG& rng);
-void copyItem(Item* itemToSet, const Item* itemToCopy);
-bool swapMonsterWeaponWithInventoryItem(Entity* my, Stat* myStats, node_t* inventoryNode, bool moveStack, bool overrideCursed);
-bool monsterUnequipSlot(Stat* myStats, Item** slot, Item* itemToUnequip);
-bool monsterUnequipSlotFromCategory(Stat* myStats, Item** slot, Category cat);
-node_t* itemNodeInInventory(const Stat* myStats, Sint32 itemToFind, Category cat, bool randomSlot = false);
-node_t* spellbookNodeInInventory(const Stat* myStats, int spellIDToFind);
-node_t* getRangedWeaponItemNodeInInventory(const Stat* myStats, bool includeMagicstaff);
-node_t* getMeleeWeaponItemNodeInInventory(const Stat* myStats);
-ItemType itemTypeWithinGoldValue(int cat, int minValue, int maxValue, BaronyRNG& rng);
-bool itemSpriteIsQuiverThirdPersonModel(int sprite);
-bool itemSpriteIsQuiverBaseThirdPersonModel(int sprite);
-bool itemSpriteIsFociThirdPersonModel(const int sprite);
-bool itemTypeIsQuiver(ItemType type);
-bool itemTypeIsFoci(ItemType type);
-bool itemTypeIsInstrument(ItemType type);
-bool itemTypeIsThrownBall(ItemType type);
-real_t rangedAttackGetSpeedModifier(const Stat* myStats);
-bool rangedWeaponUseQuiverOnAttack(const Stat* myStats);
-real_t getArtifactWeaponEffectChance(ItemType type, Stat& wielder, real_t* effectAmount);
-void updateHungerMessages(Entity* my, Stat* myStats, Item* eaten);
-bool playerCanSpawnMoreTinkeringBots(const Stat* myStats);
-int maximumTinkeringBotsCanBeDeployed(const Stat* myStats);
+extern "C" void createCustomInventory(Stat* stats, int itemLimit, BaronyRNG& rng);
+extern "C" void copyItem(Item* itemToSet, const Item* itemToCopy);
+extern "C" bool swapMonsterWeaponWithInventoryItem(Entity* my, Stat* myStats, node_t* inventoryNode, bool moveStack, bool overrideCursed);
+extern "C" bool monsterUnequipSlot(Stat* myStats, Item** slot, Item* itemToUnequip);
+extern "C" bool monsterUnequipSlotFromCategory(Stat* myStats, Item** slot, Category cat);
+extern "C" node_t* itemNodeInInventory(const Stat* myStats, Sint32 itemToFind, Category cat, bool randomSlot = false);
+extern "C" node_t* spellbookNodeInInventory(const Stat* myStats, int spellIDToFind);
+extern "C" node_t* getRangedWeaponItemNodeInInventory(const Stat* myStats, bool includeMagicstaff);
+extern "C" node_t* getMeleeWeaponItemNodeInInventory(const Stat* myStats);
+extern "C" ItemType itemTypeWithinGoldValue(int cat, int minValue, int maxValue, BaronyRNG& rng);
+extern "C" bool itemSpriteIsQuiverThirdPersonModel(int sprite);
+extern "C" bool itemSpriteIsQuiverBaseThirdPersonModel(int sprite);
+extern "C" bool itemSpriteIsFociThirdPersonModel(const int sprite);
+extern "C" bool itemTypeIsQuiver(ItemType type);
+extern "C" bool itemTypeIsFoci(ItemType type);
+extern "C" bool itemTypeIsInstrument(ItemType type);
+extern "C" bool itemTypeIsThrownBall(ItemType type);
+extern "C" real_t rangedAttackGetSpeedModifier(const Stat* myStats);
+extern "C" bool rangedWeaponUseQuiverOnAttack(const Stat* myStats);
+extern "C" real_t getArtifactWeaponEffectChance(ItemType type, Stat& wielder, real_t* effectAmount);
+extern "C" void updateHungerMessages(Entity* my, Stat* myStats, Item* eaten);
+extern "C" bool playerCanSpawnMoreTinkeringBots(const Stat* myStats);
+extern "C" int maximumTinkeringBotsCanBeDeployed(const Stat* myStats);
 extern bool overrideTinkeringLimit;
 extern int decoyBoxRange;
 
@@ -1012,7 +1012,7 @@ enum SpellbookColors
 	SPELLBOOK_COLOR_MYSTICISM_3		//"items/images/SpellbookPurple.png"
 };
 
-int getItemVariationFromSpellbookOrTome(const Item& item);
+extern "C" int getItemVariationFromSpellbookOrTome(const Item& item);
 
 #ifdef EDITOR
 SDL_Surface* itemSprite(Item* const item);

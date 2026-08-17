@@ -24,7 +24,7 @@ typedef struct pathnode
 } pathnode_t;
 
 // function prototypes
-Uint32 heuristic(int x1, int y1, int x2, int y2);
+extern "C" Uint32 heuristic(int x1, int y1, int x2, int y2);
 enum GeneratePathTypes
 {
 	GENERATE_PATH_DEFAULT,
@@ -44,9 +44,9 @@ enum GeneratePathTypes
 	GENERATE_PATH_ACHIEVEMENT
 };
 extern int lastGeneratePathTries;
-list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target, GeneratePathTypes pathingType, bool lavaIsPassable = false);
-void generatePathMaps();
+extern "C" list_t* generatePath(int x1, int y1, int x2, int y2, Entity* my, Entity* target, GeneratePathTypes pathingType, bool lavaIsPassable = false);
+extern "C" void generatePathMaps();
 // return true if an entity is blocks pathing
-bool isPathObstacle(Entity* entity);
-int pathCheckObstacle(int x, int y, Entity* my, Entity* target);
-void updateGatePath(Entity& entity);
+extern "C" bool isPathObstacle(Entity* entity);
+extern "C" int pathCheckObstacle(int x, int y, Entity* my, Entity* target);
+extern "C" void updateGatePath(Entity& entity);

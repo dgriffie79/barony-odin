@@ -297,7 +297,7 @@ const DynamicArrayStr SteamGlobalStatStr =
 	"DEATHS_MIMIC",
 };
 
-SteamGlobalStatIndexes getIndexForDeathType(int type);
+extern "C" SteamGlobalStatIndexes getIndexForDeathType(int type);
 
 static const std::pair<std::string, int> steamStatAchStringsAndMaxVals[] =
 {
@@ -430,14 +430,14 @@ extern bool achievementPenniless;
 extern bool achievementRangedMode[MAXPLAYERS];
 
 score_t* scoreConstructor(int player);
-void scoreDeconstructor(void* data);
-int saveScore(int player);
-int totalScore(score_t* score);
+extern "C" void scoreDeconstructor(void* data);
+extern "C" int saveScore(int player);
+extern "C" int totalScore(score_t* score);
 void loadScore(int score);
 void loadScore(score_t* score);
-bool deleteScore(bool multiplayer, int index);
-void saveAllScores(const DynamicString& scoresfilename);
-void loadAllScores(const DynamicString& scoresfilename);
+extern "C" bool deleteScore(bool multiplayer, int index);
+extern "C" void saveAllScores(const DynamicString& scoresfilename);
+extern "C" void loadAllScores(const DynamicString& scoresfilename);
 
 enum SaveFileType {
     MAIN,
@@ -449,10 +449,10 @@ enum SaveFileType {
 
 extern int savegameCurrentFileIndex;
 
-DynamicString setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex = savegameCurrentFileIndex);
+extern "C" DynamicString setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex = savegameCurrentFileIndex);
 
-int deleteSaveGame(int gametype, int saveIndex = savegameCurrentFileIndex);
-bool saveGameExists(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
+extern "C" int deleteSaveGame(int gametype, int saveIndex = savegameCurrentFileIndex);
+extern "C" bool saveGameExists(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
 bool anySaveFileExists(bool singleplayer);
 bool anySaveFileExists();
 
@@ -667,25 +667,25 @@ struct SaveGameInfo {
 	void computeHash(const int playernum, Uint32& hash);
 };
 
-int saveGame(int saveIndex = savegameCurrentFileIndex);
-int loadGame(int player, const SaveGameInfo& info);
-list_t* loadGameFollowers(const SaveGameInfo& info);
+extern "C" int saveGame(int saveIndex = savegameCurrentFileIndex);
+extern "C" int loadGame(int player, const SaveGameInfo& info);
+extern "C" list_t* loadGameFollowers(const SaveGameInfo& info);
 
 score_t* scoreConstructor(int player, SaveGameInfo& info);
-SaveGameInfo getSaveGameInfo(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
-const char* getSaveGameName(const SaveGameInfo& info);
-int getSaveGameType(const SaveGameInfo& info);
-int getSaveGameClientnum(const SaveGameInfo& info);
-Uint32 getSaveGameMapSeed(const SaveGameInfo& info);
-int getSaveGameVersionNum(const SaveGameInfo& info);
+extern "C" SaveGameInfo getSaveGameInfo(bool singleplayer, int saveIndex = savegameCurrentFileIndex);
+extern "C" const char* getSaveGameName(const SaveGameInfo& info);
+extern "C" int getSaveGameType(const SaveGameInfo& info);
+extern "C" int getSaveGameClientnum(const SaveGameInfo& info);
+extern "C" Uint32 getSaveGameMapSeed(const SaveGameInfo& info);
+extern "C" int getSaveGameVersionNum(const SaveGameInfo& info);
 
-int getSavegameVersion(const char* checkstr); // returns -1 on invalid version, otherwise converts to 3 digit int
-void setDefaultPlayerConducts(); // init values for foodless, penniless etc.
-void updatePlayerConductsInMainLoop(); // check and update conduct flags throughout game that don't require a specific action. (tracking gold, server flags etc...)
-void updateGameplayStatisticsInMainLoop(); // check for achievement values for gameplay statistics.
-void updateAchievementRhythmOfTheKnight(int player, Entity* target, bool playerIsHit);
-void updateAchievementThankTheTank(int player, Entity* target, bool targetKilled);
-void updateAchievementBaitAndSwitch(int player, bool isTeleporting);
+extern "C" int getSavegameVersion(const char* checkstr); // returns -1 on invalid version, otherwise converts to 3 digit int
+extern "C" void setDefaultPlayerConducts(); // init values for foodless, penniless etc.
+extern "C" void updatePlayerConductsInMainLoop(); // check and update conduct flags throughout game that don't require a specific action. (tracking gold, server flags etc...)
+extern "C" void updateGameplayStatisticsInMainLoop(); // check for achievement values for gameplay statistics.
+extern "C" void updateAchievementRhythmOfTheKnight(int player, Entity* target, bool playerIsHit);
+extern "C" void updateAchievementThankTheTank(int player, Entity* target, bool targetKilled);
+extern "C" void updateAchievementBaitAndSwitch(int player, bool isTeleporting);
 static const int SAVE_GAMES_MAX = 100;
 
 #ifndef EDITOR

@@ -880,7 +880,7 @@ public:
 template <> struct MapValueKindOf<GlyphRenderer_t::GlyphData_t> { static constexpr int value = MK_GlyphData; };
 extern GlyphRenderer_t GlyphHelper;
 
-bool charIsWordSeparator(char c);
+extern "C" bool charIsWordSeparator(char c);
 
 class ScriptTextParser_t
 {

@@ -43,11 +43,11 @@ typedef double real_t;
 // otherwise the functions will stop at the first null-terminator found,
 // matching the behavior of the original C library.
 
-char* stringCopy(char* dest, const char* src, size_t dest_size, size_t src_size);
-char* stringCopyUnsafe(char* dest, const char* src, size_t dest_size);
-char* stringCat(char* dest, const char* src, size_t dest_size, size_t src_size);
-int stringCmp(const char* str1, const char* str2, size_t str1_size, size_t str2_size);
-size_t stringLen(const char* str, size_t size);
+extern "C" char* stringCopy(char* dest, const char* src, size_t dest_size, size_t src_size);
+extern "C" char* stringCopyUnsafe(char* dest, const char* src, size_t dest_size);
+extern "C" char* stringCat(char* dest, const char* src, size_t dest_size, size_t src_size);
+extern "C" int stringCmp(const char* str1, const char* str2, size_t str1_size, size_t str2_size);
+extern "C" size_t stringLen(const char* str, size_t size);
 const char* stringStr(const char* str1, const char* str2, size_t str1_size, size_t str2_size);
 char* stringStr(char* str1, const char* str2, size_t str1_size, size_t str2_size);
 
@@ -192,7 +192,7 @@ extern bool autoLimbReload;
 #define PI 3.14159265358979323846
 
 void printlog(const char* str, ...);
-const char* gl_error_string(GLenum err);
+extern "C" const char* gl_error_string(GLenum err);
 #ifdef _MSC_VER
 #define GL_CHECK_ERR(expression) expression;\
     {\
@@ -835,14 +835,14 @@ extern DynamicMapI32T<AnimatedTile> tileAnimations;
 template <> struct MapValueKindOf<AnimatedTile> { static constexpr int value = MK_AnimatedTile; };
 
 // function prototypes for main.c:
-int sgn(real_t x);
-int numdigits_sint16(Sint16 x);
-int longestline(char const * const str);
+extern "C" int sgn(real_t x);
+extern "C" int numdigits_sint16(Sint16 x);
+extern "C" int longestline(char const * const str);
 int concatedStringLength(char* str, ...);
 
 // function prototypes for list.c:
-void list_FreeAll(list_t* list);
-void list_RemoveNode(node_t* node);
+extern "C" void list_FreeAll(list_t* list);
+extern "C" void list_RemoveNode(node_t* node);
 template <typename T>
 void list_RemoveNodeWithElement(list_t &list, T element)
 {
@@ -855,34 +855,34 @@ void list_RemoveNodeWithElement(list_t &list, T element)
 		}
 	}
 }
-node_t* list_AddNodeFirst(list_t* list);
-node_t* list_AddNodeLast(list_t* list);
-node_t* list_AddNode(list_t* list, int index);
-Uint32 list_Size(list_t* list);
-list_t* list_Copy(list_t* destlist, list_t* srclist);
-list_t* list_CopyNew(list_t* srclist);
-Uint32 list_Index(node_t* node);
-node_t* list_Node(list_t* list, int index);
+extern "C" node_t* list_AddNodeFirst(list_t* list);
+extern "C" node_t* list_AddNodeLast(list_t* list);
+extern "C" node_t* list_AddNode(list_t* list, int index);
+extern "C" Uint32 list_Size(list_t* list);
+extern "C" list_t* list_Copy(list_t* destlist, list_t* srclist);
+extern "C" list_t* list_CopyNew(list_t* srclist);
+extern "C" Uint32 list_Index(node_t* node);
+extern "C" node_t* list_Node(list_t* list, int index);
 
 // function prototypes for objects.c:
-void defaultDeconstructor(void* data);
-void emptyDeconstructor(void* data);
-void entityDeconstructor(void* data);
-void statDeconstructor(void* data);
-void lightDeconstructor(void* data);
-void mapDeconstructor(void* data);
-void stringDeconstructor(void* data);
-void listDeconstructor(void* data);
-Entity* newEntity(Sint32 sprite, Uint32 pos, list_t* entlist, list_t* creaturelist);
-button_t* newButton(void);
+extern "C" void defaultDeconstructor(void* data);
+extern "C" void emptyDeconstructor(void* data);
+extern "C" void entityDeconstructor(void* data);
+extern "C" void statDeconstructor(void* data);
+extern "C" void lightDeconstructor(void* data);
+extern "C" void mapDeconstructor(void* data);
+extern "C" void stringDeconstructor(void* data);
+extern "C" void listDeconstructor(void* data);
+extern "C" Entity* newEntity(Sint32 sprite, Uint32 pos, list_t* entlist, list_t* creaturelist);
+extern "C" button_t* newButton(void);
 string_t* newString(list_t* list, Uint32 color, Uint32 time, int player, char const * const content, ...);
 
 // function prototypes for cursors.c:
-SDL_Cursor* newCursor(char const * const image[]);
+extern "C" SDL_Cursor* newCursor(char const * const image[]);
 
 // function prototypes for maps.c:
-int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> mapParameters = std::make_tuple(-1, -1, -1, 0)); // secretLevelChance of -1 is default Barony generation.
-void assignActions(map_t* map);
+extern "C" int generateDungeon(char* levelset, Uint32 seed, std::tuple<int, int, int, int> mapParameters = std::make_tuple(-1, -1, -1, 0)); // secretLevelChance of -1 is default Barony generation.
+extern "C" void assignActions(map_t* map);
 
 // Cursor bitmap definitions
 extern char const *cursor_pencil[];
@@ -890,12 +890,12 @@ extern char const *cursor_point[];
 extern char const *cursor_brush[];
 extern char const *cursor_fill[];
 
-GLuint create_shader(const char* filename, GLenum type);
+extern "C" GLuint create_shader(const char* filename, GLenum type);
 
 extern bool no_sound; //False means sound initialized properly. True means sound failed to initialize.
 extern bool initialized; //So that messagePlayer doesn't explode before the game is initialized. //TODO: Does the editor need this set too and stuff?
 
-void GO_SwapBuffers(SDL_Window* screen);
+extern "C" void GO_SwapBuffers(SDL_Window* screen);
 
 static const int NUM_STEAM_STATISTICS = 73;
 extern SteamStat_t g_SteamStats[NUM_STEAM_STATISTICS];
@@ -919,15 +919,15 @@ extern SteamGlobalStat_t g_SteamAPIGlobalStats[1];
 
 #define LOCAL_ACHIEVEMENTS
 
-DynamicString stackTrace();
-void stackTraceUnique();
-void finishStackTraceUnique();
+extern "C" DynamicString stackTrace();
+extern "C" void stackTraceUnique();
+extern "C" void finishStackTraceUnique();
 extern bool ENABLE_STACK_TRACES;
 
-time_t getTime();
-void getTimeAndDate(time_t t, int* year, int* month, int* day, int* hour, int* min, int* second);
-char* getTimeFormatted(time_t t, char* buf, size_t size);
-char* getTimeAndDateFormatted(time_t t, char* buf, size_t size);
+extern "C" time_t getTime();
+extern "C" void getTimeAndDate(time_t t, int* year, int* month, int* day, int* hour, int* min, int* second);
+extern "C" char* getTimeFormatted(time_t t, char* buf, size_t size);
+extern "C" char* getTimeAndDateFormatted(time_t t, char* buf, size_t size);
 
 // I can't believe windows still defines these...
 #ifdef far

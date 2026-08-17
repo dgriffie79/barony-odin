@@ -52,4 +52,4 @@ constexpr Uint32 uint32ColorPlayer7_colorblind = makeColorRGB(255, 32, 128);
 constexpr Uint32 uint32ColorPlayer8_colorblind = makeColorRGB(255, 212, 64);
 constexpr Uint32 uint32ColorPlayerX_colorblind = makeColorRGB(191, 191, 191);
 
-const Uint32 playerColor(int index, bool colorblind, bool ally);
+extern "C" const Uint32 playerColor(int index, bool colorblind, bool ally);

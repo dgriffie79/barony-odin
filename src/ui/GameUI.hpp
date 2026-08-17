@@ -8,28 +8,28 @@
 #include "../interface/consolecommand.hpp"
 #include <deque>
 
-Frame::result_t doFrames();
-void doSharedMinimap();
+extern "C" Frame::result_t doFrames();
+extern "C" void doSharedMinimap();
 extern Frame* gameUIFrame[MAXPLAYERS];
-void addMessageToLogWindow(int player, string_t* string);
-void updateSlotFrameFromItem(Frame* slotFrame, void* itemPtr, bool forceUnusable = false);
-void createInventoryTooltipFrame(const int player, 
+extern "C" void addMessageToLogWindow(int player, string_t* string);
+extern "C" void updateSlotFrameFromItem(Frame* slotFrame, void* itemPtr, bool forceUnusable = false);
+extern "C" void createInventoryTooltipFrame(const int player, 
 	Frame* parentFrame,
 	Frame*& tooltipContainerFrame,
 	Frame*& titleOnlyTooltipFrame,
 	Frame*& tooltipFrame,
 	Frame*& interactFrame,
 	Frame*& promptFrame);
-bool getSlotFrameXYFromMousePos(const int player, int& outx, int& outy, bool spells);
-void resetInventorySlotFrames(const int player);
-void createPlayerInventorySlotFrameElements(Frame* slotFrame);
-void drawCharacterPreview(const int player, SDL_Rect pos, int fov, real_t offsetyaw, bool dark = false);
-void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, real_t offsetyaw, bool dark = false);
-void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, real_t offsetyaw, bool dark = false);
-void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark = false);
+extern "C" bool getSlotFrameXYFromMousePos(const int player, int& outx, int& outy, bool spells);
+extern "C" void resetInventorySlotFrames(const int player);
+extern "C" void createPlayerInventorySlotFrameElements(Frame* slotFrame);
+extern "C" void drawCharacterPreview(const int player, SDL_Rect pos, int fov, real_t offsetyaw, bool dark = false);
+extern "C" void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, real_t offsetyaw, bool dark = false);
+extern "C" void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, real_t offsetyaw, bool dark = false);
+extern "C" void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark = false);
 extern view_t playerPortraitView[MAXPLAYERS];
-void toggleShopBuybackView(const int player);
-void loadHUDSettingsJSON();
+extern "C" void toggleShopBuybackView(const int player);
+extern "C" void loadHUDSettingsJSON();
 struct EnemyBarSettings_t
 {
 	DynamicMapF32 heightOffsets;
@@ -80,8 +80,8 @@ extern CvarBool shareMinimap;
 extern Frame::result_t framesProcResult;
 extern CvarBool framesEatMouse;
 
-Frame* createPauseMenuPlayerBars();
-void openMinimap(int player);
+extern "C" Frame* createPauseMenuPlayerBars();
+extern "C" void openMinimap(int player);
 
 struct StatusEffectQueueEntry_t
 {
@@ -299,8 +299,8 @@ extern PlayerInventoryFrames_t playerInventoryFrames[MAXPLAYERS];
 
 extern Frame* minimapFrame; // shared minimap
 
-void openMapWindow(int player);
-void openLogWindow(int player);
+extern "C" void openMapWindow(int player);
+extern "C" void openLogWindow(int player);
 
 void capitalizeString(std::string& str);
 void capitalizeString(DynamicString& str);
@@ -427,8 +427,8 @@ struct LevelUpAnimation_t
 
 extern LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];
 
-void updateLevelUpFrame(const int player);
-void updateSkillUpFrame(const int player);
+extern "C" void updateLevelUpFrame(const int player);
+extern "C" void updateSkillUpFrame(const int player);
 struct SkillUpAnimation_t
 {
 	struct SkillUp_t

@@ -17,7 +17,7 @@
 #define LINETRACE_TOOLTIP_INTERACT 8
 
 // function prototypes
-real_t entityDist(Entity* my, Entity* your);
+extern "C" real_t entityDist(Entity* my, Entity* your);
 enum EntityClickType
 {
 	ENTITY_CLICK_USE,
@@ -26,16 +26,16 @@ enum EntityClickType
 	ENTITY_CLICK_FOLLOWER_INTERACT,
 	ENTITY_CLICK_CALLOUT
 };
-Entity* entityClicked(bool* clickedOnGUI, bool clickCheckOverride, int player, EntityClickType clicktype);
-bool entityInsideTile(Entity* entity, int x, int y, int z, bool checkSafeTiles = false);
-bool entityInsideEntity(Entity* entity1, Entity* entity2);
-bool entityInsideSomething(Entity* entity);
-int barony_clear(real_t tx, real_t ty, Entity* my);
-real_t clipMove(real_t* x, real_t* y, real_t vx, real_t vy, Entity* my);
-Entity* findEntityInLine(Entity* my, real_t x1, real_t y1, real_t angle, int entities, Entity* target, list_t* entityListToUse = nullptr);
-real_t lineTrace(Entity* my, real_t x1, real_t y1, real_t angle, real_t range, int entities, bool ground);
-real_t lineTraceTarget(Entity* my, real_t x1, real_t y1, real_t angle, real_t range, int entities, bool ground, Entity* target, list_t* entityListToUse = nullptr); //If the linetrace function encounters the linetrace entity, it returns even if it's invisible or passable.
-int checkObstacle(long x, long y, Entity* my, Entity* target, bool useTileEntityList = true, bool checkWalls = true, bool checkFloor = true, bool checkEnemies = true);
+extern "C" Entity* entityClicked(bool* clickedOnGUI, bool clickCheckOverride, int player, EntityClickType clicktype);
+extern "C" bool entityInsideTile(Entity* entity, int x, int y, int z, bool checkSafeTiles = false);
+extern "C" bool entityInsideEntity(Entity* entity1, Entity* entity2);
+extern "C" bool entityInsideSomething(Entity* entity);
+extern "C" int barony_clear(real_t tx, real_t ty, Entity* my);
+extern "C" real_t clipMove(real_t* x, real_t* y, real_t vx, real_t vy, Entity* my);
+extern "C" Entity* findEntityInLine(Entity* my, real_t x1, real_t y1, real_t angle, int entities, Entity* target, list_t* entityListToUse = nullptr);
+extern "C" real_t lineTrace(Entity* my, real_t x1, real_t y1, real_t angle, real_t range, int entities, bool ground);
+extern "C" real_t lineTraceTarget(Entity* my, real_t x1, real_t y1, real_t angle, real_t range, int entities, bool ground, Entity* target, list_t* entityListToUse = nullptr); //If the linetrace function encounters the linetrace entity, it returns even if it's invisible or passable.
+extern "C" int checkObstacle(long x, long y, Entity* my, Entity* target, bool useTileEntityList = true, bool checkWalls = true, bool checkFloor = true, bool checkEnemies = true);
 
 struct MonsterTrapIgnoreEntities_t
 {

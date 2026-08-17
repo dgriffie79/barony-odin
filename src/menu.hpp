@@ -51,74 +51,73 @@ extern bool losingConnection[MAXPLAYERS];
 extern int rebindaction;
 
 // button definitions
-void buttonQuitConfirm(button_t* my);
-void buttonQuitNoSaveConfirm(button_t* my);
-void buttonEndGameConfirm(button_t* my);
-void buttonCloseAndEndGameConfirm(button_t* my);
-void buttonCloseSubwindow(button_t* my);
-void buttonContinue(button_t* my);
-void buttonBack(button_t* my);
-void buttonVideoTab(button_t* my);
-void buttonAudioTab(button_t* my);
-void buttonKeyboardTab(button_t* my);
-void buttonMouseTab(button_t* my);
-void buttonGamepadBindingsTab(button_t* my);
-void buttonGamepadSettingsTab(button_t* my);
-void buttonMiscTab(button_t* my);
-void buttonSettingsAccept(button_t* my);
-void buttonSettingsOK(button_t* my);
-void buttonStartSingleplayer(button_t* my);
-void buttonStartServer(button_t* my);
-void buttonHostMultiplayer(button_t* my);
-void buttonJoinMultiplayer(button_t* my);
-void buttonHostLobby(button_t* my);
-void buttonJoinLobby(button_t* my);
-void buttonDisconnect(button_t* my);
-void buttonScoreNext(button_t* my);
-void buttonScorePrev(button_t* my);
-void buttonScoreToggle(button_t* my);
-void buttonOpenCharacterCreationWindow(button_t* my);
-void buttonDeleteSavedSoloGame(button_t* my);
-void buttonDeleteSavedMultiplayerGame(button_t* my);
-void buttonConfirmDeleteSoloFile(button_t* my);
-void buttonConfirmDeleteMultiplayerFile(button_t* my);
-void buttonLoadSingleplayerGame(button_t* my);
-void buttonLoadMultiplayerGame(button_t* my);
-void buttonRandomCharacter(button_t* my);
-bool replayLastCharacter(const int index, int multiplayer);
-void buttonRandomName(button_t* my);
-void buttonGamemodsOpenDirectory(button_t* my);
-void buttonGamemodsPrevDirectory(button_t* my);
-void buttonGamemodsBaseDirectory(button_t* my);
-void buttonGamemodsSelectDirectoryForUpload(button_t* my);
-void buttonGamemodsOpenModifyExistingWindow(button_t* my);
-void buttonGamemodsStartModdedGame(button_t* my);
-void buttonInviteFriends(button_t* my);
+extern "C" void buttonQuitConfirm(button_t* my);
+extern "C" void buttonQuitNoSaveConfirm(button_t* my);
+extern "C" void buttonEndGameConfirm(button_t* my);
+extern "C" void buttonCloseAndEndGameConfirm(button_t* my);
+extern "C" void buttonCloseSubwindow(button_t* my);
+extern "C" void buttonContinue(button_t* my);
+extern "C" void buttonBack(button_t* my);
+extern "C" void buttonVideoTab(button_t* my);
+extern "C" void buttonAudioTab(button_t* my);
+extern "C" void buttonKeyboardTab(button_t* my);
+extern "C" void buttonMouseTab(button_t* my);
+extern "C" void buttonGamepadBindingsTab(button_t* my);
+extern "C" void buttonGamepadSettingsTab(button_t* my);
+extern "C" void buttonMiscTab(button_t* my);
+extern "C" void buttonSettingsAccept(button_t* my);
+extern "C" void buttonSettingsOK(button_t* my);
+extern "C" void buttonStartSingleplayer(button_t* my);
+extern "C" void buttonStartServer(button_t* my);
+extern "C" void buttonHostMultiplayer(button_t* my);
+extern "C" void buttonJoinMultiplayer(button_t* my);
+extern "C" void buttonHostLobby(button_t* my);
+extern "C" void buttonJoinLobby(button_t* my);
+extern "C" void buttonDisconnect(button_t* my);
+extern "C" void buttonScoreNext(button_t* my);
+extern "C" void buttonScorePrev(button_t* my);
+extern "C" void buttonScoreToggle(button_t* my);
+extern "C" void buttonOpenCharacterCreationWindow(button_t* my);
+extern "C" void buttonDeleteSavedSoloGame(button_t* my);
+extern "C" void buttonDeleteSavedMultiplayerGame(button_t* my);
+extern "C" void buttonConfirmDeleteSoloFile(button_t* my);
+extern "C" void buttonConfirmDeleteMultiplayerFile(button_t* my);
+extern "C" void buttonLoadSingleplayerGame(button_t* my);
+extern "C" void buttonLoadMultiplayerGame(button_t* my);
+extern "C" void buttonRandomCharacter(button_t* my);
+extern "C" bool replayLastCharacter(const int index, int multiplayer);
+extern "C" void buttonRandomName(button_t* my);
+extern "C" void buttonGamemodsOpenDirectory(button_t* my);
+extern "C" void buttonGamemodsPrevDirectory(button_t* my);
+extern "C" void buttonGamemodsBaseDirectory(button_t* my);
+extern "C" void buttonGamemodsSelectDirectoryForUpload(button_t* my);
+extern "C" void buttonGamemodsOpenModifyExistingWindow(button_t* my);
+extern "C" void buttonGamemodsStartModdedGame(button_t* my);
+extern "C" void buttonInviteFriends(button_t* my);
 
-void windowEnterSerialPrompt();
-void windowSerialResult(int success);
-size_t serialHash(const std::string& input);
+extern "C" void windowEnterSerialPrompt();
+extern "C" void windowSerialResult(int success);
+extern "C" size_t serialHash(const std::string& input);
 extern char serialInputText[64];
 
 #define SLIDERFONT font12x12_bmp
 
 // achievement window
-void openAchievementsWindow();
-void closeAchievementsWindow(button_t*);
+extern "C" void openAchievementsWindow();
+extern "C" void closeAchievementsWindow(button_t*);
 extern bool achievements_window;
 extern int achievements_window_page;
-void buttonAchievementsUp(button_t* my);
-void buttonAchievementsDown(button_t* my);
+extern "C" void buttonAchievementsUp(button_t* my);
+extern "C" void buttonAchievementsDown(button_t* my);
 
 // misc functions
-void openSettingsWindow();
-void openFailedConnectionWindow(int mode);
-void openGameoverWindow();
-void openSteamLobbyBrowserWindow(button_t* my);
-void openLoadGameWindow(button_t* my);
-void openNewLoadGameWindow(button_t* my);
-void doSlider(int x, int y, int dots, int minvalue, int maxvalue, int increment, int* var, SDL_Surface* slider_font = SLIDERFONT, int slider_font_char_width = 16);
-void doSliderF(int x, int y, int dots, real_t minvalue, real_t maxvalue, real_t increment, real_t* var);
+extern "C" void openSettingsWindow();
+extern "C" void openFailedConnectionWindow(int mode);
+extern "C" void openSteamLobbyBrowserWindow(button_t* my);
+extern "C" void openLoadGameWindow(button_t* my);
+extern "C" void openNewLoadGameWindow(button_t* my);
+extern "C" void doSlider(int x, int y, int dots, int minvalue, int maxvalue, int increment, int* var, SDL_Surface* slider_font = SLIDERFONT, int slider_font_char_width = 16);
+extern "C" void doSliderF(int x, int y, int dots, real_t minvalue, real_t maxvalue, real_t increment, real_t* var);
 
 // menu variables
 extern bool settings_window;
@@ -140,18 +139,18 @@ extern int gamemods_uploadStatus;
 //extern int gamemods_numCurrentModsLoaded;
 extern DynamicArrayStr currentDirectoryFiles;
 extern DynamicString directoryPath;
-void gamemodsWindowClearVariables();
-void gamemodsCustomContentInit();
-bool gamemodsDrawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor, std::string btnText, int action);
-bool gamemodsRemovePathFromMountedFiles(std::string findStr);
-bool gamemodsIsPathInMountedFiles(std::string findStr);
-bool gamemodsClearAllMountedPaths();
-bool gamemodsMountAllExistingPaths();
+extern "C" void gamemodsWindowClearVariables();
+extern "C" void gamemodsCustomContentInit();
+extern "C" bool gamemodsDrawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor, std::string btnText, int action);
+extern "C" bool gamemodsRemovePathFromMountedFiles(std::string findStr);
+extern "C" bool gamemodsIsPathInMountedFiles(std::string findStr);
+extern "C" bool gamemodsClearAllMountedPaths();
+extern "C" bool gamemodsMountAllExistingPaths();
 //extern std::vector<std::pair<std::string, std::string>> gamemods_mountedFilepaths;
 //extern bool gamemods_modelsListRequiresReload;
 //extern bool gamemods_soundListRequiresReload;
 //extern bool gamemods_modPreload;
-bool drawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor);
+extern "C" bool drawClickableButton(int padx, int pady, int padw, int padh, Uint32 btnColor);
 extern bool scoreDisplayMultiplayer;
 struct SaveGameListEntry_t {
 	int lastModified = 0;
@@ -245,7 +244,7 @@ extern Sint32 oldXres;
 extern Sint32 oldYres;
 extern button_t* revertResolutionButton;
 
-int getNumDisplays();
+extern "C" int getNumDisplays();
 struct resolution {
 	int x;
 	int y;
@@ -255,30 +254,30 @@ struct resolution {
 		return x == rhs.x && y == rhs.y && hz == rhs.hz;
 	}
 };
-void getResolutionList(int device_id, DynamicArrayT<resolution>&);
-void applySettings();
-void openConfirmResolutionWindow();
-void buttonAcceptResolution(button_t* my);
-void buttonRevertResolution(button_t* my);
-void revertResolution();
+extern "C" void getResolutionList(int device_id, DynamicArrayT<resolution>&);
+extern "C" void applySettings();
+extern "C" void openConfirmResolutionWindow();
+extern "C" void buttonAcceptResolution(button_t* my);
+extern "C" void buttonRevertResolution(button_t* my);
+extern "C" void revertResolution();
 
 class Stat;
 int isCharacterValidFromDLC(Stat& myStats, int characterClass);
 int isCharacterValidFromDLC(int player, int characterClass, int race, int appearance);
 
 // handle intro stage stuff
-void doQuitGame();
-void doNewGame(bool makeHighscore);
-void doCredits();
-void doEndgame(bool saveHighscore, bool onServerDisconnect);
-void doEndgameOnDisconnect();
-void doIntro();
-void doEndgameHerx();
-void doEndgameDevil();
-void doMidgame();
-void doEndgameCitadel();
-void doEndgameClassicAndExtraMidGame();
-void doEndgameExpansion();
+extern "C" void doQuitGame();
+extern "C" void doNewGame(bool makeHighscore);
+extern "C" void doCredits();
+extern "C" void doEndgame(bool saveHighscore, bool onServerDisconnect);
+extern "C" void doEndgameOnDisconnect();
+extern "C" void doIntro();
+extern "C" void doEndgameHerx();
+extern "C" void doEndgameDevil();
+extern "C" void doMidgame();
+extern "C" void doEndgameCitadel();
+extern "C" void doEndgameClassicAndExtraMidGame();
+extern "C" void doEndgameExpansion();
 
 enum CharacterDLCValidation : int
 {
@@ -313,4 +312,4 @@ struct LastCreatedCharacter {
 };
 extern LastCreatedCharacter LastCreatedCharacterSettings;
 
-bool isAchievementUnlockedForClassUnlock(int race);
+extern "C" bool isAchievementUnlockedForClassUnlock(int race);

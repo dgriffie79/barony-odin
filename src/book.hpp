@@ -44,9 +44,9 @@ public:
 };
 extern BookParser_t bookParser_t;
 
-int getBook(DynamicString bookTitle);
-DynamicString getBookDefaultNameFromIndex(int index, bool censored = true);
-DynamicString getBookLocalizedNameFromIndex(int index, bool censored = true);
+extern "C" int getBook(DynamicString bookTitle);
+extern "C" DynamicString getBookDefaultNameFromIndex(int index, bool censored = true);
+extern "C" DynamicString getBookLocalizedNameFromIndex(int index, bool censored = true);
 extern int numbooks;
 
 static const char* banned_books[] = {
