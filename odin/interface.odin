@@ -1183,7 +1183,7 @@ Surface_Ptr_String_Pair_T :: struct {
 // (menuX=-1, filter enum, item fields). The C++ ctors ran at static-init;
 // here we port them so the flipped globals match. Called from run_barony().
 
-init_ctor_port :: proc() {
+init_gui_menus :: proc() {
 	// GenericGUIMenu ctor (interface.hpp:402) - per player
 	for i in 0 ..< MAXPLAYERS {
 		gui := &GenericGUI[i]
