@@ -30,8 +30,8 @@
 #include "ui/MainMenu.hpp"
 
 int startfloor = 0;
-BaronyRNG map_rng;
-BaronyRNG map_server_rng;
+// BaronyRNG map_rng / map_server_rng defs moved to Odin (prng.odin @(export))
+// - see prng.hpp extern "C" decls.
 int numChests = 0;
 int numMimics = 0;
 TreasureRoomGenerator treasure_room_generator;

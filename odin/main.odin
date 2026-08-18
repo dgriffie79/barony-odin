@@ -64,6 +64,8 @@ run_barony :: proc() -> int {
 		init_cvars_bool()
 		// Cvar ctor port (CvarFloat/CvarVector4 register + wire data_ptr).
 		init_cvars()
+		// test_rng_* debug console commands (prng.odin).
+		init_test_rng_commands()
 	}
 
 	rc := barony_main(c.int(len(os.args)), raw_data(argv_buf))

@@ -259,16 +259,24 @@ bool messageLocalPlayers(Uint32 type, char const * const message, ...)
 
 bool messagePlayer(int player, Uint32 type, char const * const message, ...)
 {
+	va_list argptr;
+	va_start( argptr, message );
+	const bool result = messagePlayerVargs(player, type, message, argptr);
+	va_end( argptr );
+	return result;
+}
+
+// va_list variant of messagePlayer (Odin calls this directly - C variadic
+// interop, same pattern as File_vprintf / LobbyHandler_t_vlogError).
+extern "C" bool messagePlayerVargs(int player, Uint32 type, char const * const message, va_list argptr)
+{
 	if ( player < 0 || player >= MAXPLAYERS )
 	{
 		return false;
 	}
 	char str[Player::MessageZone_t::ADD_MESSAGE_BUFFER_LENGTH] = { 0 };
 
-	va_list argptr;
-	va_start( argptr, message );
 	vsnprintf( str, Player::MessageZone_t::ADD_MESSAGE_BUFFER_LENGTH - 1, message, argptr );
-	va_end( argptr );
 
 	strncpy(str, messageSanitizePercentSign(str, nullptr).c_str(), Player::MessageZone_t::ADD_MESSAGE_BUFFER_LENGTH - 1);
 	str[Player::MessageZone_t::ADD_MESSAGE_BUFFER_LENGTH - 1] = '\0';

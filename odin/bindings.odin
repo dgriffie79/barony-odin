@@ -10,6 +10,8 @@
 
 package main
 
+import "core:c"
+
 when !#config(EDITOR, false) {
 	foreign import _barony "../builddir/src/libbarony_game.a"
 	foreign _barony {
@@ -292,6 +294,8 @@ when !#config(EDITOR, false) {
     monsterTinkeringConvertHPToAppearance :: proc "c" (myStats: ^Stat) -> i32 ---
     monsterTinkeringConvertAppearanceToHP :: proc "c" (myStats: ^Stat, appearance: i32) -> i32 ---
     messagePlayerMonsterEvent :: proc "c" (player: i32, color: u32, monsterStats: ^Stat, msgGeneric: ^u8, msgNamed: ^u8, detailType: i32, optionalEntity: ^Entity) ---
+    messagePlayerVargs :: proc "c" (player: i32, type: u32, message: cstring, argptr: c.va_list) -> bool ---
+    messagePlayerColor :: proc "c" (player: i32, type: u32, color: u32, message: cstring) -> bool ---
     playerClassLangEntry :: proc "c" (classnum: i32, playernum: i32) -> ^u8 ---
     summonChest :: proc "c" (x: i64, y: i64) -> ^Entity ---
     boulderSokobanOnDestroy :: proc "c" (pushedOffLedge: bool) ---
@@ -1653,6 +1657,8 @@ when #config(EDITOR, false) {
     monsterTinkeringConvertHPToAppearance :: proc "c" (myStats: ^Stat) -> i32 ---
     monsterTinkeringConvertAppearanceToHP :: proc "c" (myStats: ^Stat, appearance: i32) -> i32 ---
     messagePlayerMonsterEvent :: proc "c" (player: i32, color: u32, monsterStats: ^Stat, msgGeneric: ^u8, msgNamed: ^u8, detailType: i32, optionalEntity: ^Entity) ---
+    messagePlayerVargs :: proc "c" (player: i32, type: u32, message: cstring, argptr: c.va_list) -> bool ---
+    messagePlayerColor :: proc "c" (player: i32, type: u32, color: u32, message: cstring) -> bool ---
     playerClassLangEntry :: proc "c" (classnum: i32, playernum: i32) -> ^u8 ---
     summonChest :: proc "c" (x: i64, y: i64) -> ^Entity ---
     boulderSokobanOnDestroy :: proc "c" (pushedOffLedge: bool) ---

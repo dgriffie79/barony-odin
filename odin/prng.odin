@@ -14,6 +14,8 @@ import "core:math"
 import "core:mem"
 import "core:time"
 import "base:runtime"
+import "core:fmt"
+import "core:strconv"
 
 Barony_RNG :: struct {
 	seeded:     bool,
@@ -29,12 +31,17 @@ Barony_RNG :: struct {
 //      uint8_t i1,i2; size_t bytes_read;
 #assert(size_of(Barony_RNG) == 528)
 
-// The 5 RNG globals (C++: extern BaronyRNG local_rng; net_rng; map_rng;
-// map_server_rng; map_sequence_rng)
+// The 5 RNG globals (C++: extern "C" BaronyRNG local_rng; net_rng; map_rng;
+// map_server_rng; map_sequence_rng) - Odin owns the storage.
+@(export)
 local_rng:        Barony_RNG
+@(export)
 net_rng:          Barony_RNG
+@(export)
 map_rng:          Barony_RNG
+@(export)
 map_server_rng:   Barony_RNG
+@(export)
 map_sequence_rng: Barony_RNG
 
 // debug marker (C++: static uint8_t marker[256] in the header - one per TU;
@@ -332,9 +339,202 @@ BaronyRNG_testSeedHealth :: proc "c" (self: ^Barony_RNG) {
 	// printlog("seed: %s", string(seed_str[:]))
 }
 
-// The C++ prng.cpp also defines a set of ConsoleCommand test_* handlers
-// (/test_rng_seed, /test_rng_seed_health, /test_rng_u8, /test_rng_i8,
-// /test_rng_f32, /test_rng_f64, /test_rng_uniform, /test_rng_discrete,
-// /test_rng_normal) guarded by #ifndef EDITOR. Those are debug/test tools
-// that call messagePlayer(); they are not ported (the console command system
-// itself is not ported yet).
+// ---------------------------------------------------------------------------
+// test_rng console commands (prng.cpp #ifndef EDITOR) - ported to Odin.
+// Game-only: the editor build has no consolecommand.cpp / messagePlayerColor.
+// ---------------------------------------------------------------------------
+// Each command registers a ConsoleCommand (name, desc, type=Command, func).
+// The func signature matches ccmd_function: void(int argc, const char** argv).
+// Messages go through messagePlayerColor (extern "C", pre-formatted string).
+
+when !#config(EDITOR, false) {
+
+// static BaronyRNG test_rng (prng.cpp:15)
+test_rng: Barony_RNG
+
+MESSAGE_MISC :: u32(1) << 31 // game.hpp:123
+
+@(private)
+test_rng_msg :: proc(format: string, args: ..any) {
+	buf: [256]u8
+	msg := fmt.bprintf(buf[:], format, ..args)
+	messagePlayerColor(0, MESSAGE_MISC, 0xFFFFFFFF, cstring(raw_data(msg)))
+}
+
+@(private)
+register_test_cmd :: proc(cmd: ^ConsoleCommand, name: cstring, desc: cstring, fn: rawptr) {
+	cmd.name = name
+	cmd.desc = desc
+	cmd.type = .Command
+	cmd.func = fn
+	register_console_entry(cmd)
+}
+@(private)
+test_rng_arg :: proc(argc: i32, argv: ^^u8, index: i32) -> string {
+	context = runtime.default_context()
+	if index >= argc || index < 0 {
+		return ""
+	}
+	args := ([^]^u8)(argv)
+	return string(cstring(args[index]))
+}
+
+
+@(private)
+test_rng_seed_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	if argc < 2 {
+		BaronyRNG_seedTime(&test_rng)
+	} else {
+		seed := i64(strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 0)
+		BaronyRNG_seedBytes(&test_rng, &seed, size_of(seed))
+	}
+}
+
+@(private)
+test_rng_seed_health_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	BaronyRNG_testSeedHealth(&test_rng)
+}
+
+@(private)
+test_rng_u8_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	i := 100000
+	if argc > 1 { i = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 100000 }
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_getU8(&test_rng))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_i8_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	i := 100000
+	if argc > 1 { i = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 100000 }
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_getI8(&test_rng))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_f32_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	i := 100000
+	if argc > 1 { i = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 100000 }
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_getF32(&test_rng))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_f64_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	i := 100000
+	if argc > 1 { i = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 100000 }
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_getF64(&test_rng))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_uniform_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	a := -10
+	b := 10
+	i := 100000
+	if argc > 1 { a = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else -10 }
+	if argc > 2 { b = strconv.parse_int(test_rng_arg(argc, argv, 2), 10) or_else 10 }
+	if argc > 3 { i = strconv.parse_int(test_rng_arg(argc, argv, 3), 10) or_else 100000 }
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_uniform(&test_rng, i32(a), i32(b)))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_discrete_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	if argc < 3 {
+		test_rng_msg("args: {chances} iterations")
+		return
+	}
+	chances := make([dynamic]u32)
+	defer delete(chances)
+	for c in 1..<argc - 1 {
+		v := strconv.parse_int(test_rng_arg(argc, argv, c), 10) or_else 0
+		append(&chances, u32(v))
+	}
+	i := strconv.parse_int(test_rng_arg(argc, argv, argc - 1), 10) or_else 0
+	sum := f64(0)
+	for c in 0..<i {
+		sum += f64(BaronyRNG_discrete(&test_rng, raw_data(chances), i32(len(chances))))
+	}
+	sum /= f64(i)
+	test_rng_msg("mean: %.2f", sum)
+}
+
+@(private)
+test_rng_normal_cmd :: proc "c" (argc: i32, argv: ^^u8) {
+	context = runtime.default_context()
+	m := 0
+	d := 5
+	i := 100000
+	if argc > 1 { m = strconv.parse_int(test_rng_arg(argc, argv, 1), 10) or_else 0 }
+	if argc > 2 { d = strconv.parse_int(test_rng_arg(argc, argv, 2), 10) or_else 5 }
+	if argc > 3 { i = strconv.parse_int(test_rng_arg(argc, argv, 3), 10) or_else 100000 }
+	hist: map[i32]i32
+	for c in 0..<i {
+		r := BaronyRNG_normal(&test_rng, i32(m), i32(d))
+		hist[r] += 1
+	}
+	for k, v in hist {
+		value := v / 200
+		if value > 0 {
+			stars := make([]u8, value)
+			defer delete(stars)
+			for i in 0..<value { stars[i] = '*' }
+			test_rng_msg("%5d %s", k, string(stars))
+		}
+	}
+	delete(hist)
+}
+
+// Registration - called from run_barony() alongside the other init procs.
+init_test_rng_commands :: proc() {
+	register_test_cmd(&test_rng_cmd_seed, "/test_rng_seed", "seed test rng", rawptr(test_rng_seed_cmd))
+	register_test_cmd(&test_rng_cmd_seed_health, "/test_rng_seed_health", "test rng seed health", rawptr(test_rng_seed_health_cmd))
+	register_test_cmd(&test_rng_cmd_u8, "/test_rng_u8", "test rng u8", rawptr(test_rng_u8_cmd))
+	register_test_cmd(&test_rng_cmd_i8, "/test_rng_i8", "test rng i8", rawptr(test_rng_i8_cmd))
+	register_test_cmd(&test_rng_cmd_f32, "/test_rng_f32", "test rng f32", rawptr(test_rng_f32_cmd))
+	register_test_cmd(&test_rng_cmd_f64, "/test_rng_f64", "test rng f64", rawptr(test_rng_f64_cmd))
+	register_test_cmd(&test_rng_cmd_uniform, "/test_rng_uniform", "test rng with uniform(a, b, iterations)", rawptr(test_rng_uniform_cmd))
+	register_test_cmd(&test_rng_cmd_discrete, "/test_rng_discrete", "test rng with discrete({chances}, iterations)", rawptr(test_rng_discrete_cmd))
+	register_test_cmd(&test_rng_cmd_normal, "/test_rng_normal", "test rng with normal(mean, deviation, iterations)", rawptr(test_rng_normal_cmd))
+}
+
+test_rng_cmd_seed:      ConsoleCommand
+test_rng_cmd_seed_health: ConsoleCommand
+test_rng_cmd_u8:        ConsoleCommand
+test_rng_cmd_i8:        ConsoleCommand
+test_rng_cmd_f32:       ConsoleCommand
+test_rng_cmd_f64:       ConsoleCommand
+test_rng_cmd_uniform:   ConsoleCommand
+test_rng_cmd_discrete:  ConsoleCommand
+test_rng_cmd_normal:    ConsoleCommand
+
+} // when !#config(EDITOR, false)

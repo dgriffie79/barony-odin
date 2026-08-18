@@ -28,8 +28,9 @@ extern "C" int power(int a, int b);
 extern "C" int sendPacket(UDPsocket sock, int channel, UDPpacket* packet, int hostnum, bool tryReliable = false);
 extern "C" int sendPacketSafe(UDPsocket sock, int channel, UDPpacket* packet, int hostnum);
 bool messagePlayer(int player, Uint32 type, char const * const message, ...);
+extern "C" bool messagePlayerVargs(int player, Uint32 type, char const * const message, va_list argptr); // va_list variant for Odin (variadic split)
 bool messageLocalPlayers(Uint32 type, char const * const message, ...);
-bool messagePlayerColor(int player, Uint32 type, Uint32 color, char const * const message, ...);
+extern "C" bool messagePlayerColor(int player, Uint32 type, Uint32 color, char const * const message, ...); // extern C so Odin can call it with a pre-formatted string (variadic, no varargs)
 bool messageLocalPlayersColor(Uint32 color, Uint32 type, char const * const message, ...);
 extern "C" void sendEntityUDP(Entity* entity, int c, bool guarantee);
 extern "C" void sendEntityTCP(Entity* entity, int c);

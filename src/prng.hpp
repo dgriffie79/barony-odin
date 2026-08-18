@@ -85,11 +85,11 @@ private:
     void seedImpl(const void*, size_t);
 };
 
-extern BaronyRNG local_rng; // RNG for anything that does not require client synchronization
-extern BaronyRNG net_rng;   // RNG which must always be synchronized among all clients
-extern BaronyRNG map_rng;   // used strictly during map generation
-extern BaronyRNG map_server_rng; // used during map generation for server only to seed local entity rng
-extern BaronyRNG map_sequence_rng; // used to determine the next map seed
+extern "C" BaronyRNG local_rng; // RNG for anything that does not require client synchronization
+extern "C" BaronyRNG net_rng;   // RNG which must always be synchronized among all clients
+extern "C" BaronyRNG map_rng;   // used strictly during map generation
+extern "C" BaronyRNG map_server_rng; // used during map generation for server only to seed local entity rng
+extern "C" BaronyRNG map_sequence_rng; // used to determine the next map seed
 
 // Flattened C-ABI entry points (Odin @(export) proc "c"). C++ method bodies
 // forward to these; the Odin side owns the implementation.
