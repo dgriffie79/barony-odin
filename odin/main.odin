@@ -57,6 +57,8 @@ run_barony :: proc() -> int {
 	// Port of the C++ static constructors for Odin-owned globals that have
 	// reference members / non-zero defaults (GenericGUI, FollowerMenu, CalloutMenu).
 	init_gui_menus()
+	// Inputs/GameController ctor ports (playerControllerIds=-1, controller id=-1).
+	init_inputs()
 	when !#config(EDITOR, false) {
 		// CvarBool ctor port (shareMinimap, framesEatMouse).
 		init_cvars_bool()

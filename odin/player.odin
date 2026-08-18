@@ -1419,3 +1419,23 @@ gamepad_menux_invert : bool
 
 @(export)
 gamepad_menuy_invert : bool
+
+// ---------------------------------------------------------------------------
+// Inputs/GameController ctor ports (player.hpp:390, player.cpp:41)
+// ---------------------------------------------------------------------------
+// Odin zero-init leaves playerControllerIds[]=0 and GameController.id=0, but
+// the C++ ctors set both to -1. Zero-id falsely matches: getController()
+// matches game_controllers[i].getID() == getControllerID(player), so with
+// both at 0 the game thinks a controller is present (shows the "A button"
+// prompt and uses controller bindings -> keyboard/space stops working).
+
+init_inputs :: proc() {
+	// Inputs ctor (player.hpp:390)
+	for i in 0 ..< MAXPLAYERS {
+		inputs.player_controller_ids[i] = -1
+	}
+	// GameController ctor (player.cpp:41)
+	for i in 0 ..< 16 { // MAX_GAME_CONTROLLERS = 16
+		game_controllers[i].id = -1
+	}
+}
