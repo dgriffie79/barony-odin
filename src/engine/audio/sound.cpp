@@ -221,63 +221,7 @@ static int openal_streamupdate(OPENAL_SOUND* self) {
 	return active;
 }
 
-bool sfxUseDynamicAmbientVolume = true;
-bool sfxUseDynamicEnvironmentVolume = true;
 
-ALCcontext *openal_context = nullptr;
-ALCdevice  *openal_device = nullptr;
-
-//#define openal_maxchannels 100
-
-OPENAL_BUFFER** sounds = nullptr;
-OPENAL_BUFFER** minesmusic = NULL;
-OPENAL_BUFFER** swampmusic = NULL;
-OPENAL_BUFFER** labyrinthmusic = NULL;
-OPENAL_BUFFER** ruinsmusic = NULL;
-OPENAL_BUFFER** underworldmusic = NULL;
-OPENAL_BUFFER** hellmusic = NULL;
-OPENAL_BUFFER** intromusic = NULL;
-OPENAL_BUFFER* intermissionmusic = NULL;
-OPENAL_BUFFER* minetownmusic = NULL;
-OPENAL_BUFFER* splashmusic = NULL;
-OPENAL_BUFFER* librarymusic = NULL;
-OPENAL_BUFFER* shopmusic = NULL;
-OPENAL_BUFFER* storymusic = NULL;
-OPENAL_BUFFER** minotaurmusic = NULL;
-OPENAL_BUFFER* herxmusic = NULL;
-OPENAL_BUFFER* templemusic = NULL;
-OPENAL_BUFFER* endgamemusic = NULL;
-OPENAL_BUFFER* devilmusic = NULL;
-OPENAL_BUFFER* escapemusic = NULL;
-OPENAL_BUFFER* sanctummusic = NULL;
-OPENAL_BUFFER* introductionmusic = NULL;
-OPENAL_BUFFER** cavesmusic = NULL;
-OPENAL_BUFFER** citadelmusic = NULL;
-OPENAL_BUFFER* gnomishminesmusic = NULL;
-OPENAL_BUFFER* greatcastlemusic = NULL;
-OPENAL_BUFFER* sokobanmusic = NULL;
-OPENAL_BUFFER* caveslairmusic = NULL;
-OPENAL_BUFFER* bramscastlemusic = NULL;
-OPENAL_BUFFER* hamletmusic = NULL;
-OPENAL_BUFFER** fortressmusic = NULL;
-OPENAL_BUFFER* tutorialmusic = nullptr;
-OPENAL_BUFFER* gameovermusic = nullptr;
-OPENAL_BUFFER* introstorymusic = nullptr;
-
-OPENAL_SOUND* music_channel = nullptr;
-OPENAL_SOUND* music_channel2 = nullptr;
-OPENAL_SOUND* music_resume = nullptr;
-
-OPENAL_CHANNELGROUP *sound_group = NULL;
-OPENAL_CHANNELGROUP *soundAmbient_group = NULL;
-OPENAL_CHANNELGROUP *soundEnvironment_group = NULL;
-OPENAL_CHANNELGROUP *music_group = NULL;
-OPENAL_CHANNELGROUP *music_notification_group = NULL;
-
-float fadein_increment = 0.002f;
-float default_fadein_increment = 0.002f;
-float fadeout_increment = 0.005f;
-float default_fadeout_increment = 0.005f;
 
 #define MAXSOUND 1024
 OPENAL_SOUND openal_sounds[MAXSOUND];

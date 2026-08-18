@@ -30,40 +30,6 @@
 #include "shops.hpp"
 
 // definitions
-list_t topscores_json;
-list_t topscoresMultiplayer_json;
-list_t topscores_legacy;
-list_t topscoresMultiplayer_legacy;
-int victory = 0;
-Uint32 completionTime = 0;
-bool conductPenniless = true;
-bool conductFoodless = true;
-bool conductVegetarian = true;
-bool conductIlliterate = true;
-Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES] = { 0 }; // additional 'conducts' to be stored in here.
-Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS] = { 0 }; // general saved game statistics to be stored in here.
-DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS] = {};
-bool achievementStatusRhythmOfTheKnight[MAXPLAYERS] = { false };
-bool achievementRhythmOfTheKnight[MAXPLAYERS] = { false };
-DynamicMapI32T<Uint32> achievementThankTheTankPair[MAXPLAYERS];
-bool achievementStatusBaitAndSwitch[MAXPLAYERS] = { false };
-Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS] = { 0 };
-DynamicSetI32 clientLearnedAlchemyIngredients[MAXPLAYERS];
-DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
-DynamicSetI32 clientLearnedScrollLabels[MAXPLAYERS];
-bool achievementStatusThankTheTank[MAXPLAYERS] = { false };
-DynamicArrayU32 achievementStrobeVec[MAXPLAYERS] = {};
-bool achievementStatusStrobe[MAXPLAYERS] = { false };
-bool playerFailedRangedOnlyConduct[MAXPLAYERS] = { false };
-list_t booksRead;
-bool usedClass[NUMCLASSES] = {0};
-bool usedRace[NUMRACES] = { 0 };
-Uint32 loadingsavegame = 0;
-Uint32 loadinglobbykey = 0;
-bool achievementBrawlerMode = false;
-bool achievementPenniless = false;
-bool achievementRangedMode[MAXPLAYERS] = { 0 };
-int savegameCurrentFileIndex = 0;
 score_t steamLeaderboardScore;
 AchievementObserver achievementObserver;
 

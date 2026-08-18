@@ -1,4 +1,4 @@
-// items.odin — Odin mirrors of items.hpp.
+// items.odin - Odin mirrors of items.hpp.
 package main
 
 
@@ -13,7 +13,7 @@ Status :: enum i32 {
 	EXCELLENT,
 }
 
-// typedef enum Category — big enum; use i32 for layout (full mirror later)
+// typedef enum Category - big enum; use i32 for layout (full mirror later)
 Category :: i32
 
 // enum ItemEquippableSlot : int
@@ -44,7 +44,7 @@ Item_Stack_Results :: enum i32 {
 // ItemType is defined in items.hpp (big enum); Stat references it as i32.
 ItemType :: i32
 
-// class Item — 56 bytes
+// class Item - 56 bytes
 Item :: struct {
 	type:              ItemType,
 	status:            Status,
@@ -70,7 +70,7 @@ Item :: struct {
 
 #assert(size_of(Item) == 56)
 
-// class ItemGeneric — 152 bytes
+// class ItemGeneric - 152 bytes
 ItemGeneric :: struct {
 	item_name_identified:   string, // 16B
 	item_name_unidentified: string,
@@ -91,7 +91,7 @@ ItemGeneric :: struct {
 
 #assert(size_of(ItemGeneric) == 152)
 
-// struct ItemStackResult — 16 bytes
+// struct ItemStackResult - 16 bytes
 // { ItemStackResults resultType; Item* itemToStackInto; }
 ItemStackResult :: struct {
 	result_type:       Item_Stack_Results,

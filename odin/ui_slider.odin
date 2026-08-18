@@ -1,4 +1,4 @@
-// ui_slider.odin — Odin mirror of ui/Slider.hpp.
+// ui_slider.odin - Odin mirror of ui/Slider.hpp.
 package main
 
 // enum Slider::orientation_t
@@ -7,7 +7,7 @@ Slider_Orientation :: enum i32 {
 	SLIDER_VERTICAL,
 }
 
-// struct Slider::result_t — 16 bytes
+// struct Slider::result_t - 16 bytes
 Slider_Result_T :: struct {
 	highlighted:   bool,
 	clicked:       bool,
@@ -16,7 +16,7 @@ Slider_Result_T :: struct {
 }
 #assert(size_of(Slider_Result_T) == 16)
 
-// class Slider : public Widget — 408 bytes
+// class Slider : public Widget - 408 bytes
 Slider :: struct {
 	using _: Widget, // 248B base
 

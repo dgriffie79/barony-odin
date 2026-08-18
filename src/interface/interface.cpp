@@ -93,13 +93,9 @@ const DynamicString& WorldIconEntry_tMirror::getPlayerIconPath(const int playern
 
 Uint32 svFlags = 30;
 Uint32 settings_svFlags = svFlags;
-view_t camera_charsheet;
-real_t camera_charsheet_offsetyaw = (330) * PI / 180;
 
 bool keepInventoryGlobal = false;
 
-
-list_t chestInv[MAXPLAYERS];
 
 //SDL_Surface* font12x12_small_bmp = NULL;
 //bool gui_clickdrag[MAXPLAYERS] = { false };
@@ -178,33 +174,7 @@ list_t chestInv[MAXPLAYERS];
 int buttonclick = 0;
 
 
-bool auto_hotbar_new_items = true;
-bool auto_hotbar_categories[NUM_HOTBAR_CATEGORIES] = {	true, true, true, true, 
-														true, true, true, true,
-														true, true, true, true };
-int autosort_inventory_categories[NUM_AUTOSORT_CATEGORIES] = {	0, 0, 0, 0,
-																0, 0, 0, 0,
-																0, 0, 0, 0 };
-bool disable_messages = false;
-bool right_click_protect = false;
-bool auto_appraise_new_items = true;
-bool show_game_timer_always = false;
-bool hide_statusbar = true;
-bool hide_playertags = false;
-bool show_skill_values = false;
-real_t uiscale_chatlog = 1.f;
-real_t uiscale_playerbars = 1.f;
-real_t uiscale_hotbar = 1.f;
-real_t uiscale_inventory = 1.f;
-bool uiscale_charactersheet = false;
-bool uiscale_skillspage = false;
 const int inscriptionSlotHeight = 40;
-
-DamageIndicatorHandler_t DamageIndicatorHandler;
-EnemyHPDamageBarHandler enemyHPDamageBarHandler[MAXPLAYERS];
-FollowerRadialMenu FollowerMenu[MAXPLAYERS];
-CalloutRadialMenu CalloutMenu[MAXPLAYERS];
-GenericGUIMenu GenericGUI[MAXPLAYERS];
 
 bool EnemyHPDamageBarHandler::bDamageGibTypesEnabled = true;
 DynamicMapI32T<DynamicArrayS32> EnemyHPDamageBarHandler::damageGibAnimCurves;
@@ -214,93 +184,6 @@ int EnemyHPDamageBarHandler::shortDistanceHPBarFadeTicks = TICKS_PER_SECOND / 2;
 real_t EnemyHPDamageBarHandler::shortDistanceHPBarFadeDistance = 1.0;
 DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsMonsters;  // vector<pair<real_t,int>>
 DynamicArray EnemyHPDamageBarHandler::widthHealthBreakpointsFurniture;  // vector<pair<real_t,int>>
-
-DynamicArraySurfacePtrStringPair systemResourceImages =
-{
-	{&font8x8_bmp, "images/system/font8x8.png"},
-	{&font12x12_bmp, "images/system/font12x12.png"},
-	{&font16x16_bmp, "images/system/font16x16.png"},
-
-	//std::make_pair(&font12x12_small_bmp, "images/system/font12x12_small.png"),
-	//std::make_pair(&backdrop_blessed_bmp, "images/system/backdrop_blessed.png"),
-	//std::make_pair(&backdrop_cursed_bmp, "images/system/backdrop_cursed.png"),
-	//std::make_pair(&button_bmp, "images/system/ButtonHighlighted.png"),
-	//std::make_pair(&smallbutton_bmp, "images/system/SmallButtonHighlighted.png"),
-	//std::make_pair(&invup_bmp, "images/system/InventoryUpHighlighted.png"),
-	//std::make_pair(&invdown_bmp, "images/system/InventoryDownHighlighted.png"),
-	//std::make_pair(&status_bmp, "images/system/StatusBar.png"),
-	//std::make_pair(&character_bmp, "images/system/CharacterSheet.png"),
-	//std::make_pair(&hunger_bmp, "images/system/Hunger.png"),
-	//std::make_pair(&hunger_blood_bmp, "images/system/Hunger_blood.png"),
-	//std::make_pair(&hunger_boiler_bmp, "images/system/Hunger_boiler.png"),
-	//std::make_pair(&hunger_boiler_hotflame_bmp, "images/system/Hunger_boiler_hotfire.png"),
-	//std::make_pair(&hunger_boiler_flame_bmp, "images/system/Hunger_boiler_fire.png"),
-	//std::make_pair(&minotaur_bmp, "images/system/minotaur.png"),
-	//std::make_pair(&attributesleft_bmp, "images/system/AttributesLeftHighlighted.png"),
-	//std::make_pair(&attributesright_bmp, "images/system/AttributesRightHighlighted.png"),
-
-	//General GUI images.
-	//std::make_pair(&attributesleftunclicked_bmp, "images/system/AttributesLeft.png"),
-	//std::make_pair(&attributesrightunclicked_bmp, "images/system/AttributesRight.png"),
-	//std::make_pair(&shopkeeper_bmp, "images/system/shopkeeper.png"),
-	//std::make_pair(&shopkeeper2_bmp, "images/system/shopkeeper2.png"),
-	//std::make_pair(&damage_bmp, "images/system/damage.png"),
-
-	//Magic GUI images.
-	//std::make_pair(&magicspellList_bmp, "images/system/spellList.png"),
-	//std::make_pair(&spell_list_titlebar_bmp, "images/system/spellListTitlebar.png"),
-	//std::make_pair(&spell_list_gui_slot_bmp, "images/system/spellListSlot.png"),
-	//std::make_pair(&spell_list_gui_slot_highlighted_bmp, "images/system/spellListSlotHighlighted.png"),
-	//std::make_pair(&sustained_spell_generic_icon, "images/system/magic/channeled_spell.png"),
-
-	// inventory GUI images.
-	//std::make_pair(&inventory_bmp, "images/system/Inventory.png"),
-	//std::make_pair(&inventoryoption_bmp, "images/system/InventoryOption.png"),
-	//std::make_pair(&inventory_mode_item_img, "images/system/inventory_mode_item.png"),
-	//std::make_pair(&inventory_mode_item_highlighted_img, "images/system/inventory_mode_item_highlighted.png"),
-	//std::make_pair(&inventory_mode_spell_img, "images/system/inventory_mode_spell.png"),
-	//std::make_pair(&inventory_mode_spell_highlighted_img, "images/system/inventory_mode_spell_highlighted.png"),
-	//std::make_pair(&equipped_bmp, "images/system/Equipped.png"),
-	//std::make_pair(&itembroken_bmp, "images/system/Broken.png"),
-
-	//Chest images..
-	//std::make_pair(&inventoryChest_bmp, "images/system/InventoryChest.png"),
-	//std::make_pair(&inventoryoptionChest_bmp, "images/system/InventoryOptionChest.png"),
-	//std::make_pair(&invclose_bmp, "images/system/InventoryCloseHighlighted.png"),
-	//std::make_pair(&invgraball_bmp, "images/system/InventoryChestGraballHighlighted.png"),
-
-	//Identify GUI images...
-	//std::make_pair(&identifyGUI_img, "images/system/identifyGUI.png"),
-	//std::make_pair(&rightsidebar_slot_grayedout_img, "images/system/rightSidebarSlotGrayedOut.png"),
-	//std::make_pair(&bookgui_img, "images/system/book.png"),
-	//std::make_pair(&book_highlighted_left_img, "images/system/bookpageleft-highlighted.png"),
-	//std::make_pair(&book_highlighted_right_img, "images/system/bookpageright-highlighted.png"),
-
-	//Levelup images.
-	//std::make_pair(&str_bmp64u, "images/system/str64u.png"),
-	//std::make_pair(&dex_bmp64u, "images/system/dex64u.png"),
-	//std::make_pair(&con_bmp64u, "images/system/con64u.png"),
-	//std::make_pair(&int_bmp64u, "images/system/int64u.png"),
-	//std::make_pair(&per_bmp64u, "images/system/per64u.png"),
-	//std::make_pair(&chr_bmp64u, "images/system/chr64u.png"),
-	//std::make_pair(&str_bmp64, "images/system/str64.png"),
-	//std::make_pair(&dex_bmp64, "images/system/dex64.png"),
-	//std::make_pair(&con_bmp64, "images/system/con64.png"),
-	//std::make_pair(&int_bmp64, "images/system/int64.png"),
-	//std::make_pair(&per_bmp64, "images/system/per64.png"),
-	//std::make_pair(&chr_bmp64, "images/system/chr64.png"),
-
-	//Misc GUI images.
-	//std::make_pair(&sidebar_lock_bmp, "images/system/locksidebar.png"),
-	//std::make_pair(&sidebar_unlock_bmp, "images/system/unlocksidebar.png"),
-	//std::make_pair(&hotbar_img, "images/system/hotbar_slot.png"),
-	//std::make_pair(&hotbar_spell_img, "images/system/magic/hotbar_spell.png"),
-
-	//Misc effect images.
-	//std::make_pair(&effect_drunk_bmp, "images/system/drunk.png"),
-	//std::make_pair(&effect_polymorph_bmp, "images/system/polymorph.png"),
-	//std::make_pair(&effect_hungover_bmp, "images/system/hungover.png")
-};
 
 bool loadInterfaceResources()
 {

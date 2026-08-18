@@ -34,7 +34,6 @@
 #define TORCH_FLICKER my->skill[1]
 #define TORCH_FIRE my->skill[3]
 
-bool flickerLights = true;
 
 void actTorch(Entity* my)
 {

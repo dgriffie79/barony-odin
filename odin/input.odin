@@ -12,7 +12,7 @@ PlayerControlType_T :: enum i32 {
 }
 
 // Input::ControllerType
-// InputBinding_T — 104B (binding_tMirror: input string + pad/joystick/mouse fields)
+// InputBinding_T - 104B (binding_tMirror: input string + pad/joystick/mouse fields)
 InputBinding_T :: struct {
 	input:               string,
 	analog:              f32,
@@ -44,10 +44,10 @@ ControllerType :: enum i32 {
 	SteamDeck,
 }
 
-// class Input — 240 bytes
+// class Input - 240 bytes
 // { int player; bool inverted; DynamicMapBinding bindings (32B);
-//   DynamicMapStr kb_bindings, gamepad_bindings, joystick_bindings (3×32);
-//   DynamicMapStr kb_system_bindings, gamepad_system_bindings, joystick_system_bindings (3×32);
+//   DynamicMapStr kb_bindings, gamepad_bindings, joystick_bindings (3-32);
+//   DynamicMapStr kb_system_bindings, gamepad_system_bindings, joystick_system_bindings (3-32);
 //   bool disabled; }
 Input :: struct {
 	player:               i32,

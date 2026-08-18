@@ -2,7 +2,7 @@
 package main
 
 
-// class Directory — 48 bytes { DynamicArrayStr list (40B); const char* path (8B) }
+// class Directory - 48 bytes { DynamicArrayStr list (40B); const char* path (8B) }
 Directory :: struct {
 	list: [dynamic]string, // DynamicArrayStr (40B)
 	path: cstring,                       // const char*

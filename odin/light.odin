@@ -1,8 +1,8 @@
-// light.odin — Odin mirrors of light.hpp.
+// light.odin - Odin mirrors of light.hpp.
 package main
 
 
-// typedef struct light_t — 32 bytes
+// typedef struct light_t - 32 bytes
 // { Sint32 x,y; Sint32 radius; vec4_t* tiles; int index; node_t* node; }
 light_t :: struct {
 	x:      i32,
@@ -15,7 +15,7 @@ light_t :: struct {
 
 #assert(size_of(light_t) == 40)
 
-// struct LightDef — 28 bytes
+// struct LightDef - 28 bytes
 // { int radius; float r,g,b,a; float falloff_exp; bool shadows; }
 Light_Def :: struct {
 	radius:      i32,
@@ -29,7 +29,7 @@ Light_Def :: struct {
 
 #assert(size_of(Light_Def) == 28)
 
-// struct KV { const char* first; LightDef second; } — 40 bytes
+// struct KV { const char* first; LightDef second; } - 40 bytes
 Light_KV :: struct {
 	first:  cstring,
 	second: Light_Def,
@@ -37,7 +37,7 @@ Light_KV :: struct {
 
 #assert(size_of(Light_KV) == 40)
 
-// struct Iterator { KV kv; bool valid; } — 48 bytes
+// struct Iterator { KV kv; bool valid; } - 48 bytes
 Light_Iterator :: struct {
 	kv:    Light_KV,
 	valid: bool,
@@ -45,7 +45,7 @@ Light_Iterator :: struct {
 
 #assert(size_of(Light_Iterator) == 48)
 
-// DynamicMapLightDef — a string-keyed map of LightDef. C++ wraps DynamicMapRaw
+// DynamicMapLightDef - a string-keyed map of LightDef. C++ wraps DynamicMapRaw
 // (32B) with per-key LightDef values. Mirrors as map[string]Light_Def (native).
 // Layout note: the C++ class has one DynamicMapRaw member (32B) + no other data.
 DynamicMapLightDef :: struct {

@@ -1,4 +1,4 @@
-// ui_frame.odin — Odin mirror of ui/Frame.hpp.
+// ui_frame.odin - Odin mirror of ui/Frame.hpp.
 package main
 
 // enum Frame::border_style_t
@@ -23,7 +23,7 @@ Frame_SearchType :: enum i32 {
 	FRAME_SEARCH_BREADTH_FIRST,
 }
 
-// struct Frame::image_t — 80 bytes
+// struct Frame::image_t - 80 bytes
 Frame_Image_T :: struct {
 	name:           string, // DynamicString (16B)
 	path:           string,
@@ -39,7 +39,7 @@ Frame_Image_T :: struct {
 }
 #assert(size_of(Frame_Image_T) == 80)
 
-// struct Frame::entry_t — 144 bytes
+// struct Frame::entry_t - 144 bytes
 Frame_Entry_T :: struct {
 	parent:         rawptr, // Frame& (reference -> rawptr)
 	name:           string,
@@ -67,7 +67,7 @@ Frame_Entry_T :: struct {
 }
 #assert(size_of(Frame_Entry_T) == 144)
 
-// struct Frame::result_t — 24 bytes
+// struct Frame::result_t - 24 bytes
 Frame_Result_T :: struct {
 	usable:         bool,
 	highlight_time: u32,
@@ -76,9 +76,9 @@ Frame_Result_T :: struct {
 }
 #assert(size_of(Frame_Result_T) == 24)
 
-// class Frame : public Widget — 808 bytes
+// class Frame : public Widget - 808 bytes
 Frame :: struct {
-	// Widget base (248B) — inlined field-for-field
+	// Widget base (248B) - inlined field-for-field
 	using _: Widget,
 
 	ticks:                       u32,

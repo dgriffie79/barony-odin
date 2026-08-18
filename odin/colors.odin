@@ -1,7 +1,7 @@
 // colors.odin -- Odin mirror of colors.hpp.
 package main
 
-// SDL_Color — the constexpr in colors.hpp expands via SDL.h: {Uint8 r,g,b,a}
+// SDL_Color - the constexpr in colors.hpp expands via SDL.h: {Uint8 r,g,b,a}
 // In Odin we use the same layout so sizeof stays 4.
 SDL_Color :: struct {
 	r: u8,
@@ -13,14 +13,14 @@ SDL_Color :: struct {
 
 sdlColorWhite :: SDL_Color{255, 255, 255, 255}
 
-// 32-bit packed RGBA colors — all mirror the makeColor/makeColorRGB calls
+// 32-bit packed RGBA colors - all mirror the makeColor/makeColorRGB calls
 // in colors.hpp. Values are the constexpr result on little-endian x64.
 uint32ColorBlack             :: 0xff000000 // makeColorRGB(0,0,0)
 uint32ColorWhite             :: 0xffffffff // makeColorRGB(255,255,255)
 uint32ColorGray              :: 0xff7f7f7f // makeColorRGB(127,127,127)
 uint32ColorBlue              :: 0xffff5c00 // makeColor(0,92,255,255)
 uint32ColorLightBlue         :: 0xffffff00 // makeColor(0,255,255,255)
-uint32ColorBaronyBlue        :: 0xffffc000 // makeColor(0,192,255,255) — Dodger Blue
+uint32ColorBaronyBlue        :: 0xffffc000 // makeColor(0,192,255,255) - Dodger Blue
 uint32ColorRed               :: 0xff0000ff // makeColor(255,0,0,255)
 uint32ColorGreen             :: 0xff00ff00 // makeColor(0,255,0,255)
 uint32ColorOrange            :: 0xff0080ff // makeColor(255,128,0,255)

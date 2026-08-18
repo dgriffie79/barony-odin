@@ -50,15 +50,15 @@ struct DamageIndicatorHandler_t
 	void insert(const int player, const real_t _x, const real_t _y, const bool damaged);
 	DynamicArray indicators[MAXPLAYERS];  // vector<DamageIndicator_t> (POD)
 };
-extern DamageIndicatorHandler_t DamageIndicatorHandler;
+extern "C" DamageIndicatorHandler_t DamageIndicatorHandler;
 
-extern bool hide_statusbar;
-extern real_t uiscale_chatlog;
-extern real_t uiscale_playerbars;
-extern bool uiscale_charactersheet;
-extern bool uiscale_skillspage;
-extern real_t uiscale_hotbar;
-extern real_t uiscale_inventory;
+extern "C" bool hide_statusbar;
+extern "C" real_t uiscale_chatlog;
+extern "C" real_t uiscale_playerbars;
+extern "C" bool uiscale_charactersheet;
+extern "C" bool uiscale_skillspage;
+extern "C" real_t uiscale_hotbar;
+extern "C" real_t uiscale_inventory;
 
 #include "../entity.hpp"
 
@@ -202,7 +202,7 @@ public:
 // MapValueKindOf for EnemyHPDamageBarHandler::EnemyHPDetails (owns a DynamicString) — kind 25 = MK_EnemyHPDetails
 template <> struct MapValueKindOf<EnemyHPDamageBarHandler::EnemyHPDetails> { static constexpr int value = MK_EnemyHPDetails; };
 
-extern EnemyHPDamageBarHandler enemyHPDamageBarHandler[MAXPLAYERS];
+extern "C" EnemyHPDamageBarHandler enemyHPDamageBarHandler[MAXPLAYERS];
 
 #ifndef SHOPWINDOW_SIZE
 #define SHOPWINDOW_SIZE
@@ -218,11 +218,11 @@ static const int GUI_MODE_FOLLOWERMENU = 3;
 static const int GUI_MODE_SIGN = 4;
 static const int GUI_MODE_CALLOUT = 5;
 
-extern int textscroll;
-extern int inventorycategory;
-extern int itemscroll;
-extern view_t camera_charsheet;
-extern real_t camera_charsheet_offsetyaw;
+extern "C" int textscroll;
+extern "C" int inventorycategory;
+extern "C" int itemscroll;
+extern "C" view_t camera_charsheet;
+extern "C" real_t camera_charsheet_offsetyaw;
 
 extern "C" void select_inventory_slot(int player, int currentx, int currenty, int diffx, int diffy);
 extern "C" void select_spell_slot(int player, int currentx, int currenty, int diffx, int diffy);
@@ -234,8 +234,8 @@ extern "C" void select_feather_slot(int player, int currentx, int currenty, int 
 extern "C" void select_assistshrine_slot(int player, int currentx, int currenty, int diffx, int diffy);
 extern "C" void select_mail_slot(int player, int currentx, int currenty, int diffx, int diffy);
 
-extern Entity* openedChest[MAXPLAYERS]; //One for each client. //TODO: Clientside, [0] will always point to something other than NULL when a chest is open and it will be NULL when a chest is closed.
-extern list_t chestInv[MAXPLAYERS]; //This is just for the client, so that it can populate the chest inventory on its end.
+extern "C" Entity* openedChest[MAXPLAYERS]; //One for each client. //TODO: Clientside, [0] will always point to something other than NULL when a chest is open and it will be NULL when a chest is closed.
+extern "C" list_t chestInv[MAXPLAYERS]; //This is just for the client, so that it can populate the chest inventory on its end.
 
 //extern bool gui_clickdrag[MAXPLAYERS]; //True as long as an interface element is being dragged.
 //extern int dragoffset_x[MAXPLAYERS];
@@ -253,7 +253,7 @@ struct MinimapHighlight_t
 {
 	Uint32 ticks = 0;
 };
-extern DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
+extern "C" DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
 extern "C" void handleDamageIndicatorTicks();
 extern "C" void drawStatus(const int player);
 extern "C" void drawStatusNew(const int player);
@@ -287,7 +287,7 @@ extern "C" bool playerLearnedSpellbook(const int player, Item* current_item);
 //Inventory GUI definitions.
 static const int INVENTORY_MODE_ITEM = 0;
 static const int INVENTORY_MODE_SPELL = 1;
-extern bool restrictPaperDollMovement;
+extern "C" bool restrictPaperDollMovement;
 
 //Chest GUI definitions.
 extern "C" int numItemsInChest(const int player);
@@ -308,9 +308,9 @@ extern "C" int numItemsInChest(const int player);
  * 0 = spell list.
  * 1 = spell editor.
  */
-extern int magic_GUI_state;
-extern SDL_Rect magic_gui_pos; //The position of the magic GUI is stored here.
-extern SDL_Surface* sustained_spell_generic_icon; //The goto icon when no other is available.
+extern "C" int magic_GUI_state;
+extern "C" SDL_Rect magic_gui_pos; //The position of the magic GUI is stored here.
+extern "C" SDL_Surface* sustained_spell_generic_icon; //The goto icon when no other is available.
 
 extern "C" void renderMagicGUI(int winx, int winy, int winw, int winh);
 extern "C" void updateMagicGUI();
@@ -1360,7 +1360,7 @@ public:
 	};
 	AlchemyGUI_t alchemyGUI;
 };
-extern GenericGUIMenu GenericGUI[MAXPLAYERS];
+extern "C" GenericGUIMenu GenericGUI[MAXPLAYERS];
 
 /*
  * Returns true if the mouse is in the specified bounds, with x1 and y1 specifying the top left corner, and x2 and y2 specifying the bottom right corner.
@@ -1425,23 +1425,23 @@ extern "C" bool warpMouseToSelectedHotbarSlot(const int player);
  * True = automatically place items you pick up in your hotbar.
  * False = don't.
  */
-extern bool auto_hotbar_new_items;
+extern "C" bool auto_hotbar_new_items;
 
-extern bool auto_hotbar_categories[NUM_HOTBAR_CATEGORIES]; // true = enable auto add to hotbar. else don't add.
+extern "C" bool auto_hotbar_categories[NUM_HOTBAR_CATEGORIES]; // true = enable auto add to hotbar. else don't add.
 
-extern int autosort_inventory_categories[NUM_AUTOSORT_CATEGORIES]; // 0 = disable priority sort, fill rightmost first. greater than 0, fill leftmost using value as priority (0 = lowest priority)
+extern "C" int autosort_inventory_categories[NUM_AUTOSORT_CATEGORIES]; // 0 = disable priority sort, fill rightmost first. greater than 0, fill leftmost using value as priority (0 = lowest priority)
 
-extern bool disable_messages;
+extern "C" bool disable_messages;
 
-extern bool right_click_protect;
+extern "C" bool right_click_protect;
 
-extern bool auto_appraise_new_items;
+extern "C" bool auto_appraise_new_items;
 
-extern bool show_game_timer_always;
+extern "C" bool show_game_timer_always;
 
-extern bool hide_playertags;
+extern "C" bool hide_playertags;
 
-extern bool show_skill_values;
+extern "C" bool show_skill_values;
 
 extern "C" const char* getInputName(Uint32 scancode);
 extern "C" Sint8* inputPressed(Uint32 scancode);
@@ -1540,10 +1540,10 @@ public:
 
 extern "C" extern DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
 extern "C" void minimapPingAdd(const int srcPlayer, const int destPlayer, MinimapPing newPing);
-extern int minimapPingGimpTimer[MAXPLAYERS];
-extern SDL_Rect minimaps[MAXPLAYERS];
+extern "C" int minimapPingGimpTimer[MAXPLAYERS];
+extern "C" SDL_Rect minimaps[MAXPLAYERS];
 
-extern DynamicArraySurfacePtrStringPair systemResourceImages;
+extern "C" DynamicArraySurfacePtrStringPair systemResourceImages;
 
 class FollowerRadialMenu
 {
@@ -1659,7 +1659,7 @@ public:
 };
 template <> struct DynamicArrayKindOf<FollowerRadialMenu::PanelEntry> { static constexpr int value = Kind_PanelEntry; };
 
-extern FollowerRadialMenu FollowerMenu[MAXPLAYERS];
+extern "C" FollowerRadialMenu FollowerMenu[MAXPLAYERS];
 
 struct CalloutRadialMenu
 {
@@ -1895,7 +1895,7 @@ struct CalloutRadialMenu
 	static bool calloutMenuEnabledForGamemode();
 	void update();
 };
-extern CalloutRadialMenu CalloutMenu[MAXPLAYERS];
+extern "C" CalloutRadialMenu CalloutMenu[MAXPLAYERS];
 template <> struct MapValueKindOf<CalloutRadialMenu::CalloutParticle_t> { static constexpr int value = MK_CalloutParticle; };
 template <> struct DynamicArrayKindOf<CalloutRadialMenu::PanelEntry> { static constexpr int value = Kind_CalloutPanel; };
 template <> struct DynamicArrayKindOf<std::pair<Uint32, GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t>> { static constexpr int value = Kind_AssistNotifPair; };

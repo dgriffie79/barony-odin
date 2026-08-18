@@ -1,7 +1,7 @@
-// ui_image.odin — Odin mirror of ui/Image.hpp.
+// ui_image.odin - Odin mirror of ui/Image.hpp.
 package main
 
-// class Image — 56 bytes (has virtuals -> vtable ptr first)
+// class Image - 56 bytes (has virtuals -> vtable ptr first)
 Image :: struct {
 	vtable:        rawptr, // vftable pointer (Image is polymorphic)
 	name:          string, // DynamicString (16B)

@@ -12,16 +12,3 @@
 #include "../../main.hpp"
 #include "sound.hpp"
 
-Uint32 numsounds = 0;
-
-// Shared music state (used by both FMOD and OpenAL paths, and the editor).
-bool levelmusicplaying = false;
-bool shopmusicplaying = false;
-bool combatmusicplaying = false;
-bool minotaurmusicplaying = false;
-bool herxmusicplaying = false;
-bool devilmusicplaying = false;
-bool olddarkmap = false;
-bool sanctummusicplaying = false;
-int currenttrack = -1;
-

@@ -9,7 +9,7 @@ LobbyServiceType :: enum i32 {
 	LOBBY_COMBINED,
 }
 
-// struct LobbyHandler_t::LobbySearchResult_t — 8 bytes
+// struct LobbyHandler_t::LobbySearchResult_t - 8 bytes
 // (POD mirror of std::pair<Sint32, LobbyServiceType>)
 LobbySearchResult_T :: struct {
 	first:  i32, // Sint32
@@ -36,7 +36,7 @@ EResult_LobbyFailures :: enum i32 {
 	LOBBY_SAVEGAME_REQUIRES_DLC = 50013,
 }
 
-// class LobbyHandler_t — the class has a 200-element LobbySearchResult_t array.
+// class LobbyHandler_t - the class has a 200-element LobbySearchResult_t array.
 // Its exact C++ layout includes vtable/private bits; the Odin mirror stores
 // the payload fields that are accessed via the struct (hostingType etc. + the
 // 200-element array).

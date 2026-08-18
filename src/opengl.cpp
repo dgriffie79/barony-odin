@@ -709,8 +709,6 @@ void beginGraphics() {
 }
 
 #ifndef EDITOR
-CvarFloat cvar_fogDistance("/fog_distance", 0.f);
-CvarVector4 cvar_fogColor("/fog_color", {0.f, 0.f, 0.f, 0.f});
 CvarFloat cvar_fogRate("/fog_rate", 0.0);
 CvarFloat cvar_fogFade("/fog_fade", 0.0);
 #endif
@@ -999,30 +997,16 @@ static void uploadLightUniforms(view_t* camera, Shader& shader, Entity* entity, 
     }
 }
 
-const Vector4 defaultBrightness = {1.f, 1.f, 1.f, 1.f};
-const float defaultGamma = 0.75f;           // default gamma level: 75%
-const float defaultExposure = 0.5f;         // default exposure level: 50%
-const float defaultAdjustmentRate = 0.1f;   // how fast your eyes adjust
-const float defaultLimitHigh = 4.f;         // your aperture can increase to see something 4 times darker.
-const float defaultLimitLow = 0.1f;         // your aperture can decrease to see something 10 times brighter.
 constexpr float defaultLumaRed = 0.2126f;       // how much to weigh red light for luma (ITU 709)
 constexpr float defaultLumaGreen = 0.7152f;     // how much to weigh green light for luma (ITU 709)
 constexpr float defaultLumaBlue = 0.0722f;      // how much to weigh blue light for luma (ITU 709)
 constexpr bool defaultMultithread = true;       // use multiple workers to collect luminance samples
 constexpr float defaultSamples = 16384;         // how many samples (pixels) to gather from the framebuffer for average scene luminance
 #ifdef EDITOR
-bool hdrEnabled = true;
 #else
-CvarVector4 cvar_hdrBrightness("/hdr_brightness", defaultBrightness);
 static CvarBool cvar_hdrMultithread("/hdr_multithread", defaultMultithread);
-CvarFloat cvar_hdrExposure("/hdr_exposure", defaultExposure);
-CvarFloat cvar_hdrGamma("/hdr_gamma", defaultGamma);
-CvarFloat cvar_hdrAdjustment("/hdr_adjust_rate", defaultAdjustmentRate);
-CvarFloat cvar_hdrLimitHigh("/hdr_limit_high", defaultLimitHigh);
-CvarFloat cvar_hdrLimitLow("/hdr_limit_low", defaultLimitLow);
 static CvarInt cvar_hdrSamples("/hdr_samples", defaultSamples);
 static CvarVector4 cvar_hdrLuma("/hdr_luma", Vector4{defaultLumaRed, defaultLumaGreen, defaultLumaBlue, 0.f});
-bool hdrEnabled = true;
 #endif
 
 static int oldViewport[4];
@@ -1524,25 +1508,6 @@ void glDrawVoxel(view_t* camera, Entity* entity, int mode) {
 
 -------------------------------------------------------------------------------*/
 
-Mesh spriteMesh = {
-    {
-        -.5f, -.5f, 0.f,
-         .5f, -.5f, 0.f,
-         .5f,  .5f, 0.f,
-        -.5f, -.5f, 0.f,
-         .5f,  .5f, 0.f,
-        -.5f,  .5f, 0.f,
-    }, // positions
-    {
-        0.f, 1.f,
-        1.f, 1.f,
-        1.f, 0.f,
-        0.f, 1.f,
-        1.f, 0.f,
-        0.f, 0.f,
-    }, // texcoords
-    {} // colors
-};
 
 #ifndef EDITOR
 static CvarFloat cvar_enemybarDepthRange("/enemybar_depth_range", 0.5);
@@ -2291,50 +2256,6 @@ std::vector<Chunk> chunks;
 constexpr float sky_size = CLIPFAR * 16.f;
 constexpr float sky_htex_size = sky_size / 64.f;
 constexpr float sky_ltex_size = sky_size / 32.f;
-Mesh skyMesh = {
-    {
-        -sky_size, 65.f, -sky_size,
-         sky_size, 65.f, -sky_size,
-         sky_size, 65.f,  sky_size,
-        -sky_size, 65.f, -sky_size,
-         sky_size, 65.f,  sky_size,
-        -sky_size, 65.f,  sky_size,
-        -sky_size, 64.f, -sky_size,
-         sky_size, 64.f, -sky_size,
-         sky_size, 64.f,  sky_size,
-        -sky_size, 64.f, -sky_size,
-         sky_size, 64.f,  sky_size,
-        -sky_size, 64.f,  sky_size,
-    }, // positions
-    {
-        0.f, 0.f,
-        sky_htex_size, 0.f,
-        sky_htex_size, sky_htex_size,
-        0.f, 0.f,
-        sky_htex_size, sky_htex_size,
-        0.f, sky_htex_size,
-        0.f, 0.f,
-        sky_ltex_size, 0.f,
-        sky_ltex_size, sky_ltex_size,
-        0.f, 0.f,
-        sky_ltex_size, sky_ltex_size,
-        0.f, sky_ltex_size,
-    }, // texcoords
-    {
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f, .5f,
-        1.f, 1.f, 1.f, .5f,
-        1.f, 1.f, 1.f, .5f,
-        1.f, 1.f, 1.f, .5f,
-        1.f, 1.f, 1.f, .5f,
-        1.f, 1.f, 1.f, .5f,
-    }, // colors
-};
 
 #ifndef EDITOR
 static CvarBool cvar_allowChunkRebuild("/allow_chunk_rebuild", true);

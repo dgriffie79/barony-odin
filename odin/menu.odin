@@ -1,8 +1,8 @@
-// menu.odin — Odin mirrors of menu.hpp.
+// menu.odin - Odin mirrors of menu.hpp.
 package main
 
 
-// struct SaveGameListEntry_t — 16 bytes
+// struct SaveGameListEntry_t - 16 bytes
 // { int lastModified; int multiplayerType; int fileEntry; int description; }
 SaveGameListEntry_t :: struct {
 	last_modified:   i32,
@@ -12,7 +12,7 @@ SaveGameListEntry_t :: struct {
 }
 #assert(size_of(SaveGameListEntry_t) == 16)
 
-// struct resolution — 12 bytes
+// struct resolution - 12 bytes
 resolution :: struct {
 	x:  i32,
 	y:  i32,
@@ -20,7 +20,7 @@ resolution :: struct {
 }
 #assert(size_of(resolution) == 12)
 
-// struct LastCreatedCharacter — 120 bytes
+// struct LastCreatedCharacter - 120 bytes
 // { int characterClass[6]; int characterAppearance[6]; int characterSex[6];
 //   int characterRace[6]; DynamicString characterName[6]; }
 LastCreatedCharacter :: struct {

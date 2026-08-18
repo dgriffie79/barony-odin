@@ -33,7 +33,6 @@
 
 const int Mesh::ElementsPerVBO[(int)Mesh::BufferType::Max] = {3, 2, 4};
 
-framebuffer main_framebuffer;
 
 Mesh framebuffer::mesh{
 	{ // positions
@@ -64,19 +63,6 @@ Mesh framebuffer::mesh{
 
 Shader framebuffer::shader;
 Shader framebuffer::hdrShader;
-Shader voxelShader;
-Shader voxelBrightShader;
-Shader voxelDitheredShader;
-Shader voxelBrightDitheredShader;
-Shader worldShader;
-Shader worldDitheredShader;
-Shader worldDarkShader;
-Shader skyShader;
-Shader spriteShader;
-Shader spriteDitheredShader;
-Shader spriteBrightShader;
-Shader spriteUIShader;
-TempTexture* lightmapTexture[MAXPLAYERS + 1];
 
 static Shader gearShader;
 static Shader lineShader;
@@ -2083,7 +2069,6 @@ void raycast(const view_t& camera, Sint8 (*minimap)[MINIMAP_MAX_DIMENSION], bool
 
 -------------------------------------------------------------------------------*/
 
-Uint32 ditherDisabledTime = 0;
 void temporarilyDisableDithering() {
     ditherDisabledTime = ticks;
 }

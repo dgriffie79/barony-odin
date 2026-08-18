@@ -27,36 +27,16 @@
 #include "ui/MainMenu.hpp"
 
 
-Player* players[MAXPLAYERS] = { nullptr };
-PlayerSettings_t playerSettings[MAXPLAYERS];
-Entity* selectedEntity[MAXPLAYERS] = { nullptr };
 Sint32 mousex = 0, mousey = 0;
 Sint32 omousex = 0, omousey = 0;
 Sint32 mousexrel = 0, mouseyrel = 0;
-
-int gamepad_deadzone = 8000;
-int gamepad_trigger_deadzone = 18000;
-real_t gamepad_leftx_sensitivity = 1.0;
-real_t gamepad_lefty_sensitivity = 1.0;
-real_t gamepad_rightx_sensitivity = 1.0;
-real_t gamepad_righty_sensitivity = 1.0;
-real_t gamepad_menux_sensitivity = 1.0;
-real_t gamepad_menuy_sensitivity = 1.0;
-
-bool gamepad_leftx_invert = false;
-bool gamepad_lefty_invert = false;
-bool gamepad_rightx_invert = false;
-bool gamepad_righty_invert = false;
-bool gamepad_menux_invert = false;
-bool gamepad_menuy_invert = false;
 
 const int Player::Inventory_t::MAX_SPELLS_X = 4;
 const int Player::Inventory_t::MAX_SPELLS_Y = 70;
 const int Player::Inventory_t::MAX_CHEST_X = 4;
 const int Player::Inventory_t::MAX_CHEST_Y = 3;
 
-GameController game_controllers[MAX_GAME_CONTROLLERS];
-Inputs inputs;
+
 
 GameController::GameController()
 {

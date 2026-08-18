@@ -1,4 +1,4 @@
-// interface_ui.odin — Odin mirror of interface/ui.hpp.
+// interface_ui.odin - Odin mirror of interface/ui.hpp.
 package main
 
 // enum UIToastNotification::ActionFlags : Uint32
@@ -20,7 +20,7 @@ UIToast_CardState :: enum u32 {
 	UI_CARD_STATE_REMOVED,
 }
 
-// class UIToastNotification — 320 bytes (7 owned DynamicStrings + raw ptrs)
+// class UIToastNotification - 320 bytes (7 owned DynamicStrings + raw ptrs)
 UIToastNotification :: struct {
 	action_flags:                    u32, // ActionFlags
 	card_type:                       UIToast_CardType,
@@ -78,7 +78,7 @@ UIToastNotification :: struct {
 }
 #assert(size_of(UIToastNotification) == 320)
 
-// class UIToastNotificationManager_t — 72 bytes
+// class UIToastNotificationManager_t - 72 bytes
 UIToastNotificationManager_T :: struct {
 	undock_ticks:          u32,
 	time_to_undock:        u32, // const

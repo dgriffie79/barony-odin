@@ -1,7 +1,7 @@
-// messages.odin — Odin mirrors of messages.hpp.
+// messages.odin - Odin mirrors of messages.hpp.
 package main
 
-// struct Message — 16 bytes
+// struct Message - 16 bytes
 // { string_t* text; int time_displayed; Sint16 alpha; }
 Message :: struct {
 	text:           ^string_t,

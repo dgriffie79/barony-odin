@@ -34,9 +34,7 @@
 
 Uint32 minotaur_timer = 0;
 DynamicArray minimapPings[MAXPLAYERS];  // vector<MinimapPing> (POD)
-int minimapPingGimpTimer[MAXPLAYERS] = { 0 };
 Uint32 lastMapTick = 0;
-SDL_Rect minimaps[MAXPLAYERS];
 
 static TempTexture* minimapTextures[MAXPLAYERS] = { nullptr };
 static SDL_Surface* minimapSurfaces[MAXPLAYERS] = { nullptr };
@@ -95,8 +93,6 @@ inline real_t getMinimapZoom()
 {
 	return minimapObjectZoom + 50;
 }
-
-DynamicMapI32T<MinimapHighlight_t> minimapHighlights;
 
 void drawMinimap(const int player, SDL_Rect rect, bool drawingSharedMap)
 {

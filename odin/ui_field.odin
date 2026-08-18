@@ -1,4 +1,4 @@
-// ui_field.odin — Odin mirror of ui/Field.hpp.
+// ui_field.odin - Odin mirror of ui/Field.hpp.
 package main
 
 // enum Field::justify_t (TOP,BOTTOM,LEFT,RIGHT,CENTER)
@@ -11,7 +11,7 @@ Field_Justify :: enum i32 {
 	JUSTIFY_TYPE_LENGTH,
 }
 
-// struct Field::result_t — 24 bytes
+// struct Field::result_t - 24 bytes
 Field_Result_T :: struct {
 	tooltip:       cstring, // const char*
 	highlighted:   bool,
@@ -20,14 +20,14 @@ Field_Result_T :: struct {
 }
 #assert(size_of(Field_Result_T) == 24)
 
-// FieldCacheEntry_T — 24B (vector<pair<string,Text*>> cache element)
+// FieldCacheEntry_T - 24B (vector<pair<string,Text*>> cache element)
 FieldCacheEntry_T :: struct {
 	first:  string, // owned
 	second: rawptr, // Text* (not owned)
 }
 #assert(size_of(FieldCacheEntry_T) == 24)
 
-// class Field : public Widget — (248 base + own)
+// class Field : public Widget - (248 base + own)
 Field :: struct {
 	using _: Widget, // 248B base
 

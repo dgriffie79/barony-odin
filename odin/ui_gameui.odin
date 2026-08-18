@@ -1,7 +1,7 @@
-// ui_gameui.odin — Odin mirror of ui/GameUI.hpp.
+// ui_gameui.odin - Odin mirror of ui/GameUI.hpp.
 package main
 
-// struct EnemyBarSettings_t — 64 bytes
+// struct EnemyBarSettings_t - 64 bytes
 // { DynamicMapF32 heightOffsets (32); DynamicMapF32 screenDistanceOffsets (32); }
 EnemyBarSettings_T :: struct {
 	height_offsets:          map[string]f32, // DynamicMapF32 (string-keyed)
@@ -9,7 +9,7 @@ EnemyBarSettings_T :: struct {
 }
 #assert(size_of(EnemyBarSettings_T) == 64)
 
-// struct CustomColors_t — 76 bytes (19 x Uint32)
+// struct CustomColors_t - 76 bytes (19 x Uint32)
 CustomColors_T :: struct {
 	item_context_menu_heading_text:          u32,
 	item_context_menu_option_text:           u32,
@@ -51,7 +51,7 @@ StatusEffect_Dir :: enum i32 {
 	RIGHT,
 }
 
-// struct StatusEffectQueueEntry_t — 160 bytes
+// struct StatusEffectQueueEntry_t - 160 bytes
 StatusEffectQueueEntry_T :: struct {
 	animate_x:                  f64,
 	animate_y:                  f64,
@@ -79,7 +79,7 @@ StatusEffectQueueEntry_T :: struct {
 }
 #assert(size_of(StatusEffectQueueEntry_T) == 160)
 
-// struct StatusEffectQueue_t — 168 bytes
+// struct StatusEffectQueue_t - 168 bytes
 StatusEffectQueue_T :: struct {
 	status_effect_frame:         ^Frame, // Frame*
 	status_effect_tooltip_frame: ^Frame,
@@ -101,7 +101,7 @@ StatusEffectQueue_T :: struct {
 }
 #assert(size_of(StatusEffectQueue_T) == 168)
 
-// struct StatusEffectQueue_t::EffectDefinitionEntry_t — 248 bytes
+// struct StatusEffectQueue_t::EffectDefinitionEntry_t - 248 bytes
 EffectDefinitionEntry_T :: struct {
 	effect_id:                     i32, // default -1
 	spell_id:                      i32, // default -1
@@ -121,7 +121,7 @@ EffectDefinitionEntry_T :: struct {
 }
 #assert(size_of(EffectDefinitionEntry_T) == 248)
 
-// struct SkillSheetFrames_t — 280 bytes
+// struct SkillSheetFrames_t - 280 bytes
 SkillSheetFrames_T :: struct {
 	skills_frame:              ^Frame,
 	entry_frame_left:          ^Frame,
@@ -138,7 +138,7 @@ SkillSheetFrames_T :: struct {
 }
 #assert(size_of(SkillSheetFrames_T) == 280)
 
-// struct PlayerInventoryFrames_t — 152 bytes
+// struct PlayerInventoryFrames_t - 152 bytes
 PlayerInventoryFrames_T :: struct {
 	inventory_bg_frame:         ^Frame,
 	selected_slot_frame:        ^Frame,
@@ -162,7 +162,7 @@ PlayerInventoryFrames_T :: struct {
 }
 #assert(size_of(PlayerInventoryFrames_T) == 152)
 
-// struct MinotaurWarning_t — 152 bytes
+// struct MinotaurWarning_t - 152 bytes
 MinotaurWarning_T :: struct {
 	state:                      i32,
 	state_init:                 i32,
@@ -196,13 +196,13 @@ MinotaurWarning_T :: struct {
 }
 #assert(size_of(MinotaurWarning_T) == 152)
 
-// struct LevelUpAnimation_t — 40 bytes
+// struct LevelUpAnimation_t - 40 bytes
 LevelUpAnimation_T :: struct {
 	lvl_ups: [dynamic]LevelUp_T, // DynamicArrayT<LevelUp_t> (40B)
 }
 #assert(size_of(LevelUpAnimation_T) == 40)
 
-// struct LevelUpAnimation_t::LevelUp_t — 104 bytes
+// struct LevelUpAnimation_t::LevelUp_t - 104 bytes
 LevelUp_T :: struct {
 	current_lvl:        i32, // default -1
 	increase_lvl:       i32, // default -1
@@ -218,7 +218,7 @@ LevelUp_T :: struct {
 }
 #assert(size_of(LevelUp_T) == 104)
 
-// struct LevelUpAnimation_t::LevelUp_t::StatUp_t — 168 bytes
+// struct LevelUpAnimation_t::LevelUp_t::StatUp_t - 168 bytes
 StatUp_T :: struct {
 	which_stat:          i32, // default -1
 	current_stat:        i32, // default -1
@@ -252,14 +252,14 @@ StatUp_T :: struct {
 }
 #assert(size_of(StatUp_T) == 168)
 
-// struct SkillUpAnimation_t — 48 bytes
+// struct SkillUpAnimation_t - 48 bytes
 SkillUpAnimation_T :: struct {
 	anim_frame_fade_in: f64, // default 1.0
 	skill_ups:          [dynamic]SkillUp_T, // DynamicArrayT<SkillUp_t> (40B)
 }
 #assert(size_of(SkillUpAnimation_T) == 48)
 
-// struct SkillUpAnimation_t::SkillUp_t — 200 bytes
+// struct SkillUpAnimation_t::SkillUp_t - 200 bytes
 SkillUp_T :: struct {
 	which_skill:        i32, // default -1
 	current_skill:      i32, // default -1
@@ -300,3 +300,107 @@ SkillUp_T :: struct {
 	// pad 6
 }
 #assert(size_of(SkillUp_T) == 200)
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin - ported from src/ui/GameUI.hpp
+// C++ references these via `extern "C"` declarations.
+// ---------------------------------------------------------------------------
+
+@(export)
+gameUIFrame : [MAXPLAYERS]^Frame
+
+@(export)
+playerPortraitView : [MAXPLAYERS]View_T
+
+@(export)
+enemyBarSettings : EnemyBarSettings_T
+
+@(export)
+hudColors : CustomColors_T
+
+// GAMEUI_FRAMEDATA_* - integer constants used as indices into frame data arrays
+@(export)
+GAMEUI_FRAMEDATA_ANIMATING_ITEM     : i32 = 1
+@(export)
+GAMEUI_FRAMEDATA_ALCHEMY_ITEM       : i32 = 2
+@(export)
+GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_SLOT : i32 = 3  // displaying in main alchemy gui when hovering over recipe
+@(export)
+GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_ENTRY : i32 = 4  // the recipe icon
+@(export)
+GAMEUI_FRAMEDATA_WORLDTOOLTIP_ITEM  : i32 = 5
+@(export)
+GAMEUI_FRAMEDATA_SHOP_ITEM          : i32 = 6
+@(export)
+GAMEUI_FRAMEDATA_ALCHEMY_MISSING_QTY : i32 = 7  // alchemy ingredient missing quantity
+@(export)
+GAMEUI_FRAMEDATA_SPELL_LEARNABLE    : i32 = 8   // if spell provides skill xp
+
+// if true, use the new user interface
+@(export)
+newui : bool = true
+@(export)
+bUsePreciseFieldTextReflow : bool = true
+@(export)
+bUseSelectedSlotCycleAnimation : bool = false
+
+// NOTE: CvarBool globals (shareMinimap, framesEatMouse) require C++ constructor
+// side-effects (register_console_entry). Init in init_cvars_bool() (called from
+// run_barony before barony_main in BOTH game and editor builds - GameUI.cpp
+// is in the shared source list).
+@(export)
+shareMinimap : CvarBool
+
+@(export)
+framesProcResult : Frame_Result_T  // zero-init matches C++ {false, 0, nullptr, false}
+
+@(export)
+framesEatMouse : CvarBool
+
+// CvarBool ctor port (consolecommand.hpp:84): name, type, func=cvar_setter,
+// data_ptr=&data, data, then register_console_entry. Game-only: the editor
+// lib builds only editor_sources (no GameUI.cpp / consolecommand.cpp).
+when !#config(EDITOR, false) {
+init_cvars_bool :: proc() {
+	shareMinimap.name = "/shareminimap"
+	shareMinimap.type = .CvarBool
+	shareMinimap.func = rawptr(cvar_setter)
+	shareMinimap.data_ptr = &shareMinimap.data
+	shareMinimap.data = true
+	register_console_entry(rawptr(&shareMinimap))
+
+	framesEatMouse.name = "/gui_eat_mouseclicks"
+	framesEatMouse.type = .CvarBool
+	framesEatMouse.func = rawptr(cvar_setter)
+	framesEatMouse.data_ptr = &framesEatMouse.data
+	framesEatMouse.data = true
+	register_console_entry(rawptr(&framesEatMouse))
+}
+} // when !#config(EDITOR, false)
+
+// StatusEffectQueue - each entry's player field set to its index (matches C++ init)
+@(export)
+StatusEffectQueue : [MAXPLAYERS]StatusEffectQueue_T = {
+	{player = 0},
+	{player = 1},
+	{player = 2},
+	{player = 3},
+}
+
+@(export)
+skillSheetEntryFrames : [MAXPLAYERS]SkillSheetFrames_T
+
+@(export)
+playerInventoryFrames : [MAXPLAYERS]PlayerInventoryFrames_T
+
+@(export)
+minimapFrame : ^Frame
+
+@(export)
+minotaurWarning : [MAXPLAYERS]MinotaurWarning_T
+
+@(export)
+levelUpAnimation : [MAXPLAYERS]LevelUpAnimation_T
+
+@(export)
+skillUpAnimation : [MAXPLAYERS]SkillUpAnimation_T

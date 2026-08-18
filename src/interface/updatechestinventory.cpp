@@ -19,8 +19,6 @@
 #include "../player.hpp"
 #include "interface.hpp"
 
-Entity* openedChest[MAXPLAYERS] = { nullptr };
-
 int numItemsInChest(const int player)
 {
 	node_t* node = nullptr;

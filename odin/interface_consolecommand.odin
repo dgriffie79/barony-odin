@@ -60,7 +60,7 @@ CvarFloat :: struct {
 // CvarString -- 56 bytes (ConsoleCommand + DynamicString)
 CvarString :: struct {
 	using base: ConsoleCommand, // ConsoleCommand base (40B)
-	data:       string, // DynamicString (16B) — ABI-identical to Odin string
+	data:       string, // DynamicString (16B) - ABI-identical to Odin string
 }
 #assert(size_of(CvarString) == 56)
 

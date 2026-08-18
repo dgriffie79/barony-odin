@@ -1,4 +1,4 @@
-// game.odin — Odin bindings to the C++ game code + mirrors of game.hpp types.
+// game.odin - Odin bindings to the C++ game code + mirrors of game.hpp types.
 //
 // Mirrors game.cpp: that file's `main()` was renamed to barony_main and given
 // C linkage. The C++ game code is compiled into a static library
@@ -21,7 +21,7 @@ when !#config(EDITOR, false) {
 // game.hpp types
 // ---------------------------------------------------------------------------
 
-// typedef struct packetsend_t — 40 bytes
+// typedef struct packetsend_t - 40 bytes
 packetsend_t :: struct {
 	sock:    rawptr, // UDPsocket
 	channel: i32,
@@ -32,12 +32,12 @@ packetsend_t :: struct {
 }
 #assert(size_of(packetsend_t) == 40)
 
-// class TileEntityListHandler — 262144 bytes
+// class TileEntityListHandler - 262144 bytes
 // { int gridEntities[256][256]; }
 TileEntityListHandler :: struct {
 	grid_entities: [256][256]i32,
 }
 #assert(size_of(TileEntityListHandler) == 262144)
 
-// class TimerExperiments — statics only (no per-instance data). State and
+// class TimerExperiments - statics only (no per-instance data). State and
 // EntityStates are defined in entity.odin.

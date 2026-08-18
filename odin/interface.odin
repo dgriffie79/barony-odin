@@ -1,4 +1,4 @@
-// interface.odin — Odin mirror of interface/interface.hpp.
+// interface.odin - Odin mirror of interface/interface.hpp.
 package main
 
 // ---------------------------------------------------------------------------
@@ -405,7 +405,7 @@ ItemContextMenuPrompts :: enum i32 {
 // Standalone structs
 // ---------------------------------------------------------------------------
 
-// struct DamageIndicatorHandler_t::DamageIndicator_t — 72 bytes
+// struct DamageIndicatorHandler_t::DamageIndicator_t - 72 bytes
 DamageIndicator_T :: struct {
 	player:                 i32, // default -1
 	// pad 4
@@ -427,14 +427,14 @@ DamageIndicator_T :: struct {
 }
 #assert(size_of(DamageIndicator_T) == 72)
 
-// struct DamageIndicatorHandler_t — 160 bytes
-// { DynamicArray indicators[4]; } (vector<DamageIndicator_t>)
+// struct DamageIndicatorHandler_t - 160 bytes
+// { DynamicArray indicators[MAXPLAYERS]; } (vector<DamageIndicator_t>)
 DamageIndicatorHandler_T :: struct {
-	indicators: [4][dynamic]DamageIndicator_T, // DynamicArray x4 (40B each)
+	indicators: [MAXPLAYERS][dynamic]DamageIndicator_T, // DynamicArray x4 (40B each)
 }
 #assert(size_of(DamageIndicatorHandler_T) == 160)
 
-// struct EnemyHPDamageBarHandler::BarAnimator_t — 120 bytes
+// struct EnemyHPDamageBarHandler::BarAnimator_t - 120 bytes
 EnemyHP_BarAnimator_T :: struct {
 	foreground_value:   f64,
 	background_value:   f64,
@@ -448,12 +448,12 @@ EnemyHP_BarAnimator_T :: struct {
 	current_opacity:    f64,
 	fade_out:           f64,
 	fade_in:            f64,
-	skull_opacities:    [4]f64,
+	skull_opacities:    [MAXPLAYERS]f64,
 	damage_frame_opacity: f64,
 }
 #assert(size_of(EnemyHP_BarAnimator_T) == 120)
 
-// struct EnemyHPDamageBarHandler::EnemyHPDetails — 280 bytes
+// struct EnemyHPDamageBarHandler::EnemyHPDetails - 280 bytes
 EnemyHPDetails_T :: struct {
 	bar_type:        HPBarType,
 	animator:        EnemyHP_BarAnimator_T,
@@ -491,19 +491,19 @@ EnemyHPDetails_T :: struct {
 }
 #assert(size_of(EnemyHPDetails_T) == 280)
 
-// class EnemyHPDamageBarHandler — statics-only (no instance data; 0 bytes).
+// class EnemyHPDamageBarHandler - statics-only (no instance data; 0 bytes).
 // The BarAnimator_t/EnemyHPDetails_t mirrors above carry the per-entity data.
 EnemyHPDamageBarHandler :: struct {
 }
 #assert(size_of(EnemyHPDamageBarHandler) == 0)
 
-// struct MinimapHighlight_t — 4 bytes
+// struct MinimapHighlight_t - 4 bytes
 MinimapHighlight_T :: struct {
 	ticks: u32,
 }
 #assert(size_of(MinimapHighlight_T) == 4)
 
-// struct AttackHoverText_t — 48 bytes
+// struct AttackHoverText_t - 48 bytes
 AttackHoverText_T :: struct {
 	hover_type:        HoverTypes,
 	total_attack:      i32, // Sint32
@@ -519,7 +519,7 @@ AttackHoverText_T :: struct {
 }
 #assert(size_of(AttackHoverText_T) == 48)
 
-// class MinimapPing — 12 bytes
+// class MinimapPing - 12 bytes
 MinimapPing :: struct {
 	tick_start:  u32,
 	player:      u8,
@@ -530,7 +530,7 @@ MinimapPing :: struct {
 }
 #assert(size_of(MinimapPing) == 12)
 
-// struct FollowerRadialMenu::PanelEntry — 80 bytes
+// struct FollowerRadialMenu::PanelEntry - 80 bytes
 FollowerRadialMenu_PanelEntry :: struct {
 	x:                 i32,
 	y:                 i32,
@@ -544,7 +544,7 @@ FollowerRadialMenu_PanelEntry :: struct {
 }
 #assert(size_of(FollowerRadialMenu_PanelEntry) == 80)
 
-// class FollowerRadialMenu — 256 bytes
+// class FollowerRadialMenu - 256 bytes
 FollowerRadialMenu :: struct {
 	follower_to_command: ^Entity,
 	recent_entity:       ^Entity,
@@ -579,7 +579,7 @@ FollowerRadialMenu :: struct {
 }
 #assert(size_of(FollowerRadialMenu) == 256)
 
-// struct CalloutRadialMenu::PanelEntry — 48 bytes
+// struct CalloutRadialMenu::PanelEntry - 48 bytes
 CalloutRadialMenu_PanelEntry :: struct {
 	x:            i32,
 	y:            i32,
@@ -591,7 +591,7 @@ CalloutRadialMenu_PanelEntry :: struct {
 }
 #assert(size_of(CalloutRadialMenu_PanelEntry) == 48)
 
-// struct CalloutRadialMenu::CalloutParticle_t — 160 bytes
+// struct CalloutRadialMenu::CalloutParticle_t - 160 bytes
 CalloutParticle_T :: struct {
 	x:                    f64,
 	y:                    f64,
@@ -603,7 +603,7 @@ CalloutParticle_T :: struct {
 	cmd:                  CalloutCommand,
 	type:                 CalloutType,
 	expired:              bool,
-	lock_on_screen:       [4]bool,
+	lock_on_screen:       [MAXPLAYERS]bool,
 	// pad 3
 	player_color:         i32,
 	tag_id:               i32,
@@ -613,7 +613,7 @@ CalloutParticle_T :: struct {
 	// pad 4
 	scale:                f64,
 	animate_x:            f64,
-	animate_scale_for_player_view: [4]f64,
+	animate_scale_for_player_view: [MAXPLAYERS]f64,
 	animate_bounce:       f64,
 	animate_y:            f64,
 	no_update:            bool,
@@ -621,11 +621,11 @@ CalloutParticle_T :: struct {
 	do_message:           bool,
 	// pad 1
 	message_sent_tick:    u32,
-	big:                  [4]bool,
+	big:                  [MAXPLAYERS]bool,
 }
 #assert(size_of(CalloutParticle_T) == 160)
 
-// struct CalloutRadialMenu — 272 bytes
+// struct CalloutRadialMenu - 272 bytes
 CalloutRadialMenu :: struct {
 	menu_x:            i32,
 	menu_y:            i32,
@@ -663,7 +663,7 @@ CalloutRadialMenu :: struct {
 // GenericGUIMenu + nested GUI structs
 // ---------------------------------------------------------------------------
 
-// struct GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t — 72 bytes
+// struct GenericGUIMenu::AssistShrineGUI_t::AssistNotification_t - 72 bytes
 AssistNotification_T :: struct {
 	img:               string, // DynamicString
 	title:             string,
@@ -676,7 +676,7 @@ AssistNotification_T :: struct {
 }
 #assert(size_of(AssistNotification_T) == 72)
 
-// struct GenericGUIMenu::AssistShrineGUI_t — 656 bytes
+// struct GenericGUIMenu::AssistShrineGUI_t - 656 bytes
 AssistShrineGUI_T :: struct {
 	parent_gui:              rawptr, // GenericGUIMenu& (reference)
 	item_cloak:              Item,   // 56B
@@ -740,7 +740,7 @@ AssistShrineGUI_T :: struct {
 }
 #assert(size_of(AssistShrineGUI_T) == 656)
 
-// struct GenericGUIMenu::TinkerGUI_t — 216 bytes
+// struct GenericGUIMenu::TinkerGUI_t - 216 bytes
 TinkerGUI_T :: struct {
 	parent_gui:             rawptr, // GenericGUIMenu&
 	tinker_frame:           ^Frame,
@@ -783,7 +783,7 @@ TinkerGUI_T :: struct {
 }
 #assert(size_of(TinkerGUI_T) == 216)
 
-// struct GenericGUIMenu::ItemEffectGUI_t — 160 bytes
+// struct GenericGUIMenu::ItemEffectGUI_t - 160 bytes
 ItemEffectGUI_T :: struct {
 	parent_gui:             rawptr, // GenericGUIMenu&
 	item_effect_frame:      ^Frame,
@@ -819,7 +819,7 @@ ItemEffectGUI_T :: struct {
 }
 #assert(size_of(ItemEffectGUI_T) == 160)
 
-// struct GenericGUIMenu::MailboxGui_t — 232 bytes
+// struct GenericGUIMenu::MailboxGui_t - 232 bytes
 MailboxGui_T :: struct {
 	parent_gui:             rawptr, // GenericGUIMenu&
 	mail_receive_item:      Item,   // 56B
@@ -856,7 +856,7 @@ MailboxGui_T :: struct {
 }
 #assert(size_of(MailboxGui_T) == 232)
 
-// struct GenericGUIMenu::FeatherGUI_t — 424 bytes
+// struct GenericGUIMenu::FeatherGUI_t - 424 bytes
 FeatherGUI_T :: struct {
 	parent_gui:             rawptr, // GenericGUIMenu&
 	feather_frame:          ^Frame,
@@ -916,21 +916,21 @@ FeatherGUI_T :: struct {
 }
 #assert(size_of(FeatherGUI_T) == 424)
 
-// ScrollEntry_T — 8B (pair<int,bool> mirror)
+// ScrollEntry_T - 8B (pair<int,bool> mirror)
 ScrollEntry_T :: struct {
 	first:  i32,
 	second: bool,
 }
 #assert(size_of(ScrollEntry_T) == 8)
 
-// SortedScrollEntry_T — 24B (pair<string, pair<int,bool>> mirror)
+// SortedScrollEntry_T - 24B (pair<string, pair<int,bool>> mirror)
 SortedScrollEntry_T :: struct {
 	first:  string,
 	second: ScrollEntry_T,
 }
 #assert(size_of(SortedScrollEntry_T) == 24)
 
-// DiscoveryAnim_T — 24B (DiscoveryAnim_tMirror)
+// DiscoveryAnim_T - 24B (DiscoveryAnim_tMirror)
 DiscoveryAnim_T :: struct {
 	start_ticks:      u32,
 	processed_on_tick: u32,
@@ -938,7 +938,7 @@ DiscoveryAnim_T :: struct {
 }
 #assert(size_of(DiscoveryAnim_T) == 24)
 
-// Uint32IntPair_T — 8B (pair<Uint32,int> mirror; e.g. confirmActionOnItemSteps)
+// Uint32IntPair_T - 8B (pair<Uint32,int> mirror; e.g. confirmActionOnItemSteps)
 Uint32IntPair_T :: struct {
 	first:  u32,
 	second: i32,
@@ -947,7 +947,7 @@ Uint32IntPair_T :: struct {
 
 
 
-// struct GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t — 152 bytes
+// struct GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t - 152 bytes
 AlchemyRecipes_T :: struct {
 	alchemy:                    rawptr, // AlchemyGUI_t&
 	justify_left:               bool,
@@ -970,7 +970,7 @@ AlchemyRecipes_T :: struct {
 }
 #assert(size_of(AlchemyRecipes_T) == 152)
 
-// struct GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t — 184 bytes
+// struct GenericGUIMenu::AlchemyGUI_t::AlchemyRecipes_t::RecipeEntry_t - 184 bytes
 RecipeEntry_T :: struct {
 	result_item:       Item, // 56B
 	dummy_potion1:     Item,
@@ -982,7 +982,7 @@ RecipeEntry_T :: struct {
 }
 #assert(size_of(RecipeEntry_T) == 184)
 
-// struct GenericGUIMenu::AlchemyGUI_t::AlchNotification_t — 64 bytes
+// struct GenericGUIMenu::AlchemyGUI_t::AlchNotification_t - 64 bytes
 AlchNotification_T :: struct {
 	img:   string, // DynamicString
 	title: string,
@@ -992,7 +992,7 @@ AlchNotification_T :: struct {
 }
 #assert(size_of(AlchNotification_T) == 64)
 
-// struct GenericGUIMenu::AlchemyGUI_t — 608 bytes
+// struct GenericGUIMenu::AlchemyGUI_t - 608 bytes
 AlchemyGUI_T :: struct {
 	parent_gui:              rawptr, // GenericGUIMenu&
 	recipes_frame:           ^Frame,
@@ -1049,14 +1049,14 @@ AlchemyGUI_T :: struct {
 }
 #assert(size_of(AlchemyGUI_T) == 608)
 
-// vector<pair<Uint32, AssistNotification_t>> element — 80B
+// vector<pair<Uint32, AssistNotification_t>> element - 80B
 Uint32_AssistNotif_Pair :: struct {
 	first:  u32,
 	second: AssistNotification_T,
 }
 #assert(size_of(Uint32_AssistNotif_Pair) == 80)
 
-// vector<pair<Uint32, AlchNotification_t>> element — 72B
+// vector<pair<Uint32, AlchNotification_t>> element - 72B
 Uint32_AlchNotif_Pair :: struct {
 	first:  u32,
 	second: AlchNotification_T,
@@ -1064,7 +1064,7 @@ Uint32_AlchNotif_Pair :: struct {
 #assert(size_of(Uint32_AlchNotif_Pair) == 72)
 
 
-// class GenericGUIMenu — 2592 bytes
+// class GenericGUIMenu - 2592 bytes
 GenericGUIMenu :: struct {
 	gui_player:                i32,
 	gui_type:                  GUICurrentType,
@@ -1115,3 +1115,172 @@ GenericGUIMenu :: struct {
 	alchemy_gui:               AlchemyGUI_T,   // 608B
 }
 #assert(size_of(GenericGUIMenu) == 2592)
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin
+// ---------------------------------------------------------------------------
+
+@(export) DamageIndicatorHandler           : DamageIndicatorHandler_T
+
+@(export) hide_statusbar                   : bool = true
+@(export) uiscale_chatlog                  : f64  = 1.0
+@(export) uiscale_playerbars               : f64  = 1.0
+@(export) uiscale_charactersheet            : bool = false
+@(export) uiscale_skillspage               : bool = false
+@(export) uiscale_hotbar                   : f64  = 1.0
+@(export) uiscale_inventory                : f64  = 1.0
+
+@(export) enemyHPDamageBarHandler           : [MAXPLAYERS]EnemyHPDamageBarHandler
+
+@(export) camera_charsheet                  : View_T
+@(export) camera_charsheet_offsetyaw        : f64  = 330.0 * PI / 180.0
+
+@(export) chestInv                          : [MAXPLAYERS]list_t
+@(export) openedChest                       : [MAXPLAYERS]^Entity
+
+@(export) minimapHighlights                 : map[[4]byte]MinimapHighlight_T
+
+@(export) restrictPaperDollMovement         : bool = true
+
+@(export) GenericGUI                        : [MAXPLAYERS]GenericGUIMenu
+
+@(export) auto_hotbar_new_items             : bool = true
+@(export) auto_hotbar_categories            : [12]bool = {
+	true, true, true, true,
+	true, true, true, true,
+	true, true, true, true,
+}
+@(export) autosort_inventory_categories     : [12]i32  // all zeros
+@(export) disable_messages                  : bool = false
+@(export) right_click_protect               : bool = false
+@(export) auto_appraise_new_items           : bool = true
+@(export) show_game_timer_always            : bool = false
+@(export) hide_playertags                   : bool = false
+@(export) show_skill_values                 : bool = false
+
+@(export) minimapPingGimpTimer              : [MAXPLAYERS]i32   // all zeros
+@(export) minimaps                          : [MAXPLAYERS]SDL_Rect
+
+// SurfacePtrStringPair_t - 24B (SDL_Surface** + DynamicString)
+Surface_Ptr_String_Pair_T :: struct {
+	first:  rawptr,  // SDL_Surface** (double pointer, opaque)
+	second: string,  // DynamicString
+}
+#assert(size_of(Surface_Ptr_String_Pair_T) == 24)
+
+@(export) systemResourceImages              : [dynamic]Surface_Ptr_String_Pair_T
+// NOTE: C++ original had a complex static initializer referencing C++ globals
+// (font8x8_bmp etc.). Odin zero-inits to empty; runtime init needed.
+
+@(export) FollowerMenu                      : [MAXPLAYERS]FollowerRadialMenu
+@(export) CalloutMenu                       : [MAXPLAYERS]CalloutRadialMenu
+
+// ---------------------------------------------------------------------------
+// Constructor port: GenericGUIMenu/FollowerRadialMenu/CalloutRadialMenu ctors
+// ---------------------------------------------------------------------------
+// Odin globals are zero-initialized, but these C++ types have constructors
+// that wire reference members (parentGUI, alchemy) and set non-zero defaults
+// (menuX=-1, filter enum, item fields). The C++ ctors ran at static-init;
+// here we port them so the flipped globals match. Called from run_barony().
+
+init_ctor_port :: proc() {
+	// GenericGUIMenu ctor (interface.hpp:402) - per player
+	for i in 0 ..< MAXPLAYERS {
+		gui := &GenericGUI[i]
+		// reference members - the crash fix
+		gui.tinker_gui.parent_gui = gui
+		gui.item_fx_gui.parent_gui = gui
+		gui.assist_shrine_gui.parent_gui = gui
+		gui.mailbox_gui.parent_gui = gui
+		gui.feather_gui.parent_gui = gui
+		gui.alchemy_gui.parent_gui = gui
+		gui.alchemy_gui.recipes.alchemy = &gui.alchemy_gui
+
+		// ctor init list
+		gui.tinkering_filter = .TINKER_FILTER_CRAFTABLE
+		gui.scribing_filter = .SCRIBING_FILTER_CRAFTABLE
+
+		// in-class non-zero defaults
+		gui.tinker_gui.selected_tinker_slot_x = -1
+		gui.tinker_gui.selected_tinker_slot_y = -1
+		gui.assist_shrine_gui.selected_assist_shrine_slot_x = -1
+		gui.assist_shrine_gui.selected_assist_shrine_slot_y = -1
+
+		// MailboxGui_t ctor (interface.hpp:930) - mailReceiveItem
+		mail := &gui.mailbox_gui.mail_receive_item
+		mail.type = 210 // POTION_EMPTY
+		mail.status = .SERVICABLE
+		mail.count = 1
+		mail.x = -2 // MAIL_SLOT_RECV
+
+		// AlchemyGUI_t ctor (interface.hpp:1223) - result potion / bottles
+		res := &gui.alchemy_gui.alchemy_result_potion
+		res.type = 210 // POTION_EMPTY
+		res.status = .SERVICABLE
+		res.count = 1
+		res.x = -3 // ALCH_SLOT_RESULT_POTION_X
+
+		bottle := &gui.alchemy_gui.empty_bottle_count
+		bottle.type = 210 // POTION_EMPTY
+		bottle.status = .SERVICABLE
+		bottle.identified = true
+
+		torch := &gui.alchemy_gui.torch_count
+		torch.type = 148 // TOOL_TORCH
+		torch.status = .SERVICABLE
+		torch.identified = true
+
+		// AssistShrineGUI_t ctor -> resetItems() (interface.cpp:35340)
+		cloak := &gui.assist_shrine_gui.item_cloak
+		cloak.type = 330 // CLOAK_GUARDIAN
+		cloak.status = .EXCELLENT
+		cloak.count = 1
+		cloak.identified = true
+		cloak.item_hidden_from_shop = true
+
+		mask := &gui.assist_shrine_gui.item_mask
+		mask.type = 331 // MASK_MARIGOLD
+		mask.status = .EXCELLENT
+		mask.count = 1
+		mask.identified = true
+		mask.item_hidden_from_shop = true
+
+		amulet := &gui.assist_shrine_gui.item_amulet
+		amulet.type = 48 // AMULET_LIFESAVING
+		amulet.status = .EXCELLENT
+		amulet.count = 1
+		amulet.identified = true
+		amulet.item_hidden_from_shop = true
+
+		ring := &gui.assist_shrine_gui.item_ring
+		ring.type = 329 // RING_RESOLVE
+		ring.status = .EXCELLENT
+		ring.count = 1
+		ring.identified = true
+		ring.item_hidden_from_shop = true
+	}
+
+	// FollowerRadialMenu ctor (interface.hpp:1572)
+	for i in 0 ..< MAXPLAYERS {
+		fm := &FollowerMenu[i]
+		fm.menu_x = -1
+		fm.menu_y = -1
+		fm.option_selected = -1
+		fm.option_previous = -1
+		fm.move_to_x = -1
+		fm.move_to_y = -1
+		fm.party_sheet_mouse_x = -1
+		fm.party_sheet_mouse_y = -1
+		fm.max_monsters_to_draw = 5
+	}
+
+	// CalloutRadialMenu ctor (interface.hpp:1682)
+	for i in 0 ..< MAXPLAYERS {
+		cm := &CalloutMenu[i]
+		cm.menu_x = -1
+		cm.menu_y = -1
+		cm.option_selected = -1
+		cm.move_to_x = -1
+		cm.move_to_y = -1
+	}
+}

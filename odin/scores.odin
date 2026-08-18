@@ -1,8 +1,8 @@
-// scores.odin — Odin mirrors of scores.hpp.
+// scores.odin - Odin mirrors of scores.hpp.
 package main
 
 
-// struct item_t (scores.hpp serialization mirror) — 32 bytes
+// struct item_t (scores.hpp serialization mirror) - 32 bytes
 score_item_t :: struct {
 	type:       u32,
 	status:     u32,
@@ -15,7 +15,7 @@ score_item_t :: struct {
 }
 #assert(size_of(score_item_t) == 32)
 
-// struct lootbag_t (scores.hpp) — 56 bytes
+// struct lootbag_t (scores.hpp) - 56 bytes
 score_lootbag_t :: struct {
 	spawn_x:          i32,
 	spawn_y:          i32,
@@ -26,28 +26,28 @@ score_lootbag_t :: struct {
 #assert(size_of(score_lootbag_t) == 56)
 
 // --- pair mirrors for the serialized stat_t arrays (scores.hpp) ---
-// vector<pair<DynamicString, Uint32>> (player_equipment) — 24B
+// vector<pair<DynamicString, Uint32>> (player_equipment) - 24B
 Score_StringU32_Pair :: struct {
 	first:  string,
 	second: u32,
 }
 #assert(size_of(Score_StringU32_Pair) == 24)
 
-// vector<pair<DynamicString, item_t>> (npc_equipment) — 48B
+// vector<pair<DynamicString, item_t>> (npc_equipment) - 48B
 Score_StringItem_Pair :: struct {
 	first:  string,
 	second: score_item_t,
 }
 #assert(size_of(Score_StringItem_Pair) == 48)
 
-// vector<pair<Uint32, lootbag_t>> (player_lootbags) — 64B
+// vector<pair<Uint32, lootbag_t>> (player_lootbags) - 64B
 Score_U32Lootbag_Pair :: struct {
 	first:  u32,
 	second: score_lootbag_t,
 }
 #assert(size_of(Score_U32Lootbag_Pair) == 64)
 
-// struct stat_t (scores.hpp serialization mirror) — 528 bytes
+// struct stat_t (scores.hpp serialization mirror) - 528 bytes
 score_stat_t :: struct {
 	name:                  string,
 	type:                  u32,
@@ -81,7 +81,7 @@ score_stat_t :: struct {
 }
 #assert(size_of(score_stat_t) == 528)
 
-// --- SaveGameInfo::Player::PlayerRaceHostility_t (scores.hpp) — 36B.
+// --- SaveGameInfo::Player::PlayerRaceHostility_t (scores.hpp) - 36B.
 // NOTE: distinct from monster.hpp ShopkeeperPlayerHostility_t::PlayerRaceHostility_t
 // (40B, has b_requires_net_update). This one is 9 plain ints.
 Score_PlayerRaceHostility_t :: struct {
@@ -98,7 +98,7 @@ Score_PlayerRaceHostility_t :: struct {
 #assert(size_of(Score_PlayerRaceHostility_t) == 36)
 
 // --- pair mirrors for SaveGameInfo::Player pair-vectors (scores.hpp) ---
-// DynamicStringPair_T — 32B (std::pair<DynamicString,DynamicString>)
+// DynamicStringPair_T - 32B (std::pair<DynamicString,DynamicString>)
 DynamicStringPair_T :: struct {
 	first:  string,
 	second: string,
@@ -106,14 +106,14 @@ DynamicStringPair_T :: struct {
 #assert(size_of(DynamicStringPair_T) == 32)
 
 
-// vector<pair<int, PlayerRaceHostility_t>> (shopkeeperHostility) — 44B
+// vector<pair<int, PlayerRaceHostility_t>> (shopkeeperHostility) - 44B
 Score_IntHostility_Pair :: struct {
 	first:  i32,
 	second: Score_PlayerRaceHostility_t,
 }
 #assert(size_of(Score_IntHostility_Pair) == 40)
 
-// vector<pair<DynamicString, DynamicArrayS32>> (compendium_item_events) — 56B
+// vector<pair<DynamicString, DynamicArrayS32>> (compendium_item_events) - 56B
 Score_StringS32Array_Pair :: struct {
 	first:  string,
 	second: [dynamic]i32,
@@ -121,21 +121,21 @@ Score_StringS32Array_Pair :: struct {
 #assert(size_of(Score_StringS32Array_Pair) == 56)
 
 // vector<pair<int,int>> (itemDegradeRNG/escalatingRngRolls/escalatingSpellRngRolls/
-// appraisal_item_progress/sustainedSpellIDCounter/ducksInARow/favoriteBooksAchievement) — 8B
+// appraisal_item_progress/sustainedSpellIDCounter/ducksInARow/favoriteBooksAchievement) - 8B
 Score_IntInt_Pair :: struct {
 	first:  i32,
 	second: i32,
 }
 #assert(size_of(Score_IntInt_Pair) == 8)
 
-// recipe_t = pair<int, pair<int,int>> — 12B (vector<recipe_t> known_recipes)
+// recipe_t = pair<int, pair<int,int>> - 12B (vector<recipe_t> known_recipes)
 Score_Recipe_T :: struct {
 	first:  i32,
 	second: IntPair_T, // pair<int,int>
 }
 #assert(size_of(Score_Recipe_T) == 12)
 
-// struct SaveGameInfo::Player (scores.hpp) — 1816 bytes.
+// struct SaveGameInfo::Player (scores.hpp) - 1816 bytes.
 // Mirror of the nested hiscore save record. NOTE: distinct from the game
 // class Player (player.odin, 9176B). The containers shim twin (HiscorePlayer_t) is the
 // shim-side layout twin for element free/copy dispatch.
@@ -178,7 +178,7 @@ SaveGameInfo_Player_T :: struct {
 }
 #assert(size_of(SaveGameInfo_Player_T) == 1816)
 
-// struct score_t — 632 bytes
+// struct score_t - 632 bytes
 score_t :: struct {
 	kills:                 [53]i32, // Sint32 kills[53]
 	stats:                 ^Stat,
@@ -196,7 +196,7 @@ score_t :: struct {
 }
 #assert(size_of(score_t) == 632)
 
-// struct SaveGameInfo — 312 bytes
+// struct SaveGameInfo - 312 bytes
 SaveGameInfo :: struct {
 	magic_cookie:         string,
 	game_version:         i32,
@@ -228,3 +228,53 @@ SaveGameInfo :: struct {
 	additional_data:      [dynamic]DynamicStringPair_T, // DynamicArrayStringPair
 }
 #assert(size_of(SaveGameInfo) == 312)
+
+// ============================================================================
+// Globals owned by Odin (ownership flip from C++ scores.hpp / scores.cpp)
+// ============================================================================
+
+// Raw_Dynamic_Array - 40 bytes, mirrors C++ DynamicArray (type-erased).
+Score_Raw_Dynarr :: struct {
+	data:      rawptr,
+	len:       int,
+	cap:       int,
+	allocator: [2]rawptr, // mem.Allocator (data + vtable = 16 bytes on x64)
+}
+#assert(size_of(Score_Raw_Dynarr) == 40)
+
+// list_t topscores_json - 16B linked-list head
+@(export) topscores_json            : list_t
+@(export) topscoresMultiplayer_json : list_t
+@(export) topscores_legacy          : list_t
+@(export) topscoresMultiplayer_legacy : list_t
+@(export) victory                   : i32 = 0
+
+@(export) completionTime   : u32 = 0
+@(export) conductPenniless : bool = true
+@(export) conductFoodless  : bool = true
+@(export) conductVegetarian : bool = true
+@(export) conductIlliterate : bool = true
+@(export) booksRead        : list_t
+@(export) usedClass        : [26]bool   // NUMCLASSES = 26
+@(export) usedRace         : [18]bool   // NUMRACES = 18
+@(export) loadingsavegame  : u32 = 0
+@(export) loadinglobbykey  : u32 = 0
+@(export) conductGameChallenges : [32]i32  // NUM_CONDUCT_CHALLENGES
+@(export) gameStatistics        : [64]i32  // NUM_GAMEPLAY_STATISTICS
+@(export) achievementRhythmOfTheKnightVec      : [MAXPLAYERS]Score_Raw_Dynarr  // DynamicArray (type-erased, vector<pair<Uint32,Uint32>>)
+@(export) achievementStatusRhythmOfTheKnight   : [MAXPLAYERS]bool
+@(export) achievementRhythmOfTheKnight         : [MAXPLAYERS]bool
+@(export) achievementThankTheTankPair          : [MAXPLAYERS]map[[4]byte]u32  // DynamicMapI32T<Uint32>
+@(export) achievementStatusBaitAndSwitch       : [MAXPLAYERS]bool
+@(export) achievementBaitAndSwitchTimer        : [MAXPLAYERS]u32
+@(export) clientLearnedAlchemyIngredients      : [MAXPLAYERS]map[i32]struct{}  // DynamicSetI32
+@(export) clientLearnedAlchemyRecipes          : [MAXPLAYERS]Score_Raw_Dynarr  // DynamicArray (type-erased, vector<recipe_t>)
+@(export) clientLearnedScrollLabels            : [MAXPLAYERS]map[i32]struct{}  // DynamicSetI32
+@(export) achievementStatusThankTheTank       : [MAXPLAYERS]bool
+@(export) achievementStrobeVec                : [MAXPLAYERS][dynamic]u32  // DynamicArrayU32
+@(export) achievementStatusStrobe             : [MAXPLAYERS]bool
+@(export) playerFailedRangedOnlyConduct       : [MAXPLAYERS]bool
+@(export) achievementBrawlerMode              : bool = false
+@(export) achievementPenniless                : bool = false
+@(export) achievementRangedMode               : [MAXPLAYERS]bool
+@(export) savegameCurrentFileIndex            : i32 = 0

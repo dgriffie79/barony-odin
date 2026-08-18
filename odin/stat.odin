@@ -1,4 +1,4 @@
-// stat.odin — Odin mirrors of stat.hpp.
+// stat.odin - Odin mirrors of stat.hpp.
 package main
 
 
@@ -16,7 +16,7 @@ sex_t :: enum i32 {
 	FEMALE = 1,
 }
 
-// enum KilledBy { UNKNOWN, MONSTER, ITEM, ... } — declared in stat.hpp
+// enum KilledBy { UNKNOWN, MONSTER, ITEM, ... } - declared in stat.hpp
 KilledBy :: enum i32 {
 	UNKNOWN,
 	MONSTER,
@@ -35,7 +35,7 @@ KilledBy :: enum i32 {
 }
 
 
-// struct Lootbag_t — 48 bytes
+// struct Lootbag_t - 48 bytes
 // { int spawn_x, spawn_y; bool spawnedOnGround, looted; DynamicArrayT<Item> items; }
 Lootbag_t :: struct {
 	spawn_x:         i32,
@@ -47,7 +47,7 @@ Lootbag_t :: struct {
 
 #assert(size_of(Lootbag_t) == 56) // 12B scalars + pad + 40B array
 
-// struct MonsterRangedAccuracy — 24 bytes
+// struct MonsterRangedAccuracy - 24 bytes
 // { Uint32 lastTarget; real_t accuracy; Uint32 lastTick; }
 Monster_Ranged_Accuracy :: struct {
 	last_target: u32,
@@ -57,7 +57,7 @@ Monster_Ranged_Accuracy :: struct {
 
 #assert(size_of(Monster_Ranged_Accuracy) == 24)
 
-// class Stat — 2856 bytes (field order from libclang dump of stat.hpp)
+// class Stat - 2856 bytes (field order from libclang dump of stat.hpp)
 // The 20 former reference members (sneaking, playerRace, ...) are now getters
 // in C++; in Odin they are accessor procs reading MISC_FLAGS[] (below).
 Stat :: struct {
@@ -141,7 +141,7 @@ Stat :: struct {
 stat_sneaking              :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[1] }
 stat_ally_item_pickup      :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[2] }
 stat_ally_class            :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[3] }
-stat_player_race           :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[4] }
+stat_player_race           :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[MAXPLAYERS] }
 stat_player_polymorph_storage :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[5] }
 stat_player_summon_lvlhp   :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[6] }
 stat_player_summon_strdexconint :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[7] }
@@ -164,4 +164,4 @@ stat_monster_force_allegiance :: proc(s: ^Stat) -> ^i32 { return &s.misc_flags[2
 // Globals owned by Odin (C++ references via extern "C")
 // ---------------------------------------------------------------------------
 @(export)
-stats : [4]^Stat
+stats : [MAXPLAYERS]^Stat

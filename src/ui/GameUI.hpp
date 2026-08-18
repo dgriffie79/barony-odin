@@ -10,7 +10,7 @@
 
 extern "C" Frame::result_t doFrames();
 extern "C" void doSharedMinimap();
-extern Frame* gameUIFrame[MAXPLAYERS];
+extern "C" Frame* gameUIFrame[MAXPLAYERS];
 extern "C" void addMessageToLogWindow(int player, string_t* string);
 extern "C" void updateSlotFrameFromItem(Frame* slotFrame, void* itemPtr, bool forceUnusable = false);
 extern "C" void createInventoryTooltipFrame(const int player, 
@@ -27,7 +27,7 @@ extern "C" void drawCharacterPreview(const int player, SDL_Rect pos, int fov, re
 extern "C" void drawObjectPreview(std::string modelsPath, Entity* object, SDL_Rect pos, real_t offsetyaw, bool dark = false);
 extern "C" void drawSpritesPreview(std::string name, std::string modelsPath, SDL_Rect pos, real_t offsetyaw, bool dark = false);
 extern "C" void drawItemPreview(Entity* item, SDL_Rect pos, real_t offsetyaw, bool dark = false);
-extern view_t playerPortraitView[MAXPLAYERS];
+extern "C" view_t playerPortraitView[MAXPLAYERS];
 extern "C" void toggleShopBuybackView(const int player);
 extern "C" void loadHUDSettingsJSON();
 struct EnemyBarSettings_t
@@ -38,7 +38,7 @@ struct EnemyBarSettings_t
 	float getHeightOffset(Entity* entity);
 	float getScreenDistanceOffset(Entity* entity);
 };
-extern EnemyBarSettings_t enemyBarSettings;
+extern "C" EnemyBarSettings_t enemyBarSettings;
 struct CustomColors_t
 {
 	Uint32 itemContextMenuHeadingText = 0xFFFFFFFF;
@@ -61,24 +61,24 @@ struct CustomColors_t
 	Uint32 characterDLC2ClassText = 0xFFFFFFFF;
 	Uint32 characterDLC3ClassText = makeColorRGB(0, 255, 0);
 };
-extern CustomColors_t hudColors;
+extern "C" CustomColors_t hudColors;
 
-extern int GAMEUI_FRAMEDATA_ANIMATING_ITEM;
-extern int GAMEUI_FRAMEDATA_ALCHEMY_ITEM;
-extern int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_SLOT; // displaying in main alchemy gui when hovering over recipe
-extern int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_ENTRY; // the recipe icon
-extern int GAMEUI_FRAMEDATA_WORLDTOOLTIP_ITEM;
-extern int GAMEUI_FRAMEDATA_SHOP_ITEM;
-extern int GAMEUI_FRAMEDATA_ALCHEMY_MISSING_QTY; // alchemy ingredient missing quantity
-extern int GAMEUI_FRAMEDATA_SPELL_LEARNABLE; // if spell provides skill xp
+extern "C" int GAMEUI_FRAMEDATA_ANIMATING_ITEM;
+extern "C" int GAMEUI_FRAMEDATA_ALCHEMY_ITEM;
+extern "C" int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_SLOT; // displaying in main alchemy gui when hovering over recipe
+extern "C" int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_ENTRY; // the recipe icon
+extern "C" int GAMEUI_FRAMEDATA_WORLDTOOLTIP_ITEM;
+extern "C" int GAMEUI_FRAMEDATA_SHOP_ITEM;
+extern "C" int GAMEUI_FRAMEDATA_ALCHEMY_MISSING_QTY; // alchemy ingredient missing quantity
+extern "C" int GAMEUI_FRAMEDATA_SPELL_LEARNABLE; // if spell provides skill xp
 
 // if true, use the new user interface
-extern bool newui;
-extern bool bUsePreciseFieldTextReflow;
-extern bool bUseSelectedSlotCycleAnimation;
-extern CvarBool shareMinimap;
-extern Frame::result_t framesProcResult;
-extern CvarBool framesEatMouse;
+extern "C" bool newui;
+extern "C" bool bUsePreciseFieldTextReflow;
+extern "C" bool bUseSelectedSlotCycleAnimation;
+extern "C" CvarBool shareMinimap;
+extern "C" Frame::result_t framesProcResult;
+extern "C" CvarBool framesEatMouse;
 
 extern "C" Frame* createPauseMenuPlayerBars();
 extern "C" void openMinimap(int player);
@@ -252,7 +252,7 @@ struct StatusEffectQueue_t
 		static std::string getEffectImgPath(EffectDefinitionEntry_t& entry, int variation = -1);
 	};
 };
-extern StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS];
+extern "C" StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS];
 template <> struct DynamicArrayKindOf<StatusEffectQueueEntry_t> { static constexpr int value = Kind_StatusEffectQueueEntry; };
 template <> struct MapValueKindOf<StatusEffectQueue_t::EffectDefinitionEntry_t> { static constexpr int value = MK_EffectDefinitionEntry; };
 
@@ -270,7 +270,7 @@ struct SkillSheetFrames_t
 	Frame* legendFrame = nullptr;
 	bool legendTextRequiresReflow = true;
 };
-extern SkillSheetFrames_t skillSheetEntryFrames[MAXPLAYERS];
+extern "C" SkillSheetFrames_t skillSheetEntryFrames[MAXPLAYERS];
 
 struct PlayerInventoryFrames_t
 {
@@ -295,9 +295,9 @@ struct PlayerInventoryFrames_t
 	Frame::image_t* chestBaseImg = nullptr; //"chest base img"
 	Frame::image_t* spellBaseImg = nullptr; //"spell base img"
 };
-extern PlayerInventoryFrames_t playerInventoryFrames[MAXPLAYERS];
+extern "C" PlayerInventoryFrames_t playerInventoryFrames[MAXPLAYERS];
 
-extern Frame* minimapFrame; // shared minimap
+extern "C" Frame* minimapFrame; // shared minimap
 
 extern "C" void openMapWindow(int player);
 extern "C" void openLogWindow(int player);
@@ -349,7 +349,7 @@ struct MinotaurWarning_t
 	void init();
 	void deinit();
 };
-extern MinotaurWarning_t minotaurWarning[MAXPLAYERS];
+extern "C" MinotaurWarning_t minotaurWarning[MAXPLAYERS];
 
 struct LevelUpAnimation_t
 {
@@ -425,7 +425,7 @@ struct LevelUpAnimation_t
 	void addLevelUp(const int currentLvl, const int addLvl, DynamicArrayT<LevelUp_t::StatUp_t>& statInfo);
 };
 
-extern LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];
+extern "C" LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];
 
 extern "C" void updateLevelUpFrame(const int player);
 extern "C" void updateSkillUpFrame(const int player);
@@ -503,4 +503,4 @@ struct SkillUpAnimation_t
 	static bool soundIndexUsedForNotification(const int index);
 };
 
-extern SkillUpAnimation_t skillUpAnimation[MAXPLAYERS];
+extern "C" SkillUpAnimation_t skillUpAnimation[MAXPLAYERS];

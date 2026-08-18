@@ -1,12 +1,12 @@
-// prng.odin — Odin port of prng.cpp / prng.hpp
+// prng.odin - Odin port of prng.cpp / prng.hpp
 //
 // Barony's pseudo-random number generator: an RC4 (ARC4) stream cipher used
-// as a deterministic byte source. Byte-exact fidelity is REQUIRED — net_rng
+// as a deterministic byte source. Byte-exact fidelity is REQUIRED - net_rng
 // must stay synchronized across all clients and map generation seeds must
 // reproduce. Do not "improve" the algorithm.
 //
 // The C++ `BaronyRNG` methods forward to these @(export) proc "c" entry
-// points (see src/prng.cpp / prng.hpp). This is the single implementation —
+// points (see src/prng.cpp / prng.hpp). This is the single implementation -
 // no Odin wrapper layer, no shim-to-self.
 package main
 
@@ -37,7 +37,7 @@ map_rng:          Barony_RNG
 map_server_rng:   Barony_RNG
 map_sequence_rng: Barony_RNG
 
-// debug marker (C++: static uint8_t marker[256] in the header — one per TU;
+// debug marker (C++: static uint8_t marker[256] in the header - one per TU;
 // Odin: one shared global)
 marker: [256]u8
 
@@ -49,11 +49,11 @@ swap_byte :: proc(a: ^u8, b: ^u8) {
 }
 
 // ---------------------------------------------------------------------------
-// @(export) proc "c" — the C++ boundary AND the implementation.
+// @(export) proc "c" - the C++ boundary AND the implementation.
 // C++ BaronyRNG methods forward to these flat names.
 // ---------------------------------------------------------------------------
 
-// C++: seedImpl(const void* key, size_t size) — the KSA (key scheduling).
+// C++: seedImpl(const void* key, size_t size) - the KSA (key scheduling).
 // `bytes[i % size]` means a 1-byte seed repeats that byte 256 times.
 @(export)
 BaronyRNG_seedImpl :: proc "c" (self: ^Barony_RNG, key: rawptr, size: uint) {
@@ -70,11 +70,11 @@ BaronyRNG_seedImpl :: proc "c" (self: ^Barony_RNG, key: rawptr, size: uint) {
 		swap_byte(&self.buf[i], &self.buf[b])
 	}
 
-	// memcpy(seed, key, size) — only copies len(key) bytes
+	// memcpy(seed, key, size) - only copies len(key) bytes
 	for i in 0..<len(key_bytes) {
 		self.seed[i] = key_bytes[i]
 	}
-	self.seed_size = u8(len(key_bytes)) // C++ uint8_t — truncates if > 255
+	self.seed_size = u8(len(key_bytes)) // C++ uint8_t - truncates if > 255
 
 	self.i1 = 0
 	self.i2 = 0
@@ -89,7 +89,7 @@ BaronyRNG_seedBytes :: proc "c" (self: ^Barony_RNG, key: rawptr, size: uint) {
 	BaronyRNG_seedImpl(self, key, size)
 }
 
-// C++: seedTime() — seed with a 32-bit unix time value
+// C++: seedTime() - seed with a 32-bit unix time value
 @(export)
 BaronyRNG_seedTime :: proc "c" (self: ^Barony_RNG) {
 	context = runtime.default_context()
@@ -97,7 +97,7 @@ BaronyRNG_seedTime :: proc "c" (self: ^Barony_RNG) {
 	BaronyRNG_seedImpl(self, &t, size_of(t))
 }
 
-// C++: getSeed(void* out, size_t size) const — copy the seed out, return its
+// C++: getSeed(void* out, size_t size) const - copy the seed out, return its
 // size, or -1 if not seeded / buffer too small.
 @(export)
 BaronyRNG_getSeed :: proc "c" (self: ^Barony_RNG, out: rawptr, size: uint) -> i32 {
@@ -113,7 +113,7 @@ BaronyRNG_getSeed :: proc "c" (self: ^Barony_RNG, out: rawptr, size: uint) -> i3
 	return i32(self.seed_size)
 }
 
-// C++: getBytes(void* data_, size_t size) — the PRGA. Auto-seeds by time if
+// C++: getBytes(void* data_, size_t size) - the PRGA. Auto-seeds by time if
 // not seeded. Byte-exact.
 @(export)
 BaronyRNG_getBytes :: proc "c" (self: ^Barony_RNG, data: rawptr, size: uint) {
@@ -196,7 +196,7 @@ BaronyRNG_getI64 :: proc "c" (self: ^Barony_RNG) -> i64 {
 	return i64(BaronyRNG_getU64(self))
 }
 
-// C++: float getF32() — NOTE: draws only 4 bytes (u32), divides by 2^32
+// C++: float getF32() - NOTE: draws only 4 bytes (u32), divides by 2^32
 @(export)
 BaronyRNG_getF32 :: proc "c" (self: ^Barony_RNG) -> f32 {
 	context = runtime.default_context()
@@ -205,7 +205,7 @@ BaronyRNG_getF32 :: proc "c" (self: ^Barony_RNG) -> f32 {
 	return f32(f64(u) / f64(div))
 }
 
-// C++: double getF64() — NOTE: draws only 4 bytes (u32), divides by 2^32
+// C++: double getF64() - NOTE: draws only 4 bytes (u32), divides by 2^32
 @(export)
 BaronyRNG_getF64 :: proc "c" (self: ^Barony_RNG) -> f64 {
 	context = runtime.default_context()
@@ -214,7 +214,7 @@ BaronyRNG_getF64 :: proc "c" (self: ^Barony_RNG) -> f64 {
 	return f64(u) / f64(div)
 }
 
-// C++: int rand() — draw 4 bytes, & 0x7fffffff
+// C++: int rand() - draw 4 bytes, & 0x7fffffff
 @(export)
 BaronyRNG_rand :: proc "c" (self: ^Barony_RNG) -> i32 {
 	context = runtime.default_context()
@@ -222,7 +222,7 @@ BaronyRNG_rand :: proc "c" (self: ^Barony_RNG) -> i32 {
 	return i32(i & 0x7fffffff)
 }
 
-// C++: int uniform(int a, int b) — inclusive range, a or b may be larger.
+// C++: int uniform(int a, int b) - inclusive range, a or b may be larger.
 // choice = getF64() * (max-min+1), truncated to int (implicit double->int).
 @(export)
 BaronyRNG_uniform :: proc "c" (self: ^Barony_RNG, a: i32, b: i32) -> i32 {
@@ -237,7 +237,7 @@ BaronyRNG_uniform :: proc "c" (self: ^Barony_RNG, a: i32, b: i32) -> i32 {
 	return min_v + choice
 }
 
-// C++: int discrete(const unsigned int* chances, int size) — weighted pick.
+// C++: int discrete(const unsigned int* chances, int size) - weighted pick.
 // Asserts + returns 0 on empty/zero-chance; returns the FIRST index whose
 // cumulative weight exceeds the choice.
 @(export)
@@ -267,7 +267,7 @@ BaronyRNG_discrete :: proc "c" (self: ^Barony_RNG, chances: ^u32, size: i32) -> 
 	return 0
 }
 
-// C++: int normal(int mean, int deviation) — Box-Muller.
+// C++: int normal(int mean, int deviation) - Box-Muller.
 @(export)
 BaronyRNG_normal :: proc "c" (self: ^Barony_RNG, mean: i32, deviation: i32) -> i32 {
 	context = runtime.default_context()
@@ -286,7 +286,7 @@ BaronyRNG_bytesRead :: proc "c" (self: ^Barony_RNG) -> uint {
 	return uint(self.bytes_read)
 }
 
-// C++: bool isSeeded() const — inline accessor, NOT forwarded (no symbol).
+// C++: bool isSeeded() const - inline accessor, NOT forwarded (no symbol).
 // Odin reads self.seeded directly.
 
 // C++: void setMarker() const (debug)
@@ -309,7 +309,7 @@ BaronyRNG_checkMarker :: proc "c" (self: ^Barony_RNG) {
 	}
 }
 
-// C++: void testSeedHealth() const — prints % bits set + the bit string
+// C++: void testSeedHealth() const - prints % bits set + the bit string
 @(export)
 BaronyRNG_testSeedHealth :: proc "c" (self: ^Barony_RNG) {
 	context = runtime.default_context()

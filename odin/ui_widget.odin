@@ -1,4 +1,4 @@
-// ui_widget.odin — Odin mirror of ui/Widget.hpp.
+// ui_widget.odin - Odin mirror of ui/Widget.hpp.
 package main
 
 // enum Widget::type_t
@@ -34,7 +34,7 @@ Widget_MenuConfirmTypes :: enum i32 {
 	MENU_CONFIRM_CONTROLLER = 2,
 }
 
-// class Widget — 248 bytes
+// class Widget - 248 bytes
 Widget :: struct {
 	type:                   Widget_Type_T,          // type tag (4B)
 	// pad 4

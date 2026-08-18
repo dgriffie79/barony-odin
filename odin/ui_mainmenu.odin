@@ -1,4 +1,4 @@
-// ui_mainmenu.odin — Odin mirror of ui/MainMenu.hpp.
+// ui_mainmenu.odin - Odin mirror of ui/MainMenu.hpp.
 package main
 
 // enum class MainMenu::FadeDestination : Uint8 (31 values)
@@ -44,7 +44,7 @@ MainMenu_DLC :: enum i32 {
 	DesertersAndDisciples,
 }
 
-// SurvivalComplexityEntry_t — 32B (tuple<int,string,Uint32> mirror).
+// SurvivalComplexityEntry_t - 32B (tuple<int,string,Uint32> mirror).
 // Value for ClassDescriptions::DescData_t::survivalComplexity.
 SurvivalComplexityEntry_T :: struct {
 	value: i32,   // complexity level (1-5)
@@ -53,7 +53,7 @@ SurvivalComplexityEntry_T :: struct {
 }
 #assert(size_of(SurvivalComplexityEntry_T) == 32)
 
-// struct ClassDescriptions::DescData_t — 200 bytes
+// struct ClassDescriptions::DescData_t - 200 bytes
 ClassDescData_T :: struct {
 	text:               string, // DynamicString
 	internal_name:      string,
@@ -66,7 +66,7 @@ ClassDescData_T :: struct {
 }
 #assert(size_of(ClassDescData_T) == 200)
 
-// struct RaceDescriptions::DescData_t — 248 bytes
+// struct RaceDescriptions::DescData_t - 248 bytes
 RaceDescData_T :: struct {
 	text_left:                 string, // DynamicString
 	text_right:                string,

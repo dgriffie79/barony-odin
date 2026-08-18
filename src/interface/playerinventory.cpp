@@ -33,7 +33,6 @@
 #include "../book.hpp"
 
 //Prototype helper functions for player inventory helper functions.
-bool restrictPaperDollMovement = true;
 SDL_Surface* inventory_mode_item_img = NULL;
 SDL_Surface* inventory_mode_item_highlighted_img = NULL;
 SDL_Surface* inventory_mode_spell_img = NULL;

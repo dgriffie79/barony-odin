@@ -1,8 +1,8 @@
-// collision.odin — Odin mirrors of collision.hpp.
+// collision.odin - Odin mirrors of collision.hpp.
 package main
 
 
-// struct MonsterTrapIgnoreEntities_t — 40 bytes
+// struct MonsterTrapIgnoreEntities_t - 40 bytes
 // { DynamicSetI32 ignoreEntities (32B); Uint32 parent; }
 MonsterTrap_Ignore_Entities_t :: struct {
 	ignore_entities: map[i32]struct{}, // DynamicSetI32 (32B)

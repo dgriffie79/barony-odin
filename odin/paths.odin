@@ -1,7 +1,7 @@
-// paths.odin — Odin mirrors of paths.hpp.
+// paths.odin - Odin mirrors of paths.hpp.
 package main
 
-// typedef struct pathnode — 24 bytes
+// typedef struct pathnode - 24 bytes
 // { Sint32 x,y; Uint32 g,h; Sint32 px,py; }
 pathnode_t :: struct {
 	x:  i32,

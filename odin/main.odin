@@ -1,4 +1,4 @@
-// main.odin — Odin driver entry point for Barony (game or editor) + mirrors of main.hpp.
+// main.odin - Odin driver entry point for Barony (game or editor) + mirrors of main.hpp.
 //
 // The driver owns the real process main() and calls into the C++
 // barony_game.dll (or barony_editor.dll with -define:EDITOR=true), which runs
@@ -7,7 +7,7 @@
 // and this driver grows.
 //
 // The type mirrors (constants, enums, core structs from main.hpp) live here
-// in the same file — one header, one odin file.
+// in the same file - one header, one odin file.
 
 package main
 
@@ -53,6 +53,16 @@ run_barony :: proc() -> int {
 		argv_buf[i] = cstring(raw_data(arg_copies[i]))
 	}
 	argv_buf[n] = nil
+
+	// Port of the C++ static constructors for Odin-owned globals that have
+	// reference members / non-zero defaults (GenericGUI, FollowerMenu, CalloutMenu).
+	init_ctor_port()
+	when !#config(EDITOR, false) {
+		// CvarBool ctor port (shareMinimap, framesEatMouse).
+		init_cvars_bool()
+		// Cvar ctor port (CvarFloat/CvarVector4 register + wire data_ptr).
+		init_cvars()
+	}
 
 	rc := barony_main(c.int(len(os.args)), raw_data(argv_buf))
 	return int(rc)
@@ -117,7 +127,7 @@ Door_Edge :: enum i32 { // enum DoorEdge : Sint32
 // Core structs (mirror main.hpp)
 // ---------------------------------------------------------------------------
 
-// typedef struct vec4 { float x,y,z,w; } vec4_t;  — 16 bytes
+// typedef struct vec4 { float x,y,z,w; } vec4_t;  - 16 bytes
 vec4_t :: struct {
 	x: f32,
 	y: f32,
@@ -125,7 +135,7 @@ vec4_t :: struct {
 	w: f32,
 }
 
-// typedef struct mat4x4 { vec4_t x,y,z,w; } mat4x4_t;  — 64 bytes
+// typedef struct mat4x4 { vec4_t x,y,z,w; } mat4x4_t;  - 64 bytes
 mat4x4_t :: struct {
 	x: vec4_t,
 	y: vec4_t,
@@ -133,7 +143,7 @@ mat4x4_t :: struct {
 	w: vec4_t,
 }
 
-// typedef struct node_t — 48 bytes
+// typedef struct node_t - 48 bytes
 node_t :: struct {
 	next:          ^node_t,
 	prev:          ^node_t,
@@ -143,13 +153,13 @@ node_t :: struct {
 	size:          u32,
 }
 
-// typedef struct list_t { node_t* first; node_t* last; }  — 16 bytes
+// typedef struct list_t { node_t* first; node_t* last; }  - 16 bytes
 list_t :: struct {
 	first: ^node_t,
 	last:  ^node_t,
 }
 
-// typedef struct map_t  — 480 bytes
+// typedef struct map_t  - 480 bytes
 map_t :: struct {
 	name:                  [32]u8, // char name[32]
 	author:                [32]u8, // char author[32]
@@ -170,13 +180,13 @@ map_t :: struct {
 	filename:              [256]u8, // char filename[256]
 }
 
-// typedef struct deleteent_t { Uint32 uid; Uint32 tries; }  — 8 bytes
+// typedef struct deleteent_t { Uint32 uid; Uint32 tries; }  - 8 bytes
 deleteent_t :: struct {
 	uid:   u32,
 	tries: u32,
 }
 
-// typedef struct hit_t  — 40 bytes
+// typedef struct hit_t  - 40 bytes
 hit_t :: struct {
 	x:      f64, // real_t
 	y:      f64,
@@ -186,7 +196,7 @@ hit_t :: struct {
 	side:   i32,
 }
 
-// typedef struct button_t  — 80 bytes
+// typedef struct button_t  - 80 bytes
 button_t :: struct {
 	label:    [32]u8, // char label[32]
 	x:        i32,
@@ -204,7 +214,7 @@ button_t :: struct {
 	action:   proc(^button_t), // void (*action)(struct button_t* my)
 }
 
-// typedef struct voxel_t  — 792 bytes
+// typedef struct voxel_t  - 792 bytes
 voxel_t :: struct {
 	sizex:   i32,
 	sizey:   i32,
@@ -213,14 +223,14 @@ voxel_t :: struct {
 	palette: [256][3]u8,
 }
 
-// typedef struct vertex_t { real_t x,y,z; }  — 24 bytes
+// typedef struct vertex_t { real_t x,y,z; }  - 24 bytes
 vertex_t :: struct {
 	x: f64,
 	y: f64,
 	z: f64,
 }
 
-// typedef struct polyquad_t  — 104 bytes
+// typedef struct polyquad_t  - 104 bytes
 polyquad_t :: struct {
 	vertex: [4]vertex_t,
 	r: u8,
@@ -229,7 +239,7 @@ polyquad_t :: struct {
 	side: i32,
 }
 
-// typedef struct polytriangle_t  — 104 bytes
+// typedef struct polytriangle_t  - 104 bytes
 polytriangle_t :: struct {
 	vertex: [3]vertex_t,
 	normal: vertex_t,
@@ -238,7 +248,7 @@ polytriangle_t :: struct {
 	b: u8,
 }
 
-// typedef struct polymodel_t  — 32 bytes
+// typedef struct polymodel_t  - 32 bytes
 polymodel_t :: struct {
 	faces:     ^polytriangle_t,
 	numfaces:  u64,
@@ -248,7 +258,7 @@ polymodel_t :: struct {
 	normals:   u32,
 }
 
-// typedef struct string_t  — 40 bytes
+// typedef struct string_t  - 40 bytes
 string_t :: struct {
 	lines:  u32,
 	data:   ^u8, // char* data
@@ -258,7 +268,7 @@ string_t :: struct {
 	player: i32, // int player = -1
 }
 
-// typedef struct door_t  — 16 bytes
+// typedef struct door_t  - 16 bytes
 door_t :: struct {
 	x:    i32,
 	y:    i32,
@@ -266,7 +276,7 @@ door_t :: struct {
 	edge: Door_Edge, // enum DoorEdge : Sint32
 }
 
-// struct cameravars_t  — 24 bytes
+// struct cameravars_t  - 24 bytes
 cameravars_t :: struct {
 	shakex:  f64, // real_t
 	shakex2: f64,
@@ -274,7 +284,7 @@ cameravars_t :: struct {
 	shakey2: i32,
 }
 
-// struct AnimatedTile { int indices[8]; }  — 32 bytes
+// struct AnimatedTile { int indices[8]; }  - 32 bytes
 Animated_Tile :: struct {
 	indices: [8]i32,
 }

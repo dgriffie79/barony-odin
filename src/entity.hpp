@@ -1656,14 +1656,14 @@ extern "C" Sint32 statGetCON(Stat* entitystats, Entity* my);
 extern "C" Sint32 statGetINT(Stat* entitystats, Entity* my);
 extern "C" Sint32 statGetPER(Stat* entitystats, Entity* my);
 extern "C" Sint32 statGetCHR(Stat* entitystats, Entity* my);
-extern Uint32 entity_uids, lastEntityUIDs;
+extern "C" Uint32 entity_uids, lastEntityUIDs;
 //extern Entity *players[4];
-extern Uint32 nummonsters;
+extern "C" Uint32 nummonsters;
 
 class Item;
 
-extern bool swornenemies[NUMMONSTERS][NUMMONSTERS];
-extern bool monsterally[NUMMONSTERS][NUMMONSTERS];
+extern "C" bool swornenemies[NUMMONSTERS][NUMMONSTERS];
+extern "C" bool monsterally[NUMMONSTERS][NUMMONSTERS];
 
 extern "C" int AC(Stat* stat);
 
@@ -1780,11 +1780,11 @@ static const int FURNITURE_PODIUM = 4;
 
 extern "C" int checkSpriteType(Sint32 sprite);
 extern "C" Monster editorSpriteTypeToMonster(Sint32 sprite);
-extern DynamicArray spriteEditorNameStrings;  // vector<const char*> (non-owning)
-extern char tileEditorNameStrings[NUM_EDITOR_TILES][44];
-extern char monsterEditorNameStrings[NUMMONSTERS][32];
-extern char itemStringsByType[10][NUM_ITEM_STRINGS_BY_TYPE][32];
-extern char itemNameStrings[NUM_ITEM_STRINGS][32];
+extern "C" DynamicArray spriteEditorNameStrings;  // vector<const char*> (non-owning)
+extern "C" const char* tileEditorNameStrings[NUM_EDITOR_TILES];
+extern "C" const char* monsterEditorNameStrings[NUMMONSTERS];
+extern "C" const char* itemStringsByType[10][NUM_ITEM_STRINGS_BY_TYPE];
+extern "C" const char* itemNameStrings[NUM_ITEM_STRINGS];
 extern "C" int canWearEquip(Entity* entity, int category);
 extern "C" void createMonsterEquipment(Stat* stats, BaronyRNG& rng);
 extern "C" int countCustomItems(Stat* stats);
@@ -1824,7 +1824,7 @@ extern "C" char const * playerClassLangEntry(int classnum, int playernum);
 extern "C" Entity* summonChest(long x, long y);
 
 //Various settings variables regarding entities.
-extern bool flickerLights;
+extern "C" bool flickerLights;
 
 //Boulder functions.
 extern "C" void boulderSokobanOnDestroy(bool pushedOffLedge);
@@ -1853,8 +1853,8 @@ enum EntityHungerIntervals : int
 extern "C" int getEntityHungerInterval(int player, Entity* my, Stat* myStats, EntityHungerIntervals hungerInterval);
 
 //Fountain potion drop chance variables.
-extern const DynamicArrayU32 fountainPotionDropChances;
-extern const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap;
+extern "C" const DynamicArrayU32 fountainPotionDropChances;
+extern "C" const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap;
 extern "C" std::pair<int, int> fountainGeneratePotionDrop(BaronyRNG& rng);
 
 class TextSourceScript

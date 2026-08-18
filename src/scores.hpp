@@ -394,40 +394,40 @@ typedef struct score_t
 	Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES];
 	Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS];
 } score_t;
-extern list_t topscores_json;
-extern list_t topscoresMultiplayer_json;
-extern list_t topscores_legacy;
-extern list_t topscoresMultiplayer_legacy;
-extern int victory;
+extern "C" list_t topscores_json;
+extern "C" list_t topscoresMultiplayer_json;
+extern "C" list_t topscores_legacy;
+extern "C" list_t topscoresMultiplayer_legacy;
+extern "C" int victory;
 
-extern Uint32 completionTime;
-extern bool conductPenniless;
-extern bool conductFoodless;
-extern bool conductVegetarian;
-extern bool conductIlliterate;
-extern list_t booksRead;
-extern bool usedClass[NUMCLASSES];
-extern bool usedRace[NUMRACES];
-extern Uint32 loadingsavegame;
-extern Uint32 loadinglobbykey;
-extern Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES];
-extern Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS];
-extern DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS];  // vector<pair<Uint32,Uint32>>
-extern bool achievementStatusRhythmOfTheKnight[MAXPLAYERS];
-extern bool achievementRhythmOfTheKnight[MAXPLAYERS];
-extern DynamicMapI32T<Uint32> achievementThankTheTankPair[MAXPLAYERS];
-extern bool achievementStatusBaitAndSwitch[MAXPLAYERS];
-extern Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS];
-extern DynamicSetI32 clientLearnedAlchemyIngredients[MAXPLAYERS];
-extern DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
-extern DynamicSetI32 clientLearnedScrollLabels[MAXPLAYERS];
-extern bool achievementStatusThankTheTank[MAXPLAYERS];
-extern DynamicArrayU32 achievementStrobeVec[MAXPLAYERS];
-extern bool achievementStatusStrobe[MAXPLAYERS];
-extern bool playerFailedRangedOnlyConduct[MAXPLAYERS];
-extern bool achievementBrawlerMode;
-extern bool achievementPenniless;
-extern bool achievementRangedMode[MAXPLAYERS];
+extern "C" Uint32 completionTime;
+extern "C" bool conductPenniless;
+extern "C" bool conductFoodless;
+extern "C" bool conductVegetarian;
+extern "C" bool conductIlliterate;
+extern "C" list_t booksRead;
+extern "C" bool usedClass[NUMCLASSES];
+extern "C" bool usedRace[NUMRACES];
+extern "C" Uint32 loadingsavegame;
+extern "C" Uint32 loadinglobbykey;
+extern "C" Sint32 conductGameChallenges[NUM_CONDUCT_CHALLENGES];
+extern "C" Sint32 gameStatistics[NUM_GAMEPLAY_STATISTICS];
+extern "C" DynamicArray achievementRhythmOfTheKnightVec[MAXPLAYERS];  // vector<pair<Uint32,Uint32>>
+extern "C" bool achievementStatusRhythmOfTheKnight[MAXPLAYERS];
+extern "C" bool achievementRhythmOfTheKnight[MAXPLAYERS];
+extern "C" DynamicMapI32T<Uint32> achievementThankTheTankPair[MAXPLAYERS];
+extern "C" bool achievementStatusBaitAndSwitch[MAXPLAYERS];
+extern "C" Uint32 achievementBaitAndSwitchTimer[MAXPLAYERS];
+extern "C" DynamicSetI32 clientLearnedAlchemyIngredients[MAXPLAYERS];
+extern "C" DynamicArray clientLearnedAlchemyRecipes[MAXPLAYERS];  // vector<recipe_t>
+extern "C" DynamicSetI32 clientLearnedScrollLabels[MAXPLAYERS];
+extern "C" bool achievementStatusThankTheTank[MAXPLAYERS];
+extern "C" DynamicArrayU32 achievementStrobeVec[MAXPLAYERS];
+extern "C" bool achievementStatusStrobe[MAXPLAYERS];
+extern "C" bool playerFailedRangedOnlyConduct[MAXPLAYERS];
+extern "C" bool achievementBrawlerMode;
+extern "C" bool achievementPenniless;
+extern "C" bool achievementRangedMode[MAXPLAYERS];
 
 score_t* scoreConstructor(int player);
 extern "C" void scoreDeconstructor(void* data);
@@ -447,7 +447,7 @@ enum SaveFileType {
     SIZE_OF_TYPE
 };
 
-extern int savegameCurrentFileIndex;
+extern "C" int savegameCurrentFileIndex;
 
 extern "C" DynamicString setSaveGameFileName(bool singleplayer, SaveFileType type, int saveIndex = savegameCurrentFileIndex);
 

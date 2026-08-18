@@ -1,8 +1,8 @@
-// player.odin — Odin mirrors of player.hpp.
+// player.odin - Odin mirrors of player.hpp.
 package main
 
 
-// struct PlayerSettings_t (player.hpp:53, file scope) — 80 bytes.
+// struct PlayerSettings_t (player.hpp:53, file scope) - 80 bytes.
 // NOTE: distinct from the nested Player::PlayerSettings_t (16B, mirrored below
 // as Player_Settings_T). This is the type of the global playerSettings[MAXPLAYERS].
 PlayerSettings_T :: struct {
@@ -208,7 +208,7 @@ Face_Menu_Group :: enum i32 {
 // GameController nested structs
 // ---------------------------------------------------------------------------
 
-// struct GameController::Haptic_t::HapticEffect — 16 bytes
+// struct GameController::Haptic_t::HapticEffect - 16 bytes
 Haptic_Effect :: struct {
 	type:             u16, // SDL_HAPTIC_LEFTRIGHT
 	length:           u32,
@@ -218,7 +218,7 @@ Haptic_Effect :: struct {
 }
 #assert(size_of(Haptic_Effect) == 16)
 
-// class GameController::Haptic_t — 80 bytes
+// class GameController::Haptic_t - 80 bytes
 // (haptics member of GameController)
 Haptic_T :: struct {
 	haptic_effect_id:  i32,
@@ -230,7 +230,7 @@ Haptic_T :: struct {
 }
 #assert(size_of(Haptic_T) == 80)
 
-// struct GameController::Haptic_t::Rumble — 40 bytes
+// struct GameController::Haptic_t::Rumble - 40 bytes
 Rumble :: struct {
 	start_tick:     u32,
 	small_magnitude: u16,
@@ -291,7 +291,7 @@ Bindtype_T :: enum i32 {
 	NUM,
 }
 
-// struct GameController::Binding_t — 44 bytes
+// struct GameController::Binding_t - 44 bytes
 Binding_T :: struct {
 	analog:                 f32,
 	deadzone:               f32,
@@ -310,7 +310,7 @@ Binding_T :: struct {
 }
 #assert(size_of(Binding_T) == 44)
 
-// class GameController — 1448 bytes
+// class GameController - 1448 bytes
 Game_Controller :: struct {
 	sdl_device:          rawptr, // SDL_GameController*
 	sdl_haptic:          rawptr, // SDL_Haptic*
@@ -333,7 +333,7 @@ Game_Controller :: struct {
 }
 #assert(size_of(Game_Controller) == 1448)
 
-// struct Inputs::VirtualMouse — 96 bytes
+// struct Inputs::VirtualMouse - 96 bytes
 Virtual_Mouse :: struct {
 	xrel:                  i32,
 	yrel:                  i32,
@@ -358,7 +358,7 @@ Virtual_Mouse :: struct {
 }
 #assert(size_of(Virtual_Mouse) == 96)
 
-// struct Inputs::UIStatus — 40 bytes
+// struct Inputs::UIStatus - 40 bytes
 UI_Status :: struct {
 	selected_item_from_hotbar: i32,
 	selected_item_from_chest:  u32,
@@ -374,16 +374,16 @@ UI_Status :: struct {
 }
 #assert(size_of(UI_Status) == 40)
 
-// class Inputs — 568 bytes
+// class Inputs - 568 bytes
 Inputs_Struct :: struct {
-	player_controller_ids: [4]i32, // MAXPLAYERS
+	player_controller_ids: [MAXPLAYERS]i32, // MAXPLAYERS
 	player_using_keyboard_control: i32,
-	vmouse:                [4]Virtual_Mouse, // MAXPLAYERS
-	ui_status:             [4]UI_Status,     // MAXPLAYERS
+	vmouse:                [MAXPLAYERS]Virtual_Mouse, // MAXPLAYERS
+	ui_status:             [MAXPLAYERS]UI_Status,     // MAXPLAYERS
 }
 #assert(size_of(Inputs_Struct) == 568)
 
-// struct MonsterStringPair_t — 24 bytes
+// struct MonsterStringPair_t - 24 bytes
 Monster_String_Pair_T :: struct {
 	first:  i32, // Monster
 	second: string,
@@ -391,38 +391,38 @@ Monster_String_Pair_T :: struct {
 #assert(size_of(Monster_String_Pair_T) == 24)
 
 // --- local pair mirrors (player.hpp raw DynamicArray members) ---
-// vector<pair<Uint32,Rumble>> (Haptic_t::activeRumbles) — 48B
+// vector<pair<Uint32,Rumble>> (Haptic_t::activeRumbles) - 48B
 Uint32_Rumble_Pair :: struct {
 	first:  u32,
 	second: Rumble,
 }
 #assert(size_of(Uint32_Rumble_Pair) == 48)
 
-// vector<pair<Uint32,FollowerBar_t>> (HUD_t::followerBars/playerBars) — 288B
+// vector<pair<Uint32,FollowerBar_t>> (HUD_t::followerBars/playerBars) - 288B
 Uint32_FollowerBar_Pair :: struct {
 	first:  u32,
 	second: Follower_Bar_T,
 }
 #assert(size_of(Uint32_FollowerBar_Pair) == 288)
 
-// vector<pair<Entity*,real_t>> (WorldUI_t::tooltipsInRange) — 16B
+// vector<pair<Entity*,real_t>> (WorldUI_t::tooltipsInRange) - 16B
 EntityF64_Pair :: struct {
 	first:  ^Entity,
 	second: f64,
 }
 #assert(size_of(EntityF64_Pair) == 16)
 
-// vector<pair<int,Uint32>> (PlayerMechanics_t::pendingDucks) — 8B
+// vector<pair<int,Uint32>> (PlayerMechanics_t::pendingDucks) - 8B
 Int_U32_Pair :: struct {
 	first:  i32,
 	second: u32,
 }
 #assert(size_of(Int_U32_Pair) == 8)
 
-// struct Player::GUIDropdown_t::DropDown_t — 88 bytes
+// struct Player::GUIDropdown_t::DropDown_t - 88 bytes
 // --- core container mirrors (containers is shim-only; these live in core) ---
 
-// SDL_Rect — 16 bytes
+// SDL_Rect - 16 bytes
 SDL_Rect :: struct {
 	x: i32,
 	y: i32,
@@ -431,14 +431,14 @@ SDL_Rect :: struct {
 }
 #assert(size_of(SDL_Rect) == 16)
 
-// IntPair_T — 8B POD (std::pair<int,int>)
+// IntPair_T - 8B POD (std::pair<int,int>)
 IntPair_T :: struct {
 	first:  i32,
 	second: i32,
 }
 #assert(size_of(IntPair_T) == 8)
 
-// DropdownOption_T — 64B (DropdownOption_tMirror: 4 strings)
+// DropdownOption_T - 64B (DropdownOption_tMirror: 4 strings)
 DropdownOption_T :: struct {
 	text:            string,
 	keyboard_glyph:  string,
@@ -458,7 +458,7 @@ Drop_Down_T :: struct {
 }
 #assert(size_of(Drop_Down_T) == 88)
 
-// struct Player::GUIDropdown_t — 80 bytes
+// struct Player::GUIDropdown_t - 80 bytes
 // (first member is a Player& reference -> rawptr)
 GUI_Dropdown_T :: struct {
 	player:                      rawptr, // Player&
@@ -476,7 +476,7 @@ GUI_Dropdown_T :: struct {
 }
 #assert(size_of(GUI_Dropdown_T) == 80)
 
-// class Player::GUI_t — 104 bytes
+// class Player::GUI_t - 104 bytes
 GUI_T :: struct {
 	player:                rawptr, // Player&
 	active_module:         i32, // GUIModules enum
@@ -486,7 +486,7 @@ GUI_T :: struct {
 }
 #assert(size_of(GUI_T) == 104)
 
-// struct Player::Inventory_t::Cursor_t — 56 bytes
+// struct Player::Inventory_t::Cursor_t - 56 bytes
 Inventory_Cursor_T :: struct {
 	animate_x:          f64,
 	animate_y:          f64,
@@ -501,14 +501,14 @@ Inventory_Cursor_T :: struct {
 }
 #assert(size_of(Inventory_Cursor_T) == 56)
 
-// struct Player::Inventory_t::SelectedItemAnimate_t — 16 bytes
+// struct Player::Inventory_t::SelectedItemAnimate_t - 16 bytes
 Selected_Item_Animate_T :: struct {
 	animate_x: f64,
 	animate_y: f64,
 }
 #assert(size_of(Selected_Item_Animate_T) == 16)
 
-// struct Player::Inventory_t::SpellPanel_t — 72 bytes
+// struct Player::Inventory_t::SpellPanel_t - 72 bytes
 Spell_Panel_T :: struct {
 	player:                rawptr, // Player&
 	panel_justify:         i32, // PanelJustify_t enum
@@ -526,7 +526,7 @@ Spell_Panel_T :: struct {
 }
 #assert(size_of(Spell_Panel_T) == 72)
 
-// struct Player::Inventory_t::ChestGUI_t — 80 bytes
+// struct Player::Inventory_t::ChestGUI_t - 80 bytes
 Chest_GUI_T :: struct {
 	player:                rawptr, // Player&
 	panel_justify:         i32, // PanelJustify_t enum
@@ -546,7 +546,7 @@ Chest_GUI_T :: struct {
 }
 #assert(size_of(Chest_GUI_T) == 80)
 
-// struct Player::Inventory_t::ItemTooltipDisplay_t — 192 bytes
+// struct Player::Inventory_t::ItemTooltipDisplay_t - 192 bytes
 Item_Tooltip_Display_T :: struct {
 	type:                     u32,
 	status:                   i32,
@@ -588,7 +588,7 @@ Item_Tooltip_Display_T :: struct {
 }
 #assert(size_of(Item_Tooltip_Display_T) == 192)
 
-// struct Player::Inventory_t::AppraisalBreakpoint_t — 12 bytes
+// struct Player::Inventory_t::AppraisalBreakpoint_t - 12 bytes
 Appraisal_Breakpoint_T :: struct {
 	skill_lvl:         i32,
 	gold_value_limit:  i32,
@@ -596,7 +596,7 @@ Appraisal_Breakpoint_T :: struct {
 }
 #assert(size_of(Appraisal_Breakpoint_T) == 12)
 
-// class Player::Inventory_t::Appraisal_t — 128 bytes
+// class Player::Inventory_t::Appraisal_t - 128 bytes
 Appraisal_T :: struct {
 	player:                     rawptr, // Player&
 	timer:                      i32,
@@ -614,7 +614,7 @@ Appraisal_T :: struct {
 }
 #assert(size_of(Appraisal_T) == 128)
 
-// class Player::Inventory_t — 1048 bytes
+// class Player::Inventory_t - 1048 bytes
 Inventory_T :: struct {
 	sizex:                   i32,
 	sizey:                   i32,
@@ -663,7 +663,7 @@ Inventory_T :: struct {
 }
 #assert(size_of(Inventory_T) == 1048)
 
-// struct Player::ShopGUI_t — 192 bytes
+// struct Player::ShopGUI_t - 192 bytes
 Shop_GUI_T :: struct {
 	player:                 rawptr, // Player&
 	shop_frame:             rawptr, // Frame*
@@ -695,7 +695,7 @@ Shop_GUI_T :: struct {
 }
 #assert(size_of(Shop_GUI_T) == 192)
 
-// class Player::BookGUI_t — 72 bytes
+// class Player::BookGUI_t - 72 bytes
 Book_GUI_T :: struct {
 	player:                  rawptr, // Player&
 	book_fade_in_animation_y: f64,
@@ -709,7 +709,7 @@ Book_GUI_T :: struct {
 }
 #assert(size_of(Book_GUI_T) == 72)
 
-// class Player::SignGUI_t — 80 bytes
+// class Player::SignGUI_t - 80 bytes
 Sign_GUI_T :: struct {
 	player:                  rawptr, // Player&
 	sign_fade_in_animation_y: f64,
@@ -724,7 +724,7 @@ Sign_GUI_T :: struct {
 }
 #assert(size_of(Sign_GUI_T) == 80)
 
-// class Player::CharacterSheet_t — 72 bytes
+// class Player::CharacterSheet_t - 72 bytes
 Character_Sheet_T :: struct {
 	player:                  rawptr, // Player&
 	panel_justify:           i32, // PanelJustify_t enum
@@ -744,7 +744,7 @@ Character_Sheet_T :: struct {
 }
 #assert(size_of(Character_Sheet_T) == 72)
 
-// struct Player::SkillSheet_t::SkillEffect_t — 160 bytes
+// struct Player::SkillSheet_t::SkillEffect_t - 160 bytes
 Skill_Effect_T :: struct {
 	tag:                        string,
 	title:                      string,
@@ -754,9 +754,9 @@ Skill_Effect_T :: struct {
 	value_custom_width_offset:  i32,
 	b_allow_auto_resize_value:  bool,
 	b_allow_realtime_update:    bool,
-	marquee:                    [4]f64, // real_t[4]
-	marquee_ticks:              [4]u32,
-	marquee_completed:          [4]bool,
+	marquee:                    [MAXPLAYERS]f64, // real_t[MAXPLAYERS]
+	marquee_ticks:              [MAXPLAYERS]u32,
+	marquee_completed:          [MAXPLAYERS]bool,
 	effect_updated_at_skill_level: i32,
 	effect_updated_at_base_skill_level: i32,
 	effect_updated_at_monster_type: i32,
@@ -764,7 +764,7 @@ Skill_Effect_T :: struct {
 }
 #assert(size_of(Skill_Effect_T) == 160)
 
-// struct Player::SkillSheet_t::SkillEntry_t — 208 bytes
+// struct Player::SkillSheet_t::SkillEntry_t - 208 bytes
 Skill_Entry_T :: struct {
 	skill_name:               string,
 	skill_short_name:         string,
@@ -784,7 +784,7 @@ Skill_Entry_T :: struct {
 }
 #assert(size_of(Skill_Entry_T) == 208)
 
-// struct Player::SkillSheet_t::SkillSheetData_t — 384 bytes
+// struct Player::SkillSheet_t::SkillSheetData_t - 384 bytes
 Skill_Sheet_Data_T :: struct {
 	default_text_color:            u32,
 	novice_text_color:             u32,
@@ -810,7 +810,7 @@ Skill_Sheet_Data_T :: struct {
 }
 #assert(size_of(Skill_Sheet_Data_T) == 384)
 
-// class Player::SkillSheet_t — 88 bytes
+// class Player::SkillSheet_t - 88 bytes
 Skill_Sheet_T :: struct {
 	player:                    rawptr, // Player&
 	skill_frame:               rawptr, // Frame*
@@ -829,7 +829,7 @@ Skill_Sheet_T :: struct {
 }
 #assert(size_of(Skill_Sheet_T) == 88)
 
-// struct Player::HUD_t::Cursor_t — 72 bytes
+// struct Player::HUD_t::Cursor_t - 72 bytes
 HUD_Cursor_T :: struct {
 	animate_x:          f64,
 	animate_y:          f64,
@@ -848,7 +848,7 @@ HUD_Cursor_T :: struct {
 }
 #assert(size_of(HUD_Cursor_T) == 72)
 
-// struct Player::HUD_t::Bar_t — 88 bytes
+// struct Player::HUD_t::Bar_t - 88 bytes
 Bar_T :: struct {
 	animate_value:             f64,
 	animate_value2:            f64,
@@ -868,7 +868,7 @@ Bar_T :: struct {
 }
 #assert(size_of(Bar_T) == 88)
 
-// struct Player::HUD_t::XPInfo_t — 32 bytes
+// struct Player::HUD_t::XPInfo_t - 32 bytes
 XP_Info_T :: struct {
 	cycle_status:          i32, // XPCycleInfo enum
 	fade:                  f64,
@@ -878,7 +878,7 @@ XP_Info_T :: struct {
 }
 #assert(size_of(XP_Info_T) == 32)
 
-// struct Player::HUD_t::InteractPrompt_t — 24 bytes
+// struct Player::HUD_t::InteractPrompt_t - 24 bytes
 Interact_Prompt_T :: struct {
 	prompt_anim:          f64,
 	active_ticks:         u32,
@@ -887,7 +887,7 @@ Interact_Prompt_T :: struct {
 }
 #assert(size_of(Interact_Prompt_T) == 24)
 
-// struct Player::HUD_t::FollowerBar_t — 280 bytes
+// struct Player::HUD_t::FollowerBar_t - 280 bytes
 Follower_Bar_T :: struct {
 	hp_bar:               Bar_T,
 	mp_bar:               Bar_T,
@@ -909,7 +909,7 @@ Follower_Bar_T :: struct {
 }
 #assert(size_of(Follower_Bar_T) == 280)
 
-// struct Player::HUD_t::FollowerDisplay_t — 64 bytes
+// struct Player::HUD_t::FollowerDisplay_t - 64 bytes
 Follower_Display_T :: struct {
 	scroll_percent:      f64,
 	scroll_inertia:      f64,
@@ -928,7 +928,7 @@ Follower_Display_T :: struct {
 }
 #assert(size_of(Follower_Display_T) == 64)
 
-// class Player::HUD_t — 1040 bytes
+// class Player::HUD_t - 1040 bytes
 HUD_T :: struct {
 	player:                      rawptr, // Player&
 	controller_frame:            rawptr, // Frame*
@@ -1012,7 +1012,7 @@ HUD_T :: struct {
 }
 #assert(size_of(HUD_T) == 1040)
 
-// class Player::Magic_t — 120 bytes
+// class Player::Magic_t - 120 bytes
 Magic_T :: struct {
 	player:                       rawptr, // Player&
 	selected_spell:               ^spell_t,
@@ -1029,14 +1029,14 @@ Magic_T :: struct {
 }
 #assert(size_of(Magic_T) == 120)
 
-// struct Player::PlayerSettings_t — 16 bytes
+// struct Player::PlayerSettings_t - 16 bytes
 Player_Settings_T :: struct {
 	quick_turn_direction: i32,
 	quick_turn_speed:     f64,
 }
 #assert(size_of(Player_Settings_T) == 16)
 
-// struct Player::PlayerMovement_t — 40 bytes
+// struct Player::PlayerMovement_t - 40 bytes
 Player_Movement_T :: struct {
 	quick_turn_rotation:      f64,
 	quick_turn_start_ticks:   u32,
@@ -1048,7 +1048,7 @@ Player_Movement_T :: struct {
 }
 #assert(size_of(Player_Movement_T) == 40)
 
-// class Player::Ghost_t — 96 bytes
+// class Player::Ghost_t - 96 bytes
 Ghost_T :: struct {
 	quick_turn_rotation:       f64,
 	quick_turn_start_ticks:    u32,
@@ -1073,7 +1073,7 @@ Ghost_T :: struct {
 }
 #assert(size_of(Ghost_T) == 96)
 
-// class Player::MessageZone_t — 120 bytes
+// class Player::MessageZone_t - 120 bytes
 Message_Zone_T :: struct {
 	font:                       rawptr, // TTF_Font*
 	old_sdl_ticks:              u32,
@@ -1091,7 +1091,7 @@ Message_Zone_T :: struct {
 }
 #assert(size_of(Message_Zone_T) == 120)
 
-// struct Player::WorldUI_t::WorldTooltipItem_t — 48 bytes
+// struct Player::WorldUI_t::WorldTooltipItem_t - 48 bytes
 World_Tooltip_Item_T :: struct {
 	player:                    rawptr, // Player&
 	type:                      u32,
@@ -1106,7 +1106,7 @@ World_Tooltip_Item_T :: struct {
 }
 #assert(size_of(World_Tooltip_Item_T) == 48)
 
-// struct Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t — 56 bytes
+// struct Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t - 56 bytes
 Setting_T :: struct {
 	offset_z:             f64,
 	text_delay:           i32,
@@ -1122,7 +1122,7 @@ Setting_T :: struct {
 }
 #assert(size_of(Setting_T) == 56)
 
-// struct Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t — 144 bytes
+// struct Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t - 144 bytes
 Dialogue_T :: struct {
 	player:                   i32,
 	parent:                   u32,
@@ -1147,7 +1147,7 @@ Dialogue_T :: struct {
 }
 #assert(size_of(Dialogue_T) == 144)
 
-// struct Player::WorldUI_t::WorldTooltipDialogue_t — 184 bytes
+// struct Player::WorldUI_t::WorldTooltipDialogue_t - 184 bytes
 World_Tooltip_Dialogue_T :: struct {
 	player:           rawptr, // Player&
 	player_dialogue:  Dialogue_T,
@@ -1155,7 +1155,7 @@ World_Tooltip_Dialogue_T :: struct {
 }
 #assert(size_of(World_Tooltip_Dialogue_T) == 184)
 
-// class Player::WorldUI_t — 352 bytes
+// class Player::WorldUI_t - 352 bytes
 World_UI_T :: struct {
 	player:                     rawptr, // Player&
 	b_enabled:                  bool,
@@ -1173,14 +1173,14 @@ World_UI_T :: struct {
 }
 #assert(size_of(World_UI_T) == 352)
 
-// struct Player::PaperDoll_t::PaperDollSlot_t — 8 bytes
+// struct Player::PaperDoll_t::PaperDollSlot_t - 8 bytes
 Paper_Doll_Slot_T :: struct {
 	item:      u32,
 	slot_type: i32, // PaperDollSlotType enum
 }
 #assert(size_of(Paper_Doll_Slot_T) == 8)
 
-// class Player::PaperDoll_t — 168 bytes
+// class Player::PaperDoll_t - 168 bytes
 Paper_Doll_T :: struct {
 	player:                     rawptr, // Player&
 	enabled:                    bool,
@@ -1193,7 +1193,7 @@ Paper_Doll_T :: struct {
 }
 #assert(size_of(Paper_Doll_T) == 168)
 
-// struct hotbar_slot_t (interface.hpp) — 72 bytes
+// struct hotbar_slot_t (interface.hpp) - 72 bytes
 Hotbar_Slot_T :: struct {
 	item:         u32,
 	last_item:    Item,
@@ -1201,7 +1201,7 @@ Hotbar_Slot_T :: struct {
 }
 #assert(size_of(Hotbar_Slot_T) == 72)
 
-// struct Player::Hotbar_t::Cursor_t — 40 bytes
+// struct Player::Hotbar_t::Cursor_t - 40 bytes
 Hotbar_Cursor_T :: struct {
 	animate_x:          f64,
 	animate_y:          f64,
@@ -1214,7 +1214,7 @@ Hotbar_Cursor_T :: struct {
 }
 #assert(size_of(Hotbar_Cursor_T) == 40)
 
-// class Player::Hotbar_t — 4720 bytes
+// class Player::Hotbar_t - 4720 bytes
 Hotbar_T :: struct {
 	hotbar:                          [10]Hotbar_Slot_T,
 	hotbar_alternate:                [5][10]Hotbar_Slot_T,
@@ -1248,7 +1248,7 @@ Hotbar_T :: struct {
 }
 #assert(size_of(Hotbar_T) == 4720)
 
-// class Player::Minimap_t — 88 bytes
+// class Player::Minimap_t - 88 bytes
 Minimap_T :: struct {
 	player:                rawptr, // Player&
 	big:                   bool,
@@ -1264,7 +1264,7 @@ Minimap_T :: struct {
 }
 #assert(size_of(Minimap_T) == 88)
 
-// class Player::CompendiumProgress_t — 168 bytes
+// class Player::CompendiumProgress_t - 168 bytes
 Compendium_Progress_T :: struct {
 	player:               rawptr, // Player&
 	item_events:          map[string]map[[4]byte]i32, // DynamicMapStrI32Map (string->i32 map)
@@ -1280,7 +1280,7 @@ Compendium_Progress_T :: struct {
 }
 #assert(size_of(Compendium_Progress_T) == 168)
 
-// class Player::PlayerMechanics_t — 512 bytes
+// class Player::PlayerMechanics_t - 512 bytes
 Player_Mechanics_T :: struct {
 	player:                       rawptr, // Player&
 	item_degrade_rng:             map[[4]byte]i32, // DynamicMapI32T<int> (i32-keyed)
@@ -1318,7 +1318,7 @@ Player_Mechanics_T :: struct {
 }
 #assert(size_of(Player_Mechanics_T) == 512)
 
-// class Player — 9176 bytes
+// class Player - 9176 bytes
 Player :: struct {
 	local_host:              bool,
 	cam:                     rawptr, // view_t*
@@ -1354,3 +1354,68 @@ Player :: struct {
 	mechanics:               Player_Mechanics_T,
 }
 #assert(size_of(Player) == 9176)
+
+
+// ---------------------------------------------------------------------------
+// Globals owned by Odin (C++ references via extern "C")
+// ---------------------------------------------------------------------------
+
+@(export)
+selectedEntity : [MAXPLAYERS]^Entity
+
+@(export)
+lastSelectedEntity : [MAXPLAYERS]^Entity
+
+@(export)
+players : [MAXPLAYERS]^Player
+
+@(export)
+playerSettings : [MAXPLAYERS]PlayerSettings_T
+
+@(export)
+game_controllers : [16]Game_Controller
+
+@(export)
+inputs : Inputs_Struct
+
+@(export)
+gamepad_deadzone : i32 = 8000
+
+@(export)
+gamepad_trigger_deadzone : i32 = 18000
+
+@(export)
+gamepad_leftx_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_lefty_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_rightx_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_righty_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_menux_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_menuy_sensitivity : f64 = 1.0
+
+@(export)
+gamepad_leftx_invert : bool
+
+@(export)
+gamepad_lefty_invert : bool
+
+@(export)
+gamepad_rightx_invert : bool
+
+@(export)
+gamepad_righty_invert : bool
+
+@(export)
+gamepad_menux_invert : bool
+
+@(export)
+gamepad_menuy_invert : bool

@@ -26,7 +26,7 @@
 #endif
 #include "../../interface/consolecommand.hpp"
 
-extern Uint32 numsounds;
+extern "C" Uint32 numsounds;
 extern "C" bool initSoundEngine(); //If it fails to initialize the sound engine, it'll just disable audio.
 extern "C" void exitSoundEngine();
 extern "C" int loadSoundResources(real_t base_load_percent, real_t top_load_percent);
@@ -41,23 +41,23 @@ extern "C" bool loadMusic();
 #define SOUND
 #define MUSIC
 
-extern ALCcontext *openal_context;
-extern ALCdevice  *openal_device;
+extern "C" ALCcontext *openal_context;
+extern "C" ALCdevice  *openal_device;
 
-extern int openal_maxchannels;
+extern "C" int openal_maxchannels;
 
-extern bool levelmusicplaying;
+extern "C" bool levelmusicplaying;
 
-extern int currenttrack; // track index for handleLevelMusic (defined in defines.cpp)
+extern "C" int currenttrack; // track index for handleLevelMusic (defined in defines.cpp)
 
-extern bool shopmusicplaying;
-extern bool combatmusicplaying;
-extern bool minotaurmusicplaying;
-extern bool herxmusicplaying;
-extern bool devilmusicplaying;
-extern bool olddarkmap;
-extern bool sanctummusicplaying;
-extern bool sfxUseDynamicAmbientVolume, sfxUseDynamicEnvironmentVolume;
+extern "C" bool shopmusicplaying;
+extern "C" bool combatmusicplaying;
+extern "C" bool minotaurmusicplaying;
+extern "C" bool herxmusicplaying;
+extern "C" bool devilmusicplaying;
+extern "C" bool olddarkmap;
+extern "C" bool sanctummusicplaying;
+extern "C" bool sfxUseDynamicAmbientVolume, sfxUseDynamicEnvironmentVolume;
 
 struct OPENAL_CHANNELGROUP;
 
@@ -68,42 +68,42 @@ struct Vec3 {
 	float x,y,z;
 };
 
-extern OPENAL_BUFFER** sounds;
-extern OPENAL_BUFFER** minesmusic;
+extern "C" OPENAL_BUFFER** sounds;
+extern "C" OPENAL_BUFFER** minesmusic;
 #define NUMMINESMUSIC 5
-extern OPENAL_BUFFER** swampmusic;
+extern "C" OPENAL_BUFFER** swampmusic;
 #define NUMSWAMPMUSIC 4
-extern OPENAL_BUFFER** labyrinthmusic;
+extern "C" OPENAL_BUFFER** labyrinthmusic;
 #define NUMLABYRINTHMUSIC 3
-extern OPENAL_BUFFER** ruinsmusic;
+extern "C" OPENAL_BUFFER** ruinsmusic;
 #define NUMRUINSMUSIC 3
-extern OPENAL_BUFFER** underworldmusic;
+extern "C" OPENAL_BUFFER** underworldmusic;
 #define NUMUNDERWORLDMUSIC 3
-extern OPENAL_BUFFER** hellmusic;
+extern "C" OPENAL_BUFFER** hellmusic;
 #define NUMHELLMUSIC 3
-extern OPENAL_BUFFER** intromusic, *intermissionmusic, *minetownmusic, *splashmusic, *librarymusic, *shopmusic, *storymusic;
-extern OPENAL_BUFFER** minotaurmusic, *herxmusic, *templemusic;
-extern OPENAL_BUFFER* endgamemusic, *escapemusic, *devilmusic, *sanctummusic, *tutorialmusic, *introstorymusic, *gameovermusic;
-extern OPENAL_BUFFER* introductionmusic;
+extern "C" OPENAL_BUFFER** intromusic, *intermissionmusic, *minetownmusic, *splashmusic, *librarymusic, *shopmusic, *storymusic;
+extern "C" OPENAL_BUFFER** minotaurmusic, *herxmusic, *templemusic;
+extern "C" OPENAL_BUFFER* endgamemusic, *escapemusic, *devilmusic, *sanctummusic, *tutorialmusic, *introstorymusic, *gameovermusic;
+extern "C" OPENAL_BUFFER* introductionmusic;
 #define NUMMINOTAURMUSIC 2
-extern OPENAL_BUFFER** cavesmusic;
-extern OPENAL_BUFFER** citadelmusic;
-extern OPENAL_BUFFER* gnomishminesmusic;
-extern OPENAL_BUFFER* greatcastlemusic;
-extern OPENAL_BUFFER* sokobanmusic;
-extern OPENAL_BUFFER* caveslairmusic;
-extern OPENAL_BUFFER* bramscastlemusic;
-extern OPENAL_BUFFER* hamletmusic;
-extern OPENAL_BUFFER** fortressmusic;
+extern "C" OPENAL_BUFFER** cavesmusic;
+extern "C" OPENAL_BUFFER** citadelmusic;
+extern "C" OPENAL_BUFFER* gnomishminesmusic;
+extern "C" OPENAL_BUFFER* greatcastlemusic;
+extern "C" OPENAL_BUFFER* sokobanmusic;
+extern "C" OPENAL_BUFFER* caveslairmusic;
+extern "C" OPENAL_BUFFER* bramscastlemusic;
+extern "C" OPENAL_BUFFER* hamletmusic;
+extern "C" OPENAL_BUFFER** fortressmusic;
 #define NUMCAVESMUSIC 3
 #define NUMCITADELMUSIC 3
 #define NUMINTROMUSIC 3
 #define NUMFORTRESSMUSIC 2
 //TODO: Automatically scan the music folder for a mines subdirectory and use all the music for the mines or something like that. I'd prefer something neat like for that loading music for a level, anyway. And I can just reuse the code I had for ORR.
 
-extern OPENAL_SOUND* music_channel, *music_channel2, *music_resume; //TODO: List of music, play first one, fade out all the others? Eh, maybe some other day. //music_resume is the music to resume after, say, combat or shops. //TODO: Clear music_resume every biome change. Or otherwise validate it for that level set.
-extern OPENAL_CHANNELGROUP *sound_group, *music_group;
-extern OPENAL_CHANNELGROUP *soundAmbient_group, *soundEnvironment_group, *music_notification_group;
+extern "C" OPENAL_SOUND* music_channel, *music_channel2, *music_resume; //TODO: List of music, play first one, fade out all the others? Eh, maybe some other day. //music_resume is the music to resume after, say, combat or shops. //TODO: Clear music_resume every biome change. Or otherwise validate it for that level set.
+extern "C" OPENAL_CHANNELGROUP *sound_group, *music_group;
+extern "C" OPENAL_CHANNELGROUP *soundAmbient_group, *soundEnvironment_group, *music_notification_group;
 
 extern "C" int initOPENAL();
 extern "C" int closeOPENAL();
@@ -144,4 +144,4 @@ extern "C" void OPENAL_Channel_GetPosition(OPENAL_SOUND* channel, unsigned int *
 extern "C" void OPENAL_Sound_GetLength(OPENAL_BUFFER* buffer, unsigned int *length);
 extern "C" void OPENAL_Sound_Release(OPENAL_BUFFER* buffer);
 
-extern float fadein_increment, fadeout_increment, default_fadein_increment, default_fadeout_increment;
+extern "C" float fadein_increment, fadeout_increment, default_fadein_increment, default_fadeout_increment;

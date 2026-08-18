@@ -280,26 +280,26 @@ constexpr Uint32 makeColorRGB(uint8_t r, uint8_t g, uint8_t b) {
     return 0xff000000 | ((Uint32)b << 16) | ((Uint32)g << 8) | ((Uint32)r << 0);
 }
 
-extern framebuffer main_framebuffer;
-extern Shader voxelShader;
-extern Shader voxelBrightShader;
-extern Shader voxelDitheredShader;
-extern Shader voxelBrightDitheredShader;
-extern Shader worldShader;
-extern Shader worldDitheredShader;
-extern Shader worldDarkShader;
-extern Shader skyShader;
-extern Mesh skyMesh;
-extern Shader spriteShader;
-extern Shader spriteDitheredShader;
-extern Shader spriteBrightShader;
-extern Shader spriteUIShader;
-extern Mesh spriteMesh;
-extern TempTexture* lightmapTexture[MAXPLAYERS + 1];
+extern "C" framebuffer main_framebuffer;
+extern "C" Shader voxelShader;
+extern "C" Shader voxelBrightShader;
+extern "C" Shader voxelDitheredShader;
+extern "C" Shader voxelBrightDitheredShader;
+extern "C" Shader worldShader;
+extern "C" Shader worldDitheredShader;
+extern "C" Shader worldDarkShader;
+extern "C" Shader skyShader;
+extern "C" Mesh skyMesh;
+extern "C" Shader spriteShader;
+extern "C" Shader spriteDitheredShader;
+extern "C" Shader spriteBrightShader;
+extern "C" Shader spriteUIShader;
+extern "C" Mesh spriteMesh;
+extern "C" TempTexture* lightmapTexture[MAXPLAYERS + 1];
 
 #define TRANSPARENT_TILE 246
 
-extern Uint32 ditherDisabledTime;
+extern "C" Uint32 ditherDisabledTime;
 extern "C" void temporarilyDisableDithering();
 
 struct Chunk {
@@ -390,8 +390,8 @@ extern "C" void createChunks();
 extern "C" void createCommonDrawResources();
 extern "C" void destroyCommonDrawResources();
 
-extern view_t cameras[MAXPLAYERS];
-extern view_t menucam;
+extern "C" view_t cameras[MAXPLAYERS];
+extern "C" view_t menucam;
 
 // function prototypes for opengl.c:
 #define REALCOLORS 0
@@ -408,21 +408,19 @@ extern "C" void glDrawWorld(view_t* camera, int mode);
 extern "C" void glEndCamera(view_t* camera, bool useHDR, map_t& map);
 extern "C" unsigned int GO_GetPixelU32(int x, int y, view_t& camera);
 
-extern bool hdrEnabled;
+extern "C" bool hdrEnabled;
 
-#ifndef EDITOR
-extern CvarVector4 cvar_hdrBrightness;
-extern CvarFloat cvar_fogDistance;
-extern CvarVector4 cvar_fogColor;
-extern CvarFloat cvar_hdrExposure;
-extern CvarFloat cvar_hdrGamma;
-extern CvarFloat cvar_hdrAdjustment;
-extern CvarFloat cvar_hdrLimitHigh;
-extern CvarFloat cvar_hdrLimitLow;
-extern const Vector4 defaultBrightness;
-extern const float defaultGamma;
-extern const float defaultExposure;
-extern const float defaultAdjustmentRate;
-extern const float defaultLimitHigh;
-extern const float defaultLimitLow;
-#endif
+extern "C" CvarVector4 cvar_hdrBrightness;
+extern "C" CvarFloat cvar_fogDistance;
+extern "C" CvarVector4 cvar_fogColor;
+extern "C" CvarFloat cvar_hdrExposure;
+extern "C" CvarFloat cvar_hdrGamma;
+extern "C" CvarFloat cvar_hdrAdjustment;
+extern "C" CvarFloat cvar_hdrLimitHigh;
+extern "C" CvarFloat cvar_hdrLimitLow;
+extern "C" const Vector4 defaultBrightness;
+extern "C" const float defaultGamma;
+extern "C" const float defaultExposure;
+extern "C" const float defaultAdjustmentRate;
+extern "C" const float defaultLimitHigh;
+extern "C" const float defaultLimitLow;

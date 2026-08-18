@@ -202,7 +202,7 @@ extern bool broadcast;
 extern bool nohud;
 extern int menuselect;
 extern bool colorblind;
-extern bool right_click_protect;
+extern "C" bool right_click_protect;
 extern bool settings_auto_hotbar_new_items;
 extern bool settings_auto_hotbar_categories[NUM_HOTBAR_CATEGORIES];
 extern int settings_autosort_inventory_categories[NUM_AUTOSORT_CATEGORIES];

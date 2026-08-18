@@ -241,13 +241,6 @@ Frame* cursorFrame = nullptr;
 bool arachnophobia_filter = false;
 bool colorblind_lobby = false; // if true, colorblind settings enforced by lobby for shared assets (player colors)
 
-Frame::result_t framesProcResult{
-    false,
-    0,
-    nullptr,
-    false
-};
-
 #ifdef NDEBUG
 Uint32 messagesEnabled = 0xffffffff & ~MESSAGE_DEBUG; // all but debug enabled
 #else
@@ -1023,7 +1016,6 @@ static ConsoleCommand ccmd_demo_play("/demo_play", "play a recorded demo(default
 
 -------------------------------------------------------------------------------*/
 
-CvarBool framesEatMouse("/gui_eat_mouseclicks", true);
 static CvarBool cvar_lava_use_vismap("/lava_use_vismap", true);
 static CvarBool cvar_lava_bubbles_enabled("/lava_bubbles_enabled", true);
 

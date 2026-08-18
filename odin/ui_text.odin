@@ -1,7 +1,7 @@
-// ui_text.odin — Odin mirror of ui/Text.hpp.
+// ui_text.odin - Odin mirror of ui/Text.hpp.
 package main
 
-// class Text — 80 bytes
+// class Text - 80 bytes
 Text :: struct {
 	name:              string, // DynamicString (16B)
 	texid:             u32,    // GLuint

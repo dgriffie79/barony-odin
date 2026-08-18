@@ -1,4 +1,4 @@
-// ui_button.odin — Odin mirror of ui/Button.hpp.
+// ui_button.odin - Odin mirror of ui/Button.hpp.
 package main
 
 // enum Button::style_t
@@ -21,7 +21,7 @@ Button_Justify :: enum i32 {
 	JUSTIFY_TYPE_LENGTH,
 }
 
-// struct Button::result_t — 16 bytes
+// struct Button::result_t - 16 bytes
 Button_Result_T :: struct {
 	highlighted:   bool,
 	pressed:       bool,
@@ -31,7 +31,7 @@ Button_Result_T :: struct {
 }
 #assert(size_of(Button_Result_T) == 16)
 
-// class Button : public Widget — 464 bytes
+// class Button : public Widget - 464 bytes
 Button :: struct {
 	using _: Widget, // 248B base
 

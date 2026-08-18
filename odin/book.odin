@@ -1,8 +1,8 @@
-// book.odin — Odin mirrors of book.hpp.
+// book.odin - Odin mirrors of book.hpp.
 package main
 
 
-// struct Book_t — 72 bytes
+// struct Book_t - 72 bytes
 Book_t :: struct {
 	text:           string,
 	default_name:   string,
@@ -10,7 +10,7 @@ Book_t :: struct {
 }
 #assert(size_of(Book_t) == 72)
 
-// struct BookParser_t — 40 bytes
+// struct BookParser_t - 40 bytes
 // { const int versionJSON; DynamicMapStr tempBookData; }
 BookParser_t :: struct {
 	version_json:  i32, // const int

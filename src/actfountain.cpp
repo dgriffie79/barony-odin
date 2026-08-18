@@ -25,52 +25,6 @@
 #include "prng.hpp"
 #include "mod_tools.hpp"
 
-//Fountain functions.
-const DynamicArrayU32 fountainPotionDropChances =
-{
-	5,	//POTION_WATER,
-	20,	//POTION_BOOZE,
-	10,	//POTION_JUICE,
-	10,	//POTION_SICKNESS,
-	5,	//POTION_CONFUSION,
-	2,	//POTION_EXTRAHEALING,
-	5,	//POTION_HEALING,
-	5,	//POTION_CUREAILMENT,
-	10,	//POTION_BLINDNESS,
-	5,	//POTION_RESTOREMAGIC,
-	2,	//POTION_INVISIBILITY,
-	2,	//POTION_LEVITATION,
-	5,	//POTION_SPEED,
-	10,	//POTION_ACID,
-	2,	//POTION_PARALYSIS,
-	2	//POTION_POLYMORPH
-};
-
-const DynamicArrayT<std::pair<int, int>> potionStandardAppearanceMap =
-{
-	// second element is appearance.
-	{ POTION_WATER, 0 },
-	{ POTION_BOOZE, 2 },
-	{ POTION_JUICE, 3 },
-	{ POTION_SICKNESS, 1 },
-	{ POTION_CONFUSION, 0 },
-	{ POTION_EXTRAHEALING, 0 },
-	{ POTION_HEALING, 0 },
-	{ POTION_CUREAILMENT, 0 },
-	{ POTION_BLINDNESS, 0 },
-	{ POTION_RESTOREMAGIC, 1 },
-	{ POTION_INVISIBILITY, 0 },
-	{ POTION_LEVITATION, 0 },
-	{ POTION_SPEED, 0 },
-	{ POTION_ACID, 0 },
-	{ POTION_PARALYSIS, 1 },
-	{ POTION_POLYMORPH, 0 },
-	{ POTION_FIRESTORM, 0 },
-	{ POTION_ICESTORM, 0 },
-	{ POTION_THUNDERSTORM, 0 },
-	{ POTION_STRENGTH, 0 }
-};
-
 std::pair<int, int> fountainGeneratePotionDrop(BaronyRNG& rng)
 {
 	auto keyPair = potionStandardAppearanceMap.at(

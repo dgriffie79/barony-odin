@@ -81,8 +81,6 @@ static CvarVector4 logBgColor("/log_background_color", Vector4{22.f, 24.f, 29.f,
 static CvarBool cvar_hotbar_compact_disable("/hotbar_compact_disable", false); // dont use compact at all
 static CvarBool cvar_hotbar_compact_use_fullsize("/hotbar_compact_fullsize", true); // dont use extra compact view, just normal compact
 
-Frame* gameUIFrame[MAXPLAYERS] = { nullptr };
-bool newui = true;
 int selectedCursorOpacity = 255;
 int oldSelectedCursorOpacity = 255;
 int hotbarSlotOpacity = 255;
@@ -270,21 +268,11 @@ struct DamageIndicatorSettings_t
 DamageIndicatorSettings_t damageIndicatorSettings;
 
 std::vector<int> LevelUpAnimBreakpoints;
-LevelUpAnimation_t levelUpAnimation[MAXPLAYERS];
 
 DynamicMapI32T<Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::Setting_t> Player::WorldUI_t::WorldTooltipDialogue_t::WorldDialogueSettings_t::settings;
 real_t Player::WorldUI_t::WorldTooltipItem_t::WorldItemSettings_t::scaleMod = 0.0;
 real_t Player::WorldUI_t::WorldTooltipItem_t::WorldItemSettings_t::opacity = 0.0;
 
-bool bUsePreciseFieldTextReflow = true;
-bool bUseSelectedSlotCycleAnimation = false; // probably not gonna use, but can enable
-CustomColors_t hudColors;
-EnemyBarSettings_t enemyBarSettings;
-#ifdef BARONY_SUPER_MULTIPLAYER
-StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS] = { {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} };
-#else
-StatusEffectQueue_t StatusEffectQueue[MAXPLAYERS] = { {0}, {1}, {2}, {3} };
-#endif
 DynamicMapI32T<StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allEffects;
 DynamicMapI32T<StatusEffectQueue_t::EffectDefinitionEntry_t> StatusEffectQueue_t::StatusEffectDefinitions_t::allSustainedSpells;
 Uint32 StatusEffectQueue_t::StatusEffectDefinitions_t::tooltipDescColor = 0xFFFFFFFF;
@@ -294,16 +282,7 @@ DynamicString StatusEffectQueue_t::StatusEffectDefinitions_t::notificationFont =
 
 std::string formatSkillSheetEffects(int playernum, int proficiency, const std::string& tag, const std::string& rawValue);
 
-int GAMEUI_FRAMEDATA_ANIMATING_ITEM = 1;
-int GAMEUI_FRAMEDATA_ALCHEMY_ITEM = 2;
-int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_SLOT = 3;
-int GAMEUI_FRAMEDATA_ALCHEMY_RECIPE_ENTRY = 4;
-int GAMEUI_FRAMEDATA_WORLDTOOLTIP_ITEM = 5;
-int GAMEUI_FRAMEDATA_SHOP_ITEM = 6;
-int GAMEUI_FRAMEDATA_ALCHEMY_MISSING_QTY = 7;
-int GAMEUI_FRAMEDATA_SPELL_LEARNABLE = 8;
 
-MinotaurWarning_t minotaurWarning[MAXPLAYERS];
 
 void updateLevelUpFrame(const int player);
 void updateSkillUpFrame(const int player);
@@ -12669,9 +12648,7 @@ void Player::MessageZone_t::processChatbox()
 extern "C" void MessageZone_t_processChatbox(Player::MessageZone_t* self) { return self->processChatbox(); }
 
 
-CvarBool shareMinimap("/shareminimap", true);
 CvarBool cvar_minimap_prompt_vertical("/minimap_prompt_vertical", false);
-Frame* minimapFrame = nullptr; // shared minimap
 SDL_Rect Player::Minimap_t::sharedMinimapPos{ 0, 0, 0, 0 };
 int Player::Minimap_t::fullSize = 200;
 int Player::Minimap_t::compactSize = 200;
@@ -23855,7 +23832,6 @@ void createInventoryTooltipFrame(const int player,
 	}
 }
 
-view_t playerPortraitView[MAXPLAYERS];
 view_t monsterPortraitView;
 view_t itemPortraitView;
 static CvarBool cvar_compendium_portrait_static_angle("/compendium_portrait_static_angle", true);
@@ -27212,7 +27188,6 @@ bool takeAllChestGUIAction(const int player)
 
 const int chestBaseImgBorderWidth = 16;
 const int chestBaseImgBorderTopHeight = 20;
-PlayerInventoryFrames_t playerInventoryFrames[MAXPLAYERS];
 
 void createChestGUI(const int player)
 {
@@ -34836,7 +34811,6 @@ real_t Player::SkillSheet_t::windowCompactHeightScaleY = 0.0;
 real_t Player::SkillSheet_t::windowHeightScaleX = 0.0;
 real_t Player::SkillSheet_t::windowHeightScaleY = 0.0;
 bool Player::SkillSheet_t::generateFollowerTableForSkillsheet = false;
-SkillSheetFrames_t skillSheetEntryFrames[MAXPLAYERS];
 
 void Player::SkillSheet_t::createSkillSheet()
 {
@@ -43046,7 +43020,6 @@ void updateLevelUpFrame(const int player)
 	}
 }
 
-SkillUpAnimation_t skillUpAnimation[MAXPLAYERS];
 
 void createSkillUpFrame(const int player)
 {

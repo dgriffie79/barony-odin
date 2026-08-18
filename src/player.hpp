@@ -23,8 +23,8 @@
 //Splitscreen support stuff.
 
 //TODO: Move these into each and every individual player.
-extern Entity* selectedEntity[MAXPLAYERS];
-extern Entity* lastSelectedEntity[MAXPLAYERS];
+extern "C" Entity* selectedEntity[MAXPLAYERS];
+extern "C" Entity* lastSelectedEntity[MAXPLAYERS];
 
 /*
  * TODO: Will need to make messages work for each hotseat player.
@@ -34,21 +34,21 @@ extern Entity* lastSelectedEntity[MAXPLAYERS];
  * I believe one of the splitscreen layouts included a version where all of the messages were communal and were in the center of the screen or summat.
  */
 
-extern int gamepad_deadzone;
-extern int gamepad_trigger_deadzone;
-extern real_t gamepad_leftx_sensitivity;
-extern real_t gamepad_lefty_sensitivity;
-extern real_t gamepad_rightx_sensitivity;
-extern real_t gamepad_righty_sensitivity;
-extern real_t gamepad_menux_sensitivity;
-extern real_t gamepad_menuy_sensitivity;
+extern "C" int gamepad_deadzone;
+extern "C" int gamepad_trigger_deadzone;
+extern "C" real_t gamepad_leftx_sensitivity;
+extern "C" real_t gamepad_lefty_sensitivity;
+extern "C" real_t gamepad_rightx_sensitivity;
+extern "C" real_t gamepad_righty_sensitivity;
+extern "C" real_t gamepad_menux_sensitivity;
+extern "C" real_t gamepad_menuy_sensitivity;
 
-extern bool gamepad_leftx_invert;
-extern bool gamepad_lefty_invert;
-extern bool gamepad_rightx_invert;
-extern bool gamepad_righty_invert;
-extern bool gamepad_menux_invert;
-extern bool gamepad_menuy_invert;
+extern "C" bool gamepad_leftx_invert;
+extern "C" bool gamepad_lefty_invert;
+extern "C" bool gamepad_rightx_invert;
+extern "C" bool gamepad_righty_invert;
+extern "C" bool gamepad_menux_invert;
+extern "C" bool gamepad_menuy_invert;
 
 struct PlayerSettings_t
 {
@@ -75,7 +75,7 @@ struct PlayerSettings_t
 	Sint32 rightStickDeadzone = 8000;
 	void init(const int _player);
 };
-extern PlayerSettings_t playerSettings[MAXPLAYERS];
+extern "C" PlayerSettings_t playerSettings[MAXPLAYERS];
 
 //Game Controller 1 handler
 //TODO: Joystick support?
@@ -321,7 +321,7 @@ public:
 	float y_forceMaxStrafeThreshold = 0.7;
 };
 const int MAX_GAME_CONTROLLERS = 16;
-extern GameController game_controllers[MAX_GAME_CONTROLLERS];
+extern "C" GameController game_controllers[MAX_GAME_CONTROLLERS];
 
 class Inputs
 {
@@ -464,7 +464,7 @@ public:
 	static const Uint32 HAPTIC_SFX_BOULDER_LAUNCH_VOL;
 	void addRumbleRemotePlayer(const int player, Uint32 hapticType, Uint32 uid);
 };
-extern Inputs inputs;
+extern "C" Inputs inputs;
 extern "C" void initGameControllers();
 
 static const unsigned NUM_HOTBAR_SLOTS = 10; //NOTE: If you change this, you must dive into drawstatus.c and update the hotbar code. It expects 10.
@@ -2165,7 +2165,7 @@ template <> struct MapValueKindOf<Player::WorldUI_t::WorldTooltipDialogue_t::Wor
 template <> struct MapValueKindOf<Player::WorldUI_t::WorldTooltipDialogue_t::Dialogue_t> { static constexpr int value = MK_Dialogue; };
 
 
-extern Player* players[MAXPLAYERS];
+extern "C" Player* players[MAXPLAYERS];
 //In the process of switching from the old entity player array, all of the old uses of player need to be hunted down and then corrected to account for the new array.
 //So, search for the comment:
 //TODO: PLAYERSWAP

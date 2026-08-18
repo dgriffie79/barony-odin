@@ -17,14 +17,14 @@
 
 #define NUMCHITCHAT 20
 
-extern list_t* shopInv[MAXPLAYERS];
-extern Uint32 shopkeeper[MAXPLAYERS];
-extern Uint32 shoptimer[MAXPLAYERS];
-extern DynamicString shopspeech[MAXPLAYERS];
-extern int shopkeepertype[MAXPLAYERS];
-extern DynamicString shopkeepername[MAXPLAYERS];
-extern char shopkeepername_client[MAXPLAYERS][64];
-extern DynamicMapI32T<int> hamletShopkeeperSkillLimit[MAXPLAYERS];
+extern "C" list_t* shopInv[MAXPLAYERS];
+extern "C" Uint32 shopkeeper[MAXPLAYERS];
+extern "C" Uint32 shoptimer[MAXPLAYERS];
+extern "C" DynamicString shopspeech[MAXPLAYERS];
+extern "C" int shopkeepertype[MAXPLAYERS];
+extern "C" DynamicString shopkeepername[MAXPLAYERS];
+extern "C" char shopkeepername_client[MAXPLAYERS][64];
+extern "C" DynamicMapI32T<int> hamletShopkeeperSkillLimit[MAXPLAYERS];
 static const int hamletTradingSkillLimit = 7;
 
 extern "C" void startTradingServer(Entity* entity, int player);
@@ -33,7 +33,7 @@ extern "C" bool hideItemFromShopView(Item& item);
 extern "C" bool buyItemFromShop(const int player, Item* item, bool& bOutConsumedEntireStack);
 extern "C" bool sellItemToShop(const int player, Item* item);
 extern "C" bool shopIsMysteriousShopkeeper(Entity* entity);
-extern DynamicMapI32T<DynamicSetI32> shopkeeperMysteriousItems;
+extern "C" DynamicMapI32T<DynamicSetI32> shopkeeperMysteriousItems;
 extern "C" void buyItemFromMysteriousShopkeepConsumeOrb(const int player, Entity& entity, Item& boughtItem);
 extern "C" void closeShop(const int player);
 extern "C" void shopChangeGoldEvent(const int player, Sint32 amount);

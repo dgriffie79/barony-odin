@@ -107,8 +107,14 @@ int players[4];         // ->  extern "C" int players[4];
 ```
 ```odin
 @(export)
-players : [4]Player
+players : [MAXPLAYERS]Player
 ```
+
+**Use the named constant, never a magic number.** Odin mirrors reference
+`MAXPLAYERS` (defined in odin/main.odin) for per-player arrays —
+`[MAXPLAYERS]Player`, `[MAXPLAYERS]^Entity`, etc. Do NOT write `[4]`.
+Exception: `[4]byte` (the map-key type) and non-player arrays like a quad's
+`vertex[4]` are NOT player counts — leave those as-is.
 
 Odin reads a still-C++-owned global via `foreign _barony { x : i32 }`;
 C++ reads an Odin-owned global via `extern "C" int x;`. (Both directions

@@ -29,8 +29,6 @@
 //#include "player.hpp"
 
 DynamicMapI32Str modelFileNames;
-Entity* selectedEntity[MAXPLAYERS] = { nullptr };
-Entity* lastSelectedEntity[MAXPLAYERS] = { nullptr };
 Sint32 mousex = 0, mousey = 0;
 Sint32 omousex = 0, omousey = 0;
 Sint32 mousexrel = 0, mouseyrel = 0;
@@ -58,10 +56,8 @@ void steamStatisticUpdate(int statisticNum, ESteamStatTypes type, int value) {} 
 //AchievementObserver achievementObserver; // dummy function for mod_tools.cpp
 void initClass(int i) {} // dummy function for mod_tools.cpp
 //void AchievementObserver::updateGlobalStat(int index, int value) {}
-DynamicArraySurfacePtrStringPair systemResourceImages; // dummy variable for files.cpp system resource reloading in Barony.
 void initMenuOptions() {} // dummy
 int textInsertCaratPosition = -1;
-GenericGUIMenu GenericGUI[MAXPLAYERS];
 
 void actGib(Entity* my) {} // dummy for draw.cpp
 void actHudArm(Entity* my) {} // dummy for draw.cpp

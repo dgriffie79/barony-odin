@@ -1,7 +1,7 @@
-// ui_font.odin — Odin mirror of ui/Font.hpp.
+// ui_font.odin - Odin mirror of ui/Font.hpp.
 package main
 
-// class Font — 32 bytes
+// class Font - 32 bytes
 Font :: struct {
 	name:        string, // DynamicString (16B)
 	font:        rawptr, // TTF_Font*

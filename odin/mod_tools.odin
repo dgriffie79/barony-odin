@@ -1,4 +1,4 @@
-// mod_tools.odin — Odin mirror of mod_tools.hpp (data-carrying top-level structs).
+// mod_tools.odin - Odin mirror of mod_tools.hpp (data-carrying top-level structs).
 //
 // Scope note: mod_tools.hpp is the "port-with-file" giant. Most of its
 // deeply-nested structs (Statue_t, EntityColliderData_t, ItemTooltip_t,
@@ -10,7 +10,7 @@
 // top-level instance-data structs that cross the C++/Odin boundary now.
 package main
 
-// struct LibCURL_t — 16 bytes
+// struct LibCURL_t - 16 bytes
 LibCURL_T :: struct {
 	b_init:  bool,
 	// pad 7
@@ -18,7 +18,7 @@ LibCURL_T :: struct {
 }
 #assert(size_of(LibCURL_T) == 16)
 
-// struct EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t — 48 bytes
+// struct EquipmentModelOffsets_t::ModelOffset_t::AdditionalOffset_t - 48 bytes
 ModelOffset_AdditionalOffset_T :: struct {
 	focalx: f64,
 	focaly: f64,
@@ -29,7 +29,7 @@ ModelOffset_AdditionalOffset_T :: struct {
 }
 #assert(size_of(ModelOffset_AdditionalOffset_T) == 48)
 
-// struct EquipmentModelOffsets_t::ModelOffset_t — 160 bytes
+// struct EquipmentModelOffsets_t::ModelOffset_t - 160 bytes
 ModelOffset_T :: struct {
 	focalx:         f64,
 	focaly:         f64,
@@ -51,14 +51,14 @@ ModelOffset_T :: struct {
 }
 #assert(size_of(ModelOffset_T) == 160)
 
-// struct EquipmentModelOffsets_t — 64 bytes (2 maps)
+// struct EquipmentModelOffsets_t - 64 bytes (2 maps)
 EquipmentModelOffsets_T :: struct {
 	monster_models_map:     map[[4]byte]map[[4]byte]ModelOffset_T, // DynamicMapI32T<DynamicMapI32T<ModelOffset_t>>
 	misc_items_base_offsets: map[[4]byte]ModelOffset_T,            // DynamicMapI32T<ModelOffset_t>
 }
 #assert(size_of(EquipmentModelOffsets_T) == 64)
 
-// struct TreasureRoomGenerator — 688 bytes
+// struct TreasureRoomGenerator - 688 bytes
 TreasureRoomGenerator :: struct {
 	treasure_rng:          Barony_RNG, // 528B
 	treasure_floors:       map[i32]struct{}, // DynamicSetI32 (32B)

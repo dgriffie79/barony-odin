@@ -1,4 +1,4 @@
-// editor.odin — Odin bindings to the C++ editor code.
+// editor.odin - Odin bindings to the C++ editor code.
 //
 // Mirrors editor.cpp: that file's `main()` was renamed to barony_main and
 // given C linkage. The C++ editor code is compiled into a static library

@@ -1,11 +1,11 @@
-// hash.odin — Odin mirrors of hash.hpp.
+// hash.odin - Odin mirrors of hash.hpp.
 package main
 
 import "core:c"
 
 HASH_SIZE :: 256
 
-// typedef struct ttfTextHash_t — 32 bytes
+// typedef struct ttfTextHash_t - 32 bytes
 ttfTextHash_t :: struct {
 	str:     cstring, // char*
 	surf:    rawptr,  // SDL_Surface*

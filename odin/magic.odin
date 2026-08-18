@@ -1,15 +1,15 @@
-// magic.odin — Odin mirrors of magic/magic.hpp.
+// magic.odin - Odin mirrors of magic/magic.hpp.
 package main
 
 
-// struct ParticleEmitterHit_t — 8 bytes
+// struct ParticleEmitterHit_t - 8 bytes
 ParticleEmitterHit_t :: struct {
 	tick: u32,
 	hits: i32,
 }
 #assert(size_of(ParticleEmitterHit_t) == 8)
 
-// struct Effect_t (ParticleTimerEffect_t::Effect_t) — 40 bytes
+// struct Effect_t (ParticleTimerEffect_t::Effect_t) - 40 bytes
 Effect_t :: struct {
 	x:           f64, // real_t
 	y:           f64,
@@ -20,7 +20,7 @@ Effect_t :: struct {
 }
 #assert(size_of(Effect_t) == 40)
 
-// struct EffectLocations_t (ParticleTimerEffect_t::EffectLocations_t) — 40 bytes
+// struct EffectLocations_t (ParticleTimerEffect_t::EffectLocations_t) - 40 bytes
 EffectLocations_t :: struct {
 	yaw_offset: f64,
 	x_offset:   f64,
@@ -30,14 +30,14 @@ EffectLocations_t :: struct {
 }
 #assert(size_of(EffectLocations_t) == 40)
 
-// class ParticleTimerEffect_t — 32 bytes
+// class ParticleTimerEffect_t - 32 bytes
 // { DynamicMapI32T<Effect_t> effectMap; }
 ParticleTimerEffect_t :: struct {
 	effect_map: map[[4]byte]Effect_t, // DynamicMapI32T<Effect_t> (i32-keyed)
 }
 #assert(size_of(ParticleTimerEffect_t) == 32)
 
-// struct spellElement_t — 168 bytes
+// struct spellElement_t - 168 bytes
 spellElement_t :: struct {
 	damage:                 i32,
 	damage2:                i32,
@@ -59,7 +59,7 @@ spellElement_t :: struct {
 }
 #assert(size_of(spellElement_t) == 168)
 
-// struct spell_t — 224 bytes
+// struct spell_t - 224 bytes
 spell_t :: struct {
 	id:                 i32,
 	spell_internal_name: [64]u8,
@@ -91,7 +91,7 @@ spell_t :: struct {
 }
 #assert(size_of(spell_t) == 224)
 
-// struct CastSpellProps_t — 56 bytes
+// struct CastSpellProps_t - 56 bytes
 CastSpellProps_t :: struct {
 	caster_x:        f64,
 	caster_y:        f64,
@@ -106,7 +106,7 @@ CastSpellProps_t :: struct {
 }
 #assert(size_of(CastSpellProps_t) == 56)
 
-// struct PrevData_t — 32 bytes
+// struct PrevData_t - 32 bytes
 PrevData_t :: struct {
 	r:       u8,
 	g:       u8,
@@ -141,7 +141,7 @@ SurfaceCacheTypes :: enum i32 {
 	CACHE_RADIUS_MAGIC_GENERIC,
 }
 
-// struct AOEIndicators_t::Indicator_t — 136 bytes
+// struct AOEIndicators_t::Indicator_t - 136 bytes
 Indicator_t :: struct {
 	texture:        ^Temp_Texture, // TempTexture* (owned)
 	surface_old:    rawptr,        // SDL_Surface*
@@ -169,7 +169,7 @@ Indicator_t :: struct {
 }
 #assert(size_of(Indicator_t) == 136)
 
-// struct spellcastingAnimationManager — 136 bytes
+// struct spellcastingAnimationManager - 136 bytes
 Spellcasting_Animation_Manager_T :: struct {
 	spell:             ^spell_t,
 	caster:            u32,

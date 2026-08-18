@@ -498,7 +498,7 @@ when !#config(EDITOR, false) {
     mountBaseDataFolders :: proc "c" () -> bool ---
     remountBaseDataFolders :: proc "c" () -> bool ---
     FindConsoleCommand :: proc "c" (str: ^u8, index: i32) -> ^u8 ---
-    register_console_entry :: proc "c" (e: ^rawptr) ---
+    register_console_entry :: proc "c" (e: rawptr) ---
     cvar_setter :: proc "c" (argc: i32, argv: ^^u8) ---
     select_inventory_slot :: proc "c" (player: i32, currentx: i32, currenty: i32, diffx: i32, diffy: i32) ---
     select_spell_slot :: proc "c" (player: i32, currentx: i32, currenty: i32, diffx: i32, diffy: i32) ---
@@ -1859,7 +1859,7 @@ when #config(EDITOR, false) {
     mountBaseDataFolders :: proc "c" () -> bool ---
     remountBaseDataFolders :: proc "c" () -> bool ---
     FindConsoleCommand :: proc "c" (str: ^u8, index: i32) -> ^u8 ---
-    register_console_entry :: proc "c" (e: ^rawptr) ---
+    register_console_entry :: proc "c" (e: rawptr) ---
     cvar_setter :: proc "c" (argc: i32, argv: ^^u8) ---
     select_inventory_slot :: proc "c" (player: i32, currentx: i32, currenty: i32, diffx: i32, diffy: i32) ---
     select_spell_slot :: proc "c" (player: i32, currentx: i32, currenty: i32, diffx: i32, diffy: i32) ---
