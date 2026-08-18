@@ -345,9 +345,8 @@ bUsePreciseFieldTextReflow : bool = true
 bUseSelectedSlotCycleAnimation : bool = false
 
 // NOTE: CvarBool globals (shareMinimap, framesEatMouse) require C++ constructor
-// side-effects (register_console_entry). Init in init_cvars_bool() (called from
-// run_barony before barony_main in BOTH game and editor builds - GameUI.cpp
-// is in the shared source list).
+// side-effects (register_console_entry). Their init (init_cvars_bool) lives in
+// interface_consolecommand.odin next to the Cvar type mirrors.
 @(export)
 shareMinimap : CvarBool
 
@@ -356,27 +355,6 @@ framesProcResult : Frame_Result_T  // zero-init matches C++ {false, 0, nullptr, 
 
 @(export)
 framesEatMouse : CvarBool
-
-// CvarBool ctor port (consolecommand.hpp:84): name, type, func=cvar_setter,
-// data_ptr=&data, data, then register_console_entry. Game-only: the editor
-// lib builds only editor_sources (no GameUI.cpp / consolecommand.cpp).
-when !#config(EDITOR, false) {
-init_cvars_bool :: proc() {
-	shareMinimap.name = "/shareminimap"
-	shareMinimap.type = .CvarBool
-	shareMinimap.func = rawptr(cvar_setter)
-	shareMinimap.data_ptr = &shareMinimap.data
-	shareMinimap.data = true
-	register_console_entry(rawptr(&shareMinimap))
-
-	framesEatMouse.name = "/gui_eat_mouseclicks"
-	framesEatMouse.type = .CvarBool
-	framesEatMouse.func = rawptr(cvar_setter)
-	framesEatMouse.data_ptr = &framesEatMouse.data
-	framesEatMouse.data = true
-	register_console_entry(rawptr(&framesEatMouse))
-}
-} // when !#config(EDITOR, false)
 
 // StatusEffectQueue - each entry's player field set to its index (matches C++ init)
 @(export)
