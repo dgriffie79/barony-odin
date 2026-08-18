@@ -1428,6 +1428,13 @@ gamepad_menuy_invert : bool
 // matches game_controllers[i].getID() == getControllerID(player), so with
 // both at 0 the game thinks a controller is present (shows the "A button"
 // prompt and uses controller bindings -> keyboard/space stops working).
+//
+// Other non-zero C++ defaults deliberately NOT ported:
+//  - VirtualMouse::lastMovementFromController = true: only set inside
+//    bindControllerToPlayer (real controller bind); zero/false is more
+//    correct for keyboard-only (shows keyboard glyphs).
+//  - UIStatus::selectedItemFromHotbar = -1: every runtime reader sets it
+//    to -1 before checking (playerinventory.cpp 3300/3312/3339).
 
 init_inputs :: proc() {
 	// Inputs ctor (player.hpp:390)
